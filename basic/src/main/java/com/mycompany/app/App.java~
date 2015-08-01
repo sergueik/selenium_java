@@ -1,0 +1,93 @@
+package com.mycompany.app;
+
+import static org.junit.Assert.assertTrue;
+import java.awt.Toolkit;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.openqa.selenium.By;
+
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.support.ui.Select;
+
+
+public class text {
+private WebDriver driver;
+String SiteURL = "http://www.smh.com.au/";
+private final StringBuffer verificationErrors = new StringBuffer();
+@Before
+public void setUp() throws Exception {
+	driver = new FirefoxDriver();
+//go to site URL
+	driver.get(SiteURL);
+	driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+
+}
+
+private WebElement find_element(string id){ 
+int wait_interval = 5;
+long wait_polling_interval = 500;
+WebDriverWait wait = new WebDriverWait(driver, wait_interval );// 1 minute
+wait.pollingEvery(wait_polling_interva,TimeUnit.MILLISECONDS);
+try {
+wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(id)));
+//By.linkText("View report")));
+} catch (timeoutException ) {
+// ignore
+return null;
+}
+WebElement myDynamicElement = driver.findElement(By.id(id));
+
+}
+
+@Test
+public void testVerifyText() throws Exception {
+//-THIS SECTION SHOULD PASS AS TEXT IS CORRECT
+	try {
+		assertEquals("Copyright © 2013 Fairfax Media", driver.findElement(By.cssSelector("div.nN-footerLinks > cite")).getText());
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+	try {
+		assertTrue(driver.findElement(By.cssSelector("BODY")).getText().matches("Fairfax Media"));
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+	try {
+		assertEquals("World", driver.findElement(By.linkText("World")).getText());
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+//-THIS SECTION SHOULD FAIL AS TEXT IS NOT CORRECT
+	try {
+		assertEquals("Copyright © 2013 FairfaXXX Media", driver.findElement(By.cssSelector("div.nN-footerLinks > cite")).getText());
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+	try {
+		assertTrue(driver.findElement(By.cssSelector("BODY")).getText().matches("FAIRLY OK Media"));
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+	try {
+		assertEquals("World IS A WEIRD PLACE", driver.findElement(By.linkText("World")).getText());
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+}
+
+
+@After
+public void tearDown() throws Exception
+{
+	driver.quit();
+}
+
+}
