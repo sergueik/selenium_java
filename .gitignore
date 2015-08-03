@@ -1,11 +1,7 @@
-/bin
-/target/generated-sources
-/.settings
-/work
-/target/classes
-/target/test-classes
-/target/work
-/target
+**/bin/**
+**/.settings
+**/work/**
+**/target/**
 /pom.xml.releaseBackup
 /release.properties
 /settings.xml
