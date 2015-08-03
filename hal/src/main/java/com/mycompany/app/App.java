@@ -173,9 +173,10 @@ private WebElement find_element(String selector_type, String selector_value){
 	supported_selectors.put("id", true);
 	supported_selectors.put("css_selector", true);
 	supported_selectors.put("xpath", true);
-	supported_selectors.put("partial_link_text", false);
+	supported_selectors.put("partial_link_text", true);
 	supported_selectors.put("link_text", true);
-	supported_selectors.put("classname", false);
+	supported_selectors.put("classname", true);
+	supported_selectors.put("tag_name", true);
 
 	if (selector_type == null || !supported_selectors.containsKey(selector_type) || !supported_selectors.get(selector_type)) {
 		return null;
@@ -190,14 +191,24 @@ private WebElement find_element(String selector_type, String selector_value){
 		element = driver.findElement(By.id(selector_value));
 	}
 
-	if (selector_type == "id") {
+	if (selector_type == "classname") {
 
 		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(selector_value)));
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(selector_value)));
 		} catch (RuntimeException timeoutException) {
 			return null;
 		}
-		element = driver.findElement(By.id(selector_value));
+		element = driver.findElement(By.className(selector_value));
+	}
+
+	if (selector_type == "tag_name") {
+
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.tagName(selector_value)));
+		} catch (RuntimeException timeoutException) {
+			return null;
+		}
+		element = driver.findElement(By.tagName(selector_value));
 	}
 
 
@@ -209,6 +220,16 @@ private WebElement find_element(String selector_type, String selector_value){
 			return null;
 		}
 		element = driver.findElement(By.linkText(selector_value));
+	}
+
+	if (selector_type == "partial_link_text") {
+
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.partialLinkText(selector_value)));
+		} catch (RuntimeException timeoutException) { 
+			return null;
+		}
+		element = driver.findElement(By.partialLinkText(selector_value));
 	}
 
 
