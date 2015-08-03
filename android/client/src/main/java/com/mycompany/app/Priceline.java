@@ -50,54 +50,34 @@ import java.nio.charset.Charset;
 public class Priceline
 {  public static void main(String[] args) {
 
-           WebDriver driver = new AndroidDriver();
-           // driver.manage().timeouts().pageLoadTimeout(900, TimeUnit.SECONDS);
-           try{
+	   WebDriver driver = new AndroidDriver();
+	   // driver.manage().timeouts().pageLoadTimeout(900, TimeUnit.SECONDS);
+	   try{
 		   driver.get("http://www.priceline.com/");
 /*
            String csspath_selector_1 = "a#btn_hotel";
-		   WebElement element_1 = driver.findElement(By.cssSelector(csspath_selector_1));
-		   System.out.println( element_1.getText());
-		   new Actions(driver).moveToElement(element_1).click().build().perform();
+                   WebElement element_1 = driver.findElement(By.cssSelector(csspath_selector_1));
+                   System.out.println( element_1.getText());
+                   new Actions(driver).moveToElement(element_1).click().build().perform();
                    element_1.click();
            Thread.sleep(5000);
-*/
-           }	
+ */
+	   }
 
-           catch(Exception ex) {
+	   catch(Exception ex) {
 
 		   System.out.println(ex.toString());
 
 	   }
 
-           try{
-           String xpath_2 = "//*[@id='btn_hotel']";
+	   try{
+		   String xpath_2 = "//*[@id='btn_hotel']";
 		   WebElement element_2 = driver.findElement(By.xpath(xpath_2));
 		   System.out.println( element_2.getText());
-		  // new Actions(driver).moveToElement(element_2).click().build().perform();
-                   element_2.click();
-           new Actions(driver).sendKeys(element_2,org.openqa.selenium.Keys.ENTER);
-           Thread.sleep(5000);
-
-           }	
-
-           catch(Exception ex) {
-
-		   System.out.println(ex.toString());
-
-	   }
-
-
-		  // driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		  // WebDriverWait wait = new WebDriverWait(driver, 30);
-
-/*
-	   try{
-		   // wait.until(ExpectedConditions.elementToBeClickable(By.className("ccl-logo")));
-		//   wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
-		   String value1 = "ddlDestinations";
-		   String css_selector1 = String.format("select#%s", value1);
-		   driver.findElement(By.cssSelector(css_selector1)).click();
+		   // new Actions(driver).moveToElement(element_2).click().build().perform();
+		   element_2.click();
+		   new Actions(driver).sendKeys(element_2,org.openqa.selenium.Keys.ENTER);
+		   Thread.sleep(5000);
 
 	   }
 
@@ -106,7 +86,27 @@ public class Priceline
 		   System.out.println(ex.toString());
 
 	   }
-*/
+
+
+	   // driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	   // WebDriverWait wait = new WebDriverWait(driver, 30);
+
+/*
+           try{
+                   // wait.until(ExpectedConditions.elementToBeClickable(By.className("ccl-logo")));
+                //   wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
+                   String value1 = "ddlDestinations";
+                   String css_selector1 = String.format("select#%s", value1);
+                   driver.findElement(By.cssSelector(css_selector1)).click();
+
+           }
+
+           catch(Exception ex) {
+
+                   System.out.println(ex.toString());
+
+           }
+ */
 	   try{
 		   //take a screenshot
 		   File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);

@@ -52,50 +52,50 @@ import java.nio.charset.Charset;
 public class Carnival
 {  public static void main(String[] args) {
 
-           WebDriver driver = new AndroidDriver();
-//    
+	   WebDriver driver = new AndroidDriver();
+//
 //		   driver.manage().timeouts().pageLoadTimeout(900, TimeUnit.SECONDS);
-           try{
+	   try{
 		   driver.get("http://www.carnival.com/");
-           WebDriverWait wait = new WebDriverWait(driver, 30);
-           String value1 = null;
-/*          
+		   WebDriverWait wait = new WebDriverWait(driver, 30);
+		   String value1 = null;
+/*
            wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
            value1 = "ddlDestinations";
 
            String xpath_selector1 = String.format("//select[@id='%s']", value1);
-		   wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath_selector1)));
-		   WebElement element = driver.findElement(By.xpath(xpath_selector1));
-           
-		   System.out.println( element.getAttribute("id"));
-		   Actions builder = new Actions(driver);
-		   builder.moveToElement(element).build().perform();
-*/
-           String csspath_selector2 = "div.find-cruise-submit > a" ;         
+                   wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath_selector1)));
+                   WebElement element = driver.findElement(By.xpath(xpath_selector1));
+
+                   System.out.println( element.getAttribute("id"));
+                   Actions builder = new Actions(driver);
+                   builder.moveToElement(element).build().perform();
+ */
+		   String csspath_selector2 = "div.find-cruise-submit > a";
 		   WebElement element2 = driver.findElement(By.cssSelector(csspath_selector2));
 		   System.out.println( element2.getText());
 		   // new Actions(driver).moveToElement(element2).click().build().perform();
-                   element2.click();
+		   element2.click();
 // org.openqa.selenium.WebDriverException: Underlying driver does not implement advnced user interactions yet.
-           Thread.sleep(5000);
+		   Thread.sleep(5000);
 
 
-Thread.sleep(2000);
+		   Thread.sleep(2000);
 
-           }	
-           catch(Exception ex) {
+	   }
+	   catch(Exception ex) {
 
 		   System.out.println(ex.toString());
 
 	   }
 
 
-		  // driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		  // WebDriverWait wait = new WebDriverWait(driver, 30);
+	   // driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+	   // WebDriverWait wait = new WebDriverWait(driver, 30);
 
 	   try{
 		   // wait.until(ExpectedConditions.elementToBeClickable(By.className("ccl-logo")));
-		//   wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
+		   //   wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
 		   String value1 = "ddlDestinations";
 		   String css_selector1 = String.format("select#%s", value1);
 		   driver.findElement(By.cssSelector(css_selector1)).click();
