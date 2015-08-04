@@ -3,6 +3,8 @@ set OLDCWD=%CD%
 pushd %~dp0
 set GROOVY_VERSION=2.3.8
 set JAVA_VERSION=1.6.0_45
+set JAVA_VERSION=1.7.0_65
+
 set MAVEN_VERSION=3.2.1
 set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
 set GROOVY_HOME=c:\java\groovy-%GROOVY_VERSION%
