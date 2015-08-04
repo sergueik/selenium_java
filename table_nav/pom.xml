@@ -13,7 +13,7 @@
     <selenium.version>2.44.0</selenium.version>
     <selenium.firefox-driver.version>2.43.1</selenium.firefox-driver.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <java.version>1.6</java.version> 
+    <java.version>1.7</java.version> 
     <!-- jenkins hpi may require 1.6 -->
   </properties>
   <dependencies>
