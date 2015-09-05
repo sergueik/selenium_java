@@ -32,21 +32,21 @@ static WebDriverWait wait;
 static WebDriver driver;
 
 public static void main(String[] args) throws InterruptedException,java.io.IOException {
-        String base_url = "https://datatables.net/examples/api/form.html";
-        
+	String base_url = "https://datatables.net/examples/api/form.html";
+
 	// Launch embedded driver
-        driver = new FirefoxDriver();
+	driver = new FirefoxDriver();
 
 	// Wait For Page To Load
 	driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
 	// Go to base url
-        driver.get(base_url);
+	driver.get(base_url);
 
 	// Maximize Window
 	driver.manage().window().maximize();
 
-	String  table_id="example";
+	String table_id="example";
 	WebElement table_element;
 
 	wait = new WebDriverWait(driver, flexible_wait_interval );
@@ -57,25 +57,25 @@ public static void main(String[] args) throws InterruptedException,java.io.IOExc
 	} catch (RuntimeException timeoutException) {
 		return;
 	}
-		
+
 	table_element =  driver.findElement(By.id(table_id));
-    
+
 	String text_input_css_selector = "input[id='row-5-age']";
 	WebElement text_input_element;
 	text_input_element = table_element.findElement(By.cssSelector(text_input_css_selector));
 	actions = new Actions(driver);
 	actions.moveToElement(text_input_element).build().perform();
 	String cell_text = "Software Developer";
-	
+
 	text_input_element.clear();
 	// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keys.html
 	text_input_element.sendKeys(Keys.chord(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE ));
 	Thread.sleep(5000);
-	text_input_element.sendKeys(Keys.chord("20" , org.openqa.selenium.Keys.TAB , cell_text , org.openqa.selenium.Keys.ENTER));
+	text_input_element.sendKeys(Keys.chord("20", org.openqa.selenium.Keys.TAB, cell_text, org.openqa.selenium.Keys.ENTER));
 	Thread.sleep(5000);
 
 	// Close browser window
 	driver.close();
 
-    }
+}
 }

@@ -6,24 +6,30 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
+import java.nio.charset.Charset;
+
 import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
+
 import java.util.concurrent.TimeUnit;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -31,10 +37,10 @@ import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.Dimension;
-// import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
+// import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
@@ -47,8 +53,8 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import org.testng.annotations.*;
 import org.testng.*;
+import org.testng.annotations.*;
 
 public class AppTest // extends BaseTest
 //
