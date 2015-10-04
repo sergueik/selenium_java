@@ -103,7 +103,7 @@ private static String xpath_of(WebElement element){
 	String script =  "function get_xpath_of(element) {\n" +
 	                " var elementTagName = element.tagName.toLowerCase();\n" +
 	                "     if (element.id != '') {\n" +
-	                "         return elementTagName + '[@id=\"' + element.id + '\"]';\n" +
+	                "         return '//' + elementTagName + '[@id=\"' + element.id + '\"]';\n" +
 	                "     } else if (element.name && document.getElementsByName(element.name).length === 1) {\n" +
 	                "         return '//' + elementTagName + '[@name=\"' + element.name + '\"]';\n" +
 	                "     }\n" +
@@ -119,16 +119,15 @@ private static String xpath_of(WebElement element){
 	                "             continue;\n" +
 	                "         }\n" +
 	                "         if (sibling_element === element) {\n" +
-	                "             return get_xpath_of(element.parentNode) + '/' + elementTagName + '[' + (sibling_count + 1) + ']';\n" +
+	                "             return sibling_count > 0 ? get_xpath_of(element.parentNode) + '/' + elementTagName + '[' + (sibling_count + 1) + ']' : get_xpath_of(element.parentNode) + '/' + elementTagName;\n" +
 	                "         }\n" +
-	                "         if (sibling_element.nodeType === 1 && sibling_element.tagName === elementTagName) {\n" +
+	                "         if (sibling_element.nodeType === 1 && sibling_element.tagName.toLowerCase() === elementTagName) {\n" +
 	                "             sibling_count++;\n" +
 	                "         }\n" +
 	                "     }\n" +
 	                "     return;\n" +
 	                " };\n" +
 	                " return get_xpath_of(arguments[0]);\n";
-
 	return (String) execute_script(script, element);
 }
 
@@ -223,7 +222,7 @@ public static void testVerifyText()  throws Exception   {
 		element =  find_element("link_text", "Hotels");
 		highlight(element);
 		selector = xpath_of(element);
-		assertEquals("div[@id=\"HEAD\"]/div[1]/div[1]/ul[1]/li[1]/span[1]/a[1]", selector);
+		assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
 	} catch (Error e) {
 		verificationErrors.append(e.toString());
 	}
@@ -231,19 +230,13 @@ public static void testVerifyText()  throws Exception   {
 	try {
 		element =  find_element("xpath", selector);
 		highlight(element);
-		selector = xpath_of(element);
-		assertEquals("div[@id=\"HEAD\"]/div[1]/div[1]/ul[1]/li[1]/span[1]/a[1]", selector);
-		// ignore that a wrong XPath is generated .
-	} catch (Error e) {
-		// verificationErrors.append(e.toString());
-	} catch (NullPointerException e) {
-		// verificationErrors.append(e.toString());
+		} catch (NullPointerException e) {
+		verificationErrors.append(e.toString());
 	}
 	try {
 		element =  find_element("link_text", "Hotels");
 		highlight(element);
 		selector = css_selector_of(element);
-		System.out.println(selector);
 		assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a", selector);
 	} catch (Error e) {
 		verificationErrors.append(e.toString());
@@ -251,10 +244,8 @@ public static void testVerifyText()  throws Exception   {
 	try {
 		element =  find_element("css_selector", selector);
 		highlight(element);
-		selector = xpath_of(element);
-		assertEquals("div[@id=\"HEAD\"]/div[1]/div[1]/ul[1]/li[1]/span[1]/a[1]", selector);
-		// ignore that a wrong CSS Selector is generated .
-	} catch (Error e) {
+		} catch (NullPointerException e) {
+		
 		verificationErrors.append(e.toString());
 	}
 
