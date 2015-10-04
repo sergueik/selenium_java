@@ -240,6 +240,25 @@ public static void testVerifyText()  throws Exception   {
 		// verificationErrors.append(e.toString());
 	}
 	try {
+		element =  find_element("link_text", "Hotels");
+		highlight(element);
+		selector = css_selector_of(element);
+		System.out.println(selector);
+		assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a", selector);
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+	try {
+		element =  find_element("css_selector", selector);
+		highlight(element);
+		selector = xpath_of(element);
+		assertEquals("div[@id=\"HEAD\"]/div[1]/div[1]/ul[1]/li[1]/span[1]/a[1]", selector);
+		// ignore that a wrong CSS Selector is generated .
+	} catch (Error e) {
+		verificationErrors.append(e.toString());
+	}
+
+	try {
 		element =  find_element("css_selector", "input#mainSearch");
 		selector = css_selector_of(element);
 		highlight(element);
