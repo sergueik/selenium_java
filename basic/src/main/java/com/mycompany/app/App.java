@@ -19,6 +19,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -141,6 +142,59 @@ public static Object execute_script(String script,Object ... args){
 	}
 }
 
+private static List<WebElement> find_elements(String selector_type, String selector_value, WebElement parent){
+	int flexible_wait_interval = 5;
+	SearchContext finder;
+	long wait_polling_interval = 500;
+	String parent_css_selector = null;
+	String parent_xpath = null;
+
+	WebDriverWait wait = new WebDriverWait(driver, flexible_wait_interval );
+	wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+	List<WebElement> elements = null;
+	Hashtable<String, Boolean> supported_selectors = new Hashtable<String, Boolean>();
+	supported_selectors.put("css_selector", true);
+	supported_selectors.put("xpath", true);
+
+	if (selector_type == null || !supported_selectors.containsKey(selector_type) || !supported_selectors.get(selector_type)) {
+		return null;
+	}
+	if (parent != null) {
+		parent_css_selector = css_selector_of (parent );
+		parent_xpath = xpath_of(parent );
+		finder = parent;
+	} else {
+		finder = driver;
+	}
+
+	if (selector_type == "css_selector") {
+		String extended_css_selector = String.format("%s  %s", parent_css_selector, selector_value);
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(extended_css_selector)));
+		} catch (RuntimeException timeoutException) {
+			return null;
+		}
+		elements = finder.findElements(By.cssSelector(selector_value));
+	}
+	if (selector_type == "xpath") {
+		String extended_xpath = String.format("%s/%s", parent_xpath, selector_value);
+
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(extended_xpath)));
+		} catch (RuntimeException timeoutException) {
+			return null;
+		}
+		elements = finder.findElements(By.xpath(selector_value));
+	}
+	return elements;
+
+}
+
+private static List<WebElement> find_elements(String selector_type, String selector_value){
+	return find_elements(selector_type, selector_value, null);
+}
+
+
 private static WebElement find_element(String selector_type, String selector_value){
 	int flexible_wait_interval = 5;
 	long wait_polling_interval = 500;
@@ -166,14 +220,14 @@ private static WebElement find_element(String selector_type, String selector_val
 		}
 		element = driver.findElement(By.id(selector_value));
 	}
-	if (selector_type == "id") {
+	if (selector_type == "classname") {
 
 		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(selector_value)));
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(selector_value)));
 		} catch (RuntimeException timeoutException) {
 			return null;
 		}
-		element = driver.findElement(By.id(selector_value));
+		element = driver.findElement(By.className(selector_value));
 	}
 	if (selector_type == "link_text") {
 		try {
@@ -226,11 +280,11 @@ public static void testVerifyText()  throws Exception   {
 	} catch (Error e) {
 		verificationErrors.append(e.toString());
 	}
-	
+
 	try {
 		element =  find_element("xpath", selector);
 		highlight(element);
-		} catch (NullPointerException e) {
+	} catch (NullPointerException e) {
 		verificationErrors.append(e.toString());
 	}
 	try {
@@ -244,8 +298,8 @@ public static void testVerifyText()  throws Exception   {
 	try {
 		element =  find_element("css_selector", selector);
 		highlight(element);
-		} catch (NullPointerException e) {
-		
+	} catch (NullPointerException e) {
+
 		verificationErrors.append(e.toString());
 	}
 
