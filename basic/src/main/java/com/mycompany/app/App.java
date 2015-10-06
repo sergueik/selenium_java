@@ -131,7 +131,7 @@ private static String xpath_of(WebElement element){
 	                " return get_xpath_of(arguments[0]);\n";
 	return (String) execute_script(script, element);
 }
-
+// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.JavascriptExecutor
 public static Object execute_script(String script,Object ... args){
 	if (driver instanceof JavascriptExecutor) {
 		JavascriptExecutor javascriptExecutor=(JavascriptExecutor)driver;
