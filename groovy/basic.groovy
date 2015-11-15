@@ -1,7 +1,10 @@
 @Grapes([
     @Grab(group = 'org.gebish', module = 'geb-core', version = '0.9.3'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-firefox-driver', version = '2.43.1'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-support', version = '2.43.1'),
+    @Grab(group = 'com.google.code.gson', module = 'gson', version = '2.4'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-firefox-driver', version = '[2.43.0,2.44.0)'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-chrome-driver', version = '[2.43.0,2.44.0)'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-remote-driver', version = '[2.43.0,2.44.0)'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-support', version = '[2.43.0,2.44.0)'),
     @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.3.2'),
     @GrabExclude('xml-apis:xml-apis'),
     @GrabExclude('xerces:xercesImpl')
