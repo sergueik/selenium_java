@@ -6,7 +6,7 @@
     @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-firefox-driver', version = '[2.43.0,2.44.0)'),
     @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-remote-driver', version = '[2.43.0,2.44.0)'),
     @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-support', version = '[2.43.0,2.44.0)'),
-    @GrabExclude('xerces:xercesImpl')
+    @GrabExclude('xerces:xercesImpl'),
     @GrabExclude('xml-apis:xml-apis'),
 ])
 
