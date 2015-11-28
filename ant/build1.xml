@@ -1,40 +1,28 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="example" basedir=".">
   <property name="build.dir" value="${basedir}/build"/>
-  <!-- testng related jar in to be in the resource  folder -->
-  <property name="external.jars" value=".\resource"/>
-  <property name=" selenium.jars" value=".\selenium"/>
-  <property name=" src.dir" value="${basedir}/src"/>
-  <!-- Load testNG and add to the class path of application -->
+  <property name="selenium.jars" value="c:/java/selenium"/>
+  <property name="src.dir" value="${basedir}/src"/>
   <target name="loadTestNG" depends="setClassPath">
     <taskdef resource="testngtasks" classpath="${test.classpath}"/>
   </target>
   <target name="setClassPath">
     <path id="classpath_jars">
       <pathelement path="${basedir}/"/>
-      <fileset dir="${external.jars}" includes="*.jar"/>
-      <!-- selenium jar added here -->
       <fileset dir="${selenium.jars}" includes="*.jar"/>
     </path>
-    <!-- TODO: get rid of Windows-specific path separator -->
     <pathconvert pathsep=";" property="test.classpath" refid="classpath_jars"/>
   </target>
   <target name="clean">
-    <echo message="deleting existing build directory"/>
     <delete dir="${build.dir}"/>
   </target>
   <target name="compile" depends="clean,setClassPath,loadTestNG">
-    <echo message="classpath:${test.classpath}"/>
-    <echo message="Compiling."/>
     <mkdir dir="${build.dir}"/>
-    <echo message="classpath:${test.classpath}"/>
-    <echo message="Compiling."/>
     <javac destdir="${build.dir}" srcdir="${src.dir}">
       <classpath refid="classpath_jars"/>
     </javac>
   </target>
-  <target name="run_testng" depends="compile">
-    <!-- execute code defined in testng.xml file -->
+  <target name="test" depends="compile">
     <testng classpath="${test.classpath};${build.dir}">
       <xmlfileset dir="${basedir}" includes="testng.xml"/>
     </testng>
