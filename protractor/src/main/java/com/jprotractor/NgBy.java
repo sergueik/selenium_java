@@ -12,11 +12,17 @@ public abstract class NgBy extends By {
 		return new ByModel(model);
 	}
 
-	public static By binding(final String model, final WebDriver driver) {
-		return new ByBinding(driver, model);
+	public static By binding(final String binding, final WebDriver driver) {
+		return new ByBinding(driver, binding);
 	}
 
 	public static By options(final String options, final WebDriver driver) {
 		return new ByOptions(options, driver);
 	}
+
+	public static By repeater(final String repeater, final WebDriver driver) {
+		return new ByRepeater(driver, repeater);
+	}
+
+
 }
