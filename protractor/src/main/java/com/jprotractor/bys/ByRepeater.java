@@ -4,13 +4,14 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-public class ByRepeater extends By {
+public class ByRepeater extends JsBy {
 	private final String repeater;
 
-	public ByRepeater(String repeater) {
-		super();
+	public ByRepeater(String repeater, WebDriver executor) {
+		super(executor);
 		this.repeater = repeater;
 	}
 
@@ -26,4 +27,10 @@ public class ByRepeater extends By {
 	public String toString() {
 		return "By.repeater: " + repeater;
 	}
+
+	@Override
+	protected String getFilename() {
+		return "repeater.js";
+	}
+
 }

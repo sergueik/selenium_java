@@ -6,10 +6,11 @@ import org.openqa.selenium.WebDriver;
 import com.jprotractor.bys.ByBinding;
 import com.jprotractor.bys.ByModel;
 import com.jprotractor.bys.ByOptions;
+import com.jprotractor.bys.ByRepeater;
 
 public abstract class NgBy extends By {
-	public static By model(final String model) {
-		return new ByModel(model);
+	public static By model(final String model, final WebDriver driver) {
+		return new ByModel(model, driver);
 	}
 
 	public static By binding(final String binding, final WebDriver driver) {
@@ -21,7 +22,7 @@ public abstract class NgBy extends By {
 	}
 
 	public static By repeater(final String repeater, final WebDriver driver) {
-		return new ByRepeater(driver, repeater);
+		return new ByRepeater(repeater, driver );
 	}
 
 
