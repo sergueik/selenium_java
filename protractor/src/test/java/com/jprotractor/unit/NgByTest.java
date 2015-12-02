@@ -21,7 +21,7 @@ public class NgByTest {
 
 	@Test
 	public void testModel() throws Exception {
-		By by = NgBy.model("person.name");
+		By by = NgBy.model("person.name", driver);
 		assertThat(by, notNullValue());
 		assertThat(by.toString(),
 				equalTo("By.model: person.name"));
