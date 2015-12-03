@@ -5,7 +5,13 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-
+import java.io.File;
+import java.net.URI;
+import java.net.MalformedURLException;
+import java.net.BindException;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -18,6 +24,16 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.Dimension;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
@@ -27,18 +43,33 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 @RunWith(Enclosed.class)
 @Category(Integration.class)
-public class NgByTest {
+public class NgByTestIntegrationTest {
 	private static WebDriver ngDriver;
 	private static WebDriver seleniumDriver;
+	public static String seleniumBrowser = "chrome";
 
 	@BeforeClass
 	public static void setup() throws IOException {
-
-     // Create instance of PhantomJS driver
+	    
+		DesiredCapabilities capabilities =   new DesiredCapabilities(seleniumBrowser, "", Platform.ANY);
+		FirefoxProfile profile = new ProfilesIni().getProfile("default");
+		capabilities.setCapability("firefox_profile", profile);
+		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+		
+		/* PhantomJSDriver */ 
+		/*
         DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
-        PhantomJSDriver seleniumDriver = new PhantomJSDriver(capabilities);
- 
-		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByTest.class
+		seleniumDriver = new PhantomJSDriver(capabilities); 
+		*/
+		try{
+			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
+			seleniumDriver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
+			seleniumDriver.manage().timeouts().implicitlyWait(120, TimeUnit.SECONDS);
+		}  catch(Exception ex) {
+			System.out.println(ex.toString());
+		}
+
+		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByTestIntegrationTest.class
 				.getClassLoader().getResource("integrationTests.properties"));
 	}
 
@@ -46,7 +77,6 @@ public class NgByTest {
 	public static void teardown() {
 		ngDriver.close();
 	}
-
 	public static class WithAngularJsHomePage {
 
 		@Before
@@ -77,7 +107,7 @@ public class NgByTest {
 		}
 
 	}
-
+    
 	public static class WithAngularSelectDocumentationPage {
 
 		@Before
@@ -91,7 +121,6 @@ public class NgByTest {
 		public void after() {
 			ngDriver.switchTo().defaultContent();
 		}
-
 		@Test
 		public void testByOptions() throws Exception {
 			By selector = NgBy
@@ -99,5 +128,37 @@ public class NgByTest {
 			WebElement colors = ngDriver.findElement(selector);
 			assertThat(colors.getText(), equalTo("black"));
 		}
+
 	}
+
+    
+	public static class WithLocalAngularJsRepeaterExamplePage {
+        private URI uri = new File("/c/developer/sergueik/selenium_java/protractor/src/main/resources/ng_table1.html").toURI();
+		@Before
+		public void beforeEach() throws MalformedURLException {
+			ngDriver.navigate().to(/* uri.toURL()*/ "file:///c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_table1.html");
+		}
+
+		@Test
+		public void testByRepeater() throws Exception {
+			assertThat(ngDriver.findElement(NgBy.repeater("x in names", ngDriver)),
+					notNullValue());
+		}
+
+	}
+	public static class WithLocalAngularJsOptionsExamplePage {
+        private URI uri = new File("c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_options_with_object_example.htm").toURI();
+		@Before
+		public void beforeEach() throws MalformedURLException {
+			ngDriver.navigate().to( uri.toURL()/*  "file:///c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_options_with_object_example.htm"*/);
+		}
+
+		@Test
+		public void testByOptions() throws Exception {
+			assertThat(ngDriver.findElement(NgBy.options("c.name for c in colors", ngDriver)),
+					notNullValue());
+		}
+
+	}
+
 }
