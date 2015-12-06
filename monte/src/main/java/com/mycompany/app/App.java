@@ -35,6 +35,8 @@ static String SiteURL = "http://www.tripadvisor.com/";
 static int implicit_wait_interval = 1;
 static int flexible_wait_interval = 5;
 static long wait_polling_interval = 500;
+static long highlight_interval = 100;
+
 static WebDriverWait wait;
 static Actions actions;
 static VideoRecorder recorder;
@@ -68,7 +70,11 @@ public static void testVerifyText() throws Exception {
 	element = driver.findElement(By.linkText("Hotels"));
 
 	assertEquals("Hotels", element.getText());
-	highlight(element);
+	JavascriptExecutor javascriptExecutor = (JavascriptExecutor)driver;
+	javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
+	Thread.sleep(highlight_interval);
+	javascriptExecutor.executeScript("arguments[0].style.border=''", element);
+
 	element.click();
 }
 
@@ -77,23 +83,6 @@ public static void tearDown()  throws Exception
 {
 	recorder.stopRecording("Recording");
 	driver.quit();
-}
-
-private static void highlight(WebElement element) throws InterruptedException {
-	highlight(element, 100);
-}
-private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
-
-	if (wait == null)         {
-		wait = new WebDriverWait(driver, flexible_wait_interval );
-	}
-	wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
-	wait.until(ExpectedConditions.visibilityOf(element));
-	JavascriptExecutor javascriptExecutor = (JavascriptExecutor)driver;
-	javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
-	Thread.sleep(highlight_interval);
-
-	javascriptExecutor.executeScript("arguments[0].style.border=''", element);
 }
 
 }
