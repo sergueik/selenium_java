@@ -9,10 +9,22 @@ One can use template variables or even [embedded subtemplates](http://stackoverf
 
 There are two script options to utilize web page navigation payload
 
- - control Selenium through Selenium driver of a specific browser 
- - control Selenium through a RemoteDriver. 
+ - control Selenium through a specific browser driver.
+ - control Selenium through __RemoteDriver__. 
  
-The latter will still end up in a specific driver, but will improve logging.
+The latter will still end up in a specific driver, but will improve logging
+
+To run interactively on the node 
+
+```
+export GROOVY_HOME=/usr/local/groovy-2.4.5
+export PATH=$PATH:$GROOVY_HOME/bin
+export PATH=$PATH:/home/vncuser/selenium/firefox
+export DISPLAY=:99
+groovy basic.groovy
+```
+
+The value of `DISPLAY` would vary whether one runs in a vm with `Xvfb` (99) or `vnc` (1). When a __RemoteDriver__ is used these settings are already in `run_node.sh`.
 
 Dependencies
 ------------
