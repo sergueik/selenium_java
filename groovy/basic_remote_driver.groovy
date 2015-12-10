@@ -33,7 +33,9 @@ import org.openqa.selenium.WebElement
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
-System.setProperty('webdriver.chrome.driver', '/home/vncuser/selenium/chromedriver/chromedriver')
+def driver_path =  (System.properties['os.name'].toLowerCase().contains('windows')) ? 'c:/java/selenium/chromedriver.exe' : '/home/vncuser/selenium/chromedriver/chromedriver'
+
+System.setProperty('webdriver.chrome.driver', driver_path )
 def capabilities = DesiredCapabilities.firefox()
 def logging_preferences = new LoggingPreferences()
 logging_preferences.enable(LogType.BROWSER, Level.ALL)

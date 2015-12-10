@@ -31,15 +31,14 @@ import org.openqa.selenium.WebElement
 
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
+
 /*
-to run in the node witn xvfb/selenium/java/groovy stack
-export GROOVY_HOME=/usr/local/groovy-2.4.5
-export PATH=$PATH:$GROOVY_HOME/bin
-export PATH=$PATH:/home/vncuser/selenium/firefox
-export DISPLAY=:99
-groovy basic.groovy
+
 */
-System.setProperty('webdriver.chrome.driver', 'c:/java/selenium/chromedriver.exe')
+
+def driver_path =  (System.properties['os.name'].toLowerCase().contains('windows')) ? 'c:/java/selenium/chromedriver.exe' : '/home/vncuser/selenium/chromedriver/chromedriver'
+
+System.setProperty('webdriver.chrome.driver', driver_path )
 def capabilities = DesiredCapabilities.chrome()
 def logging_preferences = new LoggingPreferences()
 logging_preferences.enable(LogType.BROWSER, Level.ALL)
