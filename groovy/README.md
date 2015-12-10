@@ -4,6 +4,7 @@ Sample scripts to execute application configuration through Selenium a part of t
 
 Structure of the script
 -----------------------
+One can use template variables or even [embedded subtemplates](http://stackoverflow.com/questions/16551717/how-to-include-a-subtemplate-in-a-puppet-template) to isolate domain specific functionality:
 
 
 There are two script options to utilize web page navigation payload
