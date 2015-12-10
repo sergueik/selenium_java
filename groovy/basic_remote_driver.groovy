@@ -34,7 +34,7 @@ import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
 System.setProperty('webdriver.chrome.driver', '/home/vncuser/selenium/chromedriver/chromedriver')
-def capabilities = DesiredCapabilities.chrome()
+def capabilities = DesiredCapabilities.firefox()
 def logging_preferences = new LoggingPreferences()
 logging_preferences.enable(LogType.BROWSER, Level.ALL)
 capabilities.setCapability(CapabilityType.LOGGING_PREFS, logging_preferences)
