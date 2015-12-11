@@ -33,8 +33,11 @@ import org.openqa.selenium.interactions.Actions
 
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
+
 // global variables
-@Field WebDriver driver 
+
+@Field WebDriver driver
+@Field JavascriptExecutor javascriptExecutor
 @Field int implicit_wait_interval = 1
 @Field int flexible_wait_interval = 5
 @Field long wait_polling_interval = 500
@@ -46,18 +49,11 @@ import java.util.logging.Level
 
 def printErr = System.err.&println
 def highlight(WebElement element) {
-	if (wait!= null)         {
-		wait = new WebDriverWait(driver, flexible_wait_interval );
-	}
-	wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
-	wait.until(ExpectedConditions.visibilityOf(element));
-	if (driver instanceof JavascriptExecutor) {
-		((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid yellow'", element);
-	}
-	Thread.sleep(highlight_interval);
-	if (driver instanceof JavascriptExecutor) {
-		((JavascriptExecutor)driver).executeScript("arguments[0].style.border=''", element);
-	}
+  wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+  wait.until(ExpectedConditions.visibilityOf(element));
+  javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
+  Thread.sleep(highlight_interval);
+  javascriptExecutor.executeScript("arguments[0].style.border=''", element);
 }
 
 def driver_path =  (System.properties['os.name'].toLowerCase().contains('windows')) ? 'c:/java/selenium/chromedriver.exe' : '/home/vncuser/selenium/chromedriver/chromedriver'
@@ -67,11 +63,20 @@ def capabilities = DesiredCapabilities.chrome()
 def logging_preferences = new LoggingPreferences()
 logging_preferences.enable(LogType.BROWSER, Level.ALL)
 capabilities.setCapability(CapabilityType.LOGGING_PREFS, logging_preferences)
-driver = new ChromeDriver(capabilities)
-driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS)
+driver = new FirefoxDriver(capabilities)
 wait = new WebDriverWait(driver, flexible_wait_interval )
 actions = new Actions(driver)
-driver.get('http://way2automation.com/way2auto_jquery/index.php')
+
+if (driver instanceof JavascriptExecutor) {
+  javascriptExecutor=(JavascriptExecutor)driver
+}
+else {
+  throw new RuntimeException("JavascriptExecutor interface.")
+}
+driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS)
+base_url = 'http://way2automation.com/way2auto_jquery/index.php'
+driver.get(base_url)
+
 def signup_css_selector = 'div#load_box.popupbox form#load_form a.fancybox[href="#login"]'
 element = driver.findElement(By.cssSelector(signup_css_selector))
 highlight(element)
@@ -85,7 +90,7 @@ element.sendKeys('sergueik')
 login_password_selector = "div#login.popupbox form#load_form input[type='password'][name='password']"
 element = driver.findElement(By.cssSelector(login_password_selector))
 highlight(element)
-element.sendKeys('<PASSWORD>')
+element.sendKeys('i011155')
 
 login_button_selector = "div#login.popupbox form#load_form [value='Submit']"
 element = driver.findElement(By.cssSelector(login_button_selector))
@@ -100,6 +105,18 @@ return (d.findElements(By.cssSelector('div#login.popupbox')).size() == 0)
      }
 })
 
-println('Page title is: ' + driver.getTitle())
-driver.quit()
 
+protractor_test_base_url = 'http://www.way2automation.com/protractor-angularjs-practice-website.html'
+driver.get(protractor_test_base_url)
+
+println('Angular Exercise Page title is: ' + driver.getTitle())
+
+exercise_css_selector = "div.row div.linkbox ul.boxed_style li a[href='http://www.way2automation.com/angularjs-protractor/checkboxes']"
+element = driver.findElement(By.cssSelector(exercise_css_selector))
+highlight(element)
+javascriptExecutor.executeScript("arguments[0].setAttribute('target', '')",element)
+actions.moveToElement(element).click().build().perform()
+element.click()
+
+Thread.sleep(10000)
+driver.quit()
