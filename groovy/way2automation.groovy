@@ -150,10 +150,10 @@ actions.moveToElement(element).click().build().perform()
 
 // plain Selenium
 
-element_xpath = '/html/body/div/ul/li/h3/input'
-List<WebElement> elements_collection = driver.findElements(By.xpath(element_xpath))
+elements_css_selector = 'li[ng-repeat="prod in cat.products"]'
+List<WebElement> elements_collection = driver.findElements(By.cssSelector(elements_css_selector))
 for(WebElement element_item : elements_collection) {
-  println('*' + element_item.getText())
+  println(element_item.getText())
   actions.moveToElement(element_item).build().perform()
   highlight(element_item)
 }
