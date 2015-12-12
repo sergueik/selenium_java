@@ -46,7 +46,7 @@ import java.util.logging.Level
 @Field WebDriverWait wait
 @Field Actions actions
 @Field WebElement element
-@Field String password
+@Field String password =  ''
 
 @Field long highlight_interval = 1000
 
@@ -76,13 +76,14 @@ if (options.h) {
   cli.usage()
   return
 }
+if (options.p){
+  password = options.p
+}
 
-password = options.p
-if (!password) {
+if (password.length() == 0 ) {
   cli.usage()
   return
 }
-
 System.setProperty('webdriver.chrome.driver', driver_path )
 def capabilities = DesiredCapabilities.chrome()
 def logging_preferences = new LoggingPreferences()
@@ -127,12 +128,15 @@ element = driver.findElement(By.cssSelector(login_button_selector))
 highlight(element)
 element.submit()
 
-// wait until Login lightbox is visible 
-(new WebDriverWait(driver, 10)).until(new ExpectedCondition() {
-     public Boolean apply(WebDriver d) {
- // printErr(d.findElements(By.cssSelector('div#login.popupbox')).size() )
-return (d.findElements(By.cssSelector('div#login.popupbox')).size() == 0)
-     }
+// custom wait while Login lightbox is visible 
+// applying to inverse of 
+// (new WebDriverWait(driver, 10)).until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector('div#login.popupbox')))
+// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/support/ui/WebDriverWait.html
+// was 'until', but lacks 'while'
+(new WebDriverWait(driver, 60)).until(new ExpectedCondition() {
+  public Boolean apply(WebDriver d) {
+     return (d.findElements(By.cssSelector('div#login.popupbox')).size() == 0)
+  }
 })
 
 
