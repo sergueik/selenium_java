@@ -9,7 +9,7 @@
     @GrabExclude('xerces:xercesImpl'),
     @GrabExclude('xml-apis:xml-apis'),
 ])
-
+// exact versions:
 import groovy.transform.Field
 import groovy.grape.Grape
 
@@ -31,6 +31,8 @@ import org.openqa.selenium.support.ui.WebDriverWait
 import org.openqa.selenium.JavascriptExecutor
 import org.openqa.selenium.interactions.Actions
 
+import java.text.*
+
 import java.util.concurrent.TimeUnit
 import java.util.logging.Level
 
@@ -44,6 +46,7 @@ import java.util.logging.Level
 @Field WebDriverWait wait
 @Field Actions actions
 @Field WebElement element
+@Field String password
 
 @Field long highlight_interval = 1000
 
@@ -57,6 +60,28 @@ def highlight(WebElement element) {
 }
 
 def driver_path =  (System.properties['os.name'].toLowerCase().contains('windows')) ? 'c:/java/selenium/chromedriver.exe' : '/home/vncuser/selenium/chromedriver/chromedriver'
+
+def cli = new CliBuilder(usage: 'showdate.groovy -[hp]')
+import org.apache.commons.cli.Option
+
+cli.with {
+  h longOpt: 'help', 'Show usage information'
+  p longOpt: 'password', args: 1, argName: 'password', 'password'
+}
+def options = cli.parse(args)
+if (!options) {
+  return
+}
+if (options.h) {
+  cli.usage()
+  return
+}
+
+password = options.p
+if (!password) {
+  cli.usage()
+  return
+}
 
 System.setProperty('webdriver.chrome.driver', driver_path )
 def capabilities = DesiredCapabilities.chrome()
@@ -79,20 +104,25 @@ driver.get(base_url)
 
 def signup_css_selector = 'div#load_box.popupbox form#load_form a.fancybox[href="#login"]'
 element = driver.findElement(By.cssSelector(signup_css_selector))
+
+// show signup link
+actions.moveToElement(element).build().perform()
 highlight(element)
+
+
 element.click()
 
-def login_username_selector = "div#login.popupbox form#load_form input[name='username']"
+def login_username_selector = 'div#login.popupbox form#load_form input[name="username"]'
 element = driver.findElement(By.cssSelector(login_username_selector))
 highlight(element)
 element.sendKeys('sergueik')
 
-login_password_selector = "div#login.popupbox form#load_form input[type='password'][name='password']"
+login_password_selector = 'div#login.popupbox form#load_form input[type="password"][name="password"]'
 element = driver.findElement(By.cssSelector(login_password_selector))
 highlight(element)
-element.sendKeys('i011155')
+element.sendKeys(password)
 
-login_button_selector = "div#login.popupbox form#load_form [value='Submit']"
+login_button_selector = 'div#login.popupbox form#load_form [value="Submit"]'
 element = driver.findElement(By.cssSelector(login_button_selector))
 highlight(element)
 element.submit()
@@ -114,9 +144,20 @@ println('Angular Exercise Page title is: ' + driver.getTitle())
 exercise_css_selector = "div.row div.linkbox ul.boxed_style li a[href='http://www.way2automation.com/angularjs-protractor/checkboxes']"
 element = driver.findElement(By.cssSelector(exercise_css_selector))
 highlight(element)
+// prevent opening a new tab from target="_blank"
 javascriptExecutor.executeScript("arguments[0].setAttribute('target', '')",element)
 actions.moveToElement(element).click().build().perform()
-element.click()
+
+// plain Selenium
+
+element_xpath = '/html/body/div/ul/li/h3/input'
+List<WebElement> elements_collection = driver.findElements(By.xpath(element_xpath))
+for(WebElement element_item : elements_collection) {
+  println('*' + element_item.getText())
+  actions.moveToElement(element_item).build().perform()
+  highlight(element_item)
+}
 
 Thread.sleep(10000)
 driver.quit()
+
