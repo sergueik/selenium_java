@@ -30,12 +30,17 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.Dimension;
-
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.SearchContext;
 
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.jprotractor.NgBy;
 import com.jprotractor.categories.Integration;
@@ -43,15 +48,21 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 @RunWith(Enclosed.class)
 @Category(Integration.class)
-public class NgByTestIntegrationTest {
+	public class NgByTestIntegrationTest {
 	private static WebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	public static String seleniumBrowser = "chrome";
+	public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+	public static String browaerName = "firefox";
+	static int implicit_wait_interval = 1;
+	static int flexible_wait_interval = 5;
+	static long wait_polling_interval = 500;
+	static WebDriverWait wait;
+	static Actions actions;
 
 	@BeforeClass
 	public static void setup() throws IOException {
 	    
-		DesiredCapabilities capabilities =   new DesiredCapabilities(seleniumBrowser, "", Platform.ANY);
+		DesiredCapabilities capabilities =   new DesiredCapabilities(browaerName, "", Platform.ANY);
 		FirefoxProfile profile = new ProfilesIni().getProfile("default");
 		capabilities.setCapability("firefox_profile", profile);
 		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
@@ -76,89 +87,59 @@ public class NgByTestIntegrationTest {
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
+        seleniumDriver.quit();		
 	}
-	public static class WithAngularJsHomePage {
+	
+	private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
+		if (wait == null)         {
+			wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
+		}
+		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+		wait.until(ExpectedConditions.visibilityOf(element));
+		execute_script("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlight_interval);
+		execute_script("arguments[0].style.border=''", element);
+	}
+
+	public static Object execute_script(String script,Object ... args){
+		if (seleniumDriver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
+			return javascriptExecutor.executeScript(script,args);
+		}
+		else {
+			throw new RuntimeException("Script execution is only available for WebDrivers that implement " + "the JavascriptExecutor interface.");
+		}
+	}
+
+	public static class WithBasicCalculatorPage {
 
 		@Before
-		public void beforeEach() {
-			ngDriver.navigate().to("https://angularjs.org");
+		public void beforeEach() {		    
+			ngDriver.navigate().to(baseUrl);
 		}
 
 		@Test
 		public void testByModel() throws Exception {
-			assertThat(ngDriver.findElement(NgBy.model("yourName", ngDriver)),
-					notNullValue());
+			WebElement element = ngDriver.findElement(NgBy.model("first", ngDriver));
+			assertThat(element,notNullValue());
+			highlight(element, 100);
+			element.sendKeys("40");
+			element = ngDriver.findElement(NgBy.model("second", ngDriver));
+			assertThat(element,notNullValue());
+			highlight(element, 100);
+			element.sendKeys("2");
+			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators", ngDriver));
+			assertThat(element,notNullValue());
+			element.click();
+			element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
+			assertThat(element,notNullValue());
+			element.click();
+			Thread.sleep(5000);
+			element = ngDriver.findElement(NgBy.binding("latest", ngDriver)); 
+			assertThat(element,notNullValue());
+			assertThat(element.getText(), equalTo("42"));
+			highlight(element, 100);
+			Thread.sleep(5000);
 		}
-
-		@Test
-		public void testByBinding() throws Exception {
-			ngDriver.findElement(NgBy.model("yourName", ngDriver)).sendKeys("jProtractor");
-			WebElement element = ngDriver.findElements(NgBy.binding(
-					"yourName", ngDriver)).get(0);
-			assertThat(element.getText(), equalTo("Hello jProtractor!"));
-		}
-
-		@Test
-		public void testByBindingWithParent() throws Exception {
-			ngDriver.findElement(NgBy.model("yourName", ngDriver)).sendKeys("jProtractor");
-			WebElement element = ngDriver.findElement(NgBy.cssSelector(".container"))
-					.findElements(NgBy.binding("yourName", ngDriver)).get(0);
-			assertThat(element.getText(), equalTo("Hello jProtractor!"));
-		}
-
 	}
-    
-	public static class WithAngularSelectDocumentationPage {
-
-		@Before
-		public void init() {
-			ngDriver.navigate()
-					.to("https://docs.angularjs.org/api/ng/directive/select");
-			ngDriver.switchTo().frame("example-example49");
-		}
-
-		@After
-		public void after() {
-			ngDriver.switchTo().defaultContent();
-		}
-		@Test
-		public void testByOptions() throws Exception {
-			By selector = NgBy
-					.options("color.name for color in colors", ngDriver);
-			WebElement colors = ngDriver.findElement(selector);
-			assertThat(colors.getText(), equalTo("black"));
-		}
-
-	}
-
-    
-	public static class WithLocalAngularJsRepeaterExamplePage {
-        private URI uri = new File("/c/developer/sergueik/selenium_java/protractor/src/main/resources/ng_table1.html").toURI();
-		@Before
-		public void beforeEach() throws MalformedURLException {
-			ngDriver.navigate().to(/* uri.toURL()*/ "file:///c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_table1.html");
-		}
-
-		@Test
-		public void testByRepeater() throws Exception {
-			assertThat(ngDriver.findElement(NgBy.repeater("x in names", ngDriver)),
-					notNullValue());
-		}
-
-	}
-	public static class WithLocalAngularJsOptionsExamplePage {
-        private URI uri = new File("c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_options_with_object_example.htm").toURI();
-		@Before
-		public void beforeEach() throws MalformedURLException {
-			ngDriver.navigate().to( uri.toURL()/*  "file:///c:/developer/sergueik/selenium_java/protractor/src/main/resources/ng_options_with_object_example.htm"*/);
-		}
-
-		@Test
-		public void testByOptions() throws Exception {
-			assertThat(ngDriver.findElement(NgBy.options("c.name for c in colors", ngDriver)),
-					notNullValue());
-		}
-
-	}
-
 }
