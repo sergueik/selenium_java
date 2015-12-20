@@ -18,7 +18,7 @@ public class ByBinding extends JsBy {
 	@SuppressWarnings("unchecked")
 	public List<WebElement> findElements(SearchContext context) {
 		return (List<WebElement>) executor.executeScript(getScriptContent()
-				+ "return findBindings(arguments[0], true, arguments[1])", model,
+				+ "return findBindings(arguments[0], true, arguments[1],'body')", model,
 				getElement(context));
 	}
 
