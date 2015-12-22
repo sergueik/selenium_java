@@ -6,7 +6,7 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>jprotractor</name>
-  <url>http://carlosbecker.com</url>
+  <url></url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>

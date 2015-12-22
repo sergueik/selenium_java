@@ -7,6 +7,7 @@ import com.jprotractor.bys.ByBinding;
 import com.jprotractor.bys.ByModel;
 import com.jprotractor.bys.ByOptions;
 import com.jprotractor.bys.ByRepeater;
+import com.jprotractor.bys.ByButtonText;
 
 public abstract class NgBy extends By {
 	public static By model(final String model, final WebDriver driver) {
@@ -19,6 +20,10 @@ public abstract class NgBy extends By {
 
 	public static By options(final String options, final WebDriver driver) {
 		return new ByOptions(options, driver);
+	}
+
+	public static By buttonText(final String buttonText, final WebDriver driver) {
+		return new ByButtonText(buttonText, driver);
 	}
 
 	public static By repeater(final String repeater, final WebDriver driver) {

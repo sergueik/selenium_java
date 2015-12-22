@@ -27,6 +27,8 @@ Sample
     element = ngDriver.findElement(NgBy.options("value for (key, value) in operators", ngDriver));
     assertThat(element,notNullValue());
     element.click();
+    element = ngDriver.findElement(NgBy.buttonText("Go", ngDriver));
+    assertThat(element,notNullValue());
     element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
     assertThat(element,notNullValue());
     element.click();
