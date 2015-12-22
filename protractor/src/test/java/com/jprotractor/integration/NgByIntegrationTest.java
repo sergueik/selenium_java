@@ -48,7 +48,7 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 @RunWith(Enclosed.class)
 @Category(Integration.class)
-	public class NgByTestIntegrationTest {
+	public class NgByIntegrationTest {
 	private static WebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
@@ -136,12 +136,11 @@ import com.jprotractor.unit.NgDriverEnchancer;
 			element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
 			assertThat(element,notNullValue());
 			element.click();
-			Thread.sleep(5000);
+			Thread.sleep(3000);
 			element = ngDriver.findElement(NgBy.binding("latest", ngDriver)); 
 			assertThat(element,notNullValue());
 			assertThat(element.getText(), equalTo("42"));
 			highlight(element, 100);
-			Thread.sleep(5000);
 		}
 	}
 }
