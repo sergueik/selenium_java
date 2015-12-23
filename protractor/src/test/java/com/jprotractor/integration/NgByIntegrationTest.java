@@ -82,7 +82,7 @@ import com.jprotractor.unit.NgDriverEnchancer;
 		}
 	}
 
-	public static class WithBasicCalculatorPage {
+	public static class CalculatorTests{
 
 		public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
    		@Before
@@ -91,7 +91,7 @@ import com.jprotractor.unit.NgDriverEnchancer;
 		}
 
 		@Test
-		public void testByModel() throws Exception {
+		public void testAddition() throws Exception {
 			WebElement element = ngDriver.findElement(NgBy.model("first", ngDriver));
 			assertThat(element,notNullValue());
 			highlight(element, 100);
@@ -112,6 +112,21 @@ import com.jprotractor.unit.NgDriverEnchancer;
 			element = ngDriver.findElement(NgBy.binding("latest", ngDriver)); 
 			assertThat(element,notNullValue());
 			assertThat(element.getText(), equalTo("42"));
+			highlight(element, 100);
+		}
+	}
+	public static class Way2AutomationTests {
+
+		public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
+   		@Before
+		public void beforeEach() throws InterruptedException{
+			ngDriver.navigate().to(baseUrl);
+			Thread.sleep(3000);
+		}
+
+		@Test
+		public void testButtons() throws Exception {
+			WebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login", ngDriver));
 			highlight(element, 100);
 		}
 	}
