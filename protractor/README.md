@@ -8,14 +8,16 @@ Origins:
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
 
 Goal is to close the gap between [jProtractor locator snippets](https://github.com/sergueik/jProtractor/tree/master/src/main/resources) and [genuine protractor ones](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
-Sample
+Samples
+
+For desktop browser testing, run a Selenium hub and node and 
 ------
 ```
     DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
     capabilities.setCapability("firefox_profile", profile);
     seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-    ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByTestIntegrationTest.class
+    ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
                                 .getClassLoader().getResource("integrationTests.properties"));
 
     ngDriver.navigate().to("http://juliemr.github.io/protractor-demo/");
@@ -39,6 +41,15 @@ Sample
     highlight(element, 100);
     ngDriver.close();
     seleniumDriver.quit();
+
+```
+for CI build replace the Setup () with
+```
+	public static void setup() throws IOException {
+		seleniumDriver = new PhantomJSDriver();
+		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
+				.getClassLoader().getResource("integrationTests.properties"));
+	}
 
 ```
 Testing

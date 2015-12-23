@@ -23,23 +23,15 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
-
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import com.jprotractor.NgBy;
@@ -51,36 +43,13 @@ import com.jprotractor.unit.NgDriverEnchancer;
 	public class NgByIntegrationTest {
 	private static WebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
-	public static String browaerName = "firefox";
-	static int implicit_wait_interval = 1;
-	static int flexible_wait_interval = 5;
-	static long wait_polling_interval = 500;
 	static WebDriverWait wait;
 	static Actions actions;
 
 	@BeforeClass
 	public static void setup() throws IOException {
-	    
-		DesiredCapabilities capabilities =   new DesiredCapabilities(browaerName, "", Platform.ANY);
-		FirefoxProfile profile = new ProfilesIni().getProfile("default");
-		capabilities.setCapability("firefox_profile", profile);
-		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-		
-		/* PhantomJSDriver */ 
-		/*
-        DesiredCapabilities capabilities = DesiredCapabilities.phantomjs();
-		seleniumDriver = new PhantomJSDriver(capabilities); 
-		*/
-		try{
-			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
-			seleniumDriver.manage().timeouts().pageLoadTimeout(120, TimeUnit.SECONDS);
-			seleniumDriver.manage().timeouts().implicitlyWait(120, TimeUnit.SECONDS);
-		}  catch(Exception ex) {
-			System.out.println(ex.toString());
-		}
-
-		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByTestIntegrationTest.class
+		seleniumDriver = new PhantomJSDriver();
+		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
 				.getClassLoader().getResource("integrationTests.properties"));
 	}
 
@@ -91,6 +60,8 @@ import com.jprotractor.unit.NgDriverEnchancer;
 	}
 	
 	private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
+		int flexible_wait_interval = 5;
+		long wait_polling_interval = 500;
 		if (wait == null)         {
 			wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
 		}
@@ -113,7 +84,8 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 	public static class WithBasicCalculatorPage {
 
-		@Before
+		public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+   		@Before
 		public void beforeEach() {		    
 			ngDriver.navigate().to(baseUrl);
 		}
