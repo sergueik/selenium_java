@@ -35,13 +35,13 @@ import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import com.jprotractor.NgBy;
-import com.jprotractor.categories.Integration;
-import com.jprotractor.unit.NgDriverEnchancer;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
 
 @RunWith(Enclosed.class)
-@Category(Integration.class)
+// @Category(Integration.class)
 	public class NgByIntegrationTest {
-	private static WebDriver ngDriver;
+	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
 	static Actions actions;
@@ -49,8 +49,7 @@ import com.jprotractor.unit.NgDriverEnchancer;
 	@BeforeClass
 	public static void setup() throws IOException {
 		seleniumDriver = new PhantomJSDriver();
-		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
-				.getClassLoader().getResource("integrationTests.properties"));
+		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
 	@AfterClass
@@ -92,24 +91,24 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 		@Test
 		public void testAddition() throws Exception {
-			WebElement element = ngDriver.findElement(NgBy.model("first", ngDriver));
+			WebElement element = ngDriver.findElement(NgBy.model("first"));
 			assertThat(element,notNullValue());
 			highlight(element, 100);
 			element.sendKeys("40");
-			element = ngDriver.findElement(NgBy.model("second", ngDriver));
+			element = ngDriver.findElement(NgBy.model("second"));
 			assertThat(element,notNullValue());
 			highlight(element, 100);
 			element.sendKeys("2");
-			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators", ngDriver));
+			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
 			assertThat(element,notNullValue());
 			element.click();
-                        element = ngDriver.findElement(NgBy.buttonText("Go", ngDriver));
+                        element = ngDriver.findElement(NgBy.buttonText("Go"));
 			assertThat(element,notNullValue());
 			element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
 			assertThat(element,notNullValue());
 			element.click();
 			Thread.sleep(3000);
-			element = ngDriver.findElement(NgBy.binding("latest", ngDriver)); 
+			element = ngDriver.findElement(NgBy.binding("latest" )); 
 			assertThat(element,notNullValue());
 			assertThat(element.getText(), equalTo("42"));
 			highlight(element, 100);
@@ -126,7 +125,7 @@ import com.jprotractor.unit.NgDriverEnchancer;
 
 		@Test
 		public void testButtons() throws Exception {
-			WebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login", ngDriver));
+			WebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
 			highlight(element, 100);
 		}
 	}
