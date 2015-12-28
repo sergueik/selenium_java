@@ -1,11 +1,12 @@
 /**
  * Find a list of elements in the page by their angular binding.
  *
- * @param {string} binding The binding, e.g. {{cat.name}}.
- * @param {boolean} exactMatch Whether the binding needs to be matched exactly
- * @param {Element} using The scope of the search.
+ * arguments[0] {Element} The scope of the search.
+ * arguments[1] {string} The binding, e.g. {{cat.name}}.
+ * arguments[2] {boolean} Whether the binding needs to be matched exactly.
+ * arguments[3] {string} The selector to use for the root app element.
  *
- * @return {Array.<Element>} The elements containing the binding.
+ * @return {Array.WebElement} The elements containing the binding.
  */
 var findBindings = function(binding, exactMatch, using, rootSelector) {
     var root = document.querySelector(rootSelector || 'body');
@@ -37,3 +38,14 @@ var findBindings = function(binding, exactMatch, using, rootSelector) {
     }
     return matches; /* Return the whole array for webdriver.findElements. */
 };
+
+var using = arguments[0] || document;
+var binding = arguments[1];
+var rootSelector = arguments[2];
+
+var exactMatch = arguments[3];
+if (typeof exactMatch === 'undefined') {
+    exactMatch = true;
+}
+
+return findBindings(binding, exactMatch, using, rootSelector);

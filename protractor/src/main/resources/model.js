@@ -1,11 +1,10 @@
 /**
  * Find elements by model name.
  *
- * @param {string} model The model name.
- * @param {Element} using The scope of the search.
- * @param {string} rootSelector The selector to use for the root app element.
+ * arguments[0] {Element} The scope of the search.
+ * arguments[1] {string} The model name.
  *
- * @return {Array.<Element>} The matching elements.
+ * @return {Array.WebElement} The matching input elements.
  */
 var findByModel = function(model, using, rootSelector) {
     var root = document.querySelector(rootSelector || 'body');
@@ -23,3 +22,7 @@ var findByModel = function(model, using, rootSelector) {
         }
     }
 };
+var using = arguments[0] || document;
+var model = arguments[1];
+var rootSelector = arguments[2];
+return findByModel(model, using, rootSelector);

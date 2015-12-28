@@ -20,12 +20,10 @@ public class ClientSideScripts {
 
 	
 	public static final String WaitForAngular = getScriptContent("waitForAngular.js") ;
-	
 	public static final String TestForAngular = getScriptContent("testForAngular.js") ; 
-
-	public static final String ResumeAngularBootstrap =  "angular.resumeBootstrap(arguments[0].length ? arguments[0].split(',') : []);";
+    public static final String ResumeAngularBootstrap =  getScriptContent("resumeAngularBootstrap.js");
 	
-	public static final String GetLocationAbsUrl = "var el = document.querySelector(arguments[0]);	return angular.element(el).injector().get('$location').absUrl();";
+	public static final String GetLocationAbsUrl = getScriptContent("getLocationAbsUrl.js"); 
 	public static final String Evaluate = getScriptContent("evaluate.js");
 	public static final String FindButtonText = getScriptContent("buttonText.js");
 	public static final String FindBindings = getScriptContent("binding.js");

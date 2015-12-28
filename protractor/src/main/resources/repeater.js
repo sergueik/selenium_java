@@ -1,12 +1,12 @@
- /**
-* Find all rows of an ng-repeat.
-*
-* @param {string} repeater The text of the repeater, e.g. 'cat in cats'.
-* @param {Element} using The scope of the search.
-*
-* @return {Array.<Element>} All rows of the repeater.
-*/
-var findAllRepeaterRows = function(repeater, using ) {
+/**
+ * Find all rows of an ng-repeat.
+ *
+ * arguments[0] {Element} The scope of the search.
+ * arguments[1] {string} The text of the repeater, e.g. 'cat in cats'.
+ *
+ * @return {Array.WebElement} All rows of the repeater.
+ */
+var findAllRepeaterRows = function(using, repeater) {
     var rows = [];
     var prefixes = ['ng-', 'ng_', 'data-ng-', 'x-ng-', 'ng\\:'];
     for (var p = 0; p < prefixes.length; ++p) {
@@ -38,3 +38,6 @@ var findAllRepeaterRows = function(repeater, using ) {
     }
     return rows;
 };
+var using = arguments[0] || document;
+var repeater = arguments[1];
+return findAllRepeaterRows(using, repeater);
