@@ -3,6 +3,7 @@ Info
 
 Origins: 
   - [jProtractor](https://github.com/caarlos0/jProtractor)
+  - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [angular/protractor](https://github.com/angular/protractor) 
   - [bbaia/protractor-net](https://github.com/bbaia/protractor-net)
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
@@ -10,51 +11,52 @@ Origins:
 Goal is to close the gap between [jProtractor locator snippets](https://github.com/sergueik/jProtractor/tree/master/src/main/resources) and [genuine protractor ones](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
 Samples
 
-For desktop browser testing, run a Selenium hub and node and 
+For desktop browser testing, run a Selenium node and Selenium hub on port 4444 and 
 ------
 ```
     DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
     capabilities.setCapability("firefox_profile", profile);
     seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-    ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
-                                .getClassLoader().getResource("integrationTests.properties"));
+    ngDriver = new NgWebDriver(seleniumDriver);
+	
+@Test
+public void testCustomerLogin() throws Exception {
+	NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
+	highlight(element, 100);
+	element.click();
+	element = ngDriver.findElement(NgBy.input("custId"));
+	assertThat(element.getAttribute("id"), equalTo("userSelect"));
+	Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 
-    ngDriver.navigate().to("http://juliemr.github.io/protractor-demo/");
-    WebElement element = ngDriver.findElement(NgBy.model("first", ngDriver));
-    assertThat(element,notNullValue());
-    element.sendKeys("40");
-    element = ngDriver.findElement(NgBy.model("second", ngDriver));
-    element.sendKeys("2");
-    element = ngDriver.findElement(NgBy.options("value for (key, value) in operators", ngDriver));
-    assertThat(element,notNullValue());
-    element.click();
-    element = ngDriver.findElement(NgBy.buttonText("Go", ngDriver));
-    assertThat(element,notNullValue());
-    element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
-    assertThat(element,notNullValue());
-    element.click();
-    Thread.sleep(5000);
-    element = ngDriver.findElement(NgBy.binding("latest", ngDriver)); 
-    assertThat(element,notNullValue());
-    assertThat(element.getText(), equalTo("42"));
-    highlight(element, 100);
-    ngDriver.close();
-    seleniumDriver.quit();
-
+	while (elements.hasMoreElements()){
+		WebElement next_element = elements.nextElement();
+		if (next_element.getText().indexOf("Harry Potter") >= 0 ){
+			System.err.println(next_element.getText());
+			next_element.click();
+		}
+	}
+	NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
+	assertTrue(login_element.isEnabled());	
+	login_element.click();			
+	assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
+	
+	NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
+	assertThat(account_number_element, notNullValue());
+	assertTrue(account_number_element.getText().matches("^\\d+$"));
+}
 ```
 for CI build replace the Setup () with
 ```
 	public static void setup() throws IOException {
 		seleniumDriver = new PhantomJSDriver();
-		ngDriver = NgDriverEnchancer.enchance(seleniumDriver , NgByIntegrationTest.class
-				.getClassLoader().getResource("integrationTests.properties"));
+		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
 ```
-Testing
+NOTE
 -------
-PhantomJs allows loading Angular samples as `file://` content.
+PhantomJs allows loading Angular samples via `file://` content.
 
 Author
 ------
