@@ -3,7 +3,8 @@ package com.jprotractor.integration;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.File;
@@ -142,19 +143,23 @@ import com.jprotractor.NgWebElement;
 			element.click();
 			element = ngDriver.findElement(NgBy.input("custId"));
 			assertThat(element.getAttribute("id"), equalTo("userSelect"));
-			List<WebElement> elements = ngDriver.findElements(NgBy.repeater("cust in Customers"));
-			
-			Enumeration<WebElement> elements_enumeration = Collections.enumeration(elements);
+			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 
-			while (elements_enumeration.hasMoreElements()){
-				WebElement next_element = elements_enumeration.nextElement();
+			while (elements.hasMoreElements()){
+				WebElement next_element = elements.nextElement();
 				if (next_element.getText().indexOf("Harry Potter") >= 0 ){
-					System.out.println(next_element.getText());
+					System.err.println(next_element.getText());
 					next_element.click();
 				}
 			}
-			element =  ngDriver.findElement(NgBy.buttonText("Login"));
-			assertTrue(element.isEnabled());
+			NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login_element.isEnabled());	
+			login_element.click();			
+			assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
+			
+			NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
+			assertThat(account_number_element, notNullValue());
+			assertTrue(account_number_element.getText().matches("^\\d+$"));
 		}
 	}
 }
