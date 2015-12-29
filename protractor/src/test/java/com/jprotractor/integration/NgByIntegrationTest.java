@@ -1,9 +1,9 @@
 package com.jprotractor.integration;
 
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.hamcrest.CoreMatchers.containsString;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.io.File;
@@ -12,7 +12,15 @@ import java.net.MalformedURLException;
 import java.net.BindException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Set;
+
 import java.util.concurrent.TimeUnit;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -73,7 +81,7 @@ import com.jprotractor.NgWebElement;
 	}
 
 	private static void highlight(NgWebElement element, long highlight_interval) throws InterruptedException {
-	highlight(element.getWrappedElement(), highlight_interval);
+		highlight(element.getWrappedElement(), highlight_interval);
 	}
 	
 	public static Object execute_script(String script,Object ... args){
@@ -128,9 +136,25 @@ import com.jprotractor.NgWebElement;
 		}
 
 		@Test
-		public void testButtons() throws Exception {
-			WebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
+		public void testCustomerLogin() throws Exception {
+			NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
 			highlight(element, 100);
+			element.click();
+			element = ngDriver.findElement(NgBy.input("custId"));
+			assertThat(element.getAttribute("id"), equalTo("userSelect"));
+			List<WebElement> elements = ngDriver.findElements(NgBy.repeater("cust in Customers"));
+			
+			Enumeration<WebElement> elements_enumeration = Collections.enumeration(elements);
+
+			while (elements_enumeration.hasMoreElements()){
+				WebElement next_element = elements_enumeration.nextElement();
+				if (next_element.getText().indexOf("Harry Potter") >= 0 ){
+					System.out.println(next_element.getText());
+					next_element.click();
+				}
+			}
+			element =  ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(element.isEnabled());
 		}
 	}
 }
