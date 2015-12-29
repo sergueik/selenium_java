@@ -25,7 +25,7 @@ public static void setup() throws IOException {
 
 @Before
 public void beforeEach() {		
-	String baseUrl = "http://juliemr.github.io/protractor-demo/";    
+	String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";    
 	ngDriver.navigate().to(baseUrl);
 }
 @Test
