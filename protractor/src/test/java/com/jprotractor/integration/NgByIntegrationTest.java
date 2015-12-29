@@ -3,6 +3,7 @@ package com.jprotractor.integration;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.CoreMatchers.containsString;
 
 import java.io.IOException;
 import java.io.File;
@@ -71,6 +72,10 @@ import com.jprotractor.NgWebElement;
 		execute_script("arguments[0].style.border=''", element);
 	}
 
+	private static void highlight(NgWebElement element, long highlight_interval) throws InterruptedException {
+	highlight(element.getWrappedElement(), highlight_interval);
+	}
+	
 	public static Object execute_script(String script,Object ... args){
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
@@ -91,7 +96,7 @@ import com.jprotractor.NgWebElement;
 
 		@Test
 		public void testAddition() throws Exception {
-			WebElement element = ngDriver.findElement(NgBy.model("first"));
+			NgWebElement element = ngDriver.findElement(NgBy.model("first"));
 			assertThat(element,notNullValue());
 			highlight(element, 100);
 			element.sendKeys("40");
@@ -102,14 +107,13 @@ import com.jprotractor.NgWebElement;
 			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
 			assertThat(element,notNullValue());
 			element.click();
-                        element = ngDriver.findElement(NgBy.buttonText("Go"));
+            element = ngDriver.findElement(NgBy.buttonText("Go!"));
 			assertThat(element,notNullValue());
-			element = seleniumDriver.findElement(By.xpath("//button[contains(.,'Go')]"));
-			assertThat(element,notNullValue());
+			assertThat(element.getText(),containsString("Go"));
 			element.click();
 			Thread.sleep(3000);
 			element = ngDriver.findElement(NgBy.binding("latest" )); 
-			assertThat(element,notNullValue());
+			assertThat(element, notNullValue());
 			assertThat(element.getText(), equalTo("42"));
 			highlight(element, 100);
 		}
