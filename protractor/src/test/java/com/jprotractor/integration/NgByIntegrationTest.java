@@ -60,8 +60,7 @@ import com.jprotractor.NgWebElement;
 	static WebDriverWait wait;
 	static Actions actions;
 	
-	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444
-	
+	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 	@BeforeClass
 	public static void setup() throws IOException {
 		DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
@@ -80,14 +79,12 @@ import com.jprotractor.NgWebElement;
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-    /*
 	// for CI build 
-	@BeforeClass
-	public static void setup() throws IOException {
-		seleniumDriver = new PhantomJSDriver();
-		ngDriver = new NgWebDriver(seleniumDriver);
-	}
-   */
+	// @BeforeClass
+	// public static void setup() throws IOException {
+	//	 seleniumDriver = new PhantomJSDriver();
+	//	 ngDriver = new NgWebDriver(seleniumDriver);
+	// }
    
 	@AfterClass
 	public static void teardown() {
@@ -155,6 +152,33 @@ import com.jprotractor.NgWebElement;
 			assertThat(account_number_element, notNullValue());
 			assertTrue(account_number_element.getText().matches("^\\d+$"));
 		}
+		
+		@Test
+		public void testAddCustomer() throws Exception {
+			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+			ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
+
+			NgWebElement firstNameElement  = ngDriver.findElement(NgBy.model("fName"));
+			assertThat(firstNameElement.getAttribute("placeholder"), equalTo("First Name"));
+			firstNameElement.sendKeys("John");
+
+			NgWebElement lastNameElement  = ngDriver.findElement(NgBy.model("lName"));
+			assertThat(lastNameElement.getAttribute("placeholder"), equalTo("Last Name"));
+			lastNameElement.sendKeys("Doe");
+
+			NgWebElement postCodeElement  = ngDriver.findElement(NgBy.model("postCd"));
+			assertThat(postCodeElement.getAttribute("placeholder"), equalTo("Post Code"));
+			postCodeElement.sendKeys("11011");
+
+
+			// NOTE: there are two 'Add Customer' buttons on this form
+			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
+			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
+			addCustomerButtonElement.submit();
+			seleniumDriver.switchTo().alert().accept();
+			// unfinished
+		}
+
 	}
 		public static class CalculatorTests{
 	

@@ -1,10 +1,10 @@
-/*
-var waitForAngular = function(rootSelector, callback) {
-
-var el = document.querySelector(rootSelector );
-angular.element(el).injector().get('$browser').notifyWhenNoOutstandingRequests(callback);
-*/
-
+/**
+ * Wait until Angular has finished rendering and has
+ * no outstanding $http calls before continuing.
+ *
+ * arguments[0] {string} The selector housing an ng-app
+ * arguments[1] {function} callback
+ */
 var waitForAngular = function(rootSelector, callback) {
     var el = document.querySelector(rootSelector);
     try {

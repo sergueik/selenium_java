@@ -23,6 +23,10 @@ public class NgBy
 		return new JavaScriptBy(ClientSideScripts.FindModel, model);
 	}
 
+	public static By partialButtonText(String text){
+		return new JavaScriptBy(ClientSideScripts.PartialButtonText, text);
+	}
+	
 	public static By repeater(String repeat){
 		return new JavaScriptBy(ClientSideScripts.FindAllRepeaterRows, repeat);
 	}
