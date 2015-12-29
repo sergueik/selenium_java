@@ -9,17 +9,25 @@ Origins:
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
 
 Goal is to close the gap between [jProtractor locator snippets](https://github.com/sergueik/jProtractor/tree/master/src/main/resources) and [genuine protractor ones](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
-Samples
 
+Tests
+-----
 For desktop browser testing, run a Selenium node and Selenium hub on port 4444 and 
-------
 ```
+@BeforeClass
+public static void setup() throws IOException {
     DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
     FirefoxProfile profile = new ProfilesIni().getProfile("default");
     capabilities.setCapability("firefox_profile", profile);
     seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
     ngDriver = new NgWebDriver(seleniumDriver);
-	
+}
+
+@Before
+public void beforeEach() {		
+	String baseUrl = "http://juliemr.github.io/protractor-demo/";    
+	ngDriver.navigate().to(baseUrl);
+}
 @Test
 public void testCustomerLogin() throws Exception {
 	NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
@@ -48,12 +56,24 @@ public void testCustomerLogin() throws Exception {
 ```
 for CI build replace the Setup () with
 ```
-	public static void setup() throws IOException {
-		seleniumDriver = new PhantomJSDriver();
-		ngDriver = new NgWebDriver(seleniumDriver);
-	}
-
+@BeforeClass
+public static void setup() throws IOException {
+	seleniumDriver = new PhantomJSDriver();
+	ngDriver = new NgWebDriver(seleniumDriver);
+}
 ```
+For testing your code with  jprotractor.jar, add it to `src/main/resources`:
+add 
+```
+<dependency>
+  <groupId>com.jprotractor</groupId>
+  <artifactId>jprotractor</artifactId>
+  <version>${jprotractor.version}</version>
+  <scope>system</scope>
+  <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
+</dependency>
+```
+
 NOTE
 -------
 PhantomJs allows loading Angular samples via `file://` content.
