@@ -33,13 +33,17 @@ import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -55,13 +59,36 @@ import com.jprotractor.NgWebElement;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
 	static Actions actions;
+	
+	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444
+	
+	@BeforeClass
+	public static void setup() throws IOException {
+		DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
+		FirefoxProfile profile = new ProfilesIni().getProfile("default");
+		capabilities.setCapability("firefox_profile", profile);
+		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+		try{
+			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
+			seleniumDriver.manage().timeouts()
+				.pageLoadTimeout(50, TimeUnit.SECONDS)
+				.implicitlyWait(20, TimeUnit.SECONDS)
+				.setScriptTimeout(10, TimeUnit.SECONDS);
+		}  catch(Exception ex) {
+			System.out.println(ex.toString());
+		}
+		ngDriver = new NgWebDriver(seleniumDriver);
+	}
 
+    /*
+	// for CI build 
 	@BeforeClass
 	public static void setup() throws IOException {
 		seleniumDriver = new PhantomJSDriver();
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
-
+   */
+   
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -95,45 +122,12 @@ import com.jprotractor.NgWebElement;
 		}
 	}
 
-	public static class CalculatorTests{
-
-		public static String baseUrl = "http://juliemr.github.io/protractor-demo/";
-   		@Before
-		public void beforeEach() {		    
-			ngDriver.navigate().to(baseUrl);
-		}
-
-		@Test
-		public void testAddition() throws Exception {
-			NgWebElement element = ngDriver.findElement(NgBy.model("first"));
-			assertThat(element,notNullValue());
-			highlight(element, 100);
-			element.sendKeys("40");
-			element = ngDriver.findElement(NgBy.model("second"));
-			assertThat(element,notNullValue());
-			highlight(element, 100);
-			element.sendKeys("2");
-			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
-			assertThat(element,notNullValue());
-			element.click();
-            element = ngDriver.findElement(NgBy.buttonText("Go!"));
-			assertThat(element,notNullValue());
-			assertThat(element.getText(),containsString("Go"));
-			element.click();
-			Thread.sleep(3000);
-			element = ngDriver.findElement(NgBy.binding("latest" )); 
-			assertThat(element, notNullValue());
-			assertThat(element.getText(), equalTo("42"));
-			highlight(element, 100);
-		}
-	}
 	public static class Way2AutomationTests {
 
 		public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
    		@Before
 		public void beforeEach() throws InterruptedException{
 			ngDriver.navigate().to(baseUrl);
-			Thread.sleep(3000);
 		}
 
 		@Test
@@ -162,4 +156,36 @@ import com.jprotractor.NgWebElement;
 			assertTrue(account_number_element.getText().matches("^\\d+$"));
 		}
 	}
+		public static class CalculatorTests{
+	
+        private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+   		@Before
+		public void beforeEach() {
+			ngDriver.navigate().to(baseUrl);
+		}
+
+		@Test
+		public void testAddition() throws Exception {
+			NgWebElement element = ngDriver.findElement(NgBy.model("first"));
+			assertThat(element,notNullValue());
+			highlight(element, 100);
+			element.sendKeys("40");
+			element = ngDriver.findElement(NgBy.model("second"));
+			assertThat(element,notNullValue());
+			highlight(element, 100);
+			element.sendKeys("2");
+			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
+			assertThat(element,notNullValue());
+			element.click();
+            element = ngDriver.findElement(NgBy.buttonText("Go!"));
+			assertThat(element,notNullValue());
+			assertThat(element.getText(),containsString("Go"));
+			element.click();
+			element = ngDriver.findElement(NgBy.binding("latest" )); 
+			assertThat(element, notNullValue());
+			assertThat(element.getText(), equalTo("42"));
+			highlight(element, 100);
+		}
+	}
+	
 }
