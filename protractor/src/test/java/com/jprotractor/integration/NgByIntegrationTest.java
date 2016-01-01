@@ -167,6 +167,52 @@ import com.jprotractor.NgWebElement;
 			assertThat(account_number_element, notNullValue());
 			assertTrue(account_number_element.getText().matches("^\\d+$"));
 		}
+		@Test
+		public void testListTransactions() throws Exception {
+			// customer login
+			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+			// select customer/account with transactions
+			assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
+
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+
+			while (customers.hasMoreElements()){
+				WebElement next_customer = customers.nextElement();
+				if (next_customer.getText().indexOf("Hermoine Granger") >= 0 ){
+					System.err.println(next_customer.getText());
+					next_customer.click();
+				}
+			}
+			NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login_element.isEnabled());
+			login_element.click();
+			Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
+
+			while (accounts.hasMoreElements()){
+				WebElement next_account = accounts.nextElement();
+				if (Integer.parseInt(next_account.getText()) == 1001){
+					System.err.println(next_account.getText());
+					next_account.click();
+				}
+			}
+			// inspect transactions
+			NgWebElement ng_transactions_element = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
+			assertThat(ng_transactions_element.getText(), equalTo("Transactions"));
+			highlight(ng_transactions_element);
+			ng_transactions_element.click();
+			// wait until transactions are loaded
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
+			Iterator<WebElement> ng_transaction_type_columns = ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type")).iterator();
+			while (ng_transaction_type_columns.hasNext() ) {
+				WebElement column = (WebElement) ng_transaction_type_columns.next();
+				if (column.getText().isEmpty()){
+					break;
+				}
+				if (column.getText().equalsIgnoreCase("Credit") ){
+					highlight(column);
+				}
+			}
+		}
 		
 		@Test
 		public void testAddCustomer() throws Exception {
