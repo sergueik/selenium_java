@@ -30,6 +30,9 @@ public class NgBy
 	public static By repeater(String repeat){
 		return new JavaScriptBy(ClientSideScripts.FindAllRepeaterRows, repeat);
 	}
+	public static By repeaterColumn(String repeat, String binding){
+		return new JavaScriptBy(ClientSideScripts.FindRepeaterColumn, repeat, binding);
+	}
 
 	public static By options(String options){
 		return new JavaScriptBy(ClientSideScripts.FindOptions, options);
