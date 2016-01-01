@@ -3,50 +3,58 @@ package com.jprotractor.integration;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.IOException;
 import java.io.File;
-import java.net.URI;
-import java.net.MalformedURLException;
+import java.io.IOException;
+
 import java.net.BindException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import java.util.concurrent.TimeUnit;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
+import org.junit.Test;
+
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
@@ -59,7 +67,8 @@ import com.jprotractor.NgWebElement;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
 	static Actions actions;
-	
+    static int flexible_wait_interval = 5;
+	static long wait_polling_interval = 500;
 	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -67,6 +76,9 @@ import com.jprotractor.NgWebElement;
 		FirefoxProfile profile = new ProfilesIni().getProfile("default");
 		capabilities.setCapability("firefox_profile", profile);
 		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+		wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
+		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+
 		try{
 			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
 			seleniumDriver.manage().timeouts()
@@ -76,29 +88,32 @@ import com.jprotractor.NgWebElement;
 		}  catch(Exception ex) {
 			System.out.println(ex.toString());
 		}
+		
 		ngDriver = new NgWebDriver(seleniumDriver);
+		actions = new Actions(seleniumDriver);
 	}
 
-	// for CI build 
+	// for CI build
 	// @BeforeClass
 	// public static void setup() throws IOException {
-	//	 seleniumDriver = new PhantomJSDriver();
-	//	 ngDriver = new NgWebDriver(seleniumDriver);
+	//	seleniumDriver = new PhantomJSDriver();
+	//	wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
+	//	wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+	//  actions = new Actions(seleniumDriver);
+	//	ngDriver = new NgWebDriver(seleniumDriver);
 	// }
-   
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
         seleniumDriver.quit();		
 	}
 	
-	private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
-		int flexible_wait_interval = 5;
-		long wait_polling_interval = 500;
-		if (wait == null)         {
-			wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
-		}
-		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+	private static void highlight(WebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(WebElement element, long highlight_interval ) throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(element));
 		execute_script("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight_interval);
@@ -134,13 +149,13 @@ import com.jprotractor.NgWebElement;
 			element.click();
 			element = ngDriver.findElement(NgBy.input("custId"));
 			assertThat(element.getAttribute("id"), equalTo("userSelect"));
-			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 
-			while (elements.hasMoreElements()){
-				WebElement next_element = elements.nextElement();
-				if (next_element.getText().indexOf("Harry Potter") >= 0 ){
-					System.err.println(next_element.getText());
-					next_element.click();
+			while (customers.hasMoreElements()){
+				WebElement next_customer = customers.nextElement();
+				if (next_customer.getText().indexOf("Harry Potter") >= 0 ){
+					System.err.println(next_customer.getText());
+					next_customer.click();
 				}
 			}
 			NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
@@ -170,13 +185,38 @@ import com.jprotractor.NgWebElement;
 			assertThat(postCodeElement.getAttribute("placeholder"), equalTo("Post Code"));
 			postCodeElement.sendKeys("11011");
 
-
 			// NOTE: there are two 'Add Customer' buttons on this form
 			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
 			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
 			addCustomerButtonElement.submit();
-			seleniumDriver.switchTo().alert().accept();
-			// unfinished
+			Alert alert =  seleniumDriver.switchTo().alert();
+			String customer_added = "Customer added successfully with customer id :(\\d+)";
+			
+			Pattern pattern = Pattern.compile(customer_added);
+            Matcher matcher = pattern.matcher(alert.getText());
+			if (matcher.find()) {
+				System.out.println("customer id " + matcher.group(1) );
+			}
+			// confirm alert
+			alert.accept();
+			
+			// switch to "Customers" screen
+			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
+			Thread.sleep(1000);
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
+			
+			WebElement next_customer = null;
+			while (customers.hasMoreElements()){
+				next_customer = customers.nextElement();
+				if (next_customer.getText().indexOf("John Doe") >= 0 ){
+					System.err.println(next_customer.getText());					
+				}
+			}
+			assertThat(next_customer, notNullValue());
+			actions.moveToElement(next_customer).build().perform();
+
+			highlight(next_customer);
+			// unfinished - find and click 'Delete' column
 		}
 
 	}
@@ -205,11 +245,10 @@ import com.jprotractor.NgWebElement;
 			assertThat(element,notNullValue());
 			assertThat(element.getText(),containsString("Go"));
 			element.click();
-			element = ngDriver.findElement(NgBy.binding("latest" )); 
+			element = ngDriver.findElement(NgBy.binding("latest" ));
 			assertThat(element, notNullValue());
 			assertThat(element.getText(), equalTo("42"));
 			highlight(element, 100);
 		}
 	}
-	
 }
