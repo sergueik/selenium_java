@@ -67,8 +67,8 @@ import com.jprotractor.NgWebElement;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
 	static Actions actions;
-    static int flexible_wait_interval = 5;
-	static long wait_polling_interval = 500;
+    static int flexibleWait = 5;
+	static long pollingInterval = 500;
 	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -76,8 +76,8 @@ import com.jprotractor.NgWebElement;
 		FirefoxProfile profile = new ProfilesIni().getProfile("default");
 		capabilities.setCapability("firefox_profile", profile);
 		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-		wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
-		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+		wait = new WebDriverWait(seleniumDriver, flexibleWait );
+		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 
 		try{
 			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
@@ -88,17 +88,16 @@ import com.jprotractor.NgWebElement;
 		}  catch(Exception ex) {
 			System.out.println(ex.toString());
 		}
-		
+		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
-		actions = new Actions(seleniumDriver);
 	}
 
 	// for CI build
 	// @BeforeClass
 	// public static void setup() throws IOException {
 	//	seleniumDriver = new PhantomJSDriver();
-	//	wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
-	//	wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+	//	wait = new WebDriverWait(seleniumDriver, flexibleWait );
+	//	wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 	//  actions = new Actions(seleniumDriver);
 	//	ngDriver = new NgWebDriver(seleniumDriver);
 	// }
@@ -113,18 +112,18 @@ import com.jprotractor.NgWebElement;
 		highlight(element,  100);
 	}
 
-	private static void highlight(WebElement element, long highlight_interval ) throws InterruptedException {
+	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(element));
-		execute_script("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
-		execute_script("arguments[0].style.border=''", element);
+		executeScript("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlightInterval);
+		executeScript("arguments[0].style.border=''", element);
 	}
 
-	private static void highlight(NgWebElement element, long highlight_interval) throws InterruptedException {
-		highlight(element.getWrappedElement(), highlight_interval);
+	private static void highlight(NgWebElement element, long highlightInterval) throws InterruptedException {
+		highlight(element.getWrappedElement(), highlightInterval);
 	}
 	
-	public static Object execute_script(String script,Object ... args){
+	public static Object executeScript(String script,Object ... args){
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
 			return javascriptExecutor.executeScript(script,args);
@@ -149,23 +148,25 @@ import com.jprotractor.NgWebElement;
 			element.click();
 			element = ngDriver.findElement(NgBy.input("custId"));
 			assertThat(element.getAttribute("id"), equalTo("userSelect"));
-			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
+			highlight(element, 100);
+
+			Enumeration<WebElement> customers = Collections.enumeration(element.findElements(NgBy.repeater("cust in Customers")));
 
 			while (customers.hasMoreElements()){
-				WebElement next_customer = customers.nextElement();
-				if (next_customer.getText().indexOf("Harry Potter") >= 0 ){
-					System.err.println(next_customer.getText());
-					next_customer.click();
+				WebElement currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+					System.err.println(currentCustomer.getText());
+					currentCustomer.click();
 				}
 			}
-			NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
-			assertTrue(login_element.isEnabled());	
-			login_element.click();			
+			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login.isEnabled());	
+			login.click();			
 			assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
 			
-			NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
-			assertThat(account_number_element, notNullValue());
-			assertTrue(account_number_element.getText().matches("^\\d+$"));
+			NgWebElement accountNumber = ngDriver.findElement(NgBy.binding("accountNo"));
+			assertThat(accountNumber, notNullValue());
+			assertTrue(accountNumber.getText().matches("^\\d+$"));
 		}
 		@Test
 		public void testListTransactions() throws Exception {
@@ -177,39 +178,40 @@ import com.jprotractor.NgWebElement;
 			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
 
 			while (customers.hasMoreElements()){
-				WebElement next_customer = customers.nextElement();
-				if (next_customer.getText().indexOf("Hermoine Granger") >= 0 ){
-					System.err.println(next_customer.getText());
-					next_customer.click();
+				WebElement currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
+					System.err.println(currentCustomer.getText());
+					currentCustomer.click();
 				}
 			}
-			NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
-			assertTrue(login_element.isEnabled());
-			login_element.click();
+			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login.isEnabled());
+			login.click();
 			Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
 
 			while (accounts.hasMoreElements()){
-				WebElement next_account = accounts.nextElement();
-				if (Integer.parseInt(next_account.getText()) == 1001){
-					System.err.println(next_account.getText());
-					next_account.click();
+				WebElement currentAccount = accounts.nextElement();
+				if (Integer.parseInt(currentAccount.getText()) == 1001){
+					System.err.println(currentAccount.getText());
+					currentAccount.click();
 				}
 			}
 			// inspect transactions
-			NgWebElement ng_transactions_element = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
-			assertThat(ng_transactions_element.getText(), equalTo("Transactions"));
-			highlight(ng_transactions_element);
-			ng_transactions_element.click();
+			NgWebElement transactions = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
+			assertThat(transactions.getText(), equalTo("Transactions"));
+			highlight(transactions);
+			transactions.click();
 			// wait until transactions are loaded
+			Thread.sleep(1000);
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
-			Iterator<WebElement> ng_transaction_type_columns = ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type")).iterator();
-			while (ng_transaction_type_columns.hasNext() ) {
-				WebElement column = (WebElement) ng_transaction_type_columns.next();
-				if (column.getText().isEmpty()){
+			Iterator<WebElement> transactionTypeColumns = ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type")).iterator();
+			while (transactionTypeColumns.hasNext() ) {
+				WebElement transactionTypeColumn = (WebElement) transactionTypeColumns.next();
+				if (transactionTypeColumn.getText().isEmpty()){
 					break;
 				}
-				if (column.getText().equalsIgnoreCase("Credit") ){
-					highlight(column);
+				if (transactionTypeColumn.getText().equalsIgnoreCase("Credit") ){
+					highlight(transactionTypeColumn);
 				}
 			}
 		}
@@ -219,17 +221,17 @@ import com.jprotractor.NgWebElement;
 			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
 			ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
 
-			NgWebElement firstNameElement  = ngDriver.findElement(NgBy.model("fName"));
-			assertThat(firstNameElement.getAttribute("placeholder"), equalTo("First Name"));
-			firstNameElement.sendKeys("John");
+			NgWebElement firstName  = ngDriver.findElement(NgBy.model("fName"));
+			assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
+			firstName.sendKeys("John");
 
-			NgWebElement lastNameElement  = ngDriver.findElement(NgBy.model("lName"));
-			assertThat(lastNameElement.getAttribute("placeholder"), equalTo("Last Name"));
-			lastNameElement.sendKeys("Doe");
+			NgWebElement lastName  = ngDriver.findElement(NgBy.model("lName"));
+			assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
+			lastName.sendKeys("Doe");
 
-			NgWebElement postCodeElement  = ngDriver.findElement(NgBy.model("postCd"));
-			assertThat(postCodeElement.getAttribute("placeholder"), equalTo("Post Code"));
-			postCodeElement.sendKeys("11011");
+			NgWebElement postCode  = ngDriver.findElement(NgBy.model("postCd"));
+			assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
+			postCode.sendKeys("11011");
 
 			// NOTE: there are two 'Add Customer' buttons on this form
 			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
@@ -249,20 +251,36 @@ import com.jprotractor.NgWebElement;
 			// switch to "Customers" screen
 			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
 			Thread.sleep(1000);
+			
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
+
 			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 			
-			WebElement next_customer = null;
+			WebElement currentCustomer = null;
 			while (customers.hasMoreElements()){
-				next_customer = customers.nextElement();
-				if (next_customer.getText().indexOf("John Doe") >= 0 ){
-					System.err.println(next_customer.getText());					
+				currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
+					System.err.println(currentCustomer.getText());					
+					break;
 				}
 			}
-			assertThat(next_customer, notNullValue());
-			actions.moveToElement(next_customer).build().perform();
+			assertThat(currentCustomer, notNullValue());
+			actions.moveToElement(currentCustomer).build().perform();
 
-			highlight(next_customer);
-			// unfinished - find and click 'Delete' column
+			highlight(currentCustomer);
+			
+			// delete the new customer
+            NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
+			assertThat(deleteCustomerButton, notNullValue());
+			assertThat(deleteCustomerButton.getText(),containsString("Delete"));
+			highlight(deleteCustomerButton,300);
+			actions.moveToElement(deleteCustomerButton.getWrappedElement()).clickAndHold().build().perform();
+			Thread.sleep(100);
+			actions.release().build().perform();
+			// let the customers reload
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
+			Thread.sleep(1000);
+			// TODO: assert the customers.count change
 		}
 
 	}
