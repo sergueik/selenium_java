@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriverException;
@@ -38,7 +39,14 @@ public class NgWebElement implements WebElement, WrapsElement
         this.element.click();
 	}
 
+	public Object evaluate(String expression){
+		this.ngDriver.WaitForAngular();
+		JavascriptExecutor jsExecutor = (JavascriptExecutor)this.ngDriver.getWrappedDriver();
+		return jsExecutor.executeScript(ClientSideScripts.Evaluate, this.element, expression);
+	}
+	
 	public NgWebElement findElement(By arg0) {
+	
 		if (arg0 instanceof JavaScriptBy)
         {
             ((JavaScriptBy)arg0).RootElement = this.element;
