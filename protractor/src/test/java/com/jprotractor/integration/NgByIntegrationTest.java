@@ -77,7 +77,8 @@ import com.jprotractor.NgWebElement;
 	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
-	static boolean isDestopTesting = false;
+	// set to true for Desktop, false for CI testing
+	static boolean isDestopTesting = true; 
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -249,7 +250,7 @@ import com.jprotractor.NgWebElement;
 				alert = seleniumDriver.switchTo().alert();
 				String alert_text = alert.getText();
 				assertThat(alert_text,containsString("Account created successfully with account Number"));
-				Pattern pattern = Pattern.compile("\\d+");
+				Pattern pattern = Pattern.compile("(\\d+)");
 				Matcher matcher = pattern.matcher(alert_text);
 				if (matcher.find()) {
 					System.err.println("account id " + matcher.group(1) );
