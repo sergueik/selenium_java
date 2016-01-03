@@ -1,5 +1,6 @@
 package com.jprotractor.integration;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -44,6 +45,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.Platform;
@@ -64,6 +66,7 @@ import com.jprotractor.NgWebElement;
 @RunWith(Enclosed.class)
 // @Category(Integration.class)
 	public class NgByIntegrationTest {
+        private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
@@ -162,8 +165,9 @@ import com.jprotractor.NgWebElement;
 			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 			assertTrue(login.isEnabled());	
 			login.click();			
+			// the {{user}} is composed from first and last name	
+			assertTrue(ngDriver.findElement(NgBy.binding("user")).getText().matches("^(?:[^ ]+) +(?:[^ ]+)$"));
 			assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
-			
 			NgWebElement accountNumber = ngDriver.findElement(NgBy.binding("accountNo"));
 			assertThat(accountNumber, notNullValue());
 			assertTrue(accountNumber.getText().matches("^\\d+$"));
@@ -217,6 +221,56 @@ import com.jprotractor.NgWebElement;
 			}
 		}
 		
+		@Test
+		public void testOpenAccount() throws Exception {
+			// bank manager login
+			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+			ngDriver.findElement(NgBy.partialButtonText("Open Account")).click();
+			// wait for customers info get loaded
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers")).getWrappedElement()));
+			NgWebElement selectCustomer = ngDriver.findElement(NgBy.model("custId"));
+			assertThat(selectCustomer.getAttribute("id"),containsString("userSelect"));
+			List<WebElement> customers = new NgWebElement(ngDriver,selectCustomer).findElements(NgBy.repeater("cust in Customers"));
+			// pick random customer to log in
+			WebElement customer = customers.get((int)(Math.random()*customers.size()));
+			System.err.println(customer.getText());
+			customer.click();
+			NgWebElement ng_selectCurrencies = ngDriver.findElement(NgBy.model("currency"));
+			// use core Selenium
+			Select selectCurrencies = new Select(ng_selectCurrencies.getWrappedElement());
+			List<WebElement> accountCurrencies = selectCurrencies.getOptions();
+			// select "Dollars"
+			selectCurrencies.selectByVisibleText("Dollar");
+			// add the account
+			WebElement submitButton = ngDriver.getWrappedDriver().findElement(By.xpath("/html/body//form/button[@type='submit']"));
+			assertThat(submitButton.getText(),containsString("Process"));
+			submitButton.click();
+			try{
+				alert = seleniumDriver.switchTo().alert();
+				String alert_text = alert.getText();
+				assertThat(alert_text,containsString("Account created successfully with account Number"));
+				Pattern pattern = Pattern.compile("\\d+");
+				Matcher matcher = pattern.matcher(alert_text);
+				if (matcher.find()) {
+					System.err.println("account id " + matcher.group(1) );
+				}
+				// confirm alert
+				alert.accept();
+
+			} catch (NoAlertPresentException ex){
+				// Alert not present
+				System.err.println(ex.getStackTrace());
+				return;
+			} catch(WebDriverException ex){
+				// Alert not handled by PhantomJS
+				// fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
+				// System.err.println("Alert was not handled by PhantomJS: " + fullStackTrace);
+				System.err.println("Alert was not handled by PhantomJS: " + ex.getStackTrace().toString());
+				return;
+			}
+
+		}
+
 		@Test
 		public void testSortCustomerAccounts() throws Exception {
 			// bank manager login
@@ -309,10 +363,15 @@ import com.jprotractor.NgWebElement;
 			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
 			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
 			addCustomerButtonElement.submit();
-			try{
+			try {
 				alert = seleniumDriver.switchTo().alert();
+			} catch (NoAlertPresentException ex){
+				// Alert not present
+				System.err.println(ex.getStackTrace());
+				return;
 			} catch(WebDriverException ex){
 				// Alert not handled by PhantomJS
+				System.err.println("Alert was not handled by PhantomJS: " + ex.getStackTrace());
 				return;
 			}
 			String customer_added = "Customer added successfully with customer id :(\\d+)";
@@ -320,7 +379,7 @@ import com.jprotractor.NgWebElement;
 			Pattern pattern = Pattern.compile(customer_added);
 			Matcher matcher = pattern.matcher(alert.getText());
 			if (matcher.find()) {
-				System.out.println("customer id " + matcher.group(1) );
+				System.err.println("customer id " + matcher.group(1) );
 			}
 			// confirm alert
 			alert.accept();
