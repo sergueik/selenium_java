@@ -1,66 +1,10 @@
 package com.mycompany.app;
 
-import static org.junit.Assert.assertTrue;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
 
 import java.awt.Toolkit;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import java.util.Hashtable;
+import java.io.File;
+import java.io.IOException;
 import java.lang.RuntimeException;
-
-import java.io.File;
-import java.io.IOException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
-import static org.junit.Assert.*;
-
-import org.openqa.selenium.Alert;
-
-import org.openqa.selenium.By;
-
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import com.jprotractor.NgBy;
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
-
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
-import java.io.File;
-import java.io.IOException;
 
 import java.net.BindException;
 import java.net.MalformedURLException;
@@ -71,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -82,6 +27,7 @@ import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.experimental.categories.Category;
@@ -89,9 +35,18 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.Test;
 
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
@@ -113,13 +68,12 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 public class App {
+
 	public static VideoRecorder recorder;
 	private static WebDriver seleniumDriver;
 	private static NgWebDriver ngDriver;
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";			
-			static int implicit_wait_interval = 1;
-	static int flexible_wait_interval = 5;
-	static long wait_polling_interval = 500;
+	static int implicitWait = 10;
 	static int width = 600;
 	static int height = 400;
 	static WebDriverWait wait;
@@ -127,37 +81,33 @@ public class App {
     static int flexibleWait = 5;
 	static long pollingInterval = 500;
 
-
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
 	@Before
-public static void setUp() throws Exception {
+	public static void setUp() throws Exception {
 		seleniumDriver = new FirefoxDriver();
 		wait = new WebDriverWait(seleniumDriver, flexibleWait );
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-
 		try{
 			seleniumDriver.manage().window().setSize(new Dimension(width , height ));
 			seleniumDriver.manage().timeouts()
 				.pageLoadTimeout(50, TimeUnit.SECONDS)
-				.implicitlyWait(20, TimeUnit.SECONDS)
+				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
 		}  catch(Exception ex) {
 			System.out.println(ex.toString());
 		}
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
-	ngDriver.navigate().to(baseUrl);
-	Thread.sleep(10000);
-	recorder = new VideoRecorder();
-
-	recorder.startRecording(seleniumDriver);
-        
+		ngDriver.navigate().to(baseUrl);
+		// Thread.sleep(10000);
+		recorder = new VideoRecorder();
+		recorder.startRecording(seleniumDriver);			
 	}
 
 
 	private static String css_selector_of(WebElement element){
-		String script =  "function get_css_selector_of(element) {\n" +
+		String script = "function get_css_selector_of(element) {\n" +
 						"if (!(element instanceof Element))\n" +
 						"return;\n" +
 						"var path = [];\n" +
@@ -196,10 +146,6 @@ public static void setUp() throws Exception {
 		highlight(element, 100);
 	}
 	private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
-		if (wait == null)         {
-			wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
-		}
-		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
 		wait.until(ExpectedConditions.visibilityOf(element));
 		execute_script("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight_interval);
@@ -207,7 +153,7 @@ public static void setUp() throws Exception {
 	}
 
 	private static String xpath_of(WebElement element){
-		String script =  "function get_xpath_of(element) {\n" +
+		String script = "function get_xpath_of(element) {\n" +
 						" var elementTagName = element.tagName.toLowerCase();\n" +
 						"     if (element.id != '') {\n" +
 						"         return '//' + elementTagName + '[@id=\"' + element.id + '\"]';\n" +
@@ -237,6 +183,7 @@ public static void setUp() throws Exception {
 						" return get_xpath_of(arguments[0]);\n";
 		return (String) execute_script(script, element);
 	}
+	
 	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.JavascriptExecutor
 	public static Object execute_script(String script,Object ... args){
 		if (seleniumDriver instanceof JavascriptExecutor) {
@@ -293,19 +240,13 @@ public static void setUp() throws Exception {
 			elements = finder.findElements(By.xpath(selector_value));
 		}
 		return elements;
-
 	}
 
 	private static List<WebElement> find_elements(String selector_type, String selector_value){
 		return find_elements(selector_type, selector_value, null);
 	}
 
-
 	private static WebElement find_element(String selector_type, String selector_value){
-		int flexible_wait_interval = 5;
-		long wait_polling_interval = 500;
-		WebDriverWait wait = new WebDriverWait(seleniumDriver, flexible_wait_interval );
-		wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
 		WebElement element = null;
 		Hashtable<String, Boolean> supported_selectors = new Hashtable<String, Boolean>();
 		supported_selectors.put("id", true);
@@ -366,25 +307,23 @@ public static void setUp() throws Exception {
 	public static void main(String[] args) throws Exception {
 		setUp();
 	// 	testVerifyText();
-//	testAddition();
-testAddCustomer();
+	//	testAddition();
+	testAddCustomer();
 	// 	testByModel();
 		tearDown();
-
-
 	}
+	
 	@Test
 	public static void testVerifyText()  throws Exception   {
 		String selector = null;
 		WebElement element = null;
 		try {
 			assertEquals("Hotels", find_element("link_text", "Hotels").getText());
-
 		} catch (Error e) {
 			verificationErrors.append(e.toString());
 		}
 		try {
-			element =  find_element("link_text", "Hotels");
+			element = find_element("link_text", "Hotels");
 			highlight(element);
 			selector = xpath_of(element);
 			assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
@@ -393,13 +332,13 @@ testAddCustomer();
 		}
 
 		try {
-			element =  find_element("xpath", selector);
+			element = find_element("xpath", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
 			verificationErrors.append(e.toString());
 		}
 		try {
-			element =  find_element("link_text", "Hotels");
+			element = find_element("link_text", "Hotels");
 			highlight(element);
 			selector = css_selector_of(element);
 			assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a", selector);
@@ -407,7 +346,7 @@ testAddCustomer();
 			verificationErrors.append(e.toString());
 		}
 		try {
-			element =  find_element("css_selector", selector);
+			element = find_element("css_selector", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
 
@@ -415,7 +354,7 @@ testAddCustomer();
 		}
 
 		try {
-			element =  find_element("css_selector", "input#mainSearch");
+			element = find_element("css_selector", "input#mainSearch");
 			selector = css_selector_of(element);
 			highlight(element);
 			assertEquals("input#mainSearch", selector);
@@ -428,79 +367,75 @@ testAddCustomer();
 		}
 	}
 
+	@Test
+	public static  void testAddCustomer() throws Exception {
+		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+		ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
 
+		WebElement firstName = ngDriver.findElement(NgBy.model("fName"));
+		assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
+		firstName.sendKeys("John");
 
+		WebElement lastName = ngDriver.findElement(NgBy.model("lName"));
+		assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
+		lastName.sendKeys("Doe");
 
-		@Test
-		public static  void testAddCustomer() throws Exception {
-			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
-			ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
+		WebElement postCode = ngDriver.findElement(NgBy.model("postCd"));
+		assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
+		postCode.sendKeys("11011");
 
-			WebElement firstName  = ngDriver.findElement(NgBy.model("fName"));
-			assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
-			firstName.sendKeys("John");
-
-			WebElement lastName  = ngDriver.findElement(NgBy.model("lName"));
-			assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
-			lastName.sendKeys("Doe");
-
-			WebElement postCode  = ngDriver.findElement(NgBy.model("postCd"));
-			assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
-			postCode.sendKeys("11011");
-
-			// NOTE: there are two 'Add Customer' buttons on this form
-			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
-			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
-			addCustomerButtonElement.submit();
-			Alert alert =  seleniumDriver.switchTo().alert();
-			String customer_added = "Customer added successfully with customer id :(\\d+)";
-			
-			Pattern pattern = Pattern.compile(customer_added);
-            Matcher matcher = pattern.matcher(alert.getText());
-			if (matcher.find()) {
-				System.out.println("customer id " + matcher.group(1) );
-			}
-			// confirm alert
-			alert.accept();
-			
-			// switch to "Customers" screen
-			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
-			Thread.sleep(1000);
-			
-			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-
-			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
-			
-			WebElement currentCustomer = null;
-			while (customers.hasMoreElements()){
-				currentCustomer = customers.nextElement();
-				if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
-					System.err.println(currentCustomer.getText());					
-					break;
-				}
-			}
-			assertThat(currentCustomer, notNullValue());
-			actions.moveToElement(currentCustomer).build().perform();
-
-			highlight(currentCustomer);
-			
-			// delete the new customer
-            		NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
-			assertThat(deleteCustomerButton, notNullValue());
-			assertThat(deleteCustomerButton.getText(),containsString("Delete"));
-			highlight(deleteCustomerButton,300);
-			actions.moveToElement(deleteCustomerButton.getWrappedElement()).clickAndHold().build().perform();
-			Thread.sleep(100);
-			actions.release().build().perform();
-			// let the customers reload
-			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-			Thread.sleep(1000);
-			// TODO: assert the customers.count change
+		// NOTE: there are two 'Add Customer' buttons on this form
+		Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
+		WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
+		addCustomerButtonElement.submit();
+		Alert alert = seleniumDriver.switchTo().alert();
+		String customer_added = "Customer added successfully with customer id :(\\d+)";
+		
+		Pattern pattern = Pattern.compile(customer_added);
+		Matcher matcher = pattern.matcher(alert.getText());
+		if (matcher.find()) {
+			System.out.println("customer id " + matcher.group(1) );
 		}
+		// confirm alert
+		alert.accept();
+		
+		// switch to "Customers" screen
+		ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
+		Thread.sleep(1000);
+		
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
+
+		Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
+		
+		WebElement currentCustomer = null;
+		while (customers.hasMoreElements()){
+			currentCustomer = customers.nextElement();
+			if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
+				System.err.println(currentCustomer.getText());					
+				break;
+			}
+		}
+		assertThat(currentCustomer, notNullValue());
+		actions.moveToElement(currentCustomer).build().perform();
+
+		highlight(currentCustomer);
+		
+		// delete the new customer
+				NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
+		assertThat(deleteCustomerButton, notNullValue());
+		assertThat(deleteCustomerButton.getText(),containsString("Delete"));
+		highlight(deleteCustomerButton,300);
+		actions.moveToElement(deleteCustomerButton.getWrappedElement()).clickAndHold().build().perform();
+		Thread.sleep(100);
+		actions.release().build().perform();
+		// let the customers reload
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
+		Thread.sleep(1000);
+		// TODO: assert the customers.count change
+	}
 
 	@After
-	public static void tearDown()  throws Exception
-	{
+	public static void tearDown()  throws Exception {
 		recorder.stopRecording("Recording");
 		ngDriver.close();
 		seleniumDriver.quit();

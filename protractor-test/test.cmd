@@ -3,18 +3,23 @@
 REM This script expects the environment to be set up and Java tool chain in the PATH
 
 call mvn.bat clean package
+
 set TARGET=%CD%\target
+set SELENIUM_HOME=c:\java\selenium
 set SELENIUM_VERSION=2.44.0
+set APP_VERSION=0.1-SNAPSHOT
 set PROTRACTOR_VERSION=1.0-SNAPSHOT
 set MONTE_VERSION=1.0
 set M2_REPOSITORY=%USERPROFILE%\.m2\repository
+set MAVEN_OPTS=-Xms256m -Xmx512m
 
+set LAUNCHER_OPTS=-XX:PermSize=512M -XX:MaxPermSize=512M -Xmn128M -Xms512M -Xmx512M
 
-java.exe -cp ^
-target\app-0.1-SNAPSHOT.jar;^
-src\main\resources\jprotractor-1.0-SNAPSHOT.jar;^
-%USERPROFILE%\.m2\repository\com\pojosontheweb\monte-repack\1.0\monte-repack-1.0.jar;^
-c:\java\selenium\selenium-server-standalone-2.44.0.jar;^
+java.exe %LAUNCHER_OPTS%  -cp ^
+target\app-%APP_VERSION%.jar;^
+src\main\resources\jprotractor-%PROTRACTOR_VERSION%.jar;^
+%M2_REPOSITORY%\com\pojosontheweb\monte-repack\%MONTE_VERSION%\monte-repack-%MONTE_VERSION%.jar;^
+%SELENIUM_HOME%\selenium-server-standalone-%SELENIUM_VERSION%.jar;^
 target\lib\* ^
 com.mycompany.app.App
 
@@ -22,8 +27,3 @@ com.mycompany.app.App
 
 goto :EOF
 
-REM http://selenium-suresh.blogspot.com/2013/09/selenium-webdriver-methods-with-examples.html
-REM https://groups.google.com/forum/#!topic/selenium-users/i_xKZpLfuTk
-
-
--Dfile=src\main\resources\jprotractor-1.0-SNAPSHOT.jar -DgroupId=com.jprotractor -DartifactId=jprotractor -Dversion=1.0-SNAPSHOT -Dpackaging=jar -DgeneratePom=true
