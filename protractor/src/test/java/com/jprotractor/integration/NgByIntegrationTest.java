@@ -67,27 +67,24 @@ import com.jprotractor.NgWebElement;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
 	static Actions actions;
+	static int implicitWait = 10;
     static int flexibleWait = 5;
 	static long pollingInterval = 500;
+	static int width = 600;
+	static int height = 400;
+
 	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 	@BeforeClass
 	public static void setup() throws IOException {
 		DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
 		FirefoxProfile profile = new ProfilesIni().getProfile("default");
+		profile.setEnableNativeEvents(false);
 		capabilities.setCapability("firefox_profile", profile);
-		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);		
+		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
+		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(seleniumDriver, flexibleWait );
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-
-		try{
-			seleniumDriver.manage().window().setSize(new Dimension(600, 800));
-			seleniumDriver.manage().timeouts()
-				.pageLoadTimeout(50, TimeUnit.SECONDS)
-				.implicitlyWait(20, TimeUnit.SECONDS)
-				.setScriptTimeout(10, TimeUnit.SECONDS);
-		}  catch(Exception ex) {
-			System.out.println(ex.toString());
-		}
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
@@ -168,6 +165,54 @@ import com.jprotractor.NgWebElement;
 			assertThat(accountNumber, notNullValue());
 			assertTrue(accountNumber.getText().matches("^\\d+$"));
 		}
+		@Test
+		public void testEvaluateTransactionDetails() throws Exception {
+			// customer login
+			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+			// select customer/account with transactions
+			assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
+
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+
+			while (customers.hasMoreElements()){
+				WebElement currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
+					System.err.println(currentCustomer.getText());
+					currentCustomer.click();
+				}
+			}
+			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login.isEnabled());
+			login.click();
+			Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
+
+			while (accounts.hasMoreElements()){
+				WebElement currentAccount = accounts.nextElement();
+				if (Integer.parseInt(currentAccount.getText()) == 1001){
+					System.err.println(currentAccount.getText());
+					currentAccount.click();
+				}
+			}
+			// inspect transactions
+			NgWebElement transactions_button = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
+						
+			assertThat(transactions_button.getText(), equalTo("Transactions"));
+			highlight(transactions_button);
+			transactions_button.click();
+			// wait until transactions are loaded
+			Thread.sleep(1000);
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
+			Iterator<WebElement> transactions = ngDriver.findElements(NgBy.repeater("tx in transactions")).iterator();
+			int cnt = 0 ;
+			while (transactions.hasNext() && cnt++ < 5) {
+				WebElement currentTransaction = (WebElement) transactions.next();
+				NgWebElement ngCurrentTransaction = new NgWebElement(ngDriver, currentTransaction);
+				assertTrue(ngCurrentTransaction.evaluate("tx.amount").toString().matches("^\\d+$"));
+				assertTrue(ngCurrentTransaction.evaluate("tx.type").toString().matches("(?i:credit|debit)"));
+				Object transaction_date = ngCurrentTransaction.evaluate("tx.date");
+			}
+		}
+		
 		@Test
 		public void testListTransactions() throws Exception {
 			// customer login
@@ -274,6 +319,7 @@ import com.jprotractor.NgWebElement;
 			assertThat(deleteCustomerButton, notNullValue());
 			assertThat(deleteCustomerButton.getText(),containsString("Delete"));
 			highlight(deleteCustomerButton,300);
+			// .. in slow motion
 			actions.moveToElement(deleteCustomerButton.getWrappedElement()).clickAndHold().build().perform();
 			Thread.sleep(100);
 			actions.release().build().perform();
