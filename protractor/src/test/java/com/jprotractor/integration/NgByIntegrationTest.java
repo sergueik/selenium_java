@@ -54,6 +54,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import com.jprotractor.NgBy;
@@ -66,21 +67,18 @@ import com.jprotractor.NgWebElement;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
-	static Actions actions;
+	static Actions actions; 
+	static Alert alert;
 	static int implicitWait = 10;
-    static int flexibleWait = 5;
+	static int flexibleWait = 5;
 	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
+	static boolean isDestopTesting = false;
 
-	// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 	@BeforeClass
 	public static void setup() throws IOException {
-		DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
-		FirefoxProfile profile = new ProfilesIni().getProfile("default");
-		profile.setEnableNativeEvents(false);
-		capabilities.setCapability("firefox_profile", profile);
-		seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);		
+		seleniumDriver = getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(seleniumDriver, flexibleWait );
@@ -89,20 +87,25 @@ import com.jprotractor.NgWebElement;
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	// for CI build
-	// @BeforeClass
-	// public static void setup() throws IOException {
-	//	seleniumDriver = new PhantomJSDriver();
-	//	wait = new WebDriverWait(seleniumDriver, flexibleWait );
-	//	wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-	//  actions = new Actions(seleniumDriver);
-	//	ngDriver = new NgWebDriver(seleniumDriver);
-	// }
+	private static WebDriver getSeleniumDriver() throws IOException {
+		// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
+		if (isDestopTesting ){
+			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
+			FirefoxProfile profile = new ProfilesIni().getProfile("default");
+			profile.setEnableNativeEvents(false);
+			capabilities.setCapability("firefox_profile", profile);
+			seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+			return seleniumDriver;
+		} else {
+		// for CI build
+			return new PhantomJSDriver();
+		}
+	}
 
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
-        seleniumDriver.quit();		
+		seleniumDriver.quit();		
 	}
 	
 	private static void highlight(WebElement element) throws InterruptedException {
@@ -141,11 +144,11 @@ import com.jprotractor.NgWebElement;
 		@Test
 		public void testCustomerLogin() throws Exception {
 			NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
-			highlight(element, 100);
+			highlight(element);
 			element.click();
 			element = ngDriver.findElement(NgBy.input("custId"));
 			assertThat(element.getAttribute("id"), equalTo("userSelect"));
-			highlight(element, 100);
+			highlight(element);
 
 			Enumeration<WebElement> customers = Collections.enumeration(element.findElements(NgBy.repeater("cust in Customers")));
 
@@ -165,6 +168,7 @@ import com.jprotractor.NgWebElement;
 			assertThat(accountNumber, notNullValue());
 			assertTrue(accountNumber.getText().matches("^\\d+$"));
 		}
+		
 		@Test
 		public void testEvaluateTransactionDetails() throws Exception {
 			// customer login
@@ -266,15 +270,15 @@ import com.jprotractor.NgWebElement;
 			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
 			ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
 
-			NgWebElement firstName  = ngDriver.findElement(NgBy.model("fName"));
+			NgWebElement firstName = ngDriver.findElement(NgBy.model("fName"));
 			assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
 			firstName.sendKeys("John");
 
-			NgWebElement lastName  = ngDriver.findElement(NgBy.model("lName"));
+			NgWebElement lastName = ngDriver.findElement(NgBy.model("lName"));
 			assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
 			lastName.sendKeys("Doe");
 
-			NgWebElement postCode  = ngDriver.findElement(NgBy.model("postCd"));
+			NgWebElement postCode = ngDriver.findElement(NgBy.model("postCd"));
 			assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
 			postCode.sendKeys("11011");
 
@@ -282,11 +286,16 @@ import com.jprotractor.NgWebElement;
 			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
 			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
 			addCustomerButtonElement.submit();
-			Alert alert =  seleniumDriver.switchTo().alert();
+			try{
+				alert = seleniumDriver.switchTo().alert();
+			} catch(WebDriverException ex){
+				// Alert not handled by PhantomJS
+				return;
+			}
 			String customer_added = "Customer added successfully with customer id :(\\d+)";
 			
 			Pattern pattern = Pattern.compile(customer_added);
-            Matcher matcher = pattern.matcher(alert.getText());
+			Matcher matcher = pattern.matcher(alert.getText());
 			if (matcher.find()) {
 				System.out.println("customer id " + matcher.group(1) );
 			}
@@ -315,7 +324,7 @@ import com.jprotractor.NgWebElement;
 			highlight(currentCustomer);
 			
 			// delete the new customer
-            NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
+			NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
 			assertThat(deleteCustomerButton, notNullValue());
 			assertThat(deleteCustomerButton.getText(),containsString("Delete"));
 			highlight(deleteCustomerButton,300);
@@ -351,7 +360,7 @@ import com.jprotractor.NgWebElement;
 			element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
 			assertThat(element,notNullValue());
 			element.click();
-            element = ngDriver.findElement(NgBy.buttonText("Go!"));
+			element = ngDriver.findElement(NgBy.buttonText("Go!"));
 			assertThat(element,notNullValue());
 			assertThat(element.getText(),containsString("Go"));
 			element.click();
