@@ -218,6 +218,29 @@ import com.jprotractor.NgWebElement;
 		}
 		
 		@Test
+		public void testSortCustomerAccounts() throws Exception {
+			// bank manager login
+			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
+			// wait for customers info get loaded
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers")).getWrappedElement()));
+			WebElement sort_link = ngDriver.getWrappedDriver().findElement(By.cssSelector("a[ng-click*='sortType'][ng-click*= 'fName']"));
+			assertThat(sort_link.getText(),containsString("First Name"));
+			// sort the customers
+			highlight(sort_link);
+			sort_link.click();
+
+			List<WebElement> customers = ngDriver.findElements(NgBy.repeater("cust in Customers"));
+			// note the name of the last customer
+			String last_customer_name = customers.get(customers.size() - 1).getText();
+			// sort the customers in reverse
+			highlight(sort_link);
+			sort_link.click();
+			WebElement first_customer = ngDriver.findElement(NgBy.repeater("cust in Customers"));
+			assertThat(first_customer.getText(),containsString(last_customer_name));
+		}
+
+		@Test
 		public void testListTransactions() throws Exception {
 			// customer login
 			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
