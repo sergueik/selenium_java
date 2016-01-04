@@ -5,6 +5,7 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -20,6 +21,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -78,7 +80,7 @@ import com.jprotractor.NgWebElement;
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for CI testing
-	static boolean isDestopTesting = false; 
+	static boolean isDestopTesting = true; 
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -436,6 +438,7 @@ import com.jprotractor.NgWebElement;
 					currentCustomer.click();
 				}
 			}
+			
 			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 			assertTrue(login.isEnabled());
 			highlight(login);
@@ -446,7 +449,8 @@ import com.jprotractor.NgWebElement;
 			// pick random account 
 			assertTrue(accounts.size() > 0 );
 			int account_idx = 1 + (int)(Math.random() * (accounts.size() - 1)) ;
-			System.err.println(account_idx + " " + accounts.get(account_idx).getText());
+			String targetAccount = accounts.get(account_idx).getText();
+			System.err.println(account_idx + " " + targetAccount);
 			accounts.get(account_idx).click();
 			int initialBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 
@@ -474,6 +478,55 @@ import com.jprotractor.NgWebElement;
 			int finalBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 			assertTrue(finalBalance == 100 + initialBalance);
 			Thread.sleep(1000);
+			// switch to "Home" screen
+            ngDriver.findElement(NgBy.buttonText("Home")).click();
+			// customer login
+			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+			
+			// find the same customer / account 			
+			customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+			while (customers.hasMoreElements()){
+				WebElement currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+					System.err.println(currentCustomer.getText());
+					currentCustomer.click();
+				}
+			}
+
+			ngDriver.findElement(NgBy.buttonText("Login")).click();			
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.options("account for account in Accounts")).getWrappedElement()));
+			Enumeration<WebElement> accounts2 = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
+			while (accounts2.hasMoreElements()){
+				WebElement currentAccount = accounts2.nextElement();
+				if (currentAccount.getText().indexOf(targetAccount) >= 0 ){
+					System.err.println(currentAccount.getText());
+					currentAccount.click();
+				}
+			}
+			
+		    WebElement withdrawButton = ngDriver.findElement(NgBy.partialButtonText("Withdrawl"));
+            assertTrue(withdrawButton.isDisplayed());
+			withdrawButton.click();
+
+			// withdraw a bigger amount then is on the account
+            WebElement withdrawAmount = ngDriver.findElement(NgBy.model("amount"));
+			highlight(withdrawAmount);
+            withdrawAmount.sendKeys(String.format("%d", finalBalance + 10 ));
+			withdrawButton =  ngDriver.findElement(NgBy.buttonText("Withdraw"));
+			withdrawButton.click();
+			
+			// confirm the transaction failed
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.binding("message")).getWrappedElement()));
+            message = ngDriver.findElement(NgBy.binding("message"));
+            assertThat(message.getText(),containsString("Transaction Failed."));
+            highlight(message);
+			
+            withdrawAmount.sendKeys(String.format("%d", finalBalance - 10 ));
+			withdrawButton.click();
+			// inspect the balance change
+			finalBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
+			assertTrue(finalBalance == 10 );
+			
 		}
 	}
 		public static class CalculatorTests{
