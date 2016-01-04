@@ -425,11 +425,10 @@ import com.jprotractor.NgWebElement;
 		public void testDepositAndWithdraw() throws Exception {
 			// customer login
 			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
-			// select customer/account with transactions
+			
+			// select customer with accounts
 			assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
-
 			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
-
 			while (customers.hasMoreElements()){
 				WebElement currentCustomer = customers.nextElement();
 				if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
@@ -439,16 +438,41 @@ import com.jprotractor.NgWebElement;
 			}
 			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 			assertTrue(login.isEnabled());
+			highlight(login);
 			login.click();
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.options("account for account in Accounts")).getWrappedElement()));
 			List<WebElement> accounts = ngDriver.findElements(NgBy.options("account for account in Accounts"));
-			accounts.get((int)(Math.random() * accounts.size())).click();
-			int initialAccountBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 
-			NgWebElement depositButton = ngDriver.findElement(NgBy.partialButtonText("Deposit"));
+			// pick random currency 
+			assertTrue(accounts.size() > 0 );
+			accounts.get(1  + (int)(Math.random() * (accounts.size() - 1)) ).click();
+			int initialBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
+
+			WebElement depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit")).get(0);
             assertTrue(depositButton.isDisplayed());
+			depositButton.click();
 
+			// deposit amount
+            WebElement depositAmount = ngDriver.findElement(NgBy.model("amount"));
+			highlight(depositAmount);
+            depositAmount.sendKeys("100");
+			
+			// deposit the payment
+			depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit")).get(1);
+            assertTrue(depositButton.isDisplayed());
+			depositButton.click();
+			
+			// inspect the message
+			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.binding("message")).getWrappedElement()));
+            NgWebElement message = ngDriver.findElement(NgBy.binding("message"));
+            assertThat(message.getText(),containsString("Deposit Successful"));
+            highlight(message);
+
+			// inspect the balance change
+			int finalBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
+			assertTrue(finalBalance == 100 + initialBalance);
+			Thread.sleep(1000);
 		}
-
 	}
 		public static class CalculatorTests{
 	
