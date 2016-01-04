@@ -443,9 +443,11 @@ import com.jprotractor.NgWebElement;
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.options("account for account in Accounts")).getWrappedElement()));
 			List<WebElement> accounts = ngDriver.findElements(NgBy.options("account for account in Accounts"));
 
-			// pick random currency 
+			// pick random account 
 			assertTrue(accounts.size() > 0 );
-			accounts.get(1  + (int)(Math.random() * (accounts.size() - 1)) ).click();
+			int account_idx = 1 + (int)(Math.random() * (accounts.size() - 1)) ;
+			System.err.println(account_idx + " " + accounts.get(account_idx).getText());
+			accounts.get(account_idx).click();
 			int initialBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 
 			WebElement depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit")).get(0);
