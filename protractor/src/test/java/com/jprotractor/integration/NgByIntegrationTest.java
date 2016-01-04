@@ -78,7 +78,7 @@ import com.jprotractor.NgWebElement;
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for CI testing
-	static boolean isDestopTesting = true; 
+	static boolean isDestopTesting = false; 
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -419,6 +419,34 @@ import com.jprotractor.NgWebElement;
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
 			Thread.sleep(1000);
 			// TODO: assert the customers.count change
+		}
+		
+		@Test
+		public void testDepositAndWithdraw() throws Exception {
+			// customer login
+			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+			// select customer/account with transactions
+			assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
+
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+
+			while (customers.hasMoreElements()){
+				WebElement currentCustomer = customers.nextElement();
+				if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+					System.err.println(currentCustomer.getText());
+					currentCustomer.click();
+				}
+			}
+			NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+			assertTrue(login.isEnabled());
+			login.click();
+			List<WebElement> accounts = ngDriver.findElements(NgBy.options("account for account in Accounts"));
+			accounts.get((int)(Math.random() * accounts.size())).click();
+			int initialAccountBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
+
+			NgWebElement depositButton = ngDriver.findElement(NgBy.partialButtonText("Deposit"));
+            assertTrue(depositButton.isDisplayed());
+
 		}
 
 	}
