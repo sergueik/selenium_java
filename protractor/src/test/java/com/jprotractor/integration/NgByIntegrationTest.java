@@ -251,7 +251,8 @@ import com.jprotractor.NgWebElement;
 			assertThat(selectCustomer.getAttribute("id"),containsString("userSelect"));
 			List<WebElement> customers = new NgWebElement(ngDriver,selectCustomer).findElements(NgBy.repeater("cust in Customers"));
 			// pick random customer to log in
-			WebElement customer = customers.get((int)(Math.random()*customers.size()));
+			int random_customer_index = 1 + (int)(Math.random() * (customers.size() - 1)) ;
+			WebElement customer = customers.get(random_customer_index);
 			System.err.println(customer.getText());
 			customer.click();
 			NgWebElement ng_selectCurrencies = ngDriver.findElement(NgBy.model("currency"));
@@ -264,6 +265,11 @@ import com.jprotractor.NgWebElement;
 			WebElement submitButton = ngDriver.getWrappedDriver().findElement(By.xpath("/html/body//form/button[@type='submit']"));
 			assertThat(submitButton.getText(),containsString("Process"));
 			submitButton.click();
+			// workaround against travis detecting exception from phantomJS
+			if (!isDestopTesting) {
+				return;
+			}
+
 			try{
 				alert = seleniumDriver.switchTo().alert();
 				String alert_text = alert.getText();
@@ -382,6 +388,10 @@ import com.jprotractor.NgWebElement;
 			Object[] addCustomerButtonElements = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).toArray();
 			WebElement addCustomerButtonElement = (WebElement) addCustomerButtonElements[1];
 			addCustomerButtonElement.submit();
+			// workaround against travis detecting exception from phantomJS
+			if (!isDestopTesting) {
+				return;
+			}
 			try {
 				alert = seleniumDriver.switchTo().alert();
 			} catch (NoAlertPresentException ex){
@@ -575,18 +585,14 @@ import com.jprotractor.NgWebElement;
 		}
 	}
 	
-	public static class LocalFileTests1 {
+	public static class LocalFileTests {
 
-		public static String localFile = "ng_service_example.htm";
+		public static String localFile;
 		
-		@Before
-		public void beforeEach() {
-			ngDriver.navigate().to(getScriptContent(localFile));
-		}
-
 		@Test
 		public void testEvaluate() throws Exception {
-		
+			localFile = "ng_service_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));
 			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 			while (elements.hasMoreElements()){
 				WebElement currentElement = elements.nextElement();
@@ -600,8 +606,10 @@ import com.jprotractor.NgWebElement;
 		}
 
 		@Test
-		public void testRepeaterColumn() throws Exception {
+		public void testFindElementByRepeaterColumn() throws Exception {
 
+			localFile = "ng_service_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));
 			Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
 			while (countryColumns.hasNext() ) {
 				WebElement countryColumn = (WebElement) countryColumns.next();
@@ -610,5 +618,27 @@ import com.jprotractor.NgWebElement;
 				}
 			}
 		}
+
+		@Test
+		public void testFindElementByRepeaterWithBeginEnd() throws Exception {
+
+			localFile = "ng_repeat_start_and_ng_repeat_end_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));			
+			List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
+            assertTrue(elements.get(0).isDisplayed());
+			assertThat(elements.get(0).getText(),containsString("Foo"));
+		}
+		
+		@Test
+		public void testFindElementByOptions() throws Exception {
+
+			localFile = "ng_options_with_object_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));			
+			List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
+            assertTrue(elements.size() == 5);
+			assertThat(elements.get(0).getText(),containsString("black"));
+			assertThat(elements.get(1).getText(),containsString("white"));
+		}
+				
 	}
 }
