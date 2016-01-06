@@ -85,7 +85,7 @@ import com.jprotractor.NgWebElement;
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for CI testing
-	static boolean isDestopTesting = true; 
+	static boolean isDestopTesting = false; 
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -408,9 +408,7 @@ import com.jprotractor.NgWebElement;
 			Thread.sleep(1000);
 			
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-
-			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
-			
+			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));			
 			WebElement currentCustomer = null;
 			while (customers.hasMoreElements()){
 				currentCustomer = customers.nextElement();
@@ -577,7 +575,7 @@ import com.jprotractor.NgWebElement;
 		}
 	}
 	
-	public static class LocalFileTests {
+	public static class LocalFileTests1 {
 
 		public static String localFile = "ng_service_example.htm";
 		
@@ -587,7 +585,8 @@ import com.jprotractor.NgWebElement;
 		}
 
 		@Test
-		public void testService() throws Exception {
+		public void testEvaluate() throws Exception {
+		
 			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 			while (elements.hasMoreElements()){
 				WebElement currentElement = elements.nextElement();
@@ -598,13 +597,14 @@ import com.jprotractor.NgWebElement;
 					currentElement.click();
 				}
 			}
+		}
+
+		@Test
+		public void testRepeaterColumn() throws Exception {
+
 			Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
-			
 			while (countryColumns.hasNext() ) {
 				WebElement countryColumn = (WebElement) countryColumns.next();
-				// if (countryColumn.getText().isEmpty()){
-					// break;
-				// }
 				if (countryColumn.getText().equalsIgnoreCase("Mexico") ){
 					highlight(countryColumn);
 				}
