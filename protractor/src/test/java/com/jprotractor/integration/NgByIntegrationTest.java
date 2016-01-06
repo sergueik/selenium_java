@@ -17,6 +17,11 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,7 +112,18 @@ import com.jprotractor.NgWebElement;
 			return new PhantomJSDriver();
 		}
 	}
-
+	
+	protected static String getScriptContent(String filename) {
+		try {
+			URI uri = NgByIntegrationTest.class.getClassLoader().getResource(filename).toURI();
+		System.err.println(uri.toString());
+		return uri.toString();
+		// multi-catch statement is not supported in -source 1.6
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -558,6 +574,41 @@ import com.jprotractor.NgWebElement;
 			assertThat(element, notNullValue());
 			assertThat(element.getText(), equalTo("42"));
 			highlight(element, 100);
+		}
+	}
+	
+	public static class LocalFileTests {
+
+		public static String localFile = "ng_service_example.htm";
+		
+		@Before
+		public void beforeEach() {
+			ngDriver.navigate().to(getScriptContent(localFile));
+		}
+
+		@Test
+		public void testService() throws Exception {
+			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
+			while (elements.hasMoreElements()){
+				WebElement currentElement = elements.nextElement();
+				WebElement personName = currentElement.findElement(NgBy.binding("person.Name"));
+				Object personCountry = new NgWebElement(ngDriver,currentElement).evaluate("person.Country");
+				if (currentElement.getText().indexOf("Harry Potter") >= 0 ){
+					System.err.println(currentElement.getText());
+					currentElement.click();
+				}
+			}
+			Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
+			
+			while (countryColumns.hasNext() ) {
+				WebElement countryColumn = (WebElement) countryColumns.next();
+				// if (countryColumn.getText().isEmpty()){
+					// break;
+				// }
+				if (countryColumn.getText().equalsIgnoreCase("Mexico") ){
+					highlight(countryColumn);
+				}
+			}
 		}
 	}
 }
