@@ -302,6 +302,7 @@ import com.jprotractor.NgWebElement;
 			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
 			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
 			// wait for customers info get loaded
+			Thread.sleep(1000);
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers")).getWrappedElement()));
 			WebElement sort_link = ngDriver.getWrappedDriver().findElement(By.cssSelector("a[ng-click*='sortType'][ng-click*= 'fName']"));
 			assertThat(sort_link.getText(),containsString("First Name"));
