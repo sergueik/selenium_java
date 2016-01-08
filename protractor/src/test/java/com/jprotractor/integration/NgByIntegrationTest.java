@@ -86,16 +86,10 @@ import com.jprotractor.NgWebElement;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isDestopTesting = false;
-	static boolean isTravisBuild =  false;
+	static boolean isCIBuild =  false;
 
 	@BeforeClass
 	public static void setup() throws IOException {
-
-		Map env = System.getenv();
-		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
-			isTravisBuild =  true;
-			isDestopTesting = false;
-		}
 		seleniumDriver = getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
@@ -103,6 +97,7 @@ import com.jprotractor.NgWebElement;
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
+		checkEnvironment();
 	}
 
 	private static WebDriver getSeleniumDriver() throws IOException {
@@ -120,13 +115,22 @@ import com.jprotractor.NgWebElement;
 		}
 	}
 	
+	private static void checkEnvironment() {
+		Map env = System.getenv();
+
+		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
+			isCIBuild =  true;
+			isDestopTesting = false;
+		}
+	}
+	
+
 	protected static String getScriptContent(String filename) {
 		try {
 			URI uri = NgByIntegrationTest.class.getClassLoader().getResource(filename).toURI();
-		System.err.println(uri.toString());
-		return uri.toString();
-		// multi-catch statement is not supported in -source 1.6
-		} catch (URISyntaxException e) {
+			System.err.println("Testing: " + uri.toString());
+			return uri.toString();
+		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not supported in -source 1.6
 			throw new RuntimeException(e);
 		}
 	}
@@ -172,7 +176,7 @@ import com.jprotractor.NgWebElement;
 
 		@Test
 		public void testCustomerLogin() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
@@ -204,7 +208,7 @@ import com.jprotractor.NgWebElement;
 		
 		@Test
 		public void testEvaluateTransactionDetails() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			// customer login
@@ -255,7 +259,7 @@ import com.jprotractor.NgWebElement;
 		
 		@Test
 		public void testOpenAccount() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			// bank manager login
@@ -310,7 +314,7 @@ import com.jprotractor.NgWebElement;
 
 		@Test
 		public void testSortCustomerAccounts() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			// bank manager login
@@ -337,7 +341,7 @@ import com.jprotractor.NgWebElement;
 
 		@Test
 		public void testListTransactions() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			// customer login
@@ -388,7 +392,7 @@ import com.jprotractor.NgWebElement;
 		
 		@Test
 		public void testAddCustomer() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
@@ -467,7 +471,7 @@ import com.jprotractor.NgWebElement;
 		
 		@Test
 		public void testDepositAndWithdraw() throws Exception {
-			if (isTravisBuild) {
+			if (isCIBuild) {
 				return;
 			}
 			// customer login
@@ -612,54 +616,118 @@ import com.jprotractor.NgWebElement;
 		
 		@Test
 		public void testEvaluate() throws Exception {
+			if (!isCIBuild) {
+				return;
+			}			
 			localFile = "ng_service_example.htm";
 			ngDriver.navigate().to(getScriptContent(localFile));
+			Thread.sleep(1000);
 			Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 			while (elements.hasMoreElements()){
 				WebElement currentElement = elements.nextElement();
-				WebElement personName = currentElement.findElement(NgBy.binding("person.Name"));
+				if (currentElement.getText().isEmpty()){
+					break;
+				}
+				WebElement personName = new NgWebElement(ngDriver,currentElement).findElement(NgBy.binding("person.Name"));
+				assertThat(personName, notNullValue());
 				Object personCountry = new NgWebElement(ngDriver,currentElement).evaluate("person.Country");
-				if (currentElement.getText().indexOf("Harry Potter") >= 0 ){
-					System.err.println(currentElement.getText());
-					currentElement.click();
+				assertThat(personCountry, notNullValue());
+				System.err.println(personName.getText() + " " + personCountry.toString());
+				if (personName.getText().indexOf("Around the Horn") >= 0 ){
+					assertThat(personCountry.toString(),containsString("UK"));	
+					highlight(personName);
 				}
 			}
 		}
-
+		
 		@Test
 		public void testFindElementByRepeaterColumn() throws Exception {
-
+			if (!isCIBuild) {
+				return;
+			}
 			localFile = "ng_service_example.htm";
 			ngDriver.navigate().to(getScriptContent(localFile));
+			Thread.sleep(1000);
 			Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
+			Integer cnt = 0;
 			while (countryColumns.hasNext() ) {
 				WebElement countryColumn = (WebElement) countryColumns.next();
+				System.err.println(countryColumn.getText() );
 				if (countryColumn.getText().equalsIgnoreCase("Mexico") ){
 					highlight(countryColumn);
+					cnt = cnt + 1;
 				}
 			}
+			assertTrue(cnt == 3);	
+			System.err.println("Mexico = " + cnt.toString() );
+		}		
+		
+		@Test
+		public void testFindSelectedtOption() throws Exception {
+			if (!isCIBuild) {
+				return;
+			}
+			localFile = "bind_select_option_data_from_array_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));
+			Thread.sleep(1000);
+            WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
+			assertTrue(element.isDisplayed());
+			assertThat(element.getText(),containsString("three"));		
+			System.err.println(element.getText() );
 		}
 
 		@Test
+		public void testChangeSelectedtOption() throws Exception {
+			if (!isCIBuild) {
+				return;
+			}
+			localFile = "bind_select_option_data_from_array_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));
+			Thread.sleep(1000);
+			Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
+			while (options.hasNext() ) {
+                WebElement option = (WebElement)  options.next();
+				
+				if (option.getText().isEmpty()){
+					break;
+				}
+				if (option.getText().equalsIgnoreCase("two") ){
+                    option.click();
+                }
+            }
+            NgWebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
+			assertThat(element.getText(),containsString("two"));		
+			System.err.println(element.getText() );
+		}
+				
+		@Test
 		public void testFindElementByRepeaterWithBeginEnd() throws Exception {
-
+			if (!isCIBuild) {
+				return;
+			}
 			localFile = "ng_repeat_start_and_ng_repeat_end_example.htm";
 			ngDriver.navigate().to(getScriptContent(localFile));			
+			Thread.sleep(1000);
 			List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
             assertTrue(elements.get(0).isDisplayed());
 			assertThat(elements.get(0).getText(),containsString("Foo"));
+			System.err.println(elements.get(0).getText() );
 		}
 		
 		@Test
 		public void testFindElementByOptions() throws Exception {
-
+			if (!isCIBuild) {
+				return;
+			}
 			localFile = "ng_options_with_object_example.htm";
 			ngDriver.navigate().to(getScriptContent(localFile));			
+			Thread.sleep(1000);
 			List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
             assertTrue(elements.size() == 5);
 			assertThat(elements.get(0).getText(),containsString("black"));
+			System.err.println(elements.get(0).getText() );
 			assertThat(elements.get(1).getText(),containsString("white"));
-		}
-				
+			System.err.println(elements.get(1).getText() );
+		}				
 	}
 }
