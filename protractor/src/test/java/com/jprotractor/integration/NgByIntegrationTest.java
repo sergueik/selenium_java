@@ -114,7 +114,7 @@ import com.jprotractor.NgWebElement;
 			return new PhantomJSDriver();
 		}
 	}
-	
+
 	private static void checkEnvironment() {
 		Map env = System.getenv();
 
@@ -123,7 +123,6 @@ import com.jprotractor.NgWebElement;
 			isDestopTesting = false;
 		}
 	}
-	
 
 	protected static String getScriptContent(String filename) {
 		try {
@@ -134,13 +133,13 @@ import com.jprotractor.NgWebElement;
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
 		seleniumDriver.quit();		
 	}
-	
+
 	private static void highlight(WebElement element) throws InterruptedException {
 		highlight(element,  100);
 	}
@@ -155,7 +154,7 @@ import com.jprotractor.NgWebElement;
 	private static void highlight(NgWebElement element, long highlightInterval) throws InterruptedException {
 		highlight(element.getWrappedElement(), highlightInterval);
 	}
-	
+
 	public static Object executeScript(String script,Object ... args){
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
@@ -256,7 +255,7 @@ import com.jprotractor.NgWebElement;
 				Object transaction_date = ngCurrentTransaction.evaluate("tx.date");
 			}
 		}
-		
+
 		@Test
 		public void testOpenAccount() throws Exception {
 			if (isCIBuild) {
@@ -389,7 +388,7 @@ import com.jprotractor.NgWebElement;
 				}
 			}
 		}
-		
+
 		@Test
 		public void testAddCustomer() throws Exception {
 			if (isCIBuild) {
@@ -438,7 +437,7 @@ import com.jprotractor.NgWebElement;
 			// switch to "Customers" screen
 			ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
 			Thread.sleep(1000);
-			
+
 			wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
 			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));			
 			WebElement currentCustomer = null;
@@ -468,7 +467,7 @@ import com.jprotractor.NgWebElement;
 			Thread.sleep(1000);
 			// TODO: assert the customers.count change
 		}
-		
+
 		@Test
 		public void testDepositAndWithdraw() throws Exception {
 			if (isCIBuild) {
@@ -476,7 +475,7 @@ import com.jprotractor.NgWebElement;
 			}
 			// customer login
 			ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
-			
+
 			// select customer with accounts
 			assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
 			Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
@@ -609,7 +608,7 @@ import com.jprotractor.NgWebElement;
 			highlight(element, 100);
 		}
 	}
-	
+
 	public static class LocalFileTests {
 
 		public static String localFile;
@@ -639,7 +638,7 @@ import com.jprotractor.NgWebElement;
 				}
 			}
 		}
-		
+
 		@Test
 		public void testFindElementByRepeaterColumn() throws Exception {
 			if (!isCIBuild) {
@@ -661,7 +660,7 @@ import com.jprotractor.NgWebElement;
 			assertTrue(cnt == 3);	
 			System.err.println("Mexico = " + cnt.toString() );
 		}		
-		
+
 		@Test
 		public void testFindSelectedtOption() throws Exception {
 			if (!isCIBuild) {
@@ -670,7 +669,7 @@ import com.jprotractor.NgWebElement;
 			localFile = "bind_select_option_data_from_array_example.htm";
 			ngDriver.navigate().to(getScriptContent(localFile));
 			Thread.sleep(1000);
-            WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
+			WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
 			assertTrue(element.isDisplayed());
 			assertThat(element.getText(),containsString("three"));		
 			System.err.println(element.getText() );
@@ -686,7 +685,7 @@ import com.jprotractor.NgWebElement;
 			Thread.sleep(1000);
 			Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 			while (options.hasNext() ) {
-                WebElement option = (WebElement)  options.next();
+			WebElement option = (WebElement)  options.next();
 				
 				if (option.getText().isEmpty()){
 					break;
@@ -695,11 +694,11 @@ import com.jprotractor.NgWebElement;
                     option.click();
                 }
             }
-            NgWebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
+			NgWebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
 			assertThat(element.getText(),containsString("two"));		
 			System.err.println(element.getText() );
 		}
-				
+
 		@Test
 		public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 			if (!isCIBuild) {
@@ -709,7 +708,7 @@ import com.jprotractor.NgWebElement;
 			ngDriver.navigate().to(getScriptContent(localFile));			
 			Thread.sleep(1000);
 			List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
-            assertTrue(elements.get(0).isDisplayed());
+			assertTrue(elements.get(0).isDisplayed());
 			assertThat(elements.get(0).getText(),containsString("Foo"));
 			System.err.println(elements.get(0).getText() );
 		}
@@ -723,11 +722,44 @@ import com.jprotractor.NgWebElement;
 			ngDriver.navigate().to(getScriptContent(localFile));			
 			Thread.sleep(1000);
 			List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
-            assertTrue(elements.size() == 5);
+			assertTrue(elements.size() == 5);
 			assertThat(elements.get(0).getText(),containsString("black"));
 			System.err.println(elements.get(0).getText() );
 			assertThat(elements.get(1).getText(),containsString("white"));
 			System.err.println(elements.get(1).getText() );
+		}
+		
+		@Test
+		public void testFindElementByModel() throws Exception {
+			if (!isCIBuild) {
+				return;
+			}
+			localFile = "use_ng_pattern_to_validate_example.htm";
+			ngDriver.navigate().to(getScriptContent(localFile));			
+			Thread.sleep(1000);
+			WebElement input = ngDriver.findElement(NgBy.model("myVal"));
+			input.clear();
+			WebElement valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
+			assertThat(valid.getText(),containsString("false"));
+			System.err.println( valid.getText()); // valid: false
+			WebElement pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
+			assertThat(pattern.getText(),containsString("false"));
+			System.err.println(pattern.getText()); // pattern: false
+			WebElement required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
+			assertThat(required.getText(),containsString("true"));
+			System.err.println(required.getText()); // required: true
+
+			input.sendKeys("42");
+			valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
+			assertThat(valid.getText(),containsString("true"));
+			System.err.println(valid.getText()); // valid: true
+			pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
+			assertThat(pattern.getText(),containsString("false"));
+			System.err.println(pattern.getText()); // pattern: false
+			required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
+			assertThat(required.getText(),containsString("false"));
+			System.err.println(required.getText()); // required: false
 		}				
+
 	}
 }

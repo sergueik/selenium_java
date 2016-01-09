@@ -1,8 +1,12 @@
+Note
+----
+
+This github project is about to be retired, the active project is: [jProtratractor](https://github.com/caarlos0/jProtractor)
 Info
 ----
 
 Origins: 
-  - [jProtractor](https://github.com/caarlos0/jProtractor)
+  - [jProtratractor](https://github.com/caarlos0/jProtractor)
   - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [angular/protractor](https://github.com/angular/protractor) 
   - [bbaia/protractor-net](https://github.com/bbaia/protractor-net)
