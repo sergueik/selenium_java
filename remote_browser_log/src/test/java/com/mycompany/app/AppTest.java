@@ -1,6 +1,5 @@
 package com.mycompany.app;
 
-
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -63,80 +62,69 @@ import org.openqa.selenium.WebElement;
 
 import org.testng.*;
 import org.testng.annotations.*;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 
 public class AppTest // extends BaseTest
 {
-
-	public RemoteWebDriver driver = null;
-	public String seleniumHost = null;
-	public String seleniumPort = null;
-	public String seleniumBrowser = null;
-	public String testExecution = null;
-
+	private RemoteWebDriver driver;
+	private Actions actions;
+	private WebDriverWait wait;
+	
 	@BeforeSuite(alwaysRun = true)
 	public void setupBeforeSuite( ITestContext context ) throws InterruptedException,MalformedURLException {
 		// http://www.programcreek.com/java-api-examples/index.php?api=org.testng.ITestContext
-		seleniumHost = context.getCurrentXmlTest().getParameter("host");
-		seleniumPort = context.getCurrentXmlTest().getParameter("port");
-		seleniumBrowser = context.getCurrentXmlTest().getParameter("browser");
-		testExecution = context.getCurrentXmlTest().getParameter("execution");
+		String seleniumHost = context.getCurrentXmlTest().getParameter("host");
+		String seleniumPort = context.getCurrentXmlTest().getParameter("port");
+		String seleniumBrowser = context.getCurrentXmlTest().getParameter("browser");
+		DesiredCapabilities capabilities;
+		LoggingPreferences loggingPreferences = new LoggingPreferences();;
+		// remote Configuration
+		if (context.getCurrentXmlTest().getParameter("execution").compareToIgnoreCase("remote") == 0) {
+			String hub = "http://"+ seleniumHost + ":" + seleniumPort + "/wd/hub";
 
-		// Remote Configuration
-		if (testExecution.compareToIgnoreCase("remote") == 0) {
-			String hub = "http://"+ seleniumHost + ":" + seleniumPort   +  "/wd/hub";
-
-			LoggingPreferences loggingPreferences = new LoggingPreferences();
 			loggingPreferences.enable(LogType.BROWSER, Level.ALL);
 			loggingPreferences.enable(LogType.CLIENT, Level.INFO);
 			loggingPreferences.enable(LogType.SERVER, Level.INFO);
 
 			if (seleniumBrowser.compareToIgnoreCase("chrome") == 0) {
-				DesiredCapabilities capabilities =   new DesiredCapabilities("chrome", "", Platform.ANY);
+				capabilities = new DesiredCapabilities("chrome", "", Platform.ANY);
 				capabilities.setBrowserName("chrome");
 				capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
 
-				try {
-					driver = new RemoteWebDriver(new URL("http://"+ seleniumHost + ":" + seleniumPort + "/wd/hub"), capabilities);
-				} catch (MalformedURLException ex) { }
 			} else {
 
-				DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
+				capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
 				capabilities.setBrowserName("firefox");
 
 				FirefoxProfile profile = new ProfilesIni().getProfile("default");
 				capabilities.setCapability("firefox_profile", profile);
 				capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
-
-				try {
-					driver = new RemoteWebDriver(new URL("http://"+ seleniumHost + ":" + seleniumPort + "/wd/hub"), capabilities);
-				} catch (MalformedURLException ex) { }
 			}
+			try {
+				driver = new RemoteWebDriver(new URL("http://" + seleniumHost + ":" + seleniumPort + "/wd/hub"), capabilities);
+			} catch (MalformedURLException ex) { }
 		}
 		// standalone
 		else {
 			if (seleniumBrowser.compareToIgnoreCase("chrome") == 0) {
 				System.setProperty("webdriver.chrome.driver", context.getCurrentXmlTest().getParameter("webdriver.chrome.driver"));
-				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-				LoggingPreferences loggingPreferences = new LoggingPreferences();
+				capabilities = DesiredCapabilities.chrome();
+				loggingPreferences.enable(LogType.BROWSER, Level.ALL);
+				capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
+				driver = new ChromeDriver(capabilities);
+				// driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+			} else {
+				capabilities = DesiredCapabilities.firefox();
 				loggingPreferences.enable(LogType.BROWSER, Level.ALL);
 				capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
 				/*
 				   prefs.js:user_pref("extensions.logging.enabled", true);
 				   user.js:user_pref("extensions.logging.enabled", true);
 				 */
-				driver = new ChromeDriver(capabilities);
-				driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-			} else {
-				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-				LoggingPreferences loggingPreferences = new LoggingPreferences();
-				loggingPreferences.enable(LogType.BROWSER, Level.ALL);
-				capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
-
 				driver = new FirefoxDriver(capabilities);
 			}
 		}
+		wait = new WebDriverWait(driver, 5);
+		actions = new Actions(driver);
 		try{
 			driver.manage().window().setSize(new Dimension(600, 800));
 			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -144,7 +132,6 @@ public class AppTest // extends BaseTest
 		}  catch(Exception ex) {
 			System.out.println(ex.toString());
 		}
-
 	}
 
 	@AfterSuite(alwaysRun = true,enabled =true)
@@ -157,21 +144,18 @@ public class AppTest // extends BaseTest
 	public void LoggingTest() throws InterruptedException {
 		String base_url = "http://www.cnn.com/";
 		driver.get(base_url);
-		WebDriverWait wait = new WebDriverWait(driver, 5);
 
-		String value1 = null;
 		String class_name = "logo";
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(class_name)));
 		WebElement element = driver.findElement(By.className(class_name));
 		if (driver instanceof JavascriptExecutor) {
 			((JavascriptExecutor)driver).executeScript("arguments[0].style.border='3px solid yellow'", element);
 		}
-		Thread.sleep(3000L);
-		Actions builder = new Actions(driver);
-		builder.moveToElement(element).click().build().perform();
+		// Thread.sleep(3000L);
+		
+		actions.moveToElement(element).click().build().perform();
 		analyzeLog();
 	}
-
 
 	public void analyzeLog() {
 		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
@@ -189,5 +173,3 @@ public class AppTest // extends BaseTest
 		return objToReturn;
 	}
 }
-
-

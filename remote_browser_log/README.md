@@ -24,7 +24,12 @@ The browser should be specified in `testng.config`:
 </suite>
 
 ```
-Currently Chrome and Firefox are supported. The log is printed to console. It works with embedded, but not with remote driver.
+Currently Chrome and Firefox are supported. The verbosity of logs captured varies with the browser. Example:
+
+```
+Sat Jan 09 13:02:16 EST 2016 INFO http://www.i.cdn.cnn.com/.a/1.231.2/js/cnn-header-second.min.js 12:6843 [AmazonDirectMatchBuy]
+```
+
 
 See Also
 --------
