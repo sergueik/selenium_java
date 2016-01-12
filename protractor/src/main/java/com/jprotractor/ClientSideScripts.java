@@ -30,5 +30,6 @@ public class ClientSideScripts {
 	public static final String FindOptions = getScriptContent("options.js");
 	public static final String FindSelectedOption = getScriptContent("selectedOption.js"); 
 	public static final String FindAllRepeaterRows = getScriptContent("repeater.js"); 
+	public static final String FindRepeaterElement = getScriptContent("findRepeaterElement.js"); 
 	public static final String FindRepeaterColumn = getScriptContent("repeaterColumn.js"); 
 }
