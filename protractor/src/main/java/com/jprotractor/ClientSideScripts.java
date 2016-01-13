@@ -20,7 +20,7 @@ public class ClientSideScripts {
 
 	public static final String WaitForAngular = getScriptContent("waitForAngular.js") ;
 	public static final String TestForAngular = getScriptContent("testForAngular.js") ; 
-    public static final String ResumeAngularBootstrap =  getScriptContent("resumeAngularBootstrap.js");
+	public static final String ResumeAngularBootstrap =  getScriptContent("resumeAngularBootstrap.js");
 	public static final String GetLocationAbsUrl = getScriptContent("getLocationAbsUrl.js"); 
 	public static final String Evaluate = getScriptContent("evaluate.js");
 	public static final String FindButtonText = getScriptContent("buttonText.js");
@@ -30,6 +30,6 @@ public class ClientSideScripts {
 	public static final String FindOptions = getScriptContent("options.js");
 	public static final String FindSelectedOption = getScriptContent("selectedOption.js"); 
 	public static final String FindAllRepeaterRows = getScriptContent("repeater.js"); 
-	public static final String FindRepeaterElement = getScriptContent("findRepeaterElement.js"); 
+	public static final String FindRepeaterElement = getScriptContent("repeaterElement.js"); 
 	public static final String FindRepeaterColumn = getScriptContent("repeaterColumn.js"); 
 }
