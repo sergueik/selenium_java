@@ -1,13 +1,13 @@
 package com.jprotractor;
 
-public class NgModule 
-{
-	public String Name;
-	public String Script;
-	
-	public NgModule(String name, String script)
-	{
-		this.Name = name;
-		this.Script = script;
-	}
+import com.jprotractor.scripts.Script;
+
+public class NgModule {
+    public final transient String name;
+    public final transient Script script;
+
+    public NgModule(final String name, final Script script) {
+        this.name = name;
+        this.script = script;
+    }
 }

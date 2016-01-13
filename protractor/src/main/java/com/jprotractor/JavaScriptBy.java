@@ -1,8 +1,9 @@
 package com.jprotractor;
 
+import com.jprotractor.scripts.Script;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
@@ -10,71 +11,90 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
-public class JavaScriptBy extends By
-{
-	private String Script;
-	private Object[] Args;
-	public WebElement RootElement;
-	
-	
-	public JavaScriptBy(String script, Object ... args)
-	{
-		this.Script = script;
-		this.Args = args;
-	}
-	
-	
-	@Override
-	public WebElement findElement(SearchContext context) 
-	{
-		List<WebElement> elements = this.findElements(context);
-		if(elements.size() > 0)
-		{
-			return elements.get(0);
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	@Override
-	public List<WebElement> findElements(SearchContext arg0) throws WebDriverException
-	{
-		Object[] scriptArgs = new Object[this.Args.length +1];
-		
-		scriptArgs[0] = this.RootElement;
-		System.arraycopy(this.Args, 0, scriptArgs, 1, this.Args.length);
-		JavascriptExecutor jsExecutor = null;
-		
-		// JavaScript Executor
-		if(!(arg0 instanceof WebElement))
-		{
-			jsExecutor = (JavascriptExecutor)arg0;
-		}
-		
-		if(jsExecutor == null)
-		{
-			WrapsDriver wrapsDriver =  (WrapsDriver)arg0;
-			if(wrapsDriver != null)
-			{
-				jsExecutor = (JavascriptExecutor)wrapsDriver.getWrappedDriver();
-			}
-		}
-		
-		if(jsExecutor == null)
-		{
-			throw new WebDriverException("Could not get an IJavaScriptExecutor instance from the context.");
-		}
-		
-		@SuppressWarnings("unchecked")
-		List<WebElement> elements = (List<WebElement>)jsExecutor.executeScript(this.Script, scriptArgs);
-		if(elements == null)
-		{
-			elements = new ArrayList<WebElement>();
-		}
-		
-		return elements;
-	}
+/**
+ * Javascript WebElement searcher.
+ * @author Carlos Alexandro Becker (caarlos0@gmail.com)
+ */
+public final class JavaScriptBy extends By {
+    /**
+     * Script to use.
+     */
+    private final transient Script script;
+    /**
+     * Root element.
+     *
+     * FIXME this should not be like that.
+     */
+    public WebElement root;
+    /**
+     * Script arguments.
+     */
+    private final transient Object[] args;
 
+    /**
+     * Ctor.
+     * @param scrpt Script to use.
+//     * @param elem Root WebElement.
+     * @param jsargs Script args.
+     */
+    public JavaScriptBy(
+//        final WebElement elem,
+        final Script scrpt,
+        final Object... jsargs
+    ) {
+        super();
+        this.script = scrpt;
+//        this.root = elem;
+        this.args = Arrays.copyOf(jsargs, jsargs.length);
+    }
+
+    @Override
+    public WebElement findElement(final SearchContext context) {
+        final List<WebElement> elements = this.findElements(context);
+        WebElement result = null;
+        if (!elements.isEmpty()) {
+            result = elements.get(0);
+        }
+        return result;
+    }
+
+    @Override
+    public List<WebElement> findElements(final SearchContext context) {
+        final Object[] scriptargs = new Object[this.args.length + 1];
+        scriptargs[0] = this.root;
+        System.arraycopy(this.args, 0, scriptargs, 1, this.args.length);
+        return this.elements(context, scriptargs);
+    }
+
+    private List<WebElement> elements(
+        final SearchContext context,
+        final Object[] jsargs
+    ) {
+        @SuppressWarnings("unchecked")
+        List<WebElement> elements = (List<WebElement>) this.executor(context)
+            .executeScript(this.script.content(), jsargs);
+        if (elements == null) {
+            elements = new ArrayList<>(0);
+        }
+        return elements;
+    }
+
+    private JavascriptExecutor executor(final SearchContext context) {
+        JavascriptExecutor jsexecutor = null;
+        if (!(context instanceof WebElement)) {
+            jsexecutor = (JavascriptExecutor) context;
+        }
+        if (jsexecutor == null) {
+            final WrapsDriver driver = (WrapsDriver) context;
+            if (driver != null) {
+                jsexecutor = (JavascriptExecutor) driver.getWrappedDriver();
+            }
+        }
+        if (jsexecutor == null) {
+            throw new WebDriverException(
+                "Could not get an JavaScriptExecutor instance from the context."
+            );
+        }
+        return jsexecutor;
+    }
 }
