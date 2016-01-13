@@ -60,7 +60,7 @@ public final class NgWebElement implements WebElement, WrapsElement {
 
     public List<NgWebElement> findNgElements(By by) {
         final List<WebElement> temp = findElements(by);
-        final List<NgWebElement> elements = new ArrayList<>();
+        final List<NgWebElement> elements = new ArrayList<NgWebElement>();
         for (final WebElement element : temp) {
             elements.add(new NgWebElement(this.driver, element));
         }

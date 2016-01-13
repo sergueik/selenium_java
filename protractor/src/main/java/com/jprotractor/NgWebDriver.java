@@ -73,10 +73,9 @@ public class NgWebDriver implements WebDriver, WrapsDriver {
 
     public List<NgWebElement> findNGElements(By by) {
         this.waitForAngular();
-        List<WebElement> temp = this.driver.findElements(by);
-        // not sure idf this is correct
+        List<WebElement> temp = this.driver.findElements(by);        
 		// NOTE: diamond operator is not supported in -source 1.6
-        final List<NgWebElement> elements = new ArrayList<>();
+        final  List<NgWebElement> elements = new ArrayList<NgWebElement>();
         for (final WebElement element : temp) {
             elements.add(new NgWebElement(this, element));
         }
