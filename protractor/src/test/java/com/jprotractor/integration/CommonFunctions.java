@@ -64,9 +64,10 @@ public class CommonFunctions {
 	static boolean isDestopTesting = false;
 	static boolean isCIBuild =  false;
 
-	private static WebDriver getSeleniumDriver() throws IOException {
-		// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
+	public static WebDriver getSeleniumDriver() throws IOException {
+                checkEnvironment();
 		if (isDestopTesting ){
+		// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 			profile.setEnableNativeEvents(false);
@@ -74,18 +75,18 @@ public class CommonFunctions {
 			seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
 			return seleniumDriver;
 		} else {
-		// for CI build
 			return new PhantomJSDriver();
 		}
 	}
 
-	private static void checkEnvironment() {
+	public static boolean checkEnvironment() {
 		Map env = System.getenv();
 
 		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
 			isCIBuild =  true;
 			isDestopTesting = false;
 		}
+		return isCIBuild;
 	}
 
 	protected static String getScriptContent(String filename) {
