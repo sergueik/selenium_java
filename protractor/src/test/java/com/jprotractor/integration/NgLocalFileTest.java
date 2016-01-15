@@ -9,18 +9,7 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.IOException;
-
-import java.net.BindException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.io.File;
-import java.io.IOException;
-// import java.nio.file.Files;
-// import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -73,7 +62,6 @@ import com.jprotractor.NgWebElement;
 @RunWith(Enclosed.class)
 // @Category(Integration.class)
 	public class NgLocalFileTest {
-        private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
@@ -86,6 +74,7 @@ import com.jprotractor.NgWebElement;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
+	public static String localFile;
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -99,14 +88,8 @@ import com.jprotractor.NgWebElement;
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	protected static String getScriptContent(String filename) {
-		try {
-			URI uri = NgByIntegrationTest.class.getClassLoader().getResource(filename).toURI();
-			System.err.println("Testing: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not supported in -source 1.6
-			throw new RuntimeException(e);
-		}
+	private static String getScriptContent(String filename) {
+		return CommonFunctions.	getScriptContent( filename) ;
 	}
 
 	@AfterClass
@@ -120,27 +103,17 @@ import com.jprotractor.NgWebElement;
 	}
 
 	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		wait.until(ExpectedConditions.visibilityOf(element));
-		executeScript("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlightInterval);
-		executeScript("arguments[0].style.border=''", element);
+		CommonFunctions.highlight(element, highlightInterval);
 	}
 
-	private static void highlight(NgWebElement element, long highlightInterval) throws InterruptedException {
-		highlight(element.getWrappedElement(), highlightInterval);
+	private static void highlight(NgWebElement element) throws InterruptedException {
+		highlight(element,  100);
 	}
 
-	public static Object executeScript(String script,Object ... args){
-		if (seleniumDriver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
-			return javascriptExecutor.executeScript(script,args);
-		}
-		else {
-			throw new RuntimeException("Script execution is only available for WebDrivers that implement " + "the JavascriptExecutor interface.");
-		}
+	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
 	}
 
-	public static String localFile;
 	
 	@Test
 	public void testEvaluate() throws Exception {

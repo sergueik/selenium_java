@@ -2,9 +2,6 @@ package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
-import java.io.File;
-import java.io.IOException;
-
 import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -15,46 +12,28 @@ import java.io.IOException;
 // import java.nio.file.Files;
 // import java.nio.file.Paths;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import java.util.concurrent.TimeUnit;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+
+import com.jprotractor.NgBy;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
 
 public class CommonFunctions {
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
-	static Actions actions;
-	static Alert alert;
 	static int implicitWait = 10;
 	static int flexibleWait = 5;
 	static long pollingInterval = 500;
@@ -101,4 +80,24 @@ public class CommonFunctions {
 		}
 	}
 
+	public static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+		wait.until(ExpectedConditions.visibilityOf(element));
+		executeScript("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlightInterval);
+		executeScript("arguments[0].style.border=''", element);
+	}
+
+	public static void highlight(NgWebElement element, long highlightInterval) throws InterruptedException {
+		highlight(element.getWrappedElement(), highlightInterval);
+	}
+
+	public static Object executeScript(String script,Object ... args){
+		if (seleniumDriver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor=(JavascriptExecutor)seleniumDriver;
+			return javascriptExecutor.executeScript(script,args);
+		}
+		else {
+			throw new RuntimeException("Script execution is only available for WebDrivers that implement " + "the JavascriptExecutor interface.");
+		}
+	}
 }
