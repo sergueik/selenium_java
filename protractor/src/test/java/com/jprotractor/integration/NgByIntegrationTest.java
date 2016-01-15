@@ -19,8 +19,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+// import java.nio.file.Files;
+// import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -72,7 +72,7 @@ import com.jprotractor.NgWebElement;
 
 @RunWith(Enclosed.class)
 // @Category(Integration.class)
-	public class NgByIntegrationTest {
+	public class NgByIntegrationTest extends CommonFunctions {
         private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
