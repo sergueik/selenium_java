@@ -94,7 +94,7 @@ public class NgCalculatorTest {
 
 	@Test
 	public void testAddition() throws Exception {
-		NgWebElement element = ngDriver.findElement(NgBy.model("first"));
+		WebElement element = ngDriver.findElement(NgBy.model("first"));
 		assertThat(element,notNullValue());
 		highlight(element, 100);
 		element.sendKeys("40");
