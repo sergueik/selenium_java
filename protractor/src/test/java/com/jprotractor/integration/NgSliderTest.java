@@ -95,16 +95,50 @@ public class NgSliderTest {
 	}
 
 	@Test
-	public void testSliderKeys() throws Exception {
-		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));
-		WebElement sliderElement = ngDriver.findElement(By.className("ui-slider-handle"));
+	public void testSliderKeyPress() throws Exception {
+		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));		
 		WebElement sliderContainerElement = sliderElements.get(0);
-		WebElement sliderValueElement = sliderElements.get(1);
+		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		highlight(sliderContainerElement, 100);
-		for (int cnt = 0 ; cnt != 20 ;  cnt ++){
-			sliderElement.sendKeys(Keys.ARROW_RIGHT); 		
+		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
+		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+			sliderElement.sendKeys(Keys.ARROW_RIGHT);
 			highlight(sliderElement, 10);
 		}
+		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+			sliderElement.sendKeys(Keys.ARROW_UP);
+			highlight(sliderElement, 10);
+		}
+
+		WebElement sliderValueElement = sliderElements.get(1);
+		assertThat(sliderValueElement.getTagName(),equalTo("input"));
+		actions.moveToElement(sliderValueElement).build().perform();
+		highlight(sliderValueElement, 100);
+		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
+	}
+
+	@Test
+	public void testSliderMouseMove() throws Exception {
+		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));		
+		WebElement sliderContainerElement = sliderElements.get(0);
+		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
+		Dimension dimension = sliderContainerElement.getSize();
+		int width = dimension.width;
+		// System.err.println("width = " + width);
+		highlight(sliderContainerElement, 100);
+		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
+		// actions.dragAndDropBy(sliderElement, 100, 0).build().perform();
+		// has no effect
+		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+			actions.moveToElement(sliderElement).clickAndHold();
+			actions.moveByOffset(width/20, 0);
+			actions.release();
+			actions.build().perform();
+			Thread.sleep(100);
+		}
+
+		WebElement sliderValueElement = sliderElements.get(1);
+		assertThat(sliderValueElement.getTagName(),equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
 		highlight(sliderValueElement, 100);
 		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
@@ -133,4 +167,3 @@ public class NgSliderTest {
 	}
 	
 }
-
