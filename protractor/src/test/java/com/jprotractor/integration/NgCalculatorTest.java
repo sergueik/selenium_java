@@ -59,10 +59,8 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
-@RunWith(Enclosed.class)
-// @Category(Integration.class)
-	public class NgCalculatorTest {
-        private static String fullStackTrace;
+public class NgCalculatorTest {
+	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
@@ -75,7 +73,7 @@ import com.jprotractor.NgWebElement;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
-        private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+    private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
 
 	@BeforeClass
 	public static void setup() throws IOException{
@@ -87,28 +85,6 @@ import com.jprotractor.NgWebElement;
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
-	}
-
-	@AfterClass
-	public static void teardown() {
-		ngDriver.close();
-		seleniumDriver.quit();		
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
 	}
 
 	@Before
@@ -138,6 +114,29 @@ import com.jprotractor.NgWebElement;
 		assertThat(element.getText(), equalTo("42"));
 		highlight(element, 100);
 	}
+
+	@AfterClass
+	public static void teardown() {
+		ngDriver.close();
+		seleniumDriver.quit();		
+	}
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+
+	private static void highlight(NgWebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+	
 }
 
 

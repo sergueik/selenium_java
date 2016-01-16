@@ -9,7 +9,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
-
 import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -65,10 +64,8 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
-@RunWith(Enclosed.class)
-// @Category(Integration.class)
-	public class NgWay2AutomationIntegrationTest  {
-        private static String fullStackTrace;
+public class NgWay2AutomationIntegrationTest  {
+	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
@@ -84,8 +81,8 @@ import com.jprotractor.NgWebElement;
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
 
 	@BeforeClass
-	public static void setup() throws IOException {
-		isCIBuild = CommonFunctions.checkEnvironment();
+	public static void setup() throws IOException,InterruptedException {
+		isCIBuild = CommonFunctions.checkEnvironment();		
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
@@ -93,28 +90,6 @@ import com.jprotractor.NgWebElement;
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
-	}
-
-	@AfterClass
-	public static void teardown() {
-		ngDriver.close();
-		seleniumDriver.quit();		
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
 	}
 
    	@Before
@@ -525,4 +500,27 @@ import com.jprotractor.NgWebElement;
 		assertTrue(finalBalance == 10 );
 		
 	}
+	
+	@AfterClass
+	public static void teardown() {
+		ngDriver.close();
+		seleniumDriver.quit();		
+	}
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+
+	private static void highlight(NgWebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+
 }

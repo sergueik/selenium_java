@@ -13,6 +13,7 @@ import java.io.IOException;
 // import java.nio.file.Paths;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxProfile;
@@ -40,13 +41,13 @@ public class CommonFunctions {
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
-	static boolean isDestopTesting = false;
+	static boolean isDestopTesting = true;
 	static boolean isCIBuild =  false;
 
 	public static WebDriver getSeleniumDriver() throws IOException {
-                checkEnvironment();
+		checkEnvironment();
 		if (isDestopTesting ){
-		// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
+			// For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
 			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 			profile.setEnableNativeEvents(false);
@@ -54,8 +55,9 @@ public class CommonFunctions {
 			seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
 			return seleniumDriver;
 		} else {
-			return new PhantomJSDriver();
+			seleniumDriver = new PhantomJSDriver();
 		}
+		return seleniumDriver;
 	}
 
 	public static boolean checkEnvironment() {
@@ -71,8 +73,7 @@ public class CommonFunctions {
 	protected static String getScriptContent(String filename) {
 		try {
 			URI uri = CommonFunctions.class.getClassLoader().getResource(filename).toURI();
-		//
-		//	URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
+			//	URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
 			System.err.println("Testing: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not supported in -source 1.6
@@ -81,6 +82,10 @@ public class CommonFunctions {
 	}
 
 	public static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+		int flexibleWait = 5;
+		long pollingInterval = 500;
+		WebDriverWait wait = new WebDriverWait(seleniumDriver, flexibleWait );
+		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 		wait.until(ExpectedConditions.visibilityOf(element));
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlightInterval);

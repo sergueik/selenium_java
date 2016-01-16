@@ -59,9 +59,7 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
-@RunWith(Enclosed.class)
-// @Category(Integration.class)
-	public class NgLocalFileTest {
+public class NgLocalFileTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;
@@ -88,33 +86,6 @@ import com.jprotractor.NgWebElement;
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	private static String getScriptContent(String filename) {
-		return CommonFunctions.	getScriptContent( filename) ;
-	}
-
-	@AfterClass
-	public static void teardown() {
-		ngDriver.close();
-		seleniumDriver.quit();		
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
-	
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -289,4 +260,31 @@ import com.jprotractor.NgWebElement;
 		List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
 		assertThat(elements.size(), equalTo(0));
 	}
+
+	@AfterClass
+	public static void teardown() {
+		ngDriver.close();
+		seleniumDriver.quit();		
+	}
+
+	private static String getScriptContent(String filename) {
+		return CommonFunctions.	getScriptContent( filename) ;
+	}
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+
+	private static void highlight(NgWebElement element) throws InterruptedException {
+		highlight(element,  100);
+	}
+
+	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
+		CommonFunctions.highlight(element, highlightInterval);
+	}
+
 }
