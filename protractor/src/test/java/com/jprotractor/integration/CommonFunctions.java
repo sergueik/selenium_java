@@ -9,8 +9,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.io.File;
 import java.io.IOException;
-// import java.nio.file.Files;
-// import java.nio.file.Paths;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -31,6 +29,11 @@ import org.openqa.selenium.WebElement;
 import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
+
+/**
+ * Common functions for integration testing
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
 public class CommonFunctions {
 	private static WebDriver seleniumDriver;
@@ -70,10 +73,9 @@ public class CommonFunctions {
 		return isCIBuild;
 	}
 
-	protected static String getScriptContent(String filename) {
+	protected static String getPageContent(String pagename) {
 		try {
-			URI uri = CommonFunctions.class.getClassLoader().getResource(filename).toURI();
-			//	URI uri = this.getClass().getClassLoader().getResource(filename).toURI();
+			URI uri = CommonFunctions.class.getClassLoader().getResource(pagename).toURI();			
 			System.err.println("Testing: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not supported in -source 1.6
@@ -90,10 +92,6 @@ public class CommonFunctions {
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlightInterval);
 		executeScript("arguments[0].style.border=''", element);
-	}
-
-	public static void highlight(NgWebElement element, long highlightInterval) throws InterruptedException {
-		highlight(element.getWrappedElement(), highlightInterval);
 	}
 
 	public static Object executeScript(String script,Object ... args){

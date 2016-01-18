@@ -59,6 +59,11 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
+/**
+ * Integration tests of Calculator http://juliemr.github.io/protractor-demo/
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class NgCalculatorTest {
 	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
@@ -94,7 +99,7 @@ public class NgCalculatorTest {
 
 	@Test
 	public void testAddition() throws Exception {
-		WebElement element = ngDriver.findElement(NgBy.model("first"));
+		NgWebElement element = ngDriver.findElement(NgBy.model("first"));
 		assertThat(element,notNullValue());
 		highlight(element, 100);
 		element.sendKeys("40");
@@ -129,14 +134,6 @@ public class NgCalculatorTest {
 		CommonFunctions.highlight(element, highlightInterval);
 	}
 
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-	
 }
 
 
