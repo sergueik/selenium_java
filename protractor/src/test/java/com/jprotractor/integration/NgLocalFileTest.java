@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import java.util.regex.Matcher;
@@ -59,6 +60,11 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
+/**
+ * Local file Integration tests
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class NgLocalFileTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -92,7 +98,7 @@ public class NgLocalFileTest {
 			return;
 		}			
 		localFile = "ng_service_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));
+		ngDriver.navigate().to(getPageContent(localFile));
 		Thread.sleep(500);
 		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 		while (elements.hasMoreElements()){
@@ -118,7 +124,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "ng_service_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));
+		ngDriver.navigate().to(getPageContent(localFile));
 		Thread.sleep(500);
 		Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
 		Integer cnt = 0;
@@ -141,7 +147,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "bind_select_option_data_from_array_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));
+		ngDriver.navigate().to(getPageContent(localFile));
 		Thread.sleep(500);
 		// Some versions of PhantomJS have trouble finding the selectedOption in
 		// <option ng-repeat="option in options" value="3" ng-selected="option.value == myChoice" class="ng-scope ng-binding" selected="selected">three</option>
@@ -161,7 +167,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "bind_select_option_data_from_array_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));
+		ngDriver.navigate().to(getPageContent(localFile));
 		Thread.sleep(500);
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext() ) {
@@ -190,7 +196,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "ng_repeat_start_and_ng_repeat_end_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));			
+		ngDriver.navigate().to(getPageContent(localFile));			
 		Thread.sleep(500);
 		List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
 		assertTrue(elements.get(0).isDisplayed());
@@ -204,7 +210,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "ng_options_with_object_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));			
+		ngDriver.navigate().to(getPageContent(localFile));			
 		Thread.sleep(500);
 		List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
 		assertTrue(elements.size() == 5);
@@ -220,7 +226,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		localFile = "use_ng_pattern_to_validate_example.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));			
+		ngDriver.navigate().to(getPageContent(localFile));			
 		Thread.sleep(500);
 		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
 		input.clear();
@@ -247,18 +253,71 @@ public class NgLocalFileTest {
 	}
 
 	@Test
-	public void testfindRepeaterElement() throws Exception {
+	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
 			return;
 		}			
 		localFile = "ng_basic.htm";
-		ngDriver.navigate().to(getScriptContent(localFile));
+		ngDriver.navigate().to(getPageContent(localFile));
 		Thread.sleep(500);
 		WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
 		System.err.println("item[row='1'][col='b'] = " + element.getText());
 		highlight(element);	
 		List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
 		assertThat(elements.size(), equalTo(0));
+	}
+	
+    @Test
+	public void testDropDown() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}
+		
+		localFile = "ng_dropdown.htm";
+		ngDriver.navigate().to(getPageContent(localFile));
+		Thread.sleep(500);
+		
+		String optionsCountry = "country for (country, states) in countries";
+		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
+		assertThat(elementsCountries.size(), equalTo(4));
+		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
+		while (iteratorCountries.hasNext()) {
+			WebElement country = (WebElement) iteratorCountries.next();
+			if (country.getAttribute("value").isEmpty()){
+				continue;
+			}
+			assertTrue(country.getAttribute("value").matches("(?i:India|Australia|Usa)"));
+			System.err.println("country = " + country.getAttribute("value") );
+		}
+
+		String optionsState = "state for (state,city) in states";
+		WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
+		assertTrue(!elementState.isEnabled());
+				
+		WebElement element = ngDriver.findElement(NgBy.options(optionsCountry));
+		assertThat(element.getText().toLowerCase(Locale.getDefault()),containsString("select"));
+		assertTrue(element.isEnabled());
+
+		Select selectCountries = new Select(ngDriver.findElement(NgBy.model("states")));
+		selectCountries.selectByVisibleText("Australia");
+		WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
+		try{
+			assertThat(selectedOptionCountry, notNullValue());
+		} catch (AssertionError e) {
+		}
+		elementState = ngDriver.findElement(NgBy.options(optionsState));
+		assertTrue(elementState.isEnabled());
+		List <WebElement>elementsStates = ngDriver.findElements(NgBy.options(optionsState));
+		assertThat(elementsStates.size(), equalTo(3));
+		Iterator<WebElement> iteratorStates = elementsStates.iterator();
+		while (iteratorStates.hasNext()) {
+			WebElement state = (WebElement) iteratorStates.next();
+			if (state.getAttribute("value").isEmpty()){
+				continue;
+			}
+			assertTrue(state.getAttribute("value").matches("(?i:New South Wales|Victoria)"));
+			System.err.println("state = " + state.getAttribute("value") );
+		}
 	}
 
 	@AfterClass
@@ -267,8 +326,8 @@ public class NgLocalFileTest {
 		seleniumDriver.quit();		
 	}
 
-	private static String getScriptContent(String filename) {
-		return CommonFunctions.	getScriptContent( filename) ;
+	private static String getPageContent(String pagename) {
+		return CommonFunctions.getPageContent( pagename) ;
 	}
 
 	private static void highlight(WebElement element) throws InterruptedException {
@@ -278,13 +337,5 @@ public class NgLocalFileTest {
 	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
 		CommonFunctions.highlight(element, highlightInterval);
 	}
-
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
+	
 }
