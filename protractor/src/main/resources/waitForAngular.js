@@ -25,11 +25,11 @@ var waitForAngular = function(rootSelector, callback) {
             notifyWhenNoOutstandingRequests(callback);
         }
     } catch (err) {
-        callback(err.message);
+      callback('exception: ' + err.message);
     }
 };
-
-var log = function(s){ console.log(s); }
+// var arguments = []
+var log = function(message){ console.log("callback: " + message); return(message); }
 
 var rootSelector = arguments[0] || 'document';
 var callback = arguments[1] || log;

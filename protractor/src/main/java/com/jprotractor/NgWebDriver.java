@@ -138,10 +138,12 @@ public class NgWebDriver implements WebDriver, WrapsDriver {
     public void waitForAngular() {
         if (!this.ignoresync) {
             iterationCount++;
+	// Object result =
             this.jsExecutor.executeAsyncScript(
                 new WaitForAngular().content(),
                 this.rootElement
             );
+	// System.err.println("waitForAngular -> " +result.toString());
         }
     }
 }
