@@ -74,7 +74,7 @@ public final class JavaScriptBy extends By {
         List<WebElement> elements = (List<WebElement>) this.executor(context)
             .executeScript(this.script.content(), jsargs);
         if (elements == null) {
-            elements = new ArrayList<WebElement>();
+            elements = new ArrayList<>(0);
         }
         return elements;
     }

@@ -115,7 +115,7 @@ public class NgIgnoreSyncTest {
 			return;
 		}		
 	}
-	
+	/*
 	@Test
 	public void testNonAngularIgnoreSync() throws Exception {
 			NgWebDriver ngDriver = new NgWebDriver(seleniumDriver, true);
@@ -133,7 +133,7 @@ public class NgIgnoreSyncTest {
 			return;
 		}
 	}
-	
+	*/
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();

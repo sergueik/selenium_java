@@ -10,11 +10,26 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsElement;
 
+/**
+ * Angular Web Element.
+ */
 public final class NgWebElement implements WebElement, WrapsElement {
 
+    /**
+     * Angular Web Driver.
+     */
     private final transient NgWebDriver driver;
+
+    /**
+     * Element.
+     */
     private final transient WebElement element;
 
+    /**
+     * Ctor.
+     * @param drv Driver.
+     * @param elm Element.
+     */
     public NgWebElement(final NgWebDriver drv, final WebElement elm) {
         this.driver = drv;
         this.element = elm;
@@ -29,7 +44,6 @@ public final class NgWebElement implements WebElement, WrapsElement {
     public void clear() {
         this.driver.waitForAngular();
         this.element.clear();
-
     }
 
     @Override
@@ -60,7 +74,7 @@ public final class NgWebElement implements WebElement, WrapsElement {
 
     public List<NgWebElement> findNgElements(By by) {
         final List<WebElement> temp = findElements(by);
-        final List<NgWebElement> elements = new ArrayList<NgWebElement>();
+        final List<NgWebElement> elements = new ArrayList<>();
         for (final WebElement element : temp) {
             elements.add(new NgWebElement(this.driver, element));
         }

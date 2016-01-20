@@ -1,44 +1,55 @@
 package com.jprotractor;
 
 import java.net.URL;
-import org.openqa.selenium.WebDriver.Navigation;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 
-public class NgNavigation implements Navigation {
-    @SuppressWarnings("unused")
-    private NgWebDriver NgDriver;
-    private Navigation Nav;
-    public Navigation WrappedNavigation;
+/**
+ * Angular Navigation.
+ * @author Carlos Alexandro Becker (caarlos0@gmail.com)
+ */
+public final class NgNavigation implements WebDriver.Navigation {
+    /**
+     * Navigation.
+     */
+    private final WebDriver.Navigation nav;
 
-    public NgNavigation(NgWebDriver ngDriver, Navigation navigation) {
-        this.NgDriver = ngDriver;
-        this.Nav = navigation;
-        this.WrappedNavigation = this.Nav;
+    /**
+     * Ctor.
+     * @param navigation Navigation.
+     */
+    public NgNavigation(final WebDriver.Navigation navigation) {
+        this.nav = navigation;
     }
 
+    @Override
     public void back() {
-        this.Nav.forward();
+        this.nav.forward();
     }
 
+    @Override
     public void forward() {
-        this.Nav.forward();
+        this.nav.forward();
     }
 
+    @Override
     public void refresh() {
-        this.Nav.refresh();
+        this.nav.refresh();
     }
 
-    public void to(String arg0) {
-        if (arg0 == null) {
+    @Override
+    public void to(final String url) {
+        if (url == null) {
             throw new WebDriverException("URL cannot be null.");
         }
-
-        this.Nav.to(arg0.toString());
+        this.nav.to(url);
     }
 
-    public void to(URL arg0) {
-        this.Nav.to(arg0.toString());
-
+    @Override
+    public void to(final URL url) {
+        if (url == null) {
+            throw new WebDriverException("URL cannot be null.");
+        }
+        this.to(url.toString());
     }
-
 }

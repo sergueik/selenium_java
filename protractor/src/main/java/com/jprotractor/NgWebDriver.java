@@ -1,7 +1,6 @@
 package com.jprotractor;
 
 import com.jprotractor.scripts.WaitForAngular;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import org.openqa.selenium.By;
@@ -11,139 +10,127 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.internal.WrapsDriver;
 
-public class NgWebDriver implements WebDriver, WrapsDriver {
-    private WebDriver driver;
-    private JavascriptExecutor jsExecutor;
-    private String rootElement;
-    @SuppressWarnings("unused")
-    private NgModule[] mockModules;
-    public boolean ignoresync;
-    // little max iteration count for protector
-    public int maxIterations;
-    private int iterationCount;
+/**
+ * Angular WebDriver Implementation.
+ */
+public final class NgWebDriver implements WebDriver, WrapsDriver {
+    private final WebDriver driver;
+    private final JavascriptExecutor jsExecutor;
+    private final String root;
 
-    public NgWebDriver(WebDriver driver) {
-        this.driver = driver;
-        this.jsExecutor = (JavascriptExecutor) driver;
-        this.rootElement = "body";
-        maxIterations = 30;
-        iterationCount = 0;
+    /**
+     * Ctor.
+     * @param drv Parent web driver.
+     */
+    public NgWebDriver(final WebDriver drv) {
+        this(drv, "body");
     }
 
-    public NgWebDriver(final WebDriver driver, final boolean ignoreSync) {
-        this(driver);
-        this.ignoresync = ignoreSync;
-    }
-
-    public NgWebDriver(final WebDriver driver, final NgModule[] mockModules) {
-        this(driver, "body", mockModules);
-    }
-
+    /**
+     * Ctor.
+     * @param drv Parend Web Driver.
+     * @param rootel Root Element.
+     */
     public NgWebDriver(
-        final WebDriver driver,
-        final String rootElement,
-        final NgModule[] mockModules
+        final WebDriver drv,
+        final String rootel
     ) {
-        if (!(driver instanceof JavascriptExecutor)) {
+        if (!(drv instanceof JavascriptExecutor)) {
             throw new WebDriverException(
                 "The WebDriver instance must implement the " +
                     "JavaScriptExecutor interface."
             );
         }
 
-        this.driver = driver;
-        this.jsExecutor = (JavascriptExecutor) driver;
-        this.rootElement = rootElement;
-        this.mockModules = mockModules;
+        this.driver = drv;
+        this.jsExecutor = (JavascriptExecutor) drv;
+        this.root = rootel;
     }
 
+    @Override
     public WebDriver getWrappedDriver() {
         return this.driver;
     }
 
+    @Override
     public void close() {
         this.driver.close();
-
     }
 
-    public NgWebElement findElement(By by) {
+    @Override
+    public NgWebElement findElement(final By by) {
         this.waitForAngular();
         return new NgWebElement(this, this.driver.findElement(by));
     }
 
-    public List<NgWebElement> findNGElements(By by) {
-        this.waitForAngular();
-        List<WebElement> temp = this.driver.findElements(by);        
-		// NOTE: diamond operator is not supported in -source 1.6
-        final  List<NgWebElement> elements = new ArrayList<NgWebElement>();
-        for (final WebElement element : temp) {
-            elements.add(new NgWebElement(this, element));
-        }
-        return elements;
-    }
-
-    public List<WebElement> findElements(By by) {
+    @Override
+    public List<WebElement> findElements(final By by) {
         return this.driver.findElements(by);
     }
 
-    public void get(String arg0) {
+    @Override
+    public void get(final String arg0) {
         this.waitForAngular();
-        this.driver.navigate().to(arg0);
-
+        this.driver.get(arg0);
     }
 
+    @Override
     public String getCurrentUrl() {
         this.waitForAngular();
         return this.driver.getCurrentUrl();
     }
 
+    @Override
     public String getPageSource() {
         this.waitForAngular();
         return this.driver.getPageSource();
     }
 
+    @Override
     public String getTitle() {
         this.waitForAngular();
-        return driver.getTitle();
+        return this.driver.getTitle();
     }
 
+    @Override
     public String getWindowHandle() {
         this.waitForAngular();
-        return driver.getWindowHandle();
+        return this.driver.getWindowHandle();
     }
 
+    @Override
     public Set<String> getWindowHandles() {
         this.waitForAngular();
-        return driver.getWindowHandles();
+        return this.driver.getWindowHandles();
     }
 
-    public Options manage() {
-        //this.waitForAngular();
+    @Override
+    public WebDriver.Options manage() {
         return this.driver.manage();
     }
 
-    public Navigation navigate() {
-        return new NgNavigation(this, this.driver.navigate());
+    @Override
+    public WebDriver.Navigation navigate() {
+        return new NgNavigation(this.driver.navigate());
     }
 
+    @Override
     public void quit() {
         this.driver.quit();
 
     }
 
-    public TargetLocator switchTo() {
+    @Override
+    public WebDriver.TargetLocator switchTo() {
         return this.driver.switchTo();
     }
 
-    public void waitForAngular() {
-        if (!this.ignoresync) {
-            iterationCount++;
-	// Object result =
-            this.jsExecutor.executeAsyncScript(
-                new WaitForAngular().content(),
-                this.rootElement
-            );
+    public void waitForAngular() {	
+    	// Object result = 
+        this.jsExecutor.executeAsyncScript(
+            new WaitForAngular().content(),
+            this.root
+        );
 	// System.err.println("waitForAngular -> " +result.toString());
-        }
     }
 }
