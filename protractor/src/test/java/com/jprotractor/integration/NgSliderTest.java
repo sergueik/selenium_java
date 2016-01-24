@@ -62,7 +62,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Integration tests of Slider https://angular-ui.github.io/ui-slider/demo/demo.html
+ * Integration tests of AngularUI - Slider demo https://htmlpreview.github.io/?https://github.com/angular-ui/ui-slider/master/demo/index.html
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
  
@@ -80,7 +80,7 @@ public class NgSliderTest {
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
-	private static String baseUrl = "https://angular-ui.github.io/ui-slider/demo/demo.html";
+	private static String baseUrl = "https://htmlpreview.github.io/?https://github.com/angular-ui/ui-slider/master/demo/index.html";
 
 	@BeforeClass
 	public static void setup() throws IOException{
@@ -92,6 +92,7 @@ public class NgSliderTest {
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
 		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
+		
 	}
 
 	@Before
@@ -102,6 +103,7 @@ public class NgSliderTest {
 	@Test
 	public void testSliderKeyPress() throws Exception {
 		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));		
+		// org.openqa.selenium.WebDriverException: angular is not defined
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		highlight(sliderContainerElement, 100);

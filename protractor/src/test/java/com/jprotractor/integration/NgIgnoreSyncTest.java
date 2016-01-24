@@ -96,7 +96,9 @@ public class NgIgnoreSyncTest {
 
 	@Test
 	public void testNonAngular() throws Exception {
-
+		if (isCIBuild) {
+			return;	
+		}
 		ngDriver.navigate().to("http://www.google.com");
 		// expecting exception about to be thrown is browser-specific 
 		
@@ -118,13 +120,16 @@ public class NgIgnoreSyncTest {
 
 	@Test
 	public void testNonAngularIgnoreSync() throws Exception {
-			NgWebDriver ngDriver = new NgWebDriver(seleniumDriver, true);
-			ngDriver.navigate().to("http://www.google.com");
-			long startTime = System.currentTimeMillis();
-			ngDriver.waitForAngular();
-			long estimatedTime = System.currentTimeMillis() - startTime;
-			System.err.println("waitForAngular: " + estimatedTime);
-			NgWebElement element = ngDriver.findElement(By.cssSelector("input#gs_htif0"));
+		if (isCIBuild) {
+			return;	
+		}
+		NgWebDriver ngDriver = new NgWebDriver(seleniumDriver, true);
+		ngDriver.navigate().to("http://www.google.com");
+		long startTime = System.currentTimeMillis();
+		ngDriver.waitForAngular();
+		long estimatedTime = System.currentTimeMillis() - startTime;
+		System.err.println("waitForAngular: " + estimatedTime);
+		NgWebElement element = ngDriver.findElement(By.cssSelector("input#gs_htif0"));
 		try { 
 			element.getAttribute("id");
 		} catch (TimeoutException exception) { 
