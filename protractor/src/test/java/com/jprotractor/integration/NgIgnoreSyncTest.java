@@ -62,7 +62,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Local file Integration tests
+ * Local file Integration tests of using Protractor driver with non-Angular pages
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -115,7 +115,7 @@ public class NgIgnoreSyncTest {
 			return;
 		}		
 	}
-	/*
+
 	@Test
 	public void testNonAngularIgnoreSync() throws Exception {
 			NgWebDriver ngDriver = new NgWebDriver(seleniumDriver, true);
@@ -133,7 +133,7 @@ public class NgIgnoreSyncTest {
 			return;
 		}
 	}
-	*/
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();

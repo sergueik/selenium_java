@@ -14,6 +14,7 @@ import org.openqa.selenium.internal.WrapsDriver;
 /**
  * Javascript WebElement searcher.
  * @author Carlos Alexandro Becker (caarlos0@gmail.com)
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 public final class JavaScriptBy extends By {
     /**

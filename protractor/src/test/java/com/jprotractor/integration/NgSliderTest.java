@@ -61,6 +61,11 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
+/**
+ * Integration tests of Slider https://angular-ui.github.io/ui-slider/demo/demo.html
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+ 
 public class NgSliderTest {
 	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
