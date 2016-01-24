@@ -25,18 +25,13 @@ final class Loader {
      * @return File contents.
      */
     String content() {
-        try (
-            final InputStream stream = Loader.class
-                .getClassLoader().getResourceAsStream(this.filename)
-        ) {
-            if (stream == null) {
-                throw new ScriptLoadException(this.filename);
-            }
-            final byte[] bytes = new byte[stream.available()];
-            stream.read(bytes);
-            return new String(bytes, "UTF-8");
-        } catch (final IOException err) {
-            throw new ScriptLoadException(err, this.filename);
-        }
+		try {
+			final InputStream stream = Loader.class.getClassLoader().getResourceAsStream(this.filename);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			return new String(bytes, "UTF-8");
+		} catch ( IOException e) {
+			throw new ScriptLoadException(e, this.filename);
+		}
     }
 }
