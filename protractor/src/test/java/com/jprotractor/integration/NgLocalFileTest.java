@@ -97,9 +97,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}			
-		localFile = "ng_service_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("ng_service_example.htm");
 		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 		while (elements.hasMoreElements()){
 			WebElement currentElement = elements.nextElement();
@@ -123,9 +121,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "ng_service_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("ng_service_example.htm");
 		Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
 		Integer cnt = 0;
 		while (countryColumns.hasNext() ) {
@@ -146,9 +142,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "bind_select_option_data_from_array_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("bind_select_option_data_from_array_example.htm");
 		// Some versions of PhantomJS have trouble finding the selectedOption in
 		// <option ng-repeat="option in options" value="3" ng-selected="option.value == myChoice" class="ng-scope ng-binding" selected="selected">three</option>
 		WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
@@ -166,9 +160,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "bind_select_option_data_from_array_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("bind_select_option_data_from_array_example.htm");
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext() ) {
 			WebElement option = (WebElement)  options.next();
@@ -195,9 +187,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "ng_repeat_start_and_ng_repeat_end_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));			
-		Thread.sleep(500);
+		getPageContent("ng_repeat_start_and_ng_repeat_end_example.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
 		assertTrue(elements.get(0).isDisplayed());
 		assertThat(elements.get(0).getText(),containsString("Foo"));
@@ -209,9 +199,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "ng_options_with_object_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));			
-		Thread.sleep(500);
+		getPageContent("ng_options_with_object_example.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
 		assertTrue(elements.size() == 5);
 		assertThat(elements.get(0).getText(),containsString("black"));
@@ -225,9 +213,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		localFile = "use_ng_pattern_to_validate_example.htm";
-		ngDriver.navigate().to(getPageContent(localFile));			
-		Thread.sleep(500);
+		getPageContent("use_ng_pattern_to_validate_example.htm");
 		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
 		input.clear();
 		WebElement valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
@@ -257,9 +243,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}			
-		localFile = "ng_basic.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("ng_basic.htm");
 		WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
 		System.err.println("item[row='1'][col='b'] = " + element.getText());
 		highlight(element);	
@@ -273,10 +257,7 @@ public class NgLocalFileTest {
 			return;
 		}
 
-		localFile = "ng_dropdown_watch.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
-
+		getPageContent("ng_dropdown_watch.htm");
 		String optionsCountry = "country for country in countries";
 		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
 		assertThat(elementsCountries.size(), equalTo(3));
@@ -325,9 +306,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		
-		localFile = "ng_dropdown.htm";
-		ngDriver.navigate().to(getPageContent(localFile));
-		Thread.sleep(500);
+		getPageContent("ng_dropdown.htm");
 		
 		String optionsCountry = "country for (country, states) in countries";
 		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
@@ -378,8 +357,10 @@ public class NgLocalFileTest {
 		seleniumDriver.quit();		
 	}
 
-	private static String getPageContent(String pagename) {
-		return CommonFunctions.getPageContent( pagename) ;
+	private static void getPageContent(String pagename) throws InterruptedException{
+		String baseUrl = CommonFunctions.getPageContent( pagename) ;
+		ngDriver.navigate().to(baseUrl);
+		Thread.sleep(500);
 	}
 
 	private static void highlight(WebElement element) throws InterruptedException {
