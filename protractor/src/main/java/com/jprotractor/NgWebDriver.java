@@ -83,7 +83,6 @@ public final class NgWebDriver implements WebDriver, WrapsDriver {
 
     @Override
     public String getCurrentUrl() {
-        this.waitForAngular();
         return this.webDriver.getCurrentUrl();
     }
 
@@ -101,13 +100,11 @@ public final class NgWebDriver implements WebDriver, WrapsDriver {
 
     @Override
     public String getWindowHandle() {
-        this.waitForAngular();
         return this.webDriver.getWindowHandle();
     }
 
     @Override
     public Set<String> getWindowHandles() {
-        this.waitForAngular();
         return this.webDriver.getWindowHandles();
     }
 
@@ -134,9 +131,7 @@ public final class NgWebDriver implements WebDriver, WrapsDriver {
 
     public void waitForAngular() {	
 		if (!this.ignoreSynchronization) {
-			// Object result = 
 			this.jsExecutor.executeAsyncScript(new WaitForAngular().content(),this.rootElement);
-			// System.err.println("waitForAngular -> " +result.toString());
-		 }
+		}
     }
 }
