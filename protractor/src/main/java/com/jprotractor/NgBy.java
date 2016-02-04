@@ -13,6 +13,7 @@ import com.jprotractor.scripts.FindModel;
 import com.jprotractor.scripts.FindOptions;
 import com.jprotractor.scripts.FindPartialButtonText;
 import com.jprotractor.scripts.FindRepeaterElements;
+import com.jprotractor.scripts.FindRepeaterRows;
 import com.jprotractor.scripts.FindSelectedOption;
 
 import org.openqa.selenium.By;
@@ -51,6 +52,10 @@ public final class NgBy {
 
 	public static By repeaterElement(final String repeat, Integer index, String binding){
 		return new JavaScriptBy(new FindRepeaterElements(), repeat, index, binding);
+	}
+
+	public static By repeaterRows(final String repeat, Integer index){
+		return new JavaScriptBy(new FindRepeaterElements(), repeat, index);
 	}
 	
     public static By options(final String options) {
