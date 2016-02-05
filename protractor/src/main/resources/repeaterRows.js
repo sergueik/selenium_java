@@ -51,4 +51,19 @@ function findRepeaterRows(repeater, exact, index, using) {
   var row = rows[index] || [], multiRow = multiRows[index] || [];
   return [].concat(row, multiRow);
 }
-functions.findRepeaterRows = wrapWithHelpers(findRepeaterRows, repeaterMatch); 
+
+function repeaterMatch(ngRepeat, repeater, exact) {
+  if (exact) {
+    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
+        split('=')[0].trim() == repeater;
+  } else {
+    return ngRepeat.indexOf(repeater) != -1;
+  }
+}
+
+var using = arguments[0] || document;
+var repeater = arguments[1];
+var index = arguments[2];
+var exact = false;
+
+return findRepeaterRows(repeater, exact, index, using) ;
