@@ -253,21 +253,25 @@ public class NgLocalFileTest {
 	}
 
 	@Test
-	public void testElementisDisplayed() throws Exception {
+	public void testElementTextIsGenerated() throws Exception {
 		if (!isCIBuild) {
 			return;
 		}			
 		getPageContent("load_json_data.htm");
-		WebElement element = ngDriver.findElement(NgBy.model("name"));
-		highlight(element);	
-		element.sendKeys("John");
-		JavascriptExecutor js = (JavascriptExecutor) ngDriver.getWrappedDriver();
-        js.executeScript("arguments[0].focus(); arguments[0].blur(); return true", element);
-		element.sendKeys(Keys.TAB);
-		Thread.sleep(600);
-		element = ngDriver.findElement(NgBy.model("greeting"));
-		assertTrue(element.getText().length() > 0);
-		System.err.println("-->" + element.getText() + " " + element.getText().length() );
+		WebElement name  = ngDriver.findElement(NgBy.model("name"));
+		highlight(name);
+		name.sendKeys("John");
+		name.sendKeys(Keys.TAB);
+		// NOTE: explicitly done by getAttribute.
+		// ngDriver.waitForAngular();
+		WebElement greeting = ngDriver.findElement(NgBy.model("greeting"));
+		highlight(greeting);
+		//JavascriptExecutor js = (JavascriptExecutor) ngDriver.getWrappedDriver();
+		//String greeting_text = js.executeScript("return arguments[0].value", greeting).toString();
+		//assertTrue(greeting_text.length() > 0);
+		String greeting_text = greeting.getAttribute("value");
+		System.err.println( greeting_text );
+		assertTrue(greeting_text.length() > 0);
 	}
 
     @Test
