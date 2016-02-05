@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js'></script>
+<script type='text/javascript'>
+var app = angular.module('myApp', []);
+app.controller('myCtrl', function($scope, $http) {
+
+    $scope.text_entered = function() {
+
+        $http.jsonp('http://angularjs.org/greet.php?callback=JSON_CALLBACK&&name=' + encodeURIComponent($scope.name)).
+        success(function(data) {
+            $scope.data = '';
+            $scope.name = data.name;
+            $scope.greeting = data.greeting;
+        }).
+        error(function(data) {
+            $scope.data = 'Request failed';
+        });
+
+    };
+});
+</script>
+</head>
+<body>
+
+<div ng-controller="myCtrl">
+<form name="myForm">
+    <label>Name</label><br/>
+    <input type="text" ng-model='name' ng-blur='text_entered()'><br/>
+    <label>Greeting</label><br/>
+    <input ng-model='greeting'/><br/>
+    <pre ng-model="data">
+    {{data}}
+    </pre>
+</form>
+</div>
+</body>
+</html>

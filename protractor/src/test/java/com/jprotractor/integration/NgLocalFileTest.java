@@ -42,6 +42,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -249,6 +250,24 @@ public class NgLocalFileTest {
 		highlight(element);	
 		List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
 		assertThat(elements.size(), equalTo(0));
+	}
+
+	@Test
+	public void testElementisDisplayed() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}			
+		getPageContent("load_json_data.htm");
+		WebElement element = ngDriver.findElement(NgBy.model("name"));
+		highlight(element);	
+		element.sendKeys("John");
+		JavascriptExecutor js = (JavascriptExecutor) ngDriver.getWrappedDriver();
+        js.executeScript("arguments[0].focus(); arguments[0].blur(); return true", element);
+		element.sendKeys(Keys.TAB);
+		Thread.sleep(600);
+		element = ngDriver.findElement(NgBy.model("greeting"));
+		assertTrue(element.getText().length() > 0);
+		System.err.println("-->" + element.getText() + " " + element.getText().length() );
 	}
 
     @Test
