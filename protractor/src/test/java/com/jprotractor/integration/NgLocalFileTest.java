@@ -214,6 +214,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
+		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("use_ng_pattern_to_validate_example.htm");
 		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
 		input.clear();
@@ -279,7 +280,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-
+		//  NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
 		getPageContent("ng_dropdown_watch.htm");
 		String optionsCountry = "country for country in countries";
 		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
@@ -328,7 +329,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		
+		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("ng_dropdown.htm");
 		
 		String optionsCountry = "country for (country, states) in countries";
