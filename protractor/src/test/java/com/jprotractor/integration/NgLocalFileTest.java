@@ -1,13 +1,12 @@
 package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+//import static org.junit.Assert.assertNotEquals;
+//import static org.junit.Assert.assertThat;
+//import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 
@@ -324,6 +323,24 @@ public class NgLocalFileTest {
 
 	}
 
+    @Test
+	public void testFindRepeaterRows() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}
+		String todos_repeater = "todo in todoList.todos";
+		getPageContent("angularjs_todo_examle.htm");
+		List <WebElement>todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,1));
+		assertTrue(todos.size() > 0);
+		System.err.println("TODO: " + todos.get(0).getText());
+		todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,-1));
+		assertThat(todos.size(), equalTo(0));
+		List <WebElement>todos_check = ngDriver.findElements(NgBy.repeater(todos_repeater));
+		todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,todos_check.size() + 1));
+		assertThat(todos.size(), equalTo(0));
+		
+	}
+	
     @Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {

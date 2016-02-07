@@ -55,7 +55,7 @@ public final class NgBy {
 	}
 
 	public static By repeaterRows(final String repeat, Integer index){
-		return new JavaScriptBy(new FindRepeaterElements(), repeat, index);
+		return new JavaScriptBy(new FindRepeaterRows(), repeat, index);
 	}
 	
     public static By options(final String options) {
