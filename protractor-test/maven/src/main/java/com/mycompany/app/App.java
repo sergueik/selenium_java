@@ -74,30 +74,25 @@ public class App {
 	private static NgWebDriver ngDriver;
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";			
 	static int implicitWait = 10;
+    static int flexibleWait = 5;
+	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
 	static WebDriverWait wait;
 	static Actions actions;
-    static int flexibleWait = 5;
-	static long pollingInterval = 500;
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
 	@Before
 	public static void setUp() throws Exception {
-		seleniumDriver = new FirefoxDriver();
+		final FirefoxProfile profile = new FirefoxProfile();
+		profile.setEnableNativeEvents(false);
+		seleniumDriver = new FirefoxDriver(profile);
+		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
+		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
+		actions = new Actions(seleniumDriver);		
 		wait = new WebDriverWait(seleniumDriver, flexibleWait );
 		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-		try{
-			seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-			seleniumDriver.manage().timeouts()
-				.pageLoadTimeout(50, TimeUnit.SECONDS)
-				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
-				.setScriptTimeout(10, TimeUnit.SECONDS);
-		}  catch(Exception ex) {
-			System.out.println(ex.toString());
-		}
-		actions = new Actions(seleniumDriver);		
 		ngDriver = new NgWebDriver(seleniumDriver);
 		ngDriver.navigate().to(baseUrl);
 		// Thread.sleep(10000);
