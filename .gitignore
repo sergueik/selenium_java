@@ -2,9 +2,13 @@
 **/.settings
 **/work/**
 **/target/**
+**/src/**/*.jar
+**/build/**
+**/test-output/**
 /pom.xml.releaseBackup
 /release.properties
 /settings.xml
 *.unc-backup~
 *.uncrustify
 *~
+
