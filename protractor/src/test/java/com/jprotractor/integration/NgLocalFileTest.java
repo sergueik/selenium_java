@@ -4,10 +4,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-//import static org.junit.Assert.assertNotEquals;
-//import static org.junit.Assert.assertThat;
-//import static org.junit.Assert.assertTrue;
-
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -342,6 +338,22 @@ public class NgLocalFileTest {
 	}
 	
     @Test
+	public void testFindAllBindings() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}
+		getPageContent("ng_directive_binding.htm");
+		List <WebElement>names = ngDriver.findElements(NgBy.binding("name"));
+		assertTrue(names.size() == 5 );
+		
+		System.err.println(names.get(0).getText() );
+		System.err.println(names.get(0).getTagName() );
+		System.err.println(getIdentity(names.get(0)) );
+		
+
+	}
+
+    @Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
 			return;
@@ -410,6 +422,12 @@ public class NgLocalFileTest {
 
 	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
 		CommonFunctions.highlight(element, highlightInterval);
+	}
+	
+	private static String getIdentity(WebElement element ) throws InterruptedException {
+		String script = "return angular.identity(angular.element(arguments[0])).html();";
+		// returns too little HTML information in Java 
+		return CommonFunctions.executeScript(script, element).toString();
 	}
 
 }
