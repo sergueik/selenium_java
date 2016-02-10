@@ -343,14 +343,19 @@ public class NgLocalFileTest {
 			return;
 		}
 		getPageContent("ng_directive_binding.htm");
+		
+		WebElement container = ngDriver.getWrappedDriver().findElement(By.cssSelector("body div"));
+		assertThat(container, notNullValue());
+		System.err.println(container.getAttribute("innerHTML") );		
 		List <WebElement>names = ngDriver.findElements(NgBy.binding("name"));
 		assertTrue(names.size() == 5 );
-		
-		System.err.println(names.get(0).getText() );
-		System.err.println(names.get(0).getTagName() );
-		System.err.println(getIdentity(names.get(0)) );
-		
 
+		Iterator<WebElement> iteratorNames = names.iterator();		
+		while (iteratorNames.hasNext()) {
+			WebElement name = (WebElement) iteratorNames.next();
+			System.err.println(names.get(0).getAttribute("outerHTML") );
+			System.err.println(getIdentity(names.get(0)) );
+		}
 	}
 
     @Test
