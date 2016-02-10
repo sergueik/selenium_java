@@ -2,15 +2,152 @@ Note
 ----
 
 This github project is the 'development branch' of the collaborated project 
-[jProtratractor](https://github.com/caarlos0/jProtractor)
-Info
-----
+[jProtratractor](https://github.com/caarlos0/jProtractor). It may be using a different version of java compiler but otherwise is nearly identical.
 
+
+Info
+====
 
 Goal is to close the gap between [jProtractor locator snippets](https://github.com/sergueik/jProtractor/tree/master/src/main/resources) and [genuine protractor ones](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
 
-Tests
+
+Currently supported Antular Proractor methods:
+```
+binding.js
+buttonText.js
+evaluate.js
+getLocationAbsUrl.js
+model.js
+options.js
+partialButtonText.js
+repeater.js
+repeaterColumn.js
+repeaterElement.js
+repeaterRows.js
+resumeAngularBootstrap.js
+selectedOption.js
+testForAngular.js
+waitForAngular.js
+```
+
+
+Building
+========
+Windows (jdk1.7.0_65, 32 bit)
+-----------------------------
+The following commands compile the project in console.
+```
+set M2=c:\java\apache-maven-3.2.1\bin
+set M2_HOME=c:\java\apache-maven-3.2.1
+set MAVEN_OPTS=-Xms256m -Xmx512m
+set JAVA_HOME=c:\java\jdk1.7.0_65
+set JAVA_VERSION=1.7.0_65
+PATH=%JAVA_HOME%\bin;%PATH%;%M2%
+REM
+REM move %USERPROFILE%\.M2 %USERPROFILE%\.M2.MOVED
+REM rd /s/q %USERPROFILE%\.M2
+set TRAVIS=true
+mvn clean package
+```
+Linux
 -----
+```
+export TRAVIS=true
+mvn clean package
+```
+
+Using with existing Java projects
+=================================
+
+Maven
+-----
+
+  * Copy `target\jprotractor-1.0-SNAPSHOT.jar` to your project `src/main/resources`:
+
+```
++---src
+    +---main
+            +---java
+            |   +---com
+            |       +---mycompany
+            |           +---app
+            +---resources
+
+```
+  * Add reference to the project `pom.xml` (a sample project is checked in) 
+```
+<properties>
+    <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
+</properties>
+```
+```
+<dependencies>
+<dependency>
+     <groupId>com.jprotractor</groupId>
+     <artifactId>jprotractor</artifactId>
+     <version>${jprotractor.version}</version>
+     <scope>system</scope>
+     <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
+</dependency>
+</dependencies>
+```
+  * Add reference to the code:
+```
+import com.jprotractor.NgBy;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+  
+```
+
+Ant
+---
+
+* Copy the `target\jprotractor-1.0-SNAPSHOT.jar`  in the same location oher dependency jars, e.g. `c:\java\selenium`,
+* Use the bolierplate `build.xml` (a sample project is checked in) or merge with your existing build file(s):
+```
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="example" basedir=".">
+  <property name="build.dir" value="${basedir}/build"/>
+  <property name="selenium.jars" value="c:/java/selenium"/>
+  <property name="src.dir" value="${basedir}/src"/>
+  <target name="loadTestNG" depends="setClassPath">
+    <taskdef resource="testngtasks" classpath="${test.classpath}"/>
+  </target>
+  <target name="setClassPath">
+    <path id="classpath_jars">
+      <pathelement path="${basedir}/"/>
+      <fileset dir="${selenium.jars}" includes="*.jar"/>
+    </path>
+    <pathconvert pathsep=";" property="test.classpath" refid="classpath_jars"/>
+  </target>
+  <target name="clean">
+    <delete dir="${build.dir}"/>
+  </target>
+  <target name="compile" depends="clean,setClassPath,loadTestNG">
+    <mkdir dir="${build.dir}"/>
+    <javac destdir="${build.dir}" srcdir="${src.dir}">
+      <classpath refid="classpath_jars"/>
+    </javac>
+  </target>
+  <target name="test" depends="compile">
+    <testng classpath="${test.classpath};${build.dir}">
+      <xmlfileset dir="${basedir}" includes="testng.xml"/>
+    </testng>
+  </target>
+</project>
+
+```
+* Add reference to the code:
+```
+import com.jprotractor.NgBy;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+
+```
+
+Example Test
+============
+
 For desktop browser testing, run a Selenium node and Selenium hub on port 4444 and 
 ```
 @BeforeClass
@@ -61,21 +198,11 @@ public static void setup() throws IOException {
 	ngDriver = new NgWebDriver(seleniumDriver);
 }
 ```
-For testing your code with  jprotractor.jar, add it to `src/main/resources`:
-add 
-```
-<dependency>
-  <groupId>com.jprotractor</groupId>
-  <artifactId>jprotractor</artifactId>
-  <version>${jprotractor.version}</version>
-  <scope>system</scope>
-  <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
-</dependency>
-```
+
 
 Note
 ----
-PhantomJs allows loading Angular samples via `file://` content:
+PhantomJs allows loading Angular samples from `file://` content:
 
 ```
     seleniumDriver = new PhantomJSDriver();
@@ -92,11 +219,11 @@ PhantomJs allows loading Angular samples via `file://` content:
     assertThat(element, notNullValue());
 
 ```
-Tests involving `NgBy.selectedOption()` currently fail under [travis](https://travis-ci.org/) build.
+Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
 
 Related Projects 
-----------------
+================
   - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [ngWebDriver](https://github.com/paul-hammant/ngWebDriver)
   - [angular/protractor](https://github.com/angular/protractor) 
