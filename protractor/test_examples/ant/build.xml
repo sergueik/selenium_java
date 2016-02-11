@@ -1,15 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project name="example" basedir=".">
-  <property name="build.dir" value="${basedir}/build"/>
-  <property name="selenium.jars" value="c:/java/selenium"/>
+<project name="TestNGTestExample" basedir="." default="test">
+  <!-- Comment below to use default location -->
+  <property environment="env"/>
+  <property name="testng.version" value="6.8.8"/>
+  <taskdef name="testng" classname="org.testng.TestNGAntTask">
+    <classpath>
+      <pathelement location="${env.USERPROFILE}\.m2\repository\org\testng\testng\${testng.version}\testng-${testng.version}.jar"/>
+    </classpath>
+  </taskdef>
+  <condition property="selenium.directory" value="${env.SELENIUM_JARS_DIRECTORY}" else="c:/java/selenium">
+    <isset property="env.SELENIUM_JARS_DIRECTORY"/>
+  </condition>
+  <target name="check_env">
+    <echo message="selenium.directory='${selenium.directory}'."/>
+    <echo message="Can override by setting the envieronment variable"/> 
+    <echo message="e.g. set SELENIUM_JARS_DIRECTORY=&lt;SELENIUM JARS DIRECRORY PATH&gt;"/>
+  </target>
   <property name="src.dir" value="${basedir}/src"/>
   <target name="loadTestNG" depends="setClassPath">
     <taskdef resource="testngtasks" classpath="${test.classpath}"/>
   </target>
-  <target name="setClassPath">
+  <target name="setClassPath" depends="check_env">
     <path id="classpath_jars">
       <pathelement path="${basedir}/"/>
-      <fileset dir="${selenium.jars}" includes="*.jar"/>
+      <fileset dir="${selenium.directory}" includes="*.jar"/>
     </path>
     <pathconvert pathsep=";" property="test.classpath" refid="classpath_jars"/>
   </target>
