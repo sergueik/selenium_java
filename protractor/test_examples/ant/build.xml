@@ -13,10 +13,11 @@
   </condition>
   <target name="check_env">
     <echo message="selenium.directory='${selenium.directory}'."/>
-    <echo message="Can override by setting the envieronment variable"/> 
+    <echo message="Can override by setting the envieronment variable"/>
     <echo message="e.g. set SELENIUM_JARS_DIRECTORY=&lt;SELENIUM JARS DIRECRORY PATH&gt;"/>
   </target>
-  <property name="src.dir" value="${basedir}/src"/>
+  <property name="build.dir" location="build"/>
+  <property name="src.dir" location="src"/>
   <target name="loadTestNG" depends="setClassPath">
     <taskdef resource="testngtasks" classpath="${test.classpath}"/>
   </target>
@@ -27,16 +28,23 @@
     </path>
     <pathconvert pathsep=";" property="test.classpath" refid="classpath_jars"/>
   </target>
+  <target name="init" depends="dir.check" unless="dir.exists">
+    <mkdir dir="${build.dir}"/>
+  </target>
+  <target name="dir.check">
+    <condition property="dir.exists">
+      <available file="${build.dir}" type="dir"/>
+    </condition>
+  </target>
   <target name="clean">
     <delete dir="${build.dir}"/>
   </target>
-  <target name="compile" depends="clean,setClassPath,loadTestNG">
-    <mkdir dir="${build.dir}"/>
+  <target name="compile" depends="init,setClassPath,loadTestNG">
     <javac destdir="${build.dir}" srcdir="${src.dir}">
       <classpath refid="classpath_jars"/>
     </javac>
   </target>
-  <target name="test" depends="compile">
+  <target name="test" depends="clean,compile">
     <testng classpath="${test.classpath};${build.dir}">
       <xmlfileset dir="${basedir}" includes="testng.xml"/>
     </testng>
