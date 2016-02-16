@@ -93,7 +93,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}			
-		getPageContent("ng_service_example.htm");
+		getPageContent("ng_service.htm");
 		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
 		while (elements.hasMoreElements()){
 			WebElement currentElement = elements.nextElement();
@@ -117,8 +117,9 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		getPageContent("ng_service_example.htm");
+		getPageContent("ng_service.htm");		
 		Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
+		
 		Integer cnt = 0;
 		while (countryColumns.hasNext() ) {
 			WebElement countryColumn = (WebElement) countryColumns.next();
@@ -128,8 +129,8 @@ public class NgLocalFileTest {
 				cnt = cnt + 1;
 			}
 		}
-		assertTrue(cnt == 3);	
 		System.err.println("Mexico = " + cnt.toString() );
+		assertTrue(cnt == 3);	
 	}		
 
 	/*
@@ -138,7 +139,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		getPageContent("bind_select_option_data_from_array_example.htm");
+		getPageContent("ng_select_array.htm");
 		// Some versions of PhantomJS have trouble finding the selectedOption in
 		// <option ng-repeat="option in options" value="3" ng-selected="option.value == myChoice" class="ng-scope ng-binding" selected="selected">three</option>
 		WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
@@ -156,7 +157,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		getPageContent("bind_select_option_data_from_array_example.htm");
+		getPageContent("ng_select_array.htm");
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext() ) {
 			WebElement option = (WebElement)  options.next();
@@ -183,7 +184,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		getPageContent("ng_repeat_start_and_ng_repeat_end_example.htm");
+		getPageContent("ng_repeat_start_end.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
 		assertTrue(elements.get(0).isDisplayed());
 		assertThat(elements.get(0).getText(),containsString("Foo"));
@@ -195,7 +196,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
-		getPageContent("ng_options_with_object_example.htm");
+		getPageContent("ng_options_with_object.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
 		assertTrue(elements.size() == 5);
 		assertThat(elements.get(0).getText(),containsString("black"));
@@ -210,7 +211,7 @@ public class NgLocalFileTest {
 			return;
 		}
 		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
-		getPageContent("use_ng_pattern_to_validate_example.htm");
+		getPageContent("ng_pattern_validate.htm");
 		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
 		input.clear();
 		WebElement valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
@@ -253,7 +254,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}			
-		getPageContent("load_json_data.htm");
+		getPageContent("ng_load_json_data.htm");
 		WebElement name  = ngDriver.findElement(NgBy.model("name"));
 		highlight(name);
 		name.sendKeys("John");
@@ -324,8 +325,8 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}
+		getPageContent("ng_todo.htm");
 		String todos_repeater = "todo in todoList.todos";
-		getPageContent("angularjs_todo_examle.htm");
 		List <WebElement>todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,1));
 		assertTrue(todos.size() > 0);
 		System.err.println("TODO: " + todos.get(0).getText());
