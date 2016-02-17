@@ -347,6 +347,7 @@ public class NgLocalFileTest {
 		
 		WebElement container = ngDriver.getWrappedDriver().findElement(By.cssSelector("body div"));
 		assertThat(container, notNullValue());
+		// will show class="ng-binding" added to each node
 		System.err.println(container.getAttribute("innerHTML") );		
 		List <WebElement>names = ngDriver.findElements(NgBy.binding("name"));
 		assertTrue(names.size() == 5 );
@@ -354,8 +355,9 @@ public class NgLocalFileTest {
 		Iterator<WebElement> iteratorNames = names.iterator();		
 		while (iteratorNames.hasNext()) {
 			WebElement name = (WebElement) iteratorNames.next();
-			System.err.println(names.get(0).getAttribute("outerHTML") );
-			System.err.println(getIdentity(names.get(0)) );
+			// will show class="ng-binding" added to every node
+			System.err.println(name.getAttribute("outerHTML") );
+			System.err.println(getIdentity(name));
 		}
 	}
 
