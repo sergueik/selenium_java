@@ -19,6 +19,12 @@
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
   </properties>
   <dependencies>
+<dependency>
+  <groupId>com.jcabi</groupId>
+  <artifactId>jcabi-matchers</artifactId>
+  <version>1.3</version>
+  <scope>test</scope>
+</dependency>
     <dependency>
       <groupId>com.github.detro.ghostdriver</groupId>
       <artifactId>phantomjsdriver</artifactId>

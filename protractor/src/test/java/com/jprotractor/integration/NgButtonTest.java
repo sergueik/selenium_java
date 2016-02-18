@@ -2,6 +2,9 @@ package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.hamcrest.CoreMatchers.*;
+import org.hamcrest.MatcherAssert;
+// import static com.jcabi.matchers.RegexMatchers;
+import static com.jcabi.matchers.RegexMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
@@ -105,8 +108,7 @@ public class NgButtonTest {
 		assertThat(ng_button.getAttribute("ng-click"), equalTo("house.frontDoor.open()"));
 		assertThat(ng_button.getText(), equalTo("Open Door"));		 
 		ngDriver.waitForAngular();
-		try {
-		    
+		try {		    
 			state = ((Boolean) ng_button.evaluate("!house.frontDoor.isOpen")).booleanValue(); 
 		} catch(WebDriverException ex) { 
 		    // [JavaScript Error: "e is null"] ?
@@ -141,7 +143,37 @@ public class NgButtonTest {
 		}
 		assertTrue(state);
 	}		
-
+	@Test
+	public void testButtonStateText() throws Exception {
+		//if (isCIBuild) { // Alert not handled by PhantomJS
+		//	return;
+		//}
+		getPageContent("ng_watch_ng_if.htm");				
+		WebElement button = seleniumDriver.findElement(By.cssSelector("button.btn"));
+		Thread.sleep(1000);
+		highlight(button);
+		ngDriver.waitForAngular();
+		NgWebElement ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
+		highlight(ng_status);
+		System.err.println("Initially: " + ng_status.getText());
+		assertTrue(ng_status.getText().matches("The door is closed"));
+		button.click();
+		try{
+			// confirm alert
+			seleniumDriver.switchTo().alert().accept();
+		} catch (NoAlertPresentException ex){
+			// Alert not present - ignore			
+		} catch(WebDriverException ex){			
+			System.err.println("Alert was not handled : " + ex.getStackTrace().toString());
+			return;
+		}
+		ngDriver.waitForAngular();
+		ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
+		highlight(ng_status);
+		System.err.println("Finally: " +  ng_status.getText());
+		assertThat(ng_status.getText(), matchesPattern(".+open"));
+	}
+	
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
