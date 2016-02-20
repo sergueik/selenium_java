@@ -113,14 +113,14 @@ public class NgLocalFileTest {
 	}
 
 	@Test
-	// this test appears to be broken in PhantomJS 
 	public void testFindElementByRepeaterColumn() throws Exception {
-		//if (!isCIBuild) {
-		//	return;
-		//}
+		if (!isCIBuild) {
+			return;
+		}
+		seleniumDriver.navigate().to("http://www.w3schools.com/angular/customers.php");
+		System.err.println("Customers:" + seleniumDriver.getPageSource());
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
-		Thread.sleep(5000);
 		ArrayList<WebElement> people =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeater("person in people")));
 		System.err.println("Found people.size() = " + people.size() );
 		ArrayList<WebElement> countryColumns =  new  ArrayList<WebElement>();
@@ -134,7 +134,7 @@ public class NgLocalFileTest {
 				
 		}
 		Iterator<WebElement> countryColumnsIterator = countryColumns.iterator();
-		cnt =0 ;
+		cnt = 0 ;
 		while (countryColumnsIterator.hasNext() ) {
 			WebElement countryColumn = (WebElement) countryColumnsIterator.next();
 			System.err.println(countryColumn.getText() );
