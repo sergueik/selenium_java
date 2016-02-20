@@ -113,16 +113,30 @@ public class NgLocalFileTest {
 	}
 
 	@Test
+	// this test appears to be broken in PhantomJS 
 	public void testFindElementByRepeaterColumn() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_service.htm");		
-		Iterator<WebElement> countryColumns = ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")).iterator();
-		
+		//if (!isCIBuild) {
+		//	return;
+		//}
+		getPageContent("ng_service.htm");
+		ngDriver.waitForAngular();
+		Thread.sleep(5000);
+		ArrayList<WebElement> people =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeater("person in people")));
+		System.err.println("Found people.size() = " + people.size() );
+		ArrayList<WebElement> countryColumns =  new  ArrayList<WebElement>();
 		Integer cnt = 0;
-		while (countryColumns.hasNext() ) {
-			WebElement countryColumn = (WebElement) countryColumns.next();
+		while (countryColumns.size() == 0) {
+			ngDriver.waitForAngular();
+			countryColumns = new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
+			System.err.println("Found Countries.size() = " + countryColumns.size() );
+				cnt = cnt + 1;
+				assertTrue( cnt < 10 );
+				
+		}
+		Iterator<WebElement> countryColumnsIterator = countryColumns.iterator();
+		cnt =0 ;
+		while (countryColumnsIterator.hasNext() ) {
+			WebElement countryColumn = (WebElement) countryColumnsIterator.next();
 			System.err.println(countryColumn.getText() );
 			if (countryColumn.getText().equalsIgnoreCase("Mexico") ){
 				highlight(countryColumn);
