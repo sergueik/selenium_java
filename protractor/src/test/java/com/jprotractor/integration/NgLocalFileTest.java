@@ -75,9 +75,13 @@ public class NgLocalFileTest {
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
 	public static String localFile;
-
+	static StringBuilder sb;
+	static Formatter formatter;
+	
 	@BeforeClass
 	public static void setup() throws IOException {
+		sb = new StringBuilder();
+		formatter = new Formatter(sb, Locale.US);
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
@@ -121,29 +125,20 @@ public class NgLocalFileTest {
 		System.err.println("Customers:" + seleniumDriver.getPageSource());
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
-		ArrayList<WebElement> people =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeater("person in people")));
-		System.err.println("Found people.size() = " + people.size() );
-		ArrayList<WebElement> countryColumns =  new  ArrayList<WebElement>();
-		Integer cnt = 0;
-		while (countryColumns.size() == 0) {
-			ngDriver.waitForAngular();
-			countryColumns = new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
-			System.err.println("Found Countries.size() = " + countryColumns.size() );
-				cnt = cnt + 1;
-				assertTrue( cnt < 10 );
-				
-		}
-		Iterator<WebElement> countryColumnsIterator = countryColumns.iterator();
-		cnt = 0 ;
-		while (countryColumnsIterator.hasNext() ) {
-			WebElement countryColumn = (WebElement) countryColumnsIterator.next();
-			System.err.println(countryColumn.getText() );
-			if (countryColumn.getText().equalsIgnoreCase("Mexico") ){
-				highlight(countryColumn);
-				cnt = cnt + 1;
+		ArrayList<WebElement> countries =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
+		System.err.println("Found Countries.size() = " + countries.size() );
+		assertTrue( countries.size() > 0 );
+		Iterator<WebElement> countriesIterator = countries.iterator();
+		int cnt = 0 ;
+		while (countriesIterator.hasNext() ) {
+			WebElement country = (WebElement) countriesIterator.next();
+			System.err.format("%s %s\n", country.getText(), ( country.getText().equalsIgnoreCase("Mexico") ) ? " *" : "");
+			highlight(country);
+			if (country.getText().equalsIgnoreCase("Mexico")){
+				cnt = cnt + 1;	
 			}
 		}
-		System.err.println("Mexico = " + cnt.toString() );
+		System.err.println("Mexico found " + cnt + " times");
 		assertTrue(cnt == 3);	
 	}		
 

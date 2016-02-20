@@ -60,12 +60,11 @@ public class CommonFunctions {
 			return seleniumDriver;
 		} else {
 			DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs", "", Platform.ANY);			
-			capabilities.setCapability("local-to-remote-url-access", true);
 			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] {
 				"--web-security=false",
 				"--ssl-protocol=any",
 				"--ignore-ssl-errors=true",
-				"--local-to-remote-url-access=true", // prevent local file test XMLHttpRequest Exception 101 in PhantomJS with  
+				"--local-to-remote-url-access=true", // prevent local file test XMLHttpRequest Exception 101 
 				"--webdriver-loglevel=INFO" // set to DEBUG for a really verbose console output
 			});
 			
