@@ -123,7 +123,11 @@ public class NgSvgTest {
 			sb.setLength(0);
 			try {
 				WebElement element = seleniumDriver.findElement(By.xpath(xpath_of(circle)));
-				System.err.println("Located by xpath");
+				System.err.println("Located by xpath " + xpath_of(circle) );
+				formatter.format("Location: x = %3d", element.getLocation().x);
+				formatter.format(" y = %3d", element.getLocation().y);
+				System.err.println(sb.toString());
+				sb.setLength(0);
 				highlight(element,50);
 			} catch (NoSuchElementException ex) {
 			    // at <anonymous class>.FirefoxDriver.prototype.findElementInternal_
@@ -189,7 +193,7 @@ public class NgSvgTest {
 						"             continue;\n" +
 						"         }\n" +
 						"         if (sibling_element === element) {\n" +
-						"             return sibling_count > 0 ? get_xpath_of(element.parentNode) + '/' + elementTagName + '[' + (sibling_count + 1) + ']' : get_xpath_of(element.parentNode) + '/' + elementTagName;\n" +
+						"             return sibling_count > 0 ? get_xpath_of(element.parentNode) + '/*[name() = \"'+ elementTagName+ '\"]' + '[' + (sibling_count + 1) + ']' : get_xpath_of(element.parentNode) + '/*[name() = \"'+ elementTagName+ '\"]' ;\n" +
 						"         }\n" +
 						"         if (sibling_element.nodeType === 1 && sibling_element.tagName.toLowerCase() === elementTagName) {\n" +
 						"             sibling_count++;\n" +
