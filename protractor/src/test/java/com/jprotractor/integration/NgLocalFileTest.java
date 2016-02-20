@@ -142,25 +142,20 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
 
-	/*
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
 			return;
 		}
 		getPageContent("ng_select_array.htm");
-		// Some versions of PhantomJS have trouble finding the selectedOption in
-		// <option ng-repeat="option in options" value="3" ng-selected="option.value == myChoice" class="ng-scope ng-binding" selected="selected">three</option>
 		WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
-		Thread.sleep(500);
+		ngDriver.waitForAngular();
 		assertThat(element, notNullValue());
 		assertTrue(element.isDisplayed());
 		assertThat(element.getText(),containsString("three"));		
-		System.err.println(element.getText() );
+		System.err.println("selected option: " + element.getText() );
 	}
-	*/
 
-	/*		
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -170,23 +165,21 @@ public class NgLocalFileTest {
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext() ) {
 			WebElement option = (WebElement)  options.next();
-			System.err.println("option = " + option.getText() );
+			System.err.println("available option: " + option.getText() );
 			if (option.getText().isEmpty()){
 				break;
 			}
-			if (option.getText().equalsIgnoreCase("two") ){
+			if (option.getText().equalsIgnoreCase("two") ){		
+        			System.err.println("selecting option: " + option.getText() );
                     option.click();
                 }
             }
-		Thread.sleep(500);
-		// Some versions of PhantomJS have trouble finding the selectedOption in
-		// <option ng-repeat="option in options" value="3" ng-selected="option.value == myChoice" class="ng-scope ng-binding" selected="selected">three</option>
+		ngDriver.waitForAngular();
 		NgWebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
 		assertThat(element, notNullValue());
-		System.err.println("selectedOption = " + element.getText() );
+		System.err.println("selected option: " + element.getText() );
 		assertThat(element.getText(),containsString("two"));		
 	}
-	*/
 
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
