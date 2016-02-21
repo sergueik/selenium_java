@@ -115,6 +115,34 @@ public class NgLocalFileTest {
 			}
 		}
 	}
+	@Test
+	public void testEvaluate2() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}			
+		getPageContent("ng_table_eve_odd.htm");
+		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
+		while (elements.hasMoreElements()){
+			WebElement currentElement = elements.nextElement();
+			if (currentElement.getText().isEmpty()){
+				break;
+			}
+			boolean odd = false;
+			try {
+				odd = ((Boolean) new NgWebElement(ngDriver,currentElement).evaluate("$odd")).booleanValue();
+			} catch(WebDriverException ex) {
+				System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
+			} catch(Exception ex) {
+				System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
+			}
+			// assertThat(odd, notNullValue());
+			if ( odd ){
+				assertThat(currentElement.getAttribute("style"),containsString("#f1f1f1"));	
+				highlight(currentElement);
+			} else { 
+			}
+		}
+	}
 
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
