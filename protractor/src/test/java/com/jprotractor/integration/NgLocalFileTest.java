@@ -93,7 +93,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -118,7 +118,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
@@ -146,7 +146,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore 
+	// @Ignore 
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -173,7 +173,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
 
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -216,7 +216,7 @@ public class NgLocalFileTest {
 		assertThat(element.getText(),containsString("two"));		
 	}
 
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -229,7 +229,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText() );
 	}
 	
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -244,7 +244,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText() );
 	}
 	
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testFindElementByModel() throws Exception {
 		if (!isCIBuild) {
@@ -276,7 +276,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
@@ -289,7 +289,8 @@ public class NgLocalFileTest {
 		List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
 		assertThat(elements.size(), equalTo(0));
 	}
-
+	
+	// failing in Linux VM: PhantomJS has crashed
 	@Ignore 
 	@Test
 	public void testElementTextIsGenerated() throws Exception {
@@ -313,7 +314,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testDropDownWatch() throws Exception {
 		if (!isCIBuild) {
@@ -363,6 +364,7 @@ public class NgLocalFileTest {
 
 	}
 
+	// fails in Linux VM
 	@Ignore 
 	@Test
 	public void testFindRepeaterRows() throws Exception {
@@ -382,7 +384,7 @@ public class NgLocalFileTest {
 		
 	}
 	
-	@Ignore 
+//	@Ignore 
 	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
@@ -406,7 +408,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+//	@Ignore
 	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
