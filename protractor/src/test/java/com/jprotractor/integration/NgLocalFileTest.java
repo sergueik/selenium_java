@@ -120,7 +120,7 @@ public class NgLocalFileTest {
 		if (!isCIBuild) {
 			return;
 		}			
-		getPageContent("ng_table_eve_odd.htm");
+		getPageContent("ng_table_even_odd.htm");
 		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
 		while (elements.hasMoreElements()){
 			WebElement currentElement = elements.nextElement();
