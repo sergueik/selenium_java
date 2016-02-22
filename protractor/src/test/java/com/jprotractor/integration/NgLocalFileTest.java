@@ -29,6 +29,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -92,6 +93,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
+	@Ignore 
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -115,35 +117,36 @@ public class NgLocalFileTest {
 			}
 		}
 	}
+
+	@Ignore
 	@Test
-	public void testEvaluate2() throws Exception {
+	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
 			return;
 		}			
 		getPageContent("ng_table_even_odd.htm");
-		Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
-		while (elements.hasMoreElements()){
-			WebElement currentElement = elements.nextElement();
-			if (currentElement.getText().isEmpty()){
-				break;
-			}
-			boolean odd = false;
-			try {
-				odd = ((Boolean) new NgWebElement(ngDriver,currentElement).evaluate("$odd")).booleanValue();
-			} catch(WebDriverException ex) {
-				System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
-			} catch(Exception ex) {
-				System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
-			}
-			// assertThat(odd, notNullValue());
-			if ( odd ){
-				assertThat(currentElement.getAttribute("style"),containsString("#f1f1f1"));	
-				highlight(currentElement);
-			} else { 
+		Enumeration<WebElement> rows = Collections.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
+
+
+		while (rows.hasMoreElements()){
+			WebElement currentRow = rows.nextElement();
+
+			Enumeration<WebElement> cells = Collections.enumeration(currentRow.findElements(By.tagName("td")));
+			while (cells.hasMoreElements()){
+				WebElement currentCell = cells.nextElement();
+				System.err.println(currentCell.getTagName() + " '" +currentCell.getText() + "' " + currentCell.getAttribute("style"));
+
+				boolean odd = ((Boolean) new NgWebElement(ngDriver,currentCell).evaluate("$odd")).booleanValue();
+				if ( odd ){
+					assertThat(currentCell.getAttribute("style"),containsString("241")); // #f1
+					highlight(currentCell);
+				} else { 
+				}
 			}
 		}
 	}
 
+	@Ignore 
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -170,6 +173,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
 
+//	@Ignore 
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -178,12 +182,15 @@ public class NgLocalFileTest {
 		getPageContent("ng_select_array.htm");
 		WebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
 		ngDriver.waitForAngular();
+		
 		assertThat(element, notNullValue());
+		System.err.println("selected option found: " + element.getTagName().toString());
 		assertTrue(element.isDisplayed());
 		assertThat(element.getText(),containsString("three"));		
 		System.err.println("selected option: " + element.getText() );
 	}
 
+	@Ignore 
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -209,6 +216,7 @@ public class NgLocalFileTest {
 		assertThat(element.getText(),containsString("two"));		
 	}
 
+	@Ignore 
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -221,6 +229,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText() );
 	}
 	
+	@Ignore 
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -235,6 +244,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText() );
 	}
 	
+	@Ignore 
 	@Test
 	public void testFindElementByModel() throws Exception {
 		if (!isCIBuild) {
@@ -266,6 +276,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
+	@Ignore 
 	@Test
 	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
@@ -279,6 +290,7 @@ public class NgLocalFileTest {
 		assertThat(elements.size(), equalTo(0));
 	}
 
+	@Ignore 
 	@Test
 	public void testElementTextIsGenerated() throws Exception {
 		if (!isCIBuild) {
@@ -301,7 +313,8 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-    @Test
+	@Ignore 
+	@Test
 	public void testDropDownWatch() throws Exception {
 		if (!isCIBuild) {
 			return;
@@ -350,7 +363,8 @@ public class NgLocalFileTest {
 
 	}
 
-    @Test
+	@Ignore 
+	@Test
 	public void testFindRepeaterRows() throws Exception {
 		if (!isCIBuild) {
 			return;
@@ -368,7 +382,8 @@ public class NgLocalFileTest {
 		
 	}
 	
-    @Test
+	@Ignore 
+	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
 			return;
@@ -391,7 +406,8 @@ public class NgLocalFileTest {
 		}
 	}
 
-    @Test
+	@Ignore
+	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
 			return;
