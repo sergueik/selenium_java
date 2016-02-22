@@ -18,6 +18,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -58,7 +59,16 @@ public class CommonFunctions {
 			seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
 			return seleniumDriver;
 		} else {
-			seleniumDriver = new PhantomJSDriver();
+			DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs", "", Platform.ANY);			
+			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS, new String[] {
+				"--web-security=false",
+				"--ssl-protocol=any",
+				"--ignore-ssl-errors=true",
+				"--local-to-remote-url-access=true", // prevent local file test XMLHttpRequest Exception 101 
+				"--webdriver-loglevel=INFO" // set to DEBUG for a really verbose console output
+			});
+			
+			seleniumDriver = new PhantomJSDriver(capabilities);
 		}
 		return seleniumDriver;
 	}
