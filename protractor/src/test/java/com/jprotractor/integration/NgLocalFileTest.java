@@ -93,7 +93,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -118,7 +118,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore 
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
@@ -146,7 +146,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore 
+	@Ignore 
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -190,7 +190,7 @@ public class NgLocalFileTest {
 		System.err.println("selected option: " + element.getText() );
 	}
 
-	@Ignore 
+	// @Ignore 
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -207,16 +207,18 @@ public class NgLocalFileTest {
 			if (option.getText().equalsIgnoreCase("two") ){		
         			System.err.println("selecting option: " + option.getText() );
                     option.click();
+					// break;
                 }
             }
 		ngDriver.waitForAngular();
+		// Thread.sleep(1000);
 		NgWebElement element = ngDriver.findElement(NgBy.selectedOption("myChoice"));
 		assertThat(element, notNullValue());
 		System.err.println("selected option: " + element.getText() );
 		assertThat(element.getText(),containsString("two"));		
 	}
 
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -229,7 +231,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText() );
 	}
 	
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -244,7 +246,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText() );
 	}
 	
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindElementByModel() throws Exception {
 		if (!isCIBuild) {
@@ -276,7 +278,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
@@ -314,7 +316,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testDropDownWatch() throws Exception {
 		if (!isCIBuild) {
@@ -384,7 +386,7 @@ public class NgLocalFileTest {
 		
 	}
 	
-//	@Ignore 
+	@Ignore 
 	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
@@ -408,7 +410,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-//	@Ignore
+	// @Ignore 
 	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
@@ -416,7 +418,7 @@ public class NgLocalFileTest {
 		}
 		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("ng_dropdown.htm");
-		
+		Thread.sleep(1000);
 		String optionsCountry = "country for (country, states) in countries";
 		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
 		assertThat(elementsCountries.size(), equalTo(4));
@@ -429,17 +431,18 @@ public class NgLocalFileTest {
 			assertTrue(country.getAttribute("value").matches("(?i:India|Australia|Usa)"));
 			System.err.println("country = " + country.getAttribute("value") );
 		}
-
 		String optionsState = "state for (state,city) in states";
 		WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
+		assertThat(elementState.getText().toLowerCase(Locale.getDefault()),containsString("select"));		
 		assertTrue(!elementState.isEnabled());
 
 		WebElement element = ngDriver.findElement(NgBy.options(optionsCountry));
-		assertThat(element.getText().toLowerCase(Locale.getDefault()),containsString("select"));
 		assertTrue(element.isEnabled());
-
 		Select selectCountries = new Select(ngDriver.findElement(NgBy.model("states")));
+
 		selectCountries.selectByValue("Australia");
+		Thread.sleep(1000);
+		
 		WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
 		try{
 			assertThat(selectedOptionCountry, notNullValue());

@@ -9,11 +9,26 @@
 var findSelectedOption = function(model, using) {
     var prefixes = ['ng-', 'ng_', 'data-ng-', 'x-ng-', 'ng\\:'];
     for (var p = 0; p < prefixes.length; ++p) {
+		/*
         var selector = 'select[' + prefixes[p] + 'model="' + model + '"] option:checked';
         var inputs = using.querySelectorAll(selector);
         if (inputs.length) {
             return inputs;
         }
+		*/
+		// workaround for Travis
+		var inputs = [];
+		var selector = 'select[' + prefixes[p] + 'model="' + model + '"] option';
+        var all_inputs = using.querySelectorAll(selector);
+		for (var this_input in all_inputs){
+			if (this_input.checked) { 
+				inputs += this_input;
+			}
+		}
+        if (inputs.length) {
+            return inputs;
+        }
+		
     }
 };
 var using = arguments[0] || document;
