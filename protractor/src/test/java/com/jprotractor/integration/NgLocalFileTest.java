@@ -173,6 +173,49 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
 
+  
+	@Test
+	public void testFindSelectedtOptionWithAlert() throws Exception {
+		if (!isCIBuild) {
+			return;
+		}
+		getPageContent("ng_selected_option.htm");
+		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
+		WebElement element = elements.get(0);
+		ngDriver.waitForAngular();
+		
+		assertThat(element, notNullValue());
+		assertTrue(element.isDisplayed());
+		System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+		assertThat(element.getText(),containsString("One"));
+
+		Iterator<WebElement> options = ngDriver.findElements(NgBy.options("count.id as count.name for count in countList")).iterator();
+		while (options.hasNext() ) {
+			WebElement option = (WebElement)  options.next();
+			System.err.println("Available option: " + option.getText() );
+			if (option.getText().isEmpty()){
+				break;
+			}
+			if (option.getText().equalsIgnoreCase("two") ){		
+        			System.err.println("selecting option: " + option.getText() );
+                    option.click();
+                // no alert in PhantomJS;
+                }
+            }
+		ngDriver.waitForAngular();
+		elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
+		element = elements.get(0);
+		assertThat(element, notNullValue());
+		System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+		assertThat(element.getText(),containsString("Two"));    
+    WebElement countSelected = ngDriver.findElement(NgBy.binding("countSelected"));
+    assertThat(countSelected, notNullValue());
+		// System.err.println(countSelected.getText() );
+    int valueOfCountSelected = Integer.parseInt(new NgWebElement(ngDriver,countSelected).evaluate("countSelected").toString());
+		System.err.println("countSelected = " + valueOfCountSelected );
+		assertThat(valueOfCountSelected,equalTo(2));		
+	}
+
 	// @Ignore 
 	@Test
 	public void testFindSelectedtOption() throws Exception {
@@ -187,7 +230,7 @@ public class NgLocalFileTest {
 		assertThat(element, notNullValue());
 		assertTrue(element.isDisplayed());
 		assertThat(element.getText(),containsString("three"));		
-		System.err.println("selected option: " + element.getText() );
+		System.err.println("Selected option: " + element.getText());    
 	}
 
 	// @Ignore 
