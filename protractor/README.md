@@ -160,7 +160,7 @@ public static void setup() throws IOException {
 }
 
 @Before
-public void beforeEach() {    
+public void beforeEach() {
 	String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";    
 	ngDriver.navigate().to(baseUrl);
 }
@@ -182,7 +182,7 @@ public void testCustomerLogin() throws Exception {
 	}
 	NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
 	assertTrue(login_element.isEnabled());	
-	login_element.click();    	
+	login_element.click();
 	assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
 	
 	NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
@@ -221,6 +221,26 @@ PhantomJs allows loading Angular samples from `file://` content:
 ```
 Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
+Test setup
+----------
+The project work on Linux with Java 1.7, Firefox 40 and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
+
+```
+export NODE_PORT=5555
+export HUB_IP_ADDRESS=127.0.0.1
+export HUB_PORT=4444
+export SELENIUM_JAR_VERSION=2.47.1
+export DISPLAY_PORT=0
+export SELENIUM_HOME=`pwd`
+export LAUNCHER_OPTS='-XX:MaxPermSize=256M -Xmn128M -Xms256M -Xmx256M'
+export NODE_CONFIG=node.json
+export NODE_HOST=127.0.0.1
+java $LAUNCHER_OPTS  -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role node -host $NODE_HOST -port $NODE_PORT -hub http://${HUB_IP_ADDRESS}:${HUB_PORT}/hub/register -nodeConfig $NODE_CONFIG -browserTimeout 12000 -timeout 12000 -ensureCleanSession true -trustAllSSLCertificates
+
+export HUB_PORT=4444
+java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role hub  -port $HUB_PORT
+
+```
 
 Related Projects 
 ================
