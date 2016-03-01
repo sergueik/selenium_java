@@ -223,7 +223,8 @@ Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [t
 
 Test setup
 ----------
-The project work on Linux with Java 1.7, Firefox 40 and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
+The project work on Linux with Java 1.7, Firefox 40 (download desired version of firefox from
+[ubuntuzilla](https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/)) and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
 
 ```
 export NODE_PORT=5555
