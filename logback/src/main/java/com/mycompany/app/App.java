@@ -1,5 +1,11 @@
 package com.mycompany.app;
 
+
+import java.util.concurrent.TimeUnit;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.io.File;
 import java.io.InputStream;
 import java.io.IOException;
@@ -56,27 +62,35 @@ import org.openqa.selenium.WebElement;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 public class App
 {
-
-private static final Logger slf4jLogger = LoggerFactory.getLogger(App.class);
-    /**
-     * Print hello in log using log4j log implementation
-     * 
-     * @param name
-     */
-    public void sayHello(String name) {
-        slf4jLogger.info("Hi, {}", name);
-        slf4jLogger.info("Welcome to the HelloWorld example of Log4j using SLF4J");
+  private static final Logger LOG = LoggerFactory.getLogger(App.class);
+  public static void main(String[] args) {
+    LOG.info("Starting Firefox");
+    FirefoxProfile profile = new ProfilesIni().getProfile("default");
+    WebDriver driver = new FirefoxDriver(profile);
+    LOG.info("Firefox started");
+    try{
+      LOG.info("Go to main page");
+      driver.manage().window().setSize(new Dimension(800, 600));
+      driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
+      driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+      driver.get("http://m.carnival.com/");
+      // WebDriverWait wait = new WebDriverWait(driver, 30);
+      // wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
     }
- 
-    /**
-     * @param args
-     */
-    public static void main(String[] args) {
-slf4jLogger.info("Welcome to the HelloWorld example of Log4j using SLF4J");
+    catch(Exception ex) {
+
+      System.out.println(ex.toString());
 
     }
+    finally {
+
+      driver.close();
+      driver.quit();
+    }
+  }
 }
 
 

@@ -1,5 +1,7 @@
 <?xml version="1.0"?>
+<!-- 
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+-->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- by defult encoders are assigned the type "ch.qos.logback.classic.encoder.PatternLayoutEncoder" -->
@@ -7,7 +9,7 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
     </encoder>
   </appender>
-  <root level="debug">
+  <root level="info">
     <appender-ref ref="STDOUT"/>
   </root>
 </log4j:configuration>
