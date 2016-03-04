@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <!-- 
-<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd"> 
+uncommenting will cause maven to try to find dtd file locally
 -->
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -12,4 +13,11 @@
   <root level="info">
     <appender-ref ref="STDOUT"/>
   </root>
+  <!-- 
+  <root level="debug">
+    uncomenting this and commenting the root[@level='info'] node 
+    will reveal a lot of Selenium debug messages
+    <appender-ref ref="STDOUT"/>
+  </root>
+-->
 </log4j:configuration>

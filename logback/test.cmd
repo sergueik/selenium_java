@@ -1,10 +1,8 @@
 @echo OFF
-REM works
- call mvn clean package install
-REM call mvn package install
+call mvn package install
 set TARGET=%CD%\target
 
-java -cp target\app-1.1-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-2.44.0.jar;target\lib\*  com.mycompany.app.App
+java -Dlogback.configurationFile=src/logback.console.xml,src/logback.sqlite.xml -cp target\app-1.1-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-2.44.0.jar;target\lib\*  com.mycompany.app.App
 
 goto :EOF
 
