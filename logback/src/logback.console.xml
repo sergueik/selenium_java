@@ -13,11 +13,5 @@ uncommenting will cause maven to try to find dtd file locally
   <root level="info">
     <appender-ref ref="STDOUT"/>
   </root>
-  <!-- 
-  <root level="debug">
-    uncomenting this and commenting the root[@level='info'] node 
-    will reveal a lot of Selenium debug messages
-    <appender-ref ref="STDOUT"/>
-  </root>
--->
+ 
 </log4j:configuration>
