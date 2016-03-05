@@ -5,9 +5,10 @@ set TARGET=%CD%\target
 set SELENIUM_HOME=C:\JAVA\SELENIUM
 set SELENIUM_VERSION=2.47.1
 
-REM combining multiple logback configurations do not work, only the last entry matters
+REM If multiple logback configurations found, only the last entry matters
+
 java ^
--Dlogback.configurationFile=src/logback.mysql.xml ^
+-Dlogback.configurationFile=src/logback.xml ^
 -cp target\app-1.1-SNAPSHOT.jar;%SELENIUM_HOME%\selenium-server-standalone-%SELENIUM_VERSION%.jar;target\lib\* ^
 com.mycompany.app.App
 
