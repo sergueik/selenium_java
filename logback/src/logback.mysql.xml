@@ -1,17 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="DBAppender" class="ch.qos.logback.classic.db.DBAppender">
+  <appender name="Database" class="ch.qos.logback.classic.db.Database">
     <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
       <dataSource class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
         <serverName>localhost</serverName>
         <port>3306</port>
         <databaseName>selenium_java</databaseName>
         <user>root</user>
-        <password/>
+        <password>i011155</password>
       </dataSource>
     </connectionSource>
   </appender>
-  <root level="debug">
-    <appender-ref ref="DBAppender"/>
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+    <!-- by defult encoders are assigned the type "ch.qos.logback.classic.encoder.PatternLayoutEncoder" -->
+    <encoder>
+      <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+  </appender>
+  <root level="info">
+    <appender-ref ref="Console"/>
+    <appender-ref ref="Database"/>
   </root>
 </configuration>
