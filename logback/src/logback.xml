@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="mySQL" class="ch.qos.logback.classic.db.Database">
-    <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+  <appender name="mySQL" class="ch.qos.logback.classic.db.DBAppender">
+    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
       <dataSource class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
-        <serverName>localhost</serverName>
-        <port>3306</port>
-        <databaseName>selenium_java</databaseName>
+        <driverClass>com.mysql.jdbc.Driver</driverClass>
+        <url>jdbc:mysql://localhost:3306/selenium_java</url>
         <user>root</user>
         <password>i011155</password>
       </dataSource>
@@ -26,9 +25,9 @@
   </appender>
   <root level="info">
     <appender-ref ref="Console"/>
-    <!-- 
+    
     <appender-ref ref="mySQL"/>
-    Could not create an Appender of type [ch.qos.logback.classic.db.Database]. ch.qos.logback.core.util.DynamicClassLoadingException: Failed to instantiate type ch.qos.logback.classic.db.Database
+    <!-- Could not create an Appender of type [ch.qos.logback.classic.db.Database]. ch.qos.logback.core.util.DynamicClassLoadingException: Failed to instantiate type ch.qos.logback.classic.db.Database
     -->
     <appender-ref ref="SQLite"/>
   </root>
