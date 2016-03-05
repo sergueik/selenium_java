@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appender name="Database" class="ch.qos.logback.classic.db.Database">
+  <appender name="mySQL" class="ch.qos.logback.classic.db.Database">
     <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
       <dataSource class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
         <serverName>localhost</serverName>
@@ -11,6 +11,13 @@
       </dataSource>
     </connectionSource>
   </appender>
+ 
+ <appender name="SQLite" class="ch.qos.logback.classic.db.DBAppender">
+    <connectionSource class="ch.qos.logback.core.db.DriverManagerConnectionSource">
+      <driverClass>org.sqlite.JDBC</driverClass>
+      <url>jdbc:sqlite:logback.db</url>
+    </connectionSource>
+  </appender>
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
     <!-- by defult encoders are assigned the type "ch.qos.logback.classic.encoder.PatternLayoutEncoder" -->
     <encoder>
@@ -19,6 +26,10 @@
   </appender>
   <root level="info">
     <appender-ref ref="Console"/>
-    <appender-ref ref="Database"/>
+    <!-- 
+    <appender-ref ref="mySQL"/>
+    Could not create an Appender of type [ch.qos.logback.classic.db.Database]. ch.qos.logback.core.util.DynamicClassLoadingException: Failed to instantiate type ch.qos.logback.classic.db.Database
+    -->
+    <appender-ref ref="SQLite"/>
   </root>
 </configuration>
