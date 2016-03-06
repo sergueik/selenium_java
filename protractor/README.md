@@ -8,8 +8,9 @@ This github project is the 'development branch' of the collaborated project
 Info
 ====
 
-Goal is to close the gap between [jProtractor locator snippets](https://github.com/sergueik/jProtractor/tree/master/src/main/resources) and [genuine protractor ones](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
-
+Being  a JS testing tool, [Angular Protractor](https://github.com/angular/protractor) enforces one to (re)write the web page tests in Javascript - this project (and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)) tries to make this unnecessary.
+On the other hand Protractor offers some [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) that take advantage of Angular's features -  
+this is what this project tries to keep.
 
 Currently supported Antular Proractor methods:
 ```
