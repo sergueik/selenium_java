@@ -9,35 +9,41 @@ import org.openqa.selenium.support.events.WebDriverEventListener;
 public class EventListenerType1 implements WebDriverEventListener {
 
   @Override
-  public void afterChangeValueOf(WebElement arg0, WebDriver arg1) {  }
+  public void beforeScript(String script, WebDriver driver) {  }
   @Override
-  public void afterClickOn(WebElement arg0, WebDriver arg1) {  }
+  public void afterScript(String script, WebDriver driver) {  }
   @Override
-  public void afterFindBy(By arg0, WebElement arg1, WebDriver arg2) { }
+  public void beforeChangeValueOf(WebElement element, WebDriver driver) {
+    //String strlastElement = (element.toString().split("->")[1]);
+    // strlastElement = strlastElement.substring(0 , strlastElement.length()-1);
+    System.err.println("beforeChangeValueOf '"  + element.toString()+ "'");
+  }
   @Override
-  public void afterNavigateBack(WebDriver arg0) {  }
+  public void afterChangeValueOf(WebElement element, WebDriver driver) { }
   @Override
-  public void afterNavigateForward(WebDriver arg0) {  }
+  public void beforeClickOn(WebElement element, WebDriver driver) {  }
   @Override
-  public void afterNavigateTo(String arg0, WebDriver arg1) { }
+  public void afterClickOn(WebElement element, WebDriver driver) { 
+    System.err.println("afterClickOn '"  + element.toString() + "'");
+  }
   @Override
-  public void afterScript(String arg0, WebDriver arg1) {  }
+  public void beforeFindBy(By by, WebElement element, WebDriver driver) {  }
   @Override
-  public void beforeChangeValueOf(WebElement arg0, WebDriver arg1) {  }
+  public void afterFindBy(By by, WebElement element, WebDriver driver) { }
   @Override
-  public void beforeClickOn(WebElement arg0, WebDriver arg1) {  }
+  public void beforeNavigateBack(WebDriver driver) {  }
   @Override
-  public void beforeFindBy(By arg0, WebElement arg1, WebDriver arg2) {  }
+  public void afterNavigateBack(WebDriver driver) {  }
   @Override
-  public void beforeNavigateBack(WebDriver arg0) {  }
+  public void beforeNavigateForward(WebDriver driver) {  }
   @Override
-  public void beforeNavigateForward(WebDriver arg0) {  }
+  public void afterNavigateForward(WebDriver driver) {  }
   @Override
-  public void beforeNavigateTo(String arg0, WebDriver arg1) {  }
+  public void beforeNavigateTo(String url, WebDriver driver) {  }
   @Override
-  public void beforeScript(String arg0, WebDriver arg1) {  }
+  public void afterNavigateTo(String url, WebDriver driver) { }
   @Override
-  public void onException(Throwable ex, WebDriver arg1) {
+  public void onException(Throwable ex, WebDriver driver) {
     System.err.println("There is an exception in the script, please find the below error description" );
     ex.printStackTrace();
   }
