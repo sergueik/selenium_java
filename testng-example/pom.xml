@@ -36,11 +36,11 @@
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <dependency>
+ <!--   <dependency>
       <groupId>com.github.detro</groupId>
       <artifactId>phantomjsdriver</artifactId>
       <version>1.2.0</version>
-    </dependency>
+    </dependency> -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-firefox-driver</artifactId>
@@ -70,6 +70,12 @@
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <version>6.8.8</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.2.1</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -53,10 +53,18 @@
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+<!--
     <dependency>
       <groupId>com.github.detro</groupId>
       <artifactId>phantomjsdriver</artifactId>
       <version>1.2.0</version>
+    </dependency>
+-->
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>1.2.1</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
