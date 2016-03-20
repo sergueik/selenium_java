@@ -71,7 +71,7 @@ public class AppTest
   public String seleniumPort = null;
   public String seleniumBrowser = null;
 
-  @BeforeMethod
+  @BeforeSuite
   public void setupBeforeSuite( ITestContext context ) throws InterruptedException {
     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
@@ -80,11 +80,11 @@ public class AppTest
     seleniumBrowser = context.getCurrentXmlTest().getParameter("selenium.browser");
 
     capabilities =   new DesiredCapabilities(seleniumBrowser, "", Platform.ANY);
-    FirefoxProfile profile = new ProfilesIni().getProfile("default");
-    capabilities.setCapability("firefox_profile", profile);
 
     try {
-      driver = new RemoteWebDriver(new URL("http://"+  seleniumHost  + ":" + seleniumPort   +  "/wd/hub"), capabilities);
+      String hubUrl = "http://"+  seleniumHost  + ":" + seleniumPort   +  "/wd/hub";
+      System.err.println(hubUrl); 
+      driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
     } catch (MalformedURLException ex) { }
 
     try{
@@ -96,11 +96,11 @@ public class AppTest
     }
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 2, /* invocationCount = 2, */ description="Finds a publication", dataProvider = "parseLocaleData")
+  @Test(singleThreaded = true, threadPoolSize = 1, invocationCount = 2, description="Finds a publication", dataProvider = "parseSearchResult")
   public void test1(String search_keyword, int expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
-    WebDriverWait wait = new WebDriverWait(driver, 5);
+    WebDriverWait wait = new WebDriverWait(driver, 30);
     String search_input_name = null;
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("inner_search_form")));
     search_input_name = "q";
@@ -127,8 +127,8 @@ public class AppTest
     assertTrue( publicationsFound >= expected );
   }
 
-  @DataProvider(parallel = true)
-  public Object[][] parseLocaleData() {
+  @DataProvider(parallel = false)
+  public Object[][] parseSearchResult() {
     return new Object[][]{
       {"junit", 100},
       {"testng", 30},
@@ -136,7 +136,7 @@ public class AppTest
     };
   }
 
-  @AfterMethod
+  @AfterSuite
   public void cleanupSuite() {
     driver.close();
     driver.quit();
