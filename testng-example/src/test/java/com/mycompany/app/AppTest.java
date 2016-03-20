@@ -71,7 +71,7 @@ public class AppTest
   public String seleniumPort = null;
   public String seleniumBrowser = null;
 
-  @BeforeSuite
+  @BeforeMethod
   public void setupBeforeSuite( ITestContext context ) throws InterruptedException {
     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
@@ -89,14 +89,20 @@ public class AppTest
 
     try{
       driver.manage().window().setSize(new Dimension(600, 800));
-      driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
+      driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
       driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
     }  catch(Exception ex) {
       System.out.println(ex.toString());
     }
   }
 
-  @Test(singleThreaded = true, threadPoolSize = 1, invocationCount = 2, description="Finds a publication", dataProvider = "parseSearchResult")
+  @AfterMethod
+  public void cleanupSuite() {
+    driver.close();
+    driver.quit();
+  }
+
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 2, description="Finds a publication", dataProvider = "parseSearchResult")
   public void test1(String search_keyword, int expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
@@ -127,7 +133,7 @@ public class AppTest
     assertTrue( publicationsFound >= expected );
   }
 
-  @DataProvider(parallel = false)
+  @DataProvider(parallel = true)
   public Object[][] parseSearchResult() {
     return new Object[][]{
       {"junit", 100},
@@ -136,9 +142,4 @@ public class AppTest
     };
   }
 
-  @AfterSuite
-  public void cleanupSuite() {
-    driver.close();
-    driver.quit();
-  }
 }
