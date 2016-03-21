@@ -1,0 +1,44 @@
+.AllTestsFailed, .AllTestsSuccess, .AfterHeader {
+    width: 100%;
+    float: left;
+}
+
+.AllTestsFailed div, .AllTestsSuccess div, .AfterHeader div {
+    float: left;
+    border: 1px solid;
+    padding: 9px;
+}
+
+.Lowest {
+    font-weight: bold;
+}
+
+img {
+    margin: 27px 0 18px 0;
+}
+
+.AfterHeader:first-child {
+    margin-top: 18px;
+}
+
+.AllTestsFailed div:nth-child(3) {
+    color: red;
+    font-weight: bold;
+}
+
+.AllTestsSuccess div:nth-child(3) {
+    color: green;
+    font-weight: bold;
+}
+
+.AllTestsSuccess div:nth-child(2n) {
+   width: 300px;
+}
+
+.AllTestsFailed div:nth-child(2n) {
+   width: 300px;
+}
+
+.AfterHeader div:nth-child(2n) {
+   width: 300px;
+}
