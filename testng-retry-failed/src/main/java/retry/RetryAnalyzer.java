@@ -4,53 +4,75 @@ import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
 
 /**
- * Created by user on 11.11.15.
+ * implements IRetryAnalyzer Interface to rank a failed test.
  */
 public class RetryAnalyzer implements IRetryAnalyzer {
-    private int retryCount = 0;
-    private int retryMaxCount = 3;
+  private int retryCount = 0;
+  private int retryMaxCount = 3;
 
-    // решаем, требует ли тест перезапуска
-    @Override
-    public boolean retry(ITestResult testResult) {
-        boolean result = false;
-        if (testResult.getAttributeNames().contains("retry") == false) {
-            System.out.println("retry count = " + retryCount + "\n" +"max retry count = " + retryMaxCount);
-            if(retryCount < retryMaxCount){
-                System.out.println("Retrying " + testResult.getName() + " with status "
-                        + testResult.getStatus() + " for the try " + (retryCount+1) + " of "
-                        + retryMaxCount + " max times.");
+  /**
+   * Returns true if the test method has to be retried, false otherwise.
+   *
+   * @param result The result of the test method that just ran.
+   * @return true if the test method has to be retried, false otherwise.
+   */
+  // unused
+  /*
+  @Override
+  public boolean retry_unused(ITestResult testResult) {
+    if (!testResult.isSuccess()) {
+      if (retryCount < maxRetryCount) {
+        retryCount++;
+        // override status
+        testResult.setStatus(ITestResult.SUCCESS);
+        String message = Thread.currentThread().getName() + ": Error in " + testResult.getName() + 
+        " Retrying " + (maxRetryCount + 1 - retryCount) + " more times";
+        System.out.println(message);
+        Reporter.log("message");
+        return true;
+      } else {
+        testResult.setStatus(ITestResult.FAILURE);
+      }
+    }
+    return false;
+  }
+	*/
+  
+  
+  @Override
+  public boolean retry(ITestResult testResult) {
+    if (testResult.getAttributeNames().contains("retry") == false) {
+      System.out.println("retry count = " + retryCount + "\n" +"max retry count = " + retryMaxCount);
+      if (retryCount < retryMaxCount) {
+        // override status
+        testResult.setStatus(ITestResult.SUCCESS);
+        System.out.println("Retrying " + testResult.getName() + " with status "
+          + testResult.getStatus() + " for the try " + ( retryCount + 1 ) + " of "
+          + retryMaxCount + " max times.");
+        retryCount++;
+        return true;  
+      } else if ( retryCount == retryMaxCount ) {
+        // last retry to fail loud
+        String stackTrace = testResult.getThrowable().fillInStackTrace().toString();
+        System.out.println(stackTrace);
+        ReportCreator.addTestInfo(testResult.getName(), testResult.getTestClass().toString(), resultOfTest(testResult) , stackTrace);
+        testResult.setStatus(ITestResult.FAILURE);
+        return false;
+      }
+    }
+    return false;
+  }
 
-                retryCount++;
-                result = true;
-            }else if (retryCount == retryMaxCount){
-                // тут будем складывать в отчет неуспешные тесты
-                // получаем все необходимые параметры теста
-                String testName = testResult.getName();
-                String className = testResult.getTestClass().toString();
-                String resultOfTest = resultOfTest(testResult);
-                String stackTrace = testResult.getThrowable().fillInStackTrace().toString();
-                System.out.println(stackTrace);
-                // и записываем в массив тестов
-                ReportCreator.addTestInfo(testName, className, resultOfTest, stackTrace);
-            }
-        }
-        return result;
+  public String resultOfTest (ITestResult testResult) {
+    int status = testResult.getStatus();
+    if (status == 1) {
+      return "Success";
     }
-    // простенький метод для записи в результат теста  saccess / failure
-    public String resultOfTest (ITestResult testResult) {
-        int status = testResult.getStatus();
-        if (status == 1) {
-            String TR = "Success";
-            return TR;
-        }
-        if (status == 2) {
-            String TR = "Failure";
-            return TR;
-        }
-        else {
-            String unknownResult = "not interested for other results";
-            return unknownResult;
-        }
+    if (status == 2) {
+      return "Failure";
     }
+    else {
+      return "Unknown";
+    }
+  }
 }
