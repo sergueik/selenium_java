@@ -1,4 +1,6 @@
 package com.mycompany.app;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.io.File;
 import java.io.InputStream;
@@ -61,6 +63,26 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+// custom testng data provider 
+import java.util.Iterator;
+
+import org.apache.poi.ss.usermodel.Cell;
+
+import org.apache.poi.ss.usermodel.Row;
+
+// OLE2 Office Documents needs HSSF
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+
+// Office 2007+ XML needs XSSF
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
+
+
 import org.testng.*;
 import org.testng.annotations.*;
 
@@ -102,8 +124,8 @@ public class AppTest
     driver.quit();
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 2, description="Finds a publication", dataProvider = "parseSearchResult")
-  public void test1(String search_keyword, int expected) throws InterruptedException {
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderInline")
+  public void parseSearchResult(String search_keyword, int expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
     WebDriverWait wait = new WebDriverWait(driver, 30);
@@ -132,14 +154,78 @@ public class AppTest
     }
     assertTrue( publicationsFound >= expected );
   }
+  // TODO: if the datprovider is using poi and gets the data from Excel (old or new)
+  // in order for the tests to not be skipped,
+  // the following additional dependencies needed to make it work:
+  // poi-ooxml, poi-ooxml-schemas, poi-excelant.
 
   @DataProvider(parallel = true)
-  public Object[][] parseSearchResult() {
+  public Object[][] dataProviderInline() {
     return new Object[][]{
       {"junit", 100},
       {"testng", 30},
       {"spock", 10},
     };
+  }
+
+  /*
+   * Reads test data {<SEARCH>,<COUNT>} from Excel sheet :
+   * ID(0) SEARCH(1) COUNT(2)
+   * 1.0   junit(1)  100.0
+   */
+   
+  @DataProvider(parallel = false)
+  public Object[][] dataProviderExcel() {
+    
+    List<Object[]> data = new ArrayList<Object[]>();
+    Object[] dataRow = { };
+   
+    String filename = "demo.xlsx"; 
+    try{
+
+      XSSFWorkbook wb = new XSSFWorkbook(filename );
+      XSSFSheet sheet = wb.getSheetAt(0);
+      XSSFRow row;
+      XSSFCell cell;
+      String name = "";
+      double count = 0;
+
+      Iterator rows = sheet.rowIterator();  
+      while (rows.hasNext()) {
+        row = (XSSFRow) rows.next();
+        if (row.getRowNum() == 0){ // skip the header
+          continue;
+        }
+        Iterator cells = row.cellIterator();
+        while (cells.hasNext()) {
+          cell = (XSSFCell) cells.next();
+          if (cell.getColumnIndex() == 2) { 
+            if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
+              count = cell.getNumericCellValue();
+            } else {
+              count = 0;
+            }
+          }
+          if (cell.getColumnIndex() == 1) { 
+            if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
+              name = cell.getStringCellValue();
+            } else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
+              name = Double.toString(cell.getNumericCellValue());
+            } else {
+              // TODO: Boolean, Formula, Errors
+              name = "";
+            }
+          }
+        }
+        dataRow = new Object[]{name, count} ;
+        data.add(dataRow);
+      }
+    }  catch (Exception e) {
+      e.printStackTrace();
+    }
+    Object[][] dataArray = new Object[ data.size() ][];
+    data.toArray( dataArray );
+    return dataArray;
   }
 
 }
