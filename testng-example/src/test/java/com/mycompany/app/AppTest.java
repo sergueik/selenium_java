@@ -124,8 +124,8 @@ public class AppTest
     driver.quit();
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderInline")
-  public void parseSearchResult(String search_keyword, int expected) throws InterruptedException {
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel")
+  public void parseSearchResult(String search_keyword, double expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
     WebDriverWait wait = new WebDriverWait(driver, 30);
@@ -154,22 +154,18 @@ public class AppTest
     }
     assertTrue( publicationsFound >= expected );
   }
-  // TODO: if the datprovider is using poi and gets the data from Excel (old or new)
-  // in order for the tests to not be skipped,
-  // the following additional dependencies needed to make it work:
-  // poi-ooxml, poi-ooxml-schemas, poi-excelant.
 
   @DataProvider(parallel = true)
   public Object[][] dataProviderInline() {
     return new Object[][]{
-      {"junit", 100},
-      {"testng", 30},
-      {"spock", 10},
+      {"junit", 100.0},
+      {"testng", 30.0},
+      {"spock", 10.0},
     };
   }
 
   /*
-   * Reads test data {<SEARCH>,<COUNT>} from Excel sheet :
+   * Reads test data {<SEARCH>,<COUNT>} from Excel 2007 sheet with the following columns (ID is ignored):
    * ID(0) SEARCH(1) COUNT(2)
    * 1.0   junit(1)  100.0
    */
@@ -180,7 +176,7 @@ public class AppTest
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
    
-    String filename = "demo.xlsx"; 
+    String filename = "data_2007.xslx"; 
     try{
 
       XSSFWorkbook wb = new XSSFWorkbook(filename );
