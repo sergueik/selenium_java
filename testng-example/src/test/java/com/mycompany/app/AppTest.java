@@ -63,7 +63,9 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// custom testng data provider 
+// custom testng data provider
+
+
 import java.util.Iterator;
 
 import org.apache.poi.ss.usermodel.Cell;
@@ -71,6 +73,14 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
 // OLE2 Office Documents needs HSSF
+
+import java.io.File;
+import java.io.InputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+
+
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -124,7 +134,7 @@ public class AppTest
     driver.quit();
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel")
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2007")
   public void parseSearchResult(String search_keyword, double expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
@@ -171,7 +181,7 @@ public class AppTest
    */
    
   @DataProvider(parallel = false)
-  public Object[][] dataProviderExcel() {
+  public Object[][] dataProviderExcel2007() {
     
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
@@ -224,4 +234,66 @@ public class AppTest
     return dataArray;
   }
 
+  /*
+   * Reads test data {<SEARCH>,<COUNT>} from Excel 2007 sheet with the following columns (ID is ignored):
+   * ID(0) SEARCH(1) COUNT(2)
+   * 1.0   junit(1)  100.0
+   */
+   
+  @DataProvider(parallel = false)
+  public Object[][] dataProviderExcel2003() {
+    
+    List<Object[]> data = new ArrayList<Object[]>();
+    Object[] dataRow = { };
+   
+    String filename = "data_2003.xslx"; 
+    try{
+      InputStream ExcelFileToRead = new FileInputStream(filename );
+      HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
+
+      HSSFSheet sheet = wb.getSheetAt(0);
+      HSSFRow row;
+      HSSFCell cell;
+
+      String name = "";
+      double count = 0;
+
+      Iterator rows = sheet.rowIterator();  
+      while (rows.hasNext()) {
+        row = (HSSFRow) rows.next();
+        if (row.getRowNum() == 0){ // skip the header
+          continue;
+        }
+        Iterator cells = row.cellIterator();
+        while (cells.hasNext()) {
+          cell = (HSSFCell) cells.next();
+          if (cell.getColumnIndex() == 2) { 
+            if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
+              count = cell.getNumericCellValue();
+            } else {
+              count = 0;
+            }
+          }
+          if (cell.getColumnIndex() == 1) { 
+            if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
+              name = cell.getStringCellValue();
+            } else if(cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC){
+              name = Double.toString(cell.getNumericCellValue());
+            } else {
+              // TODO: Boolean, Formula, Errors
+              name = "";
+            }
+          }
+        }
+        dataRow = new Object[]{name, count} ;
+        data.add(dataRow);
+      }
+    }  catch (Exception e) {
+      e.printStackTrace();
+    }
+    Object[][] dataArray = new Object[ data.size() ][];
+    data.toArray( dataArray );
+    return dataArray;
+  }
+  
 }
