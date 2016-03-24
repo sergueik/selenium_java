@@ -63,8 +63,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// custom testng data provider
-
+// custom testng data providers
 
 import java.util.Iterator;
 
@@ -92,6 +91,11 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
 
+
+// OpenOffice 
+import org.jopendocument.dom.spreadsheet.MutableCell;
+import org.jopendocument.dom.spreadsheet.Sheet;
+import org.jopendocument.dom.spreadsheet.SpreadSheet;
 
 import org.testng.*;
 import org.testng.annotations.*;
@@ -134,7 +138,7 @@ public class AppTest
     driver.quit();
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2007")
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2003" /*"dataProviderOpenOfficeSpreadsheet"*/ )
   public void parseSearchResult(String search_keyword, double expected) throws InterruptedException {
 
     driver.get("http://habrahabr.ru/search/?");
@@ -186,7 +190,7 @@ public class AppTest
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
    
-    String filename = "data_2007.xslx"; 
+    String filename = "data_2007.xlsx"; 
     try{
 
       XSSFWorkbook wb = new XSSFWorkbook(filename );
@@ -235,18 +239,17 @@ public class AppTest
   }
 
   /*
-   * Reads test data {<SEARCH>,<COUNT>} from Excel 2007 sheet with the following columns (ID is ignored):
+   * Reads test data {<SEARCH>,<COUNT>} from Excel 2003 OLE binary file with the following columns (ID is ignored):
    * ID(0) SEARCH(1) COUNT(2)
    * 1.0   junit(1)  100.0
    */
-   
   @DataProvider(parallel = false)
   public Object[][] dataProviderExcel2003() {
     
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
    
-    String filename = "data_2003.xslx"; 
+    String filename = "data_2003.xls"; 
     try{
       InputStream ExcelFileToRead = new FileInputStream(filename );
       HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
@@ -289,6 +292,47 @@ public class AppTest
         data.add(dataRow);
       }
     }  catch (Exception e) {
+      e.printStackTrace();
+    }
+    Object[][] dataArray = new Object[ data.size() ][];
+    data.toArray( dataArray );
+    return dataArray;
+  }
+  
+  /*
+   * Reads test data {<SEARCH>,<COUNT>} from OpenoOffice spreadsheet with the following columns (ID is ignored):
+   * ID(0) SEARCH(1) COUNT(2)
+   * 1.0   junit(1)  100.0
+   */
+  
+  @DataProvider(parallel = false)
+  public Object[][] dataProviderOpenOfficeSpreadsheet() {
+    
+    List<Object[]> data = new ArrayList<Object[]>();
+    Object[] dataRow = { };
+   
+    String filename = "data.ods"; 
+    Sheet sheet;
+
+    String name = "";
+    double count = 0;
+   
+    try{
+      File file = new File(filename);
+      sheet = SpreadSheet.createFromFile(file).getSheet(0); // can pass sheet name as string 
+      int nColCount = sheet.getColumnCount();
+      int nRowCount = sheet.getRowCount();
+      MutableCell cell = null;
+      for (int nRowIndex = 1; nRowIndex < nRowCount; nRowIndex++ ) {
+        if (sheet.getCellAt(0, nRowIndex).getValue() == null || sheet.getCellAt(0, nRowIndex).getValue() == "") {
+          break ;
+        }
+        name = sheet.getCellAt(1, nRowIndex).getValue().toString() ;
+        count = Double.valueOf(sheet.getCellAt(2, nRowIndex).getValue().toString() );
+        dataRow = new Object[]{name, count} ;
+        data.add(dataRow);
+      }
+    } catch (IOException e) {
       e.printStackTrace();
     }
     Object[][] dataArray = new Object[ data.size() ][];
