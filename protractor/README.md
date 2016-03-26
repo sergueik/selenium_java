@@ -148,8 +148,9 @@ import com.jprotractor.NgWebElement;
 
 Example Test
 ============
+For desktop browser testing, run a Selenium node and Selenium hub on port 4444. Likewise, for Vagrant box browser testing have localhost port 4444 forwarded to the hub 4444
+Then create a typical TestNG test class with the annotated methods like below.
 
-For desktop browser testing, run a Selenium node and Selenium hub on port 4444 and 
 ```
 @BeforeClass
 public static void setup() throws IOException {
