@@ -317,7 +317,7 @@ public class NgLocalFileTest {
   
 	// @Ignore
 	@Test
-	public void testChangeSelectedtOption2() throws Exception {
+	public void testChangeRepeaterSelectedtOption() throws Exception {
  		if (!isCIBuild) {
 			return;
 		}
