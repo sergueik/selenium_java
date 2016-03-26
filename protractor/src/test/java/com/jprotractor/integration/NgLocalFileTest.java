@@ -174,23 +174,21 @@ public class NgLocalFileTest {
 		System.err.println("Mexico found " + cnt + " times");
 		assertTrue(cnt == 3);	
 	}		
-
-  // org.openqa.selenium.UnhandledAlertException: Unexpected modal dialog (text: Selected id:Two )
   
-  @Ignore
+  // @Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() throws Exception {
-//		if (!isCIBuild) {
-//			return;
-//		}
+		if (!isCIBuild) {
+			return;
+		}
 		getPageContent("ng_selected_option.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
 
     try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
@@ -213,23 +211,34 @@ public class NgLocalFileTest {
 				break;
 			}
 			if (option.getText().equalsIgnoreCase("two") ){		
-        			System.err.println("selecting option: " + option.getText() );
-                    option.click();
-                // no alert in PhantomJS;
-                }
-            }
+        System.err.println("selecting option: " + option.getText() );
+        option.click();
+        if (!isCIBuild) {
+          try{
+            alert = seleniumDriver.switchTo().alert();
+            String alert_text = alert.getText();
+            System.err.println("Accepted alert: " + alert_text );
+            alert.accept();
+          } catch (NoAlertPresentException ex){
+            System.err.println(ex.getStackTrace());
+            return;
+          }
+        }
+      }
+    }
 		ngDriver.waitForAngular();
 		elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
     try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
       }
 		}
+    
 		element = elements.get(0);
 		assertThat(element, notNullValue());
 		System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
@@ -245,16 +254,16 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindSelectedtOption() throws Exception {
-//		if (!isCIBuild) {
-//			return;
-//		}
+		if (!isCIBuild) {
+			return;
+		}
 		getPageContent("ng_select_array.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("myChoice"));
     try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
@@ -272,9 +281,9 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
-		//if (!isCIBuild) {
-	//		return;
-	//	}
+    if (!isCIBuild) {
+			return;
+		}
 		getPageContent("ng_select_array.htm");
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext() ) {
@@ -284,18 +293,17 @@ public class NgLocalFileTest {
 				break;
 			}
 			if (option.getText().equalsIgnoreCase("two") ){		
-        			System.err.println("selecting option: " + option.getText() );
-                    option.click();
-					// break;
-                }
-            }
+        System.err.println("selecting option: " + option.getText() );
+        option.click();
+      }
+    }
 		ngDriver.waitForAngular();
 		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("myChoice"));
 		try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());        
         return;
       } else {
         throw e;
@@ -306,15 +314,14 @@ public class NgLocalFileTest {
 		System.err.println("selected option: " + element.getText() );
 		assertThat(element.getText(),containsString("two"));		
 	}
-
   
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChangeSelectedtOption2() throws Exception {
-/* 		if (!isCIBuild) {
+ 		if (!isCIBuild) {
 			return;
 		}
- */		getPageContent("ng_repeat_selected.htm");
+    getPageContent("ng_repeat_selected.htm");
 		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("fruit in Fruits")).iterator();
 		while (options.hasNext() ) {
 			WebElement option = (WebElement)  options.next();
@@ -323,19 +330,18 @@ public class NgLocalFileTest {
 				break;
 			}
 			if (option.getText().equalsIgnoreCase("Orange") ){		
-        			System.err.println("selecting option: " + option.getText() );
-                    option.click();
-					// break;
-                }
-            }
+        System.err.println("selecting option: " + option.getText() );
+        option.click();
+      }
+    }
 		ngDriver.waitForAngular();
 
-		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("fruit"));
+		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOptionRepeater("fruit in Fruits"));
 		try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
@@ -343,19 +349,22 @@ public class NgLocalFileTest {
 		}
 		WebElement element = elements.get(0);
 		assertThat(element, notNullValue());
-		System.err.println("selected option: " + element.getText() );
-		assertThat(element.getText(),containsString("Orange"));		
-	  Object fruitSelected = new NgWebElement(ngDriver,element).evaluate("fruit");
-	  assertTrue(parseBoolean(fruitSelected.toString()));
+		System.err.println("findElements(NgBy.selectedOptionRepeater(...)) => selected option: " + element.getText() );
+		assertThat(element.getText(),containsString("Orange"));
 
-    // selectedOptionRepeater.js  may be needed
+    /*
+	  Object fruitSelected = new NgWebElement(ngDriver,element).evaluate("fruit.Selected");
+    System.err.println("fruit.Selected = " + fruitSelected.toString()) ;
+	  assertTrue(parseBoolean(fruitSelected.toString()));
+    */
+
     NgWebElement ngRootWevelement = new NgWebElement(ngDriver, ngDriver.findElement(By.cssSelector("div[ng-app='myApp']"))); 
-    List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.selectedOption("fruit"));
+    List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.selectedOptionRepeater("fruit in Fruits"));
     try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			// workaround for Travis CI
       if (isCIBuild) {
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
@@ -365,22 +374,13 @@ public class NgLocalFileTest {
 		NgWebElement ngElement = ngElements.get(0);
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
-		System.err.println("selected option: " + ngElement.getText() );
-		assertThat(ngElement.getText(),containsString("Orange"));   
-	  fruitSelected = ngElement.evaluate("fruit.Selected");
-    System.err.println("fruit.Selected = " + fruitSelected.toString()) ;
-	  assertTrue(parseBoolean(fruitSelected.toString()));
+		System.err.println("findNgElements(NgBy.selectedOptionRepeater(...)) => selected option: " + ngElement.getText() );    
     
-    
-		ngElement = ngDriver.findElement(NgBy.selectedOption("fruit.Name"));
+		ngElement = ngDriver.findElement(NgBy.selectedOptionRepeater("fruit in Fruits"));
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
-		System.err.println("selected option: " + ngElement.getText() );
-		assertThat(ngElement.getText(),containsString("Orange"));   
-	  fruitSelected = ngElement.evaluate("fruit.Selected");
-	  assertTrue(parseBoolean(fruitSelected.toString()));
+		System.err.println("findElement(NgBy.selectedOptionRepeater(...)) => selected option: " + ngElement.getText() );
 	}
-
   
 	// @Ignore
 	@Test
