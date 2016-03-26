@@ -14,8 +14,8 @@ import com.jprotractor.scripts.FindOptions;
 import com.jprotractor.scripts.FindPartialButtonText;
 import com.jprotractor.scripts.FindRepeaterElements;
 import com.jprotractor.scripts.FindRepeaterRows;
+import com.jprotractor.scripts.FindRepeaterSelectedOption;
 import com.jprotractor.scripts.FindSelectedOption;
-import com.jprotractor.scripts.FindSelectedOptionRepeater;
 
 import org.openqa.selenium.By;
 
@@ -67,7 +67,7 @@ public final class NgBy {
         return new JavaScriptBy(new FindSelectedOption(), model);
     }
 
-    public static By selectedOptionRepeater(final String repeat) {
-        return new JavaScriptBy(new FindSelectedOptionRepeater(), repeat);
+    public static By repeaterSelectedOption(final String repeat) {
+        return new JavaScriptBy(new FindRepeaterSelectedOption(), repeat);
     }
 }

@@ -336,7 +336,7 @@ public class NgLocalFileTest {
     }
 		ngDriver.waitForAngular();
 
-		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOptionRepeater("fruit in Fruits"));
+		List<WebElement> elements = ngDriver.findElements(NgBy.repeaterSelectedOption("fruit in Fruits"));
 		try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
@@ -349,7 +349,7 @@ public class NgLocalFileTest {
 		}
 		WebElement element = elements.get(0);
 		assertThat(element, notNullValue());
-		System.err.println("findElements(NgBy.selectedOptionRepeater(...)) => selected option: " + element.getText() );
+		System.err.println("findElements(NgBy.repeaterSelectedOption(...)) => selected option: " + element.getText() );
 		assertThat(element.getText(),containsString("Orange"));
 
     /*
@@ -359,7 +359,7 @@ public class NgLocalFileTest {
     */
 
     NgWebElement ngRootWevelement = new NgWebElement(ngDriver, ngDriver.findElement(By.cssSelector("div[ng-app='myApp']"))); 
-    List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.selectedOptionRepeater("fruit in Fruits"));
+    List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.repeaterSelectedOption("fruit in Fruits"));
     try{
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
@@ -374,12 +374,12 @@ public class NgLocalFileTest {
 		NgWebElement ngElement = ngElements.get(0);
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
-		System.err.println("findNgElements(NgBy.selectedOptionRepeater(...)) => selected option: " + ngElement.getText() );    
+		System.err.println("findNgElements(NgBy.repeaterSelectedOption(...)) => selected option: " + ngElement.getText() );    
     
-		ngElement = ngDriver.findElement(NgBy.selectedOptionRepeater("fruit in Fruits"));
+		ngElement = ngDriver.findElement(NgBy.repeaterSelectedOption("fruit in Fruits"));
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
-		System.err.println("findElement(NgBy.selectedOptionRepeater(...)) => selected option: " + ngElement.getText() );
+		System.err.println("findElement(NgBy.repeaterSelectedOption(...)) => selected option: " + ngElement.getText() );
 	}
   
 	// @Ignore
