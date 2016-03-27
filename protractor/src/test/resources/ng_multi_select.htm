@@ -4,7 +4,7 @@
 <title></title>
 <!-- http://stackoverflow.com/questions/18751129/angularjs-selecting-multiple-options?rq=1 -->
 </head>
-<body>
+<body ng-app="myApp">
 
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js">
 </script>
@@ -40,7 +40,7 @@ app.controller('myController', function($scope) {
 // http://docs.angularjs.org/guide/bootstrap Manual Initialization
 //angular.bootstrap(document, ['myApp']);
 </script>
-<div ng-app="myApp" ng-controller="myController">
+<div ng-controller="myController">
   <label>Select a Color:</label><br>
   <select multiple ng-model="selectedValues">
     <option value="1">Blue</option>
