@@ -95,7 +95,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -120,7 +120,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
@@ -148,7 +148,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -175,7 +175,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
   
-  @Ignore
+  // @Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() throws Exception {
 		if (!isCIBuild) {
@@ -251,7 +251,7 @@ public class NgLocalFileTest {
 		assertThat(valueOfCountSelected,equalTo(2));		
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -278,7 +278,7 @@ public class NgLocalFileTest {
 		System.err.println("Selected option: " + element.getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -316,7 +316,7 @@ public class NgLocalFileTest {
 	}
 
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChangeRepeaterSelectedtOption() throws Exception {
  		if (!isCIBuild) {
@@ -388,7 +388,7 @@ public class NgLocalFileTest {
 	}
 
   
-	// @Ignore
+	// // @Ignore
 	@Test
 	public void testMultiSelect() throws Exception {
  		// if (!isCIBuild) {
@@ -455,7 +455,7 @@ public class NgLocalFileTest {
     
 	}
   
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -468,7 +468,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText() );
 	}
 	
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -483,7 +483,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText() );
 	}
 	
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByModel() throws Exception {
 		if (!isCIBuild) {
@@ -515,7 +515,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
@@ -530,7 +530,7 @@ public class NgLocalFileTest {
 	}
 	
 	// failing in Linux VM: PhantomJS has crashed
-	@Ignore
+	// @Ignore
 	@Test
 	public void testElementTextIsGenerated() throws Exception {
 		if (!isCIBuild) {
@@ -553,7 +553,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDropDownWatch() throws Exception {
 		if (!isCIBuild) {
@@ -603,7 +603,7 @@ public class NgLocalFileTest {
 
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindRepeaterRows() throws Exception {
 		if (!isCIBuild) {
@@ -622,7 +622,7 @@ public class NgLocalFileTest {
 		
 	}
 	
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
@@ -646,7 +646,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
