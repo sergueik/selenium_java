@@ -388,7 +388,7 @@ public class NgLocalFileTest {
 	}
 
   
-	// // @Ignore
+	// @Ignore
 	@Test
 	public void testMultiSelect() throws Exception {
  		// if (!isCIBuild) {
@@ -622,6 +622,30 @@ public class NgLocalFileTest {
 		
 	}
 	
+
+
+	// @Ignore
+	@Test
+	public void testFindorderByField() throws Exception {
+		if (!isCIBuild) {
+      return;
+		}
+		getPageContent("ng_headers_sort_example1.htm");
+    String[] headers = new String[]{"First Name", "Last Name", "Age"};
+    for(String header : headers)
+    {
+      WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
+      System.err.println(header);
+      headerelement.click();
+      ngDriver.waitForAngular();      
+      List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
+      WebElement row = (WebElement) rows.get(0);
+      NgWebElement ngRow = new NgWebElement(ngDriver,row);
+      String field =  row.getAttribute("ng-order-by");
+      System.err.println( field  + " = " + ngRow.evaluate( field  ).toString());
+    }
+  }
+
 	// @Ignore
 	@Test
 	public void testFindAllBindings() throws Exception {
