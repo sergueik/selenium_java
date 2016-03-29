@@ -622,15 +622,13 @@ public class NgLocalFileTest {
 		
 	}
 	
-
-
-	// @Ignore
+  // @Ignore
 	@Test
-	public void testFindorderByField() throws Exception {
-		if (!isCIBuild) {
+  public void testFindorderByField() throws Exception {
+    if (!isCIBuild) {
       return;
-		}
-		getPageContent("ng_headers_sort_example1.htm");
+    }
+    getPageContent("ng_headers_sort_example1.htm");
     String[] headers = new String[]{"First Name", "Last Name", "Age"};
     for(String header : headers)
     {
@@ -642,7 +640,50 @@ public class NgLocalFileTest {
       WebElement row = (WebElement) rows.get(0);
       NgWebElement ngRow = new NgWebElement(ngDriver,row);
       String field =  row.getAttribute("ng-order-by");
-      System.err.println( field  + " = " + ngRow.evaluate( field  ).toString());
+      System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
+    }
+  }
+
+	// @Ignore
+	@Test
+	public void testPrintOrderByFieldColumn() throws Exception {
+		if (!isCIBuild) {
+      return;
+		}
+		getPageContent("ng_headers_sort_example2.htm");
+    // NOTE: This test will fail with "ng_headers_sort_example1.htm"
+    // Exception:    
+    // no injector found for element argument to getTestability
+    String[] headers = new String[]{"First Name", "Last Name", "Age"};
+    for(String header : headers)
+    {
+      for (int cnt = 0 ; cnt != 2; cnt ++) {
+        WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
+        System.err.println("Clicking on header: " + header);
+        headerelement.click();
+        ngDriver.waitForAngular();      
+        List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
+        WebElement row = (WebElement) rows.get(0);
+        NgWebElement ngRow = new NgWebElement(ngDriver,row);
+        String field =  row.getAttribute("ng-order-by");
+        System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
+        String empField = "emp." + ngRow.evaluate( field  );
+        System.err.println( empField  + ":"); 
+        Iterator<WebElement> iteratorEmp = rows.iterator();
+        while (iteratorEmp.hasNext()) {
+          WebElement emp = (WebElement) iteratorEmp.next();
+          NgWebElement ngEmp = new NgWebElement(ngDriver, emp );
+          assertThat(ngEmp, notNullValue());
+          // System.err.println(ngEmp.getAttribute("innerHTML"));
+          try {
+            WebElement empFieldElement = ngEmp.findElement(NgBy.binding( empField ));
+            assertThat(empFieldElement, notNullValue());
+            System.err.println( empFieldElement.getText());          
+          } catch(Exception ex) {
+          //  System.err.println(ex.getStackTrace());
+         }
+        }
+      }
     }
   }
 
@@ -707,6 +748,7 @@ public class NgLocalFileTest {
 		try{
 			assertThat(selectedOptionCountry, notNullValue());
 		} catch (AssertionError e) {
+      // TODO
 		}
 		elementState = ngDriver.findElement(NgBy.options(optionsState));
 		assertTrue(elementState.isEnabled());
