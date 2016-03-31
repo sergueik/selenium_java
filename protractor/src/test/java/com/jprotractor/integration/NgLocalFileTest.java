@@ -175,7 +175,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
   
-  // @Ignore
+	// @Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() throws Exception {
 		if (!isCIBuild) {
@@ -251,7 +251,7 @@ public class NgLocalFileTest {
 		assertThat(valueOfCountSelected,equalTo(2));		
 	}
 
-	// @Ignore
+		// @Ignore
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -278,7 +278,7 @@ public class NgLocalFileTest {
 		System.err.println("Selected option: " + element.getText());
 	}
 
-	// @Ignore
+		// @Ignore
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -316,10 +316,10 @@ public class NgLocalFileTest {
 	}
 
 
-	// @Ignore
+		// @Ignore
 	@Test
 	public void testChangeRepeaterSelectedtOption() throws Exception {
- 		if (!isCIBuild) {
+		if (!isCIBuild) {
 			return;
 		}
     getPageContent("ng_repeat_selected.htm");
@@ -388,10 +388,10 @@ public class NgLocalFileTest {
 	}
 
   
-	// @Ignore
+		// @Ignore
 	@Test
 	public void testMultiSelect() throws Exception {
- 		// if (!isCIBuild) {
+		// if (!isCIBuild) {
 			// return;
 		// }
     getPageContent("ng_multi_select.htm");
@@ -622,7 +622,7 @@ public class NgLocalFileTest {
 		
 	}
 	
-  // @Ignore
+	// @Ignore
 	@Test
   public void testFindorderByField() throws Exception {
     if (!isCIBuild) {
@@ -680,7 +680,7 @@ public class NgLocalFileTest {
             assertThat(empFieldElement, notNullValue());
             System.err.println( empFieldElement.getText());          
           } catch(Exception ex) {
-          //  System.err.println(ex.getStackTrace());
+            System.err.println( org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex));
          }
         }
       }

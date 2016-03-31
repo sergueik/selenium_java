@@ -41,19 +41,13 @@ app.controller('myCtrl', function($scope) {
     <thead>
       <tr>
         <th>
-          <a href="#" ng-click="orderByField='firstName'; reverseSort = !reverseSort">
-          First Name <span ng-show="orderByField == 'firstName'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
-          </a>
+          <a href="#" ng-click="orderByField='firstName'; reverseSort = !reverseSort">First Name <span ng-show="orderByField == 'firstName'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span></a>
         </th>
         <th>
-          <a href="#" ng-click="orderByField='lastName'; reverseSort = !reverseSort">
-            Last Name <span ng-show="orderByField == 'lastName'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
-          </a>
+          <a href="#" ng-click="orderByField='lastName'; reverseSort = !reverseSort">Last Name <span ng-show="orderByField == 'lastName'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span></a>
         </th>
         <th>
-          <a href="#" ng-click="orderByField='age'; reverseSort = !reverseSort">
-          Age <span ng-show = "orderByField == 'age'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span>
-          </a>
+          <a href="#" ng-click="orderByField='age'; reverseSort = !reverseSort">Age <span ng-show = "orderByField == 'age'"><span ng-show="!reverseSort">^</span><span ng-show="reverseSort">v</span></span></a>
         </th>
       </tr>
     </thead>
