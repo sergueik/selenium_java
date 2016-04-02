@@ -1,0 +1,195 @@
+package com.mycompany.app;
+
+import java.awt.Toolkit;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.RuntimeException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Formatter;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.apache.commons.lang.exception.ExceptionUtils;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+
+import org.junit.experimental.categories.Category;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+
+
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
+//import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.*;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import static java.lang.Boolean.*;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
+
+public class App {
+  
+  private static WebDriver driver;
+  static String baseUrl = "http://www.freetranslation.com/";
+  static int implicit_wait_interval = 1;
+  static int flexible_wait_interval = 5;
+  static long wait_polling_interval = 500;
+  static WebDriverWait wait;
+  static Actions actions;
+  static JavascriptExecutor javascriptExecutor;
+  static String text = "good morning driver" ;
+
+  // TODO: write the text to the file 
+  // Write-Host ('Translating: "{0}"' -f $text)
+  // $text_file = [System.IO.Path]::Combine((Get-ScriptDirectory), 'testfile.txt')
+  // Write-Output $text | Out-File -FilePath $text_file -Encoding ascii
+
+  static String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
+  
+  private static final StringBuffer verificationErrors = new StringBuffer();
+
+  @Before
+  public static void setUp() throws Exception  {
+    long implicit_wait_interval = 3;
+    DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
+    driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+    // TODO:
+    // http://stackoverflow.com/questions/13204820/how-to-obtain-native-logger-in-selenium-webdriver
+    // http://vrajasankar.blogspot.com/2012/04/logging-selenium-webdriver.html
+    // https://www.nuget.org/packages/SeleniumLog﻿
+    // driver has to be of type RemoteWebDriver
+    // driver.setLogLevel(Level.ALL);
+    javascriptExecutor = (JavascriptExecutor)driver;
+    driver.get(baseUrl);
+    driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+
+    }
+
+  public static void main(String[] args) throws Exception {
+    setUp();
+    testUpload();
+    tearDown();
+  }
+
+  @Test
+  public static void testUpload()  throws Exception   {
+    
+    // Wait for page loading  logo / title 
+    WebElement element = driver.findElement(By.cssSelector("a.brand"));
+    assertThat(element.getAttribute("title"),containsString("Translate text, documents and websites for free"));
+
+    // optional:
+    // driver.manage().window().maximize();
+
+    WebElement uploadButton = driver.findElement(By.cssSelector("div[id = 'upload-button']"));
+    highlight(uploadButton, 1500);
+
+    WebElement  uploadElement = driver.findElement(By.cssSelector("input[class='ajaxupload-input']"));
+    assertThat(uploadElement, notNullValue());
+    assertEquals("file", uploadElement.getAttribute("type"));   
+    assertEquals("file", uploadElement.getAttribute("name"));   
+   // the uploadElement is not visible
+   
+    LocalFileDetector detector = new LocalFileDetector();
+    File remoteFile = detector.getLocalFile(localPath );
+    // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/LocalFileDetector.html
+    // driver.setFileDetector(new LocalFileDetector());
+
+    ((RemoteWebElement) element).setFileDetector(detector);
+    // TODO : debug cannot find symbol error
+    // System.err.format("Uploading the file '%s'.\n" , text_file);
+
+    // Populate upload input
+    // uploadElement.sendKeys(localPath);
+    uploadElement.sendKeys(remoteFile.getAbsolutePath());
+    // TODO : locate the progressbar
+    // hard wait
+    Thread.sleep(2000);
+    /*
+    
+    $element_text = 'Download'
+$classname = 'gw-download-link'
+$element1 = find_element -classname $classname 
+[NUnit.Framework.Assert]::IsTrue($element1.Text -match $element_text)
+
+$css_selector = 'div [class="status-text"] img[class *= "gw-icon"]'
+$element2 = find_element -css_selector $css_selector
+highlight -selenium_ref ([ref]$selenium) -element_ref ([ref]$element2) -Delay 3000
+
+$text_url = $element1.GetAttribute('href')
+write-host 'This version performs the direct upload of the translated text'
+
+Write-Host ('Reading "{0}"' -f $text_url)
+
+$result = Invoke-WebRequest -Uri $text_url
+$result_body = $result.ToString() -join '`r`n'
+
+
+
+    */
+  }
+
+  @After
+  public static void tearDown()  throws Exception
+  {
+    driver.quit();
+  }
+  
+  private static void highlight(WebElement element) throws InterruptedException {
+
+    highlight(element, 100);
+  }
+  
+  private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
+    if (wait == null)         {
+      wait = new WebDriverWait(driver, flexible_wait_interval );
+    }
+    wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+    wait.until(ExpectedConditions.visibilityOf(element));
+    javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
+    Thread.sleep(highlight_interval);
+		javascriptExecutor.executeScript("arguments[0].style.border=''", element);
+  }
+
+}
