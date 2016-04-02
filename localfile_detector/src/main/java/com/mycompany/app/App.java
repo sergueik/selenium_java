@@ -2,9 +2,13 @@ package com.mycompany.app;
 
 import java.awt.Toolkit;
 
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.RuntimeException;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -13,7 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
-import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -24,9 +28,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.lang.exception.ExceptionUtils;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -34,11 +37,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.junit.experimental.categories.Category;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
-
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -53,10 +54,11 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-//import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.remote.*;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -67,84 +69,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static java.lang.Boolean.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
-
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
-
-//--
-import org.apache.commons.lang.exception.ExceptionUtils;
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import static java.lang.Boolean.*;
-
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Formatter;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.Test;
-import org.junit.Ignore;
-
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.By;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
-// todo package org.openqa.selenium.phantomjs
-// import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-
-//-------------
 import static org.junit.Assert.assertTrue;
-
-import java.lang.RuntimeException;
-
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Assert;
-import static org.junit.Assert.*;
-
 
 //--
 public class App {
@@ -218,12 +143,10 @@ public class App {
     // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/LocalFileDetector.html
     // driver.setFileDetector(new LocalFileDetector());
 
-    ((RemoteWebElement) element).setFileDetector(detector);
-    // TODO : debug cannot find symbol error
-    // System.err.format("Uploading the file '%s'.\n" , text_file);
+    (( RemoteWebElement ) uploadElement ).setFileDetector(detector);
+    System.err.format("Uploading the file '%s'.\n" , remoteFile.getAbsolutePath());
 
     // Populate upload input
-    // uploadElement.sendKeys(localPath);
     uploadElement.sendKeys(remoteFile.getAbsolutePath());
     // TODO : locate the progressbar
     // hard wait
@@ -282,7 +205,7 @@ public class App {
     connection.setRequestProperty("User-Agent", USER_AGENT);
 
     int responseCode = connection.getResponseCode();
-    // Assert.
+    // TODO: Assert.
     System.err.println("Response Code : " + responseCode);
 
     BufferedReader in = new BufferedReader( new InputStreamReader(connection.getInputStream()));
@@ -298,6 +221,4 @@ public class App {
     System.err.println(response.toString());
 
   }
-	
-  
 }
