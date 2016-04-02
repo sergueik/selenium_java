@@ -95,7 +95,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -120,7 +120,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
@@ -148,7 +148,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -175,7 +175,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);	
 	}		
   
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() throws Exception {
 		if (!isCIBuild) {
@@ -251,7 +251,7 @@ public class NgLocalFileTest {
 		assertThat(valueOfCountSelected,equalTo(2));		
 	}
 
-		// @Ignore
+		 // @Ignore
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -278,7 +278,7 @@ public class NgLocalFileTest {
 		System.err.println("Selected option: " + element.getText());
 	}
 
-		// @Ignore
+		 // @Ignore
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -316,7 +316,7 @@ public class NgLocalFileTest {
 	}
 
 
-		// @Ignore
+		 // @Ignore
 	@Test
 	public void testChangeRepeaterSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -387,8 +387,45 @@ public class NgLocalFileTest {
     
 	}
 
+
+
+	// @Ignore
+	@Test
+	public void testMultiSelect2() throws Exception {
+    // if (!isCIBuild) {
+      // return;
+    // }
+    getPageContent("ng_multi_select2.htm");
+    WebElement button = ngDriver.findElement(By.cssSelector("multiselect-dropdown button[data-ng-click='openDropdown()']"));
+    assertThat(button, notNullValue());
+    button.click();
+    // repeaterSelectedOption("option in options") will not work with this directive
+    List<WebElement> elements = ngDriver.findElements(NgBy.binding("option.name"));
+    assertTrue( elements.size() > 0 );
+    Iterator<WebElement> elementsIterator = elements.iterator();
+    // find what is selected based on the bootstrap class attribute 
+    String expression = "\\-remove\\-" ;
+    Pattern pattern = Pattern.compile(expression);
+    Matcher matcher = null;
+    while (elementsIterator.hasNext() ) {
+      WebElement element = (WebElement ) elementsIterator.next();
+      NgWebElement ngElement = new NgWebElement(ngDriver, element);
+      String optionName = ngElement.evaluate("option.name").toString();
+      // switch to core Selenium 
+      WebElement element2 = element.findElement(By.tagName("span"));
+      assertThat(element2, notNullValue());
+      String classAttribute = element2.getAttribute("class");
+      // System.err.println( "option.name = " + optionName  + " " + classAttribute);
+      matcher = pattern.matcher(classAttribute);
+      if (matcher.find()){
+        System.err.println("selected: " + optionName);
+        highlight(element);
+      }
+    }
+    
+  }
   
-		// @Ignore
+	// @Ignore
 	@Test
 	public void testMultiSelect() throws Exception {
 		// if (!isCIBuild) {
@@ -455,7 +492,7 @@ public class NgLocalFileTest {
     
 	}
   
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -468,7 +505,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText() );
 	}
 	
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -483,7 +520,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText() );
 	}
 	
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindElementByModel() throws Exception {
 		if (!isCIBuild) {
@@ -530,7 +567,7 @@ public class NgLocalFileTest {
 	}
 	
 	// failing in Linux VM: PhantomJS has crashed
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testElementTextIsGenerated() throws Exception {
 		if (!isCIBuild) {
@@ -553,7 +590,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testDropDownWatch() throws Exception {
 		if (!isCIBuild) {
@@ -603,7 +640,7 @@ public class NgLocalFileTest {
 
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testFindRepeaterRows() throws Exception {
 		if (!isCIBuild) {
@@ -622,7 +659,7 @@ public class NgLocalFileTest {
 		
 	}
 	
-	// @Ignore
+	 // @Ignore
 	@Test
   public void testFindorderByField() throws Exception {
     if (!isCIBuild) {
@@ -648,7 +685,7 @@ public class NgLocalFileTest {
 	@Test
 	public void testPrintOrderByFieldColumn() throws Exception {
 		if (!isCIBuild) {
-      return;
+      			return;
 		}
 		getPageContent("ng_headers_sort_example2.htm");
     // NOTE: This test will fail with "ng_headers_sort_example1.htm"
@@ -687,7 +724,7 @@ public class NgLocalFileTest {
     }
   }
 
-	// @Ignore
+ 	// @Ignore
 	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
@@ -711,7 +748,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	 // @Ignore
 	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
