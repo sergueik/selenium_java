@@ -407,6 +407,7 @@ public class NgLocalFileTest {
     String expression = "\\-remove\\-" ;
     Pattern pattern = Pattern.compile(expression);
     Matcher matcher = null;
+    int count = 0 ;
     while (elementsIterator.hasNext() ) {
       WebElement element = (WebElement ) elementsIterator.next();
       NgWebElement ngElement = new NgWebElement(ngDriver, element);
@@ -418,11 +419,20 @@ public class NgLocalFileTest {
       // System.err.println( "option.name = " + optionName  + " " + classAttribute);
       matcher = pattern.matcher(classAttribute);
       if (matcher.find()){
+        
+      } else {
         System.err.println("selected: " + optionName);
         highlight(element);
+        count++;
       }
     }
-    
+    elements = ngDriver.findElements(NgBy.repeaterColumn("country in SelectedCountries", "country.name"));
+    assertTrue( elements.size() == count );
+    elementsIterator = elements.iterator();
+    while (elementsIterator.hasNext() ) {
+      WebElement element = (WebElement ) elementsIterator.next();
+			System.err.format("%s\n", element.getText());
+    }
   }
   
 	// @Ignore
