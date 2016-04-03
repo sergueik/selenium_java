@@ -7,28 +7,27 @@
 
 var app = angular.module('myApp', []);
 app.controller('myCtrl', function ($timeout, $scope) {
-    $scope.countList = [
-        { id: 1, name: 'One' },
-        { id: 2, name: 'Two' },
-        { id: 3, name: 'Three' }
-    ];
-    $scope.countSelected = $scope.countList[0].id;    
-    // alert('Selected count ID: ' + $scope.countSelected);
-    
-    $scope.onchange = function(id) {
-        alert("Selected id:" + id.name);
-    }
+  $scope.countList = [
+    { id: 1, name: 'One' },
+    { id: 2, name: 'Two' },
+    { id: 3, name: 'Three' }
+  ];
+  $scope.countSelected = $scope.countList[0].id;    
+  // alert('Selected count ID: ' + $scope.countSelected);
+  
+  $scope.onchange = function(id) {
+    alert("Selected id:" + id.name);
+  }
 });
 
-  </script>
+</script>
 </head>
 <body>
 
 <div ng-controller="myCtrl">
-    Count:
-    <select ng-model="countSelected" 
-    ng-options="count.id as count.name for count in countList" ng-change="onchange(countList[countSelected-1])">
-    </select>
+  Count:
+  <select ng-model="countSelected" ng-options="count.id as count.name for count in countList" ng-change="onchange(countList[countSelected-1])">
+  </select>
   <div>Value = {{countSelected}}</div>
 </div>
 </body>
