@@ -3,9 +3,15 @@ basedir = ENV.fetch('USERPROFILE', '')
 basedir = ENV.fetch('HOME', '') if basedir == ''
 basedir = basedir.gsub('\\', '/')
 
+# standalone ubuntu box with selenium server, Firefox and aotologin and tmux-driven selenium bootstrap scripts 
+# origin : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'ubuntu/trusty64'
+  # vanilla trusty base box
   config_vm_box_name ='trusty-server-cloudimg-amd64-vagrant-disk1.box'
+  # base box with installed 
+  config_vm_box_name = 'trusty-server-amd64-vagrant-selenium.box'
   config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}" 
   
   config.vm.network :forwarded_port, guest:4444, host:4444
@@ -13,12 +19,13 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision 'shell', inline: <<-END
 #!/bin/sh
 #=========================================================
+UPDATE_SELENIUM_APP_STACK=''
 
 #=========================================================
 echo "Install the packages..."
 #=========================================================
 sudo apt-get update
-sudo apt-get -y install fluxbox xorg unzip vim default-jre rungetty firefox
+sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty firefox
 
 #=========================================================
 echo "Set autologin for the Vagrant user..."
@@ -38,6 +45,7 @@ EOF
 echo "${PROFILE_STRING}" >> .profile
 echo "ok"
 
+if [ $UPDATE_SELENIUM_APP_STACK ] ; then
 #=========================================================
 echo "Download the latest chrome..."
 #=========================================================
@@ -61,7 +69,7 @@ wget "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromed
 unzip chromedriver_linux64.zip
 sudo rm chromedriver_linux64.zip
 chown vagrant:vagrant chromedriver
-
+fi
 #=========================================================
 echo -n "Install tmux scripts..."
 #=========================================================
@@ -106,15 +114,10 @@ echo "Reboot the VM"
 #=========================================================
 sudo reboot
 
-
   END
 
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
   end
 end
-
-# standalone ubuntu box with selenium server, Firefox and aotologin and tmux-driven selenium bootstrap scripts 
-# origin : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
-
 
