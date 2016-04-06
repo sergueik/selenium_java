@@ -7,7 +7,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import static java.lang.Boolean.*;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -120,6 +119,45 @@ public class NgLocalFileTest {
 		}
 	}
 
+  // @Ignore
+	@Test
+	public void testUpload3() throws Exception {
+		// if (!isCIBuild) {
+			// return;
+		// }
+		getPageContent("ng_upload3.htm");
+    WebElement drop = ngDriver.findElement(NgBy.binding("dropText"));
+    assertThat(drop, notNullValue());
+    highlight(drop);
+    WebElement fileToUpload = ngDriver.findElement(By.id("fileToUpload"));
+    assertThat(fileToUpload, notNullValue());
+    assertTrue( fileToUpload.getTagName().equalsIgnoreCase("input") );
+    assertTrue( fileToUpload.getAttribute("type").equalsIgnoreCase("file") );
+    fileToUpload.sendKeys("test.txt");
+  }
+  
+  // @Ignore
+	@Test
+	public void testUpload1() throws Exception {
+		// if (!isCIBuild) {
+			// return;
+		// }
+    // Thid example tries to interact with custom 'fileModel' directive 
+		getPageContent("ng_upload1.htm");
+    WebElement file = ngDriver.findElement(By.cssSelector("div[ng-controller = 'myCtrl'] > input[type='file']"));
+    assertThat(file, notNullValue());
+    String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
+    file.sendKeys(localPath);
+
+    NgWebElement ng_file = new NgWebElement(ngDriver, file);
+    assertThat(ng_file, notNullValue());
+    System.err.println(ng_file.evaluate("myFile").toString());
+
+    // String script = "var e = angular.element(arguments[0]); var f = e.scope().myFile; return f.name";
+    // Object result = CommonFunctions.executeScript(script,file);
+    // assertThat(result, notNullValue());
+  }
+
 	 // @Ignore
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
@@ -159,7 +197,7 @@ public class NgLocalFileTest {
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
 		ArrayList<WebElement> countries =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
-		System.err.println("Found Countries.size() = " + countries.size() );
+		System.err.println("Found Countries.size() = " + countries.size() );    
 		assertTrue( countries.size() > 0 );
 		Iterator<WebElement> countriesIterator = countries.iterator();
 		int cnt = 0 ;
