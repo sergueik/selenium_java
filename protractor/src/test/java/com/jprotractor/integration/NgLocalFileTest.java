@@ -79,6 +79,7 @@ public class NgLocalFileTest {
   public static String localFile;
   static StringBuilder sb;
   static Formatter formatter;
+  private static String fullStackTrace;
 	
   @BeforeClass
   public static void setup() throws IOException {
@@ -120,12 +121,58 @@ public class NgLocalFileTest {
   }
 
   // @Ignore
-	@Test
-	public void testUpload3() throws Exception {
-		// if (!isCIBuild) {
-			// return;
-		// }
-		getPageContent("ng_upload3.htm");
+  @Test
+  public void testUpload1() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    // This example interacts with custom 'fileModel' directive
+    getPageContent("ng_upload1.htm");
+    WebElement file = ngDriver.findElement(By.cssSelector("div[ng-controller = 'myCtrl'] > input[type='file']"));
+    assertThat(file, notNullValue());
+    String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
+    file.sendKeys(localPath);
+    WebElement button = ngDriver.findElement(NgBy.buttonText("Upload"));
+    button.click();
+
+    NgWebElement ng_file = new NgWebElement(ngDriver, file);
+    assertThat(ng_file, notNullValue());
+    try {
+      Object myFile = ng_file.evaluate("myFile");
+      if (myFile instanceof Map) {
+        Map<?,?> map = (Map)(myFile);
+        for (Map.Entry<?,?> entry : map.entrySet()) {
+            String key = entry.getKey().toString();
+            Object value = entry.getValue();
+            System.err.println( key + " = " + value.toString());
+        }
+      } else {
+          System.err.println(myFile.toString());
+      }
+    } catch (Exception ex) {
+      fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
+      System.err.println("Exception:\n" + fullStackTrace);
+    }
+    try{
+      String script = "var e = angular.element(arguments[0]); var f = e.scope().myFile; return f.name";
+      Object result = CommonFunctions.executeScript(script,ng_file);
+      assertThat(result, notNullValue());
+      System.err.println("myFile.name = " + result);
+    } catch (Exception ex) {
+      fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
+      System.err.println("Exception:\n" + fullStackTrace);
+    }
+  }
+
+  @Ignore
+  // TODO: abort the test on timeout
+  // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
+  @Test
+  public void testUpload3() throws Exception {
+    // if (!isCIBuild) {
+      // return;
+    // }
+    getPageContent("ng_upload3.htm");
     WebElement drop = ngDriver.findElement(NgBy.binding("dropText"));
     assertThat(drop, notNullValue());
     highlight(drop);
@@ -133,29 +180,18 @@ public class NgLocalFileTest {
     assertThat(fileToUpload, notNullValue());
     assertTrue( fileToUpload.getTagName().equalsIgnoreCase("input") );
     assertTrue( fileToUpload.getAttribute("type").equalsIgnoreCase("file") );
-    fileToUpload.sendKeys("test.txt");
-  }
-  
-  // @Ignore
-	@Test
-	public void testUpload1() throws Exception {
-		// if (!isCIBuild) {
-			// return;
-		// }
-    // Thid example tries to interact with custom 'fileModel' directive 
-		getPageContent("ng_upload1.htm");
-    WebElement file = ngDriver.findElement(By.cssSelector("div[ng-controller = 'myCtrl'] > input[type='file']"));
-    assertThat(file, notNullValue());
     String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
-    file.sendKeys(localPath);
-
-    NgWebElement ng_file = new NgWebElement(ngDriver, file);
-    assertThat(ng_file, notNullValue());
-    System.err.println(ng_file.evaluate("myFile").toString());
-
-    // String script = "var e = angular.element(arguments[0]); var f = e.scope().myFile; return f.name";
-    // Object result = CommonFunctions.executeScript(script,file);
+    System.err.println("sendKeys :" +  localPath);
+    fileToUpload.sendKeys(localPath);
+    NgWebElement ng_fileToUpload = new NgWebElement(ngDriver,fileToUpload);
+    // String script = "angular.element(this).scope().setFiles(this)";
+    // Object result = CommonFunctions.executeScript(script,ng_fileToUpload);
     // assertThat(result, notNullValue());
+    wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(By.cssSelector("input[ type='button' ][ value='Upload' ]"))));
+    // Element is not currently visible and may not be manipulated
+    WebElement button = ngDriver.findElement(By.cssSelector("input[ type='button' ][ value='Upload' ]"));
+    System.err.println("Click" );
+    button.click();
   }
 
   // @Ignore
@@ -194,7 +230,7 @@ public class NgLocalFileTest {
     getPageContent("ng_service.htm");
     ngDriver.waitForAngular();
     ArrayList<WebElement> countries =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
-    System.err.println("Found Countries.size() = " + countries.size() );    
+    System.err.println("Found Countries.size() = " + countries.size() );
     assertTrue( countries.size() > 0 );
     Iterator<WebElement> countriesIterator = countries.iterator();
     int cnt = 0 ;
@@ -209,43 +245,43 @@ public class NgLocalFileTest {
     System.err.println("Mexico found " + cnt + " times");
     assertTrue(cnt == 3);	
   }		
-  
-	 // @Ignore
-	@Test
-	public void testFindSelectedtOptionWithAlert() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_selected_option.htm");
-		List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
+
+  // @Ignore
+  @Test
+  public void testFindSelectedtOptionWithAlert() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_selected_option.htm");
+    List<WebElement> elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
 
     try{
-			assertThat(elements.size(), equalTo(1));
-		} catch (AssertionError e) {
+      assertThat(elements.size(), equalTo(1));
+    } catch (AssertionError e) {
       if (isCIBuild) {
         System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
       }
-		}
+    }
 
-		WebElement element = elements.get(0);
-		ngDriver.waitForAngular();
-		
-		assertThat(element, notNullValue());
-		assertTrue(element.isDisplayed());
-		System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
-		assertThat(element.getText(),containsString("One"));
+    WebElement element = elements.get(0);
+    ngDriver.waitForAngular();
+    
+    assertThat(element, notNullValue());
+    assertTrue(element.isDisplayed());
+    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+    assertThat(element.getText(),containsString("One"));
 
-		Iterator<WebElement> options = ngDriver.findElements(NgBy.options("count.id as count.name for count in countList")).iterator();
-		while (options.hasNext() ) {
-			WebElement option = (WebElement)  options.next();
-			System.err.println("Available option: " + option.getText() );
-			if (option.getText().isEmpty()){
-				break;
-			}
-			if (option.getText().equalsIgnoreCase("two") ){		
+    Iterator<WebElement> options = ngDriver.findElements(NgBy.options("count.id as count.name for count in countList")).iterator();
+    while (options.hasNext() ) {
+      WebElement option = (WebElement)  options.next();
+      System.err.println("Available option: " + option.getText() );
+      if (option.getText().isEmpty()){
+        break;
+      }
+      if (option.getText().equalsIgnoreCase("two") ){		
         System.err.println("selecting option: " + option.getText() );
         option.click();
         if (!isCIBuild) {
@@ -261,30 +297,30 @@ public class NgLocalFileTest {
         }
       }
     }
-		ngDriver.waitForAngular();
-		elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
+    ngDriver.waitForAngular();
+    elements = ngDriver.findElements(NgBy.selectedOption("countSelected"));
     try{
-			assertThat(elements.size(), equalTo(1));
-		} catch (AssertionError e) {
+      assertThat(elements.size(), equalTo(1));
+    } catch (AssertionError e) {
       if (isCIBuild) {
         System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
       }
-		}
-    
-		element = elements.get(0);
-		assertThat(element, notNullValue());
-		System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
-		assertThat(element.getText(),containsString("Two"));
+    }
+
+    element = elements.get(0);
+    assertThat(element, notNullValue());
+    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+    assertThat(element.getText(),containsString("Two"));
     WebElement countSelected = ngDriver.findElement(NgBy.binding("countSelected"));
     assertThat(countSelected, notNullValue());
-		// System.err.println(countSelected.getText() );
+    // System.err.println(countSelected.getText() );
     int valueOfCountSelected = Integer.parseInt(new NgWebElement(ngDriver,countSelected).evaluate("countSelected").toString());
-		System.err.println("countSelected = " + valueOfCountSelected );
-		assertThat(valueOfCountSelected,equalTo(2));		
-	}
+    System.err.println("countSelected = " + valueOfCountSelected );
+    assertThat(valueOfCountSelected,equalTo(2));		
+  }
 
   // @Ignore
   @Test
@@ -338,7 +374,7 @@ public class NgLocalFileTest {
       assertThat(elements.size(), equalTo(1));
     } catch (AssertionError e) {
       if (isCIBuild) {
-        System.err.println("Skipped processing exception " + e.toString());        
+        System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
@@ -371,7 +407,7 @@ public class NgLocalFileTest {
       }
     }
 		ngDriver.waitForAngular();
-    
+
     // System.err.println("findElements(NgBy.selectedRepeaterOption(...))");
 		List<WebElement> elements = ngDriver.findElements(NgBy.selectedRepeaterOption("fruit in Fruits"));
 		try{
@@ -386,7 +422,7 @@ public class NgLocalFileTest {
 		}
 		WebElement element = elements.get(0);
 		assertThat(element, notNullValue());
-    System.err.println("selected option: " + element.getText() );    
+    System.err.println("selected option: " + element.getText() );
 		assertThat(element.getText(),containsString("Orange"));
 
     /*
@@ -395,8 +431,8 @@ public class NgLocalFileTest {
 	  assertTrue(parseBoolean(fruitSelected.toString()));
     */
 
-    // System.err.println("findElement(NgBy.selectedRepeaterOption(...))");    
-    NgWebElement ngRootWevelement = new NgWebElement(ngDriver, ngDriver.findElement(By.cssSelector("div[ng-app='myApp']"))); 
+    // System.err.println("findElement(NgBy.selectedRepeaterOption(...))");
+    NgWebElement ngRootWevelement = new NgWebElement(ngDriver, ngDriver.findElement(By.cssSelector("div[ng-app='myApp']")));
     List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.selectedRepeaterOption("fruit in Fruits"));
     try{
 			assertThat(elements.size(), equalTo(1));
@@ -412,9 +448,9 @@ public class NgLocalFileTest {
 		NgWebElement ngElement = ngElements.get(0);
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
-    System.err.println("selected option: " + ngElement.getText() );    
-    
-		// System.err.println("findNgElements(NgBy.selectedRepeaterOption(...))"); 
+    System.err.println("selected option: " + ngElement.getText() );
+
+		// System.err.println("findNgElements(NgBy.selectedRepeaterOption(...))");
 		ngElement = ngDriver.findElement(NgBy.selectedRepeaterOption("fruit in Fruits"));
 		assertThat(ngElement, notNullValue());
 		assertThat(ngElement.getWrappedElement() , notNullValue());
@@ -435,7 +471,7 @@ public class NgLocalFileTest {
     List<WebElement> elements = ngDriver.findElements(NgBy.binding("option.name"));
     assertTrue( elements.size() > 0 );
     Iterator<WebElement> elementsIterator = elements.iterator();
-    // find what is selected based on the bootstrap class attribute 
+    // find what is selected based on the bootstrap class attribute
     String expression = "\\-remove\\-" ;
     Pattern pattern = Pattern.compile(expression);
     Matcher matcher = null;
@@ -444,14 +480,14 @@ public class NgLocalFileTest {
       WebElement element = (WebElement ) elementsIterator.next();
       NgWebElement ngElement = new NgWebElement(ngDriver, element);
       String optionName = ngElement.evaluate("option.name").toString();
-      // switch to core Selenium 
+      // switch to core Selenium
       WebElement element2 = element.findElement(By.tagName("span"));
       assertThat(element2, notNullValue());
       String classAttribute = element2.getAttribute("class");
       // System.err.println( "option.name = " + optionName  + " " + classAttribute);
       matcher = pattern.matcher(classAttribute);
       if (matcher.find()){
-        
+
       } else {
         System.err.println("selected: " + optionName);
         highlight(element);
@@ -466,34 +502,33 @@ public class NgLocalFileTest {
 			System.err.format("%s\n", element.getText());
     }
   }
-  
-	// @Ignore
-	@Test
-	public void testMultiSelect() throws Exception {
-		// if (!isCIBuild) {
-			// return;
-		// }
+
+  // @Ignore
+  @Test
+  public void testMultiSelect() throws Exception {
+    // if (!isCIBuild) {
+    //    return;
+    // }
     getPageContent("ng_multi_select.htm");
-		WebElement element = ngDriver.findElement(NgBy.model("selectedValues"));
+    WebElement element = ngDriver.findElement(NgBy.model("selectedValues"));
     // use core Selenium
-		Select selectObj = new Select(element);
-		Iterator<WebElement> options = selectObj.getOptions().iterator();
+    Select selectObj = new Select(element);
+    Iterator<WebElement> options = selectObj.getOptions().iterator();
     ArrayList<String> data = new ArrayList<String>();
-		while (options.hasNext() ) {
-			WebElement option = (WebElement )  options.next();
-			if (option.getText().isEmpty()){
-				break;
-			}
-			if (parseBoolean(option.getAttribute("selected")) ){		
+    while (options.hasNext() ) {
+      WebElement option = (WebElement )  options.next();
+      if (option.getText().isEmpty()){
+        break;
+      }
+      if (parseBoolean(option.getAttribute("selected")) ){		
         System.err.println("Selected:  '" +  option.getText() + "' value = " + option.getAttribute("value") );
         // option.click();
         data.add(option.getAttribute("value"));
       } else {
         System.err.println("Not selected: '" +  option.getText() + "' value = " + option.getAttribute("value") );
-        
       }
     }
-    
+
     String selectedValues = ngDriver.findElement(NgBy.binding("selectedValues")).getText();
     System.err.println("Inspecting: " + selectedValues );
     for (int cnt =  0 ; cnt != data.size() ; cnt ++ ) {
@@ -502,17 +537,17 @@ public class NgLocalFileTest {
       Pattern pattern = Pattern.compile(expression);
       Matcher matcher = pattern.matcher(selectedValues);
       assertTrue(matcher.find());
-      System.err.println("Found \"" + value + "\"");      
+      System.err.println("Found \"" + value + "\"");
     }
-    
+
     // change selected options
     data.clear();
-		options = selectObj.getOptions().iterator();
-		while (options.hasNext() ) {
-			WebElement option = (WebElement )  options.next();
-			if (option.getText().isEmpty()){
-				break;
-			}
+    options = selectObj.getOptions().iterator();
+    while (options.hasNext() ) {
+      WebElement option = (WebElement )  options.next();
+      if (option.getText().isEmpty()){
+        break;
+      }
       System.err.println("changing selection of " + option.getText());
       actions.keyDown(Keys.CONTROL).click(option).keyUp(Keys.CONTROL).build().perform();
       ngDriver.waitForAngular();
@@ -520,7 +555,7 @@ public class NgLocalFileTest {
         data.add(option.getAttribute("value"));
       }
     }
-		
+
     selectedValues = ngDriver.findElement(NgBy.binding("selectedValues")).getText();
     System.err.println("Inspecting: " + selectedValues );
     for (int cnt =  0 ; cnt != data.size() ; cnt ++ ) {
@@ -529,180 +564,177 @@ public class NgLocalFileTest {
       Pattern pattern = Pattern.compile(expression);
       Matcher matcher = pattern.matcher(selectedValues);
       assertTrue(matcher.find());
-      System.err.println("Found \"" + value + "\"");      
+      System.err.println("Found \"" + value + "\"");
     }
-    
-	}
-  
-	 // @Ignore
-	@Test
-	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_repeat_start_end.htm");
-		List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
-		assertTrue(elements.get(0).isDisplayed());
-		assertThat(elements.get(0).getText(),containsString("Foo"));
-		System.err.println(elements.get(0).getText() );
-	}
+  }
+
+  // @Ignore
+  @Test
+  public void testFindElementByRepeaterWithBeginEnd() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_repeat_start_end.htm");
+    List<WebElement> elements = ngDriver.findElements(NgBy.repeater("definition in definitions"));
+    assertTrue(elements.get(0).isDisplayed());
+    assertThat(elements.get(0).getText(),containsString("Foo"));
+    System.err.println(elements.get(0).getText() );
+  }
 	
-	 // @Ignore
-	@Test
-	public void testFindElementByOptions() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_options_with_object.htm");
-		List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
-		assertTrue(elements.size() == 5);
-		assertThat(elements.get(0).getText(),containsString("black"));
-		System.err.println(elements.get(0).getText() );
-		assertThat(elements.get(1).getText(),containsString("white"));
-		System.err.println(elements.get(1).getText() );
-	}
+  // @Ignore
+  @Test
+  public void testFindElementByOptions() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_options_with_object.htm");
+    List<WebElement> elements = ngDriver.findElements(NgBy.options("c.name for c in colors"));
+    assertTrue(elements.size() == 5);
+    assertThat(elements.get(0).getText(),containsString("black"));
+    System.err.println(elements.get(0).getText() );
+    assertThat(elements.get(1).getText(),containsString("white"));
+    System.err.println(elements.get(1).getText() );
+  }
 	
-	 // @Ignore
-	@Test
-	public void testFindElementByModel() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
-		getPageContent("ng_pattern_validate.htm");
-		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
-		input.clear();
-		WebElement valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
-		assertThat(valid.getText(),containsString("false"));
-		System.err.println( valid.getText()); // valid: false
-		WebElement pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
-		assertThat(pattern.getText(),containsString("false"));
-		System.err.println(pattern.getText()); // pattern: false
-		WebElement required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
-		assertThat(required.getText(),containsString("true"));
-		System.err.println(required.getText()); // required: true
+  // @Ignore
+  @Test
+  public void testFindElementByModel() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    //  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
+    getPageContent("ng_pattern_validate.htm");
+    WebElement input = ngDriver.findElement(NgBy.model("myVal"));
+    input.clear();
+    WebElement valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
+    assertThat(valid.getText(),containsString("false"));
+    System.err.println( valid.getText()); // valid: false
+    WebElement pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
+    assertThat(pattern.getText(),containsString("false"));
+    System.err.println(pattern.getText()); // pattern: false
+    WebElement required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
+    assertThat(required.getText(),containsString("true"));
+    System.err.println(required.getText()); // required: true
 
-		input.sendKeys("42");
-		valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
-		assertThat(valid.getText(),containsString("true"));
-		System.err.println(valid.getText()); // valid: true
-		pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
-		assertThat(pattern.getText(),containsString("false"));
-		System.err.println(pattern.getText()); // pattern: false
-		required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
-		assertThat(required.getText(),containsString("false"));
-		System.err.println(required.getText()); // required: false
-	}
+    input.sendKeys("42");
+    valid = ngDriver.findElement(NgBy.binding("form.value.$valid"));
+    assertThat(valid.getText(),containsString("true"));
+    System.err.println(valid.getText()); // valid: true
+    pattern = ngDriver.findElement(NgBy.binding("form.value.$error.pattern"));
+    assertThat(pattern.getText(),containsString("false"));
+    System.err.println(pattern.getText()); // pattern: false
+    required = ngDriver.findElement(NgBy.binding("!!form.value.$error.required"));
+    assertThat(required.getText(),containsString("false"));
+    System.err.println(required.getText()); // required: false
+  }
 
-	// @Ignore
-	@Test
-	public void testFindRepeaterElement() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}			
-		getPageContent("ng_basic.htm");
-		WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
-		System.err.println("item[row='1'][col='b'] = " + element.getText());
-		highlight(element);	
-		List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
-		assertThat(elements.size(), equalTo(0));
-	}
+  // @Ignore
+  @Test
+  public void testFindRepeaterElement() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }			
+    getPageContent("ng_basic.htm");
+    WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
+    System.err.println("item[row='1'][col='b'] = " + element.getText());
+    highlight(element);	
+    List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
+    assertThat(elements.size(), equalTo(0));
+  }
 	
-	// failing in Linux VM: PhantomJS has crashed
-	 // @Ignore
-	@Test
-	public void testElementTextIsGenerated() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}			
-		getPageContent("ng_load_json_data.htm");
-		WebElement name  = ngDriver.findElement(NgBy.model("name"));
-		highlight(name);
-		name.sendKeys("John");
-		name.sendKeys(Keys.TAB);
-		// NOTE: explicitly done by getAttribute.
-		// ngDriver.waitForAngular();
-		WebElement greeting = ngDriver.findElement(NgBy.model("greeting"));
-		highlight(greeting);
-		//JavascriptExecutor js = (JavascriptExecutor) ngDriver.getWrappedDriver();
-		//String greeting_text = js.executeScript("return arguments[0].value", greeting).toString();
-		//assertTrue(greeting_text.length() > 0);
-		String greeting_text = greeting.getAttribute("value");
-		System.err.println( greeting_text );
-		assertTrue(greeting_text.length() > 0);
-	}
+  // failing in Linux VM: PhantomJS has crashed
+  // @Ignore
+  @Test
+  public void testElementTextIsGenerated() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }			
+    getPageContent("ng_load_json_data.htm");
+    WebElement name  = ngDriver.findElement(NgBy.model("name"));
+    highlight(name);
+    name.sendKeys("John");
+    name.sendKeys(Keys.TAB);
+    // NOTE: explicitly done by getAttribute.
+    // ngDriver.waitForAngular();
+    WebElement greeting = ngDriver.findElement(NgBy.model("greeting"));
+    highlight(greeting);
+    //JavascriptExecutor js = (JavascriptExecutor) ngDriver.getWrappedDriver();
+    //String greeting_text = js.executeScript("return arguments[0].value", greeting).toString();
+    //assertTrue(greeting_text.length() > 0);
+    String greeting_text = greeting.getAttribute("value");
+    System.err.println( greeting_text );
+    assertTrue(greeting_text.length() > 0);
+  }
 
-	 // @Ignore
-	@Test
-	public void testDropDownWatch() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		//  NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
-		getPageContent("ng_dropdown_watch.htm");
-		String optionsCountry = "country for country in countries";
-		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
-		assertThat(elementsCountries.size(), equalTo(3));
+  // @Ignore
+  @Test
+  public void testDropDownWatch() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    //  NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
+    getPageContent("ng_dropdown_watch.htm");
+    String optionsCountry = "country for country in countries";
+    List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
+    assertThat(elementsCountries.size(), equalTo(3));
 
-		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
-		while (iteratorCountries.hasNext()) {
-			WebElement country = (WebElement) iteratorCountries.next();
-			if (country.getAttribute("value").isEmpty()){
-				continue;
-			}
-			assertTrue(country.getAttribute("value").matches("^\\d+$"));
-			assertTrue(country.getText().matches("(?i:China|United States)"));
-			System.err.println("country = " + country.getText() );
-		}
-		String optionsState = "state for state in states";
-		WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
-		assertTrue(!elementState.isEnabled());
+    Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
+    while (iteratorCountries.hasNext()) {
+      WebElement country = (WebElement) iteratorCountries.next();
+      if (country.getAttribute("value").isEmpty()){
+        continue;
+      }
+      assertTrue(country.getAttribute("value").matches("^\\d+$"));
+      assertTrue(country.getText().matches("(?i:China|United States)"));
+      System.err.println("country = " + country.getText() );
+    }
+    String optionsState = "state for state in states";
+    WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
+    assertTrue(!elementState.isEnabled());
 
-		Select selectCountries = new Select(ngDriver.findElement(NgBy.model("country")));
-		selectCountries.selectByVisibleText("china");
-		WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
-		try{
-			assertThat(selectedOptionCountry, notNullValue());
-		} catch (AssertionError e) {
-		}
-		assertTrue(elementState.isEnabled());
-		
-		List <WebElement>elementsStates = ngDriver.findElements(NgBy.options(optionsState));
-		assertThat(elementsStates.size(), equalTo(3));
-		Iterator<WebElement> iteratorStates = elementsStates.iterator();
-		while (iteratorStates.hasNext()) {
-			WebElement state = (WebElement) iteratorStates.next();
-			if (state.getAttribute("value").isEmpty()){
-				continue;
-			}
-			assertTrue(state.getAttribute("value").matches("^\\d+$"));
-			assertTrue(state.getText().matches("(?i:BeiJing|ShangHai)"));
-			System.err.println("state = " + state.getText());
-		}
+    Select selectCountries = new Select(ngDriver.findElement(NgBy.model("country")));
+    selectCountries.selectByVisibleText("china");
+    WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
+    try{
+      assertThat(selectedOptionCountry, notNullValue());
+    } catch (AssertionError e) {
+    }
+    assertTrue(elementState.isEnabled());
 
-	}
+    List <WebElement>elementsStates = ngDriver.findElements(NgBy.options(optionsState));
+    assertThat(elementsStates.size(), equalTo(3));
+    Iterator<WebElement> iteratorStates = elementsStates.iterator();
+    while (iteratorStates.hasNext()) {
+      WebElement state = (WebElement) iteratorStates.next();
+      if (state.getAttribute("value").isEmpty()){
+        continue;
+      }
+      assertTrue(state.getAttribute("value").matches("^\\d+$"));
+      assertTrue(state.getText().matches("(?i:BeiJing|ShangHai)"));
+      System.err.println("state = " + state.getText());
+    }
+  }
 
-	 // @Ignore
-	@Test
-	public void testFindRepeaterRows() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_todo.htm");
-		String todos_repeater = "todo in todoList.todos";
-		List <WebElement>todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,1));
-		assertTrue(todos.size() > 0);
-		System.err.println("TODO: " + todos.get(0).getText());
-		todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,-1));
-		assertThat(todos.size(), equalTo(0));
-		List <WebElement>todos_check = ngDriver.findElements(NgBy.repeater(todos_repeater));
-		todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,todos_check.size() + 1));
-		assertThat(todos.size(), equalTo(0));
-		
-	}
+  // @Ignore
+  @Test
+  public void testFindRepeaterRows() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_todo.htm");
+    String todos_repeater = "todo in todoList.todos";
+    List <WebElement>todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,1));
+    assertTrue(todos.size() > 0);
+    System.err.println("TODO: " + todos.get(0).getText());
+    todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,-1));
+    assertThat(todos.size(), equalTo(0));
+    List <WebElement>todos_check = ngDriver.findElements(NgBy.repeater(todos_repeater));
+    todos = ngDriver.findElements(NgBy.repeaterRows(todos_repeater,todos_check.size() + 1));
+    assertThat(todos.size(), equalTo(0));
+  }
 	
-	 // @Ignore
-	@Test
+  // @Ignore
+  @Test
   public void testFindorderByField() throws Exception {
     if (!isCIBuild) {
       return;
@@ -714,7 +746,7 @@ public class NgLocalFileTest {
       WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
       System.err.println(header);
       headerelement.click();
-      ngDriver.waitForAngular();      
+      ngDriver.waitForAngular();
       List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
       WebElement row = (WebElement) rows.get(0);
       NgWebElement ngRow = new NgWebElement(ngDriver,row);
@@ -723,15 +755,15 @@ public class NgLocalFileTest {
     }
   }
 
-	// @Ignore
-	@Test
-	public void testPrintOrderByFieldColumn() throws Exception {
-		if (!isCIBuild) {
-      			return;
-		}
-		getPageContent("ng_headers_sort_example2.htm");
+  // @Ignore
+  @Test
+  public void testPrintOrderByFieldColumn() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_headers_sort_example2.htm");
     // NOTE: This test will fail with "ng_headers_sort_example1.htm"
-    // Exception:    
+    // Exception:
     // no injector found for element argument to getTestability
     String[] headers = new String[]{"First Name", "Last Name", "Age"};
     for(String header : headers)
@@ -740,14 +772,14 @@ public class NgLocalFileTest {
         WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
         System.err.println("Clicking on header: " + header);
         headerelement.click();
-        ngDriver.waitForAngular();      
+        ngDriver.waitForAngular();
         List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
         WebElement row = (WebElement) rows.get(0);
         NgWebElement ngRow = new NgWebElement(ngDriver,row);
         String field =  row.getAttribute("ng-order-by");
         System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
         String empField = "emp." + ngRow.evaluate( field  );
-        System.err.println( empField  + ":"); 
+        System.err.println( empField  + ":");
         Iterator<WebElement> iteratorEmp = rows.iterator();
         while (iteratorEmp.hasNext()) {
           WebElement emp = (WebElement) iteratorEmp.next();
@@ -757,7 +789,7 @@ public class NgLocalFileTest {
           try {
             WebElement empFieldElement = ngEmp.findElement(NgBy.binding( empField ));
             assertThat(empFieldElement, notNullValue());
-            System.err.println( empFieldElement.getText());          
+            System.err.println( empFieldElement.getText());
           } catch(Exception ex) {
             System.err.println( org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex));
          }
@@ -766,108 +798,107 @@ public class NgLocalFileTest {
     }
   }
 
- 	// @Ignore
-	@Test
-	public void testFindAllBindings() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		getPageContent("ng_directive_binding.htm");
-		
-		WebElement container = ngDriver.getWrappedDriver().findElement(By.cssSelector("body div"));
-		assertThat(container, notNullValue());
-		// will show class="ng-binding" added to each node
-		System.err.println(container.getAttribute("innerHTML") );		
-		List <WebElement>names = ngDriver.findElements(NgBy.binding("name"));
-		assertTrue(names.size() == 5 );
+  // @Ignore
+  @Test
+  public void testFindAllBindings() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    getPageContent("ng_directive_binding.htm");
 
-		Iterator<WebElement> iteratorNames = names.iterator();		
-		while (iteratorNames.hasNext()) {
-			WebElement name = (WebElement) iteratorNames.next();
-			// will show class="ng-binding" added to every node
-			System.err.println(name.getAttribute("outerHTML") );
-			System.err.println(getIdentity(name));
-		}
-	}
+    WebElement container = ngDriver.getWrappedDriver().findElement(By.cssSelector("body div"));
+    assertThat(container, notNullValue());
+    // will show class="ng-binding" added to each node
+    System.err.println(container.getAttribute("innerHTML") );		
+    List <WebElement>names = ngDriver.findElements(NgBy.binding("name"));
+    assertTrue(names.size() == 5 );
 
-	 // @Ignore
-	@Test
-	public void testDropDown() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
-		//  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
-		getPageContent("ng_dropdown.htm");
-		Thread.sleep(1000);
-		String optionsCountry = "country for (country, states) in countries";
-		List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
-		assertThat(elementsCountries.size(), equalTo(4));
-		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
-		while (iteratorCountries.hasNext()) {
-			WebElement country = (WebElement) iteratorCountries.next();
-			if (country.getAttribute("value").isEmpty()){
-				continue;
-			}
-			assertTrue(country.getAttribute("value").matches("(?i:India|Australia|Usa)"));
-			System.err.println("country = " + country.getAttribute("value") );
-		}
-		String optionsState = "state for (state,city) in states";
-		WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
-		assertThat(elementState.getText().toLowerCase(Locale.getDefault()),containsString("select"));		
-		assertTrue(!elementState.isEnabled());
+    Iterator<WebElement> iteratorNames = names.iterator();		
+    while (iteratorNames.hasNext()) {
+      WebElement name = (WebElement) iteratorNames.next();
+      // will show class="ng-binding" added to every node
+      System.err.println(name.getAttribute("outerHTML") );
+      System.err.println(getIdentity(name));
+    }
+  }
 
-		WebElement element = ngDriver.findElement(NgBy.options(optionsCountry));
-		assertTrue(element.isEnabled());
-		Select selectCountries = new Select(ngDriver.findElement(NgBy.model("states")));
+   // @Ignore
+  @Test
+  public void testDropDown() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
+    //  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
+    getPageContent("ng_dropdown.htm");
+    Thread.sleep(1000);
+    String optionsCountry = "country for (country, states) in countries";
+    List <WebElement>elementsCountries = ngDriver.findElements(NgBy.options(optionsCountry));
+    assertThat(elementsCountries.size(), equalTo(4));
+    Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
+    while (iteratorCountries.hasNext()) {
+      WebElement country = (WebElement) iteratorCountries.next();
+      if (country.getAttribute("value").isEmpty()){
+        continue;
+      }
+      assertTrue(country.getAttribute("value").matches("(?i:India|Australia|Usa)"));
+      System.err.println("country = " + country.getAttribute("value") );
+    }
+    String optionsState = "state for (state,city) in states";
+    WebElement elementState = ngDriver.findElement(NgBy.options(optionsState));
+    assertThat(elementState.getText().toLowerCase(Locale.getDefault()),containsString("select"));		
+    assertTrue(!elementState.isEnabled());
 
-		selectCountries.selectByValue("Australia");
-		Thread.sleep(1000);
-		
-		WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
-		try{
-			assertThat(selectedOptionCountry, notNullValue());
-		} catch (AssertionError e) {
+    WebElement element = ngDriver.findElement(NgBy.options(optionsCountry));
+    assertTrue(element.isEnabled());
+    Select selectCountries = new Select(ngDriver.findElement(NgBy.model("states")));
+
+    selectCountries.selectByValue("Australia");
+    Thread.sleep(1000);
+
+    WebElement selectedOptionCountry = ngDriver.findElement(NgBy.selectedOption(optionsCountry));
+    try{
+      assertThat(selectedOptionCountry, notNullValue());
+    } catch (AssertionError e) {
       // TODO
-		}
-		elementState = ngDriver.findElement(NgBy.options(optionsState));
-		assertTrue(elementState.isEnabled());
-		List <WebElement>elementsStates = ngDriver.findElements(NgBy.options(optionsState));
-		assertThat(elementsStates.size(), equalTo(3));
-		Iterator<WebElement> iteratorStates = elementsStates.iterator();
-		while (iteratorStates.hasNext()) {
-			WebElement state = (WebElement) iteratorStates.next();
-			if (state.getAttribute("value").isEmpty()){
-				continue;
-			}
-			assertTrue(state.getAttribute("value").matches("(?i:New South Wales|Victoria)"));
-			System.err.println("state = " + state.getAttribute("value") );
-		}
-	}
+    }
+    elementState = ngDriver.findElement(NgBy.options(optionsState));
+    assertTrue(elementState.isEnabled());
+    List <WebElement>elementsStates = ngDriver.findElements(NgBy.options(optionsState));
+    assertThat(elementsStates.size(), equalTo(3));
+    Iterator<WebElement> iteratorStates = elementsStates.iterator();
+    while (iteratorStates.hasNext()) {
+      WebElement state = (WebElement) iteratorStates.next();
+      if (state.getAttribute("value").isEmpty()){
+        continue;
+      }
+      assertTrue(state.getAttribute("value").matches("(?i:New South Wales|Victoria)"));
+      System.err.println("state = " + state.getAttribute("value") );
+    }
+  }
 
-	@AfterClass
-	public static void teardown() {
-		ngDriver.close();
-		seleniumDriver.quit();		
-	}
+  @AfterClass
+  public static void teardown() {
+    ngDriver.close();
+    seleniumDriver.quit();		
+  }
 
-	private static void getPageContent(String pagename) throws InterruptedException{
-		String baseUrl = CommonFunctions.getPageContent( pagename) ;
-		ngDriver.navigate().to(baseUrl);
-		Thread.sleep(500);
-	}
+  private static void getPageContent(String pagename) throws InterruptedException{
+    String baseUrl = CommonFunctions.getPageContent( pagename) ;
+    ngDriver.navigate().to(baseUrl);
+    Thread.sleep(500);
+  }
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+    highlight(element,  100);
+  }
 
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-	
-	private static String getIdentity(WebElement element ) throws InterruptedException {
-		String script = "return angular.identity(angular.element(arguments[0])).html();";
-		// returns too little HTML information in Java
-		return CommonFunctions.executeScript(script, element).toString();
-	}
+  private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+    CommonFunctions.highlight(element, highlightInterval);
+  }
 
+  private static String getIdentity(WebElement element ) throws InterruptedException {
+    String script = "return angular.identity(angular.element(arguments[0])).html();";
+    // returns too little HTML information in Java
+    return CommonFunctions.executeScript(script, element).toString();
+  }
 }
