@@ -164,7 +164,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   // TODO: abort the test on timeout
   // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
   @Test
@@ -752,6 +752,44 @@ public class NgLocalFileTest {
       NgWebElement ngRow = new NgWebElement(ngDriver,row);
       String field =  row.getAttribute("ng-order-by");
       System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
+    }
+  }
+
+  // @Ignore
+  @Test
+  public void testAngularUISelect() throws Exception {
+    // if (!isCIBuild) {
+    //  return;
+    // }
+    getPageContent("ng_ui_select_example.htm");
+    List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
+
+    Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
+    while (iteratorSelectedColors.hasNext()) {
+      WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
+      NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
+      highlight(selectedColor);
+      Object itemColor = ngSelectedColor.evaluate("$item"); 
+      System.err.println( "selected color: "  + itemColor.toString() );
+    }
+    // WebElement search = ngDriver.findElement(By.cssSelector("input[type='search']"));
+    // same element
+    WebElement search = ngDriver.findElement(NgBy.model("$select.search"));
+    search.click();
+    ngDriver.waitForAngular();
+    List <WebElement>  searchOptions = ngDriver.findElements(By.cssSelector("div[role='option']"));
+    Iterator<WebElement> iteratorSearchOptions = searchOptions.iterator();
+    while (iteratorSearchOptions.hasNext()) {
+      WebElement searchOption = (WebElement) iteratorSearchOptions.next();
+      NgWebElement ngSearchOption = new NgWebElement(ngDriver,searchOption);
+      highlight(searchOption);
+      int index = 0;
+      try {
+        Object itemIndex = ngSearchOption.evaluate("$index"); 
+        System.err.println( );
+        index = Integer.parseInt(itemIndex.toString() );
+      } catch (Exception e) {}
+      System.err.println( "available color:" + searchOption.getText() + ",index = " + index );
     }
   }
 
