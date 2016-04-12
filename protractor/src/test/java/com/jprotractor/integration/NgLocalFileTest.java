@@ -757,7 +757,7 @@ public class NgLocalFileTest {
 
   // @Ignore
   @Test
-  public void testAngularUISelect() throws Exception {
+  public void testHandleAngularUISelect() throws Exception {
     // if (!isCIBuild) {
     //  return;
     // }
@@ -777,19 +777,17 @@ public class NgLocalFileTest {
     WebElement search = ngDriver.findElement(NgBy.model("$select.search"));
     search.click();
     ngDriver.waitForAngular();
-    List <WebElement>  searchOptions = ngDriver.findElements(By.cssSelector("div[role='option']"));
-    Iterator<WebElement> iteratorSearchOptions = searchOptions.iterator();
-    while (iteratorSearchOptions.hasNext()) {
-      WebElement searchOption = (WebElement) iteratorSearchOptions.next();
-      NgWebElement ngSearchOption = new NgWebElement(ngDriver,searchOption);
-      highlight(searchOption);
-      int index = 0;
+    List <WebElement>  availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
+    Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
+    while (iteratorAvailableColors.hasNext()) {
+      WebElement availableColor = (WebElement) iteratorAvailableColors.next();
+      NgWebElement ngAvailableColor = new NgWebElement(ngDriver,availableColor);
+      highlight(availableColor);
+      int availableColorIndex = -1;
       try {
-        Object itemIndex = ngSearchOption.evaluate("$index"); 
-        System.err.println( );
-        index = Integer.parseInt(itemIndex.toString() );
+        availableColorIndex = Integer.parseInt(ngAvailableColor.evaluate("$index").toString() );
       } catch (Exception e) {}
-      System.err.println( "available color:" + searchOption.getText() + ",index = " + index );
+      System.err.println( "available color:" + availableColor.getText() + ",index = " + availableColorIndex );
     }
   }
 
