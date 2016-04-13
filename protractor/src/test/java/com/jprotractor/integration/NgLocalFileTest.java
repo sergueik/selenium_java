@@ -759,7 +759,7 @@ public class NgLocalFileTest {
   @Ignore
   @Test
   public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
-    getPageContent("ng_ui_select_example.htm");
+    getPageContent("ng_ui_select_example1.htm");
     List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
 
     Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
@@ -790,7 +790,7 @@ public class NgLocalFileTest {
   // @Ignore
   @Test
   public void testAngularUISelectHandleSearch() throws Exception {
-    getPageContent("ng_ui_select_example.htm");
+    getPageContent("ng_ui_select_example1.htm");
     String searchText = "Ma";
     WebElement search = ngDriver.findElement(By.cssSelector("input[type='search']"));
     search.sendKeys(searchText);
@@ -809,7 +809,7 @@ public class NgLocalFileTest {
   // @Ignore
   @Test
   public void testAngularUISelectHandleDeselect() throws Exception {
-    getPageContent("ng_ui_select_example.htm");
+    getPageContent("ng_ui_select_example1.htm");
     List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
     while (selectedColors.size() != 0 ) {      
       selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
