@@ -95,7 +95,7 @@ public class NgLocalFileTest {
     ngDriver = new NgWebDriver(seleniumDriver);
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testEvaluate() throws Exception {
     if (!isCIBuild) {
@@ -120,7 +120,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testUpload1() throws Exception {
     if (!isCIBuild) {
@@ -164,7 +164,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   // TODO: abort the test on timeout
   // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
   @Test
@@ -194,7 +194,7 @@ public class NgLocalFileTest {
     button.click();
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testEvaluateEvenOdd() throws Exception {
     if (!isCIBuild) {
@@ -219,7 +219,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindElementByRepeaterColumn() throws Exception {
     if (!isCIBuild) {
@@ -246,7 +246,7 @@ public class NgLocalFileTest {
     assertTrue(cnt == 3);	
   }		
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindSelectedtOptionWithAlert() throws Exception {
     if (!isCIBuild) {
@@ -322,7 +322,7 @@ public class NgLocalFileTest {
     assertThat(valueOfCountSelected,equalTo(2));		
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -349,7 +349,7 @@ public class NgLocalFileTest {
     System.err.println("Selected option: " + element.getText());
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -387,7 +387,7 @@ public class NgLocalFileTest {
   }
 
 
-		 // @Ignore
+		 @Ignore
 	@Test
 	public void testChangeSelectedRepeaterOption() throws Exception {
 		if (!isCIBuild) {
@@ -457,7 +457,7 @@ public class NgLocalFileTest {
 		System.err.println("selected option: " + ngElement.getText() );
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testMultiSelect2() throws Exception {
     // if (!isCIBuild) {
@@ -503,7 +503,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testMultiSelect() throws Exception {
     // if (!isCIBuild) {
@@ -568,7 +568,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindElementByRepeaterWithBeginEnd() throws Exception {
     if (!isCIBuild) {
@@ -581,7 +581,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(0).getText() );
   }
 	
-  // @Ignore
+  @Ignore
   @Test
   public void testFindElementByOptions() throws Exception {
     if (!isCIBuild) {
@@ -596,7 +596,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(1).getText() );
   }
 	
-  // @Ignore
+  @Ignore
   @Test
   public void testFindElementByModel() throws Exception {
     if (!isCIBuild) {
@@ -628,7 +628,7 @@ public class NgLocalFileTest {
     System.err.println(required.getText()); // required: false
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindRepeaterElement() throws Exception {
     if (!isCIBuild) {
@@ -643,7 +643,7 @@ public class NgLocalFileTest {
   }
 	
   // failing in Linux VM: PhantomJS has crashed
-  // @Ignore
+  @Ignore
   @Test
   public void testElementTextIsGenerated() throws Exception {
     if (!isCIBuild) {
@@ -666,7 +666,7 @@ public class NgLocalFileTest {
     assertTrue(greeting_text.length() > 0);
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testDropDownWatch() throws Exception {
     if (!isCIBuild) {
@@ -715,7 +715,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindRepeaterRows() throws Exception {
     if (!isCIBuild) {
@@ -733,7 +733,7 @@ public class NgLocalFileTest {
     assertThat(todos.size(), equalTo(0));
   }
 	
-  // @Ignore
+  @Ignore
   @Test
   public void testFindorderByField() throws Exception {
     if (!isCIBuild) {
@@ -755,12 +755,10 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  // TODO: separate into class AngularUISelect.java 
+  @Ignore
   @Test
-  public void testHandleAngularUISelect() throws Exception {
-    // if (!isCIBuild) {
-    //  return;
-    // }
+  public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
     getPageContent("ng_ui_select_example.htm");
     List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
 
@@ -772,8 +770,6 @@ public class NgLocalFileTest {
       Object itemColor = ngSelectedColor.evaluate("$item"); 
       System.err.println( "selected color: "  + itemColor.toString() );
     }
-    // WebElement search = ngDriver.findElement(By.cssSelector("input[type='search']"));
-    // same element
     WebElement search = ngDriver.findElement(NgBy.model("$select.search"));
     search.click();
     ngDriver.waitForAngular();
@@ -792,6 +788,51 @@ public class NgLocalFileTest {
   }
 
   // @Ignore
+  @Test
+  public void testAngularUISelectHandleSearch() throws Exception {
+    getPageContent("ng_ui_select_example.htm");
+    String searchText = "Ma";
+    WebElement search = ngDriver.findElement(By.cssSelector("input[type='search']"));
+    search.sendKeys(searchText);
+    ngDriver.waitForAngular();
+    List <WebElement>  availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
+    Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
+    while (iteratorAvailableColors.hasNext()) {
+      WebElement availableColor = (WebElement) iteratorAvailableColors.next();
+      NgWebElement ngAvailableColor = new NgWebElement(ngDriver,availableColor);
+      highlight(availableColor);
+      assertThat(availableColor.getText(),containsString(searchText));
+      System.err.println( "search = " + searchText + ", found :"  + availableColor.getText()  );
+    }
+  }
+
+  // @Ignore
+  @Test
+  public void testAngularUISelectHandleDeselect() throws Exception {
+    getPageContent("ng_ui_select_example.htm");
+    List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
+    while (selectedColors.size() != 0 ) {      
+      selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
+      Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
+      while (iteratorSelectedColors.hasNext()) {
+        WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
+        NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
+        Object itemColor = ngSelectedColor.evaluate("$item"); 
+        System.err.println( "deselecting color: "  + itemColor.toString() );
+        WebElement ng_close = ngSelectedColor.findElement(By.cssSelector("span[class *='close']"));
+        assertThat(ng_close, notNullValue());       
+        assertThat(ng_close.getAttribute("ng-click"), notNullValue());       
+        assertThat(ng_close.getAttribute("ng-click"), containsString("removeChoice"));
+        highlight(ng_close);
+        ng_close.click();
+        ngDriver.waitForAngular();
+      }
+    }
+    System.err.println( "Nothing is selected" );
+    
+  }
+  
+  @Ignore
   @Test
   public void testPrintOrderByFieldColumn() throws Exception {
     if (!isCIBuild) {
@@ -834,7 +875,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testFindAllBindings() throws Exception {
     if (!isCIBuild) {
@@ -858,7 +899,7 @@ public class NgLocalFileTest {
     }
   }
 
-   // @Ignore
+   @Ignore
   @Test
   public void testDropDown() throws Exception {
     if (!isCIBuild) {
