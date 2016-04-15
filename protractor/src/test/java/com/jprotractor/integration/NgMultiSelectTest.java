@@ -63,7 +63,7 @@ import com.jprotractor.NgWebElement;
  * Tests of Native AngularJS multiselect directive https://github.com/amitava82/angular-multiselect
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-public class NgCalculatorTest {
+public class NgMultiSelectTest {
 	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -77,7 +77,7 @@ public class NgCalculatorTest {
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
-    private static String baseUrl = "http://amitava82.github.io/angular-multiselect/";
+  private static String baseUrl = "http://amitava82.github.io/angular-multiselect/";
 
 	@BeforeClass
 	public static void setup() throws IOException{
@@ -97,8 +97,39 @@ public class NgCalculatorTest {
 	}
 
 	@Test
-	public void testSingleSelect() throws Exception {
-	}
+	public void testCheckAllSelect() throws Exception {
+    
+    NgWebElement selectedCar = ngDriver.findElement(NgBy.model("selectedCar"));
+    assertThat(selectedCar, notNullValue());
+    // System.err.println(selectedCar.getAttribute("innerHTML") );		
+    WebElement toggleSelect = selectedCar.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
+    assertThat(toggleSelect, notNullValue());
+    assertTrue(toggleSelect.isDisplayed());
+    System.err.println(toggleSelect.getAttribute("innerHTML") );	
+    toggleSelect.click();
+    
+    ngDriver.waitForAngular();
+    wait.until(ExpectedConditions.visibilityOf(selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
+    WebElement checkAll = selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"));
+    assertThat(checkAll, notNullValue());
+    assertTrue(checkAll.isDisplayed());
+    // System.err.println(checkAll.getAttribute("innerHTML") );	
+    NgWebElement ngCheckAll = new NgWebElement(ngDriver, checkAll);
+    ngCheckAll.click();
+    ngDriver.waitForAngular();
+    List <WebElement> cars = selectedCar.findElements(NgBy.repeater("i in items")); 
+    // TODO: debug options = "c.name for c in cars"
+    assertThat(cars.size(), equalTo(3));
+    Iterator<WebElement> iteratorCars = cars.iterator();
+    while (iteratorCars.hasNext()) {
+      WebElement car = (WebElement) iteratorCars.next();
+      if (car.getAttribute("value").isEmpty()){
+        continue;
+      }
+      assertTrue(car.getText().matches("(?i:Audi|BMW|Honda)"));
+      System.err.println( car.getText() + " " + car.getAttribute("value"));
+    }    
+ 	}
 
 	@AfterClass
 	public static void teardown() {
