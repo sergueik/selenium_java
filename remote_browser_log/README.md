@@ -38,6 +38,8 @@ See Also
  - [Capturing Browser logs with-Selenium] (http://stackoverflow.com/questions/25431380/capturing-browser-logs-with-selenium)
  - [klepikov/Test.java](https://gist.github.com/klepikov/5457750)
  - [discussion of missing C# bindings for WebDriver logging](https://code.google.com/p/selenium/issues/detail?id=6832)
+ - [interacing with JSErrorCollector.xpi, java](https://github.com/mguillem/JSErrorCollector)
+ - [interacing with JSErrorCollector.xpi, .net](https://github.com/protectedtrust/JSErrorCollector.NET)
 
 Author
 ------
