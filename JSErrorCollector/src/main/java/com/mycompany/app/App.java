@@ -133,9 +133,18 @@ public class App {
     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 
     driver = new RemoteWebDriver(capabilities);
-    List<JavaScriptError> jsErrors = JavaScriptError.readErrors(driver);
 
     navigate();
+    List<JavaScriptError> jsErrors = JavaScriptError.readErrors(driver);
+        System.err.println("Found " + jsErrors.size() + " errors." );
+    Iterator<JavaScriptError> jsErrorsIterator = jsErrors.iterator();
+    int cnt = 1 ;
+    while (jsErrorsIterator.hasNext() ) {
+      JavaScriptError jsError = (JavaScriptError) jsErrorsIterator.next();
+      System.err.format("%d: %s %s\n", cnt, jsError.getClass(), jsError.getErrorMessage() );
+      cnt++;
+    }
+    driver.close();
     driver.quit();
 
   }
@@ -153,7 +162,7 @@ public class App {
     // Wait For Page To Load
     driver.manage().timeouts().implicitlyWait(60, TimeUnit.SECONDS);
 
-
+/*
     String value0 = "pnav-destinations";
     String title0  = "Destinations & Excursions - opens submenu";
 
@@ -171,7 +180,8 @@ public class App {
     //save the screenshot in png format on the disk.
     FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
     //closing current driver window
-    driver.close();
+    */
+    
   }
 
   private static String getResource(final String string) {
