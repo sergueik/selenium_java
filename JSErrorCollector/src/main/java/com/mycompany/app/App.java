@@ -121,13 +121,15 @@ public class App {
     } catch (IOException e) {
       e.printStackTrace();
     }
-
+    // http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+    // http://www.atetric.com/atetric/javadoc/org.seleniumhq.selenium/selenium-firefox-driver/2.43.1/src-html/org/openqa/selenium/firefox/FirefoxProfile.html
     profile.setPreference("app.update.enabled", false);
 
   // Setting preferences
   //	profile.setPreference("extensions.firebug.currentVersion", "2.0");
 
     DesiredCapabilities capabilities = new DesiredCapabilities();
+    
     capabilities.setBrowserName("firefox");
     capabilities.setPlatform(org.openqa.selenium.Platform.ANY);
     capabilities.setCapability(FirefoxDriver.PROFILE, profile);
