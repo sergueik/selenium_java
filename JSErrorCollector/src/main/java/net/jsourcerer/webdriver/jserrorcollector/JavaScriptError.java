@@ -22,14 +22,14 @@ public class JavaScriptError {
 	private final int lineNumber;	
 	private final String console;
 
-	JavaScriptError(final Map<String, ? extends Object> map) {
+	public JavaScriptError(final Map<String, ? extends Object> map) {
 		errorMessage = (String) map.get("errorMessage");
 		sourceName = (String) map.get("sourceName");
 		lineNumber = ((Number) map.get("lineNumber")).intValue();
 		console = (String) map.get("console");
 	}
 
-	JavaScriptError(final String errorMessage, final String sourceName, final int lineNumber, String console) {
+	public JavaScriptError(final String errorMessage, final String sourceName, final int lineNumber, String console) {
 		this.errorMessage = errorMessage;
 		this.sourceName = sourceName;
 		this.lineNumber = lineNumber;
