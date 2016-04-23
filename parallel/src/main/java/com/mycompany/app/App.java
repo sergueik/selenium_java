@@ -1,6 +1,6 @@
 package com.mycompany.app;
 // example from 
-// # http://bharathautomation.blogspot.in/p/selenium-webdriver-faqs.html
+// http://bharathautomation.blogspot.in/p/selenium-webdriver-faqs.html
 // has errors 
 // import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.hamcrest.CoreMatchers.*;
@@ -115,22 +115,36 @@ public class App implements Runnable{
         thread.start();
     }
 
-    public void run(){      
+    public void run(){
+
+      try {
+        System.err.println("Thread: sleep 10 sec." );
+        Thread.sleep(10000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }    
+        System.err.println("Thread: wake." );
 			// With modal window, WebDriver appears to be hanging on [get current window handle]        
       String currentHandle = currentHandle = driver.getWindowHandle();
-      System.out.println("Thread: Current Window handle" + currentHandle );
+      System.err.println("Thread: Current Window handle" + currentHandle );
       while(true) {
         try {
-					System.out.println("Thread: wait ");
+					System.out.println("Thread: wait .5 sec");
           Thread.sleep(500);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        // With modal window, WebDriver appears to be hanging on [get window handles]
+        System.out.println("Thread: inspecting all Window handles" );        
+        // when a modal window is created by Javascript window.showModalDialog
+        // WebDriver appears to be hanging on [get current window handle], [get window handles]
+        // Node console shows no Done: [get current window handle] or Done: [get window handles]
+        // if the window is closed manually, and cleater again, the problem goes away
         windowHandles =  driver.getWindowHandles();
         if (windowHandles.size() > 1) {
 					System.err.println("Found "  + (windowHandles.size() - 1 ) + " additional Windows");
 					break;
+        } else {
+          System.out.println("Thread: no other Windows" );          
         }
       } 
 
@@ -138,13 +152,15 @@ public class App implements Runnable{
       while(windowHandleIterator.hasNext()) { 
         String handle = (String) windowHandleIterator.next();
 				if (! handle.equals(currentHandle)){				
-					System.out.println("Switch to" + handle);
+					System.out.println("Switch to " + handle);
 					driver.switchTo().window(handle);
 					// move, print attributes
+					System.out.println("Switch to main window." );
 					driver.switchTo().defaultContent();
 				}
       }
-       /*
+      /*
+      // the rest of example commented out
       String nextHandle = driver.getWindowHandle();
       System.out.println("nextHandle" + nextHandle);
       
@@ -183,35 +199,15 @@ public class App implements Runnable{
 
       driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-      // driver=new ChromeDriver();
-      // driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-			// 
-      //driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
       new App();
-			driver.get("http://www.naukri.com/");
-			// WebDriver appears to be hanging on [get current window handle]
-			String currentHandle = driver.getWindowHandle();
-			System.out.println("main: Current Window handle" + currentHandle );
-      windowHandles =  driver.getWindowHandles();
-
-      Iterator<String> windowHandleIterator =  windowHandles.iterator();
-      while(windowHandleIterator.hasNext()) { 
-				String handle = (String) windowHandleIterator.next();
-				System.out.println("main: window Handle:" + handle);
-      }
-      // driver.findElement(By.xpath("html/body/input")).click();
-			Thread.sleep(10000);
-      // not reached 
-			/*
-      windowHandles =  driver.getWindowHandles();
-
-      windowHandleIterator =  windowHandles.iterator();
-      while(windowHandleIterator.hasNext()) { 
-				String handle = (String) windowHandleIterator.next();
-				System.out.println("window Handle:" + handle);
-				//  driver.switchTo().window(handle);
-      }
- */
+      // non-modal windows are handled successfully.
+			// driver.get("http://www.naukri.com/");
+      driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
+      driver.findElement(By.xpath("html/body/input")).click();
+      System.out.println("main: sleeping 10 sec");
+      
+			Thread.sleep(20000);
+      System.out.println("main: close");
       driver.close();
       driver.quit();
 
