@@ -1,7 +1,8 @@
 #!/bin/bash
 # This is the standalone launcher script for hub it is listening to 4444
 export HUB_PORT=4444
-export SELENIUM_JAR_VERSION=2.43.1
+export HUB_IP_ADDRESS=127.0.0.1
+export SELENIUM_JAR_VERSION=2.47.1
 
 # This code verifies that selenium jar of the correct version is linked to 
 # simply selenium-sever-standalone.jar
@@ -30,4 +31,4 @@ fi
 # This is options for java runtime.
 export LAUNCHER_OPTS='-XX:MaxPermSize=256M -Xmn128M -Xms256M -Xmx256M'
 
-java $LAUNCHER_OPTS -Dlog4j.configuration=/root/hub.log4j.properties -cp log4j-1.2.17.jar:selenium-server-standalone.jar:log4j.xml:log4j.properties org.openqa.grid.selenium.GridLauncher -role hub  -port $HUB_PORT &
+java $LAUNCHER_OPTS -Dlog4j.configuration=/root/hub.log4j.properties -cp log4j-1.2.17.jar:selenium-server-standalone.jar:log4j.xml:log4j.properties org.openqa.grid.selenium.GridLauncher -role hub -host $HUB_IP_ADDRESS -port $HUB_PORT &

@@ -5,10 +5,14 @@
 # This allows run two or more nodes on separate displays
 
 export NODE_PORT=5555
+export NODE_HOST=$(ip addr | sed -En '/scope global/s/inet (([0-9]*\.){3}[0-9]*).*/\1/p')
+# http://stackoverflow.com/questions/13322485/how-to-i-get-the-primary-ip-address-of-the-local-machine-on-linux-and-os-x
+# export NODE_HOST=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
+# export NODE_HOST=$(hostname -I)
 export HUB_IP_ADDRESS=127.0.0.1
 export HUB_PORT=4444
-export SELENIUM_JAR_VERSION=2.43.1
-export DISPLAY_PORT=1000
+export SELENIUM_JAR_VERSION=2.47.1
+export DISPLAY_PORT=0
 export ROLE=node
 
 usage() { cat<<END_OF_USAGE;exit 1; 
@@ -70,7 +74,7 @@ else
 fi    
 export DISPLAY_PORT=$DISPLAY_PORT_ARG
 
-# configuration -can? be shared
+# configuration 
 export DEFAULT_CONFIG_FILE='node.json'
 
 # This allows setting alternative port on the commandline 
@@ -168,6 +172,14 @@ rm ~/.mozilla/firefox/$PROFILE/history.dat
 sleep 3
 
 fi
+
+if $(ps ax | grep -qE '\bX\b')  
+
+then 
+echo 'X Windows is running ' 
+
+else
+
 # Detect already running Xvfb. It is harmless to
 # let run - the attempt to run second instance on the same
 # port will fail
@@ -183,6 +195,7 @@ fi
 export DISPLAY=:$DISPLAY_PORT
 # TODO : specify geometry of the display
 Xvfb $DISPLAY -ac >/dev/null 2>&1 &
+fi
 SELENIUM_NODE_PID=$!
 # This is options for java runtime.
 export LAUNCHER_OPTS='-XX:MaxPermSize=256M -Xmn128M -Xms256M -Xmx256M'
@@ -201,7 +214,7 @@ org.openqa.grid.selenium.GridLauncher \
 -host $NODE_HOST \
 -port $NODE_PORT \
 -hub http://${HUB_IP_ADDRESS}:${HUB_PORT}/hub/register \
--nodeConfig $NODE_CONFIG  \
+-nodeConfig $CONFIG_FILE \
 -browserTimeout 12000 -timeout 12000 \
 -ensureCleanSession true \
 -trustAllSSLCertificates 
@@ -217,7 +230,7 @@ org.openqa.grid.selenium.GridLauncher \
 -host $NODE_HOST \
 -port $NODE_PORT \
 -hub http://${HUB_IP_ADDRESS}:${HUB_PORT}/hub/register \
--nodeConfig $NODE_CONFIG  \
+-nodeConfig $CONFIG_FILE \
 -browserTimeout 12000 -timeout 12000 \
 -ensureCleanSession true \
 -trustAllSSLCertificates &

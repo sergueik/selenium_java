@@ -3,6 +3,12 @@
     {
       "browserName": "chrome",
       "version": "",
+      "platform": "LINUX",
+      "maxInstances": 1
+    },
+    {
+      "browserName": "chrome",
+      "version": "",
       "platform": "WINDOWS",
       "maxInstances": 1
     },
@@ -10,6 +16,12 @@
       "browserName": "internet explorer",
       "version": "",
       "platform": "WINDOWS",
+      "maxInstances": 1
+    },
+    {
+      "browserName": "firefox",
+      "version": "",
+      "platform": "LINUX",
       "maxInstances": 1
     },
     {
