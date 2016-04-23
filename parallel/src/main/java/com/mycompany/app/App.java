@@ -116,33 +116,35 @@ public class App implements Runnable{
     }
 
     public void run(){      
-      
-      System.err.println("run");
+			// With modal window, WebDriver appears to be hanging on [get current window handle]        
+      String currentHandle = currentHandle = driver.getWindowHandle();
+      System.out.println("Thread: Current Window handle" + currentHandle );
       while(true) {
         try {
-          Thread.sleep(5000);
+					System.out.println("Thread: wait ");
+          Thread.sleep(500);
         } catch (InterruptedException e) {
           e.printStackTrace();
         }
-        // WebDriver appears to be hanging on [get current window handle]
-        String currentHandle = driver.getWindowHandle();
-        System.out.println("Current Window handle" + currentHandle );
-        // WebDriver appears to be hanging on getWindowHandles
+        // With modal window, WebDriver appears to be hanging on [get window handles]
         windowHandles =  driver.getWindowHandles();
-        System.err.println( "handles = " + windowHandles.size());
         if (windowHandles.size() > 1) {
-        System.err.println("Switch to new Window");
-        break;
+					System.err.println("Found "  + (windowHandles.size() - 1 ) + " additional Windows");
+					break;
         }
       } 
 
       Iterator<String> windowHandleIterator =  windowHandles.iterator();
       while(windowHandleIterator.hasNext()) { 
         String handle = (String) windowHandleIterator.next();
-        System.out.println("Switch to" + handle);
-        driver.switchTo().window(handle);
+				if (! handle.equals(currentHandle)){				
+					System.out.println("Switch to" + handle);
+					driver.switchTo().window(handle);
+					// move, print attributes
+					driver.switchTo().defaultContent();
+				}
       }
-       
+       /*
       String nextHandle = driver.getWindowHandle();
       System.out.println("nextHandle" + nextHandle);
       
@@ -154,6 +156,7 @@ public class App implements Runnable{
       }
       // Accept alert
       driver.switchTo().alert().accept();
+			*/
     }
     
     public static void main(String args[]) throws InterruptedException,MalformedURLException{
@@ -182,19 +185,33 @@ public class App implements Runnable{
 
       // driver=new ChromeDriver();
       // driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-      driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
+			// 
+      //driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
       new App();
-      driver.findElement(By.xpath("html/body/input")).click();
-      // not reached 
+			driver.get("http://www.naukri.com/");
+			// WebDriver appears to be hanging on [get current window handle]
+			String currentHandle = driver.getWindowHandle();
+			System.out.println("main: Current Window handle" + currentHandle );
       windowHandles =  driver.getWindowHandles();
 
       Iterator<String> windowHandleIterator =  windowHandles.iterator();
       while(windowHandleIterator.hasNext()) { 
-      String handle = (String) windowHandleIterator.next();
-          System.out.println("window Handle:" + handle);
-         //  driver.switchTo().window(handle);
+				String handle = (String) windowHandleIterator.next();
+				System.out.println("main: window Handle:" + handle);
       }
+      // driver.findElement(By.xpath("html/body/input")).click();
+			Thread.sleep(10000);
+      // not reached 
+			/*
+      windowHandles =  driver.getWindowHandles();
 
+      windowHandleIterator =  windowHandles.iterator();
+      while(windowHandleIterator.hasNext()) { 
+				String handle = (String) windowHandleIterator.next();
+				System.out.println("window Handle:" + handle);
+				//  driver.switchTo().window(handle);
+      }
+ */
       driver.close();
       driver.quit();
 
