@@ -153,7 +153,6 @@ public class App {
     
     driver.get(url);
     alert = wait.until(alertIsPresent());
-
     Credentials credentials = new UserAndPassword(username, password);
 
     alert.authenticateUsing(credentials);
