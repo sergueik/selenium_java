@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -50,6 +52,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static org.hamcrest.CoreMatchers.*;
 import org.junit.Assert;
 import static org.junit.Assert.*;
 
@@ -91,6 +94,8 @@ public class App {
   static long pollingInterval = 500;
   static boolean inject_local_script = false;
 
+  static String url = "http://demo.testfire.net/";
+
   public static void main(String[] args) throws InterruptedException,java.io.IOException {
 
     System.out.println(System.getProperty("user.dir"));
@@ -104,6 +109,7 @@ public class App {
     driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(120, TimeUnit.SECONDS);
     wait = new WebDriverWait(driver, flexibleWait );
     wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
+    driver.get(url);
 
     inject();
 
@@ -114,8 +120,6 @@ public class App {
 
   public static void inject () throws InterruptedException,java.io.IOException  {
 
-    String url = "http://demo.testfire.net/" ;
-    driver.get(url);
     WebElement loginLink = driver.findElement(By.id("_ctl0__ctl0_LoginLink"));
     loginLink.click();
     WebElement userId = driver.findElement(By.id("uid"));
@@ -152,11 +156,15 @@ public class App {
     String jqueryEnabledScript = "if (window.jQuery) {  return true } else { return false  } ";
     boolean jqueryEnabled = (Boolean)(executeScript(jqueryEnabledScript));
     assertTrue(jqueryEnabled);
-
-    String jQueryElementLocatorScript = "return jQuery(\"input[name='btnSubmit']\")";
+    String buttonElementLocator = "input[name='btnSubmit']";
+    StringBuilder sb = new StringBuilder();
+    // Send all output to the Appendable object sb
+    Formatter formatter = new Formatter(sb, Locale.US);
+    String jQueryElementLocatorScript = formatter.format("return jQuery(\"%s\")", buttonElementLocator).toString();
 
     System.err.println("Running : " + jQueryElementLocatorScript );
     List<Object> loginButtonObjects = (List<Object>)(executeScript(jQueryElementLocatorScript));
+    assertThat( loginButtonObjects, notNullValue());
     assertTrue( loginButtonObjects.size() > 0 );
 
     Iterator<Object> loginButtonObjectIterator = loginButtonObjects.iterator();
