@@ -20,7 +20,6 @@ import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
-
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,8 +52,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static org.hamcrest.CoreMatchers.*;
-import org.junit.Assert;
+// import static org.hamcrest.CoreMatchers.containsString;
+// could not parse error message:   symbol:   static containsString
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.junit.Assert;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -169,18 +172,38 @@ public class App {
 
     Iterator<Object> loginButtonObjectIterator = loginButtonObjects.iterator();
     int cnt = 0;
+    WebElement loginButtonElement = null; 
     while (loginButtonObjectIterator.hasNext() ) {
       Object loginButtonObject = (Object) loginButtonObjectIterator.next();
       // [type="submit", value="Login", name="btnSubmit"]
       System.err.println("Returned (raw): " + loginButtonObject.toString() );
-      WebElement loginButtonElement = (WebElement) loginButtonObject;
+      loginButtonElement = (WebElement) loginButtonObject;
       System.err.format("%s %s %s\n", loginButtonElement.getTagName(), loginButtonElement.getAttribute("value"), loginButtonElement.getAttribute("type"));
       if (loginButtonElement.getAttribute("value").equalsIgnoreCase("login")){
          cnt = cnt + 1;
          // highlight(loginButtonElement);
       }
     }
+    
     System.err.println("Login Button found " + cnt + " times");
+    assertThat( loginButtonElement, notNullValue());
+    loginButtonElement.click();
+    try {
+      // http://obscuredclarity.blogspot.com/2012/10/unit-testing-runtime-exceptions-with.html
+      WebElement accountButtonElement = driver.findElement(By.id("btnGetAccount"));
+      // does one need to be a JUnit method 
+      fail("Expected exception");
+    } catch (NoSuchElementException e) {
+      // pass - not being caught by this block
+      assertTrue(e.getMessage().contains("Unable to locate element: ")); // {"method":"id","selector":"btnGetAccount"}
+    } catch (Exception e) {
+      assertThat(e, instanceOf(org.openqa.selenium.NoSuchElementException.class));
+      // cannot find symbol
+      // assertThat(e.getMessage(), containsString("Unable to locate element: "));
+      assertTrue(e.getMessage().contains("Unable to locate element: ")); // {"method":"id","selector":"btnGetAccount"}
+      // System.err.println("Cause: " + e.getCause()); // Cause: org.openqa.selenium.remote.ScreenshotException
+      // System.err.println("Full stack trace:\n" + org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e));
+    }
   }
 
   private static Object  executeAsyncScript( String script,Object ... args){
