@@ -37,7 +37,7 @@ public class AppTest {
   public static LinkedList<String[]> getEnvironments() throws Exception {
     LinkedList<String[]> env = new LinkedList<String[]>();
     env.add(new String[]{Platform.ANY.toString(), "chrome", "50"});
-    // env.add(new String[]{Platform.ANY.toString(),"firefox","45"});
+    env.add(new String[]{Platform.ANY.toString(),"firefox","45"});
     //add more browsers here
     //env.add(new String[]{Platform.WINDOWS.toString(),"ie","9"});
     return env;
