@@ -24,7 +24,7 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import com.mycompany.app.ParallelTest;
 
 @RunWith(ParallelTest.class)
-public class AppTest {
+public class App {
   
   private String platform;
   private String browserName;
@@ -43,12 +43,11 @@ public class AppTest {
     return env;
   }
 
-  public AppTest(String platform, String browserName, String browserVersion) {
+  public App(String platform, String browserName, String browserVersion) {
     this.platform = platform;
     this.browserName = browserName;
     this.browserVersion = browserVersion;
   }
-
 
   @Before
   public void setUp() throws Exception {
@@ -56,7 +55,7 @@ public class AppTest {
     capabilities.setCapability("platform", platform);
     capabilities.setCapability("browser", browserName);
     capabilities.setBrowserName(browserName);
-    // capabilities.setCapability("browserVersion", browserVersion);
+    capabilities.setCapability("browserVersion", browserVersion);
     // org.openqa.selenium.WebDriverException: The best matching driver provider oenqa.selenium.chrome.ChromeDriver can't create a new driver instance for Caities [{platform=ANY, browserVersion=45, browser=firefox}]
     driver = new RemoteWebDriver( new URL(hubUrl), capabilities );
   }
