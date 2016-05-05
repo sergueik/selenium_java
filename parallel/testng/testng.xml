@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<suite name="My Test Suite">
+  <suite-files>
+    <suite-file path="./catalog.xml"/>
+  </suite-files>
+</suite>

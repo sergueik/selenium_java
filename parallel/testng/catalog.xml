@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="Parallel test runs" parallel="tests" thread-count="4">
+  <test name="Test_1">
+    <classes>
+      <class name="com.mycompany.app.Test1"/>
+    </classes>
+  </test>
+  <test name="Test_2">
+    <classes>
+      <class name="com.mycompany.app.Test2"/>
+    </classes>
+  </test>
+  <test name="Test_3">
+    <classes>
+      <class name="com.mycompany.app.Test3"/>
+    </classes>
+  </test>
+  <test name="Test_4">
+    <classes>
+      <class name="com.mycompany.app.Test4"/>
+    </classes>
+  </test>
+</suite>
