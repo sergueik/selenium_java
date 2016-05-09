@@ -63,68 +63,75 @@ import com.jprotractor.NgWebElement;
 
 /**
  * Purpose: implement Java equivalents of the Protractor test spec
- * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js 
- * https://github.com/qualityshepherd/protractor_example/pages/friendPage.js 
+ * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js
+ * https://github.com/qualityshepherd/protractor_example/pages/friendPage.js
  * to practice difference between Java and Jasmine Test layout
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
 public class NgQualityShepherdTest {
-	private static String fullStackTrace;
-	private static NgWebDriver ngDriver;
-	private static WebDriver seleniumDriver;
-	static WebDriverWait wait;
-	static Actions actions;
-	static Alert alert;
-	static int implicitWait = 10;
-	static int flexibleWait = 5;
-	static long pollingInterval = 500;
-	static int width = 600;
-	static int height = 400;
-	// set to true for Desktop, false for headless browser testing
-	static boolean isCIBuild =  false;
+
+  private static String fullStackTrace;
+  private static NgWebDriver ngDriver;
+  private static WebDriver seleniumDriver;
+  static WebDriverWait wait;
+  static Actions actions;
+  static Alert alert;
+  static int implicitWait = 10;
+  static int flexibleWait = 5;
+  static long pollingInterval = 500;
+  static int width = 600;
+  static int height = 400;
+  // set to true for Desktop, false for headless browser testing
+  static boolean isCIBuild =  false;
   private static String baseUrl = "http://qualityshepherd.com/angular/friends/";
 
-	@BeforeClass
-	public static void setup() throws IOException{
-		isCIBuild = CommonFunctions.checkEnvironment();
-		seleniumDriver = CommonFunctions.getSeleniumDriver();
-		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait );
-		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-		actions = new Actions(seleniumDriver);		
-		ngDriver = new NgWebDriver(seleniumDriver);
-	}
+  @BeforeClass
+  public static void setup() throws IOException{
+    isCIBuild = CommonFunctions.checkEnvironment();
+    seleniumDriver = CommonFunctions.getSeleniumDriver();
+    seleniumDriver.manage().window().setSize(new Dimension(width , height ));
+    seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
+    wait = new WebDriverWait(seleniumDriver, flexibleWait );
+    wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
+    actions = new Actions(seleniumDriver);		
+    ngDriver = new NgWebDriver(seleniumDriver);
+  }
 
-	@Before
-	public void beforeEach() {
-		ngDriver.navigate().to(baseUrl);
-	}
+  @Before
+  public void beforeEach() {
+    ngDriver.navigate().to(baseUrl);
+  }
 
-	@Test
-	public void testAddFriend() throws Exception {
+  @Test
+  public void testAddFriend() throws Exception {
+    String friendName = "John Doe";
+    int friendCount = ngDriver.findElements(NgBy.repeater("row in rows")).size();
     NgWebElement addnameBox = ngDriver.findElement(NgBy.model("addName"));
-		assertThat(addnameBox,notNullValue());
+    assertThat(addnameBox,notNullValue());
     highlight(addnameBox, 100);
-    addnameBox.sendKeys("John Doe");
+    addnameBox.sendKeys(friendName);
     NgWebElement addButton = ngDriver.findElement(NgBy.buttonText("+ add"));
- 		assertThat(addButton,notNullValue());
+    assertThat(addButton,notNullValue());
     highlight(addButton, 100);
     addButton.click();
-    // TODO: assert count increment
-    // by.cssContainingText("td.ng-binding")
- }
-  
-	@Test
-	public void testSearchAndDeleteFriend() throws Exception {
-    
+    ngDriver.waitForAngular();
+    assertThat(ngDriver.findElements(NgBy.repeater("row in rows")).size() - friendCount , equalTo(1));
+    WebElement addedFriendElement = ngDriver.findElements(NgBy.cssContainingText("td.ng-binding",friendName)).get(0);
+    assertThat(addedFriendElement,notNullValue());
+    highlight(addedFriendElement, 100);
+    System.err.println("Added friend name: " + addedFriendElement.getText());
+  }
+
+  @Test
+  public void testSearchAndDeleteFriend() throws Exception {
+
     List<WebElement> names = ngDriver.findElements(NgBy.repeaterColumn("row in rows", "row"));
     String nameString = names.get(0).getText();
     assertFalse( nameString.isEmpty() );
     System.err.println("Search name: " + nameString);
     NgWebElement searchBox  = ngDriver.findElement(NgBy.model("search"));
-		assertThat(searchBox,notNullValue());
+    assertThat(searchBox,notNullValue());
     searchBox.sendKeys(nameString);
     Iterator<WebElement> elements = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
     while (elements.hasNext() ) {
@@ -135,14 +142,14 @@ public class NgQualityShepherdTest {
         WebElement deleteButton = currentElement.findElement(By.cssSelector("i.icon-trash"));
         highlight(deleteButton);
         deleteButton.click();
-        ngDriver.waitForAngular(); 
+        ngDriver.waitForAngular();
       }
-    } 
+    }
     WebElement clearSearchBox = searchBox.findElement(By.xpath("..")).findElement(By.cssSelector("i.icon-remove"));
     assertThat(clearSearchBox,notNullValue());
     System.err.println("Clear Search");
     clearSearchBox.click();
-    ngDriver.waitForAngular(); 
+    ngDriver.waitForAngular();
     elements = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
     while (elements.hasNext() ) {
       WebElement currentElement = (WebElement) elements.next();
@@ -151,29 +158,28 @@ public class NgQualityShepherdTest {
       assertTrue(currentName.indexOf(nameString) == -1);
     }
   }
-  
+
   @Ignore
   @Test
-	public void testRemoveAllFriends() throws Exception {
-     ngDriver.waitForAngular(); 
+  public void testRemoveAllFriends() throws Exception {
+     ngDriver.waitForAngular();
      List <WebElement> elements = ngDriver.findElements(NgBy.repeater("row in rows"));
      assertTrue( elements.size() != 0 );
   }
 
-	@AfterClass
-	public static void teardown() {
-		ngDriver.close();
-		seleniumDriver.quit();		
-	}
+  @AfterClass
+  public static void teardown() {
+    ngDriver.close();
+    seleniumDriver.quit();		
+  }
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+    highlight(element,  100);
+  }
 
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
+  private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
+    CommonFunctions.highlight(element, highlightInterval);
+  }
 }
 
 
