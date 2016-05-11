@@ -95,6 +95,68 @@ public class NgLocalFileTest {
     ngDriver = new NgWebDriver(seleniumDriver);
   }
 
+
+  @Test
+  public void testDatePicker() throws Exception {
+    //if (!isCIBuild) {
+    //  return;
+    //}
+    getPageContent("ng_datepicker.htm");
+    // can not test official page -  it is not an Angular app.
+    // http://dalelotts.github.io/angular-bootstrap-datetimepicker/
+    // test aborted with exception
+    // Caused by: org.openqa.selenium.WebDriverException: [ng:test] no injector found for element argument to getTestability
+    WebElement ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
+    assertThat(ng_result, notNullValue());
+    assertTrue(ng_result.getAttribute("type").matches("text"));
+    ng_result.clear();
+    NgWebElement ng_calendar = ngDriver.findElement(By.cssSelector(".input-group-addon"));
+    assertThat(ng_calendar, notNullValue());
+    highlight(ng_calendar);
+    actions.moveToElement(ng_calendar.getWrappedElement()).click().build().perform();
+    // need a little more room
+    int datepicker_width = 900 ;
+    int datepicker_heght =  800 ;
+    seleniumDriver.manage().window().setSize(new Dimension(datepicker_width , datepicker_heght ));
+
+    NgWebElement ng_dropDown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
+    assertThat(ng_dropDown,notNullValue());
+    highlight(ng_dropDown);
+    List<WebElement> ng_weekDates = ng_dropDown.findElements(NgBy.repeater("dateObject in week.dates"));
+    assertTrue(ng_weekDates.size() > 27 );
+    String monthDate = "12";
+    WebElement dateElement = ng_dropDown.findElements(NgBy.cssContainingText("td.ng-binding",monthDate)).get(0);
+    assertThat(dateElement,notNullValue());
+    highlight(dateElement, 100);
+    System.err.println("Mondh Date: " + dateElement.getText());
+    dateElement.click();
+    NgWebElement ng_element = ng_dropDown.findElement(NgBy.model("data.inputOnTimeSet"));
+    assertThat(ng_element,notNullValue());
+    List<WebElement> ng_dataDates = ng_element.findElements(NgBy.repeater("dateObject in data.dates"));
+    assertThat(ng_dataDates.size(), equalTo(24));
+    String timeOfDay = "6:00 PM";
+    WebElement timeOfDayElement = ng_element.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
+    assertThat(timeOfDayElement,notNullValue());
+    highlight(timeOfDayElement, 100);
+    System.err.println("time of the day: " + timeOfDayElement.getText());
+    timeOfDayElement.click();
+    String specificMinute = "6:35 PM";
+    // reload
+    ng_element = ng_dropDown.findElement(NgBy.model("data.inputOnTimeSet"));
+    assertThat(ng_element,notNullValue());
+    highlight(ng_element, 100);
+    WebElement minuteElement = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);
+    assertThat(minuteElement,notNullValue());
+    highlight(minuteElement, 100);
+    System.err.println("time of the day: " + minuteElement.getText());
+    minuteElement.click();
+    ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
+    highlight(ng_result, 100);
+    System.err.println("time of the day: " + ng_result.getAttribute("value"));
+    // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
+    assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
+  }
+
   @Ignore
   @Test
   public void testEvaluate() throws Exception {
@@ -268,7 +330,7 @@ public class NgLocalFileTest {
 
     WebElement element = elements.get(0);
     ngDriver.waitForAngular();
-    
+
     assertThat(element, notNullValue());
     assertTrue(element.isDisplayed());
     System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
@@ -755,7 +817,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // TODO: separate into class AngularUISelect.java 
+  // TODO: separate into class AngularUISelect.java
   @Ignore
   @Test
   public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
@@ -767,7 +829,7 @@ public class NgLocalFileTest {
       WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
       NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
       highlight(selectedColor);
-      Object itemColor = ngSelectedColor.evaluate("$item"); 
+      Object itemColor = ngSelectedColor.evaluate("$item");
       System.err.println( "selected color: "  + itemColor.toString() );
     }
     WebElement search = ngDriver.findElement(NgBy.model("$select.search"));
@@ -787,7 +849,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testAngularUISelectHandleSearch() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -806,22 +868,22 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   @Test
   public void testAngularUISelectHandleDeselect() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
     List <WebElement> selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
-    while (selectedColors.size() != 0 ) {      
+    while (selectedColors.size() != 0 ) {
       selectedColors = ngDriver.findElements(NgBy.repeater("$item in $select.selected"));
       Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
       while (iteratorSelectedColors.hasNext()) {
         WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
         NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
-        Object itemColor = ngSelectedColor.evaluate("$item"); 
+        Object itemColor = ngSelectedColor.evaluate("$item");
         System.err.println( "deselecting color: "  + itemColor.toString() );
         WebElement ng_close = ngSelectedColor.findElement(By.cssSelector("span[class *='close']"));
-        assertThat(ng_close, notNullValue());       
-        assertThat(ng_close.getAttribute("ng-click"), notNullValue());       
+        assertThat(ng_close, notNullValue());
+        assertThat(ng_close.getAttribute("ng-click"), notNullValue());
         assertThat(ng_close.getAttribute("ng-click"), containsString("removeChoice"));
         highlight(ng_close);
         ng_close.click();
@@ -829,9 +891,9 @@ public class NgLocalFileTest {
       }
     }
     System.err.println( "Nothing is selected" );
-    
+
   }
-  
+
   @Ignore
   @Test
   public void testPrintOrderByFieldColumn() throws Exception {
