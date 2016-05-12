@@ -8,6 +8,7 @@ import java.io.IOException;
 import static java.lang.Boolean.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -96,8 +97,9 @@ public class NgLocalFileTest {
   }
 
 
+  @Ignore
   @Test
-  public void testDatePicker() throws Exception {
+  public void testDatePickerDirectSelect() throws Exception {
     //if (!isCIBuild) {
     //  return;
     //}
@@ -118,43 +120,84 @@ public class NgLocalFileTest {
     int datepicker_width = 900 ;
     int datepicker_heght =  800 ;
     seleniumDriver.manage().window().setSize(new Dimension(datepicker_width , datepicker_heght ));
-
-    NgWebElement ng_dropDown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
-    assertThat(ng_dropDown,notNullValue());
-    highlight(ng_dropDown);
-    List<WebElement> ng_weekDates = ng_dropDown.findElements(NgBy.repeater("dateObject in week.dates"));
+    NgWebElement ng_dropdown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
+    assertThat(ng_dropdown,notNullValue());
+    highlight(ng_dropdown);
+    List<WebElement> ng_weekDates = ng_dropdown.findElements(NgBy.repeater("dateObject in week.dates"));
     assertTrue(ng_weekDates.size() > 27 );
     String monthDate = "12";
-    WebElement dateElement = ng_dropDown.findElements(NgBy.cssContainingText("td.ng-binding",monthDate)).get(0);
+    WebElement dateElement = ng_dropdown.findElements(NgBy.cssContainingText("td.ng-binding",monthDate)).get(0);
     assertThat(dateElement,notNullValue());
     highlight(dateElement, 100);
     System.err.println("Mondh Date: " + dateElement.getText());
     dateElement.click();
-    NgWebElement ng_element = ng_dropDown.findElement(NgBy.model("data.inputOnTimeSet"));
+    NgWebElement ng_element = ng_dropdown.findElement(NgBy.model("data.inputOnTimeSet"));
     assertThat(ng_element,notNullValue());
     List<WebElement> ng_dataDates = ng_element.findElements(NgBy.repeater("dateObject in data.dates"));
     assertThat(ng_dataDates.size(), equalTo(24));
     String timeOfDay = "6:00 PM";
-    WebElement timeOfDayElement = ng_element.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
-    assertThat(timeOfDayElement,notNullValue());
-    highlight(timeOfDayElement, 100);
-    System.err.println("time of the day: " + timeOfDayElement.getText());
-    timeOfDayElement.click();
+    WebElement ng_hour = ng_element.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
+    assertThat(ng_hour,notNullValue());
+    highlight(ng_hour, 100);
+    System.err.println("Hour of the day: " + ng_hour.getText());
+    ng_hour.click();
     String specificMinute = "6:35 PM";
     // reload
-    ng_element = ng_dropDown.findElement(NgBy.model("data.inputOnTimeSet"));
+    ng_element = ng_dropdown.findElement(NgBy.model("data.inputOnTimeSet"));
     assertThat(ng_element,notNullValue());
     highlight(ng_element, 100);
     WebElement minuteElement = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);
     assertThat(minuteElement,notNullValue());
     highlight(minuteElement, 100);
-    System.err.println("time of the day: " + minuteElement.getText());
+    System.err.println("Time of the day: " + minuteElement.getText());
     minuteElement.click();
     ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
     highlight(ng_result, 100);
     System.err.println("time of the day: " + ng_result.getAttribute("value"));
     // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
     assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
+  }
+
+  @Test
+  public void testDatePickerNavigation() throws Exception {
+    //if (!isCIBuild) {
+    //  return;
+    //}
+    getPageContent("ng_datepicker.htm");
+    WebElement ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
+    assertThat(ng_result, notNullValue());
+    assertTrue(ng_result.getAttribute("type").matches("text"));
+    ng_result.clear();
+    NgWebElement ng_calendar = ngDriver.findElement(By.cssSelector(".input-group-addon"));
+    assertThat(ng_calendar, notNullValue());
+    highlight(ng_calendar);
+    actions.moveToElement(ng_calendar.getWrappedElement()).click().build().perform();
+    NgWebElement ng_dropdown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
+    assertThat(ng_dropdown,notNullValue());
+    highlight(ng_dropdown);
+    NgWebElement ng_display = ngDriver.findElement(NgBy.binding("data.previousViewDate.display"));
+    assertThat(ng_display,notNullValue());
+    String dateDattern = "\\d{4}\\-(\\w{3})" ;
+    assertTrue(ng_display.getText().matches(dateDattern));
+    highlight(ng_display,100);
+    System.err.println("Current month: " + ng_display.getText());
+
+    Pattern pattern = Pattern.compile(dateDattern);
+		Matcher matcher = pattern.matcher(ng_display.getText());
+    ArrayList<String> months = new ArrayList<>(Arrays.asList(new String[]{"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec", "Jan"}));
+    String followingMonth = null;
+		if (matcher.find()) {
+	     followingMonth = months.get(months.indexOf(matcher.group(1).toString()) + 1 );
+  	}
+
+    WebElement ng_right =  ng_display.findElement(By.xpath("..")).findElement(By.className("right"));
+    assertThat(ng_right,notNullValue());
+    highlight(ng_right,100);
+    ng_right.click();
+    ng_display = ngDriver.findElement(NgBy.binding("data.previousViewDate.display"));
+    highlight(ng_display,100);
+    assertThat(ng_display.getText(),containsString(followingMonth));
+    System.err.println("Following month: " + ng_display.getText());
   }
 
   @Ignore
@@ -450,78 +493,78 @@ public class NgLocalFileTest {
 
 
 		 @Ignore
-	@Test
-	public void testChangeSelectedRepeaterOption() throws Exception {
-		if (!isCIBuild) {
-			return;
-		}
+  @Test
+  public void testChangeSelectedRepeaterOption() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }
     getPageContent("ng_repeat_selected.htm");
-		Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("fruit in Fruits")).iterator();
-		while (options.hasNext() ) {
-			WebElement option = (WebElement)  options.next();
-			System.err.println("available option: " + option.getText() );
-			if (option.getText().isEmpty()){
-				break;
-			}
-			if (option.getText().equalsIgnoreCase("Orange") ){		
+    Iterator<WebElement> options = ngDriver.findElements(NgBy.repeater("fruit in Fruits")).iterator();
+    while (options.hasNext() ) {
+      WebElement option = (WebElement)  options.next();
+      System.err.println("available option: " + option.getText() );
+      if (option.getText().isEmpty()){
+        break;
+      }
+      if (option.getText().equalsIgnoreCase("Orange") ){		
         System.err.println("selecting option: " + option.getText() );
         option.click();
       }
     }
-		ngDriver.waitForAngular();
+    ngDriver.waitForAngular();
 
     // System.err.println("findElements(NgBy.selectedRepeaterOption(...))");
-		List<WebElement> elements = ngDriver.findElements(NgBy.selectedRepeaterOption("fruit in Fruits"));
-		try{
-			assertThat(elements.size(), equalTo(1));
-		} catch (AssertionError e) {
+    List<WebElement> elements = ngDriver.findElements(NgBy.selectedRepeaterOption("fruit in Fruits"));
+    try{
+      assertThat(elements.size(), equalTo(1));
+    } catch (AssertionError e) {
       if (isCIBuild) {
         System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
       }
-		}
-		WebElement element = elements.get(0);
-		assertThat(element, notNullValue());
+    }
+    WebElement element = elements.get(0);
+    assertThat(element, notNullValue());
     System.err.println("selected option: " + element.getText() );
-		assertThat(element.getText(),containsString("Orange"));
+    assertThat(element.getText(),containsString("Orange"));
 
     /*
-	  Object fruitSelected = new NgWebElement(ngDriver,element).evaluate("fruit.Selected");
+    Object fruitSelected = new NgWebElement(ngDriver,element).evaluate("fruit.Selected");
     System.err.println("fruit.Selected = " + fruitSelected.toString()) ;
-	  assertTrue(parseBoolean(fruitSelected.toString()));
+    assertTrue(parseBoolean(fruitSelected.toString()));
     */
 
     // System.err.println("findElement(NgBy.selectedRepeaterOption(...))");
     NgWebElement ngRootWevelement = new NgWebElement(ngDriver, ngDriver.findElement(By.cssSelector("div[ng-app='myApp']")));
     List<NgWebElement> ngElements = ngRootWevelement.findNgElements(NgBy.selectedRepeaterOption("fruit in Fruits"));
     try{
-			assertThat(elements.size(), equalTo(1));
-		} catch (AssertionError e) {
+      assertThat(elements.size(), equalTo(1));
+    } catch (AssertionError e) {
       if (isCIBuild) {
         System.err.println("Skipped processing exception " + e.toString());
         return;
       } else {
         throw e;
       }
-		}
+    }
 
-		NgWebElement ngElement = ngElements.get(0);
-		assertThat(ngElement, notNullValue());
-		assertThat(ngElement.getWrappedElement() , notNullValue());
+    NgWebElement ngElement = ngElements.get(0);
+    assertThat(ngElement, notNullValue());
+    assertThat(ngElement.getWrappedElement() , notNullValue());
     System.err.println("selected option: " + ngElement.getText() );
 
-		// System.err.println("findNgElements(NgBy.selectedRepeaterOption(...))");
-		ngElement = ngDriver.findElement(NgBy.selectedRepeaterOption("fruit in Fruits"));
-		assertThat(ngElement, notNullValue());
-		assertThat(ngElement.getWrappedElement() , notNullValue());
-		System.err.println("selected option: " + ngElement.getText() );
-	}
+    // System.err.println("findNgElements(NgBy.selectedRepeaterOption(...))");
+    ngElement = ngDriver.findElement(NgBy.selectedRepeaterOption("fruit in Fruits"));
+    assertThat(ngElement, notNullValue());
+    assertThat(ngElement.getWrappedElement() , notNullValue());
+    System.err.println("selected option: " + ngElement.getText() );
+  }
 
-	@Ignore
-	@Test
-	public void testMultiSelect2() throws Exception {
+  @Ignore
+  @Test
+  public void testMultiSelect2() throws Exception {
     // if (!isCIBuild) {
       // return;
     // }
@@ -561,7 +604,7 @@ public class NgLocalFileTest {
     elementsIterator = elements.iterator();
     while (elementsIterator.hasNext() ) {
       WebElement element = (WebElement ) elementsIterator.next();
-			System.err.format("%s\n", element.getText());
+      System.err.format("%s\n", element.getText());
     }
   }
 
