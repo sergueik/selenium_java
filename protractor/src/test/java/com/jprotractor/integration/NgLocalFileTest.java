@@ -101,9 +101,6 @@ public class NgLocalFileTest {
   // @Ignore
   @Test
   public void testDatePickerDirectSelect() throws Exception {
-    //if (!isCIBuild) {
-    //  return;
-    //}
     getPageContent("ng_datepicker.htm");
     // can not test official page -  it is not an Angular app.
     // http://dalelotts.github.io/angular-bootstrap-datetimepicker/
@@ -186,12 +183,10 @@ public class NgLocalFileTest {
       }
     }
   }
-
+  
+  // @Ignore
   @Test
   public void testDatePickerNavigation() throws Exception {
-    //if (!isCIBuild) {
-    //  return;
-    //}
     getPageContent("ng_datepicker.htm");
     WebElement ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
     assertThat(ng_result, notNullValue());
@@ -229,7 +224,7 @@ public class NgLocalFileTest {
     System.err.println("Following month: " + ng_display.getText());
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testEvaluate() throws Exception {
     if (!isCIBuild) {
@@ -254,7 +249,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testUpload1() throws Exception {
     if (!isCIBuild) {
@@ -328,7 +323,7 @@ public class NgLocalFileTest {
     button.click();
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testEvaluateEvenOdd() throws Exception {
     if (!isCIBuild) {
@@ -353,7 +348,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindElementByRepeaterColumn() throws Exception {
     if (!isCIBuild) {
@@ -380,7 +375,7 @@ public class NgLocalFileTest {
     assertTrue(cnt == 3);	
   }		
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindSelectedtOptionWithAlert() throws Exception {
     if (!isCIBuild) {
@@ -456,7 +451,7 @@ public class NgLocalFileTest {
     assertThat(valueOfCountSelected,equalTo(2));		
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -483,7 +478,7 @@ public class NgLocalFileTest {
     System.err.println("Selected option: " + element.getText());
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -521,7 +516,7 @@ public class NgLocalFileTest {
   }
 
 
-		 @Ignore
+		 // @Ignore
   @Test
   public void testChangeSelectedRepeaterOption() throws Exception {
     if (!isCIBuild) {
@@ -591,7 +586,7 @@ public class NgLocalFileTest {
     System.err.println("selected option: " + ngElement.getText() );
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testMultiSelect2() throws Exception {
     // if (!isCIBuild) {
@@ -637,7 +632,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testMultiSelect() throws Exception {
     // if (!isCIBuild) {
@@ -702,7 +697,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindElementByRepeaterWithBeginEnd() throws Exception {
     if (!isCIBuild) {
@@ -715,7 +710,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(0).getText() );
   }
 	
-  @Ignore
+  // @Ignore
   @Test
   public void testFindElementByOptions() throws Exception {
     if (!isCIBuild) {
@@ -730,7 +725,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(1).getText() );
   }
 	
-  @Ignore
+  // @Ignore
   @Test
   public void testFindElementByModel() throws Exception {
     if (!isCIBuild) {
@@ -762,7 +757,7 @@ public class NgLocalFileTest {
     System.err.println(required.getText()); // required: false
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindRepeaterElement() throws Exception {
     if (!isCIBuild) {
@@ -777,7 +772,7 @@ public class NgLocalFileTest {
   }
 	
   // failing in Linux VM: PhantomJS has crashed
-  @Ignore
+  // @Ignore
   @Test
   public void testElementTextIsGenerated() throws Exception {
     if (!isCIBuild) {
@@ -800,7 +795,7 @@ public class NgLocalFileTest {
     assertTrue(greeting_text.length() > 0);
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testDropDownWatch() throws Exception {
     if (!isCIBuild) {
@@ -849,7 +844,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindRepeaterRows() throws Exception {
     if (!isCIBuild) {
@@ -867,7 +862,7 @@ public class NgLocalFileTest {
     assertThat(todos.size(), equalTo(0));
   }
 	
-  @Ignore
+  // @Ignore
   @Test
   public void testFindorderByField() throws Exception {
     if (!isCIBuild) {
@@ -890,7 +885,7 @@ public class NgLocalFileTest {
   }
 
   // TODO: separate into class AngularUISelect.java
-  @Ignore
+  // @Ignore
   @Test
   public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -921,7 +916,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testAngularUISelectHandleSearch() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -940,7 +935,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testAngularUISelectHandleDeselect() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -966,7 +961,7 @@ public class NgLocalFileTest {
 
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testPrintOrderByFieldColumn() throws Exception {
     if (!isCIBuild) {
@@ -1009,7 +1004,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   @Test
   public void testFindAllBindings() throws Exception {
     if (!isCIBuild) {
@@ -1033,7 +1028,7 @@ public class NgLocalFileTest {
     }
   }
 
-   @Ignore
+   // @Ignore
   @Test
   public void testDropDown() throws Exception {
     if (!isCIBuild) {
