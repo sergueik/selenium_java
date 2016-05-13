@@ -8,7 +8,7 @@
  */
 var findByModel = function(model, using, rootSelector) {
     var root = document.querySelector(rootSelector || 'body');
-    using = using || document;
+    using = using || '[ng-app]';
     if (angular.getTestability) {
         return angular.getTestability(root).
         findModels(using, model, true);
