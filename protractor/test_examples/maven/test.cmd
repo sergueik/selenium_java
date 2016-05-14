@@ -2,11 +2,11 @@
 
 REM This script expects the environment to be set up and Java tool chain in the PATH
 
-call mvn.bat clean package
+call mvn.cmd clean package
 
 set TARGET=%CD%\target
 set SELENIUM_HOME=c:\java\selenium
-set SELENIUM_VERSION=2.44.0
+set SELENIUM_VERSION=2.47.1
 set APP_VERSION=0.1-SNAPSHOT
 set PROTRACTOR_VERSION=1.0-SNAPSHOT
 set MONTE_VERSION=1.0
