@@ -28,6 +28,10 @@ public final class NgBy {
     return new JavaScriptBy(new FindBindings(), binding);
   }
 
+  public static By binding(final String binding, String rootSelector) {
+    return new JavaScriptBy(new FindBindings(), binding, rootSelector);
+  }
+
   public static By buttonText(final String text) {
     return new JavaScriptBy(new FindButtonText(), text);
   }
@@ -42,6 +46,10 @@ public final class NgBy {
 
   public static By model(final String model) {
     return new JavaScriptBy(new FindModel(), model);
+  }
+
+  public static By model(final String model, String rootSelector) {
+    return new JavaScriptBy(new FindModel(), model, rootSelector);
   }
 
   public static By partialButtonText(final String text) {
