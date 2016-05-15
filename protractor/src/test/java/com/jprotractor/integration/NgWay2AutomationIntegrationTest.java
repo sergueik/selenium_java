@@ -38,6 +38,8 @@ import org.junit.experimental.categories.Category;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.junit.Ignore;
+
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -65,121 +67,124 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 public class NgWay2AutomationIntegrationTest  {
-	private static String fullStackTrace;
-	private static NgWebDriver ngDriver;
-	private static WebDriver seleniumDriver;
-	static WebDriverWait wait;
-	static Actions actions;
-	static Alert alert;
-	static int implicitWait = 10;
-	static int flexibleWait = 5;
-	static long pollingInterval = 500;
-	static int width = 600;
-	static int height = 400;
-	// set to true for Desktop, false for headless browser testing
-	static boolean isCIBuild =  false;
-	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
+  private static String fullStackTrace;
+  private static NgWebDriver ngDriver;
+  private static WebDriver seleniumDriver;
+  static WebDriverWait wait;
+  static Actions actions;
+  static Alert alert;
+  static int implicitWait = 10;
+  static int flexibleWait = 5;
+  static long pollingInterval = 500;
+  static int width = 600;
+  static int height = 400;
+  // set to true for Desktop, false for headless browser testing
+  static boolean isCIBuild =  false;
+  public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
 
-	@BeforeClass
-	public static void setup() throws IOException,InterruptedException {
-		isCIBuild = CommonFunctions.checkEnvironment();		
-		seleniumDriver = CommonFunctions.getSeleniumDriver();
-		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait );
-		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-		actions = new Actions(seleniumDriver);		
-		ngDriver = new NgWebDriver(seleniumDriver);
-	}
+  @BeforeClass
+  public static void setup() throws IOException,InterruptedException {
+    isCIBuild = CommonFunctions.checkEnvironment();		
+    seleniumDriver = CommonFunctions.getSeleniumDriver();
+    seleniumDriver.manage().window().setSize(new Dimension(width , height ));
+    seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
+    wait = new WebDriverWait(seleniumDriver, flexibleWait );
+    wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
+    actions = new Actions(seleniumDriver);		
+    ngDriver = new NgWebDriver(seleniumDriver);
+  }
 
-   	@Before
-	public void beforeEach() throws InterruptedException{
-		ngDriver.navigate().to(baseUrl);
-	}
-		
+  @Before
+  public void beforeEach() throws InterruptedException{
+    ngDriver.navigate().to(baseUrl);
+  }
+
+  // @Ignore		
+  @Test
+  public void testCustomerLogin() throws Exception {
+    if (isCIBuild) {
+      return;
+    }
+    NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
+    highlight(element);
+    element.click();
+    element = ngDriver.findElement(NgBy.input("custId"));
+    assertThat(element.getAttribute("id"), equalTo("userSelect"));
+    highlight(element);
+
+    Enumeration<WebElement> customers = Collections.enumeration(element.findElements(NgBy.repeater("cust in Customers")));
+
+    while (customers.hasMoreElements()){
+      WebElement currentCustomer = customers.nextElement();
+      if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+        System.err.println(currentCustomer.getText());
+        currentCustomer.click();
+      }
+    }
+    NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+    assertTrue(login.isEnabled());	
+    login.click();			
+    // the {{user}} is composed from first and last name	
+    assertTrue(ngDriver.findElement(NgBy.binding("user")).getText().matches("^(?:[^ ]+) +(?:[^ ]+)$"));
+    assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
+    NgWebElement accountNumber = ngDriver.findElement(NgBy.binding("accountNo"));
+    assertThat(accountNumber, notNullValue());
+    assertTrue(accountNumber.getText().matches("^\\d+$"));
+  }
+
+  // @Ignore		
 	@Test
-	public void testCustomerLogin() throws Exception {
-		if (isCIBuild) {
-			return;
-		}
-		NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
-		highlight(element);
-		element.click();
-		element = ngDriver.findElement(NgBy.input("custId"));
-		assertThat(element.getAttribute("id"), equalTo("userSelect"));
-		highlight(element);
+  public void testEvaluateTransactionDetails() throws Exception {
+    if (isCIBuild) {
+      return;
+    }
+    // customer login
+    ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+    // select customer/account with transactions
+    assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
 
-		Enumeration<WebElement> customers = Collections.enumeration(element.findElements(NgBy.repeater("cust in Customers")));
+    Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
 
-		while (customers.hasMoreElements()){
-			WebElement currentCustomer = customers.nextElement();
-			if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
-				System.err.println(currentCustomer.getText());
-				currentCustomer.click();
-			}
-		}
-		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
-		assertTrue(login.isEnabled());	
-		login.click();			
-		// the {{user}} is composed from first and last name	
-		assertTrue(ngDriver.findElement(NgBy.binding("user")).getText().matches("^(?:[^ ]+) +(?:[^ ]+)$"));
-		assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
-		NgWebElement accountNumber = ngDriver.findElement(NgBy.binding("accountNo"));
-		assertThat(accountNumber, notNullValue());
-		assertTrue(accountNumber.getText().matches("^\\d+$"));
-	}
-	
-	@Test
-	public void testEvaluateTransactionDetails() throws Exception {
-		if (isCIBuild) {
-			return;
-		}
-		// customer login
-		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
-		// select customer/account with transactions
-		assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
+    while (customers.hasMoreElements()){
+      WebElement currentCustomer = customers.nextElement();
+      if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
+        System.err.println(currentCustomer.getText());
+        currentCustomer.click();
+      }
+    }
+    NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+    assertTrue(login.isEnabled());
+    login.click();
+    Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
 
-		Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+    while (accounts.hasMoreElements()){
+      WebElement currentAccount = accounts.nextElement();
+      if (Integer.parseInt(currentAccount.getText()) == 1001){
+        System.err.println(currentAccount.getText());
+        currentAccount.click();
+      }
+    }
+    // inspect transactions
+    NgWebElement transactions_button = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
+          
+    assertThat(transactions_button.getText(), equalTo("Transactions"));
+    highlight(transactions_button);
+    transactions_button.click();
+    // wait until transactions are loaded
+    Thread.sleep(500);
+    wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
+    Iterator<WebElement> transactions = ngDriver.findElements(NgBy.repeater("tx in transactions")).iterator();
+    int cnt = 0 ;
+    while (transactions.hasNext() && cnt++ < 5) {
+      WebElement currentTransaction = (WebElement) transactions.next();
+      NgWebElement ngCurrentTransaction = new NgWebElement(ngDriver, currentTransaction);
+      assertTrue(ngCurrentTransaction.evaluate("tx.amount").toString().matches("^\\d+$"));
+      assertTrue(ngCurrentTransaction.evaluate("tx.type").toString().matches("(?i:credit|debit)"));
+      Object transaction_date = ngCurrentTransaction.evaluate("tx.date");
+    }
+  }
 
-		while (customers.hasMoreElements()){
-			WebElement currentCustomer = customers.nextElement();
-			if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
-				System.err.println(currentCustomer.getText());
-				currentCustomer.click();
-			}
-		}
-		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
-		assertTrue(login.isEnabled());
-		login.click();
-		Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
-
-		while (accounts.hasMoreElements()){
-			WebElement currentAccount = accounts.nextElement();
-			if (Integer.parseInt(currentAccount.getText()) == 1001){
-				System.err.println(currentAccount.getText());
-				currentAccount.click();
-			}
-		}
-		// inspect transactions
-		NgWebElement transactions_button = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
-					
-		assertThat(transactions_button.getText(), equalTo("Transactions"));
-		highlight(transactions_button);
-		transactions_button.click();
-		// wait until transactions are loaded
-		Thread.sleep(500);
-		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
-		Iterator<WebElement> transactions = ngDriver.findElements(NgBy.repeater("tx in transactions")).iterator();
-		int cnt = 0 ;
-		while (transactions.hasNext() && cnt++ < 5) {
-			WebElement currentTransaction = (WebElement) transactions.next();
-			NgWebElement ngCurrentTransaction = new NgWebElement(ngDriver, currentTransaction);
-			assertTrue(ngCurrentTransaction.evaluate("tx.amount").toString().matches("^\\d+$"));
-			assertTrue(ngCurrentTransaction.evaluate("tx.type").toString().matches("(?i:credit|debit)"));
-			Object transaction_date = ngCurrentTransaction.evaluate("tx.date");
-		}
-	}
-
+  // @Ignore		
 	@Test
 	public void testOpenAccount() throws Exception {
 		if (isCIBuild) {
@@ -235,6 +240,7 @@ public class NgWay2AutomationIntegrationTest  {
 
 	}
 
+  // @Ignore
 	@Test
 	public void testSortCustomerAccounts() throws Exception {
 		if (isCIBuild) {
@@ -262,57 +268,59 @@ public class NgWay2AutomationIntegrationTest  {
 		assertThat(first_customer.getText(),containsString(last_customer_name));
 	}
 
-	@Test
-	public void testListTransactions() throws Exception {
-		if (isCIBuild) {
-			return;
-		}
-		// customer login
-		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
-		// select customer/account with transactions
-		assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
+  // @Ignore
+  @Test
+  public void testListTransactions() throws Exception {
+    if (isCIBuild) {
+      return;
+    }
+    // customer login
+    ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+    // select customer/account with transactions
+    assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"), equalTo("userSelect"));
 
-		Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+    Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
 
-		while (customers.hasMoreElements()){
-			WebElement currentCustomer = customers.nextElement();
-			if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
-				System.err.println(currentCustomer.getText());
-				currentCustomer.click();
-			}
-		}
-		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
-		assertTrue(login.isEnabled());
-		login.click();
-		Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
+    while (customers.hasMoreElements()){
+      WebElement currentCustomer = customers.nextElement();
+      if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0 ){
+        System.err.println(currentCustomer.getText());
+        currentCustomer.click();
+      }
+    }
+    NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+    assertTrue(login.isEnabled());
+    login.click();
+    Enumeration<WebElement> accounts = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
 
-		while (accounts.hasMoreElements()){
-			WebElement currentAccount = accounts.nextElement();
-			if (Integer.parseInt(currentAccount.getText()) == 1001){
-				System.err.println(currentAccount.getText());
-				currentAccount.click();
-			}
-		}
-		// inspect transactions
-		NgWebElement transactions = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
-		assertThat(transactions.getText(), equalTo("Transactions"));
-		highlight(transactions);
-		transactions.click();
-		// wait until transactions are loaded
-		Thread.sleep(500);
-		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
-		Iterator<WebElement> transactionTypeColumns = ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type")).iterator();
-		while (transactionTypeColumns.hasNext() ) {
-			WebElement transactionTypeColumn = (WebElement) transactionTypeColumns.next();
-			if (transactionTypeColumn.getText().isEmpty()){
-				break;
-			}
-			if (transactionTypeColumn.getText().equalsIgnoreCase("Credit") ){
-				highlight(transactionTypeColumn);
-			}
-		}
-	}
+    while (accounts.hasMoreElements()){
+      WebElement currentAccount = accounts.nextElement();
+      if (Integer.parseInt(currentAccount.getText()) == 1001){
+        System.err.println(currentAccount.getText());
+        currentAccount.click();
+      }
+    }
+    // inspect transactions
+    NgWebElement transactions = ngDriver.findElement(NgBy.partialButtonText("Transactions"));
+    assertThat(transactions.getText(), equalTo("Transactions"));
+    highlight(transactions);
+    transactions.click();
+    // wait until transactions are loaded
+    Thread.sleep(500);
+    wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
+    Iterator<WebElement> transactionTypeColumns = ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type")).iterator();
+    while (transactionTypeColumns.hasNext() ) {
+      WebElement transactionTypeColumn = (WebElement) transactionTypeColumns.next();
+      if (transactionTypeColumn.getText().isEmpty()){
+        break;
+      }
+      if (transactionTypeColumn.getText().equalsIgnoreCase("Credit") ){
+        highlight(transactionTypeColumn);
+      }
+    }
+  }
 
+  // @Ignore
 	@Test
 	public void testAddCustomer() throws Exception {
 		if (isCIBuild) {
@@ -353,7 +361,7 @@ public class NgWay2AutomationIntegrationTest  {
 		Pattern pattern = Pattern.compile(customer_added);
 		Matcher matcher = pattern.matcher(alert.getText());
 		if (matcher.find()) {
-			System.err.println("customer id " + matcher.group(1) );
+			System.err.println("customer id: " + matcher.group(1) );
 		}
 		// confirm alert
 		alert.accept();
@@ -363,14 +371,28 @@ public class NgWay2AutomationIntegrationTest  {
 		Thread.sleep(500);
 
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-		Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));			
+		Enumeration<WebElement> fNamecells = Collections.enumeration(ngDriver.findElements(NgBy.repeaterColumn("cust in Customers", "cust.fName")));
+		while (fNamecells.hasMoreElements()){
+      WebElement firstNameElement = fNamecells.nextElement();
+      highlight(firstNameElement);
+      System.err.println("Customer's First Name: " + firstNameElement.getText());					
+		}
+
+		Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 		WebElement currentCustomer = null;
 		while (customers.hasMoreElements()){
-			currentCustomer = customers.nextElement();
-			if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
-				System.err.println(currentCustomer.getText());					
-				break;
-			}
+      currentCustomer = customers.nextElement();
+      if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+        NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,currentCustomer );
+        Object firstNameValue = ng_currentCustomer.evaluate("cust.fName"); // fName, lName, accountNo, postCD, id, date
+        assertThat(firstNameValue, notNullValue());
+        assertThat(firstNameValue.toString(),containsString("Harry"));
+        ArrayList<Long> accounts = (ArrayList<Long>) ng_currentCustomer.evaluate("cust.accountNo");
+        for (Long account : accounts) {
+          System.err.println( "Account No: " + account.toString());          
+        }
+        break;
+      }
 		}
 		assertThat(currentCustomer, notNullValue());
 		actions.moveToElement(currentCustomer).build().perform();
@@ -392,6 +414,7 @@ public class NgWay2AutomationIntegrationTest  {
 		// TODO: assert the customers.count change
 	}
 
+  // @Ignore		
 	@Test
 	public void testDepositAndWithdraw() throws Exception {
 		if (isCIBuild) {
@@ -427,31 +450,31 @@ public class NgWay2AutomationIntegrationTest  {
 		int initialBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 
 		WebElement depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit")).get(0);
-            assertTrue(depositButton.isDisplayed());
+    assertTrue(depositButton.isDisplayed());
 		depositButton.click();
 
 		// deposit amount
-            WebElement depositAmount = ngDriver.findElement(NgBy.model("amount"));
+    WebElement depositAmount = ngDriver.findElement(NgBy.model("amount"));
 		highlight(depositAmount);
-            depositAmount.sendKeys("100");
+    depositAmount.sendKeys("100");
 		
 		// deposit the payment
 		depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit")).get(1);
-            assertTrue(depositButton.isDisplayed());
+    assertTrue(depositButton.isDisplayed());
 		depositButton.click();
 		
 		// inspect the message
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.binding("message")).getWrappedElement()));
-            NgWebElement message = ngDriver.findElement(NgBy.binding("message"));
-            assertThat(message.getText(),containsString("Deposit Successful"));
-            highlight(message);
+    NgWebElement message = ngDriver.findElement(NgBy.binding("message"));
+    assertThat(message.getText(),containsString("Deposit Successful"));
+    highlight(message);
 
 		// inspect the balance change
 		int finalBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 		assertTrue(finalBalance == 100 + initialBalance);
 		Thread.sleep(500);
 		// switch to "Home" screen
-            ngDriver.findElement(NgBy.buttonText("Home")).click();
+    ngDriver.findElement(NgBy.buttonText("Home")).click();
 		// customer login
 		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
 		
@@ -476,29 +499,28 @@ public class NgWay2AutomationIntegrationTest  {
 			}
 		}
 		
-	    WebElement withdrawButton = ngDriver.findElement(NgBy.partialButtonText("Withdrawl"));
-            assertTrue(withdrawButton.isDisplayed());
+    WebElement withdrawButton = ngDriver.findElement(NgBy.partialButtonText("Withdrawl"));
+    assertTrue(withdrawButton.isDisplayed());
 		withdrawButton.click();
 
 		// withdraw a bigger amount then is on the account
-            WebElement withdrawAmount = ngDriver.findElement(NgBy.model("amount"));
+    WebElement withdrawAmount = ngDriver.findElement(NgBy.model("amount"));
 		highlight(withdrawAmount);
-            withdrawAmount.sendKeys(String.format("%d", finalBalance + 10 ));
+    withdrawAmount.sendKeys(String.format("%d", finalBalance + 10 ));
 		withdrawButton =  ngDriver.findElement(NgBy.buttonText("Withdraw"));
 		withdrawButton.click();
 		
 		// confirm the transaction failed
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.binding("message")).getWrappedElement()));
-            message = ngDriver.findElement(NgBy.binding("message"));
-            assertThat(message.getText(),containsString("Transaction Failed."));
-            highlight(message);
+    message = ngDriver.findElement(NgBy.binding("message"));
+    assertThat(message.getText(),containsString("Transaction Failed."));
+    highlight(message);
 		
-            withdrawAmount.sendKeys(String.format("%d", finalBalance - 10 ));
+    withdrawAmount.sendKeys(String.format("%d", finalBalance - 10 ));
 		withdrawButton.click();
 		// inspect the balance change
 		finalBalance = Integer.parseInt(ngDriver.findElement(NgBy.binding("amount")).getText());
 		assertTrue(finalBalance == 10 );
-		
 	}
 	
 	@AfterClass
@@ -514,5 +536,4 @@ public class NgWay2AutomationIntegrationTest  {
 	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
 		CommonFunctions.highlight(element, highlightInterval);
 	}
-
 }

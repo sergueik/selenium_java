@@ -99,7 +99,8 @@ public class NgDatePickerTest {
   public void beforeEach() {
     ngDriver.navigate().to(baseUrl);
   }
-  // Caused by: org.openqa.selenium.WebDriverException: [ng:test] no injector found for element argument to getTestability
+  
+ 
   @Test
   public void testDatePickerDirectSelect() throws Exception {
     NgWebElement ng_result;
