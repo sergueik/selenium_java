@@ -293,7 +293,7 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
+  // @Ignore
   // TODO: abort the test on timeout
   // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
   @Test
@@ -347,7 +347,33 @@ public class NgLocalFileTest {
         }
     }
   }
-
+  
+  // @Ignore
+  @Test
+  public void testFindRepeaterElement() throws Exception {
+    if (!isCIBuild) {
+      return;
+    }			
+    getPageContent("ng_table2.htm");
+    int length = 0;
+    Pattern pattern = Pattern.compile("(\\d+)");
+		Matcher matcher = pattern.matcher(ngDriver.findElement(NgBy.binding("filtered.length")).getText());
+		if (matcher.find()) {
+	     length = Integer.parseInt(matcher.group(1).toString());
+  	}
+    for (int cnt=0; cnt != length;  cnt ++ ) {
+      Enumeration<WebElement> cells = Collections.enumeration(ngDriver.findElements(NgBy.repeaterElement("client in filtered ",cnt  ,"client.name")));
+      while (cells.hasMoreElements()){
+        WebElement currentCell = cells.nextElement();
+        actions.moveToElement(currentCell).build().perform();
+        highlight(currentCell,300);
+      }
+    }
+    List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("client in filtered ", length  ,"client.name"));
+    assertThat(elements.size(), equalTo(0));
+  }
+  
+  
   // @Ignore
   @Test
   public void testFindElementByRepeaterColumn() throws Exception {
@@ -635,9 +661,9 @@ public class NgLocalFileTest {
   // @Ignore
   @Test
   public void testMultiSelect() throws Exception {
-    // if (!isCIBuild) {
-    //    return;
-    // }
+    if (!isCIBuild) {
+        return;
+    }
     getPageContent("ng_multi_select.htm");
     WebElement element = ngDriver.findElement(NgBy.model("selectedValues"));
     // use core Selenium
@@ -757,19 +783,19 @@ public class NgLocalFileTest {
     System.err.println(required.getText()); // required: false
   }
 
-  // @Ignore
-  @Test
-  public void testFindRepeaterElement() throws Exception {
-    if (!isCIBuild) {
-      return;
-    }			
-    getPageContent("ng_basic.htm");
-    WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
-    System.err.println("item[row='1'][col='b'] = " + element.getText());
-    highlight(element);	
-    List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
-    assertThat(elements.size(), equalTo(0));
-  }
+  //// @Ignore
+  // @Test
+  // public void testFindRepeaterElement() throws Exception {
+    // if (!isCIBuild) {
+      // return;
+    // }			
+    // getPageContent("ng_basic.htm");
+    // WebElement element = ngDriver.findElement(NgBy.repeaterElement("item in items",1,"item.b"));
+    // System.err.println("item[row='1'][col='b'] = " + element.getText());
+    // highlight(element);	
+    // List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
+    // assertThat(elements.size(), equalTo(0));
+  // }
 	
   // failing in Linux VM: PhantomJS has crashed
   // @Ignore
