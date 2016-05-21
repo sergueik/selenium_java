@@ -66,157 +66,140 @@ import java.nio.charset.Charset;
 public class App
 {
 
-public static RemoteWebDriver driver = null;
-public static String selenium_host = null;
-public static String selenium_port = null;
-public static String selenium_browser = null;
-public static String selenium_run = null;
+  public static RemoteWebDriver driver = null;
+  public static String selenium_host = null;
+  public static String selenium_port = null;
+  public static String selenium_browser = null;
+  public static String selenium_run = null;
 
-public static void main(String[] args) throws InterruptedException {
+  public static void main(String[] args) throws InterruptedException {
 
-	selenium_host = "localhost";
-	selenium_port = "4444";
-	selenium_browser = "firefox";
-	selenium_run = "local";
+    selenium_host = "localhost";
+    selenium_port = "4444";
+    selenium_browser = "firefox";
+    selenium_run = "local";
 
-	// start the proxy
-	ProxyServer server = new ProxyServer(4444);
-	server.start();
-//captures the moouse movements and navigations
-	server.setCaptureHeaders(true);
-	server.setCaptureContent(true);
+    ProxyServer server = new ProxyServer(4444);
+    server.start();
+    //captures the mouse movements and navigations
+    server.setCaptureHeaders(true);
+    server.setCaptureContent(true);
+    // get the Selenium proxy object
+    org.openqa.selenium.Proxy proxy = server.seleniumProxy();
+    if (selenium_browser.compareToIgnoreCase("remote") == 0) { // Remote Configuration
+      String hub = "http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub";
+      if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
+        DesiredCapabilities capabilities =   new DesiredCapabilities("chrome", "", Platform.ANY);
+        capabilities.setBrowserName("chrome");
+        try {
+          driver = new RemoteWebDriver(new URL("http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub"), capabilities);
+        } catch (MalformedURLException ex) { }
+      } else {
+        DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
+        capabilities.setBrowserName("firefox");
+        FirefoxProfile profile = new ProfilesIni().getProfile("default");
+        capabilities.setCapability("firefox_profile", profile);
+        try {
+          driver = new RemoteWebDriver(new URL("http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub"), capabilities);
+        } catch (MalformedURLException ex) { }
+      }
+    } else { // standalone
+      if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
+        System.setProperty("webdriver.chrome.driver", "c:/java/selenium/chromedriver.exe");
+        DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+        capabilities.setCapability(CapabilityType.PROXY, proxy);
+        driver = new ChromeDriver(capabilities);
+      } else {
+        DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+        capabilities.setCapability(CapabilityType.PROXY, proxy);
+      }
+    }
+    try{
+      // create a new HAR
+      server.newHar("m.carnival.com");
+      driver.manage().window().setSize(new Dimension(600, 800));
+      driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
+      driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
+    }  catch(Exception ex) {
+      System.out.println(ex.toString());
+    }
+    try{
 
-// get the Selenium proxy object
-	org.openqa.selenium.Proxy proxy = server.seleniumProxy();
-	if (selenium_browser.compareToIgnoreCase("remote") == 0) { // Remote Configuration
+      driver.get("http://m.carnival.com/");
+      WebDriverWait wait = new WebDriverWait(driver, 30);
+      String value1 = null;
 
-		String hub = "http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub";
+      wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
+      value1 = "ddlDestinations";
 
-		if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
-			DesiredCapabilities capabilities =   new DesiredCapabilities("chrome", "", Platform.ANY);
-			capabilities.setBrowserName("chrome");
+      String xpath_selector1 = String.format("//select[@id='%s']", value1);
+      wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath_selector1)));
+      WebElement element = driver.findElement(By.xpath(xpath_selector1));
 
-			try {
-				driver = new RemoteWebDriver(new URL("http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub"), capabilities);
-			} catch (MalformedURLException ex) { }
-		} else {
+      System.out.println( element.getAttribute("id"));
+      Actions builder = new Actions(driver);
+      builder.moveToElement(element).build().perform();
 
-			DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
-			capabilities.setBrowserName("firefox");
+      String csspath_selector2 = "div.find-cruise-submit > a";
+      WebElement element2 = driver.findElement(By.cssSelector(csspath_selector2));
+      System.out.println( element2.getText());
+      new Actions(driver).moveToElement(element2).click().build().perform();
+      Thread.sleep(5000);
 
-			FirefoxProfile profile = new ProfilesIni().getProfile("default");
-			capabilities.setCapability("firefox_profile", profile);
+      // print the node information
+      //String result = getIPOfNode(driver);
+      //System.out.println(result);
 
-			try {
-				driver = new RemoteWebDriver(new URL("http://"+  selenium_host  + ":" + selenium_port   +  "/wd/hub"), capabilities);
-			} catch (MalformedURLException ex) { }
-		}
+      //take a screenshot
+      //File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
 
-	} else { // standalone
-		if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
-			System.setProperty("webdriver.chrome.driver", "c:/java/selenium/chromedriver.exe");
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			capabilities.setCapability(CapabilityType.PROXY, proxy);
-			driver = new ChromeDriver(capabilities);
+      //save the screenshot in png format on the disk.
+      //FileUtils.copyFile(scrFile, new File(System.getProperty("user.dir") + "\\screenshot.png"));
 
-		} else {
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			capabilities.setCapability(CapabilityType.PROXY, proxy);
+      Har har = server.getHar();
+      String strFilePath = "test.har";
+      FileOutputStream fos = new FileOutputStream(strFilePath);
+      har.writeTo(fos);
+    }
+    catch(Exception ex) {
+      System.out.println(ex.toString());
+    }
+    finally {
+      server.stop();
+      driver.close();
+      driver.quit();
+    }
+  }
+  private static String getIPOfNode(RemoteWebDriver remoteDriver)
+  {
+    String hostFound = null;
+    try  {
+      HttpCommandExecutor ce = (HttpCommandExecutor) remoteDriver.getCommandExecutor();
+      String hostName = ce.getAddressOfRemoteServer().getHost();
+      int port = ce.getAddressOfRemoteServer().getPort();
+      HttpHost host = new HttpHost(hostName, port);
+      DefaultHttpClient client = new DefaultHttpClient();
+      URL sessionURL = new URL(String.format("http://%s:%d/grid/api/testsession?session=%s", hostName, port, remoteDriver.getSessionId()));
+      BasicHttpEntityEnclosingRequest r = new BasicHttpEntityEnclosingRequest( "POST", sessionURL.toExternalForm());
+      HttpResponse response = client.execute(host, r);
+      JSONObject object = extractObject(response);
+      URL myURL = new URL(object.getString("proxyId"));
+      if ((myURL.getHost() != null) && (myURL.getPort() != -1)) {
+        hostFound = myURL.getHost();
+      }
+    } catch (Exception e) {
+      System.err.println(e);
+    }
+    return hostFound;
+  }
 
-		}
-	}
-	try{
-
-// create a new HAR
-		server.newHar("m.carnival.com");
-		driver.manage().window().setSize(new Dimension(600, 800));
-		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
-		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-	}  catch(Exception ex) {
-		System.out.println(ex.toString());
-	}
-	try{
-
-		driver.get("http://m.carnival.com/");
-		WebDriverWait wait = new WebDriverWait(driver, 30);
-		String value1 = null;
-
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
-		value1 = "ddlDestinations";
-
-		String xpath_selector1 = String.format("//select[@id='%s']", value1);
-		wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath_selector1)));
-		WebElement element = driver.findElement(By.xpath(xpath_selector1));
-
-		System.out.println( element.getAttribute("id"));
-		Actions builder = new Actions(driver);
-		builder.moveToElement(element).build().perform();
-
-		String csspath_selector2 = "div.find-cruise-submit > a";
-		WebElement element2 = driver.findElement(By.cssSelector(csspath_selector2));
-		System.out.println( element2.getText());
-		new Actions(driver).moveToElement(element2).click().build().perform();
-		Thread.sleep(5000);
-
-		// print the node information
-		//String result = getIPOfNode(driver);
-		//System.out.println(result);
-
-		//take a screenshot
-		//File scrFile = ((TakesScreenshot)driver).getScreenshotAs(OutputType.FILE);
-
-		//save the screenshot in png format on the disk.
-		//FileUtils.copyFile(scrFile, new File(System.getProperty("user.dir") + "\\screenshot.png"));
-
-		Har har = server.getHar();
-		String strFilePath = "test.har";
-		FileOutputStream fos = new FileOutputStream(strFilePath);
-		har.writeTo(fos);
-
-	}
-
-	catch(Exception ex) {
-
-		System.out.println(ex.toString());
-
-	}
-	finally {
-
-		server.stop();
-		driver.close();
-		driver.quit();
-	}
-}
-private static String getIPOfNode(RemoteWebDriver remoteDriver)
-{
-	String hostFound = null;
-	try  {
-		HttpCommandExecutor ce = (HttpCommandExecutor) remoteDriver.getCommandExecutor();
-		String hostName = ce.getAddressOfRemoteServer().getHost();
-		int port = ce.getAddressOfRemoteServer().getPort();
-		HttpHost host = new HttpHost(hostName, port);
-		DefaultHttpClient client = new DefaultHttpClient();
-		URL sessionURL = new URL(String.format("http://%s:%d/grid/api/testsession?session=%s", hostName, port, remoteDriver.getSessionId()));
-		BasicHttpEntityEnclosingRequest r = new BasicHttpEntityEnclosingRequest( "POST", sessionURL.toExternalForm());
-		HttpResponse response = client.execute(host, r);
-		JSONObject object = extractObject(response);
-		URL myURL = new URL(object.getString("proxyId"));
-		if ((myURL.getHost() != null) && (myURL.getPort() != -1)) {
-			hostFound = myURL.getHost();
-		}
-	} catch (Exception e) {
-		System.err.println(e);
-	}
-	return hostFound;
-}
-
-private static JSONObject extractObject(HttpResponse resp) throws IOException, JSONException {
-	InputStream contents = resp.getEntity().getContent();
-	StringWriter writer = new StringWriter();
-	IOUtils.copy(contents, writer, "UTF8");
-	JSONObject objToReturn = new JSONObject(writer.toString());
-	return objToReturn;
-}
+  private static JSONObject extractObject(HttpResponse resp) throws IOException, JSONException {
+    InputStream contents = resp.getEntity().getContent();
+    StringWriter writer = new StringWriter();
+    IOUtils.copy(contents, writer, "UTF8");
+    JSONObject objToReturn = new JSONObject(writer.toString());
+    return objToReturn;
+  }
 }
 
 
