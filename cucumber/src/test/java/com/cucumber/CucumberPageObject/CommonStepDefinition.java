@@ -19,11 +19,11 @@ public class CommonStepDefinition extends AbstractPageStepDefinition{
 		driver.findElement(By.id(link+"_link")).click();
 	 
 	}
-
+*/
 	@Then("^I close the Brower$")
 	public void i_close_the_Brower() throws Throwable {
-	   driver.quit();
+   driver.close();
+   driver.quit();
 	}
-*/
 
 }

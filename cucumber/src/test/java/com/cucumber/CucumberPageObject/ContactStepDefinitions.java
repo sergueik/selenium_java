@@ -11,8 +11,7 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import junit.framework.Assert;
 
-public class ContactStepDefinitions extends AbstractPageStepDefinition
-{
+public class ContactStepDefinitions extends AbstractPageStepDefinition {
 	
 	WebDriver driver = getDriver();
 	LandingPage landingPage;
@@ -58,47 +57,23 @@ public class ContactStepDefinitions extends AbstractPageStepDefinition
 		contactPage.setAddressField(data.get(2).get(1));
 		contactPage.setEmailField(data.get(4).get(1));
 		contactPage.setPostCodeField(data.get(3).get(1));
-		
-		
-		
-		/* With Data Table
-		 * List<List<String>> data = table.raw();
-	 	driver.findElement(By.name("name_field")).sendKeys(data.get(1).get(1));
-		driver.findElement(By.id("rdona")).click();
-		driver.findElement(By.id("cadop")).click();
-		driver.findElement(By.name("address_field")).sendKeys(data.get(2).get(1));
-		driver.findElement(By.name("postcode_field")).sendKeys(data.get(3).get(1));
-		driver.findElement(By.name("email_field")).sendKeys(data.get(4).get(1));*/
-		
-		/* With out DataTable
-		 * driver.findElement(By.name("name_field")).sendKeys("Rajesh");
-		driver.findElement(By.id("rdona")).click();
-		driver.findElement(By.id("cadop")).click();
-		driver.findElement(By.name("address_field")).sendKeys("222 commerce");
-		driver.findElement(By.name("postcode_field")).sendKeys("92620");
-		driver.findElement(By.name("email_field")).sendKeys("rajesh@gmail.com");*/
-			    
 	}
 
 	@Then("^I submit the form$")
 	public void i_submit_the_form() throws Throwable {
-	    		//driver.findElement(By.id("submit_message")).click();
+    //driver.findElement(By.id("submit_message")).click();
 		contactConfirmationPage = contactPage.submitForm();
 	}
 
 	@Then("^I check the confirmation message$")
 	public void i_check_the_confirmation_message() throws Throwable {
-	   //Assert.assertTrue(driver.findElement(By.cssSelector(".content h1")).getText().contains("We have your message"));		
+	  // Assert.assertTrue(driver.findElement(By.cssSelector(".content h1")).getText().contains("We have your message"));		
 		Assert.assertTrue(contactConfirmationPage.getPageTitle().contains("We have your message"));
 	}
-	
-	@Then("^I close the Brower$")
-	public void i_close_the_Brower() throws Throwable {
-	    
-	  driver.quit();
+
+	@Then("^I close the Browser$")
+	public void i_close_the_Browser() throws Throwable {
+   driver.close();
+   driver.quit();
 	}
-	
-	
-
-
 }

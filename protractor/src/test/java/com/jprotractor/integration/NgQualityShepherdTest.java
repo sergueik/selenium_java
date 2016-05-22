@@ -62,11 +62,9 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Purpose: implement Java equivalents of the Protractor test spec
- * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js
- * https://github.com/qualityshepherd/protractor_example/pages/friendPage.js
- * to practice difference between Java and Jasmine Test layout
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ * ref. Protractor test spec
+ * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js
  */
 
 public class NgQualityShepherdTest {
@@ -96,6 +94,7 @@ public class NgQualityShepherdTest {
     wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
     actions = new Actions(seleniumDriver);		
     ngDriver = new NgWebDriver(seleniumDriver);
+    CommonFunctions.setHighlightTimeout(1000);
   }
 
   @Before
@@ -105,57 +104,71 @@ public class NgQualityShepherdTest {
 
   @Test
   public void testAddFriend() throws Exception {
+    // add a friend
     String friendName = "John Doe";
     int friendCount = ngDriver.findElements(NgBy.repeater("row in rows")).size();
     NgWebElement addnameBox = ngDriver.findElement(NgBy.model("addName"));
     assertThat(addnameBox,notNullValue());
-    highlight(addnameBox, 100);
+    highlight(addnameBox);
     addnameBox.sendKeys(friendName);
     NgWebElement addButton = ngDriver.findElement(NgBy.buttonText("+ add"));
     assertThat(addButton,notNullValue());
-    highlight(addButton, 100);
+    highlight(addButton);
     addButton.click();
     ngDriver.waitForAngular();
+    // confirm there is more friends
     assertThat(ngDriver.findElements(NgBy.repeater("row in rows")).size() - friendCount , equalTo(1));
+    // find the new friend via Protractor search
     WebElement addedFriendElement = ngDriver.findElements(NgBy.cssContainingText("td.ng-binding",friendName)).get(0);
     assertThat(addedFriendElement,notNullValue());
-    highlight(addedFriendElement, 100);
+    highlight(addedFriendElement);
     System.err.println("Added friend name: " + addedFriendElement.getText());
   }
 
   @Test
   public void testSearchAndDeleteFriend() throws Exception {
-
-    List<WebElement> names = ngDriver.findElements(NgBy.repeaterColumn("row in rows", "row"));
-    String nameString = names.get(0).getText();
-    assertFalse( nameString.isEmpty() );
-    System.err.println("Search name: " + nameString);
-    NgWebElement searchBox  = ngDriver.findElement(NgBy.model("search"));
-    assertThat(searchBox,notNullValue());
-    searchBox.sendKeys(nameString);
-    Iterator<WebElement> elements = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
-    while (elements.hasNext() ) {
-      WebElement currentElement = (WebElement) elements.next();
-      WebElement personName = new NgWebElement(ngDriver,currentElement).findElement(NgBy.binding("row"));
-      System.err.println("Found name: " + personName.getText());
-      if (personName.getText().indexOf(nameString) >= 0 ){
-        WebElement deleteButton = currentElement.findElement(By.cssSelector("i.icon-trash"));
+    // pick friend to delete
+    List<WebElement> friendNames = ngDriver.findElements(NgBy.repeaterColumn("row in rows", "row"));
+    WebElement friendName = friendNames.get(0);
+    highlight(friendName);
+    String deleteFriendName = friendName.getText();
+    assertFalse( deleteFriendName.isEmpty() );
+    // delete every friend with the chosen name
+    Iterator<WebElement> friendRows = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
+    while (friendRows.hasNext() ) {
+      WebElement currentfriendRow = (WebElement) friendRows.next();
+      WebElement currentfriendName = new NgWebElement(ngDriver,currentfriendRow).findElement(NgBy.binding("row"));
+      if (currentfriendName.getText().indexOf(deleteFriendName) >= 0 ){
+        System.err.println("Delete: " + currentfriendName.getText());
+        WebElement deleteButton = currentfriendRow.findElement(By.cssSelector("i.icon-trash"));
         highlight(deleteButton);
         deleteButton.click();
         ngDriver.waitForAngular();
       }
     }
+    // confirm the deleted friend cannot be found through search
+    System.err.println("Search name: " + deleteFriendName);
+    NgWebElement searchBox  = ngDriver.findElement(NgBy.model("search"));
+    searchBox.sendKeys(deleteFriendName);
+    List<WebElement>rows = ngDriver.findElements(NgBy.repeater("row in rows"));
+    assertTrue( rows.size() == 0 );
+    // clear search
     WebElement clearSearchBox = searchBox.findElement(By.xpath("..")).findElement(By.cssSelector("i.icon-remove"));
     assertThat(clearSearchBox,notNullValue());
     System.err.println("Clear Search");
     clearSearchBox.click();
     ngDriver.waitForAngular();
-    elements = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
-    while (elements.hasNext() ) {
-      WebElement currentElement = (WebElement) elements.next();
-      String currentName =  new NgWebElement(ngDriver, currentElement).evaluate("row").toString();
-      System.err.println("Found name: " + currentName);
-      assertTrue(currentName.indexOf(nameString) == -1);
+    // confirm the deleted friend cannot be found through Protractor find
+    List<WebElement>elements = ngDriver.findElements(NgBy.cssContainingText("td.ng-binding",deleteFriendName));
+    assertTrue( elements.size() == 0 );
+    // examine remaining friends
+    friendRows = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
+    while (friendRows.hasNext() ) {
+      WebElement currentFriendRow = (WebElement) friendRows.next();
+      highlight(currentFriendRow);
+      String currentFriendName =  new NgWebElement(ngDriver, currentFriendRow).evaluate("row").toString();
+      System.err.println("Found name: " + currentFriendName);
+      assertTrue(currentFriendName.indexOf(deleteFriendName) == -1);
     }
   }
 
@@ -174,11 +187,7 @@ public class NgQualityShepherdTest {
   }
 
   private static void highlight(WebElement element) throws InterruptedException {
-    highlight(element,  100);
-  }
-
-  private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-    CommonFunctions.highlight(element, highlightInterval);
+	  CommonFunctions.highlight(element);
   }
 }
 
