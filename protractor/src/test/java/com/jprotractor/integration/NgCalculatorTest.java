@@ -101,11 +101,11 @@ public class NgCalculatorTest {
 	public void testAddition() throws Exception {
 		NgWebElement element = ngDriver.findElement(NgBy.model("first"));
 		assertThat(element,notNullValue());
-		highlight(element, 100);
+		highlight(element);
 		element.sendKeys("40");
 		element = ngDriver.findElement(NgBy.model("second"));
 		assertThat(element,notNullValue());
-		highlight(element, 100);
+		highlight(element);
 		element.sendKeys("2");
 		element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
 		assertThat(element,notNullValue());
@@ -117,7 +117,7 @@ public class NgCalculatorTest {
 		element = ngDriver.findElement(NgBy.binding("latest" ));
 		assertThat(element, notNullValue());
 		assertThat(element.getText(), equalTo("42"));
-		highlight(element, 100);
+		highlight(element);
 	}
 
 	@AfterClass
@@ -126,13 +126,9 @@ public class NgCalculatorTest {
 		seleniumDriver.quit();		
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 
 }
 

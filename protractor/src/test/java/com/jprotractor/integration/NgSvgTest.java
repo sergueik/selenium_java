@@ -114,7 +114,7 @@ public class NgSvgTest {
 			Object y = new NgWebElement(ngDriver,circle).evaluate("circle.y");
 			Object r = new NgWebElement(ngDriver,circle).evaluate("circle.r");
 			
-			highlight(circle,50);
+			highlight(circle);
 			formatter.format("x = %1$2d y = %2$2d r = %3$2d\n", x, y, r );
 			
 			formatter.format("Location: x = %3d", circle.getLocation().x);
@@ -128,7 +128,7 @@ public class NgSvgTest {
 				formatter.format(" y = %3d", element.getLocation().y);
 				System.err.println(sb.toString());
 				sb.setLength(0);
-				highlight(element,50);
+				highlight(element);
 			} catch (NoSuchElementException ex) {
 			    // at <anonymous class>.FirefoxDriver.prototype.findElementInternal_
 				System.err.println("Cannot locate by xpath: " + xpath_of(circle));
@@ -136,7 +136,7 @@ public class NgSvgTest {
 			try {
 				WebElement element = seleniumDriver.findElement(By.cssSelector(css_selector_of(circle)));
 				System.err.println("Located by cssSelector " + css_selector_of(circle) );
-				highlight(element,50);
+				highlight(element);
 				System.err.println("innerHTML:" + element.getAttribute("innerHTML"));
 				// WebDriverException: cannot forward the request Software caused connection abort
 				System.err.println("Fill: "  + CommonFunctions.executeScript("return arguments[0].getAttribute('fill')", element));
@@ -159,20 +159,16 @@ public class NgSvgTest {
 		Thread.sleep(500);
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-	
 	private static String getIdentity(WebElement element ) throws InterruptedException {
 		String script = "return angular.identity(angular.element(arguments[0])).html();";
 		// returns too little HTML information in Java 
 		return CommonFunctions.executeScript(script, element).toString();
 	}
-
+  
 	private static String xpath_of(WebElement element){
 		String script = "function get_xpath_of(element) {\n" +
 						" var elementTagName = element.tagName.toLowerCase();\n" +

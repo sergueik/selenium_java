@@ -92,6 +92,7 @@ public class NgWay2AutomationIntegrationTest  {
     wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
     actions = new Actions(seleniumDriver);		
     ngDriver = new NgWebDriver(seleniumDriver);
+    CommonFunctions.setHighlightTimeout(1000);
   }
 
   @Before
@@ -403,7 +404,7 @@ public class NgWay2AutomationIntegrationTest  {
 		NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
 		assertThat(deleteCustomerButton, notNullValue());
 		assertThat(deleteCustomerButton.getText(),containsString("Delete"));
-		highlight(deleteCustomerButton,300);
+		highlight(deleteCustomerButton);
 		// .. in slow motion
 		actions.moveToElement(deleteCustomerButton.getWrappedElement()).clickAndHold().build().perform();
 		Thread.sleep(100);
@@ -529,11 +530,8 @@ public class NgWay2AutomationIntegrationTest  {
 		seleniumDriver.quit();		
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
 }

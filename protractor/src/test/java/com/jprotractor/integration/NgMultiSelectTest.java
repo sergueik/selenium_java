@@ -137,13 +137,9 @@ public class NgMultiSelectTest {
 		seleniumDriver.quit();		
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 
 }
 

@@ -175,7 +175,7 @@ public class NgDatePickerTest {
     try{
       ng_minute = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);      
       assertThat(ng_minute,notNullValue());
-      highlight(ng_minute, 100);
+      highlight(ng_minute);
       System.err.println("Time of the day: " + ng_minute.getText());
       ng_minute.click();
     } catch (StaleElementReferenceException e)  { 
@@ -187,7 +187,7 @@ public class NgDatePickerTest {
     }
     try{
       ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput", "[data-ng-app]"));
-      highlight(ng_result, 100);
+      highlight(ng_result);
       System.err.println("Selected Date/time : " + ng_result.getAttribute("value"));
       // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
       assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
@@ -207,12 +207,9 @@ public class NgDatePickerTest {
   }
 
   private static void highlight(WebElement element) throws InterruptedException {
-    highlight(element,  100);
+	  CommonFunctions.highlight(element);
   }
 
-  private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-    CommonFunctions.highlight(element, highlightInterval);
-  }
 }
 
 

@@ -126,7 +126,7 @@ public class NgLocalFileTest {
     String monthDate = "12";
     WebElement dateElement = ng_dropdown.findElements(NgBy.cssContainingText("td.ng-binding",monthDate)).get(0);
     assertThat(dateElement,notNullValue());
-    highlight(dateElement, 100);
+    highlight(dateElement);
     System.err.println("Mondh Date: " + dateElement.getText());
     dateElement.click();
     NgWebElement ng_element = ng_dropdown.findElement(NgBy.model("data.inputOnTimeSet"));
@@ -136,7 +136,7 @@ public class NgLocalFileTest {
     String timeOfDay = "6:00 PM";
     WebElement ng_hour = ng_element.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
     assertThat(ng_hour,notNullValue());
-    highlight(ng_hour, 100);
+    highlight(ng_hour);
     System.err.println("Hour of the day: " + ng_hour.getText());
     ng_hour.click();
     ngDriver.waitForAngular();
@@ -145,7 +145,7 @@ public class NgLocalFileTest {
     try{
       ng_element = ng_dropdown.findElement(NgBy.model("data.inputOnTimeSet"));
       assertThat(ng_element,notNullValue());
-      highlight(ng_element, 100);
+      highlight(ng_element);
     } catch (StaleElementReferenceException e)  { 
       // org.openqa.selenium.StaleElementReferenceException in Phantom JS 
       // works fine with desktop browsers
@@ -159,7 +159,7 @@ public class NgLocalFileTest {
     try{
       ng_minute = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);      
       assertThat(ng_minute,notNullValue());
-      highlight(ng_minute, 100);
+      highlight(ng_minute);
       System.err.println("Time of the day: " + ng_minute.getText());
       ng_minute.click();
     } catch (StaleElementReferenceException e)  { 
@@ -171,7 +171,7 @@ public class NgLocalFileTest {
     }
     try{
       ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
-      highlight(ng_result, 100);
+      highlight(ng_result);
       System.err.println("Selected Date/time : " + ng_result.getAttribute("value"));
       // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
       assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
@@ -203,7 +203,7 @@ public class NgLocalFileTest {
     assertThat(ng_display,notNullValue());
     String dateDattern = "\\d{4}\\-(\\w{3})" ;
     assertTrue(ng_display.getText().matches(dateDattern));
-    highlight(ng_display,100);
+    highlight(ng_display);
     System.err.println("Current month: " + ng_display.getText());
 
     Pattern pattern = Pattern.compile(dateDattern);
@@ -216,10 +216,10 @@ public class NgLocalFileTest {
 
     WebElement ng_right =  ng_display.findElement(By.xpath("..")).findElement(By.className("right"));
     assertThat(ng_right,notNullValue());
-    highlight(ng_right,100);
+    highlight(ng_right);
     ng_right.click();
     ng_display = ngDriver.findElement(NgBy.binding("data.previousViewDate.display"));
-    highlight(ng_display,100);
+    highlight(ng_display);
     assertThat(ng_display.getText(),containsString(followingMonth));
     System.err.println("Following month: " + ng_display.getText());
   }
@@ -366,7 +366,7 @@ public class NgLocalFileTest {
       while (cells.hasMoreElements()){
         WebElement currentCell = cells.nextElement();
         actions.moveToElement(currentCell).build().perform();
-        highlight(currentCell,300);
+        highlight(currentCell);
       }
     }
     List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("client in filtered ", length  ,"client.name"));
@@ -1121,11 +1121,7 @@ public class NgLocalFileTest {
   }
 
   private static void highlight(WebElement element) throws InterruptedException {
-    highlight(element,  100);
-  }
-
-  private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-    CommonFunctions.highlight(element, highlightInterval);
+	  CommonFunctions.highlight(element);
   }
 
   private static String getIdentity(WebElement element ) throws InterruptedException {

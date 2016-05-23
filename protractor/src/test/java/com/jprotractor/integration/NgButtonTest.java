@@ -186,13 +186,9 @@ public class NgButtonTest {
 		Thread.sleep(500);
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 	
 	private static String getIdentity(WebElement element ) throws InterruptedException {
 		String script = "return angular.identity(angular.element(arguments[0])).html();";
