@@ -8,9 +8,9 @@ import cucumber.api.junit.Cucumber;
 
 @RunWith(Cucumber.class)
 @CucumberOptions(
-  format = {"pretty", "html:target/html/", "json:target/json/output.json"},
-  features = "src/test/resources",
-  tags = "@Contact"
+    format = {"pretty", "html:target/html/", "json:target/json/output.json"},
+    features = "src/test/resources",
+    tags = "@Contact"
   )
 
-public class ZooRunnerPOTest { }
+public class CucumberTest { }

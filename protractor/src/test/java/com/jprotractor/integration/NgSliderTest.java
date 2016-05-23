@@ -113,21 +113,23 @@ public class NgSliderTest {
 		
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
-		highlight(sliderContainerElement, 100);
+		highlight(sliderContainerElement);
+    CommonFunctions.setHighlightTimeout(10);
 		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
 		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
 			sliderElement.sendKeys(Keys.ARROW_RIGHT);
-			highlight(sliderElement, 10);
+			highlight(sliderElement);
 		}
 		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
 			sliderElement.sendKeys(Keys.ARROW_UP);
-			highlight(sliderElement, 10);
+			highlight(sliderElement);
 		}
 
 		WebElement sliderValueElement = sliderElements.get(1);
 		assertThat(sliderValueElement.getTagName(),equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
-		highlight(sliderValueElement, 100);
+    CommonFunctions.setHighlightTimeout(100);
+		highlight(sliderValueElement);
 		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
 	}
 
@@ -146,7 +148,7 @@ public class NgSliderTest {
 		Dimension dimension = sliderContainerElement.getSize();
 		int width = dimension.width;
 		// System.err.println("width = " + width);
-		highlight(sliderContainerElement, 100);
+		highlight(sliderContainerElement);
 		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
 		// actions.dragAndDropBy(sliderElement, 100, 0).build().perform();
 		// has no effect
@@ -161,7 +163,7 @@ public class NgSliderTest {
 		WebElement sliderValueElement = sliderElements.get(1);
 		assertThat(sliderValueElement.getTagName(),equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
-		highlight(sliderValueElement, 100);
+		highlight(sliderValueElement);
 		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
 	}
 
@@ -170,21 +172,8 @@ public class NgSliderTest {
 		ngDriver.close();
 		seleniumDriver.quit();		
 	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(WebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-
-	private static void highlight(NgWebElement element) throws InterruptedException {
-		highlight(element,  100);
-	}
-
-	private static void highlight(NgWebElement element, long highlightInterval ) throws InterruptedException {
-		CommonFunctions.highlight(element, highlightInterval);
-	}
-	
+  
+  private static void highlight(WebElement element) throws InterruptedException {
+	  CommonFunctions.highlight(element);
+  }
 }

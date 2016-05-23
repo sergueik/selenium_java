@@ -13,15 +13,8 @@ public class CommonStepDefinition extends AbstractPageStepDefinition{
 	WebDriver driver = getDriver();	
 	LandingPage landingPage;
 	
-	/*@When("^I click on \"([^\"]*)\"$")
-	public void i_click_on(String link) throws Throwable {
-	   
-		driver.findElement(By.id(link+"_link")).click();
-	 
-	}
-*/
-	@Then("^I close the Brower$")
-	public void i_close_the_Brower() throws Throwable {
+	@Then("^I close the Browser$")
+	public void i_close_the_Browser() throws Throwable {
    driver.close();
    driver.quit();
 	}

@@ -26,28 +26,26 @@ public class ContactStepDefinitions extends AbstractPageStepDefinition {
 			
 	}
 
-/*	@When("^I click on a Contact button$")
-	public void i_click_on_a_Contact_button() throws Throwable {
-		
-		driver.findElement(By.id("contact_link")).click();
-	 
-	}*/
+  /*
+  @When("^I click on a Contact button$")
+  public void i_click_on_a_Contact_button() throws Throwable {
+    
+    driver.findElement(By.id("contact_link")).click();
+   
+  }*/
 	
 	@When("^I click on a \"([^\"]*)\" button$")
-	public void i_click_on_a_button(String link) throws Throwable {
-	   
+	public void i_click_on_a_button(String link) throws Throwable { 
 		//driver.findElement(By.id(link+"_link")).click();
 		//landingPage = new LandingPage(driver);
 		contactPage = landingPage.navigateToContactPage(link);
 	}
 
-	@Then("^I check I am on contact page$")
-	public void i_check_I_am_on_contact_page() throws Throwable {
-		System.out.println(driver.findElement(By.cssSelector(".content h1")).getText());
-		
-	  Assert.assertTrue(driver.findElement(By.cssSelector(".content h1")).getText().contains("CONTACT US"));
-	    
-	}
+  @Then("^I check I am on contact page$")
+  public void i_check_I_am_on_contact_page() throws Throwable {
+    System.out.println(driver.findElement(By.cssSelector(".content h1")).getText());		
+    Assert.assertTrue(driver.findElement(By.cssSelector(".content h1")).getText().contains("CONTACT US"));
+  }
 
 	@Then("^I fill in the Contact Form$")
 	public void i_fill_in_the_Contact_Form(DataTable table) throws Throwable {
@@ -71,9 +69,9 @@ public class ContactStepDefinitions extends AbstractPageStepDefinition {
 		Assert.assertTrue(contactConfirmationPage.getPageTitle().contains("We have your message"));
 	}
 
-	@Then("^I close the Browser$")
-	public void i_close_the_Browser() throws Throwable {
-   driver.close();
-   driver.quit();
-	}
+  @Then("^I close the Browser$")
+  public void i_close_the_Browser() throws Throwable {
+    driver.close();
+    driver.quit();
+  }
 }

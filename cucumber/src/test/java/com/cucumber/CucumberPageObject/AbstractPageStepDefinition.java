@@ -16,12 +16,12 @@ public class AbstractPageStepDefinition {
 		return driver;
 	}
   
-  public void waitForDestinationPage(final String destinationPage) throws InterruptedException {
-    // Wait for the destination page to load
-   (new WebDriverWait(driver, 10)).until(new ExpectedCondition<Boolean>() {
+  // Wait for the current url to get changed
+  public void waitForCurrentUrl(final String expectedUrl) throws InterruptedException {
+   (new WebDriverWait(driver, 60)).until(new ExpectedCondition<Boolean>() {
       public Boolean apply(WebDriver d) {
-        // System.err.println( "url: " + d.getCurrentUrl());
-        return (d.getCurrentUrl().contains((CharSequence )destinationPage));
+        System.err.println( "Expecting: " +  expectedUrl + "\n Current url: " + d.getCurrentUrl());
+        return (d.getCurrentUrl().contains((CharSequence ) expectedUrl));
       }
    });
     
