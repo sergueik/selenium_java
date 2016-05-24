@@ -96,22 +96,48 @@ public class NgMultiSelectTest {
 		ngDriver.navigate().to(baseUrl);
 	}
 
-	@Test
-	public void testSelectAll() throws Exception {
-    
-    NgWebElement selectedCar = ngDriver.findElement(NgBy.model("selectedCar"));
-    assertThat(selectedCar, notNullValue());
-    WebElement toggleSelect = selectedCar.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
+  @Test  
+	public void testSelectOneByOne() throws Exception {
+    NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
+    assertThat(ng_directive, notNullValue());
+    WebElement toggleSelect = ngDriver.findElement(NgBy.buttonText("Select Some Cars"));
     assertThat(toggleSelect, notNullValue());
     assertTrue(toggleSelect.isDisplayed());
     toggleSelect.click();    
-    wait.until(ExpectedConditions.visibilityOf(selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
-    WebElement checkAll = selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"));
+    // NOTE: not "c.name for c in cars"
+    List <WebElement> cars = ng_directive.findElements(NgBy.repeater("i in items")); 
+    int cnt = 0;
+    for (WebElement car: cars) {
+      NgWebElement ng_car = new NgWebElement(ngDriver,car);
+      assertThat(car, notNullValue());
+      NgWebElement ng_carLabel = ng_car.findElement(NgBy.binding("i.label"));
+      if (ng_carLabel.getText().matches("(?i:Audi|BMW|Honda)")){
+        System.err.println( "* " + ng_car.evaluate("i.label").toString());
+        highlight(car);
+        car.click();
+        cnt ++;
+      }
+    }
+    cars = ng_directive.findElements(NgBy.repeater("i in items")); 
+    assertThat(cars.size(), equalTo(cnt));
+  }
+  
+	@Test
+	public void testSelectAll() throws Exception {
+    
+    NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
+    assertThat(ng_directive, notNullValue());
+    WebElement toggleSelect = ng_directive.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
+    assertThat(toggleSelect, notNullValue());
+    assertTrue(toggleSelect.isDisplayed());
+    toggleSelect.click();    
+    wait.until(ExpectedConditions.visibilityOf(ng_directive.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
+    WebElement checkAll = ng_directive.findElement(By.cssSelector("button[ng-click='checkAll()']"));
     assertThat(checkAll, notNullValue());
     assertTrue(checkAll.isDisplayed());
     checkAll.click();
     // NOTE: not "c.name for c in cars"
-    List <WebElement> cars = selectedCar.findElements(NgBy.repeater("i in items")); 
+    List <WebElement> cars = ng_directive.findElements(NgBy.repeater("i in items")); 
     int cnt = 0;
     for (WebElement car: cars) {
       assertTrue(car.getText().matches("(?i:Audi|BMW|Honda)"));
