@@ -97,38 +97,30 @@ public class NgMultiSelectTest {
 	}
 
 	@Test
-	public void testCheckAllSelect() throws Exception {
+	public void testSelectAll() throws Exception {
     
     NgWebElement selectedCar = ngDriver.findElement(NgBy.model("selectedCar"));
     assertThat(selectedCar, notNullValue());
-    // System.err.println(selectedCar.getAttribute("innerHTML") );		
     WebElement toggleSelect = selectedCar.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
     assertThat(toggleSelect, notNullValue());
     assertTrue(toggleSelect.isDisplayed());
-    System.err.println(toggleSelect.getAttribute("innerHTML") );	
-    toggleSelect.click();
-    
-    ngDriver.waitForAngular();
+    toggleSelect.click();    
     wait.until(ExpectedConditions.visibilityOf(selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
     WebElement checkAll = selectedCar.findElement(By.cssSelector("button[ng-click='checkAll()']"));
     assertThat(checkAll, notNullValue());
     assertTrue(checkAll.isDisplayed());
-    // System.err.println(checkAll.getAttribute("innerHTML") );	
-    NgWebElement ngCheckAll = new NgWebElement(ngDriver, checkAll);
-    ngCheckAll.click();
-    ngDriver.waitForAngular();
+    checkAll.click();
+    // NOTE: not "c.name for c in cars"
     List <WebElement> cars = selectedCar.findElements(NgBy.repeater("i in items")); 
-    // TODO: debug options = "c.name for c in cars"
-    assertThat(cars.size(), equalTo(3));
-    Iterator<WebElement> iteratorCars = cars.iterator();
-    while (iteratorCars.hasNext()) {
-      WebElement car = (WebElement) iteratorCars.next();
-      if (car.getAttribute("value").isEmpty()){
-        continue;
-      }
+    int cnt = 0;
+    for (WebElement car: cars) {
       assertTrue(car.getText().matches("(?i:Audi|BMW|Honda)"));
-      System.err.println( car.getText() + " " + car.getAttribute("value"));
-    }    
+      Object ng_checked = new NgWebElement(ngDriver, car).evaluate("i.checked");
+      assertTrue((boolean ) ng_checked );
+      System.err.println( "* " + car.getText());
+      cnt ++;
+    }
+    assertThat(cars.size(), equalTo(cnt));
  	}
 
 	@AfterClass
