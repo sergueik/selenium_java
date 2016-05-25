@@ -106,20 +106,22 @@ public class NgMultiSelectTest {
     toggleSelect.click();    
     // NOTE: not "c.name for c in cars"
     List <WebElement> cars = ng_directive.findElements(NgBy.repeater("i in items")); 
-    int cnt = 0;
-    for (WebElement car: cars) {
-      NgWebElement ng_car = new NgWebElement(ngDriver,car);
-      assertThat(car, notNullValue());
-      NgWebElement ng_carLabel = ng_car.findElement(NgBy.binding("i.label"));
-      if (ng_carLabel.getText().matches("(?i:Audi|BMW|Honda)")){
+    int count = 0;
+    for (count = 0; count != cars.size() ; count ++) {
+      NgWebElement ng_car = ngDriver.findElement(NgBy.repeaterElement("i in items", count, "i.label"));      
+      if (ng_car.getText().matches("(?i:Audi|BMW|Honda)")){
         System.err.println( "* " + ng_car.evaluate("i.label").toString());
-        highlight(car);
-        car.click();
-        cnt ++;
+        highlight(ng_car);
+        ng_car.click();
+        WebElement button = ngDriver.findElement(By.cssSelector("am-multiselect > div > button"));
+        assertTrue(button.getText().matches("There are (\\d+) car\\(s\\) selected"));
+        System.err.println( button.getText());
       }
     }
     cars = ng_directive.findElements(NgBy.repeater("i in items")); 
-    assertThat(cars.size(), equalTo(cnt));
+    assertThat(cars.size(), equalTo(count));
+    
+    
   }
   
 	@Test
