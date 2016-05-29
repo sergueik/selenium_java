@@ -1,13 +1,13 @@
-Feature: Example Test
+Feature: Search Example
 
   @test
-  Scenario: Verify user is able to search on Google
+  Scenario: Verify user is able to search
     Given I am on Google page
     When I search for "Google"
     Then I verify the search results are displayed
  
   @test 
-   Scenario Outline: Search for keywords that yield results in Firefox
+   Scenario Outline: Validation of search results
     Given I am on Google page
     When I search for "<queryText>"
     Then I should see "<queryResults>"

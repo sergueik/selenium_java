@@ -1,6 +1,12 @@
 package com.mycompany.pagetype;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.springframework.stereotype.Component;
 
 import com.mycompany.api.BrowserDriver;
@@ -8,26 +14,32 @@ import com.mycompany.api.BrowserDriver;
 @Component
 public class GooglePage {
 
-  private final By searchBox = By.id("lst-ib");
-  private final By searchButton = By.xpath("//button[@class='lsb']");
-  private final By resultStats = By.id("resultStats");
+  private final By _searchBox = By.name("q") ; 
+  // By.id("lst-ib");
+  private final By _searchButton = By.xpath("//button[@class='lsb']");
+  private final By _resultStats = By.id("resultStats");
 
   public void isPageDisplayed() {
     BrowserDriver.driver.get("http://www.google.com/ncr");  // no country redirect
-    BrowserDriver.waitForElementVisible(searchBox);
+    BrowserDriver.waitForElementVisible(_searchBox);
   }
 
   public void inputTextInSearchBox(String text) {
-    BrowserDriver.driver.findElement(searchBox).sendKeys(text);
+    WebElement queryText = BrowserDriver.driver.findElement(_searchBox);
+    queryText.sendKeys(text);
   }
 
   public void clickSearchButton() {
-    BrowserDriver.waitForElementVisible(searchButton);
-    BrowserDriver.driver.findElement(searchButton).click();
+    // NOTE: phantomjs -   Scenario: Verify user is able to search: Timed out after 5 seconds waiting for visibility of element located by By.xpath: //button[@class='lsb'](..)
+    // WebElement queryText = BrowserDriver.driver.findElement(_searchBox);
+    // queryText.sendKeys(Keys.RETURN);
+
+    BrowserDriver.waitForElementVisible(_searchButton);
+    BrowserDriver.driver.findElement(_searchButton).click();
   }
 
   public void isResultPageDispalyed() {
-    BrowserDriver.waitForElementVisible(resultStats, 5);
+    BrowserDriver.waitForElementVisible(_resultStats, 5);
   }
 
   public String getBodyText() {
