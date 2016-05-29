@@ -57,7 +57,6 @@ public class BrowserDriver {
 
     DesiredCapabilities capabilities = null;
 
-
     if (browser.toLowerCase().equals("firefox")) {
         capabilities = capabilitiesFirefox(capabilities);        
     } else if (browser.toLowerCase().equals("phantomjs")) {
@@ -92,11 +91,12 @@ public class BrowserDriver {
     } else if (browser.toLowerCase().equals("ipad")) {
         driver = new ChromeDriver(capabilities);
     }
-    // WebDriverWait wait = new WebDriverWait(driver, flexibleWait );
-    // wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-    // actions = new Actions(driver);    
+    wait = new WebDriverWait(driver, flexibleWait );
+    wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
+    actions = new Actions(driver);    
   }
 
+  
    public DesiredCapabilities capabilitiesPhantomJS(DesiredCapabilities capabilities) {
  
     capabilities = new DesiredCapabilities("phantomjs", "", Platform.ANY);			
@@ -109,7 +109,7 @@ public class BrowserDriver {
     });
     return capabilities;
   }
-
+  
   public DesiredCapabilities capabilitiesAndroid(DesiredCapabilities capabilities) {
     capabilities = DesiredCapabilities.chrome();
 
@@ -149,11 +149,12 @@ public class BrowserDriver {
     return capabilities;
   }
 
-  public DesiredCapabilities capabilitiesFirefox(DesiredCapabilities capabilities) {
+  public DesiredCapabilities capabilitiesFirefox(DesiredCapabilities capabilities) {  
     capabilities = DesiredCapabilities.firefox();
 
     FirefoxProfile profile = new FirefoxProfile();
-    profile.setPreference("network.http.phishy-userpass-length", 255);
+    // java.lang.IllegalArgumentException: Preference network.http.phishy-userpass-length may not be overridden: frozen value=255, requested value=255
+    // profile.setPreference("network.http.phishy-userpass-length", 255);
     profile.setEnableNativeEvents(true);
     profile.setAcceptUntrustedCertificates(true);
 
@@ -201,11 +202,9 @@ public class BrowserDriver {
     return capabilities;
   }
 
-
   @After
   public void tearDown(Scenario scenario) {
     if (scenario.isFailed()) {
-      // Take a screenshot...
       final byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
       scenario.embed(screenshot, "image/png"); // ... and embed it in the report.
     }
@@ -214,45 +213,30 @@ public class BrowserDriver {
     }
   }
 
-  /*
-   * Waits for the actual element to appear on the web page
-   */
   public static void waitForElementVisible(By locator) {
     log.info("Waiting for element visible for locator: {}", locator);
-    WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
+    // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
     wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
   }
 
-  /*
-   * Waits for the actual element to appear on the web page
-   */
   public static void waitForElementVisible(By locator, long timeout) {
     log.info("Waiting for element visible for locator: {}", locator);
     WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
     wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
   }
 
-  /*
-   * Waits for the element to load from the html
-   */
   public static void waitForElementPresent(By locator) {
     log.info("Waiting for element present  for locator: {}", locator);
-    WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
+    // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
     wait.until(ExpectedConditions.presenceOfElementLocated(locator));
   }
 
-  /*
-   * Waits for the element to load from the html
-   */
   public static void waitForElementPresent(By locator, long timeout) {
     log.info("Waiting for element present for locator: {}", locator);
     WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
     wait.until(ExpectedConditions.presenceOfElementLocated(locator));
   }
 
-  /*
-   * Uses JS to detect if the page is fully loaded
-   */
   public static void waitForPageLoad() {
     log.info("Wait for page load via JS...");
     String state = "";
@@ -271,17 +255,11 @@ public class BrowserDriver {
 
   }
 
-  /*
-   * Returns true if an attribute exists for the element specified
-   */
   public static boolean isAttributePresent(By locator, String attribute) {
     log.info("Is Attribute Present for locator: {}, attribute: {}", locator, attribute);
     return driver.findElement(locator).getAttribute(attribute) != null;
   }
 
-  /*
-   * Method to select a dropdown option by index
-   */
   public static void selectDropdownByIndex(By locator, int index) {
     log.info("Select Dropdown for locator: {} and index: {}", locator, index);
     try {
@@ -292,9 +270,6 @@ public class BrowserDriver {
     }
   }
 
-  /*
-   * Method to return the base URL of the current window
-   */
   public static String getBaseURL() {
     log.info("Get base URL: {}", driver.getCurrentUrl());
     String currentURL = driver.getCurrentUrl();
@@ -311,82 +286,54 @@ public class BrowserDriver {
     return protocol + "://" + domain;
   }
 
-  /*
-   * Clicks the element using Javascript
-   */
   public static void clickJS(By locator) {
     log.info("Clicking on locator via JS: {}", locator);
-    WebDriverWait wait = new WebDriverWait(driver, 30);
+    // WebDriverWait wait = new WebDriverWait(driver, 30);
     wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(locator)));
 
     ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(locator));
   }
 
-  /*
-   * Scrolls the webpage to where the element is located via javascript
-   */
   public static void scrollIntoView(By locator) {
     log.info("Scrolling into view: {}", locator);
     ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(locator));
   }
 
-  /*
-   * Hovers mouse cursor over a specified element
-   */
   public static void mouseOver(By locator) {
     log.info("Mouse over: {}", locator);
-    Actions actions = new Actions(driver);
     actions.moveToElement(driver.findElement(locator)).build().perform();
   }
 
-  /*
-   * Clicks the specified locator
-   */
   public static void click(By locator) {
     log.info("Clicking: {}", locator);
     driver.findElement(locator).click();
   }
 
-  /*
-   * Clear the specified field via locator
-   */
   public static void clear(By locator) {
     log.info("Clearing input: {}", locator);
     driver.findElement(locator).clear();
   }
 
-  /*
-   * Types the input specified via locator
-   */
   public static void sendKeys(By locator, String text) {
     log.info("Typing \"{}\" into locator: {}", text, locator);
     driver.findElement(locator).sendKeys(text);
   }
 
-  /*
-   * Grabs the text specified via locator
-   */
   public static String getText(By locator) {
     String text = driver.findElement(locator).getText();
     log.info("The string at {} is: {}", locator, text);
     return text;
   }
 
-  /*
-   * Grabs the Element attribute's value
-   */
   public static String getAttributeValue(By locator, String attribute) {
     String value = driver.findElement(locator).getAttribute(attribute);
     log.info("The attribute \"{}\" value of {} is: {}", attribute, locator, value);
     return value;
   }
 
-  /*
-   * Checks if element is visible
-   */
   public static boolean isElementVisible(By locator) {
     try {
-      WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 5);
+      // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 5);
       wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
       log.info("Element {} is visible", locator);
       return true;
@@ -396,12 +343,9 @@ public class BrowserDriver {
     }
   }
 
-  /*
-   * Checks if element is not visible
-   */
   public static boolean isElementNotVisible(By locator) {
     try {
-      WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 1);
+      // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 1);
       wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
       log.info("Element {} is visible", locator);
       return false;
@@ -410,4 +354,8 @@ public class BrowserDriver {
       return true;
     }
   }
+  public static String getBodyText(){
+    return driver.findElement(By.tagName("body")).getText();
+  }
+  
 }

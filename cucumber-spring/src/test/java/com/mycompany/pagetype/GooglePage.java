@@ -6,14 +6,14 @@ import org.springframework.stereotype.Component;
 import com.mycompany.api.BrowserDriver;
 
 @Component
-public class Homepage {
+public class GooglePage {
 
   private final By searchBox = By.id("lst-ib");
   private final By searchButton = By.xpath("//button[@class='lsb']");
   private final By resultStats = By.id("resultStats");
 
-  public void isHomepageDisplayed() {
-    BrowserDriver.driver.get("http://www.google.com/");
+  public void isPageDisplayed() {
+    BrowserDriver.driver.get("http://www.google.com/ncr");  // no country redirect
     BrowserDriver.waitForElementVisible(searchBox);
   }
 
@@ -28,5 +28,9 @@ public class Homepage {
 
   public void isResultPageDispalyed() {
     BrowserDriver.waitForElementVisible(resultStats, 5);
+  }
+
+  public String getBodyText() {
+    return BrowserDriver.getBodyText();
   }
 }
