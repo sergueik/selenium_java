@@ -37,10 +37,13 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
-
-public class BrowserDriver {
-
+import com.jprotractor.NgBy;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+// cucumber.runtime.CucumberException: You're not allowed to extend classes that define Step Definitions or hooks. class com.mycompany.api.ProtractorDriver extends
+public class ProtractorDriver /* extends BrowserDriver */ {
   public static WebDriver driver;
+  public static NgWebDriver ngDriver;
   private static WebDriverWait wait;
   static int implicitWait = 10;
   static int flexibleWait = 5;
@@ -54,8 +57,7 @@ public class BrowserDriver {
 
   @Before
   public void init() throws MalformedURLException {
-    log.info("Launching " + browser + "...");
-
+    log.info("Launching (protractor) in " + browser + "...");
     DesiredCapabilities capabilities = null;
 
     if (browser.toLowerCase().equals("firefox")) {
@@ -94,10 +96,9 @@ public class BrowserDriver {
     }
     wait = new WebDriverWait(driver, flexibleWait );
     wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-    actions = new Actions(driver);    
+    actions = new Actions(driver);
+    NgWebDriver ngDriver = new NgWebDriver(driver);
   }
-
-  
    public DesiredCapabilities capabilitiesPhantomJS(DesiredCapabilities capabilities) {
  
     capabilities = new DesiredCapabilities("phantomjs", "", Platform.ANY);			
@@ -218,145 +219,6 @@ public class BrowserDriver {
     log.info("Waiting for element visible for locator: {}", locator);
     // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
     wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-  }
-
-  public static void waitForElementVisible(By locator, long timeout) {
-    log.info("Waiting for element visible for locator: {}", locator);
-    WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
-    wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-  }
-
-  public static void waitForElementPresent(By locator) {
-    log.info("Waiting for element present  for locator: {}", locator);
-    // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 30);
-    wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-  }
-
-  public static void waitForElementPresent(By locator, long timeout) {
-    log.info("Waiting for element present for locator: {}", locator);
-    WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, timeout);
-    wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-  }
-
-  public static void waitForPageLoad() {
-    log.info("Wait for page load via JS...");
-    String state = "";
-    int counter = 0;
-
-    do {
-      try {
-          state = (String) ((JavascriptExecutor) driver).executeScript("return document.readyState");
-          Thread.sleep(1000);
-      } catch (Exception e) {
-          e.printStackTrace();
-      }
-      counter++;
-      log.info(("Browser state is: " + state));
-    } while (!state.equalsIgnoreCase("complete") && counter < 20);
-
-  }
-
-  public static boolean isAttributePresent(By locator, String attribute) {
-    log.info("Is Attribute Present for locator: {}, attribute: {}", locator, attribute);
-    return driver.findElement(locator).getAttribute(attribute) != null;
-  }
-
-  public static void selectDropdownByIndex(By locator, int index) {
-    log.info("Select Dropdown for locator: {} and index: {}", locator, index);
-    try {
-      Select select = new Select(driver.findElement(locator));
-      select.selectByIndex(index);
-    } catch (Exception e) {
-      e.printStackTrace();
-    }
-  }
-
-  public static String getBaseURL() {
-    log.info("Get base URL: {}", driver.getCurrentUrl());
-    String currentURL = driver.getCurrentUrl();
-    String protocol = null;
-    String domain = null;
-
-    try {
-      URL url = new URL(currentURL);
-      protocol = url.getProtocol();
-      domain = url.getHost();
-    } catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
-    return protocol + "://" + domain;
-  }
-
-  public static void clickJS(By locator) {
-    log.info("Clicking on locator via JS: {}", locator);
-    // WebDriverWait wait = new WebDriverWait(driver, 30);
-    wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(locator)));
-
-    ((JavascriptExecutor) driver).executeScript("arguments[0].click();", driver.findElement(locator));
-  }
-
-  public static void scrollIntoView(By locator) {
-    log.info("Scrolling into view: {}", locator);
-    ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", driver.findElement(locator));
-  }
-
-  public static void mouseOver(By locator) {
-    log.info("Mouse over: {}", locator);
-    actions.moveToElement(driver.findElement(locator)).build().perform();
-  }
-
-  public static void click(By locator) {
-    log.info("Clicking: {}", locator);
-    driver.findElement(locator).click();
-  }
-
-  public static void clear(By locator) {
-    log.info("Clearing input: {}", locator);
-    driver.findElement(locator).clear();
-  }
-
-  public static void sendKeys(By locator, String text) {
-    log.info("Typing \"{}\" into locator: {}", text, locator);
-    driver.findElement(locator).sendKeys(text);
-  }
-
-  public static String getText(By locator) {
-    String text = driver.findElement(locator).getText();
-    log.info("The string at {} is: {}", locator, text);
-    return text;
-  }
-
-  public static String getAttributeValue(By locator, String attribute) {
-    String value = driver.findElement(locator).getAttribute(attribute);
-    log.info("The attribute \"{}\" value of {} is: {}", attribute, locator, value);
-    return value;
-  }
-
-  public static boolean isElementVisible(By locator) {
-    try {
-      // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 5);
-      wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-      log.info("Element {} is visible", locator);
-      return true;
-    } catch (Exception e) {
-      log.info("Element {} is not visible", locator);
-      return false;
-    }
-  }
-
-  public static boolean isElementNotVisible(By locator) {
-    try {
-      // WebDriverWait wait = new WebDriverWait(BrowserDriver.driver, 1);
-      wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-      log.info("Element {} is visible", locator);
-      return false;
-    } catch (Exception e) {
-      log.info("Element {} is not visible", locator);
-      return true;
-    }
-  }
-  public static String getBodyText(){
-    return driver.findElement(By.tagName("body")).getText();
   }
   
 }

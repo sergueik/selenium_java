@@ -20,6 +20,7 @@ public class GooglePage {
   private final By _resultStats = By.id("resultStats");
 
   public void isPageDisplayed(String url) {
+    System.err.println(url);
     BrowserDriver.driver.get(url);  // no country redirect
     BrowserDriver.waitForElementVisible(_searchBox);
   }

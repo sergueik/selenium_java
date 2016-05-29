@@ -16,14 +16,3 @@ Feature: Search Example
       |queryText     |queryResults                                |
       |cucumber bdd  |Cucumber is for Behaviour-Driven Development|
 
-    @test
-    Scenario Outline: test local file
-    Given I open url "file:///c/developer/sergueik/selenium_java/cucumber-spring.BACKUP/src/test/resources/pages/ng_basic.htm"
-    When I search for "Google"
-    Then I verify the search results are displayed
-    
-    @test
-    Scenario Outline: test local file
-    Given I open url "file://${project.basedir}/src/test/resources/pages/ng_basic.htm"
-    When I search for "Google"
-    Then I verify the search results are displayed    

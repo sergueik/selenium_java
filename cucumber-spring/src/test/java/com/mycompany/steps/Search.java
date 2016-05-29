@@ -12,17 +12,24 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import com.mycompany.pagetype.GooglePage;
+import com.mycompany.pagetype.AngularPage;
 
 // step definitions
 public class Search {
 
   private @Autowired GooglePage _page;
+  private @Autowired AngularPage _angularPage;
 
   @Given("^I open url \"(.*)\"$")
   public void I_am_opening_url(String url) {
     _page.isPageDisplayed(url);
   }
   
+  @Given("^I open angular url \"(.*)\"$")
+  public void I_am_opening_angular_url(String url) throws InterruptedException   {
+    _angularPage.isPageDisplayed(url);
+    Thread.sleep(5000);
+  }
   
   @When("^I search for \"(.*)\"$")
   public void I_search_for(String input) {
