@@ -19,8 +19,8 @@ public class GooglePage {
   private final By _searchButton = By.xpath("//button[@class='lsb']");
   private final By _resultStats = By.id("resultStats");
 
-  public void isPageDisplayed() {
-    BrowserDriver.driver.get("http://www.google.com/ncr");  // no country redirect
+  public void isPageDisplayed(String url) {
+    BrowserDriver.driver.get(url);  // no country redirect
     BrowserDriver.waitForElementVisible(_searchBox);
   }
 

@@ -18,11 +18,12 @@ public class Search {
 
   private @Autowired GooglePage _page;
 
-  @Given("^I am on Google page$")
-  public void I_am_on_Google_page() {
-    _page.isPageDisplayed();
+  @Given("^I open url \"(.*)\"$")
+  public void I_am_opening_url(String url) {
+    _page.isPageDisplayed(url);
   }
-
+  
+  
   @When("^I search for \"(.*)\"$")
   public void I_search_for(String input) {
     _page.inputTextInSearchBox(input);
