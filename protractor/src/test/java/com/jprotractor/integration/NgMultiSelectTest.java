@@ -98,12 +98,15 @@ public class NgMultiSelectTest {
 
   @Test  
 	public void testSelectOneByOne() throws Exception {
+    // Given selecting cars in multuselect directive
     NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
     assertThat(ng_directive, notNullValue());
     WebElement toggleSelect = ngDriver.findElement(NgBy.buttonText("Select Some Cars"));
     assertThat(toggleSelect, notNullValue());
     assertTrue(toggleSelect.isDisplayed());
-    toggleSelect.click();    
+    toggleSelect.click();
+    // When selecting all carscount one car at a time
+    // find how many cars there are
     // NOTE: not "c.name for c in cars"
     List <WebElement> cars = ng_directive.findElements(NgBy.repeater("i in items")); 
     int count = 0;
@@ -113,31 +116,33 @@ public class NgMultiSelectTest {
         System.err.println( "* " + ng_car.evaluate("i.label").toString());
         highlight(ng_car);
         ng_car.click();
-        WebElement button = ngDriver.findElement(By.cssSelector("am-multiselect > div > button"));
-        assertTrue(button.getText().matches("There are (\\d+) car\\(s\\) selected"));
-        System.err.println( button.getText());
       }
     }
+    // Then all cars were selected
     cars = ng_directive.findElements(NgBy.repeater("i in items")); 
-    assertThat(cars.size(), equalTo(count));
-    
-    
+    assertThat(cars.size(), equalTo(count));    
+    // TODO: Then button text shows that all cars were selected
+    WebElement button = ngDriver.findElement(By.cssSelector("am-multiselect > div > button"));
+    assertTrue(button.getText().matches("There are (\\d+) car\\(s\\) selected"));
+    System.err.println( button.getText());
   }
   
 	@Test
 	public void testSelectAll() throws Exception {
-    
+    // Given selecting cars in multuselect directive
     NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
     assertThat(ng_directive, notNullValue());
     WebElement toggleSelect = ng_directive.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
     assertThat(toggleSelect, notNullValue());
     assertTrue(toggleSelect.isDisplayed());
     toggleSelect.click();    
+    // When selected all cars using 'check all' link
     wait.until(ExpectedConditions.visibilityOf(ng_directive.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
     WebElement checkAll = ng_directive.findElement(By.cssSelector("button[ng-click='checkAll()']"));
     assertThat(checkAll, notNullValue());
     assertTrue(checkAll.isDisplayed());
     checkAll.click();
+    // Then all cars were selected
     // NOTE: not "c.name for c in cars"
     List <WebElement> cars = ng_directive.findElements(NgBy.repeater("i in items")); 
     int cnt = 0;
