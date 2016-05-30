@@ -18,10 +18,29 @@ import com.mycompany.api.ProtractorDriver;
 @Component
 public class AngularPage {
 
-  private final By _searchBox = NgBy.repeater("item in items"); 
+  private final By _valueBox = NgBy.model("first");
+  private final By _goButton = NgBy.partialButtonText("Go");  // By.id("gobutton");
+  private final By _result = NgBy.binding("latest");
 
-  public void isPageDisplayed(String url) {
+  public void isAngularPagePageDisplayed(String url) {
     ProtractorDriver.ngDriver.get(url);
-    ProtractorDriver.waitForElementVisible(_searchBox);
+    ProtractorDriver.waitForElementVisible(_valueBox);
   }
+  
+  public void enterValue(String model, String value) { 
+    ProtractorDriver.sendKeys(NgBy.model(model), value);
+  }
+
+  public void evaluateResult() { 
+    ProtractorDriver.click(_goButton);
+  }
+  
+  public String getDisplayedResult() throws InterruptedException{
+    Thread.sleep(3000);
+    ProtractorDriver.ngDriver.waitForAngular();
+    ProtractorDriver.waitForElementVisible(_result);
+    ProtractorDriver.highlight(_result);            
+    return ProtractorDriver.getText(_result);
+  }
+
 }

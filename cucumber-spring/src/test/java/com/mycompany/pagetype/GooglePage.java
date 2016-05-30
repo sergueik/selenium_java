@@ -9,7 +9,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.springframework.stereotype.Component;
 
-import com.mycompany.api.BrowserDriver;
+import com.mycompany.api.ProtractorDriver;
 
 @Component
 public class GooglePage {
@@ -20,30 +20,29 @@ public class GooglePage {
   private final By _resultStats = By.id("resultStats");
 
   public void isPageDisplayed(String url) {
-    System.err.println(url);
-    BrowserDriver.driver.get(url);  // no country redirect
-    BrowserDriver.waitForElementVisible(_searchBox);
+    ProtractorDriver.driver.get(url);
+    ProtractorDriver.waitForElementVisible(_searchBox);
   }
 
   public void inputTextInSearchBox(String text) {
-    WebElement queryText = BrowserDriver.driver.findElement(_searchBox);
+    WebElement queryText = ProtractorDriver.driver.findElement(_searchBox);
     queryText.sendKeys(text);
   }
 
   public void clickSearchButton() {
     // NOTE: phantomjs -   Scenario: Verify user is able to search: Timed out after 5 seconds waiting for visibility of element located by By.xpath: //button[@class='lsb'](..)
-    // WebElement queryText = BrowserDriver.driver.findElement(_searchBox);
+    // WebElement queryText = ProtractorDriver.driver.findElement(_searchBox);
     // queryText.sendKeys(Keys.RETURN);
 
-    BrowserDriver.waitForElementVisible(_searchButton);
-    BrowserDriver.driver.findElement(_searchButton).click();
+    ProtractorDriver.waitForElementVisible(_searchButton);
+    ProtractorDriver.driver.findElement(_searchButton).click();
   }
 
   public void isResultPageDispalyed() {
-    BrowserDriver.waitForElementVisible(_resultStats, 5);
+    ProtractorDriver.waitForElementVisible(_resultStats, 5);
   }
 
   public String getBodyText() {
-    return BrowserDriver.getBodyText();
+    return ProtractorDriver.getBodyText();
   }
 }

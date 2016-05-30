@@ -86,8 +86,10 @@
       <artifactId>jprotractor</artifactId>
       <version>${jprotractor.version}</version>
       <type>jar</type>
+<!--
       <scope>system</scope>
       <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
+-->
     </dependency>
   </dependencies>
   <build>
