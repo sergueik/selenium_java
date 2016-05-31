@@ -58,11 +58,6 @@
           <!-- Skip the default running of this plug-in (or everything is run twice...see below) -->
           <skip>true</skip>
           <trimStackTrace>false</trimStackTrace>
-          <!--
-            <suiteXmlFiles>
-           <suiteXmlFile>test.xml</suiteXmlFile>
-            </suiteXmlFiles>
--->
         </configuration>
         <executions>
           <execution>

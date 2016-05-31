@@ -5,7 +5,7 @@ Project showing basic [Sikuli](http://www.sikuli.org/) WebDriver intergation.
  
 Usage
 -----
-If Sikuli is already installed, update `pom.xml`. Otherwise download `sikuli-script.jar` from elsewhere e.g. from [mubbashir/Sikuli-on-Selenium](https://github.com/mubbashir/Sikuli-on-Selenium/tree/master/lib).
+If Sikuli is already installed, update `pom.xml`. Otherwise download `sikuli-script.jar` from elsewhere e.g. from [mubbashir/Sikuli-on-Selenium](https://github.com/mubbashir/Sikuli-on-Selenium/tree/master/lib) and put into `lib` directory.
 
 On first run Sikuli will populate libs subdirectory with the following files:
 ```
@@ -26,3 +26,7 @@ WinUtil.dll
 zlib1.dll
 ```
 This directory needs to be added to the user `PATH` environment. 
+
+Author
+------
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
