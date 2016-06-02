@@ -293,14 +293,14 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+  @Ignore
   // TODO: abort the test on timeout
   // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
   @Test
   public void testUpload3() throws Exception {
-    // if (!isCIBuild) {
-      // return;
-    // }
+    if (isCIBuild) {
+       return;
+    }
     getPageContent("ng_upload3.htm");
     WebElement drop = ngDriver.findElement(NgBy.binding("dropText"));
     assertThat(drop, notNullValue());
@@ -1016,7 +1016,7 @@ public class NgLocalFileTest {
     if (!isCIBuild) {
       return;
     }
-    getPageContent("ng_headers_sort_example2.htm");
+    getPageContent("ng_headers_sort_example1.htm");
     // NOTE: This test will fail with "ng_headers_sort_example1.htm"
     // Exception:
     // no injector found for element argument to getTestability
