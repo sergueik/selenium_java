@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- origin: http://jsfiddle.net/tgienger/89RTg/ -->
+<style>
+.container {
+    width: 200px;
+}
+.outerDiv {
+    width: 200px;
+    height: 200px;
+    text-align:center;
+    background: yellow;
+    position:relative;
+}
+.innerDiv {
+    width: 100%;
+    height: 100px;
+    background: blue;
+    color:white;
+    text-align:center;
+    position:absolute;
+    bottom:0;
+}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js">
+</script>
+<script type="text/javascript">
+angular.module('myApp', [])
+    .controller('myCtrl', function($scope, $timeout) {
+        // start with the div hidden
+        $scope.hovering = false;
+
+        // create the timer variable
+        var timer;
+
+        // mouseenter event -mshow tooltip with a delay
+        $scope.showIt = function() {
+            timer = $timeout(function() {
+                $scope.hovering = true;
+            }, 1000);
+        };
+
+        // mouseleave event - hide tooltip instantly 
+        $scope.hideIt = function() {
+            $timeout.cancel(timer);
+            $scope.hovering = false;
+        };
+    });
+</script>
+
+</head>
+<body ng-app="myApp">
+  <div ng-controller="myCtrl">
+    <span id="hover" ng-mouseenter="showIt()" ng-mouseleave="hideIt()">Hover Me</span>
+    <div class="outerDiv" ng-show="hovering">
+      <p>Some content</p>
+      <div class="innerDiv">
+        <p>More Content</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

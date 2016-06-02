@@ -51,8 +51,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -98,7 +100,7 @@ public class NgLocalFileTest {
     ngDriver = new NgWebDriver(seleniumDriver);
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testDatePickerDirectSelect() throws Exception {
     getPageContent("ng_datepicker.htm");
@@ -184,7 +186,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testDatePickerNavigation() throws Exception {
     getPageContent("ng_datepicker.htm");
@@ -224,7 +226,7 @@ public class NgLocalFileTest {
     System.err.println("Following month: " + ng_display.getText());
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testEvaluate() throws Exception {
     if (!isCIBuild) {
@@ -249,7 +251,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testUpload1() throws Exception {
     if (!isCIBuild) {
@@ -293,14 +295,14 @@ public class NgLocalFileTest {
     }
   }
 
-  @Ignore
-  // TODO: abort the test on timeout
-  // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
+	@Ignore
   @Test
   public void testUpload3() throws Exception {
     if (isCIBuild) {
        return;
     }
+    // TODO: abort the test on timeout
+    // http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
     getPageContent("ng_upload3.htm");
     WebElement drop = ngDriver.findElement(NgBy.binding("dropText"));
     assertThat(drop, notNullValue());
@@ -323,7 +325,7 @@ public class NgLocalFileTest {
     button.click();
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testEvaluateEvenOdd() throws Exception {
     if (!isCIBuild) {
@@ -348,7 +350,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindRepeaterElement() throws Exception {
     if (!isCIBuild) {
@@ -374,7 +376,7 @@ public class NgLocalFileTest {
   }
 
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindElementByRepeaterColumn() throws Exception {
     if (!isCIBuild) {
@@ -401,7 +403,7 @@ public class NgLocalFileTest {
     assertTrue(cnt == 3);	
   }		
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindSelectedtOptionWithAlert() throws Exception {
     if (!isCIBuild) {
@@ -477,7 +479,7 @@ public class NgLocalFileTest {
     assertThat(valueOfCountSelected,equalTo(2));		
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -504,7 +506,7 @@ public class NgLocalFileTest {
     System.err.println("Selected option: " + element.getText());
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testChangeSelectedtOption() throws Exception {
     if (!isCIBuild) {
@@ -542,7 +544,7 @@ public class NgLocalFileTest {
   }
 
 
-		 // @Ignore
+		 @Ignore
   @Test
   public void testChangeSelectedRepeaterOption() throws Exception {
     if (!isCIBuild) {
@@ -612,7 +614,7 @@ public class NgLocalFileTest {
     System.err.println("selected option: " + ngElement.getText() );
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testMultiSelect2() throws Exception {
     // if (!isCIBuild) {
@@ -658,7 +660,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testMultiSelect() throws Exception {
     if (!isCIBuild) {
@@ -723,7 +725,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindElementByRepeaterWithBeginEnd() throws Exception {
     if (!isCIBuild) {
@@ -736,7 +738,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(0).getText() );
   }
 	
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindElementByOptions() throws Exception {
     if (!isCIBuild) {
@@ -751,7 +753,7 @@ public class NgLocalFileTest {
     System.err.println(elements.get(1).getText() );
   }
 	
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindElementByModel() throws Exception {
     if (!isCIBuild) {
@@ -783,7 +785,7 @@ public class NgLocalFileTest {
     System.err.println(required.getText()); // required: false
   }
 
-  //// @Ignore
+  //@Ignore
   // @Test
   // public void testFindRepeaterElement() throws Exception {
     // if (!isCIBuild) {
@@ -798,7 +800,7 @@ public class NgLocalFileTest {
   // }
 	
   // failing in Linux VM: PhantomJS has crashed
-  // @Ignore
+	// @Ignore
   @Test
   public void testElementTextIsGenerated() throws Exception {
     if (!isCIBuild) {
@@ -821,7 +823,7 @@ public class NgLocalFileTest {
     assertTrue(greeting_text.length() > 0);
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testDropDownWatch() throws Exception {
     if (!isCIBuild) {
@@ -870,7 +872,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindRepeaterRows() throws Exception {
     if (!isCIBuild) {
@@ -888,7 +890,7 @@ public class NgLocalFileTest {
     assertThat(todos.size(), equalTo(0));
   }
 	
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindorderByField() throws Exception {
    // if (!isCIBuild) {
@@ -934,7 +936,7 @@ public class NgLocalFileTest {
   }
 
   // TODO: separate into class AngularUISelect.java
-  // @Ignore
+	// @Ignore
   @Test
   public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -965,7 +967,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testAngularUISelectHandleSearch() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -984,7 +986,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testAngularUISelectHandleDeselect() throws Exception {
     getPageContent("ng_ui_select_example1.htm");
@@ -1010,7 +1012,7 @@ public class NgLocalFileTest {
 
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testPrintOrderByFieldColumn() throws Exception {
     if (!isCIBuild) {
@@ -1053,7 +1055,7 @@ public class NgLocalFileTest {
     }
   }
 
-  // @Ignore
+	// @Ignore
   @Test
   public void testFindAllBindings() throws Exception {
     if (!isCIBuild) {
@@ -1077,13 +1079,52 @@ public class NgLocalFileTest {
     }
   }
 
-   // @Ignore
+	// @Ignore
+  @Test
+  public void testHover() throws InterruptedException {
+    // if (!isCIBuild) {
+    //   return;
+    // }
+
+    getPageContent("ng_hover1.htm");
+    // Hover over menu
+    WebElement element = seleniumDriver.findElement(By.id("hover"));
+    highlight(element);
+    actions.moveToElement(element).build().perform();
+    // Wait for the Angular 'hovering' property to get evaluated to true
+    WebDriverWait wait2 = new WebDriverWait(seleniumDriver, 120 );
+    wait2.pollingEvery(50,TimeUnit.MILLISECONDS);
+    wait2.until(new ExpectedCondition<Boolean>() {
+      // NOTE: 'until' only prints "hovering: true" and never "hovering: false"
+      @Override  
+      public Boolean apply(WebDriver d) {
+        NgWebDriver ngD = new NgWebDriver(d);
+        // org.openqa.selenium.WebDriverException: The WebDriver instance must implement JavaScriptExecutor interface.
+        NgWebElement ng_element = ngD.findElement(By.id("hover"));
+        Object value = ng_element.evaluate("hovering");
+        System.err.println( "hovering: " +  value.toString());
+        return parseBoolean(value.toString());
+      }
+    });
+    
+    actions.moveByOffset(0, 300).build().perform();
+    // NOTE: cannot find div[ng-show='true'] nor div[show='true']
+    // Wait for the tooltip div to get visible 
+    Thread.sleep(1000);
+    actions.moveToElement(element).build().perform();
+    try {
+      wait.until(ExpectedConditions.visibilityOf(seleniumDriver.findElement(By.cssSelector("div[ng-show='hovering']"))));
+    } catch (NoSuchElementException e  ) {
+    }
+  }
+   
+	@Ignore
   @Test
   public void testDropDown() throws Exception {
     if (!isCIBuild) {
       return;
     }
-    //  NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
+    //  TODO: works with Angular 1.2.13, fails with Angular 1.4.9
     getPageContent("ng_dropdown.htm");
     Thread.sleep(1000);
     String optionsCountry = "country for (country, states) in countries";
