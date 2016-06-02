@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +78,7 @@ public class NgLocalFileTest {
   static int width = 600;
   static int height = 400;
   // set to true for Desktop, false for headless browser testing
-  static boolean isCIBuild =  false;
+  static boolean isCIBuild = false;
   public static String localFile;
   static StringBuilder sb;
   static Formatter formatter;
@@ -97,7 +98,6 @@ public class NgLocalFileTest {
     ngDriver = new NgWebDriver(seleniumDriver);
   }
 
-
   // @Ignore
   @Test
   public void testDatePickerDirectSelect() throws Exception {
@@ -116,7 +116,7 @@ public class NgLocalFileTest {
     actions.moveToElement(ng_calendar.getWrappedElement()).click().build().perform();
     // need a little more room
     int datepicker_width = 900 ;
-    int datepicker_heght =  800 ;
+    int datepicker_heght = 800 ;
     seleniumDriver.manage().window().setSize(new Dimension(datepicker_width , datepicker_heght ));
     NgWebElement ng_dropdown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
     assertThat(ng_dropdown,notNullValue());
@@ -141,32 +141,32 @@ public class NgLocalFileTest {
     ng_hour.click();
     ngDriver.waitForAngular();
     String specificMinute = "6:35 PM";
-    // reload,     
+    // reload,
     try{
       ng_element = ng_dropdown.findElement(NgBy.model("data.inputOnTimeSet"));
       assertThat(ng_element,notNullValue());
       highlight(ng_element);
-    } catch (StaleElementReferenceException e)  { 
-      // org.openqa.selenium.StaleElementReferenceException in Phantom JS 
+    } catch (StaleElementReferenceException e)  {
+      // org.openqa.selenium.StaleElementReferenceException in Phantom JS
       // works fine with desktop browsers
       if (isCIBuild) {
         System.err.println("Ignoring StaleElementReferenceException" );
       } else {
-        throw(e);        
+        throw(e);
       }
     }
     WebElement ng_minute;
     try{
-      ng_minute = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);      
+      ng_minute = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);
       assertThat(ng_minute,notNullValue());
       highlight(ng_minute);
       System.err.println("Time of the day: " + ng_minute.getText());
       ng_minute.click();
-    } catch (StaleElementReferenceException e)  { 
+    } catch (StaleElementReferenceException e)  {
       if (isCIBuild) {
         System.err.println("Ignoring StaleElementReferenceException" );
       } else {
-        throw(e);        
+        throw(e);
       }
     }
     try{
@@ -175,15 +175,15 @@ public class NgLocalFileTest {
       System.err.println("Selected Date/time : " + ng_result.getAttribute("value"));
       // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
       assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
-    } catch (StaleElementReferenceException e)  { 
+    } catch (StaleElementReferenceException e)  {
       if (isCIBuild) {
         System.err.println("Ignoring StaleElementReferenceException" );
       } else {
-        throw(e);        
+        throw(e);
       }
     }
   }
-  
+
   // @Ignore
   @Test
   public void testDatePickerNavigation() throws Exception {
@@ -214,7 +214,7 @@ public class NgLocalFileTest {
 	     followingMonth = months.get(months.indexOf(matcher.group(1).toString()) + 1 );
   	}
 
-    WebElement ng_right =  ng_display.findElement(By.xpath("..")).findElement(By.className("right"));
+    WebElement ng_right = ng_display.findElement(By.xpath("..")).findElement(By.className("right"));
     assertThat(ng_right,notNullValue());
     highlight(ng_right);
     ng_right.click();
@@ -347,7 +347,7 @@ public class NgLocalFileTest {
         }
     }
   }
-  
+
   // @Ignore
   @Test
   public void testFindRepeaterElement() throws Exception {
@@ -372,8 +372,8 @@ public class NgLocalFileTest {
     List <WebElement>elements = ngDriver.findElements(NgBy.repeaterElement("client in filtered ", length  ,"client.name"));
     assertThat(elements.size(), equalTo(0));
   }
-  
-  
+
+
   // @Ignore
   @Test
   public void testFindElementByRepeaterColumn() throws Exception {
@@ -384,7 +384,7 @@ public class NgLocalFileTest {
     System.err.println("Customers:" + seleniumDriver.getPageSource());
     getPageContent("ng_service.htm");
     ngDriver.waitForAngular();
-    ArrayList<WebElement> countries =  new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
+    ArrayList<WebElement> countries = new ArrayList<WebElement>(ngDriver.findElements(NgBy.repeaterColumn("person in people", "person.Country")));
     System.err.println("Found Countries.size() = " + countries.size() );
     assertTrue( countries.size() > 0 );
     Iterator<WebElement> countriesIterator = countries.iterator();
@@ -426,7 +426,7 @@ public class NgLocalFileTest {
 
     assertThat(element, notNullValue());
     assertTrue(element.isDisplayed());
-    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML") );
     assertThat(element.getText(),containsString("One"));
 
     Iterator<WebElement> options = ngDriver.findElements(NgBy.options("count.id as count.name for count in countList")).iterator();
@@ -467,7 +467,7 @@ public class NgLocalFileTest {
 
     element = elements.get(0);
     assertThat(element, notNullValue());
-    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML")  );
+    System.err.println("selected option: " + element.getText() + "\n" + element.getAttribute("outerHTML") );
     assertThat(element.getText(),containsString("Two"));
     WebElement countSelected = ngDriver.findElement(NgBy.binding("countSelected"));
     assertThat(countSelected, notNullValue());
@@ -639,7 +639,7 @@ public class NgLocalFileTest {
       WebElement element2 = element.findElement(By.tagName("span"));
       assertThat(element2, notNullValue());
       String classAttribute = element2.getAttribute("class");
-      // System.err.println( "option.name = " + optionName  + " " + classAttribute);
+      // System.err.println( "option.name = " + optionName + " " + classAttribute);
       matcher = pattern.matcher(classAttribute);
       if (matcher.find()){
 
@@ -686,7 +686,7 @@ public class NgLocalFileTest {
 
     String selectedValues = ngDriver.findElement(NgBy.binding("selectedValues")).getText();
     System.err.println("Inspecting: " + selectedValues );
-    for (int cnt =  0 ; cnt != data.size() ; cnt ++ ) {
+    for (int cnt = 0 ; cnt != data.size() ; cnt ++ ) {
       String value = data.get(cnt);
       String expression = "\\\"" + value + "\\\"" ;
       Pattern pattern = Pattern.compile(expression);
@@ -713,7 +713,7 @@ public class NgLocalFileTest {
 
     selectedValues = ngDriver.findElement(NgBy.binding("selectedValues")).getText();
     System.err.println("Inspecting: " + selectedValues );
-    for (int cnt =  0 ; cnt != data.size() ; cnt ++ ) {
+    for (int cnt = 0 ; cnt != data.size() ; cnt ++ ) {
       String value = data.get(cnt);
       String expression = "\\\"" + value + "\\\"" ;
       Pattern pattern = Pattern.compile(expression);
@@ -805,7 +805,7 @@ public class NgLocalFileTest {
       return;
     }			
     getPageContent("ng_load_json_data.htm");
-    WebElement name  = ngDriver.findElement(NgBy.model("name"));
+    WebElement name = ngDriver.findElement(NgBy.model("name"));
     highlight(name);
     name.sendKeys("John");
     name.sendKeys(Keys.TAB);
@@ -891,22 +891,45 @@ public class NgLocalFileTest {
   // @Ignore
   @Test
   public void testFindorderByField() throws Exception {
-    if (!isCIBuild) {
-      return;
-    }
+   // if (!isCIBuild) {
+   //   return;
+   // }
+    // Given there is a sorted data grid
     getPageContent("ng_headers_sort_example1.htm");
     String[] headers = new String[]{"First Name", "Last Name", "Age"};
-    for(String header : headers)
-    {
-      WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
-      System.err.println(header);
-      headerelement.click();
-      ngDriver.waitForAngular();
-      List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
-      WebElement row = (WebElement) rows.get(0);
-      NgWebElement ngRow = new NgWebElement(ngDriver,row);
-      String field =  row.getAttribute("ng-order-by");
-      System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
+
+    Hashtable<String, String> header_columns = new Hashtable<String, String>();
+
+    header_columns.put("First Name", "emp.firstName");
+    header_columns.put("Last Name", "emp.lastName");
+    header_columns.put("Age", "age");
+
+    String[] sortOrders = new String[]{"descending", "ascending"};
+    for(String header : headers) {
+      for (int dir = 0; dir != 2; dir ++) {
+        // When grid is sorted by <header> in <sort order>
+        WebElement headerelement = ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
+        headerelement.click();
+        ngDriver.waitForAngular();
+        // Then Angular sets the data sort order to <binding>, <sort order>
+        List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
+        WebElement row = (WebElement) rows.get(0);
+        NgWebElement ngRow = new NgWebElement(ngDriver,row);
+        String field = row.getAttribute("ng-order-by");
+        System.err.println( "Angular " + field + ": " + ngRow.evaluate(field).toString() + " " + sortOrders[dir] );
+        // Then the data in the grid is sorted by <header> in <sort order>
+        String binding = header_columns.get(header);
+        WebElement column_start = ngDriver.findElements(NgBy.repeaterElement("emp in data.employees", 0, binding )).get(0);
+        WebElement column_end = ngDriver.findElements(NgBy.repeaterElement("emp in data.employees", rows.size()-1, binding )).get(0);
+        System.err.println("column starts: " + column_start.getText());
+        System.err.println("column ends: " + column_end.getText());
+        // TODO: assert:
+        if ( dir  > 0 ){
+          System.err.println( (column_start.getText().compareTo(column_end.getText()) < 0 ));
+        } else {
+          System.err.println( (column_start.getText().compareTo(column_end.getText()) > 0 ) );
+        }
+      }
     }
   }
 
@@ -923,12 +946,12 @@ public class NgLocalFileTest {
       NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
       highlight(selectedColor);
       Object itemColor = ngSelectedColor.evaluate("$item");
-      System.err.println( "selected color: "  + itemColor.toString() );
+      System.err.println( "selected color: " + itemColor.toString() );
     }
     WebElement search = ngDriver.findElement(NgBy.model("$select.search"));
     search.click();
     ngDriver.waitForAngular();
-    List <WebElement>  availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
+    List <WebElement> availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
     Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
     while (iteratorAvailableColors.hasNext()) {
       WebElement availableColor = (WebElement) iteratorAvailableColors.next();
@@ -950,14 +973,14 @@ public class NgLocalFileTest {
     WebElement search = ngDriver.findElement(By.cssSelector("input[type='search']"));
     search.sendKeys(searchText);
     ngDriver.waitForAngular();
-    List <WebElement>  availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
+    List <WebElement> availableColors = ngDriver.findElements(By.cssSelector("div[role='option']"));
     Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
     while (iteratorAvailableColors.hasNext()) {
       WebElement availableColor = (WebElement) iteratorAvailableColors.next();
       NgWebElement ngAvailableColor = new NgWebElement(ngDriver,availableColor);
       highlight(availableColor);
       assertThat(availableColor.getText(),containsString(searchText));
-      System.err.println( "search = " + searchText + ", found :"  + availableColor.getText()  );
+      System.err.println( "search = " + searchText + ", found :" + availableColor.getText() );
     }
   }
 
@@ -973,7 +996,7 @@ public class NgLocalFileTest {
         WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
         NgWebElement ngSelectedColor = new NgWebElement(ngDriver,selectedColor);
         Object itemColor = ngSelectedColor.evaluate("$item");
-        System.err.println( "deselecting color: "  + itemColor.toString() );
+        System.err.println( "deselecting color: " + itemColor.toString() );
         WebElement ng_close = ngSelectedColor.findElement(By.cssSelector("span[class *='close']"));
         assertThat(ng_close, notNullValue());
         assertThat(ng_close.getAttribute("ng-click"), notNullValue());
@@ -1001,17 +1024,17 @@ public class NgLocalFileTest {
     for(String header : headers)
     {
       for (int cnt = 0 ; cnt != 2; cnt ++) {
-        WebElement headerelement =  ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
+        WebElement headerelement = ngDriver.findElement(By.xpath("//th/a[contains(text(),'" + header + "')]"));
         System.err.println("Clicking on header: " + header);
         headerelement.click();
         ngDriver.waitForAngular();
         List <WebElement> rows = ngDriver.findElements(NgBy.repeater("emp in data.employees"));
         WebElement row = (WebElement) rows.get(0);
         NgWebElement ngRow = new NgWebElement(ngDriver,row);
-        String field =  row.getAttribute("ng-order-by");
-        System.err.println( field  + ": " + ngRow.evaluate( field  ).toString());
-        String empField = "emp." + ngRow.evaluate( field  );
-        System.err.println( empField  + ":");
+        String field = row.getAttribute("ng-order-by");
+        System.err.println( field + ": " + ngRow.evaluate( field ).toString());
+        String empField = "emp." + ngRow.evaluate( field );
+        System.err.println( empField + ":");
         Iterator<WebElement> iteratorEmp = rows.iterator();
         while (iteratorEmp.hasNext()) {
           WebElement emp = (WebElement) iteratorEmp.next();
