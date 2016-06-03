@@ -1,4 +1,4 @@
-package se.iths.CucumberProject;
+package com.mycompany.app;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -13,8 +13,7 @@ public class CheckOut_Info_Final_Page {
 	}	
 	
 	public static WebElement pageEmptyMsg(WebDriver driver){
-		element = driver.findElement(By.className("entry-content"));
-		return element;
+		return driver.findElement(By.className("entry-content"));
 	}
 	public static String getEmptyPageMsg(WebDriver driver){
 		return CheckOut_Info_Final_Page.pageEmptyMsg(driver).getText();

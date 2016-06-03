@@ -1,4 +1,4 @@
-package se.iths.CucumberProject;
+package com.mycompany.app;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
