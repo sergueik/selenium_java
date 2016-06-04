@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import static org.junit.Assert.assertNotEquals;
@@ -438,7 +439,7 @@ public class NgWay2AutomationIntegrationTest  {
     Pattern pattern = Pattern.compile(customer_added);
     Matcher matcher = pattern.matcher(alert.getText());
     if (matcher.find()) {
-      System.err.println("customer id: " + matcher.group(1) );
+      System.err.println("New Customer id: " + matcher.group(1) );
     }
 
     // Actually add the customer 
@@ -446,7 +447,7 @@ public class NgWay2AutomationIntegrationTest  {
     
     // switch to "Customers" screen
     ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
-    // let the grid get populated
+    // Wait the grid to get populated
     
     wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
     Enumeration<WebElement> fNamecells = Collections.enumeration(ngDriver.findElements(NgBy.repeaterColumn("cust in Customers", "cust.fName")));
@@ -457,40 +458,35 @@ public class NgWay2AutomationIntegrationTest  {
       System.err.println("Customer's First Name: " + firstNameElement.getText());
       // no need for explicit findElements 
       Object objLastName = new NgWebElement(ngDriver, firstNameElement).evaluate("cust.lName");
+      assertThat(objLastName, notNullValue());
       System.err.println("Customer's Last Name: " + objLastName.toString());
-      try{
-        ArrayList<Long> accounts = (ArrayList<Long>) new NgWebElement(ngDriver, firstNameElement).evaluate("cust.accountNo");
-        if (accounts != null){
-          for (Long account : accounts) {
-            System.err.println( "Account No: " + account.toString());
-          }
-        } else {          
-            System.err.println( "No accounts");
+      // fName, lName, accountNo, postCD, id, date
+      ArrayList<Long> accounts = (ArrayList<Long>) new NgWebElement(ngDriver, firstNameElement).evaluate("cust.accountNo");
+      if (accounts != null){
+        for (Long account : accounts) {
+          System.err.println( "Account No: " + account.toString());
         }
-      }	catch(NullPointerException e) { 
-      }		
+      } else {          
+          System.err.println( "No accounts");
+      }
     }
 
     Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
-    WebElement currentCustomer = null;
+    NgWebElement ng_deleteCustomer = null;
     while (customers.hasMoreElements()){
-      currentCustomer = customers.nextElement();
+      WebElement currentCustomer = customers.nextElement();
       if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
-        NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,currentCustomer );
-        Object firstNameValue = ng_currentCustomer.evaluate("cust.fName"); // fName, lName, accountNo, postCD, id, date
-        assertThat(firstNameValue, notNullValue());
-        assertThat(firstNameValue.toString(),containsString("John"));
-        ArrayList<Long> accounts = (ArrayList<Long>) ng_currentCustomer.evaluate("cust.accountNo");
+        ng_deleteCustomer = new NgWebElement(ngDriver,currentCustomer );
         break;
       }
     }
-    assertThat(currentCustomer, notNullValue());
-    actions.moveToElement(currentCustomer).build().perform();
+    assertThat(ng_deleteCustomer.getWrappedElement(), notNullValue());
+    actions.moveToElement(ng_deleteCustomer.getWrappedElement()).build().perform();
 
-    highlight(currentCustomer);
+    highlight(ng_deleteCustomer);
     
     // delete the new customer
-    NgWebElement deleteCustomerButton = new NgWebElement(ngDriver, currentCustomer).findElement(NgBy.buttonText("Delete"));
+    NgWebElement deleteCustomerButton = ng_deleteCustomer.findElement(NgBy.buttonText("Delete"));
     assertThat(deleteCustomerButton, notNullValue());
     assertThat(deleteCustomerButton.getText(),containsString("Delete"));
     highlight(deleteCustomerButton);
@@ -500,14 +496,14 @@ public class NgWay2AutomationIntegrationTest  {
     actions.release().build().perform();
     // let the customers reload
     wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-    Thread.sleep(500);
+    Thread.sleep(100);
     // TODO: assert the customers.count change
   }
 
   
 	// @Ignore
   @Test
-  public void testAddCustomerWithNoAccount() throws Exception {
+  public void testCustomerWithNoAccount() throws Exception {
     if (isCIBuild) {
       return;
     }
@@ -539,7 +535,7 @@ public class NgWay2AutomationIntegrationTest  {
       Pattern pattern = Pattern.compile(customer_added);
       Matcher matcher = pattern.matcher(alert.getText());
       if (matcher.find()) {
-        System.err.println("customer id: " + matcher.group(1) );
+        System.err.println("New Customer id: " + matcher.group(1) );
       }
       // confirm alert
       alert.accept();
@@ -584,11 +580,20 @@ public class NgWay2AutomationIntegrationTest  {
 
     assertThat(ng_user.getText() ,containsString("John"));
     assertThat(ng_user.getText() ,containsString("Doe"));
-    // And I have no accounts
+    // And I am invited to open an account
     Object noAccount = ng_user.evaluate("noAccount"); 
     assertTrue(parseBoolean(noAccount.toString()));
-    System.err.println(noAccount.toString());
-    // NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo")); 
+    boolean hasAccounts = !(parseBoolean(noAccount.toString()));
+    System.err.println("Has accounts: " + hasAccounts);
+    WebElement message = seleniumDriver.findElement(By.cssSelector("span[ng-show='noAccount']"));
+    highlight(message);
+    System.err.println(message.getText());
+    
+    // And I have no accounts
+    NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo")); 
+    assertFalse(accountNo.isDisplayed());
+    List<WebElement> accounts = ngDriver.findElements(NgBy.repeater("account for account in Accounts")); 
+    assertThat(accounts.size(), equalTo(0));
   }
   
 	@Ignore		
