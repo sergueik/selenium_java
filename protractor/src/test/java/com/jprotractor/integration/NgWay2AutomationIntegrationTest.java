@@ -20,6 +20,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.io.IOException;
 
+
+import static java.lang.Boolean.*;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,6 +34,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 
 import java.util.concurrent.TimeUnit;
 
@@ -108,7 +112,37 @@ public class NgWay2AutomationIntegrationTest  {
     ngDriver.navigate().to(baseUrl);
   }
 
-	// @Ignore		
+  /*
+  
+  Feature: Login Feature
+
+  @test
+    Scenario: Customer Login
+    Given I go to the home page
+    When I continue as "Customer Login"
+    Then I should be able to choose customer
+    
+  @test
+    Scenario: Bank Manager Login
+    Given I go to the home page
+    When I continue as "Bank Manager Login"
+    Then I should see "Add Customer"
+    And I should see "Open Account"
+    And I should see "Customers"
+
+  @test
+    Scenario Outline: Existing Customer Login 
+    Given I go to the home page
+    When I continue as "Customer Login"
+    When I login as "<FirstName>", "<LastName>"
+    Then I am greeted by "<FirstName>", "<LastName>"
+    And I can choose my acccounts "<AccountNumbers>"
+    Examples:
+      |AccountNumbers|FirstName|LastName|
+      |1001,1002,1003|Hermoine |Granger |
+      |1004,1005,1006|Harry    |Potter  |
+  */
+	@Ignore		
   @Test
   public void testCustomerLogin() throws Exception {
     if (isCIBuild) {
@@ -125,6 +159,7 @@ public class NgWay2AutomationIntegrationTest  {
     highlight(element);
 
     Enumeration<WebElement> customers = Collections.enumeration(element.findElements(NgBy.repeater("cust in Customers")));
+    // Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
 
     while (customers.hasMoreElements()){
       WebElement currentCustomer = customers.nextElement();
@@ -144,25 +179,25 @@ public class NgWay2AutomationIntegrationTest  {
     String user = ngDriver.findElement(NgBy.binding("user")).getText() ;
     assertTrue(user.matches("^(?:[^ ]+) +(?:[^ ]+)$"));
     assertThat(user,containsString("Harry"));
-    NgWebElement accountNumber = ngDriver.findElement(NgBy.binding("accountNo"));
+    NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
     // And I see a valid account number
-    highlight(accountNumber);
-    assertThat(accountNumber, notNullValue());
-    assertTrue(accountNumber.getText().matches("^\\d+$"));
+    highlight(accountNo);
+    assertThat(accountNo, notNullValue());
+    assertTrue(accountNo.getText().matches("^\\d+$"));
     // And I see one of my account details
-    String customerAccountsString = "1004,1005,1006";
-    String[] customerAccounts = customerAccountsString.split(",");
+    String allCustomerAccountsAsString = "1004,1005,1006";
+    String[] customerAccounts = allCustomerAccountsAsString.split(",");
     Pattern pattern = Pattern.compile("(" + StringUtils.join(customerAccounts, "|") + ")");
-		Matcher matcher = pattern.matcher(accountNumber.getText());
+		Matcher matcher = pattern.matcher(accountNo.getText());
 		assertTrue(matcher.find());
     
     // And I can choose any of my accounts
     ArrayList<String>avaliableAccounts = new ArrayList<String>();
-    Enumeration<WebElement> accountOptions = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
-    while (accountOptions.hasMoreElements()){
-        WebElement currentAccount = accountOptions.nextElement();
-        assertTrue(currentAccount.getText().matches("^\\d+$"));
-        avaliableAccounts.add(currentAccount.getText());
+    Enumeration<WebElement> options = Collections.enumeration(ngDriver.findElements(NgBy.options("account for account in Accounts")));
+    while (options.hasMoreElements()){
+        String accountOption = options.nextElement().getText();
+        assertTrue(accountOption.matches("^\\d+$"));
+        avaliableAccounts.add(accountOption);
     }
     assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays.asList(customerAccounts))));
 
@@ -171,7 +206,7 @@ public class NgWay2AutomationIntegrationTest  {
 
   }
 
-	//	@Ignore
+	@Ignore
 	@Test
   public void testEvaluateTransactionDetails() throws Exception {
     if (isCIBuild) {
@@ -225,7 +260,7 @@ public class NgWay2AutomationIntegrationTest  {
     }
   }	
   
-  // @Ignore		
+  @Ignore		
   @Test
   public void testOpenAccount() throws Exception {
     if (isCIBuild) {
@@ -281,7 +316,7 @@ public class NgWay2AutomationIntegrationTest  {
 
   }
 
-	// @Ignore
+	@Ignore
   @Test
   public void testSortCustomerAccounts() throws Exception {
     if (isCIBuild) {
@@ -305,11 +340,12 @@ public class NgWay2AutomationIntegrationTest  {
     // sort the customers in reverse
     highlight(sort_link);
     sort_link.click();
+    // FindElement is equivalent to FindElements...get(0)
     WebElement first_customer = ngDriver.findElement(NgBy.repeater("cust in Customers"));
     assertThat(first_customer.getText(),containsString(last_customer_name));
   }
 
-	// @Ignore
+	@Ignore
   @Test
   public void testListTransactions() throws Exception {
     if (isCIBuild) {
@@ -404,34 +440,47 @@ public class NgWay2AutomationIntegrationTest  {
     if (matcher.find()) {
       System.err.println("customer id: " + matcher.group(1) );
     }
-    // confirm alert
+
+    // Actually add the customer 
     alert.accept();
     
     // switch to "Customers" screen
     ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
-    Thread.sleep(500);
-
+    // let the grid get populated
+    
     wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy.repeater("cust in Customers"))));
     Enumeration<WebElement> fNamecells = Collections.enumeration(ngDriver.findElements(NgBy.repeaterColumn("cust in Customers", "cust.fName")));
     while (fNamecells.hasMoreElements()){
       WebElement firstNameElement = fNamecells.nextElement();
+      actions.moveToElement(firstNameElement).build().perform();
       highlight(firstNameElement);
-      System.err.println("Customer's First Name: " + firstNameElement.getText());					
+      System.err.println("Customer's First Name: " + firstNameElement.getText());
+      // no need for explicit findElements 
+      Object objLastName = new NgWebElement(ngDriver, firstNameElement).evaluate("cust.lName");
+      System.err.println("Customer's Last Name: " + objLastName.toString());
+      try{
+        ArrayList<Long> accounts = (ArrayList<Long>) new NgWebElement(ngDriver, firstNameElement).evaluate("cust.accountNo");
+        if (accounts != null){
+          for (Long account : accounts) {
+            System.err.println( "Account No: " + account.toString());
+          }
+        } else {          
+            System.err.println( "No accounts");
+        }
+      }	catch(NullPointerException e) { 
+      }		
     }
 
     Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
     WebElement currentCustomer = null;
     while (customers.hasMoreElements()){
       currentCustomer = customers.nextElement();
-      if (currentCustomer.getText().indexOf("Harry Potter") >= 0 ){
+      if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
         NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,currentCustomer );
         Object firstNameValue = ng_currentCustomer.evaluate("cust.fName"); // fName, lName, accountNo, postCD, id, date
         assertThat(firstNameValue, notNullValue());
-        assertThat(firstNameValue.toString(),containsString("Harry"));
+        assertThat(firstNameValue.toString(),containsString("John"));
         ArrayList<Long> accounts = (ArrayList<Long>) ng_currentCustomer.evaluate("cust.accountNo");
-        for (Long account : accounts) {
-          System.err.println( "Account No: " + account.toString());
-        }
         break;
       }
     }
@@ -455,7 +504,94 @@ public class NgWay2AutomationIntegrationTest  {
     // TODO: assert the customers.count change
   }
 
-	// @Ignore		
+  
+	// @Ignore
+  @Test
+  public void testAddCustomerWithNoAccount() throws Exception {
+    if (isCIBuild) {
+      return;
+    }
+    // When I proceed to "Bank Manager Login"
+    ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+    // And I proceed to "Add Customer"
+    ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
+
+    NgWebElement firstName = ngDriver.findElement(NgBy.model("fName"));
+    assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
+    firstName.sendKeys("John");
+
+    NgWebElement lastName = ngDriver.findElement(NgBy.model("lName"));
+    assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
+    lastName.sendKeys("Doe");
+
+    NgWebElement postCode = ngDriver.findElement(NgBy.model("postCd"));
+    assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
+    postCode.sendKeys("11011");
+    // And I add no accounts
+    
+    // NOTE: there are two 'Add Customer' buttons on this form
+    WebElement addCustomerButtonElement = ngDriver.findElements(NgBy.partialButtonText("Add Customer")).get(1);
+    addCustomerButtonElement.submit();
+    try {
+      alert = seleniumDriver.switchTo().alert();
+      String customer_added = "Customer added successfully with customer id :(\\d+)";
+      
+      Pattern pattern = Pattern.compile(customer_added);
+      Matcher matcher = pattern.matcher(alert.getText());
+      if (matcher.find()) {
+        System.err.println("customer id: " + matcher.group(1) );
+      }
+      // confirm alert
+      alert.accept();
+    } catch (NoAlertPresentException ex){
+      // Alert not present
+      System.err.println(ex.getStackTrace());
+      return;
+    } catch(WebDriverException ex){
+      // Alert not handled by PhantomJS
+      System.err.println("Alert was not handled by PhantomJS: " + ex.getStackTrace());
+      return;
+    }
+    
+    // And I switch to "Home" screen
+    NgWebElement ng_home = ngDriver.findElement(NgBy.buttonText("Home"));
+    highlight(ng_home);
+    ng_home.click();
+    // And I proceed to "Customer Login"
+    ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+
+    
+    // And I login as "John Doe" 			
+    Enumeration<WebElement> customers = Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+    while (customers.hasMoreElements()){
+      WebElement currentCustomer = customers.nextElement();
+      if (currentCustomer.getText().indexOf("John Doe") >= 0 ){
+        System.err.println(currentCustomer.getText());
+        currentCustomer.click();
+      }
+    }
+
+    NgWebElement ng_login = ngDriver.findElement(NgBy.buttonText("Login"));
+    highlight(ng_login);
+    assertTrue(ng_login.isEnabled());
+    
+    ng_login.click();
+
+    ngDriver.waitForAngular();
+    // Then I am greeted as "John Doe"
+    NgWebElement ng_user = ngDriver.findElement(NgBy.binding("user"));
+    System.err.println(ng_user.getAttribute("outerHTML"));
+
+    assertThat(ng_user.getText() ,containsString("John"));
+    assertThat(ng_user.getText() ,containsString("Doe"));
+    // And I have no accounts
+    Object noAccount = ng_user.evaluate("noAccount"); 
+    assertTrue(parseBoolean(noAccount.toString()));
+    System.err.println(noAccount.toString());
+    // NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo")); 
+  }
+  
+	@Ignore		
   @Test
   public void testDepositAndWithdraw() throws Exception {
     if (isCIBuild) {
