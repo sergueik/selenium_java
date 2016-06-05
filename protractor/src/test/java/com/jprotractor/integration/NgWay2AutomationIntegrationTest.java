@@ -143,7 +143,7 @@ public class NgWay2AutomationIntegrationTest  {
       |1001,1002,1003|Hermoine |Granger |
       |1004,1005,1006|Harry    |Potter  |
   */
-	@Ignore		
+	// @Ignore		
   @Test
   public void testCustomerLogin() throws Exception {
     if (isCIBuild) {
@@ -207,7 +207,7 @@ public class NgWay2AutomationIntegrationTest  {
 
   }
 
-	@Ignore
+	// @Ignore
 	@Test
   public void testEvaluateTransactionDetails() throws Exception {
     if (isCIBuild) {
@@ -261,7 +261,7 @@ public class NgWay2AutomationIntegrationTest  {
     }
   }	
   
-  @Ignore		
+  // @Ignore		
   @Test
   public void testOpenAccount() throws Exception {
     if (isCIBuild) {
@@ -317,7 +317,7 @@ public class NgWay2AutomationIntegrationTest  {
 
   }
 
-	@Ignore
+	// @Ignore
   @Test
   public void testSortCustomerAccounts() throws Exception {
     if (isCIBuild) {
@@ -346,7 +346,7 @@ public class NgWay2AutomationIntegrationTest  {
     assertThat(first_customer.getText(),containsString(last_customer_name));
   }
 
-	@Ignore
+	// @Ignore
   @Test
   public void testListTransactions() throws Exception {
     if (isCIBuild) {
@@ -398,7 +398,7 @@ public class NgWay2AutomationIntegrationTest  {
     }
   }
 
-	// @Ignore
+	// // @Ignore
   @Test
   public void testAddCustomer() throws Exception {
     if (isCIBuild) {
@@ -501,7 +501,7 @@ public class NgWay2AutomationIntegrationTest  {
   }
 
   
-	// @Ignore
+	// // @Ignore
   @Test
   public void testCustomerWithNoAccount() throws Exception {
     if (isCIBuild) {
@@ -568,24 +568,24 @@ public class NgWay2AutomationIntegrationTest  {
     }
 
     NgWebElement ng_login = ngDriver.findElement(NgBy.buttonText("Login"));
-    highlight(ng_login);
     assertTrue(ng_login.isEnabled());
-    
+    highlight(ng_login);    
     ng_login.click();
 
     ngDriver.waitForAngular();
     // Then I am greeted as "John Doe"
     NgWebElement ng_user = ngDriver.findElement(NgBy.binding("user"));
-    System.err.println(ng_user.getAttribute("outerHTML"));
+    // System.err.println(ng_user.getAttribute("outerHTML"));
 
-    assertThat(ng_user.getText() ,containsString("John"));
-    assertThat(ng_user.getText() ,containsString("Doe"));
+    assertThat(ng_user.getText(), containsString("John"));
+    assertThat(ng_user.getText(), containsString("Doe"));
     // And I am invited to open an account
     Object noAccount = ng_user.evaluate("noAccount"); 
     assertTrue(parseBoolean(noAccount.toString()));
     boolean hasAccounts = !(parseBoolean(noAccount.toString()));
     System.err.println("Has accounts: " + hasAccounts);
     WebElement message = seleniumDriver.findElement(By.cssSelector("span[ng-show='noAccount']"));
+    assertTrue(message.isDisplayed());
     highlight(message);
     System.err.println(message.getText());
     
@@ -596,7 +596,7 @@ public class NgWay2AutomationIntegrationTest  {
     assertThat(accounts.size(), equalTo(0));
   }
   
-	@Ignore		
+	// @Ignore		
   @Test
   public void testDepositAndWithdraw() throws Exception {
     if (isCIBuild) {

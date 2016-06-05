@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html ng-app="myApp">
 <head>
-<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js">
+<script src="angular.js">
 </script>
 <script type='text/javascript'>
 
@@ -10,7 +10,8 @@ app.controller('myCtrl', function ($timeout, $scope) {
   $scope.countList = [
     { id: 1, name: 'One' },
     { id: 2, name: 'Two' },
-    { id: 3, name: 'Three' }
+    { id: 3, name: 'Three' },
+    { id: 4, name: 'Four' }
   ];
   $scope.countSelected = $scope.countList[0].id;    
   // alert('Selected count ID: ' + $scope.countSelected);
