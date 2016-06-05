@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.JavascriptExecutor;
@@ -55,11 +56,14 @@ public class CommonFunctions {
       // For desktop browser testing, run a Selenium node and Selenium hub on port 4444	
       // For Vagrant box browser testing have localhost port 4444 forwarded to the hub 4444
       
+
       DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
+      seleniumDriver = new FirefoxDriver(capabilities);
       // FirefoxProfile profile = new ProfilesIni().getProfile("default");
       // profile.setEnableNativeEvents(false);
       // capabilities.setCapability("firefox_profile", profile);
-      seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+      
+      // seleniumDriver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
       return seleniumDriver;
     } else {
       DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs", "", Platform.ANY);			
