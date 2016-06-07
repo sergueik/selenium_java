@@ -14,33 +14,33 @@ import java.util.List;
  */
 public class JPageFactoryElementLocator extends DefaultElementLocator {
 
-    public JPageFactoryElementLocator(SearchContext searchContext, Field field) {
-        super(searchContext, field);
-    }
+  public JPageFactoryElementLocator(SearchContext searchContext, Field field) {
+    super(searchContext, field);
+  }
 
-    public JPageFactoryElementLocator(SearchContext searchContext, AbstractAnnotations annotations) {
-        super(searchContext, annotations);
-    }
+  public JPageFactoryElementLocator(SearchContext searchContext, AbstractAnnotations annotations) {
+    super(searchContext, annotations);
+  }
 
-    @Override
-    public WebElement findElement() {
+  @Override
+  public WebElement findElement() {
 
-        WebElement element = super.findElement();
-        if (element instanceof NgWebElement) {
-            return ((NgWebElement) element).getWrappedElement();
-        }
-        return element;
+    WebElement element = super.findElement();
+    if (element instanceof NgWebElement) {
+      return ((NgWebElement) element).getWrappedElement();
     }
+    return element;
+  }
 
-    @Override
-    public List<WebElement> findElements() {
-        List<WebElement> elements = super.findElements();
-        for (int i = 0; i < elements.size(); i++) {
-            WebElement element = elements.get(i);
-            if (element instanceof NgWebElement) {
-                elements.add(i, ((NgWebElement) element).getWrappedElement());
-            }
-        }
-        return elements;
+  @Override
+  public List<WebElement> findElements() {
+    List<WebElement> elements = super.findElements();
+    for (int i = 0; i < elements.size(); i++) {
+      WebElement element = elements.get(i);
+      if (element instanceof NgWebElement) {
+        elements.add(i, ((NgWebElement) element).getWrappedElement());
+      }
     }
+    return elements;
+  }
 }

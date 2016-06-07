@@ -11,20 +11,20 @@ import java.lang.reflect.Field;
  */
 public class JPageFactoryElementLocatorFactory implements ElementLocatorFactory {
 
-    private final SearchContext searchContext;
-    private Channel channel;
+  private final SearchContext searchContext;
+  private Channel channel;
 
-    public JPageFactoryElementLocatorFactory(SearchContext searchContext) {
-        this.searchContext = searchContext;
-        this.channel = Channel.WEB;
-    }
+  public JPageFactoryElementLocatorFactory(SearchContext searchContext) {
+    this.searchContext = searchContext;
+    this.channel = Channel.WEB;
+  }
 
-    public JPageFactoryElementLocatorFactory(SearchContext searchContext, Channel channel) {
-        this.searchContext = searchContext;
-        this.channel = channel;
-    }
+  public JPageFactoryElementLocatorFactory(SearchContext searchContext, Channel channel) {
+    this.searchContext = searchContext;
+    this.channel = channel;
+  }
 
-    public ElementLocator createLocator(Field field) {
-        return new JPageFactoryElementLocator(searchContext, new JPageFactoryAnnotations(field, channel));
-    }
+  public ElementLocator createLocator(Field field) {
+    return new JPageFactoryElementLocator(searchContext, new JPageFactoryAnnotations(field, channel));
+  }
 }

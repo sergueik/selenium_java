@@ -14,60 +14,58 @@ import java.util.concurrent.TimeUnit;
  */
 public class SuperCalculatorPage {
 
-    @FindBy(how = How.MODEL, using = "first")
-    private WebElement firstNumber;
+  @FindBy(how = How.MODEL, using = "first")
+  private WebElement firstNumber;
 
-    // the @FindBy annotation below gives an example of defining different locators for web and mobile channels, a simpler way is to do the same as firstNumber input above
-    @FindBy(howWeb = How.INPUT, usingWeb = "second", howMobile = How.XPATH, usingMobile = "//input[@ng-model='second']")
-    private WebElement secondNumber;
+  // the @FindBy annotation below gives an example of defining different locators for web and mobile channels, a simpler way is to do the same as firstNumber input above
+  @FindBy(howWeb = How.INPUT, usingWeb = "second", howMobile = How.XPATH, usingMobile = "//input[@ng-model='second']")
+  private WebElement secondNumber;
 
-    @FindBy(how = How.MODEL, using = "operator")
-    private WebElement operatorSelect;
+  @FindBy(how = How.MODEL, using = "operator")
+  private WebElement operatorSelect;
 
-    @FindBy(how = How.ID, using = "gobutton")
-    private WebElement goButton;
+  @FindBy(how = How.ID, using = "gobutton")
+  private WebElement goButton;
 
-    @FindBy(how = How.BINDING, using = "latest")
-    private WebElement latestResult;
+  @FindBy(how = How.BINDING, using = "latest")
+  private WebElement latestResult;
 
-    @FindAll({
-            @FindBy(how = How.REPEATER, using = "result in memory")
-    })
-    private List<WebElement> history;
+  @FindAll({
+    @FindBy(how = How.REPEATER, using = "result in memory")
+  })
+  private List<WebElement> history;
 
-    public void add(String first, String second) throws InterruptedException {
-        firstNumber.clear();
-        secondNumber.clear();
+  public void add(String first, String second) throws InterruptedException {
+    firstNumber.clear();
+    secondNumber.clear();
 
-        firstNumber.sendKeys(first);
-        secondNumber.sendKeys(second);
+    firstNumber.sendKeys(first);
+    secondNumber.sendKeys(second);
 
-        goButton.click();
+    goButton.click();
 
-        TimeUnit.SECONDS.sleep(5);
-    }
+    TimeUnit.SECONDS.sleep(5);
+  }
 
-    public void times(String first, String second) throws InterruptedException {
-        firstNumber.clear();
-        secondNumber.clear();
+  public void times(String first, String second) throws InterruptedException {
+    firstNumber.clear();
+    secondNumber.clear();
 
-        firstNumber.sendKeys(first);
-        secondNumber.sendKeys(second);
+    firstNumber.sendKeys(first);
+    secondNumber.sendKeys(second);
 
-        Select select = new Select(operatorSelect);
-        select.selectByValue("MULTIPLICATION");
+    Select select = new Select(operatorSelect);
+    select.selectByValue("MULTIPLICATION");
 
-        goButton.click();
+    goButton.click();
+    TimeUnit.SECONDS.sleep(5);
+  }
 
-        TimeUnit.SECONDS.sleep(5);
-    }
+  public int getNumberOfHistoryEntries() {
+    return history.size();
+  }
 
-    public int getNumberOfHistoryEntries() {
-        return history.size();
-    }
-
-    public String getLatestResult() {
-        return latestResult.getText();
-    }
-
+  public String getLatestResult() {
+    return latestResult.getText();
+  }
 }

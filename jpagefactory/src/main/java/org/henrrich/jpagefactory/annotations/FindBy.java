@@ -18,13 +18,13 @@ import java.lang.annotation.Target;
  * Usage:
  * <pre>
  * {@code
- *     public class MyPage extends GeneralPage {
+ *   public class MyPage extends GeneralPage {
  *
- *         @FindBy(how = UnitardHow.INPUT, using = "user.name")
- *         private WebElement usernameInput
+ *     @FindBy(how = UnitardHow.INPUT, using = "user.name")
+ *     private WebElement usernameInput
  *
- *         ...
- *     }
+ *     ...
+ *   }
  * }
  * </pre>
  *
@@ -45,15 +45,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.TYPE})
 public @interface FindBy {
-    How how() default How.UNSET;
-
-    How howWeb() default How.UNSET;
-
-    How howMobile() default How.UNSET;
-
-    String using() default "";
-
-    String usingWeb() default "";
-
-    String usingMobile() default "";
+  How how() default How.UNSET;
+  How howWeb() default How.UNSET;
+  How howMobile() default How.UNSET;
+  String using() default "";
+  String usingWeb() default "";
+  String usingMobile() default "";
 }

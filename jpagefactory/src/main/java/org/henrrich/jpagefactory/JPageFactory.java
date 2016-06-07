@@ -8,15 +8,15 @@ import org.openqa.selenium.support.PageFactory;
  */
 public class JPageFactory {
 
-    public static void initElements(SearchContext searchContext, Channel channel, Object page) {
-        PageFactory.initElements(new JPageFactoryFieldDecorator(new JPageFactoryElementLocatorFactory(searchContext, channel)), page);
-    }
+  public static void initElements(SearchContext searchContext, Channel channel, Object page) {
+    PageFactory.initElements(new JPageFactoryFieldDecorator(new JPageFactoryElementLocatorFactory(searchContext, channel)), page);
+  }
 
-    public static void initWebElements(SearchContext searchContext, Object page) {
-        initElements(searchContext, Channel.WEB, page);
-    }
+  public static void initWebElements(SearchContext searchContext, Object page) {
+    initElements(searchContext, Channel.WEB, page);
+  }
 
-    public static void initMobileElements(SearchContext searchContext, Object page) {
-        initElements(searchContext, Channel.MOBILE, page);
-    }
+  public static void initMobileElements(SearchContext searchContext, Object page) {
+    initElements(searchContext, Channel.MOBILE, page);
+  }
 }
