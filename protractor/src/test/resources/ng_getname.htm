@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html ng-app>  
+<head lang="en">
+<meta charset="utf-8">
+<title>Custom Plunker</title>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
+<link rel="stylesheet" href="style.css">
+<link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.1.1/css/bootstrap-combined.min.css" rel="stylesheet">
+<script>
+  function MainCtrl($scope) {
+    $scope.firstName = "";
+    $scope.lastName = "";
+    $scope.getName = function() {
+      return $scope.firstName + " " + $scope.lastName;
+    };
+  }
+  
+</script>  
+</head>
+
+<body ng-controller="MainCtrl">
+<br />
+<form class="form-vertical">
+<div class="control-group">
+  <label class="control-label" for="firstName">First Name:</label>
+  <div class="controls">
+    <input ng-model="firstName">    
+  </div>
+</div>
+<div class="control-group">
+  <label class="control-label" for="firstName">Last Name:</label>
+  <div class="controls">
+    <input ng-model="lastName">    
+  </div>
+</div>
+<div class="control-group">
+  <h4 class="text-info">{{ getName() }}</h4>
+ </div>
+</form>  
+</body>
+</html>
