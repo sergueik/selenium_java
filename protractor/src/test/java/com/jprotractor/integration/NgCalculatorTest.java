@@ -61,6 +61,7 @@ import com.jprotractor.NgWebElement;
 
 /**
  * Integration tests of Calculator http://juliemr.github.io/protractor-demo/
+ * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -77,18 +78,20 @@ public class NgCalculatorTest {
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
-	static boolean isCIBuild =  false;
+	static boolean isCIBuild = false;
 	private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
 
 	@BeforeClass
-	public static void setup() throws IOException{
+	public static void setup() throws IOException {
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
-		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait );
-		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-		actions = new Actions(seleniumDriver);		
+		seleniumDriver.manage().window().setSize(new Dimension(width, height));
+		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+				.setScriptTimeout(10, TimeUnit.SECONDS);
+		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
@@ -100,21 +103,22 @@ public class NgCalculatorTest {
 	@Test
 	public void testAddition() throws Exception {
 		NgWebElement element = ngDriver.findElement(NgBy.model("first"));
-		assertThat(element,notNullValue());
+		assertThat(element, notNullValue());
 		highlight(element);
 		element.sendKeys("40");
 		element = ngDriver.findElement(NgBy.model("second"));
-		assertThat(element,notNullValue());
+		assertThat(element, notNullValue());
 		highlight(element);
 		element.sendKeys("2");
-		element = ngDriver.findElement(NgBy.options("value for (key, value) in operators"));
-		assertThat(element,notNullValue());
+		element = ngDriver.findElement(NgBy
+				.options("value for (key, value) in operators"));
+		assertThat(element, notNullValue());
 		element.click();
 		element = ngDriver.findElement(NgBy.buttonText("Go!"));
-		assertThat(element,notNullValue());
-		assertThat(element.getText(),containsString("Go"));
+		assertThat(element, notNullValue());
+		assertThat(element.getText(), containsString("Go"));
 		element.click();
-		element = ngDriver.findElement(NgBy.binding("latest" ));
+		element = ngDriver.findElement(NgBy.binding("latest"));
 		assertThat(element, notNullValue());
 		assertThat(element.getText(), equalTo("42"));
 		highlight(element);
@@ -123,7 +127,7 @@ public class NgCalculatorTest {
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
-		seleniumDriver.quit();		
+		seleniumDriver.quit();
 	}
 
 	private static void highlight(WebElement element) throws InterruptedException {
@@ -131,5 +135,3 @@ public class NgCalculatorTest {
 	}
 
 }
-
-

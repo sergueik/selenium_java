@@ -68,148 +68,164 @@ import com.jprotractor.NgWebElement;
 
 public class NgDatePickerTest {
 
-  private static String fullStackTrace;
-  private static NgWebDriver ngDriver;
-  private static WebDriver seleniumDriver;
-  static WebDriverWait wait;
-  static Actions actions;
-  static Alert alert;
-  static int implicitWait = 10;
-  static int flexibleWait = 5;
-  static long pollingInterval = 500;
-  static int width = 600;
-  static int height = 400;
-  // set to true for Desktop, false for headless browser testing
-  static boolean isCIBuild =  false;
-  private static String baseUrl = "http://dalelotts.github.io/angular-bootstrap-datetimepicker/";
+	private static String fullStackTrace;
+	private static NgWebDriver ngDriver;
+	private static WebDriver seleniumDriver;
+	static WebDriverWait wait;
+	static Actions actions;
+	static Alert alert;
+	static int implicitWait = 10;
+	static int flexibleWait = 5;
+	static long pollingInterval = 500;
+	static int width = 600;
+	static int height = 400;
+	// set to true for Desktop, false for headless browser testing
+	static boolean isCIBuild = false;
+	private static String baseUrl = "http://dalelotts.github.io/angular-bootstrap-datetimepicker/";
 
-  @BeforeClass
-  public static void setup() throws IOException{
-    isCIBuild = CommonFunctions.checkEnvironment();
-    seleniumDriver = CommonFunctions.getSeleniumDriver();
-    seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-    seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
-    wait = new WebDriverWait(seleniumDriver, flexibleWait );
-    wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-    actions = new Actions(seleniumDriver);		
-    ngDriver = new NgWebDriver(seleniumDriver);
-  }
+	@BeforeClass
+	public static void setup() throws IOException {
+		isCIBuild = CommonFunctions.checkEnvironment();
+		seleniumDriver = CommonFunctions.getSeleniumDriver();
+		seleniumDriver.manage().window().setSize(new Dimension(width, height));
+		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+				.setScriptTimeout(10, TimeUnit.SECONDS);
+		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(seleniumDriver);
+		ngDriver = new NgWebDriver(seleniumDriver);
+	}
 
-  @Before
-  public void beforeEach() {
-    ngDriver.navigate().to(baseUrl);
-  }
-  
- 
-  @Test
-  public void testDatePickerDirectSelect() throws Exception {
-    NgWebElement ng_result;
-    try{
-      ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput"));      
-    } catch(WebDriverException e) {
-      // Assert.assertThat(e.getMessage(), CoreMatchers.containsString("no injector found for element argument to getTestability"));
-      assertTrue(e.getMessage().contains("no injector found for element argument to getTestability"));
-      // System.err.println( "exception information" + e.getAdditionalInformation());
-      System.err.println( "exception message(expected): " + e.getMessage());
-    } catch(Exception e) {
-      throw(e);
-    }
-    
-    ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput", "[data-ng-app]"));
-    assertThat(ng_result, notNullValue());
-    assertTrue(ng_result.getAttribute("type").matches("text"));
-    actions.moveToElement(ng_result.getWrappedElement()).build().perform();
-    highlight(ng_result);
-    NgWebElement ng_calendar = ngDriver.findElement(By.cssSelector(".input-group-addon"));
-    assertThat(ng_calendar, notNullValue());
-    highlight(ng_calendar);
-    actions.moveToElement(ng_calendar.getWrappedElement()).click().build().perform();
-    // need a little more room
-    int datepicker_width = 900 ;
-    int datepicker_heght =  800 ;
-    seleniumDriver.manage().window().setSize(new Dimension(datepicker_width , datepicker_heght ));
-    NgWebElement ng_dropdown = ngDriver.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
-    assertThat(ng_dropdown,notNullValue());
-    highlight(ng_dropdown);
-    String monthDate = "12";
-    WebElement dateElement = ng_dropdown.findElements(NgBy.cssContainingText("td.ng-binding",monthDate)).get(0);
-    assertThat(dateElement,notNullValue());
-    highlight(dateElement);
-    System.err.println("Mondh Date: " + dateElement.getText());
-    dateElement.click();
-    ngDriver.waitForAngular();
-    NgWebElement ng_element = ng_dropdown.findElement(NgBy.model("data.dateDropDownInput", "[data-ng-app]"));
-    assertThat(ng_element,notNullValue());
-    highlight(ng_element);
-    // System.err.println(ng_element.getAttribute("innerHTML"));    
-    List<WebElement> ng_dataDates = ng_dropdown .findElements(NgBy.repeater("dateObject in data.dates"));
-    assertThat(ng_dataDates.size(), equalTo(24));
-    // Thread.sleep(10000);
-    
-    String timeOfDay = "6:00 PM";
-    WebElement ng_hour = ng_element.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
-    // java.lang.NullPointerException
-    assertThat(ng_hour,notNullValue());
-    highlight(ng_hour);
-    System.err.println("Hour of the day: " + ng_hour.getText());
-    ng_hour.click();
-    ngDriver.waitForAngular();
-    String specificMinute = "6:35 PM";
-    // reload,     
-    try{
-      ng_element = ng_dropdown.findElement(NgBy.model("data.dateDropDownInput", "[data-ng-app]"));
-      assertThat(ng_element,notNullValue());
-      highlight(ng_element);
-      // System.err.println("Dropdown: " + ng_element.getText());
-    } catch (StaleElementReferenceException e)  { 
-      // org.openqa.selenium.StaleElementReferenceException in Phantom JS 
-      // works fine with desktop browsers
-      if (isCIBuild) {
-        System.err.println("Ignoring StaleElementReferenceException" );
-      } else {
-        System.err.println("Enexpected exception" );
-        throw(e);        
-      }
-    }
-    WebElement ng_minute;
-    try{
-      ng_minute = ng_element.findElements(NgBy.cssContainingText("span.minute", specificMinute)).get(0);      
-      assertThat(ng_minute,notNullValue());
-      highlight(ng_minute);
-      System.err.println("Time of the day: " + ng_minute.getText());
-      ng_minute.click();
-    } catch (StaleElementReferenceException e)  { 
-      if (isCIBuild) {
-        System.err.println("Ignoring StaleElementReferenceException" );
-      } else {
-        throw(e);        
-      }
-    }
-    try{
-      ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput", "[data-ng-app]"));
-      highlight(ng_result);
-      System.err.println("Selected Date/time : " + ng_result.getAttribute("value"));
-      // "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
-      assertTrue(ng_result.getAttribute("value").matches("\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
-    } catch (StaleElementReferenceException e)  { 
-      if (isCIBuild) {
-        System.err.println("Ignoring StaleElementReferenceException" );
-      } else {
-        throw(e);        
-      }
-    }    
-  }
+	@Before
+	public void beforeEach() {
+		ngDriver.navigate().to(baseUrl);
+	}
 
-  @AfterClass
-  public static void teardown() {
-    ngDriver.close();
-    seleniumDriver.quit();		
-  }
+	@Test
+	public void testDatePickerDirectSelect() throws Exception {
+		NgWebElement ng_result;
+		try {
+			ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput"));
+		} catch (WebDriverException e) {
+			// Assert.assertThat(e.getMessage(),
+			// CoreMatchers.containsString("no injector found for element argument to getTestability"));
+			assertTrue(e.getMessage().contains(
+					"no injector found for element argument to getTestability"));
+			// System.err.println( "exception information" +
+			// e.getAdditionalInformation());
+			System.err.println("exception message(expected): " + e.getMessage());
+		} catch (Exception e) {
+			throw (e);
+		}
 
-  private static void highlight(WebElement element) throws InterruptedException {
-	  CommonFunctions.highlight(element);
-  }
+		ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput",
+				"[data-ng-app]"));
+		assertThat(ng_result, notNullValue());
+		assertTrue(ng_result.getAttribute("type").matches("text"));
+		actions.moveToElement(ng_result.getWrappedElement()).build().perform();
+		highlight(ng_result);
+		NgWebElement ng_calendar = ngDriver.findElement(By
+				.cssSelector(".input-group-addon"));
+		assertThat(ng_calendar, notNullValue());
+		highlight(ng_calendar);
+		actions.moveToElement(ng_calendar.getWrappedElement()).click().build()
+				.perform();
+		// need a little more room
+		int datepicker_width = 900;
+		int datepicker_heght = 800;
+		seleniumDriver.manage().window()
+				.setSize(new Dimension(datepicker_width, datepicker_heght));
+		NgWebElement ng_dropdown = ngDriver.findElement(By
+				.cssSelector("div.dropdown.open ul.dropdown-menu"));
+		assertThat(ng_dropdown, notNullValue());
+		highlight(ng_dropdown);
+		String monthDate = "12";
+		WebElement dateElement = ng_dropdown.findElements(
+				NgBy.cssContainingText("td.ng-binding", monthDate)).get(0);
+		assertThat(dateElement, notNullValue());
+		highlight(dateElement);
+		System.err.println("Mondh Date: " + dateElement.getText());
+		dateElement.click();
+		ngDriver.waitForAngular();
+		NgWebElement ng_element = ng_dropdown.findElement(NgBy.model(
+				"data.dateDropDownInput", "[data-ng-app]"));
+		assertThat(ng_element, notNullValue());
+		highlight(ng_element);
+		// System.err.println(ng_element.getAttribute("innerHTML"));
+		List<WebElement> ng_dataDates = ng_dropdown.findElements(NgBy
+				.repeater("dateObject in data.dates"));
+		assertThat(ng_dataDates.size(), equalTo(24));
+		// Thread.sleep(10000);
+
+		String timeOfDay = "6:00 PM";
+		WebElement ng_hour = ng_element.findElements(
+				NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
+		// java.lang.NullPointerException
+		assertThat(ng_hour, notNullValue());
+		highlight(ng_hour);
+		System.err.println("Hour of the day: " + ng_hour.getText());
+		ng_hour.click();
+		ngDriver.waitForAngular();
+		String specificMinute = "6:35 PM";
+		// reload,
+		try {
+			ng_element = ng_dropdown.findElement(NgBy.model("data.dateDropDownInput",
+					"[data-ng-app]"));
+			assertThat(ng_element, notNullValue());
+			highlight(ng_element);
+			// System.err.println("Dropdown: " + ng_element.getText());
+		} catch (StaleElementReferenceException e) {
+			// org.openqa.selenium.StaleElementReferenceException in Phantom JS
+			// works fine with desktop browsers
+			if (isCIBuild) {
+				System.err.println("Ignoring StaleElementReferenceException");
+			} else {
+				System.err.println("Enexpected exception");
+				throw (e);
+			}
+		}
+		WebElement ng_minute;
+		try {
+			ng_minute = ng_element.findElements(
+					NgBy.cssContainingText("span.minute", specificMinute)).get(0);
+			assertThat(ng_minute, notNullValue());
+			highlight(ng_minute);
+			System.err.println("Time of the day: " + ng_minute.getText());
+			ng_minute.click();
+		} catch (StaleElementReferenceException e) {
+			if (isCIBuild) {
+				System.err.println("Ignoring StaleElementReferenceException");
+			} else {
+				throw (e);
+			}
+		}
+		try {
+			ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput",
+					"[data-ng-app]"));
+			highlight(ng_result);
+			System.err.println("Selected Date/time : "
+					+ ng_result.getAttribute("value"));
+			// "Thu May 12 2016 18:35:00 GMT-0400 (Eastern Standard Time)"
+			assertTrue(ng_result.getAttribute("value").matches(
+					"\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
+		} catch (StaleElementReferenceException e) {
+			if (isCIBuild) {
+				System.err.println("Ignoring StaleElementReferenceException");
+			} else {
+				throw (e);
+			}
+		}
+	}
+
+	@AfterClass
+	public static void teardown() {
+		ngDriver.close();
+		seleniumDriver.quit();
+	}
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		CommonFunctions.highlight(element);
+	}
 
 }
-
-
