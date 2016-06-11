@@ -99,22 +99,19 @@ public class NgButtonTest {
 		//	return;
 		//}
 		getPageContent("ng_watch_ng_if.htm");		
-		
+
 		WebElement button = seleniumDriver.findElement(By.cssSelector("button.btn"));
-		Thread.sleep(1000);
+		ngDriver.waitForAngular();
 		highlight(button);
-        NgWebElement ng_button = new NgWebElement(ngDriver, button);
+		NgWebElement ng_button = new NgWebElement(ngDriver, button);
 		assertThat(ng_button, notNullValue());
 		assertThat(ng_button.getAttribute("ng-click"), equalTo("house.frontDoor.open()"));
 		assertThat(ng_button.getText(), equalTo("Open Door"));		 
 		ngDriver.waitForAngular();
 		try {		    
 			state = ((Boolean) ng_button.evaluate("!house.frontDoor.isOpen")).booleanValue(); 
-		} catch(WebDriverException ex) { 
-		    // [JavaScript Error: "e is null"] ?
-			System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
 		} catch(Exception ex) { 
-		System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
+			System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
 		}
 		assertTrue(state);
 		button.click();
@@ -129,20 +126,19 @@ public class NgButtonTest {
 		}
 		button = seleniumDriver.findElement(By.cssSelector("button.btn"));
 		highlight(button);
-        ng_button = new NgWebElement(ngDriver, button);
+		ng_button = new NgWebElement(ngDriver, button);
 		assertThat(ng_button, notNullValue());
 		assertThat(ng_button.getAttribute("ng-click"), equalTo("house.frontDoor.close()"));
 		assertThat(ng_button.getText(), equalTo("Close Door"));		
 		try {			
 			state = ((Boolean) ng_button.evaluate("house.frontDoor.isOpen")).booleanValue(); 
-		} catch(WebDriverException ex) { 
-		    // [JavaScript Error: "e is null"] ?
-			System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
 		} catch(Exception ex) { 
-		System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
+			// [JavaScript Error: "e is null"] ?
+			System.err.println("evaluate was not handled : " + ex.getStackTrace().toString());
 		}
 		assertTrue(state);
-	}		
+	}
+	
 	@Test
 	public void testButtonStateText() throws Exception {
 		//if (isCIBuild) { // Alert not handled by PhantomJS
@@ -150,13 +146,12 @@ public class NgButtonTest {
 		//}
 		getPageContent("ng_watch_ng_if.htm");				
 		WebElement button = seleniumDriver.findElement(By.cssSelector("button.btn"));
-		Thread.sleep(1000);
-		highlight(button);
 		ngDriver.waitForAngular();
+		highlight(button);
 		NgWebElement ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
 		highlight(ng_status);
-		System.err.println("Initially: " + ng_status.getText());
 		assertTrue(ng_status.getText().matches("The door is closed"));
+		System.err.println("Initially: " + ng_status.getText());
 		button.click();
 		try{
 			// confirm alert
@@ -167,13 +162,12 @@ public class NgButtonTest {
 			System.err.println("Alert was not handled : " + ex.getStackTrace().toString());
 			return;
 		}
-		ngDriver.waitForAngular();
 		ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
 		highlight(ng_status);
-		System.err.println("Finally: " +  ng_status.getText());
+		System.err.println("Finally: " + ng_status.getText());
 		assertThat(ng_status.getText(), matchesPattern(".+open"));
 	}
-	
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -186,10 +180,10 @@ public class NgButtonTest {
 		Thread.sleep(500);
 	}
 
-  private static void highlight(WebElement element) throws InterruptedException {
-	  CommonFunctions.highlight(element);
-  }
-	
+	private static void highlight(WebElement element) throws InterruptedException {
+		CommonFunctions.highlight(element);
+	}
+
 	private static String getIdentity(WebElement element ) throws InterruptedException {
 		String script = "return angular.identity(angular.element(arguments[0])).html();";
 		// returns too little HTML information in Java 

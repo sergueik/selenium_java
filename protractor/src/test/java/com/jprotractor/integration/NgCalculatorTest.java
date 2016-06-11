@@ -78,7 +78,7 @@ public class NgCalculatorTest {
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild =  false;
-    private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+	private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
 
 	@BeforeClass
 	public static void setup() throws IOException{
@@ -126,9 +126,9 @@ public class NgCalculatorTest {
 		seleniumDriver.quit();		
 	}
 
-  private static void highlight(WebElement element) throws InterruptedException {
-	  CommonFunctions.highlight(element);
-  }
+	private static void highlight(WebElement element) throws InterruptedException {
+		CommonFunctions.highlight(element);
+	}
 
 }
 

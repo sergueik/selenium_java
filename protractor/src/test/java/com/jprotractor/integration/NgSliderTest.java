@@ -62,10 +62,13 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Integration tests of AngularUI - Slider demo https://htmlpreview.github.io/?https://github.com/angular-ui/ui-slider/master/demo/index.html
+ * Integration tests of AngularUI - Slider demo
+ * https://htmlpreview.github.io/?https
+ * ://github.com/angular-ui/ui-slider/master/demo/index.html
+ * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
- 
+
 public class NgSliderTest {
 	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
@@ -79,20 +82,22 @@ public class NgSliderTest {
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
-	static boolean isCIBuild =  false;
+	static boolean isCIBuild = false;
 	private static String baseUrl = "https://htmlpreview.github.io/?https://github.com/angular-ui/ui-slider/master/demo/index.html";
 
 	@BeforeClass
-	public static void setup() throws IOException{
+	public static void setup() throws IOException {
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
-		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
-		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait );
-		wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-		actions = new Actions(seleniumDriver);		
+		seleniumDriver.manage().window().setSize(new Dimension(width, height));
+		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+				.setScriptTimeout(10, TimeUnit.SECONDS);
+		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
-		
+
 	}
 
 	@Before
@@ -107,28 +112,30 @@ public class NgSliderTest {
 		}
 		// suppressing the
 		ngDriver.waitForAngular();
-		// leads to  org.openqa.selenium.WebDriverException: angular is not defined
+		// leads to org.openqa.selenium.WebDriverException: angular is not defined
 		// in the
-		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));		
-		
+		List<WebElement> sliderElements = ngDriver.findElements(NgBy
+				.model("demoVals.sliderExample1"));
+
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		highlight(sliderContainerElement);
-    CommonFunctions.setHighlightTimeout(10);
-		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
-		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+		CommonFunctions.setHighlightTimeout(10);
+		WebElement sliderElement = sliderContainerElement.findElement(By
+				.className("ui-slider-handle"));
+		for (int cnt = 0; cnt != 10; cnt++) {
 			sliderElement.sendKeys(Keys.ARROW_RIGHT);
 			highlight(sliderElement);
 		}
-		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+		for (int cnt = 0; cnt != 10; cnt++) {
 			sliderElement.sendKeys(Keys.ARROW_UP);
 			highlight(sliderElement);
 		}
 
 		WebElement sliderValueElement = sliderElements.get(1);
-		assertThat(sliderValueElement.getTagName(),equalTo("input"));
+		assertThat(sliderValueElement.getTagName(), equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
-    CommonFunctions.setHighlightTimeout(100);
+		CommonFunctions.setHighlightTimeout(100);
 		highlight(sliderValueElement);
 		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
 	}
@@ -140,28 +147,30 @@ public class NgSliderTest {
 		}
 		// suppressing the
 		ngDriver.waitForAngular();
-		// leads to  org.openqa.selenium.WebDriverException: angular is not defined
+		// leads to org.openqa.selenium.WebDriverException: angular is not defined
 		// in the
-		List<WebElement> sliderElements = ngDriver.findElements(NgBy.model("demoVals.sliderExample1"));		
+		List<WebElement> sliderElements = ngDriver.findElements(NgBy
+				.model("demoVals.sliderExample1"));
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		Dimension dimension = sliderContainerElement.getSize();
 		int width = dimension.width;
 		// System.err.println("width = " + width);
 		highlight(sliderContainerElement);
-		WebElement sliderElement = sliderContainerElement.findElement(By.className("ui-slider-handle"));
+		WebElement sliderElement = sliderContainerElement.findElement(By
+				.className("ui-slider-handle"));
 		// actions.dragAndDropBy(sliderElement, 100, 0).build().perform();
 		// has no effect
-		for (int cnt = 0 ; cnt != 10 ;  cnt ++){
+		for (int cnt = 0; cnt != 10; cnt++) {
 			actions.moveToElement(sliderElement).clickAndHold();
-			actions.moveByOffset(width/20, 0);
+			actions.moveByOffset(width / 20, 0);
 			actions.release();
 			actions.build().perform();
 			Thread.sleep(100);
 		}
 
 		WebElement sliderValueElement = sliderElements.get(1);
-		assertThat(sliderValueElement.getTagName(),equalTo("input"));
+		assertThat(sliderValueElement.getTagName(), equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
 		highlight(sliderValueElement);
 		System.err.println("Value = " + sliderValueElement.getAttribute("value"));
@@ -170,10 +179,10 @@ public class NgSliderTest {
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
-		seleniumDriver.quit();		
+		seleniumDriver.quit();
 	}
-  
-  private static void highlight(WebElement element) throws InterruptedException {
-	  CommonFunctions.highlight(element);
-  }
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		CommonFunctions.highlight(element);
+	}
 }
