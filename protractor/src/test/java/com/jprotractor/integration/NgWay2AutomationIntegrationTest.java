@@ -134,7 +134,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * And I log in 
 	 * Then I am greeted by "<FirstName>", "<LastName>" 
 	 * And I see balance on one of my accounts "<AccountNumbers>"
-	 * And I can switch to any of my acccounts "<AccountNumbers>" 
+	 * And I can switch to any of my accounts "<AccountNumbers>" 
 	 * Examples: 
 	 * | AccountNumbers | FirstName | LastName | 
 	 * | 1004,1005,1006 | Harry | Potter |
@@ -174,23 +174,31 @@ public class NgWay2AutomationIntegrationTest {
 
 		// Then I am greeted by my first and last name
 		String user = ngDriver.findElement(NgBy.binding("user")).getText();
-		// NOTE: the binding is {{user}}. It is composed from first and last name
-		// The greeting looks like a person's name
+		// NOTE: the binding is {{user}}. It is composed from first and last name 
+		// surrounded with whitespace
+		// confirm the greeting looks like a person's name
 		assertTrue(user.matches("^(?:[^ ]+) +(?:[^ ]+)$"));
 		// The greeting contains my first name
 		assertThat(user, containsString("Harry"));
 		// And I see balance on one of my accounts
-		NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
-		highlight(accountNo);
-		assertThat(accountNo, notNullValue());
+		NgWebElement ng_accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
+		highlight(ng_accountNo);
+		assertThat(ng_accountNo, notNullValue());
 		// a valid account number
-		assertTrue(accountNo.getText().matches("^\\d+$"));
 		String allCustomerAccountsAsString = "1004,1005,1006";
 		String[] customerAccounts = allCustomerAccountsAsString.split(",");
 		Pattern pattern = Pattern.compile("("
 				+ StringUtils.join(customerAccounts, "|") + ")");
-		Matcher matcher = pattern.matcher(accountNo.getText());
+		Matcher matcher = pattern.matcher(ng_accountNo.getText());
 		assertTrue(matcher.find());
+
+		WebElement balance = ngDriver.findElement(NgBy.binding("amount"));
+		assertTrue(balance.getText().matches("^\\d+$"));
+		highlight(balance);
+
+		WebElement currency = ngDriver.findElement(NgBy.binding("currency"));
+		assertTrue(currency.getText().matches("^(?:Dollar|Pound|Rupee)$"));
+		highlight(currency);
 
 		// And I can switch to any of my accounts
 		ArrayList<String> avaliableAccounts = new ArrayList<String>();
