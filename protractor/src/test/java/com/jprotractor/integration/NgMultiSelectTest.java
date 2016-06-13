@@ -140,6 +140,7 @@ public class NgMultiSelectTest {
 		// Given in multuselect directive
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
+		assertTrue(ng_directive.getTagName().equals("am-multiselect"));
 		// When selecting cars
 		WebElement toggleSelect = ng_directive.findElement(By
 				.cssSelector("button[ng-click='toggleSelect()']"));
@@ -161,8 +162,6 @@ public class NgMultiSelectTest {
 				.repeater("i in items"));
 		int cnt = 0;
 		for (WebElement car : cars) {
-			// assertTrue(car.getText().matches("(?i:Audi|BMW|Honda)"));
-			// Object ng_checked = new NgWebElement(ngDriver, car).evaluate("i.checked");
 			assertTrue((boolean) (new NgWebElement(ngDriver, car).evaluate("i.checked")));
 			System.err.println("* " + car.getText());
 			cnt++;

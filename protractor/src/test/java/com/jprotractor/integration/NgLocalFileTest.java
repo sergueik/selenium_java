@@ -341,9 +341,7 @@ public class NgLocalFileTest {
 		assertThat(drop, notNullValue());
 		highlight(drop);
 		WebElement fileToUpload = ngDriver.findElement(By.id("fileToUpload"));
-		assertThat(fileToUpload, notNullValue());
-		assertTrue(fileToUpload.getTagName().equalsIgnoreCase("input"));
-		assertTrue(fileToUpload.getAttribute("type").equalsIgnoreCase("file"));
+		assertThat(fileToUpload, notNullValue());		assertTrue(fileToUpload.getAttribute("type").equalsIgnoreCase("file"));
 		String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
 		System.err.println("sendKeys :" + localPath);
 		fileToUpload.sendKeys(localPath);

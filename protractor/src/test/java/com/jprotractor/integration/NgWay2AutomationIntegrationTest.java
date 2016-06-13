@@ -115,19 +115,29 @@ public class NgWay2AutomationIntegrationTest {
 	 * 
 	 * Feature: Login Feature
 	 * 
-	 * @test Scenario: Customer Login Given I go to the home page When I continue
-	 * as "Customer Login" Then I should be able to choose customer
+	 * @test Scenario: Customer Login 
+	 * Given I go to the home page 
+	 * When I continue as "Customer Login" 
+	 * Then I should be able to choose my name from the list of existing customers
 	 * 
-	 * @test Scenario: Bank Manager Login Given I go to the home page When I
-	 * continue as "Bank Manager Login" Then I should see "Add Customer" And I
-	 * should see "Open Account" And I should see "Customers"
+	 * @test Scenario: Bank Manager Login 
+	 * Given I go to the home page 
+	 * When I continue as "Bank Manager Login" 
+	 * Then I should see "Add Customer" button 
+	 * And Ishould see "Open Account" button 
+	 * And I should see "Customers" button
 	 * 
-	 * @test Scenario Outline: Existing Customer Login Given I go to the home page
-	 * When I continue as "Customer Login" When I login as "<FirstName>",
-	 * "<LastName>" Then I am greeted by "<FirstName>", "<LastName>" And I can
-	 * choose my acccounts "<AccountNumbers>" Examples:
-	 * |AccountNumbers|FirstName|LastName| |1001,1002,1003|Hermoine |Granger |
-	 * |1004,1005,1006|Harry |Potter |
+	 * @test Scenario Outline: Existing Customer Login 
+	 * Given I go to the home page
+	 * When I continue as "Customer Login" 
+	 * And I choose myself "<FirstName>", "<LastName>" from existing customers
+	 * And I log in 
+	 * Then I am greeted by "<FirstName>", "<LastName>" 
+	 * And I see balance on one of my accounts "<AccountNumbers>"
+	 * And I can switch to any of my acccounts "<AccountNumbers>" 
+	 * Examples: 
+	 * | AccountNumbers | FirstName | LastName | 
+	 * | 1004,1005,1006 | Harry | Potter |
 	 */
 	// @Ignore
 	@Test
@@ -141,15 +151,13 @@ public class NgWay2AutomationIntegrationTest {
 		highlight(element);
 		element.click();
 
-		// And I login as existing customer
+		// And I choose my name from the list of existing customers
 		element = ngDriver.findElement(NgBy.input("custId"));
 		assertThat(element.getAttribute("id"), equalTo("userSelect"));
 		highlight(element);
 
 		Enumeration<WebElement> customers = Collections.enumeration(element
 				.findElements(NgBy.repeater("cust in Customers")));
-		// Enumeration<WebElement> customers =
-		// Collections.enumeration(ngDriver.findElement(NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
 
 		while (customers.hasMoreElements()) {
 			WebElement currentCustomer = customers.nextElement();
@@ -159,22 +167,24 @@ public class NgWay2AutomationIntegrationTest {
 				currentCustomer.click();
 			}
 		}
+		// And I log in
 		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 		assertTrue(login.isEnabled());
-
 		login.click();
+
 		// Then I am greeted by my first and last name
+		String user = ngDriver.findElement(NgBy.binding("user")).getText();
 		// NOTE: the binding is {{user}}. It is composed from first and last name
 		// The greeting looks like a person's name
-		String user = ngDriver.findElement(NgBy.binding("user")).getText();
 		assertTrue(user.matches("^(?:[^ ]+) +(?:[^ ]+)$"));
+		// The greeting contains my first name
 		assertThat(user, containsString("Harry"));
+		// And I see balance on one of my accounts
 		NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
-		// And I see a valid account number
 		highlight(accountNo);
 		assertThat(accountNo, notNullValue());
+		// a valid account number
 		assertTrue(accountNo.getText().matches("^\\d+$"));
-		// And I see one of my account details
 		String allCustomerAccountsAsString = "1004,1005,1006";
 		String[] customerAccounts = allCustomerAccountsAsString.split(",");
 		Pattern pattern = Pattern.compile("("
@@ -182,7 +192,7 @@ public class NgWay2AutomationIntegrationTest {
 		Matcher matcher = pattern.matcher(accountNo.getText());
 		assertTrue(matcher.find());
 
-		// And I can choose any of my accounts
+		// And I can switch to any of my accounts
 		ArrayList<String> avaliableAccounts = new ArrayList<String>();
 		Enumeration<WebElement> options = Collections.enumeration(ngDriver
 				.findElements(NgBy.options("account for account in Accounts")));
@@ -195,7 +205,7 @@ public class NgWay2AutomationIntegrationTest {
 				.asList(customerAccounts))));
 
 		// TODO: And I do not see any other accounts
-		// NOTE: cannot use regexp for this
+		// NOTE: cannot seem to utilize a regexp for this
 
 	}
 
@@ -546,28 +556,27 @@ public class NgWay2AutomationIntegrationTest {
 		// And I proceed to "Add Customer"
 		ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
 
-		NgWebElement firstName = ngDriver.findElement(NgBy.model("fName"));
-		assertThat(firstName.getAttribute("placeholder"), equalTo("First Name"));
-		firstName.sendKeys("John");
+		NgWebElement ng_firstName = ngDriver.findElement(NgBy.model("fName"));
+		assertThat(ng_firstName.getAttribute("placeholder"), equalTo("First Name"));
+		ng_firstName.sendKeys("John");
 
-		NgWebElement lastName = ngDriver.findElement(NgBy.model("lName"));
-		assertThat(lastName.getAttribute("placeholder"), equalTo("Last Name"));
-		lastName.sendKeys("Doe");
+		NgWebElement ng_lastName = ngDriver.findElement(NgBy.model("lName"));
+		assertThat(ng_lastName.getAttribute("placeholder"), equalTo("Last Name"));
+		ng_lastName.sendKeys("Doe");
 
-		NgWebElement postCode = ngDriver.findElement(NgBy.model("postCd"));
-		assertThat(postCode.getAttribute("placeholder"), equalTo("Post Code"));
-		postCode.sendKeys("11011");
+		NgWebElement ng_postCode = ngDriver.findElement(NgBy.model("postCd"));
+		assertThat(ng_postCode.getAttribute("placeholder"), equalTo("Post Code"));
+		ng_postCode.sendKeys("11011");
 		// And I add no accounts
 
 		// NOTE: there are two 'Add Customer' buttons on this form
-		WebElement addCustomerButtonElement = ngDriver.findElements(
+		WebElement ng_addCustomerButtonElement = ngDriver.findElements(
 				NgBy.partialButtonText("Add Customer")).get(1);
-		addCustomerButtonElement.submit();
+		ng_addCustomerButtonElement.submit();
 		try {
 			alert = seleniumDriver.switchTo().alert();
-			String customer_added = "Customer added successfully with customer id :(\\d+)";
-
-			Pattern pattern = Pattern.compile(customer_added);
+			Pattern pattern = Pattern
+					.compile("Customer added successfully with customer id :(\\d+)");
 			Matcher matcher = pattern.matcher(alert.getText());
 			if (matcher.find()) {
 				System.err.println("New Customer id: " + matcher.group(1));
@@ -629,9 +638,10 @@ public class NgWay2AutomationIntegrationTest {
 
 		System.err.println(message.getText());
 
-		// And I have no accounts
+		// And I see no accounts
 		NgWebElement accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
 		assertFalse(accountNo.isDisplayed());
+		// And I cannot choose an account to view
 		List<WebElement> accounts = ngDriver.findElements(NgBy
 				.repeater("account for account in Accounts"));
 		assertThat(accounts.size(), equalTo(0));

@@ -108,13 +108,9 @@ public class NgDatePickerTest {
 		try {
 			ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput"));
 		} catch (WebDriverException e) {
-			// Assert.assertThat(e.getMessage(),
-			// CoreMatchers.containsString("no injector found for element argument to getTestability"));
 			assertTrue(e.getMessage().contains(
 					"no injector found for element argument to getTestability"));
-			// System.err.println( "exception information" +
-			// e.getAdditionalInformation());
-			System.err.println("exception message(expected): " + e.getMessage());
+			System.err.println(" Ignoring exception: " + e.getMessage());
 		} catch (Exception e) {
 			throw (e);
 		}
