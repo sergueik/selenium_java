@@ -135,6 +135,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * Then I am greeted by "<FirstName>", "<LastName>" 
 	 * And I see balance on one of my accounts "<AccountNumbers>"
 	 * And I can switch to any of my accounts "<AccountNumbers>" 
+	 * And I can not see any other accounts
 	 * Examples: 
 	 * | AccountNumbers | FirstName | LastName | 
 	 * | 1004,1005,1006 | Harry | Potter |
@@ -191,6 +192,11 @@ public class NgWay2AutomationIntegrationTest {
 				+ StringUtils.join(customerAccounts, "|") + ")");
 		Matcher matcher = pattern.matcher(ng_accountNo.getText());
 		assertTrue(matcher.find());
+		pattern = Pattern.compile("^(?!"
+				+ StringUtils.join(customerAccounts, "|") + ").*$");
+		matcher = pattern.matcher(ng_accountNo.getText());
+		assertFalse(matcher.find());
+
 
 		WebElement balance = ngDriver.findElement(NgBy.binding("amount"));
 		assertTrue(balance.getText().matches("^\\d+$"));
@@ -205,16 +211,17 @@ public class NgWay2AutomationIntegrationTest {
 		Enumeration<WebElement> options = Collections.enumeration(ngDriver
 				.findElements(NgBy.options("account for account in Accounts")));
 		while (options.hasMoreElements()) {
-			String accountOption = options.nextElement().getText();
-			assertTrue(accountOption.matches("^\\d+$"));
-			avaliableAccounts.add(accountOption);
+			String otherAccount = options.nextElement().getText();
+			assertTrue(otherAccount.matches("^\\d+$"));
+			// And I can not see any other accounts 
+			pattern = Pattern.compile("^(?!"
+					+ StringUtils.join(customerAccounts, "|") + ").*$");
+			matcher = pattern.matcher(otherAccount);
+			assertFalse(matcher.find());
+			avaliableAccounts.add(otherAccount);
 		}
 		assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays
 				.asList(customerAccounts))));
-
-		// TODO: And I do not see any other accounts
-		// NOTE: cannot seem to utilize a regexp for this
-
 	}
 
 	// @Ignore
@@ -326,7 +333,7 @@ public class NgWay2AutomationIntegrationTest {
 			if (matcher.find()) {
 				System.err.println("account id " + matcher.group(1));
 			}
-			// confirm alert
+			// confirm the alert
 			alert.accept();
 
 		} catch (NoAlertPresentException ex) {
@@ -334,7 +341,6 @@ public class NgWay2AutomationIntegrationTest {
 			System.err.println(ex.getStackTrace());
 			return;
 		} catch (WebDriverException ex) {
-			// Alert not handled by PhantomJS
 			// fullStackTrace =
 			// org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
 			// System.err.println("Alert was not handled by PhantomJS: " +
@@ -642,7 +648,7 @@ public class NgWay2AutomationIntegrationTest {
 				.cssSelector("span[ng-show='noAccount']"));
 		assertTrue(message.isDisplayed());
 		highlight(message);
-		assertThat(message.getText(), containsString("Harry"));
+		assertThat(message.getText(), containsString("Please open an account"));
 
 		System.err.println(message.getText());
 
