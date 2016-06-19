@@ -1,4 +1,4 @@
-package com.paulhammant.ngwebdriver;
+package com.mycompany.app;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;

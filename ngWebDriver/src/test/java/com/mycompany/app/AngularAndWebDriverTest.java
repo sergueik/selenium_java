@@ -1,4 +1,4 @@
-package com.paulhammant.ngwebdriver;
+package com.mycompany.app;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConnectionFactory;
