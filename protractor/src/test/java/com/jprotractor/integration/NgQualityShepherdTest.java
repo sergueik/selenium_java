@@ -62,10 +62,9 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com) ref. Protractor test
- *         spec
- *         https://github.com/qualityshepherd/protractor_example/specs/friendSpec
- *         .js
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com) 
+ * ref. Protractor test spec
+ * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js
  */
 
 public class NgQualityShepherdTest {
@@ -107,7 +106,7 @@ public class NgQualityShepherdTest {
 
 	@Test
 	public void testAddFriend() throws Exception {
-		// add a friend
+		// When we add a friend
 		String friendName = "John Doe";
 		int friendCount = ngDriver.findElements(NgBy.repeater("row in rows"))
 				.size();
@@ -120,10 +119,10 @@ public class NgQualityShepherdTest {
 		highlight(addButton);
 		addButton.click();
 		ngDriver.waitForAngular();
-		// confirm there is more friends
+		// Then there the total number of friends is increased by one
 		assertThat(ngDriver.findElements(NgBy.repeater("row in rows")).size()
 				- friendCount, equalTo(1));
-		// find the new friend via Protractor search
+		// And we can find the new friend using search
 		WebElement addedFriendElement = ngDriver.findElements(
 				NgBy.cssContainingText("td.ng-binding", friendName)).get(0);
 		assertThat(addedFriendElement, notNullValue());
@@ -133,14 +132,14 @@ public class NgQualityShepherdTest {
 
 	@Test
 	public void testSearchAndDeleteFriend() throws Exception {
-		// pick friend to delete
+		// Given we pick friend to delete
 		List<WebElement> friendNames = ngDriver.findElements(NgBy.repeaterColumn(
 				"row in rows", "row"));
 		WebElement friendName = friendNames.get(0);
 		highlight(friendName);
 		String deleteFriendName = friendName.getText();
 		assertFalse(deleteFriendName.isEmpty());
-		// delete every friend with the chosen name
+		// When we delete every friend with the chosen name
 		Iterator<WebElement> friendRows = ngDriver.findElements(
 				NgBy.repeater("row in rows")).iterator();
 		while (friendRows.hasNext()) {
@@ -156,7 +155,7 @@ public class NgQualityShepherdTest {
 				ngDriver.waitForAngular();
 			}
 		}
-		// confirm the deleted friend cannot be found through search
+		// That the deleted friend's name cannot be found through search
 		System.err.println("Search name: " + deleteFriendName);
 		NgWebElement searchBox = ngDriver.findElement(NgBy.model("search"));
 		searchBox.sendKeys(deleteFriendName);
@@ -169,7 +168,7 @@ public class NgQualityShepherdTest {
 		System.err.println("Clear Search");
 		clearSearchBox.click();
 		ngDriver.waitForAngular();
-		// confirm the deleted friend cannot be found through Protractor find
+		// And the deleted friend cannot be found by looking at the remaining friend names
 		List<WebElement> elements = ngDriver.findElements(NgBy.cssContainingText(
 				"td.ng-binding", deleteFriendName));
 		assertTrue(elements.size() == 0);
@@ -186,6 +185,7 @@ public class NgQualityShepherdTest {
 	}
 
 	@Ignore
+	// TODO
 	@Test
 	public void testRemoveAllFriends() throws Exception {
 		ngDriver.waitForAngular();

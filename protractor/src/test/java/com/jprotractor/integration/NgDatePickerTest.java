@@ -63,6 +63,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
+ * Testing http://dalelotts.github.io/angular-bootstrap-datetimepicker/
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -79,6 +80,9 @@ public class NgDatePickerTest {
 	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
+	// need a little more room for datepicker
+	private static int datepicker_width = 900;
+	private static int datepicker_heght = 800;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isCIBuild = false;
 	private static String baseUrl = "http://dalelotts.github.io/angular-bootstrap-datetimepicker/";
@@ -127,9 +131,6 @@ public class NgDatePickerTest {
 		highlight(ng_calendar);
 		actions.moveToElement(ng_calendar.getWrappedElement()).click().build()
 				.perform();
-		// need a little more room
-		int datepicker_width = 900;
-		int datepicker_heght = 800;
 		seleniumDriver.manage().window()
 				.setSize(new Dimension(datepicker_width, datepicker_heght));
 		NgWebElement ng_dropdown = ngDriver.findElement(By
@@ -157,7 +158,6 @@ public class NgDatePickerTest {
 		String timeOfDay = "6:00 PM";
 		WebElement ng_hour = ng_element.findElements(
 				NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
-		// java.lang.NullPointerException
 		assertThat(ng_hour, notNullValue());
 		highlight(ng_hour);
 		System.err.println("Hour of the day: " + ng_hour.getText());

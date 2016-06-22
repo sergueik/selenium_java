@@ -175,7 +175,7 @@ public class NgButtonTest {
 	}
 
 	private static void getPageContent(String pagename) throws InterruptedException{
-		String baseUrl = CommonFunctions.getPageContent( pagename) ;
+		String baseUrl = CommonFunctions.getPageContent(pagename) ;
 		ngDriver.navigate().to(baseUrl);
 		Thread.sleep(500);
 	}
@@ -183,11 +183,4 @@ public class NgButtonTest {
 	private static void highlight(WebElement element) throws InterruptedException {
 		CommonFunctions.highlight(element);
 	}
-
-	private static String getIdentity(WebElement element ) throws InterruptedException {
-		String script = "return angular.identity(angular.element(arguments[0])).html();";
-		// returns too little HTML information in Java 
-		return CommonFunctions.executeScript(script, element).toString();
-	}
-
 }

@@ -110,7 +110,7 @@ public class NgSliderTest {
 		if (isCIBuild) {
 			return;
 		}
-		// suppressing the
+		// suppressing the Angular interaction
 		ngDriver.waitForAngular();
 		// leads to org.openqa.selenium.WebDriverException: angular is not defined
 		// in the
@@ -145,10 +145,7 @@ public class NgSliderTest {
 		if (isCIBuild) {
 			return;
 		}
-		// suppressing the
 		ngDriver.waitForAngular();
-		// leads to org.openqa.selenium.WebDriverException: angular is not defined
-		// in the
 		List<WebElement> sliderElements = ngDriver.findElements(NgBy
 				.model("demoVals.sliderExample1"));
 		WebElement sliderContainerElement = sliderElements.get(0);

@@ -102,7 +102,7 @@ public class NgMultiSelectTest {
 
 	@Test
 	public void testSelectOneByOne() throws Exception {
-		// Given selecting cars in multuselect directive
+		// Given we are using multiselect directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
 		assertThat(ng_directive.getTagName(), equalTo("am-multiselect"));
@@ -111,23 +111,24 @@ public class NgMultiSelectTest {
 		assertThat(toggleSelect, notNullValue());
 		assertTrue(toggleSelect.isDisplayed());
 		toggleSelect.click();
+
 		// When selecting every car one car at a time
 		// find how many cars there are
 		List<WebElement> cars = ng_directive.findElements(NgBy
 				.repeater("i in items"));
 		// NOTE: not "c.name for c in cars"
-		int count = 0;
-		for (count = 0; count != cars.size(); count++) {
-			// Click on the car name
+		int rowNum = 0;
+		for (rowNum = 0; rowNum != cars.size(); rowNum++) {
+			// For every row, click on the car name
 			NgWebElement ng_car = ngDriver.findElement(NgBy.repeaterElement(
-					"i in items", count, "i.label"));
+					"i in items", rowNum, "i.label"));
 			System.err.println("* " + ng_car.evaluate("i.label").toString());
 			highlight(ng_car);
 			ng_car.click();
 		}
 		// Then all cars got selected
 		assertThat(ng_directive.findElements(NgBy.repeater("i in items")).size(),
-				equalTo(count));
+				equalTo(rowNum));
 		// TODO: verify the number of cars on the button
 		WebElement button = ngDriver.findElement(By
 				.cssSelector("am-multiselect > div > button"));
@@ -137,7 +138,7 @@ public class NgMultiSelectTest {
 
 	@Test
 	public void testSelectAll() throws Exception {
-		// Given in multuselect directive
+		// Given we are using multiselect directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
 		assertTrue(ng_directive.getTagName().equals("am-multiselect"));
@@ -160,13 +161,13 @@ public class NgMultiSelectTest {
 		// NOTE: not "c.name for c in cars"
 		List<WebElement> cars = ng_directive.findElements(NgBy
 				.repeater("i in items"));
-		int cnt = 0;
+		int selectedCarCount = 0;
 		for (WebElement car : cars) {
 			assertTrue((boolean) (new NgWebElement(ngDriver, car).evaluate("i.checked")));
 			System.err.println("* " + car.getText());
-			cnt++;
+			selectedCarCount++;
 		}
-		assertThat(cars.size(), equalTo(cnt));
+		assertThat(cars.size(), equalTo(selectedCarCount));
 	}
 
 	@AfterClass

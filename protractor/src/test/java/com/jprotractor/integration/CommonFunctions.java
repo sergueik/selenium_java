@@ -50,6 +50,7 @@ public class CommonFunctions {
 	static boolean isDestopTesting = true;
 	static boolean isCIBuild = false;
 	private static long highlightInterval = 100;
+	private static Map <String,String>env = System.getenv();
 
 	public static WebDriver getSeleniumDriver() throws IOException {
 		checkEnvironment();
@@ -74,15 +75,10 @@ public class CommonFunctions {
 					"", Platform.ANY);
 			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
 					new String[] { "--web-security=false", "--ssl-protocol=any",
-							"--ignore-ssl-errors=true", "--local-to-remote-url-access=true", // prevent
-																																								// local
-																																								// file
-																																								// test
-																																								// XMLHttpRequest
-																																								// Exception
-																																								// 101
-							"--webdriver-loglevel=INFO" // set to DEBUG for a really verbose
-																					// console output
+							"--ignore-ssl-errors=true", "--local-to-remote-url-access=true", 
+							// prevent local file test XMLHttpRequest Exception 101
+							"--webdriver-loglevel=INFO" 
+							// set to DEBUG for a really verbose console output
 					});
 
 			seleniumDriver = new PhantomJSDriver(capabilities);
@@ -91,7 +87,6 @@ public class CommonFunctions {
 	}
 
 	public static boolean checkEnvironment() {
-		Map env = System.getenv();
 
 		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
 			isCIBuild = true;
