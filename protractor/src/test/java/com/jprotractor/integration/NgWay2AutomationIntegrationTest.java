@@ -7,7 +7,6 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.notNullValue;
-
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -33,9 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import java.util.concurrent.TimeUnit;
-
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,7 +45,7 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.Test;
 import org.junit.Ignore;
-
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -115,30 +112,21 @@ public class NgWay2AutomationIntegrationTest {
 	 * 
 	 * Feature: Login Feature
 	 * 
-	 * @test Scenario: Customer Login 
-	 * Given I go to the home page 
-	 * When I continue as "Customer Login" 
-	 * Then I should be able to choose my name from the list of existing customers
+	 * @test Scenario: Customer Login Given I go to the home page When I continue
+	 * as "Customer Login" Then I should be able to choose my name from the list
+	 * of existing customers
 	 * 
-	 * @test Scenario: Bank Manager Login 
-	 * Given I go to the home page 
-	 * When I continue as "Bank Manager Login" 
-	 * Then I should see "Add Customer" button 
-	 * And Ishould see "Open Account" button 
-	 * And I should see "Customers" button
+	 * @test Scenario: Bank Manager Login Given I go to the home page When I
+	 * continue as "Bank Manager Login" Then I should see "Add Customer" button
+	 * And Ishould see "Open Account" button And I should see "Customers" button
 	 * 
-	 * @test Scenario Outline: Existing Customer Login 
-	 * Given I go to the home page
-	 * When I continue as "Customer Login" 
-	 * And I choose myself "<FirstName>", "<LastName>" from existing customers
-	 * And I log in 
-	 * Then I am greeted by "<FirstName>", "<LastName>" 
-	 * And I see balance on one of my accounts "<AccountNumbers>"
-	 * And I can switch to any of my accounts "<AccountNumbers>" 
-	 * And I can not see any other accounts
-	 * Examples: 
-	 * | AccountNumbers | FirstName | LastName | 
-	 * | 1004,1005,1006 | Harry | Potter |
+	 * @test Scenario Outline: Existing Customer Login Given I go to the home page
+	 * When I continue as "Customer Login" And I choose myself "<FirstName>",
+	 * "<LastName>" from existing customers And I log in Then I am greeted by
+	 * "<FirstName>", "<LastName>" And I see balance on one of my accounts
+	 * "<AccountNumbers>" And I can switch to any of my accounts
+	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
+	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
 	// @Ignore
 	@Test
@@ -175,7 +163,7 @@ public class NgWay2AutomationIntegrationTest {
 
 		// Then I am greeted by my first and last name
 		String user = ngDriver.findElement(NgBy.binding("user")).getText();
-		// NOTE: the binding is {{user}}. It is composed from first and last name 
+		// NOTE: the binding is {{user}}. It is composed from first and last name
 		// surrounded with whitespace
 		// confirm the greeting looks like a person's name
 		assertTrue(user.matches("^(?:[^ ]+) +(?:[^ ]+)$"));
@@ -192,11 +180,10 @@ public class NgWay2AutomationIntegrationTest {
 				+ StringUtils.join(customerAccounts, "|") + ")");
 		Matcher matcher = pattern.matcher(ng_accountNo.getText());
 		assertTrue(matcher.find());
-		pattern = Pattern.compile("^(?!"
-				+ StringUtils.join(customerAccounts, "|") + ").*$");
+		pattern = Pattern.compile("^(?!" + StringUtils.join(customerAccounts, "|")
+				+ ").*$");
 		matcher = pattern.matcher(ng_accountNo.getText());
 		assertFalse(matcher.find());
-
 
 		WebElement balance = ngDriver.findElement(NgBy.binding("amount"));
 		assertTrue(balance.getText().matches("^\\d+$"));
@@ -208,20 +195,31 @@ public class NgWay2AutomationIntegrationTest {
 
 		// And I can switch to any of my accounts
 		ArrayList<String> avaliableAccounts = new ArrayList<String>();
-		Enumeration<WebElement> options = Collections.enumeration(ngDriver
+		Enumeration<WebElement> accounts = Collections.enumeration(ngDriver
 				.findElements(NgBy.options("account for account in Accounts")));
-		while (options.hasMoreElements()) {
-			String otherAccount = options.nextElement().getText();
-			assertTrue(otherAccount.matches("^\\d+$"));
-			// And I can not see any other accounts 
+
+		while (accounts.hasMoreElements()) {
+			String otherAccountId = accounts.nextElement().getText();
+			assertTrue(otherAccountId.matches("^\\d+$"));
+			// And I can not see any other accounts
 			pattern = Pattern.compile("^(?!"
 					+ StringUtils.join(customerAccounts, "|") + ").*$");
-			matcher = pattern.matcher(otherAccount);
+			matcher = pattern.matcher(otherAccountId);
 			assertFalse(matcher.find());
-			avaliableAccounts.add(otherAccount);
+			avaliableAccounts.add(otherAccountId);
 		}
 		assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays
 				.asList(customerAccounts))));
+		
+		accounts = Collections.enumeration(ngDriver
+				.findElements(NgBy.options("account for account in Accounts")));
+
+		while (accounts.hasMoreElements()) {
+			WebElement currentAccount = accounts.nextElement();
+				System.err.println(currentAccount.getText());
+				currentAccount.click();
+		}
+
 	}
 
 	// @Ignore
@@ -265,8 +263,6 @@ public class NgWay2AutomationIntegrationTest {
 		// inspect transactions
 		NgWebElement transactions_button = ngDriver.findElement(NgBy
 				.partialButtonText("Transactions"));
-
-		assertThat(transactions_button.getText(), equalTo("Transactions"));
 		highlight(transactions_button);
 		transactions_button.click();
 		// wait until transactions are loaded
@@ -307,10 +303,17 @@ public class NgWay2AutomationIntegrationTest {
 		// pick random customer to log in
 		int random_customer_index = 1 + (int) (Math.random() * (customers.size() - 1));
 		WebElement customer = customers.get(random_customer_index);
-		System.err.println(customer.getText());
+		String customerName = customer.getText();
+		System.err.println(customerName);
+		
 		customer.click();
 		NgWebElement ng_selectCurrencies = ngDriver.findElement(NgBy
 				.model("currency"));
+
+		actions.moveToElement(ng_selectCurrencies.getWrappedElement()).build()
+				.perform();
+		highlight(ng_selectCurrencies.getWrappedElement());
+
 		// use core Selenium
 		Select selectCurrencies = new Select(
 				ng_selectCurrencies.getWrappedElement());
@@ -321,8 +324,10 @@ public class NgWay2AutomationIntegrationTest {
 		WebElement submitButton = ngDriver.getWrappedDriver().findElement(
 				By.xpath("/html/body//form/button[@type='submit']"));
 		assertThat(submitButton.getText(), containsString("Process"));
+		actions.moveToElement(submitButton).build().perform();
+		highlight(submitButton);
 		submitButton.click();
-
+		String newAccount = null; 
 		try {
 			alert = seleniumDriver.switchTo().alert();
 			String alert_text = alert.getText();
@@ -331,15 +336,17 @@ public class NgWay2AutomationIntegrationTest {
 			Pattern pattern = Pattern.compile("(\\d+)");
 			Matcher matcher = pattern.matcher(alert_text);
 			if (matcher.find()) {
-				System.err.println("account id " + matcher.group(1));
+				newAccount = matcher.group(1);
+				System.err.println("New account id " + newAccount);
 			}
 			// confirm the alert
 			alert.accept();
 
 		} catch (NoAlertPresentException ex) {
 			// Alert not present
-			System.err.println(ex.getStackTrace());
-			return;
+			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
+      // observed in Chrome. Ignore
+			// return;
 		} catch (WebDriverException ex) {
 			// fullStackTrace =
 			// org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
@@ -350,6 +357,38 @@ public class NgWay2AutomationIntegrationTest {
 			return;
 		}
 
+		// And I switch to "Home" screen
+		NgWebElement ng_home = ngDriver.findElement(NgBy.buttonText("Home"));
+		highlight(ng_home);
+		ng_home.click();
+		// And I proceed to "Bank Manager Login"
+		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+		ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
+		// wait for customers info get loaded
+		ngDriver.waitForAngular();
+		// I can find the Customers Account I just Added
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.repeater("cust in Customers")).getWrappedElement()));
+		Enumeration<WebElement> customersEnum = Collections.enumeration(ngDriver
+				.findElements(NgBy.repeater("cust in Customers")));
+		while (customersEnum.hasMoreElements()) {
+			// find the customer
+			WebElement currentCustomer = customersEnum.nextElement();
+			if (currentCustomer.getText().indexOf(customerName) >= 0) {
+				// System.err.println("Current customer: " + currentCustomer.getText());
+				highlight(currentCustomer);
+				NgWebElement ng_currentCustomer = new NgWebElement(ngDriver, currentCustomer);
+				Enumeration<WebElement> accountsEnum = Collections.enumeration(ng_currentCustomer
+						.findElements(NgBy.repeater("account in cust.accountNo")));
+				while (accountsEnum.hasMoreElements()) {
+					// find the account
+					WebElement currentAccount = accountsEnum.nextElement();
+					if (currentAccount.getText().indexOf(newAccount) >= 0) {
+						highlight(currentAccount);
+					}
+					}
+			}
+		}
 	}
 
 	// @Ignore
@@ -694,7 +733,7 @@ public class NgWay2AutomationIntegrationTest {
 		List<WebElement> accounts = ngDriver.findElements(NgBy
 				.options("account for account in Accounts"));
 
-		// pick random account
+		// pick a random account
 		assertTrue(accounts.size() > 0);
 		int account_idx = 1 + (int) (Math.random() * (accounts.size() - 1));
 		String targetAccount = accounts.get(account_idx).getText();
@@ -719,14 +758,14 @@ public class NgWay2AutomationIntegrationTest {
 		assertTrue(depositButton.isDisplayed());
 		depositButton.click();
 
-		// inspect the message
+		// Then we see the confirmation message
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
 				NgBy.binding("message")).getWrappedElement()));
 		NgWebElement message = ngDriver.findElement(NgBy.binding("message"));
 		assertThat(message.getText(), containsString("Deposit Successful"));
 		highlight(message);
 
-		// inspect the balance change
+		// And the balance changes
 		int finalBalance = Integer.parseInt(ngDriver.findElement(
 				NgBy.binding("amount")).getText());
 		assertTrue(finalBalance == 100 + initialBalance);
@@ -765,14 +804,14 @@ public class NgWay2AutomationIntegrationTest {
 		assertTrue(withdrawButton.isDisplayed());
 		withdrawButton.click();
 
-		// withdraw a bigger amount then is on the account
+		// When we withdraw a amount bigger then the balance on the account
 		WebElement withdrawAmount = ngDriver.findElement(NgBy.model("amount"));
 		highlight(withdrawAmount);
 		withdrawAmount.sendKeys(String.format("%d", finalBalance + 10));
 		withdrawButton = ngDriver.findElement(NgBy.buttonText("Withdraw"));
 		withdrawButton.click();
 
-		// confirm the transaction failed
+		// We see warning that transaction failed
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
 				NgBy.binding("message")).getWrappedElement()));
 		message = ngDriver.findElement(NgBy.binding("message"));
@@ -781,7 +820,7 @@ public class NgWay2AutomationIntegrationTest {
 
 		withdrawAmount.sendKeys(String.format("%d", finalBalance - 10));
 		withdrawButton.click();
-		// inspect the balance change
+		// And the balance does not change
 		finalBalance = Integer.parseInt(ngDriver
 				.findElement(NgBy.binding("amount")).getText());
 		assertTrue(finalBalance == 10);
