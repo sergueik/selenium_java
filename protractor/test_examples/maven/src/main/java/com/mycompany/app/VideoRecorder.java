@@ -33,6 +33,8 @@ public class VideoRecorder {
 
 			Point point = driver.manage().window().getPosition();
 			Dimension dimension = driver.manage().window().getSize();
+      			System.err.println(" Rectangle: " + dimension.width + " " + dimension.height);
+
 
 			Rectangle rectangle = new Rectangle(point.x, point.y, dimension.width,
 					dimension.height);

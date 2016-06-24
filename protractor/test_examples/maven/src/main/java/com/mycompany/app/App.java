@@ -108,8 +108,8 @@ public class App {
 	static int implicitWait = 10;
 	static int flexibleWait = 5;
 	static long pollingInterval = 500;
-	static int width = 1200;
-	static int height = 800;
+	static int width = 1600;
+	static int height = 1200;
 	static WebDriverWait wait;
 	static Actions actions;
 
@@ -118,20 +118,14 @@ public class App {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		final FirefoxProfile profile = new FirefoxProfile();
-		profile.setEnableNativeEvents(false);
-		// seleniumDriver = new FirefoxDriver(profile);
+		// profile.setEnableNativeEvents(false);
+		seleniumDriver = new FirefoxDriver(profile);
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		// LoggingPreferences logging_preferences = new LoggingPreferences();
-		// logging_preferences.enable(LogType.BROWSER, Level.ALL);
-		// capabilities.setCapability(CapabilityType.LOGGING_PREFS,
-		// logging_preferences);
-		// prefs.js:user_pref("extensions.logging.enabled", true);
-		// user.js:user_pref("extensions.logging.enabled", true);
-		seleniumDriver = new ChromeDriver(capabilities);
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// seleniumDriver = new ChromeDriver(capabilities);
 
-		seleniumDriver.manage().window().setSize(new Dimension(width , height ));
+		seleniumDriver.manage().window().setSize(new Dimension(width, height));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
@@ -356,7 +350,6 @@ public class App {
 		setUp();
 		ngDriver.navigate().to(baseUrl3);
 		testDatePickerDirectSelect();
-
 		// testVerifyText();
 		// testAddition();
 		ngDriver.navigate().to(baseUrl1);
@@ -374,8 +367,13 @@ public class App {
 		testInvitateNewCustomerToOpenAccount();
 		// testByModel();
 		ngDriver.navigate().to(baseUrl2);
-
 		testListTransactions();
+		ngDriver.navigate().to(baseUrl2);
+		testOpenAccount();
+
+		ngDriver.navigate().to(baseUrl2);
+		testDepositAndWithdraw();
+
 		tearDown();
 	}
 
@@ -395,7 +393,9 @@ public class App {
 		ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput",
 				"[data-ng-app]"));
 		actions.moveToElement(ng_result.getWrappedElement()).build().perform();
-
+		execute_script("scroll(0, 550)");
+		Thread.sleep(300);
+		execute_script("scroll(0, 550)");
 		assertThat(ng_result, notNullValue());
 		assertTrue(ng_result.getAttribute("type").matches("text"));
 		actions.moveToElement(ng_result.getWrappedElement()).build().perform();
@@ -862,6 +862,242 @@ public class App {
 		}
 		assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays
 				.asList(customerAccounts))));
+		Enumeration<WebElement> accounts = Collections.enumeration(ngDriver
+				.findElements(NgBy.options("account for account in Accounts")));
+
+		while (accounts.hasMoreElements()) {
+			WebElement currentAccount = accounts.nextElement();
+			System.err.println(currentAccount.getText());
+			currentAccount.click();
+		}
+	}
+
+	// @Ignore
+	@Test
+	public static void testOpenAccount() throws Exception {
+		// bank manager login
+		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+		ngDriver.findElement(NgBy.partialButtonText("Open Account")).click();
+		// wait for customers info get loaded
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.repeater("cust in Customers")).getWrappedElement()));
+		NgWebElement selectCustomer = ngDriver.findElement(NgBy.model("custId"));
+		assertThat(selectCustomer.getAttribute("id"), containsString("userSelect"));
+		List<WebElement> customers = new NgWebElement(ngDriver, selectCustomer)
+				.findElements(NgBy.repeater("cust in Customers"));
+		// pick random customer to log in
+		int random_customer_index = 1 + (int) (Math.random() * (customers.size() - 1));
+		WebElement customer = customers.get(random_customer_index);
+		String customerName = customer.getText();
+		System.err.println(customerName);
+
+		customer.click();
+		NgWebElement ng_selectCurrencies = ngDriver.findElement(NgBy
+				.model("currency"));
+
+		actions.moveToElement(ng_selectCurrencies.getWrappedElement()).build()
+				.perform();
+		highlight(ng_selectCurrencies.getWrappedElement());
+
+		// use core Selenium
+		Select selectCurrencies = new Select(
+				ng_selectCurrencies.getWrappedElement());
+		List<WebElement> accountCurrencies = selectCurrencies.getOptions();
+		// select "Dollars"
+		selectCurrencies.selectByVisibleText("Dollar");
+		// add the account
+		WebElement submitButton = ngDriver.getWrappedDriver().findElement(
+				By.xpath("/html/body//form/button[@type='submit']"));
+		assertThat(submitButton.getText(), containsString("Process"));
+		actions.moveToElement(submitButton).build().perform();
+		highlight(submitButton);
+		submitButton.click();
+		String newAccount = null;
+		try {
+			alert = seleniumDriver.switchTo().alert();
+			String alert_text = alert.getText();
+			assertThat(alert_text,
+					containsString("Account created successfully with account Number"));
+			Pattern pattern = Pattern.compile("(\\d+)");
+			Matcher matcher = pattern.matcher(alert_text);
+			if (matcher.find()) {
+				newAccount = matcher.group(1);
+				System.err.println("New account id " + newAccount);
+			}
+			// confirm the alert
+			alert.accept();
+
+		} catch (NoAlertPresentException ex) {
+			// Alert not present
+			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
+			// observed in Chrome. Ignore
+			// return;
+		} catch (WebDriverException ex) {
+			// fullStackTrace =
+			// org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
+			// System.err.println("Alert was not handled by PhantomJS: " +
+			// fullStackTrace);
+			System.err.println("Alert was not handled by PhantomJS: "
+					+ ex.getStackTrace().toString());
+			return;
+		}
+
+		// And I switch to "Home" screen
+		NgWebElement ng_home = ngDriver.findElement(NgBy.buttonText("Home"));
+		highlight(ng_home);
+		ng_home.click();
+		// And I proceed to "Bank Manager Login"
+		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
+		ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
+		// wait for customers info get loaded
+		ngDriver.waitForAngular();
+		// I can find the Customers Account I just Added
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.repeater("cust in Customers")).getWrappedElement()));
+		Enumeration<WebElement> customersEnum = Collections.enumeration(ngDriver
+				.findElements(NgBy.repeater("cust in Customers")));
+		while (customersEnum.hasMoreElements()) {
+			// find the customer
+			WebElement currentCustomer = customersEnum.nextElement();
+			if (currentCustomer.getText().indexOf(customerName) >= 0) {
+				// System.err.println("Current customer: " + currentCustomer.getText());
+				highlight(currentCustomer);
+				NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,
+						currentCustomer);
+				Enumeration<WebElement> accountsEnum = Collections
+						.enumeration(ng_currentCustomer.findElements(NgBy
+								.repeater("account in cust.accountNo")));
+				while (accountsEnum.hasMoreElements()) {
+					// find the account
+					WebElement currentAccount = accountsEnum.nextElement();
+					if (currentAccount.getText().indexOf(newAccount) >= 0) {
+						highlight(currentAccount);
+					}
+				}
+			}
+		}
+	}
+
+	// @Ignore
+	@Test
+	public static void testDepositAndWithdraw() throws Exception {
+		// customer login
+		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+
+		// select customer with accounts
+		assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"),
+				equalTo("userSelect"));
+		Enumeration<WebElement> customers = Collections.enumeration(ngDriver
+				.findElement(NgBy.model("custId")).findElements(
+						NgBy.repeater("cust in Customers")));
+		while (customers.hasMoreElements()) {
+			WebElement currentCustomer = customers.nextElement();
+			if (currentCustomer.getText().indexOf("Harry Potter") >= 0) {
+				System.err.println(currentCustomer.getText());
+				currentCustomer.click();
+			}
+		}
+
+		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
+		assertTrue(login.isEnabled());
+		highlight(login);
+		login.click();
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.options("account for account in Accounts")).getWrappedElement()));
+		List<WebElement> accounts = ngDriver.findElements(NgBy
+				.options("account for account in Accounts"));
+
+		// pick a random account
+		assertTrue(accounts.size() > 0);
+		int account_idx = 1 + (int) (Math.random() * (accounts.size() - 1));
+		String targetAccount = accounts.get(account_idx).getText();
+		System.err.println(account_idx + " " + targetAccount);
+		accounts.get(account_idx).click();
+		int initialBalance = Integer.parseInt(ngDriver.findElement(
+				NgBy.binding("amount")).getText());
+
+		WebElement depositButton = ngDriver.findElements(
+				NgBy.partialButtonText("Deposit")).get(0);
+		assertTrue(depositButton.isDisplayed());
+		depositButton.click();
+
+		// deposit amount
+		WebElement depositAmount = ngDriver.findElement(NgBy.model("amount"));
+		highlight(depositAmount);
+		depositAmount.sendKeys("100");
+
+		// deposit the payment
+		depositButton = ngDriver.findElements(NgBy.partialButtonText("Deposit"))
+				.get(1);
+		assertTrue(depositButton.isDisplayed());
+		depositButton.click();
+
+		// Then we see the confirmation message
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.binding("message")).getWrappedElement()));
+		NgWebElement message = ngDriver.findElement(NgBy.binding("message"));
+		assertThat(message.getText(), containsString("Deposit Successful"));
+		highlight(message);
+
+		// And the balance changes
+		int finalBalance = Integer.parseInt(ngDriver.findElement(
+				NgBy.binding("amount")).getText());
+		assertTrue(finalBalance == 100 + initialBalance);
+		Thread.sleep(500);
+		// switch to "Home" screen
+		ngDriver.findElement(NgBy.buttonText("Home")).click();
+		// customer login
+		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
+
+		// find the same customer / account
+		customers = Collections.enumeration(ngDriver.findElement(
+				NgBy.model("custId")).findElements(NgBy.repeater("cust in Customers")));
+		while (customers.hasMoreElements()) {
+			WebElement currentCustomer = customers.nextElement();
+			if (currentCustomer.getText().indexOf("Harry Potter") >= 0) {
+				System.err.println(currentCustomer.getText());
+				currentCustomer.click();
+			}
+		}
+
+		ngDriver.findElement(NgBy.buttonText("Login")).click();
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.options("account for account in Accounts")).getWrappedElement()));
+		Enumeration<WebElement> accounts2 = Collections.enumeration(ngDriver
+				.findElements(NgBy.options("account for account in Accounts")));
+		while (accounts2.hasMoreElements()) {
+			WebElement currentAccount = accounts2.nextElement();
+			if (currentAccount.getText().indexOf(targetAccount) >= 0) {
+				System.err.println(currentAccount.getText());
+				currentAccount.click();
+			}
+		}
+
+		WebElement withdrawButton = ngDriver.findElement(NgBy
+				.partialButtonText("Withdrawl"));
+		assertTrue(withdrawButton.isDisplayed());
+		withdrawButton.click();
+
+		// When we withdraw a amount bigger then the balance on the account
+		WebElement withdrawAmount = ngDriver.findElement(NgBy.model("amount"));
+		highlight(withdrawAmount);
+		withdrawAmount.sendKeys(String.format("%d", finalBalance + 10));
+		withdrawButton = ngDriver.findElement(NgBy.buttonText("Withdraw"));
+		withdrawButton.click();
+
+		// We see warning that transaction failed
+		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
+				NgBy.binding("message")).getWrappedElement()));
+		message = ngDriver.findElement(NgBy.binding("message"));
+		assertThat(message.getText(), containsString("Transaction Failed."));
+		highlight(message);
+
+		withdrawAmount.sendKeys(String.format("%d", finalBalance - 10));
+		withdrawButton.click();
+		// And the balance does not change
+		finalBalance = Integer.parseInt(ngDriver
+				.findElement(NgBy.binding("amount")).getText());
+		assertTrue(finalBalance == 10);
 	}
 
 	@AfterClass
