@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- https://jsfiddle.net/Wijmo5/QNb9X/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.latest/controls/wijmo.chart.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.23/controls/wijmo.input.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+
+<title>FlexGrid control and FlexChar example</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+// define app, include Wijmo 5 directives
+var app = angular.module('app', ['wj']);
+
+// controller
+app.controller('appCtrl', function ($scope) {
+
+    // create some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i],
+            downloads: Math.round(Math.random() * 20000),
+            sales: Math.random() * 10000,
+            expenses: Math.random() * 5000
+        });
+    }
+
+    // expose data as a CollectionView to get events
+    $scope.data = new wijmo.collections.CollectionView(data);
+    
+    // show grid and restore scroll position
+    $scope.toggle = function() {
+        var flex = $scope.flex;
+        
+        // save scroll position before hiding grid
+        if (flex && !$scope.hidden) {
+            $scope.sp = flex.scrollPosition;
+        }
+        
+        // toggle visibility
+        $scope.hidden = !$scope.hidden;
+        
+        // restore scroll position after showing grid
+        // (this is required only in IE...)
+        if (flex && !$scope.hidden) {
+            setTimeout(function() {
+                flex.scrollPosition = $scope.sp;
+            }, 0);
+        }
+    }
+});
+</script>
+</head>
+<body>
+<div ng-app="app" ng-controller="appCtrl">
+    <p>This is a <b>FlexGrid</b> control:</p>
+    <button ng-click="toggle()">Toggle Grid</button>
+    <div ng-hide="hidden">
+        <wj-flex-grid items-source="data" style="height: 150px;margin-top:10px" control="flex">
+            <wj-flex-grid-column header="Country" binding="country"></wj-flex-grid-column>
+            <wj-flex-grid-column header="Sales" binding="sales"></wj-flex-grid-column>
+            <wj-flex-grid-column header="Expenses" binding="expenses"></wj-flex-grid-column>
+            <wj-flex-grid-column header="Downloads" binding="downloads"></wj-flex-grid-column>
+        </wj-flex-grid>
+    </div>
+    
+    <p>And this is a <b>FlexChart</b> control showing the same data:</p>
+    <wj-flex-chart style="height:300px" items-source="data" binding-x="country" selection-mode="Point">
+        <wj-flex-chart-axis wj-property="axisY" major-unit="5000"></wj-flex-chart-axis>
+        <wj-flex-chart-series binding="sales" name="Sales"></wj-flex-chart-series>
+        <wj-flex-chart-series binding="expenses" name="Expenses"></wj-flex-chart-series>
+        <wj-flex-chart-series binding="downloads" name="Downloads" chart-type="LineSymbols"></wj-flex-chart-series>
+        <wj-flex-chart-legend position="Bottom"></wj-flex-chart-legend>
+    </wj-flex-chart>
+</div>
+</body>
+</html>

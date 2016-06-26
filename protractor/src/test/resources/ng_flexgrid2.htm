@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- http://jsfiddle.net/Wijmo5/hak6c27w/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20142.0/controls/wijmo.chart.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+<title>FlexGrid control and FlexChar jquery example </title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+
+$(document).ready(function () {
+
+    // create some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i],
+            downloads: Math.round(Math.random() * 20000),
+            sales: Math.random() * 10000,
+            expenses: Math.random() * 5000
+        });
+    }
+
+    // create CollectionView on the data (to get events)
+    var view = new wijmo.collections.CollectionView(data);
+
+    // initialize the grid
+    var grid = new wijmo.grid.FlexGrid('#theGrid', {
+        columns: [{
+            binding: 'country',
+            header: 'Country'
+        }, {
+            binding: 'sales',
+            header: 'Sales'
+        }, {
+            binding: 'expenses',
+            header: 'Expenses'
+        }, {
+            binding: 'downloads',
+            header: 'Downloads',
+            format: 'n0'
+        }],
+        autoGenerateColumns: false,
+        itemsSource: view,
+        selectionMode: wijmo.grid.SelectionMode.Row
+    });
+
+    // initialize the chart
+    var chart = new wijmo.chart.FlexChart('#theChart', {
+        itemsSource: view,
+        bindingX: 'country',
+        series: [{
+            binding: 'sales',
+            name: 'Sales'
+        }, {
+            binding: 'expenses',
+            name: 'Expenses'
+        }, {
+            binding: 'downloads',
+            name: 'Downloads',
+            chartType: wijmo.chart.ChartType.LineSymbols
+        }],
+        selectionMode: wijmo.chart.SelectionMode.Point
+    });
+});
+
+</script>
+</head>
+<body>
+<p>This is a <b>FlexGrid</b> control:</p>
+<div id="theGrid"></div>
+<p>And this is a <b>FlexChart</b> control showing the same data:</p>
+<div id="theChart" style="height:300px;"></div>
+
+</body>
+</html>

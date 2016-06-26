@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- http://jsfiddle.net/Wijmo5/hak6c27w/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.23/controls/wijmo.input.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+<title>FlexGrid control: row.cssClass example</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+window.onload = function() {
+
+    // create the grid
+    var grid = new wijmo.grid.FlexGrid('#theGrid', {
+        autoGenerateColumns: false,
+        columns: [
+            { header: "Company Name", binding: "CompanyName",width: "20*" },
+            { header: "Contact Name", binding: "ContactName",width: "15*" },
+            { header: "Contact Title", binding: "ContactTitle", width: "20*" },
+            { header: "Address", binding: "Address", width: "20*" },
+            { header: "City", binding: "City", width: "10*" },
+            { header: "Country", binding: "Country", width: "15*" }
+        ],
+    });
+    
+    // make it responsive
+    grid.addEventListener(window, 'resize', showColumns);
+    function showColumns() {
+        var phone = grid.hostElement.getBoundingClientRect().width < 600,
+            cols = ['ContactName', 'ContactTitle', 'City', 'Country'];
+        for (var i = 0; i < cols.length; i++) {
+            grid.columns.getColumn(cols[i]).visible = !phone;
+        }
+    }
+    
+    // get some data
+    wijmo.httpRequest('http://services.odata.org/Northwind/Northwind.svc/Customers?$format=json', {
+        success: function (xhr) {
+            var response = JSON.parse(xhr.responseText);
+            grid.itemsSource = response.value;
+            showColumns();
+        }
+    });
+
+}
+</script>
+</head>
+<body>
+<h3>Responsive Column Layout</h3>
+<div id="theGrid"></div>
+</body>
+</html>

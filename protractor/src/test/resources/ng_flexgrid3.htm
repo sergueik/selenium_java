@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- https://jsfiddle.net/Wijmo5/wc2yLktf/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.23/controls/wijmo.input.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+<title>FlexGrid with drop-downs</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+
+var app = angular.module('app', ['wj']);
+
+// controller
+app.controller('appCtrl', function ($scope) {
+
+    // create some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(','),
+        actions = 'Invite,Finalize,Withdraw'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i % countries.length],
+            action: actions[i % actions.length]
+        });
+    }
+
+    // expose data as a CollectionView to get events
+    $scope.data = new wijmo.collections.CollectionView(data);
+    $scope.actions = actions;
+});
+</script>
+</head>
+<body>
+<div ng-app="app" ng-controller="appCtrl">    
+<h1>FlexGrid with drop-downs</h1>
+  <wj-flex-grid items-source="data" selection-mode="Row">
+    <wj-flex-grid-column 
+      header="Country"
+      binding="country">
+    </wj-flex-grid-column>
+    <wj-flex-grid-column
+      header="Action"
+      binding="action"
+      data-map="actions">
+    </wj-flex-grid-column>
+  </wj-flex-grid>
+</div>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- https://jsfiddle.net/Wijmo5/esuhoy93/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20142.0/controls/wijmo.chart.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.23/controls/wijmo.input.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+<title>FlexGrid Responsive Column Layout</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+// define app, include Wijmo 5 directives
+var app = angular.module('app', ['wj']);
+
+// controller
+app.controller('appCtrl', function ($scope) {
+
+    // create some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i],
+            downloads: Math.round(Math.random() * 20000),
+            sales: Math.random() * 10000,
+            expenses: Math.random() * 5000
+        });
+    }
+
+    // expose data as a CollectionView to get events
+    $scope.data = new wijmo.collections.CollectionView(data);
+
+    // invalidate all Wijmo controls on the page
+    $scope.invalidateWijmoControls = function (e) {
+        if (!e) e = document.body;
+        var ctl = wijmo.Control.getControl(e);
+        if (ctl) {
+            ctl.invalidate();
+        }
+        if (e.children) {
+            for (var i = 0; i < e.children.length; i++) {
+                $scope.invalidateWijmoControls(e.children[i]);
+            }
+        }
+    };
+
+    // invalidate Wijmo controls when panels collapse/expand
+    // http://getbootstrap.com/javascript/#collapse
+    $(function () {
+        $('#accordion').on('show.bs.collapse', function () {
+            $scope.invalidateWijmoControls();
+        });
+    });
+});
+</script>
+</head>
+<body>
+<h3>Responsive Column Layout</h3>
+<!-- mark this as an Angular application and give it a controller -->
+<div ng-app="app" ng-controller="appCtrl">  
+  <h1>FlexGrid in Bootstrap Accordion</h1>
+
+  <div class="panel-group" id="accordion">
+      <div class="panel panel-default">
+          <div class="panel-heading">
+               <h4 class="panel-title">
+      <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+        Sales Grid
+      </a>
+    </h4>
+
+          </div>
+          <div id="collapseOne" class="panel-collapse collapse in">
+              <div class="panel-body">
+                  <wj-flex-grid items-source="data" selection-mode="Row">
+                      <wj-flex-grid-column header="Country" binding="country"></wj-flex-grid-column>
+                      <wj-flex-grid-column header="Sales" binding="sales"></wj-flex-grid-column>
+                  </wj-flex-grid>
+              </div>
+          </div>
+      </div>
+      <div class="panel panel-default">
+          <div class="panel-heading">
+               <h4 class="panel-title">
+      <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+        Expenses Grid
+      </a>
+    </h4>
+
+          </div>
+          <div id="collapseTwo" class="panel-collapse collapse">
+              <div class="panel-body">
+                  <wj-flex-grid items-source="data" selection-mode="Row">
+                      <wj-flex-grid-column header="Country" binding="country"></wj-flex-grid-column>
+                      <wj-flex-grid-column header="Expenses" binding="expenses"></wj-flex-grid-column>
+                  </wj-flex-grid>
+              </div>
+          </div>
+      </div>
+      <div class="panel panel-default">
+          <div class="panel-heading">
+               <h4 class="panel-title">
+      <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+        Downloads Grid
+      </a>
+    </h4>
+
+    </div>
+    <div id="collapseThree" class="panel-collapse collapse">
+              <div class="panel-body">
+                  <wj-flex-grid items-source="data" selection-mode="Row">
+                      <wj-flex-grid-column header="Country" binding="country"></wj-flex-grid-column>
+                      <wj-flex-grid-column header="Downloads" binding="downloads"></wj-flex-grid-column>
+                  </wj-flex-grid>
+              </div>
+          </div>
+      </div>
+  </div>
+</body>
+</html>

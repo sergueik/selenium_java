@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- http://jsfiddle.net/Wijmo5/h0es9e14/ -->
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.23/controls/wijmo.input.min.js"></script>
+<title>FlexGrid control: row.cssClass example</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+$(document).ready(function () {
+
+    // generate some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i],
+            downloads: Math.round(Math.random() * 20000),
+            sales: Math.random() * 10000,
+            expenses: Math.random() * 5000
+        });
+    }
+
+    // wrap data in a CollectionView to get updates
+    // (so editing the grid updates the chart)
+    var view = new wijmo.collections.CollectionView(data);
+    var cols = [{
+                header: 'Country',
+                binding: 'country',
+                width: '*'
+            }, {
+                header: 'Sales',
+                binding: 'sales',
+                width: '*'
+            }, {
+                header: 'Expenses',
+                binding: 'expenses',
+                width: '*'
+            }, {
+                header: 'Downloads',
+                binding: 'downloads',
+                width: '*',
+                format: 'n0'
+            }];
+
+    // create grid and show data
+    var grid = new wijmo.grid.FlexGrid('#theGrid');
+    grid.autoGenerateColumns = false; // before setting itemsSource
+    grid.itemsSource = view;
+    if (false) {
+        // method 1: columnLayout
+        grid.columnLayout = JSON.stringify({ columns: cols });
+    } else {
+        // method 2: just add the columns
+        for (var i = 0; i < cols.length; i++) {
+            var col = new wijmo.grid.Column();
+            wijmo.copy(col, cols[i]);
+            grid.columns.push(col);
+        }
+    }
+});
+</script>
+</head>
+<body>
+<h3>FlexGrid ColumnLayout</h3>
+<div id="theGrid"></div>
+</body>
+</html>

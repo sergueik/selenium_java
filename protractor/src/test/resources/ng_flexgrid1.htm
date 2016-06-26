@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- http://jsfiddle.net/Wijmo5/hak6c27w/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.0.min.js"></script>
+<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.min.js"></script>
+<link rel="stylesheet" href="http://cdn.wijmo.com/5.20143.22/styles/wijmo.min.css">
+<script src="http://cdn.wijmo.com/5.20143.22/controls/wijmo.grid.min.js"></script>
+<script src="http://cdn.wijmo.com/5.20143.22/interop/angular/wijmo.angular.min.js"></script>
+<title>FlexGrid control: row.cssClass example</title>
+<style>
+.redRow:not(.wj-state-selected) {
+    background-color:rgb(250, 210, 210) !important;
+    color:black !important;
+}
+</style>
+
+<script type='text/javascript'>
+
+// define app, include Wijmo 5 directives
+var app = angular.module('myApp', ['wj']);
+
+// controller
+app.controller('appCtrl', function ($scope) {
+
+    // set cssClass property on rows depending on their data
+    $scope.loadedRows = function (sender, args) {
+        var rows = sender.rows;
+        for (var i = 0; i < rows.length; i++) {
+            if (rows[i].dataItem.sales < 5000) {
+                rows[i].cssClass = 'redRow';
+            }
+        }
+    }
+
+    // create some random data
+    var countries = 'US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,US,Germany,UK,Japan,Italy,Greece,'.split(','),
+        data = [];
+    for (var i = 0; i < countries.length; i++) {
+        data.push({
+            country: countries[i],
+            downloads: Math.round(Math.random() * 20000),
+            sales: Math.random() * 10000,
+            expenses: Math.random() * 5000
+        });
+    }
+
+    // expose data as a CollectionView to get events
+    $scope.data = new wijmo.collections.CollectionView(data);
+});
+
+</script>
+</head>
+<body ng-app="myApp" >
+<!-- mark this as an Angular application and give it a controller -->
+<div ng-controller="appCtrl">
+    
+<h1>FlexGrid row.cssClass example</h1>
+
+    <p>This is a <b>FlexGrid</b> control:</p>
+    <wj-flex-grid items-source="data" loaded-rows="loadedRows(s,e)"></wj-flex-grid>
+</div>
+</body>
+</html>
