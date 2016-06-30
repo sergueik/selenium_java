@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suite name="Suite" parallel="false">
+  <test name="ExcelSuiteParserTest">
+    <classes>
+      <class name="net.randomsync.testng.excel.ExcelSuiteParserTest"/>
+      <class name="net.randomsync.testng.excel.ExcelSuiteParserTest2"/>
+    </classes>
+  </test>
+  <test name="ExcelTestCaseTest">
+    <classes>
+      <class name="net.randomsync.testng.excel.ExcelTestCaseTest"/>
+    </classes>
+  </test>
+  <test name="ExcelTestSuiteTest">
+    <classes>
+      <class name="net.randomsync.testng.excel.ExcelTestSuiteTest"/>
+    </classes>
+  </test>
+</suite>
