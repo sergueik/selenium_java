@@ -1,5 +1,7 @@
 **/bin/**
 **/.settings
+**/.classpath
+**/.project
 **/work/**
 **/target/**
 **/src/**/*.jar
