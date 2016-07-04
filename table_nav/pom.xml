@@ -11,10 +11,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.8.1</junit.version>
     <selenium.version>2.44.0</selenium.version>
-    <selenium.firefox-driver.version>2.43.1</selenium.firefox-driver.version>
+    <selenium.firefox-driver.version>2.45.0</selenium.firefox-driver.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <java.version>1.7</java.version> 
-    <!-- jenkins hpi may require 1.6 -->
   </properties>
   <dependencies>
     <dependency>
