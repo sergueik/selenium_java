@@ -1,4 +1,4 @@
-package com.mycompany.app;
+pack`age com.mycompany.app;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConnectionFactory;
@@ -10,6 +10,8 @@ import org.eclipse.jetty.server.handler.MovedContextHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -19,6 +21,13 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +40,6 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
-
 import static org.openqa.selenium.By.*;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
@@ -41,8 +49,7 @@ public class AppTest {
 
 	private FirefoxDriver driver;
 	private Server webServer;
-
-	@BeforeSuite
+@BeforeSuite
 	public void before_suite() throws Exception {
 
 		((StdErrLog) Log.getRootLogger()).setLevel(StdErrLog.LEVEL_OFF);
@@ -51,16 +58,36 @@ public class AppTest {
 				new HttpConnectionFactory());
 		connector.setPort(8080);
 		webServer.addConnector(connector);
+
+		/*
+    ConstraintSecurityHandler security_handler = new ConstraintSecurityHandler();
+
+    Constraint constraint = new Constraint();
+    constraint.setName( "auth" );
+    constraint.setAuthenticate( true );
+    constraint.setRoles( new String[]
+        { "user", "admin" } );
+
+    ConstraintMapping mapping = new ConstraintMapping();
+    mapping.setPathSpec( "/*" );
+    // mapping.setConstraint(constraint);
+
+    security_handler.setConstraintMappings( Collections.singletonList( mapping ) );
+    // security.setConstraintMappings(new ConstraintMapping[] {mapping});
+    security_handler.setAuthenticator( new BasicAuthenticator() );
+    // security_handler.setLoginService( loginService );
+    */
 		ResourceHandler resource_handler = new ResourceHandler();
-		resource_handler.setDirectoriesListed(true);
+		resource_handler.setDirectoriesListed(true);	
 		resource_handler.setWelcomeFiles(new String[] { "index.html" });
 		resource_handler.setResourceBase("src/test/webapp");
+    // security_handler.setHandler( resource_handler );
+    
 		HandlerList handlers = new HandlerList();
-		// MovedContextHandler effective_symlink = new
-		// MovedContextHandler(webServer, "/lib/angular", "/lib/angular_v1.2.9");
 		handlers
 				.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
 		webServer.setHandler(handlers);
+    
 		webServer.start();
 
 		driver = new FirefoxDriver();
@@ -81,7 +108,7 @@ public class AppTest {
 	@Test
 	public void pageLaded() {
 
-		driver.get("http://localhost:8080/");
+		driver.get("http://user:password@localhost:8080/");
 		assertTrue(driver.findElements(cssSelector("html body div table.sortable"))
 				.size() > 0);
 
