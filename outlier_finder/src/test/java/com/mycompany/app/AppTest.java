@@ -10,7 +10,11 @@ import org.eclipse.jetty.server.handler.MovedContextHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.StdErrLog;
+import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.security.Credential;
+import org.eclipse.jetty.util.security.Password;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.security.LoginService;
 
 import static org.openqa.selenium.By.*;
 
@@ -25,11 +29,23 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import org.testng.annotations.Test;
+import org.eclipse.jetty.security.ConstraintMapping;
+import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
+import java.util.Collections;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -46,7 +62,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
-// not using junit in this project
+// not using jUnit in this project
 // import static org.junit.Assert.assertThat;
 
 public class AppTest {
@@ -157,23 +173,52 @@ public class AppTest {
 			+ " // TODO: collect 'module' column\n" + " return array_keys.join();";
 
 	@BeforeSuite
+	// http://www.javased.com/index.php?api=org.eclipse.jetty.util.security.Constraint
+	// http://www.programcreek.com/java-api-examples/index.php?api=org.eclipse.jetty.security.LoginService
 	public void before_suite() throws Exception {
 
-		((StdErrLog) Log.getRootLogger()).setLevel(StdErrLog.LEVEL_OFF);
+		((StdErrLog) Log.getRootLogger()).setLevel(StdErrLog.LEVEL_DEBUG);
 		webServer = new Server(new QueuedThreadPool(5));
 		ServerConnector connector = new ServerConnector(webServer,
 				new HttpConnectionFactory());
 		connector.setPort(8080);
 		webServer.addConnector(connector);
+
+
+		Constraint constraint = new Constraint("default", Constraint.ANY_ROLE);
+		constraint.setAuthenticate(true);
+		ConstraintMapping constraintMapping = new ConstraintMapping();
+		constraintMapping.setPathSpec("/*");
+		constraintMapping.setConstraint(constraint);
+		ConstraintSecurityHandler security_handler = new ConstraintSecurityHandler();
+		security_handler.setAuthenticator(new BasicAuthenticator());
+		security_handler.addConstraintMapping(constraintMapping);
+
+		// HTTP ERROR 403
+		//  Problem accessing /. Reason:
+		//  !role
+		final String userName = "user";
+		final String password = "password";
+		LoginService loginService = new HashLoginService("default");
+		webServer.addBean(loginService);
+		((HashLoginService) loginService).putUser(userName,
+				Credential.getCredential(password),
+				new String[] { Constraint.ANY_ROLE });
+
+		security_handler.setLoginService(loginService);
+
+		/*
+		 * security_handler.setConstraintMappings( Collections.singletonList(
+		 * mapping ) ); security_handler.setAuthenticator( new BasicAuthenticator()
+		 * ); security_handler.setLoginService( loginService );
+		 */
 		ResourceHandler resource_handler = new ResourceHandler();
 		resource_handler.setDirectoriesListed(true);
 		resource_handler.setWelcomeFiles(new String[] { "index.html" });
 		resource_handler.setResourceBase("src/test/webapp");
-		HandlerList handlers = new HandlerList();
-		// TODO: https://examples.javacodegeeks.com/enterprise-java/jetty/jetty-authentication-configuration-example/
-		handlers
-				.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
-		webServer.setHandler(handlers);
+		security_handler.setHandler(resource_handler);
+
+		webServer.setHandler(security_handler);
 		webServer.start();
 
 		driver = new FirefoxDriver();
@@ -182,13 +227,14 @@ public class AppTest {
 
 	@AfterSuite
 	public void after_suite() throws Exception {
+		Thread.sleep(10000);
 		driver.quit();
 		webServer.stop();
 	}
 
 	@BeforeMethod
 	public void loadPage() {
-    driver.get("http://localhost:8080/");
+    driver.get("http://user:password@localhost:8080/");
 	}
 
 	@AfterMethod
