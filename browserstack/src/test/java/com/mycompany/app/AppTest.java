@@ -1,17 +1,13 @@
 package com.mycompany.app;
 
+import java.net.URL;
+
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.Assert;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-
-import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
@@ -27,7 +23,7 @@ public class AppTest {
 	private String platform;
 	private String browserName;
 	private String browserVersion;
- 	private static final String USERNAME = "********";
+	private static final String USERNAME = "********";
 	private static final String ACCESS_KEY = "********";
 
 	@Factory(dataProvider = "getBrowsers")
@@ -37,16 +33,17 @@ public class AppTest {
 		this.browserVersion = browserVersion;
 	}
 
-	private WebDriver driver;	
+	private WebDriver driver;
 
 	@BeforeClass
 	public void setUp() throws Exception {
 		DesiredCapabilities capability = new DesiredCapabilities();
-		capability.setCapability("platform",platform);
+		capability.setCapability("platform", platform);
 		capability.setCapability("browser", browserName);
 		capability.setCapability("browserVersion", browserVersion);
-		driver = new RemoteWebDriver(new URL("http://USERNAME:ACCESS_KEY@hub.browserstack.com/wd/hub"), capability);
-	}	
+		driver = new RemoteWebDriver(new URL(
+				"http://USERNAME:ACCESS_KEY@hub.browserstack.com/wd/hub"), capability);
+	}
 
 	@Test
 	public void test() throws Exception {
@@ -56,25 +53,16 @@ public class AppTest {
 		WebElement element = driver.findElement(By.name("q"));
 		element.sendKeys("Browser Stack");
 		element.submit();
-		driver = new Augmenter().augment(driver);
-		File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		try {
-			FileUtils.copyFile(srcFile, new File("Screenshot.png"));
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
-	@AfterClass	
-	public void tearDown() throws Exception {	
-		driver.quit();	
-	}	
+	@AfterClass
+	public void tearDown() throws Exception {
+		driver.quit();
+	}
 
 	@DataProvider(name = "getBrowsers")
 	public static Object[][] createData1() {
-		return new Object[][] {
-			{ Platform.WINDOWS.toString(), "chrome", "51" },
-			{ Platform.XP.toString(), "firefox", "43"},
-		};
+		return new Object[][] { { Platform.WINDOWS.toString(), "chrome", "51" },
+				{ Platform.XP.toString(), "firefox", "43" }, };
 	}
 }
