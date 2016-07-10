@@ -42,7 +42,7 @@ public class AppTest {
 		capability.setCapability("browser", browserName);
 		capability.setCapability("browserVersion", browserVersion);
 		driver = new RemoteWebDriver(new URL(
-				"http://USERNAME:ACCESS_KEY@hub.browserstack.com/wd/hub"), capability);
+				"http://" + USERNAME + ":" + ACCESS_KEY + "@hub.browserstack.com/wd/hub"), capability);
 	}
 
 	@Test

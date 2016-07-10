@@ -33,7 +33,7 @@ public class ParallelTest {
 		capability.setCapability("project", "P1");
 		capability.setCapability("build", "1.0");
 		driver = new RemoteWebDriver(new URL(
-				"http://USERNAME:ACCESS_KEY@hub.browserstack.com/wd/hub"), capability);
+				"http://" + USERNAME + ":" + ACCESS_KEY + "@hub.browserstack.com/wd/hub" ), capability);
 	}
 
 	@Test
