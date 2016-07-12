@@ -1,10 +1,14 @@
 package com.mycompany.app;
 
 import java.net.URL;
+import java.net.MalformedURLException;
+
+import java.util.concurrent.TimeUnit;
 
 import org.testng.annotations.Test;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Parameters;
 import org.testng.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
@@ -14,6 +18,8 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriverException;
+
 
 public class ParallelTest {
 
@@ -22,10 +28,9 @@ public class ParallelTest {
 
 	private WebDriver driver;
 
+	@Parameters(value = { "browser", "version", "platform" })
 	@BeforeClass
-	@org.testng.annotations.Parameters(value = { "browser", "version", "platform" })
-	public void setUp(String browser, String version, String platform)
-			throws Exception {
+	public void setUp(String browser, String version, String platform ) throws MalformedURLException, InterruptedException, WebDriverException {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("platform", platform);
 		capability.setCapability("browserName", browser);

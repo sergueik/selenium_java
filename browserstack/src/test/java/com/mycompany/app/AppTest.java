@@ -1,6 +1,9 @@
 package com.mycompany.app;
 
 import java.net.URL;
+import java.net.MalformedURLException;
+
+import java.util.concurrent.TimeUnit;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Factory;
@@ -17,6 +20,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.WebDriverException;
 
 public class AppTest {
 
@@ -36,7 +40,7 @@ public class AppTest {
 	private WebDriver driver;
 
 	@BeforeClass
-	public void setUp() throws Exception {
+	public void setUp() throws MalformedURLException, InterruptedException, WebDriverException {
 		DesiredCapabilities capability = new DesiredCapabilities();
 		capability.setCapability("platform", platform);
 		capability.setCapability("browser", browserName);
