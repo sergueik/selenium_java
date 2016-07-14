@@ -1,5 +1,4 @@
 var git_hashes_str = arguments[0];
-// var git_hashes_str = '259c762,25bad25,2bad762,b26e5f1,bade5f1,d1bad8d,d158d8d,533acf2,533ace2,1b24bca,1b24bc2,d3c1652,d3aaa52,7538e12,7000e12';
 var row_selector = 'tbody tr';
 var table_selector = 'html body div table.sortable';
 var hash_column_selector = 'td:nth-child(3)';
@@ -8,7 +7,7 @@ var module_column_selector = 'td:nth-child(2)';
 var result = {};
 var col_num = 0;
 var git_hashes = {};
-var git_hashes_keys = git_hashes_str.split(',');
+var git_hashes_keys = JSON.parse(git_hashes_str);
 for (var key in git_hashes_keys) {
 	git_hashes[git_hashes_keys[key]] = 1;
 }

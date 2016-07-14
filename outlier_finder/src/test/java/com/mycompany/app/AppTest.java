@@ -140,27 +140,36 @@ public class AppTest {
 		String result = storeEval(hashesFinderScript, "");
 		assertFalse(result.isEmpty());
 	}
-
-	@Test(enabled = false)
+	
+	// https://processing.org/reference/JSONArray.html
+	@Test(enabled = true)
 	public void findHashes() {
-		List<String> hashes = Arrays.asList(storeEval(hashesFinderScript, "")
-				.split("\\s*,\\s*"));
+		ArrayList<String> hashes = new ArrayList<String>();
+		JSONArray hashesDataArray = new JSONArray(storeEval(hashesFinderScript, ""));
+		for (int i = 0; i < hashesDataArray.length(); i++) {
+			hashes.add(hashesDataArray.getString(i));
+		}
 		assertTrue(hashes.size() > 0);
+		for (String hash : hashes) {
+			System.err.println("Hash: " + hash);
+		}
+			System.err.println("Raw: " + storeEval(hashesFinderScript, ""));
 	}
 
-  // https://processing.org/reference/JSONObject.html
+	// https://processing.org/reference/JSONObject.html
 	@Test(enabled = true)
 	public void findResultsDetails() {
+		System.err.println("Raw: " + storeEval(resultFinderScript,
+				storeEval(hashesFinderScript, "")));
 		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
 				storeEval(hashesFinderScript, "")));
 		Iterator<String> masterServerIterator = resultObj.keys();
 		while (masterServerIterator.hasNext()) {
 			String masterServer = masterServerIterator.next();
-      JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
-      for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
-        System.err
-            .println(masterServer + " " + resultDataArray.get(cnt));
-      }
+			JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
+			for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
+				System.err.println(masterServer + " " + resultDataArray.get(cnt));
+			}
 		}
 	}
 
