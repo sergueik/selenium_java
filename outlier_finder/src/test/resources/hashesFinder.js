@@ -49,5 +49,5 @@ var array_keys = [];
 for (var key in git_hashes) {
     array_keys.push(key);
 }
-
-return array_keys.join();;
+// var git_hashes_str =
+return array_keys.join();

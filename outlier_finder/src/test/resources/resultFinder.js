@@ -1,6 +1,7 @@
 var git_hashes_str = arguments[0];
-var table_selector = 'html body div table.sortable';
+// var git_hashes_str = '259c762,25bad25,2bad762,b26e5f1,bade5f1,d1bad8d,d158d8d,533acf2,533ace2,1b24bca,1b24bc2,d3c1652,d3aaa52,7538e12,7000e12';
 var row_selector = 'tbody tr';
+var table_selector = 'html body div table.sortable';
 var hash_column_selector = 'td:nth-child(3)';
 var master_server_column_selector = 'td:nth-child(1)';
 var module_column_selector = 'td:nth-child(2)';
@@ -32,7 +33,11 @@ for (table_cnt = 0; table_cnt != tables.length; table_cnt++) {
 							var master_server_data = master_server_cols[0].innerHTML;
 							master_server_data = master_server_data.replace(/\s+/g, '');
 							if (!result[master_server_data]) {
-								result[master_server_data] = hash_data;
+								result[master_server_data] = [];
+							}
+							var module_cols = row.querySelectorAll(module_column_selector);
+							if (module_cols.length > 0) {
+								result[master_server_data].push(module_cols[0].innerHTML.replace(/\s+/g, ''));
 							}
 						}
 					}
@@ -41,4 +46,4 @@ for (table_cnt = 0; table_cnt != tables.length; table_cnt++) {
 		}
 	}
 }
-return JSON.stringify(result);;
+return JSON.stringify(result);
