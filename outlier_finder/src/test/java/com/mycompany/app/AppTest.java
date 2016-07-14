@@ -38,6 +38,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -80,7 +81,7 @@ public class AppTest {
 	private Server webServer;
 
 	private String hashesFinderScript = null;
-	private String serverFinderScript = null;
+	private String resultFinderScript = null;
 
 	@BeforeSuite
 	public void before_suite() throws Exception {
@@ -104,10 +105,8 @@ public class AppTest {
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-
-		serverFinderScript = getScriptContent("serverFinder.js");
 		hashesFinderScript = getScriptContent("hashesFinder.js");
-		;
+		resultFinderScript = getScriptContent("resultFinder.js");
 	}
 
 	@AfterSuite
@@ -149,26 +148,20 @@ public class AppTest {
 		assertTrue(hashes.size() > 0);
 	}
 
+  // https://processing.org/reference/JSONObject.html
 	@Test(enabled = true)
-	public void findServersDetails() {
-		JSONObject resultObj = new JSONObject(storeEval(serverFinderScript,
+	public void findResultsDetails() {
+		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
 				storeEval(hashesFinderScript, "")));
 		Iterator<String> masterServerIterator = resultObj.keys();
-		System.err.println(serverFinderScript);
-		System.err.println("\n\n" + hashesFinderScript);
 		while (masterServerIterator.hasNext()) {
 			String masterServer = masterServerIterator.next();
-			System.err
-					.println(masterServer + " " + resultObj.getString(masterServer));
+      JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
+      for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
+        System.err
+            .println(masterServer + " " + resultDataArray.get(cnt));
+      }
 		}
-		// assertTrue(servers.size() > 0);
-	}
-
-	@Test(enabled = false)
-	public void findServers() {
-		List<String> servers = Arrays.asList(storeEval(serverFinderScript,
-				storeEval(hashesFinderScript, "")));
-		assertTrue(servers.size() > 0);
 	}
 
 	private String storeEval(String script, String input) {
