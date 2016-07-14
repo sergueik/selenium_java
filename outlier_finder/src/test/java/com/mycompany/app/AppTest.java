@@ -135,9 +135,11 @@ public class AppTest {
 				.size() > 0);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testRunScript() {
 		String result = storeEval(hashesFinderScript, "");
+		assertFalse(result.isEmpty());
+    result = storeEval(hashesFinderScript);
 		assertFalse(result.isEmpty());
 	}
 	
@@ -145,7 +147,7 @@ public class AppTest {
 	@Test(enabled = true)
 	public void findHashes() {
 		ArrayList<String> hashes = new ArrayList<String>();
-		JSONArray hashesDataArray = new JSONArray(storeEval(hashesFinderScript, ""));
+		JSONArray hashesDataArray = new JSONArray(storeEval(hashesFinderScript));
 		for (int i = 0; i < hashesDataArray.length(); i++) {
 			hashes.add(hashesDataArray.getString(i));
 		}
@@ -153,16 +155,16 @@ public class AppTest {
 		for (String hash : hashes) {
 			System.err.println("Hash: " + hash);
 		}
-			System.err.println("Raw: " + storeEval(hashesFinderScript, ""));
+			System.err.println("Raw: " + storeEval(hashesFinderScript));
 	}
 
 	// https://processing.org/reference/JSONObject.html
 	@Test(enabled = true)
 	public void findResultsDetails() {
 		System.err.println("Raw: " + storeEval(resultFinderScript,
-				storeEval(hashesFinderScript, "")));
+				storeEval(hashesFinderScript)));
 		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
-				storeEval(hashesFinderScript, "")));
+				storeEval(hashesFinderScript)));
 		Iterator<String> masterServerIterator = resultObj.keys();
 		while (masterServerIterator.hasNext()) {
 			String masterServer = masterServerIterator.next();
@@ -173,7 +175,7 @@ public class AppTest {
 		}
 	}
 
-	private String storeEval(String script, String input) {
+	private String storeEval(String script, String... input) {
 		String result = null;
 		if (driver instanceof JavascriptExecutor) {
 			result = (String) ((JavascriptExecutor) driver).executeScript(script,
@@ -193,5 +195,4 @@ public class AppTest {
 			throw new Exception(scriptName);
 		}
 	}
-
 }
