@@ -39,6 +39,10 @@ var removeMaxValue = function(datahash) {
         if (datahash[key] === max_value) {
             delete datahash[key]
         }
+        // some modules may have less servers in total
+        if (datahash[key] >= max_value *.5 ) {
+          delete datahash[key]
+        }
     }
     return datahash;
 }
