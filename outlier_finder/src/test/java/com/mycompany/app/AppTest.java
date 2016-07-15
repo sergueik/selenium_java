@@ -128,21 +128,21 @@ public class AppTest {
 
 	@Test(enabled = true)
 	public void pageLaded() {
+		String tableCssSelector = "html body div table.sortable";
 		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
-				.cssSelector("html body div table.sortable"))));
+				.cssSelector(tableCssSelector))));
 
-		assertTrue(driver.findElements(cssSelector("html body div table.sortable"))
-				.size() > 0);
+		assertTrue(driver.findElements(cssSelector(tableCssSelector)).size() > 0);
 	}
 
 	@Test(enabled = true)
 	public void testRunScript() {
 		String result = storeEval(hashesFinderScript, "");
 		assertFalse(result.isEmpty());
-    result = storeEval(hashesFinderScript);
+		result = storeEval(hashesFinderScript);
 		assertFalse(result.isEmpty());
 	}
-	
+
 	// https://processing.org/reference/JSONArray.html
 	@Test(enabled = true)
 	public void findHashes() {
@@ -155,14 +155,11 @@ public class AppTest {
 		for (String hash : hashes) {
 			System.err.println("Hash: " + hash);
 		}
-			System.err.println("Raw: " + storeEval(hashesFinderScript));
 	}
 
 	// https://processing.org/reference/JSONObject.html
 	@Test(enabled = true)
 	public void findResultsDetails() {
-		System.err.println("Raw: " + storeEval(resultFinderScript,
-				storeEval(hashesFinderScript)));
 		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
 				storeEval(hashesFinderScript)));
 		Iterator<String> masterServerIterator = resultObj.keys();
