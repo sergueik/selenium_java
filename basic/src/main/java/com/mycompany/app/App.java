@@ -76,6 +76,7 @@ public class App {
 	static WebDriverWait wait;
 	static Actions actions;
 	private static String cssSelectorOfElementFinderScript;
+  private static String cssSelectorOfElementAlternativeFinderScript;
 	private static String xpathOfElementFinderScript;
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
@@ -100,11 +101,17 @@ public class App {
 		driver.manage().timeouts()
 				.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
 		cssSelectorOfElementFinderScript = getScriptContent("cssSelectorOfElement.js");
+    cssSelectorOfElementAlternativeFinderScript = getScriptContent("cssSelectorOfElementAlternative.js");
 		xpathOfElementFinderScript = getScriptContent("xpathOfElement.js");
+    
 	}
 
 	private static String cssSelectorOfElement(WebElement element) {
 		return (String) executeScript(cssSelectorOfElementFinderScript, element);
+	}
+
+	private static String cssSelectorOfElementAlternative(WebElement element) {
+    return (String) executeScript(cssSelectorOfElementAlternativeFinderScript, element);
 	}
 
 	private static void highlight(WebElement element) throws InterruptedException {
@@ -311,6 +318,34 @@ public class App {
 		} catch (Error e) {
 			verificationErrors.append(e.toString());
 		}
+
+		try {
+			element = find_element("id", "searchbox");
+			selector = cssSelectorOfElement(element);
+			highlight(element);
+			assertEquals("input#searchbox", selector);
+		} catch (Error e) {
+			verificationErrors.append(e.toString());
+		}
+    
+		try {
+			element = find_element("id", "searchbox");
+			highlight(element);
+			selector = cssSelectorOfElementAlternative(element);
+      // System.err.println("css_selector: " +  selector );
+			assertEquals("form[name=\"PTPT_HAC_FORM\"] > div > label > input[name=\"q\"]",
+					selector);
+		} catch (Error e) {
+			verificationErrors.append(e.toString());
+		}
+		try {
+			element = find_element("css_selector", selector);
+			highlight(element);
+		} catch (NullPointerException e) {
+
+			verificationErrors.append(e.toString());
+		}
+
 
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());

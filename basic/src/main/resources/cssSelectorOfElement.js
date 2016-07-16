@@ -1,4 +1,4 @@
-function cssSelectorOfElement(element) {
+cssSelectorOfElement = function (element) {
 	if (!(element instanceof Element))
 		return;
 	var path = [];
@@ -6,7 +6,7 @@ function cssSelectorOfElement(element) {
 		var selector = element.nodeName.toLowerCase();
 		if (element.id) {
 			if (element.id.indexOf('-') > -1) {
-				selector += '[id = "' + element.id + '"]';
+				selector += '[id="' + element.id + '"]';
 			} else {
 				selector += '#' + element.id;
 			}
