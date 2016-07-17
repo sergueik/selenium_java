@@ -94,14 +94,14 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
-public class App {
+public class AppTest {
 
 	public static VideoRecorder recorder;
 	private static WebDriver seleniumDriver;
 	private static NgWebDriver ngDriver;
-	public static String baseUrl2 = "http://www.way2automation.com/angularjs-protractor/banking";
-	private static String baseUrl1 = "http://amitava82.github.io/angular-multiselect/";
-	private static String baseUrl3 = "http://dalelotts.github.io/angular-bootstrap-datetimepicker/";
+	public static String urlBanking = "http://www.way2automation.com/angularjs-protractor/banking";
+	private static String urlMultiSelect = "http://amitava82.github.io/angular-multiselect/";
+	private static String urlDatePicker = "http://dalelotts.github.io/angular-bootstrap-datetimepicker/";
 
 	static Alert alert;
 
@@ -117,13 +117,13 @@ public class App {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		final FirefoxProfile profile = new FirefoxProfile();
+		// final FirefoxProfile profile = new FirefoxProfile();
 		// profile.setEnableNativeEvents(false);
-		seleniumDriver = new FirefoxDriver(profile);
+		// seleniumDriver = new FirefoxDriver(profile);
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
-		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		// seleniumDriver = new ChromeDriver(capabilities);
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		seleniumDriver = new ChromeDriver(capabilities);
 
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
@@ -138,248 +138,10 @@ public class App {
 		recorder.startRecording(seleniumDriver);
 	}
 
-	private static String css_selector_of(WebElement element) {
-		String script = "function get_css_selector_of(element) {\n"
-				+ "if (!(element instanceof Element))\n"
-				+ "return;\n"
-				+ "var path = [];\n"
-				+ "while (element.nodeType === Node.ELEMENT_NODE) {\n"
-				+ "var selector = element.nodeName.toLowerCase();\n"
-				+ "if (element.id) {\n"
-				+ "if (element.id.indexOf('-') > -1) {\n"
-				+ "selector += '[id = \"' + element.id + '\"]';\n"
-				+ "} else {\n"
-				+ "selector += '#' + element.id;\n"
-				+ "}\n"
-				+ "path.unshift(selector);\n"
-				+ "break;\n"
-				+ "} else {\n"
-				+ "var element_sibling = element;\n"
-				+ "var sibling_cnt = 1;\n"
-				+ "while (element_sibling = element_sibling.previousElementSibling) {\n"
-				+ "if (element_sibling.nodeName.toLowerCase() == selector)\n"
-				+ "sibling_cnt++;\n" + "}\n" + "if (sibling_cnt != 1)\n"
-				+ "selector += ':nth-of-type(' + sibling_cnt + ')';\n" + "}\n"
-				+ "path.unshift(selector);\n" + "element = element.parentNode;\n"
-				+ "}\n" + "return path.join(' > ');\n" + "} \n"
-				+ "return get_css_selector_of(arguments[0]);\n";
-		return (String) execute_script(script, element);
-
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-
-		highlight(element, 500);
-	}
-
-	private static void highlight(WebElement element, long highlight_interval)
-			throws InterruptedException {
-		wait.until(ExpectedConditions.visibilityOf(element));
-		execute_script("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
-		execute_script("arguments[0].style.border=''", element);
-	}
-
-	private static String xpath_of(WebElement element) {
-		String script = "function get_xpath_of(element) {\n"
-				+ " var elementTagName = element.tagName.toLowerCase();\n"
-				+ "     if (element.id != '') {\n"
-				+ "         return '//' + elementTagName + '[@id=\"' + element.id + '\"]';\n"
-				+ "     } else if (element.name && document.getElementsByName(element.name).length === 1) {\n"
-				+ "         return '//' + elementTagName + '[@name=\"' + element.name + '\"]';\n"
-				+ "     }\n"
-				+ "     if (element === document.body) {\n"
-				+ "         return '/html/' + elementTagName;\n"
-				+ "     }\n"
-				+ "     var sibling_count = 0;\n"
-				+ "     var siblings = element.parentNode.childNodes;\n"
-				+ "     siblings_length = siblings.length;\n"
-				+ "     for (cnt = 0; cnt < siblings_length; cnt++) {\n"
-				+ "         var sibling_element = siblings[cnt];\n"
-				+ "         if (sibling_element.nodeType !== 1) { // not ELEMENT_NODE\n"
-				+ "             continue;\n"
-				+ "         }\n"
-				+ "         if (sibling_element === element) {\n"
-				+ "             return sibling_count > 0 ? get_xpath_of(element.parentNode) + '/' + elementTagName + '[' + (sibling_count + 1) + ']' : get_xpath_of(element.parentNode) + '/' + elementTagName;\n"
-				+ "         }\n"
-				+ "         if (sibling_element.nodeType === 1 && sibling_element.tagName.toLowerCase() === elementTagName) {\n"
-				+ "             sibling_count++;\n" + "         }\n" + "     }\n"
-				+ "     return;\n" + " };\n" + " return get_xpath_of(arguments[0]);\n";
-		return (String) execute_script(script, element);
-	}
-
-	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.JavascriptExecutor
-	public static Object execute_script(String script, Object... args) {
-		if (seleniumDriver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;
-			return javascriptExecutor.executeScript(script, args);
-		} else {
-			throw new RuntimeException(
-					"Script execution is only available for WebDrivers that implement "
-							+ "the JavascriptExecutor interface.");
-		}
-	}
-
-	private static List<WebElement> find_elements(String selector_type,
-			String selector_value, WebElement parent) {
-		int flexible_wait_interval = 5;
-		SearchContext finder;
-		long wait_polling_interval = 500;
-		String parent_css_selector = null;
-		String parent_xpath = null;
-
-		WebDriverWait wait = new WebDriverWait(seleniumDriver,
-				flexible_wait_interval);
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		List<WebElement> elements = null;
-		Hashtable<String, Boolean> supported_selectors = new Hashtable<String, Boolean>();
-		supported_selectors.put("css_selector", true);
-		supported_selectors.put("xpath", true);
-
-		if (selector_type == null
-				|| !supported_selectors.containsKey(selector_type)
-				|| !supported_selectors.get(selector_type)) {
-			return null;
-		}
-		if (parent != null) {
-			parent_css_selector = css_selector_of(parent);
-			parent_xpath = xpath_of(parent);
-			finder = parent;
-		} else {
-			finder = seleniumDriver;
-		}
-
-		if (selector_type == "css_selector") {
-			String extended_css_selector = String.format("%s  %s",
-					parent_css_selector, selector_value);
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.cssSelector(extended_css_selector)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			elements = finder.findElements(By.cssSelector(selector_value));
-		}
-		if (selector_type == "xpath") {
-			String extended_xpath = String.format("%s/%s", parent_xpath,
-					selector_value);
-
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.xpath(extended_xpath)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			elements = finder.findElements(By.xpath(selector_value));
-		}
-		return elements;
-	}
-
-	private static List<WebElement> find_elements(String selector_type,
-			String selector_value) {
-		return find_elements(selector_type, selector_value, null);
-	}
-
-	private static WebElement find_element(String selector_type,
-			String selector_value) {
-		WebElement element = null;
-		Hashtable<String, Boolean> supported_selectors = new Hashtable<String, Boolean>();
-		supported_selectors.put("id", true);
-		supported_selectors.put("css_selector", true);
-		supported_selectors.put("xpath", true);
-		supported_selectors.put("partial_link_text", false);
-		supported_selectors.put("link_text", true);
-		supported_selectors.put("classname", false);
-
-		if (selector_type == null
-				|| !supported_selectors.containsKey(selector_type)
-				|| !supported_selectors.get(selector_type)) {
-			return null;
-		}
-		if (selector_type == "id") {
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.id(selector_value)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			element = seleniumDriver.findElement(By.id(selector_value));
-		}
-		if (selector_type == "classname") {
-
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.className(selector_value)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			element = seleniumDriver.findElement(By.className(selector_value));
-		}
-		if (selector_type == "link_text") {
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.linkText(selector_value)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			element = seleniumDriver.findElement(By.linkText(selector_value));
-		}
-		if (selector_type == "css_selector") {
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.cssSelector(selector_value)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			element = seleniumDriver.findElement(By.cssSelector(selector_value));
-		}
-		if (selector_type == "xpath") {
-
-			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.xpath(selector_value)));
-			} catch (RuntimeException timeoutException) {
-				return null;
-			}
-			element = seleniumDriver.findElement(By.xpath(selector_value));
-		}
-		return element;
-	}
-
-	public static void main(String[] args) throws Exception {
-		setUp();
-		ngDriver.navigate().to(baseUrl3);
-		testDatePickerDirectSelect();
-		// testVerifyText();
-		// testAddition();
-		ngDriver.navigate().to(baseUrl1);
-
-		testSelectAll();
-		ngDriver.navigate().to(baseUrl1);
-
-		testSelectOneByOne();
-		// testAddCustomer();
-		ngDriver.navigate().to(baseUrl2);
-
-		testCustomerLogin();
-		ngDriver.navigate().to(baseUrl2);
-
-		testInvitateNewCustomerToOpenAccount();
-		// testByModel();
-		ngDriver.navigate().to(baseUrl2);
-		testListTransactions();
-		ngDriver.navigate().to(baseUrl2);
-		testOpenAccount();
-
-		ngDriver.navigate().to(baseUrl2);
-		testDepositAndWithdraw();
-
-		tearDown();
-	}
-
 	@Test
-	public static void testDatePickerDirectSelect() throws Exception {
+	public void testDatePickerDirectSelect() throws Exception {
 		NgWebElement ng_result;
+		ngDriver.navigate().to(urlDatePicker);
 		try {
 			ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput"));
 		} catch (WebDriverException e) {
@@ -481,7 +243,8 @@ public class App {
 
 	// @Ignore
 	@Test
-	public static void testListTransactions() throws Exception {
+	public void testListTransactions() throws Exception {
+		ngDriver.navigate().to(urlBanking);
 		// customer login
 		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
 		// select customer/account with transactions
@@ -537,8 +300,9 @@ public class App {
 	}
 
 	@Test
-	public static void testInvitateNewCustomerToOpenAccount() throws Exception {
-		// When I proceed to "Bank Manager Login"
+	public void testInvitateNewCustomerToOpenAccount() throws Exception {
+			ngDriver.navigate().to(urlBanking);
+	// When I proceed to "Bank Manager Login"
 		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
 		// And I proceed to "Add Customer"
 		ngDriver.findElement(NgBy.partialButtonText("Add Customer")).click();
@@ -642,7 +406,8 @@ public class App {
 	}
 
 	@Test
-	public static void testSelectOneByOne() throws Exception {
+	public void testSelectOneByOne() throws Exception {
+    ngDriver.navigate().to(urlMultiSelect);
 		// Given we are using multiselect directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
@@ -678,7 +443,8 @@ public class App {
 	}
 
 	@Test
-	public static void testSelectAll() throws Exception {
+	public void testSelectAll() throws Exception {
+    ngDriver.navigate().to(urlMultiSelect);
 		// Given we are using multiselect directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
@@ -712,61 +478,6 @@ public class App {
 		assertThat(cars.size(), equalTo(selectedCarCount));
 	}
 
-	@Test
-	public static void testVerifyText() throws Exception {
-		String selector = null;
-		WebElement element = null;
-		try {
-			assertEquals("Hotels", find_element("link_text", "Hotels").getText());
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-		try {
-			element = find_element("link_text", "Hotels");
-			highlight(element);
-			selector = xpath_of(element);
-			assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-
-		try {
-			element = find_element("xpath", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-			verificationErrors.append(e.toString());
-		}
-		try {
-			element = find_element("link_text", "Hotels");
-			highlight(element);
-			selector = css_selector_of(element);
-			assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
-					selector);
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-		try {
-			element = find_element("css_selector", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-
-			verificationErrors.append(e.toString());
-		}
-
-		try {
-			element = find_element("css_selector", "input#mainSearch");
-			selector = css_selector_of(element);
-			highlight(element);
-			assertEquals("input#mainSearch", selector);
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-
-		if (verificationErrors.length() != 0) {
-			throw new Exception(verificationErrors.toString());
-		}
-	}
-
 	/*
 	 * 
 	 * Feature: Login Feature
@@ -779,9 +490,11 @@ public class App {
 	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
 	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
+   
 	// @Ignore
 	@Test
-	public static void testCustomerLogin() throws Exception {
+	public  void testCustomerLogin() throws Exception {
+    ngDriver.navigate().to(urlBanking);
 		// When I proceed to "Customer Login"
 		NgWebElement element = ngDriver.findElement(NgBy
 				.buttonText("Customer Login"));
@@ -874,7 +587,8 @@ public class App {
 
 	// @Ignore
 	@Test
-	public static void testOpenAccount() throws Exception {
+	public void testOpenAccount() throws Exception {
+    ngDriver.navigate().to(urlBanking);
 		// bank manager login
 		ngDriver.findElement(NgBy.buttonText("Bank Manager Login")).click();
 		ngDriver.findElement(NgBy.partialButtonText("Open Account")).click();
@@ -980,7 +694,8 @@ public class App {
 
 	// @Ignore
 	@Test
-	public static void testDepositAndWithdraw() throws Exception {
+	public void testDepositAndWithdraw() throws Exception {
+    ngDriver.navigate().to(urlBanking);
 		// customer login
 		ngDriver.findElement(NgBy.buttonText("Customer Login")).click();
 
@@ -1105,5 +820,28 @@ public class App {
 		recorder.stopRecording("Recording");
 		ngDriver.close();
 		seleniumDriver.quit();
+	}
+
+	private static void highlight(WebElement element) throws InterruptedException {
+		highlight(element, 500);
+	}
+
+	private static void highlight(WebElement element, long highlight_interval)
+			throws InterruptedException {
+		wait.until(ExpectedConditions.visibilityOf(element));
+		execute_script("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlight_interval);
+		execute_script("arguments[0].style.border=''", element);
+	}
+
+	public static Object execute_script(String script, Object... args) {
+		if (seleniumDriver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;
+			return javascriptExecutor.executeScript(script, args);
+		} else {
+			throw new RuntimeException(
+					"Script execution is only available for WebDrivers that implement "
+							+ "the JavascriptExecutor interface.");
+		}
 	}
 }
