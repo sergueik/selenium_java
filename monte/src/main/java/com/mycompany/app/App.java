@@ -7,7 +7,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.Hashtable;
 import java.lang.RuntimeException;
 
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,60 +28,62 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class App {
-private static WebDriver driver;
-static String SiteURL = "http://www.tripadvisor.com/";
+	private static WebDriver driver;
+	static String SiteURL = "http://www.tripadvisor.com/";
 
-static int implicit_wait_interval = 1;
-static int flexible_wait_interval = 5;
-static long wait_polling_interval = 500;
-static long highlight_interval = 100;
+	static int implicit_wait_interval = 1;
+	static int flexible_wait_interval = 5;
+	static long wait_polling_interval = 500;
+	static long highlight_interval = 100;
 
-static WebDriverWait wait;
-static Actions actions;
-static VideoRecorder recorder;
-private static final StringBuffer verificationErrors = new StringBuffer();
+	static WebDriverWait wait;
+	static Actions actions;
+	static VideoRecorder recorder;
+	private static final StringBuffer verificationErrors = new StringBuffer();
 
-@Before
-public static void setup() throws Exception  {
-	long implicit_wait_interval = 3;
-	driver = new FirefoxDriver();
-	driver.get(SiteURL);
-	driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
-	recorder = new VideoRecorder();
-	recorder.startRecording(driver);
-}
-
-public static void main(String[] args) throws Exception {
-	setup();
-	testVerifyText();
-	tearDown();
-}
-
-@Test
-public static void testVerifyText() throws Exception {
-	String selector = null;
-	WebElement element = null;
-	try {
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText("Hotels")));
-	} catch (RuntimeException timeoutException) {
-
+	@Before
+	public static void setup() throws Exception {
+		long implicit_wait_interval = 3;
+		driver = new FirefoxDriver();
+		driver.get(SiteURL);
+		driver.manage().timeouts()
+				.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+		recorder = new VideoRecorder();
+		recorder.startRecording(driver);
 	}
-	element = driver.findElement(By.linkText("Hotels"));
 
-	assertEquals("Hotels", element.getText());
-	JavascriptExecutor javascriptExecutor = (JavascriptExecutor)driver;
-	javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
-	Thread.sleep(highlight_interval);
-	javascriptExecutor.executeScript("arguments[0].style.border=''", element);
+	public static void main(String[] args) throws Exception {
+		setup();
+		testVerifyText();
+		tearDown();
+	}
 
-	element.click();
-}
+	@Test
+	public static void testVerifyText() throws Exception {
+		String selector = null;
+		WebElement element = null;
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By
+					.linkText("Hotels")));
+		} catch (RuntimeException timeoutException) {
 
-@After
-public static void tearDown()  throws Exception
-{
-	recorder.stopRecording("Recording");
-	driver.quit();
-}
+		}
+		element = driver.findElement(By.linkText("Hotels"));
+
+		assertEquals("Hotels", element.getText());
+		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
+		javascriptExecutor.executeScript(
+				"arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlight_interval);
+		javascriptExecutor.executeScript("arguments[0].style.border=''", element);
+
+		element.click();
+	}
+
+	@After
+	public static void tearDown() throws Exception {
+		recorder.stopRecording("Recording");
+		driver.quit();
+	}
 
 }
