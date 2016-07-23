@@ -103,7 +103,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDatePickerDirectSelect() throws Exception {
 		getPageContent("ng_datepicker.htm");
@@ -203,7 +203,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDatePickerNavigation() throws Exception {
 		getPageContent("ng_datepicker.htm");
@@ -253,7 +253,7 @@ public class NgLocalFileTest {
 		System.err.println("Following month: " + ng_display.getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testEvaluate() throws Exception {
 		if (!isCIBuild) {
@@ -281,7 +281,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testUpload1() throws Exception {
 		if (!isCIBuild) {
@@ -328,7 +328,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testUpload3() throws Exception {
 		if (isCIBuild) {
@@ -341,7 +341,8 @@ public class NgLocalFileTest {
 		assertThat(drop, notNullValue());
 		highlight(drop);
 		WebElement fileToUpload = ngDriver.findElement(By.id("fileToUpload"));
-		assertThat(fileToUpload, notNullValue());		assertTrue(fileToUpload.getAttribute("type").equalsIgnoreCase("file"));
+		assertThat(fileToUpload, notNullValue());
+		assertTrue(fileToUpload.getAttribute("type").equalsIgnoreCase("file"));
 		String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
 		System.err.println("sendKeys :" + localPath);
 		fileToUpload.sendKeys(localPath);
@@ -358,7 +359,7 @@ public class NgLocalFileTest {
 		button.click();
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testEvaluateEvenOdd() throws Exception {
 		if (!isCIBuild) {
@@ -387,7 +388,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindRepeaterElement() throws Exception {
 		if (!isCIBuild) {
@@ -416,7 +417,7 @@ public class NgLocalFileTest {
 		assertThat(elements.size(), equalTo(0));
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindElementByRepeaterColumn() throws Exception {
 		if (!isCIBuild) {
@@ -447,7 +448,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() throws Exception {
 
@@ -533,7 +534,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -561,7 +562,7 @@ public class NgLocalFileTest {
 		System.err.println("Selected option: " + element.getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testChangeSelectedtOption() throws Exception {
 		if (!isCIBuild) {
@@ -600,7 +601,7 @@ public class NgLocalFileTest {
 		assertThat(element.getText(), containsString("two"));
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testChangeSelectedRepeaterOption() throws Exception {
 		if (!isCIBuild) {
@@ -676,7 +677,7 @@ public class NgLocalFileTest {
 		System.err.println("selected option: " + ngElement.getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testMultiSelect2() throws Exception {
 		getPageContent("ng_multi_select2.htm");
@@ -725,7 +726,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testMultiSelect() throws Exception {
 		getPageContent("ng_multi_select.htm");
@@ -792,7 +793,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
 		if (!isCIBuild) {
@@ -806,7 +807,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindElementByOptions() throws Exception {
 		if (!isCIBuild) {
@@ -822,7 +823,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindElementByModel() throws Exception {
 		// NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
@@ -869,10 +870,8 @@ public class NgLocalFileTest {
 	// ngDriver.findElements(NgBy.repeaterElement("item in items",5,"item.a"));
 	// assertThat(elements.size(), equalTo(0));
 	// }
-
 	// NOTE: failing in Linux VM: PhantomJS has crashed
-
-	// @Ignore
+	@Ignore
 	@Test
 	public void testElementTextIsGenerated() throws Exception {
 		if (!isCIBuild) {
@@ -896,7 +895,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDropDownWatch() throws Exception {
 		// NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
@@ -983,7 +982,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindRepeaterRows() throws Exception {
 		if (!isCIBuild) {
@@ -1004,7 +1003,7 @@ public class NgLocalFileTest {
 		assertThat(todos.size(), equalTo(0));
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testOrderByColumnField() throws Exception {
 		// Given there is a sorted data grid
@@ -1082,7 +1081,7 @@ public class NgLocalFileTest {
 	}
 
 	// TODO: separate into class AngularUISelect.java
-	// @Ignore
+	@Ignore
 	@Test
 	public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1118,7 +1117,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testAngularUISelectHandleSearch() throws Exception {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1140,7 +1139,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testAngularUISelectHandleDeselect() throws Exception {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1169,7 +1168,7 @@ public class NgLocalFileTest {
 		System.err.println("Nothing is selected");
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testFindAllBindings() throws Exception {
 		if (!isCIBuild) {
@@ -1194,7 +1193,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testHover() throws InterruptedException {
 		getPageContent("ng_hover1.htm");
@@ -1231,7 +1230,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDropDown() throws Exception {
 		if (!isCIBuild) {
@@ -1292,6 +1291,68 @@ public class NgLocalFileTest {
 		}
 	}
 
+	// @Ignore
+	@Test
+	public void testDragAndDrop() throws InterruptedException, Exception {
+		getPageContent("ng_drag_and_drop1.htm");
+
+		Enumeration<WebElement> ng_cars = Collections.enumeration(ngDriver
+				.findElements(NgBy.repeater("car in models.cars")));
+
+		WebElement basket = seleniumDriver.findElement(By
+				.xpath("//*[@id='my-basket']"));
+		NgWebElement ng_basket = new NgWebElement(ngDriver, basket);
+		highlight(basket);
+		while (ng_cars.hasMoreElements()) {
+			WebElement ng_car = ng_cars.nextElement();
+			if (ng_car.getText().isEmpty()) {
+				break;
+			}
+			highlight(ng_car);
+			actions.moveToElement(ng_car).build().perform();
+			actions.clickAndHold(ng_car).moveToElement(basket).release().build()
+					.perform();
+			ngDriver.waitForAngular();
+			// System.err.println(basket.getAttribute("innerHTML"));
+			List<WebElement> ng_cars_basket = ng_basket.findElements(NgBy
+							.repeater("car in models.basket"));
+				NgWebElement ng_car_basket = new NgWebElement(ngDriver,
+						ng_cars_basket.get(ng_cars_basket.size() - 1));
+				if (ng_car_basket.getText().isEmpty()) {
+					break;
+				}
+				// {{ car.name }} - {{ car.modelYear }} ( {{ car.price | currency }} )
+				System.err.format("%s - %s ( %s )\n",
+						ng_car_basket.evaluate("car.name"),
+						ng_car_basket.evaluate("car.modelYear"),
+						ng_car_basket.evaluate("car.price | currency"));
+		}
+	}
+
+	@Ignore
+	@Test
+	public void testDragAndDropSimulate() throws InterruptedException, Exception {
+		getPageContent("ng_drag_and_drop1.htm");
+
+		Enumeration<WebElement> ng_cars = Collections.enumeration(ngDriver
+				.findElements(NgBy.repeater("car in models.cars")));
+
+		WebElement basket = seleniumDriver.findElement(By
+				.xpath("//*[@id='my-basket']"));
+		highlight(basket);
+		while (ng_cars.hasMoreElements()) {
+			WebElement ng_car = ng_cars.nextElement();
+			if (ng_car.getText().isEmpty()) {
+				break;
+			}
+			highlight(ng_car);
+			actions.moveToElement(ng_car).build().perform();
+			// does not work
+			dragAndDrop(ng_car, basket);
+			ngDriver.waitForAngular();
+		}
+	}
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -1315,4 +1376,12 @@ public class NgLocalFileTest {
 		// returns too little HTML information in Java
 		return CommonFunctions.executeScript(script, element).toString();
 	}
+
+	private static void dragAndDrop(WebElement sourceElement,
+			WebElement destinationElement) throws Exception {
+		String script = "simulateDragDrop.js";
+		CommonFunctions.executeScript(CommonFunctions.getScriptContent(script),
+				sourceElement, destinationElement);
+	}
+
 }

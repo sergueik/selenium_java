@@ -7,7 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.IOException;
 
 import java.util.Map;
@@ -50,7 +53,7 @@ public class CommonFunctions {
 	static boolean isDestopTesting = true;
 	static boolean isCIBuild = false;
 	private static long highlightInterval = 100;
-	private static Map <String,String>env = System.getenv();
+	private static Map<String, String> env = System.getenv();
 
 	public static WebDriver getSeleniumDriver() throws IOException {
 		checkEnvironment();
@@ -62,23 +65,23 @@ public class CommonFunctions {
 
 			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
 					Platform.ANY);
-			seleniumDriver = new FirefoxDriver(capabilities);
+			// seleniumDriver = new FirefoxDriver(capabilities);
 			// FirefoxProfile profile = new ProfilesIni().getProfile("default");
 			// profile.setEnableNativeEvents(false);
 			// capabilities.setCapability("firefox_profile", profile);
 
-			// seleniumDriver = new RemoteWebDriver(new
-			// URL("http://127.0.0.1:4444/wd/hub"), capabilities);
+			seleniumDriver = new RemoteWebDriver(new URL(
+					"http://127.0.0.1:4444/wd/hub"), capabilities);
 			return seleniumDriver;
 		} else {
 			DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs",
 					"", Platform.ANY);
 			capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
 					new String[] { "--web-security=false", "--ssl-protocol=any",
-							"--ignore-ssl-errors=true", "--local-to-remote-url-access=true", 
+							"--ignore-ssl-errors=true", "--local-to-remote-url-access=true",
 							// prevent local file test XMLHttpRequest Exception 101
-							"--webdriver-loglevel=INFO" 
-							// set to DEBUG for a really verbose console output
+							"--webdriver-loglevel=INFO"
+					// set to DEBUG for a really verbose console output
 					});
 
 			seleniumDriver = new PhantomJSDriver(capabilities);
@@ -107,6 +110,19 @@ public class CommonFunctions {
 		}
 	}
 
+	protected static String getScriptContent(String scriptName) throws Exception {
+		try {
+			final InputStream stream = CommonFunctions.class.getClassLoader()
+					.getResourceAsStream(scriptName);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			// System.err.println(new String(bytes, "UTF-8"));
+			return new String(bytes, "UTF-8");
+		} catch (IOException e) {
+			throw new Exception(scriptName);
+		}
+	}
+
 	public static void setHighlightTimeout(long value) {
 		highlightInterval = value;
 	}
@@ -127,9 +143,7 @@ public class CommonFunctions {
 			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;
 			return javascriptExecutor.executeScript(script, args);
 		} else {
-			throw new RuntimeException(
-					"Script execution is only available for WebDrivers that implement "
-							+ "the JavascriptExecutor interface.");
+			throw new RuntimeException("Script execution failed.");
 		}
 	}
 }
