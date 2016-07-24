@@ -1,22 +1,21 @@
-VAGRANTFILE_API_VERSION = "2"
 basedir = ENV.fetch('USERPROFILE', '')
 basedir = ENV.fetch('HOME', '') if basedir == ''
 basedir = basedir.gsub('\\', '/')
 
-# standalone ubuntu box with selenium server, Firefox and aotologin and tmux-driven selenium bootstrap scripts 
+# standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox and autologin
 # origin : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
 
+VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'ubuntu/trusty64'
-  # vanilla trusty base box
   config_vm_box_name ='trusty-server-cloudimg-amd64-vagrant-disk1.box'
-  # base box with installed 
   config_vm_box_name = 'trusty-server-amd64-vagrant-selenium.box'
   config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}" 
-  
+
   config.vm.network :forwarded_port, guest:4444, host:4444
   config.vm.network :private_network, ip: '192.168.33.10'
-  config.vm.provision 'shell', inline: <<-END
+  config.vm.provision 'shell', inline: <<-END_OF_SHELL_PROVISION
+
 #!/bin/sh
 #=========================================================
 UPDATE_SELENIUM_APP_STACK=''
@@ -25,7 +24,8 @@ UPDATE_SELENIUM_APP_STACK=''
 echo "Install the packages..."
 #=========================================================
 sudo apt-get update
-sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty firefox
+# sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty firefox
+sudo apt-get -y install fluxbox xorg unzip vim default-jre rungetty firefox
 
 #=========================================================
 echo "Set autologin for the Vagrant user..."
@@ -36,44 +36,41 @@ sudo echo "exec /sbin/rungetty --autologin vagrant tty1" >> /etc/init/tty1.conf
 #=========================================================
 echo -n "Start X on login..."
 #=========================================================
-PROFILE_STRING=$(cat <<EOF
+cat <<EOF>> .profile
 if [ ! -e "/tmp/.X0-lock" ] ; then
-    startx
+  startx
 fi
 EOF
-)
-echo "${PROFILE_STRING}" >> .profile
-echo "ok"
 
 if [ $UPDATE_SELENIUM_APP_STACK ] ; then
-#=========================================================
-echo "Download the latest chrome..."
-#=========================================================
-wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-sudo dpkg -i google-chrome-stable_current_amd64.deb
-sudo rm google-chrome-stable_current_amd64.deb
-sudo apt-get install -y -f
+  #=========================================================
+  echo "Download the latest chrome..."
+  #=========================================================
+  wget "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+  sudo dpkg -i google-chrome-stable_current_amd64.deb
+  sudo rm google-chrome-stable_current_amd64.deb
+  sudo apt-get install -y -f
 
-#=========================================================
-echo "Download latest selenium server..."
-#=========================================================
-SELENIUM_VERSION=$(curl "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
-wget "https://selenium-release.storage.googleapis.com/${SELENIUM_VERSION}" -O selenium-server-standalone.jar
-chown vagrant:vagrant selenium-server-standalone.jar
+  #=========================================================
+  echo "Download latest selenium server..."
+  #=========================================================
+  SELENIUM_VERSION=$(curl "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
+  wget "https://selenium-release.storage.googleapis.com/${SELENIUM_VERSION}" -O selenium-server-standalone.jar
+  chown vagrant:vagrant selenium-server-standalone.jar
 
-#=========================================================
-echo "Download latest chrome driver..."
-#=========================================================
-CHROMEDRIVER_VERSION=$(curl "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
-wget "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-unzip chromedriver_linux64.zip
-sudo rm chromedriver_linux64.zip
-chown vagrant:vagrant chromedriver
+  #=========================================================
+  echo "Download latest chrome driver..."
+  #=========================================================
+  CHROMEDRIVER_VERSION=$(curl "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+  wget "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+  unzip chromedriver_linux64.zip
+  sudo rm chromedriver_linux64.zip
+  chown vagrant:vagrant chromedriver
 fi
 #=========================================================
 echo -n "Install tmux scripts..."
 #=========================================================
-TMUX_SCRIPT=$(cat <<EOF
+cat <<EOF> tmux.sh
 #!/bin/sh
 tmux start-server
 
@@ -83,38 +80,30 @@ tmux send-keys -t selenium:0 './chromedriver' C-m
 tmux new-session -d -s chrome-driver
 tmux send-keys -t chrome-driver:0 'java -jar selenium-server-standalone.jar' C-m
 EOF
-)
-echo "${TMUX_SCRIPT}"
-echo "${TMUX_SCRIPT}" > tmux.sh
 chmod +x tmux.sh
 chown vagrant:vagrant tmux.sh
-echo "ok"
 
 #=========================================================
 echo -n "Install startup scripts..."
 #=========================================================
-STARTUP_SCRIPT=$(cat <<EOF
+cat <<EOF> /etc/X11/Xsession.d/9999-common_start
 #!/bin/sh
 ~/tmux.sh &
 xterm &
 EOF
-)
-echo "${STARTUP_SCRIPT}" > /etc/X11/Xsession.d/9999-common_start
 chmod +x /etc/X11/Xsession.d/9999-common_start
-echo "ok"
 
 #=========================================================
 echo -n "Add host alias..."
 #=========================================================
-echo "192.168.33.1 host" >> /etc/hosts
-echo "ok"
+echo '192.168.33.1 host'| tee /etc/hosts
 
 #=========================================================
 echo "Reboot the VM"
 #=========================================================
 sudo reboot
 
-  END
+  END_OF_SHELL_PROVISION
 
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
