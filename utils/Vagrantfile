@@ -3,6 +3,8 @@ basedir = ENV.fetch('USERPROFILE', '')
 basedir = ENV.fetch('HOME', '') if basedir == ''
 box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
 basedir = basedir.gsub('\\', '/')
+selenium_version = ENV.fetch('SELENIUM_VERSION', '2.47')
+chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '2.16')
 
 # standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox and autologin
 # origin : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
@@ -46,13 +48,23 @@ EOF
 
 if [ $UPDATE_SELENIUM_APP_STACK != '' ] ; then
 
-  #=========================================================
-  echo "Download latest selenium server..."
-  #=========================================================
-  SELENIUM_VERSION=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
-  echo "Selenium server version = ${SELENIUM_VERSION}"
-  SELENIUM_VERSION=2.47/selenium-server-standalone-2.47.1.jar
-  wget -nv -O selenium-server-standalone.jar "https://selenium-release.storage.googleapis.com/${SELENIUM_VERSION}" 
+
+  SELENIUM_VERSION='#{selenium_version}'
+  if [ $SELENIUM_VERSION == '' ] 
+  then
+    #=========================================================
+    echo "Download latest selenium server..."
+    #=========================================================
+    SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
+  else
+    #=========================================================
+    echo "Download selenium server version ${SELENIUM_VERSION} ..."
+    #=========================================================
+    RELEASE_REGEX=$(echo "/.*<Key>(${SELENIUM_VERSION}[^>]+selenium-server-standalone[^<]+)/&& print \\$1")
+    SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e"${RELEASE_REGEX}")
+  fi
+  echo "Downloading Selenium from \\"https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}\\""
+  wget -nv -O selenium-server-standalone.jar "https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}" 
   chown vagrant:vagrant selenium-server-standalone.jar
 
   #=========================================================
@@ -67,11 +79,18 @@ if [ $UPDATE_SELENIUM_APP_STACK != '' ] ; then
   # sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
   # sudo apt-get update
   # sudo apt-get install google-chrome-stable
-
+  # https://dw.uptodown.com/dwn/gTqQucBStVTk-lzILoc3LH9BeK-I0eeLsW8MZ9xlkCocDgWjO_nIdOJmFyavzkKZY2MfGCwi0gvMiiIKXn7g7dhyrUwHEkpnQMKqEHHTv7AfYvz41pwVGcIQj4X6LY8Y/guJv-QUCwm9Cdi_c5x2rhzJ7qxoE-A8F3iVoqCQy7RFQSI4gyEFLnd0V0dv8sXQRvTGZZ7F0h73RPozajVPIQvZvrHfqMD6rwuwmWeqhbbzQSu-HfrnqsmuIqhPvd4V0/orMuiQ0WyDLZrd6UmgOxN8vQoO5zhcTLijMTXBpu3c9drIZ7NlrEiNvjwCpFa5gBDVNxZA581d8RsFkdfTBMmTmfqIfOamDrjiHoGDqFLzjwcHUopCi_UPL8PQgn4UAr/7-MijyptygWBa73iL5GR-XvCctvGO7N2oJHsLnI7LKc=/
   #=========================================================
-  echo 'Download latest chrome driver...'
   #=========================================================
-  CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+  # 
+  CHROMEDRIVER_VERSION='#{chromedriver_version}'
+  if [ $CHROMEDRIVER_VERSION == '' ] 
+  then
+    echo 'Download latest chrome driver...'
+    CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
+  else
+    echo "Download chrome driver version ${CHROMEDRIVER_VERSION} ..."
+  fi
   wget -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
   unzip -fo chromedriver_linux64.zip
   sudo rm chromedriver_linux64.zip
@@ -89,7 +108,6 @@ cat <<EOF> tmux.sh
 tmux start-server
 
 tmux new-session -d -s chrome-driver
-
 tmux send-keys -t chrome-driver:0 './chromedriver' C-m
 
 tmux new-session -d -s selenium
@@ -125,6 +143,9 @@ sudo reboot
   config.vm.provider :virtualbox do |vb|
     vb.gui = true
     vb.customize ['modifyvm', :id, '--memory', box_memory ]
+    vb.customize ['setextradata', 'global', 'GUI/MaxGuestResolution', 'any']
+    vb.customize ['setextradata', :id, 'CustomVideoMode1', '1280x960x32']
+# supported by fluxbox
   end
 end
 
