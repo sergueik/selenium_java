@@ -24,9 +24,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 #!/bin/sh
 #=========================================================
 UPDATE_SELENIUM_APP_STACK='#{update_selenium_app_stack}'
-
+# set -x 
 #=========================================================
-echo "Install the packages..."
+echo 'Install the packages...'
 #=========================================================
 sudo apt-get update
 sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty firefox wget
@@ -38,19 +38,20 @@ sudo sed -i '$ d' /etc/init/tty1.conf
 sudo echo "exec /sbin/rungetty --autologin vagrant tty1" >> /etc/init/tty1.conf
 
 #=========================================================
-echo -n "Start X on login..."
-#=========================================================
 cat <<EOF>> .profile
-if [ ! -e "/tmp/.X0-lock" ] ; then
+if [ !-e "/tmp/.X0-lock" ] ; then
+  echo -n 'Start X on login...'
   startx
+else
+  echo 'X is alredy running...'
 fi
 EOF
 
-if [ $UPDATE_SELENIUM_APP_STACK != '' ] ; then
+if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
 
-
+  echo 'Updating Selenium app stack...'
   SELENIUM_VERSION='#{selenium_version}'
-  if [ $SELENIUM_VERSION == '' ] 
+  if [ "$SELENIUM_VERSION" = '' ] 
   then
     #=========================================================
     echo "Download latest selenium server..."
@@ -84,7 +85,7 @@ if [ $UPDATE_SELENIUM_APP_STACK != '' ] ; then
   #=========================================================
   # 
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
-  if [ $CHROMEDRIVER_VERSION == '' ] 
+  if [ "$CHROMEDRIVER_VERSION" = '' ] 
   then
     echo 'Download latest chrome driver...'
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
@@ -108,9 +109,11 @@ cat <<EOF> tmux.sh
 tmux start-server
 
 tmux new-session -d -s chrome-driver
+tmux send-keys -t chrome-driver:0 'export DISPLAY=:0' C-m
 tmux send-keys -t chrome-driver:0 './chromedriver' C-m
 
 tmux new-session -d -s selenium
+tmux send-keys -t selenium:0 'export DISPLAY=:0' C-m
 tmux send-keys -t selenium:0 'java $LAUNCHER_OPTS -jar selenium-server-standalone.jar' C-m
 tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub;  done' C-m
 
