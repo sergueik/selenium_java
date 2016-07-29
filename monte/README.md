@@ -17,3 +17,5 @@ Java
 .Net
 ----
 For .Net one can use [Microsoft Expression Encoder](https://msdn.microsoft.com/en-us/library/microsoft.expression.encoder.screencapture.screencapturejob.capturerectangle%28v=expression.40%29.aspx), see e.g. [basic example](http://roadtoautomation.blogspot.com/2013/07/road-to-screen-recording-in-webdriver.html). It is not covered here.
+
+The possible alternative is [ScreenToGif](https://github.com/dbremner/ScreenToGif), which has an [unlimited time tria](http://gifrecorder.com/)
