@@ -49,6 +49,9 @@ public @interface FindBy {
   How howWeb() default How.UNSET;
   How howMobile() default How.UNSET;
   String using() default "";
+  String column() default "";
+  String text() default "";
+  // Integer row() default = new Integer(0);
   String usingWeb() default "";
   String usingMobile() default "";
 }

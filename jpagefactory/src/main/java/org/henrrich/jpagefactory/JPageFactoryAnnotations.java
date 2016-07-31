@@ -67,6 +67,7 @@ public class JPageFactoryAnnotations extends Annotations {
   protected By buildByFromFindBy(FindBy findBy) {
     How how = getHowDefinition(findBy);
     String using = getUsingDefinition(findBy);
+    String column = getColumnDefinition(findBy);
 
     if (using.isEmpty()) {
         return null;
@@ -124,9 +125,13 @@ public class JPageFactoryAnnotations extends Annotations {
 
       case REPEATER_SELECTED_OPTION:
         return NgBy.selectedRepeaterOption(using);
-
-      case SELECTED_OPTION:
+        
+      case REPEATER_COLUMN:
+        return NgBy.repeaterColumn(using, column);
+        
+        case SELECTED_OPTION:
         return NgBy.selectedOption(using);
+        
 
       default:
         // Note that this shouldn't happen (eg, the above matches all
@@ -135,6 +140,11 @@ public class JPageFactoryAnnotations extends Annotations {
     }
   }
 
+  private String getColumnDefinition(FindBy findBy) {
+    String column = findBy.column();
+    return column;
+  }
+  
   private String getUsingDefinition(FindBy findBy) {
     String using = findBy.using();
     if (using.isEmpty()) {

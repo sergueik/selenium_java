@@ -43,6 +43,11 @@ public enum How {
   REPEATER_SELECTED_OPTION,
 
   /**
+   * TODO: example to be added
+   */
+  REPEATER_COLUMN,
+
+  /**
    * Finding select web element options by Angular <code>ng-options</code> directive, <code>using</code> attribute in <code>@FindBy</code> annotation specifies the <code>ng-options</code> string.
    */
   OPTIONS,
