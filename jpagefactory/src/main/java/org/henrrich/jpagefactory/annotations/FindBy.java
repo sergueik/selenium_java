@@ -7,6 +7,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/* 
+ * updated by sergueik on 07/31/2016.
+ */
+
+ 
 /**
  *
  * <p>
@@ -32,7 +37,10 @@ import java.lang.annotation.Target;
  * The "how", "howWeb" and "howMobile" clauses define the locator strategy. <br/>
  * The "howWeb" clause defines the locator strategy for web channel.<br/>
  * The "howMobile" clause defines the locator strategy for mobile channel.<br/>
- * If the same locator strategy is applicable for both web and mobile channels, the "how" clause can be used to simplify the annotation declaration.
+ * If the same locator strategy is applicable for both web and mobile channels,<br/> 
+ * the "how" clause can be used to simplify the annotation declaration.<br/>
+ * The "row", "column" and "text" clauses are used with specific Angular locators:<br/>
+ * REPEATER_ELEMENT, REPEATER_COLUMN, REPEATER_ROW and CSS_CONTAINING_TEXT. <br/>
  * </p>
  *
  * <p>
@@ -51,7 +59,7 @@ public @interface FindBy {
   String using() default "";
   String column() default "";
   String text() default "";
-  // Integer row() default = new Integer(0);
+  int row() default 0;
   String usingWeb() default "";
   String usingMobile() default "";
 }

@@ -1,12 +1,16 @@
 package org.henrrich.jpagefactory.example.NgQualityShepherd;
 
 import com.jprotractor.NgWebDriver;
+
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
+
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -21,7 +25,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by henrrich on 23/05/2016.
+ * Created by sergueik on 31/07/2016.
  */
 public class NgQualityShepherdTest {
 
@@ -83,13 +87,26 @@ public class NgQualityShepherdTest {
 		JPageFactory.initElements(ngDriver, channel, NgQualityShepherdPage);
 	}
 
+  @Ignore
 	@Test
 	public void testShouldSearchFriend() throws Exception {
-		Assert.assertTrue("Result is not 3!", NgQualityShepherdPage.getNumberOfFriendNames()
-				 == 3);
+		Assert.assertTrue("Number of friends is not 3!",
+				NgQualityShepherdPage.getNumberOfFriendNames() == 3);
 	}
 
+//	@Test
+//	public void testShouldHaveFriendNamedJohn() throws Exception {
+//		Assert.assertTrue("Unexpected name of the friend!", NgQualityShepherdPage
+//				.getFriendName(0).equals("John"));
+//
+//	}
 
+	@Test
+	public void testShouldHaveFriendNamedJohn() throws Exception {
+		Assert.assertTrue("Unexpected name of the friend!", NgQualityShepherdPage
+				.getFriendName().equals("John"));
+
+	}
 	@After
 	public void tearDown() throws Exception {
 		ngDriver.quit();

@@ -18,7 +18,19 @@ public class NgQualityShepherdPage {
 	@FindAll({ @FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "row") })
 	private List<WebElement> friendNames;
 
+	@FindBy(how = How.REPEATER_ELEMENT, using = "row in rows", column = "row",  row = 1)
+	private WebElement friendNameElement;
+
 	public int getNumberOfFriendNames () {
 		return friendNames.size();
 	}
+  
+//	public String getFriendName(int index) {
+//    WebElement friendName = friendNames.get(index);
+//		return friendName.getText();
+//	}
+	public String getFriendName() {
+		return friendNameElement.getText();
+	}
+  
 }
