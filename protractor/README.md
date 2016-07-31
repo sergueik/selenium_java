@@ -12,10 +12,11 @@ Being  a JS testing tool, [Angular Protractor](https://github.com/angular/protra
 On the other hand Protractor offers some [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) that take advantage of Angular's features -  
 this is what this project tries to keep.
 
-Currently supported Antular Proractor methods:
+Currently supported Angular Proractor methods:
 ```
 binding.js
 buttonText.js
+cssContainingText.js
 evaluate.js
 getLocationAbsUrl.js
 model.js
@@ -27,6 +28,7 @@ repeaterElement.js
 repeaterRows.js
 resumeAngularBootstrap.js
 selectedOption.js
+selectedRepeaterOption.js
 testForAngular.js
 waitForAngular.js
 ```
@@ -34,9 +36,10 @@ waitForAngular.js
 
 Building
 ========
-Windows (jdk1.7.0_65, 32 bit)
------------------------------
 The following commands compile the project in console.
+
+Windows
+-------
 ```
 set M2=c:\java\apache-maven-3.2.1\bin
 set M2_HOME=c:\java\apache-maven-3.2.1
@@ -104,7 +107,7 @@ Ant
 ---
 
 * Copy the `target\jprotractor-1.0-SNAPSHOT.jar`  in the same location oher dependency jars, e.g. `c:\java\selenium`,
-* Use the bolierplate `build.xml` (a sample project is checked in) or merge with your existing build file(s):
+* Use the `build.xml` from a sample project provided or merge with your existing build file(s):
 ```
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="example" basedir=".">
