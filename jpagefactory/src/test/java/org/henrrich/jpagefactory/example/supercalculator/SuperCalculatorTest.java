@@ -37,15 +37,9 @@ public class SuperCalculatorTest {
 	@Before
 	public void setUp() throws Exception {
 
-		// change the chrome driver path below to chromedriver_linux32 or
-		// chromedriver_linux64 if you are on linux
-		// change the chrome driver path below to chromedriver_mac32 if you are on
-		// mac
-		System
-				.setProperty(
-						"webdriver.chrome.driver",
-						"C:\\henrrich\\jpagefactory\\src\\test\\resources\\chromedrivers\\chromedriver.exe");
-
+		// change according to platformm
+		System.setProperty("webdriver.chrome.driver",
+				"C:\\java\\selenium\\chromedriver.exe");
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<String, String>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");

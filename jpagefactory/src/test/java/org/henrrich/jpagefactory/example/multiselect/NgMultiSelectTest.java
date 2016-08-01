@@ -1,6 +1,8 @@
-package org.henrrich.jpagefactory.example.ngqualityshepherd;
+package org.henrrich.jpagefactory.example.multiselect;
 
 import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+import com.jprotractor.NgBy;
 
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
@@ -25,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by sergueik on 31/07/2016.
  */
-public class NgQualityShepherdTest {
+public class NgMultiSelectTest {
 
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -34,7 +36,7 @@ public class NgQualityShepherdTest {
 	// change this boolean flag to true to run on chrome emulator
 	private boolean isMobile = false;
 
-	private NgQualityShepherdPage page;
+	private NgMultiSelectPage page;
 
 	@Before
 	public void setUp() throws Exception {
@@ -68,31 +70,30 @@ public class NgQualityShepherdTest {
 
 		}
 
-		baseUrl = "http://qualityshepherd.com/angular/friends/";
+		baseUrl = baseUrl = "http://amitava82.github.io/angular-multiselect/";
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		page = new NgQualityShepherdPage();
-
+		page = new NgMultiSelectPage();
+		page.setDriver(ngDriver);
 		Channel channel = Channel.WEB;
 		if (isMobile) {
 			channel = Channel.MOBILE;
 		}
 		JPageFactory.initElements(ngDriver, channel, page);
+
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
-	public void testShouldSearchFriend() throws Exception {
-		Assert.assertTrue("Number of friends is not 3!",
-				page.getNumberOfFriendNames() == 3);
+	public void testSelectCarsOneByOne() throws Exception {
+		page.openSelect();
+		page.selectAllCars();
+    System.err.println(page
+				.getStatus());
+		Assert.assertTrue("Should be able to select cars", page
+				.getStatus().matches("There are (\\d+) car\\(s\\) selected"));
 	}
 
-	@Test
-	public void testShouldHaveFriendNamedJohn() throws Exception {
-		Assert.assertTrue("Unexpected name of the friend!", page
-				.getFriendName().equals("John"));
-	}
-  
 	@After
 	public void tearDown() throws Exception {
 		ngDriver.quit();
