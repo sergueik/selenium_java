@@ -23,8 +23,6 @@ as well as the following locators from Protractor:
 * Repeater
 * Button Text / Partial Button Text
 * Options / Selected Options / Repeater Selected Options
-
-Pending: locators (not currently implemented)
 * CssContainingText 
 * RepeaterColumn
 * RepeaterRow

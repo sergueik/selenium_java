@@ -3,14 +3,37 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.henrrich</groupId>
   <artifactId>jpagefactory</artifactId>
-  <version>1.0.1</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>JPageFactory is a set of Selenium Java FindBy annotations that eases the usage of Selenium page factory pattern for automating Angular based web application.</description>
+  <url>https://github.com/henrrich/jpagefactory</url>
+  <scm>
+    <connection>scm:git:git@github.com:henrrich/jpagefactory.git</connection>
+    <developerConnection>scm:git:git@github.com:henrrich/jpagefactory.git</developerConnection>
+    <url>git@github.com:henrrich/jpagefactory.git</url>
+  </scm>
   <properties>
     <selenium.version>2.47.0</selenium.version>
     <selenium-firefox-driver.version>2.47.0</selenium-firefox-driver.version>
+    <selenium-chrome-driver.version>2.50.1</selenium-chrome-driver.version>
     <junit.version>4.12</junit.version>
-    <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
+    <jprotractor.version>1.1-SNAPSHOT</jprotractor.version>
   </properties>
+  <developers>
+    <developer>
+      <name>He Huang</name>
+      <email>huanghe389@gmail.com</email>
+      <organization>org.henrrich</organization>
+      <organizationUrl>https://github.com/henrrich</organizationUrl>
+    </developer>
+    <developer>
+      <name>Serguei Kouzmine</name>
+      <email>kouzmine_serguei@yahoo.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/sergueik</organizationUrl>
+    </developer>
+  </developers>
   <dependencies>
     <dependency>
       <groupId>com.jprotractor</groupId>
@@ -44,7 +67,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-chrome-driver</artifactId>
-      <version>2.50.1</version>
+      <version>${selenium-chrome-driver.version}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
