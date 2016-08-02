@@ -3,10 +3,25 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.jprotractor</groupId>
   <artifactId>jprotractor</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>jprotractor</name>
-  <url/>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>jProtractor is a port of Angular Protractor functionality to Java.</description>
+  <url>https://github.com/caarlos0/jprotractor</url>
+  <developers>
+    <developer>
+      <name>Carlos Alexandro Becker</name>
+      <email>caarlos0@gmail.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/caarlos0</organizationUrl>
+    </developer>
+    <developer>
+      <name>Serguei Kouzmine</name>
+      <email>kouzmine_serguei@yahoo.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/sergueik</organizationUrl>
+    </developer>
+  </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.7</maven.compiler.source>
