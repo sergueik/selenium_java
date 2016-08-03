@@ -10,28 +10,29 @@ JPageFactory is a set of Selenium Java `FindBy` annotations that eases the usage
 JPageFactory is implemented based on [JProtractor fork from sergueik](https://github.com/sergueik/jProtractor) and provides extended set of web elements locators annotations with a syntax following the core Selenium `FindBy`:
 
 + Core Selenum
-* ID
-* Name
-* XPath
-* CSS
-* Class Name
-* Tag Name
-* Link Text / Partial Link Text
+  * ID
+  * Name
+  * XPath
+  * CSS
+  * Class Name
+  * Tag Name
+  * Link Text 
+  * Partial Link Text
    
 + Protractor
-* Binding
-* Input
-* Model
-* Repeater
-* Button Text 
-* Partial Button Text
-* Options
-* Selected Options 
-* Repeater Selected Options
-* CssContainingText 
-* RepeaterColumn
-* RepeaterRow
-* RepeaterElement
+  * Binding
+  * Input
+  * Model
+  * Repeater
+  * Button Text 
+  * Partial Button Text
+  * Options
+  * Selected Options 
+  * Repeater Selected Options
+  * CssContainingText 
+  * RepeaterColumn
+  * RepeaterRow
+  * RepeaterElement
 
 JPageFactory also supports defining different locators of the same web element for both desktop web and mobile web applications (Angular applications running in mobile browsers).
 
