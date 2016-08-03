@@ -5,9 +5,11 @@
 This is a fork of [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory) - preparing to pull request with updating the latest jProtractor code.
 ## Summary:
 
-JPageFactory is a set of Selenium Java `FindBy` annotations that eases the usage of Selenium page factory pattern for automating Angular based web application. 
+JPageFactory is a set of Selenium Java `FindBy` annotations that eases the usage of [Selenium page factory pattern](http://toolsqa.com/selenium-webdriver/page-object-pattern-model-page-factory/) for automating Angular based web application. 
 
-JPageFactory is implemented based on [JProtractor fork from sergueik](https://github.com/sergueik/jProtractor) and provides the following web elements locators as original Selenium `FindBy` annotations:
+JPageFactory is implemented based on [JProtractor fork from sergueik](https://github.com/sergueik/jProtractor) and provides extended set of web elements locators annotations with a syntax following the core Selenium `FindBy`:
+
++ Core Selenum
 * ID
 * Name
 * XPath
@@ -16,13 +18,16 @@ JPageFactory is implemented based on [JProtractor fork from sergueik](https://gi
 * Tag Name
 * Link Text / Partial Link Text
    
-as well as the following locators from Protractor:
++ Protractor
 * Binding
 * Input
 * Model
 * Repeater
-* Button Text / Partial Button Text
-* Options / Selected Options / Repeater Selected Options
+* Button Text 
+* Partial Button Text
+* Options
+* Selected Options 
+* Repeater Selected Options
 * CssContainingText 
 * RepeaterColumn
 * RepeaterRow
