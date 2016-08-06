@@ -1,71 +1,237 @@
 <!DOCTYPE html>
-<html>
+<html ng-app="uigrid">  
 <head>
+
+<!-- 
+http://jsfiddle.net/relly/p8d0qsas/
+https://github.com/angular-ui/ui-grid
+--> 
+<!-- dependencies -->
+<link rel="stylesheet" type="text/css" href="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.css"> 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-touch.js"></script> 
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular-animate.js"></script> 
+<script src="https://cdn.rawgit.com/angular-ui/bower-ui-grid/master/ui-grid.min.js"></script> 
 <style>
-
-<!-- https://jsfiddle.net/qzty5wcx/ --> 
-
 .grid {
+  width: 500px;
   height: 250px;
 }
+.text-warning {
+  color: #8a6d3b; 
+}
 </style>
-<script src="angular.js">
 
-<!-- dependencies -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
-<script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.19/angular-sanitize.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 <script type="text/javascript">
+var app = angular.module('uigrid', ['ngTouch', 'ui.grid', 'ui.grid.edit']);
 
-var myapp = angular.module('myapp', ["ui", "ngGrid"]);
+app.controller('MainCtrl', ['ProductsService', '$scope', function(ProductsService, $scope) {
+    $scope.sort = [];
+    $scope.filter = [];
+    $scope.pagination = {
+        pageSize: 5,
+        pageNumber: 1,
+        totalItems: null,
+        getTotalPages: function() {
+            return Math.ceil(this.totalItems / this.pageSize);
+        },
+        nextPage: function() {
+            if (this.pageNumber < this.getTotalPages()) {
+                this.pageNumber++;
+                $scope.load();
+            }
+        },
+        previousPage: function() {
+            if (this.pageNumber > 1) {
+                this.pageNumber--;
+                $scope.load();
+            }
+        }
+    };
 
-myapp.controller('myctrl', function($scope, $http) {
+    $scope.gridOptions = {
+        excludeProperties: '__metadata',
+        enablePaginationControls: false,
+        useExternalSorting: true,
+        useExternalFiltering: true,
+        enableFiltering: true,
+        onRegisterApi: function(gridApi) {
+            $scope.gridApi = gridApi;
 
-    $scope.testInfo= "TestInfo";
-  
-  $scope.data = {
-    persons: [],
-    selected:[],
-    load: function () {
-      // $http.get("/echo/json/").success(function(data) {
-      $scope.data.persons = [
-            {id:1, name:"Max", number:51323.512},
-            {id:2, name:"Adam", number:7245.2},
-            {id:3, name:"Betty", number:828},
-            {id:4, name:"Sara", number:23452.45182}
-          ];
-        
-        $scope.data.selected[0] = $scope.data.persons[0];
-        
-     // });
-     }
-  };
+            //declare the events
+            $scope.gridApi.core.on.sortChanged($scope, function(grid, sortColumns) {
+                $scope.sort = [];
+                angular.forEach(sortColumns, function(sortColumn) {
+                    $scope.sort.push({
+                        fieldName: sortColumn.name,
+                        order: sortColumn.sort.direction
+                    });
+                });
+                $scope.load();
+            });
 
-  $scope.grid = {
-    options: {
-      data: "data.persons",
-      selectedItems: $scope.data.selected,
-      multiSelect: false,
-      columnDefs: [
-        {field:"id", displayName:"ID"},
-        {field:"name", displayName:"Name"},
-        {field:"number", displayName:"Nummer", cellFilter:"number:2"}
-        
-        ]
+            $scope.gridApi.core.on.filterChanged($scope, function() {
+                $scope.filter = [];
+
+                var grid = this.grid;
+                angular.forEach(grid.columns, function(column) {
+                    var fieldName = column.field;
+                    var value = column.filters[0].term;
+                    var operator = "contains";
+                    if (value) {
+                        if (fieldName == "id") operator = "equals";
+                        else if (fieldName == "price") operator = "greaterThanOrEqualsTo";
+                        $scope.filter.push({
+                            fieldName: fieldName,
+                            operator: operator,
+                            value: value
+                        });
+                    }
+                });
+
+                $scope.load();
+            });
+
+            $scope.gridApi.edit.on.afterCellEdit($scope, function(rowEntity, colDef, newValue, oldValue) {
+                var id = rowEntity.__metadata.id;
+                var data = {};
+                data[colDef.name] = newValue;
+
+                ProductsService.update(id, data).then(function(response) {
+                    $scope.load(); //The change may trigger other server side action that may change additional data
+                    $scope.$apply();
+                });
+            });
+        }
+    };
+
+    $scope.gridOptions.columnDefs = [{
+            name: 'id',
+            enableCellEdit: false,
+            width: '10%'
+        }, {
+            name: 'name',
+            enableCellEdit: false,
+            displayName: 'Name',
+            width: '20%'
+        }, {
+            name: 'type',
+            displayName: 'Type',
+            enableCellEdit: false,
+            width: '20%'
+        }, {
+            name: 'description',
+            displayName: 'Description',
+            width: '30%'
+        }, {
+            name: 'price',
+            displayName: 'Price',
+            width: '20%'
+        }
+
+    ];
+
+
+    $scope.load = function() {
+        ProductsService.readAll($scope.pagination.pageSize, $scope.pagination.pageNumber, $scope.sort, $scope.filter).then(function(response) {
+            $scope.gridOptions.data = response.data;
+            $scope.pagination.totalItems = response.totalRows;
+
+        });
+    };
+
+    $scope.load();
+}]);
+
+
+(function() {
+
+    angular.module('uigrid')
+        .service('ProductsService', ['$http', ProductsService]);
+
+    function ProductsService($http) {
+
+        var self = this;
+        var baseUrl = 'https://api.backand.com/1/objects/';
+        var anonymousToken = {
+            'AnonymousToken': '78020290-5df3-44b8-9bdb-7b3b4fea2f25'
+        };
+
+        var objectName = 'products';
+
+        self.readAll = function(pageSize, pageNumber, sort, filter) {
+            return $http({
+                method: 'GET',
+                url: baseUrl + objectName,
+                params: {
+                    pageSize: pageSize,
+                    pageNumber: pageNumber,
+                    sort: sort,
+                    filter: filter
+                },
+                headers: anonymousToken
+            }).then(function(response) {
+                return response.data;
+            });
+        };
+
+        self.readOne = function(id) {
+            return $http({
+                method: 'GET',
+                url: baseUrl + objectName + '/' + id,
+                headers: anonymousToken
+            }).then(function(response) {
+                return response.data;
+            });
+        };
+
+        self.create = function(data) {
+            return $http({
+                method: 'POST',
+                url: baseUrl + objectName,
+                data: data,
+                params: {
+                    returnObject: true
+                },
+                headers: anonymousToken
+            }).then(function(response) {
+                return response.data;
+            });
+        };
+
+        self.update = function(id, data) {
+            return $http({
+                method: 'PUT',
+                url: baseUrl + objectName + '/' + id,
+                data: data,
+                headers: anonymousToken
+            }).then(function(response) {
+                return response.data;
+            });
+        };
+
+        self.delete = function(id) {
+            return $http({
+                method: 'DELETE',
+                url: baseUrl + objectName + '/' + id,
+                headers: anonymousToken
+            });
+        };
+
     }
-  };
-
-});
-
+}());
 </script>
-<div ng-app="myapp">
-  <div ng-controller="myctrl">    
-    <a class="btn" ng-click="data.load()">Get data!</a>
-    <div ng-grid="grid.options" class="grid"></div>
-    <ul ng-repeat="item in data.selected">
-      <li>{{item}}</li>
-    </ul>
+</head>
+<body>
+  <div ng-controller="MainCtrl">
+    <div class="text-warning">Only the <b>Description</b> and <b>Price</b> columns are editable in the server side</div>
+    <div ui-grid="gridOptions" class="grid" ui-grid-edit></div>
+    <p>Current page:
+      <input type="number" min="1" max="{{ pagination.getTotalPages() }}" ng-model="pagination.pageNumber" ng-change="load()">of {{ pagination.getTotalPages() }}</p>
+    <button type="button" class="btn btn-success" ng-click="pagination.previousPage()">previous page</button>
+    <button type="button" class="btn btn-success" ng-click="pagination.nextPage()">next page</button>
   </div>
-</div>
+  <p><a target="_blank" href="http://blog.backand.com/ng-grid-and-a-simple-rest-api/">Back to the article</a></p>
+  <p><a target="_blank" href="https://www.backand.com/apps/#/sign_up">Create your own backend</a></p>
+</body>
+</html>
