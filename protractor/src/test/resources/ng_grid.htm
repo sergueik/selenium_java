@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+
+<!-- https://jsfiddle.net/qzty5wcx/ --> 
+
+.grid {
+  height: 250px;
+}
+</style>
+<script src="angular.js">
+
+<!-- dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.2.19/angular.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/angular.js/1.2.19/angular-sanitize.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+var myapp = angular.module('myapp', ["ui", "ngGrid"]);
+
+myapp.controller('myctrl', function($scope, $http) {
+
+    $scope.testInfo= "TestInfo";
+  
+  $scope.data = {
+    persons: [],
+    selected:[],
+    load: function () {
+      // $http.get("/echo/json/").success(function(data) {
+      $scope.data.persons = [
+            {id:1, name:"Max", number:51323.512},
+            {id:2, name:"Adam", number:7245.2},
+            {id:3, name:"Betty", number:828},
+            {id:4, name:"Sara", number:23452.45182}
+          ];
+        
+        $scope.data.selected[0] = $scope.data.persons[0];
+        
+     // });
+     }
+  };
+
+  $scope.grid = {
+    options: {
+      data: "data.persons",
+      selectedItems: $scope.data.selected,
+      multiSelect: false,
+      columnDefs: [
+        {field:"id", displayName:"ID"},
+        {field:"name", displayName:"Name"},
+        {field:"number", displayName:"Nummer", cellFilter:"number:2"}
+        
+        ]
+    }
+  };
+
+});
+
+</script>
+<div ng-app="myapp">
+  <div ng-controller="myctrl">    
+    <a class="btn" ng-click="data.load()">Get data!</a>
+    <div ng-grid="grid.options" class="grid"></div>
+    <ul ng-repeat="item in data.selected">
+      <li>{{item}}</li>
+    </ul>
+  </div>
+</div>
