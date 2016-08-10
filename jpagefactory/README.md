@@ -65,12 +65,12 @@ _annotation example_:
 private WebElement firstNumber;
 ```  
 
-**- Find element with Angular ng-model**  
-_html_: `<input ng-model="first" type="text" class="input-small"/>`  
+**- Find Angular directive by ng-model**  
+_html_: `<am-multiselect class="input-lg" ng-model="selectedCar" ms-header="Select Some Cars">`
 _annotation example_: 
 ```
-@FindBy(how = How.MODEL, using = "first")
-private WebElement firstNumber;
+@FindBy(how = How.MODEL, using = "selectedCar")
+private WebElement _directive;
 ```
 
 **- Find elements of Angular ng-repeater**  
@@ -96,6 +96,22 @@ _annotation example_:
 private List<WebElement> history;
 ```
 
+**- Find element in the repeater, binding by Angular repeater column**  
+_html_: 
+```
+ <table>
+    <tr ng-repeat="row in rows | filter : search">
+      <td>{{$index+1}}</td>
+      <td>{{name}}</td>
+    </tr>
+  </table>
+```  
+_annotation example_: 
+```
+@FindAll({ @FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "name") })
+private List<WebElement> friendNames;
+```
+
 **- Find element with button text**  
 _html_: `<button ng-click="doAddition()" id="gobutton" class="btn">Go!</button>`  
 _annotation example_: 
@@ -104,12 +120,16 @@ _annotation example_:
 private WebElement goButton;
 ```
 
-**- Find element with partial button text**  
-_html_: `<button ng-click="doAddition()" id="gobutton" class="btn">Go!</button>`  
+**- Find Angular directive by partial button text**  
+_html_: 
+```
+<am-multiselect class="input-lg" multiple="true" ms-selected ="There are {{selectedCar.length}} car(s) selected"
+    ng-model="selectedCar" ms-header="Select Some Cars">
+```
 _annotation example_: 
 ```
-@FindBy(how = How.PARTIAL_BUTTON_TEXT, using = "Go")
-private WebElement goButton;
+@FindBy(how = How.PARTIAL_BUTTON_TEXT, using = "Select Some Cars")
+private WebElement _multiselect;
 ```
 
 **- Find select options**  
@@ -135,6 +155,18 @@ private List<WebElement> operationSelectorOptions;
 private WebElement selectedOption;
 
 ```
+**- Find element for CSS Selector and text**  
+[_html_](http://dalelotts.github.io/angular-bootstrap-datetimepicker/): 
+```
+<span class="hour" data-ng-repeat="dateObject in data.dates" 
+data-ng-click="changeView(data.nextView, dateObject, $event)">10:00 AM</span>
+```
+_annotation example_: 
+```
+String timeOfDay = "10:00 AM";
+WebElement ng_hour = ng_element.findElements(
+    NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
+
 
 ## Use annotation for both desktop and mobile web applications:
 
