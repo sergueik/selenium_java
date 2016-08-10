@@ -122,10 +122,8 @@ private WebElement goButton;
 
 **- Find Angular directive by partial button text**  
 _html_: 
-```
-<am-multiselect class="input-lg" multiple="true" ms-selected ="There are {{selectedCar.length}} car(s) selected"
-    ng-model="selectedCar" ms-header="Select Some Cars">
-```
+`<am-multiselect class="input-lg" multiple="true" ms-selected ="There are {{selectedCar.length}} car(s) selected" ng-model="selectedCar" ms-header="Select Some Cars">`
+
 _annotation example_: 
 ```
 @FindBy(how = How.PARTIAL_BUTTON_TEXT, using = "Select Some Cars")
@@ -166,7 +164,7 @@ _annotation example_:
 String timeOfDay = "10:00 AM";
 WebElement ng_hour = ng_element.findElements(
     NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
-
+```
 
 ## Use annotation for both desktop and mobile web applications:
 
