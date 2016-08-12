@@ -1,0 +1,11 @@
+import cucumber.api.CucumberOptions;
+import cucumber.api.testng.AbstractTestNGCucumberTests;
+
+@CucumberOptions(strict = $strict,
+features = {"classpath:$featureFile"},
+plugin = {$reports, "pretty"},
+monochrome = ${monochrome},
+tags = {#if($tags)$tags#end},
+glue = { $glue })
+public class $className extends AbstractTestNGCucumberTests {
+}
