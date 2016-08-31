@@ -1,4 +1,5 @@
 package com.mycompany.app;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
-
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -90,7 +90,6 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook; 
-
 
 // OpenOffice 
 import org.jopendocument.dom.spreadsheet.MutableCell;
@@ -106,6 +105,7 @@ public class AppTest
   public String seleniumHost = null;
   public String seleniumPort = null;
   public String seleniumBrowser = null;
+  public String baseUrl = "http://habrahabr.ru/search/?"; 
 
   @BeforeMethod
   public void setupBeforeSuite( ITestContext context ) throws InterruptedException {
@@ -138,16 +138,47 @@ public class AppTest
     driver.quit();
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2003" /*"dataProviderOpenOfficeSpreadsheet"*/ )
-  public void parseSearchResult(String search_keyword, double expected) throws InterruptedException {
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2003"  )
+  public void test1(String search_keyword, double expected) throws InterruptedException {
 
-    driver.get("http://habrahabr.ru/search/?");
+    driver.get(baseUrl);
     WebDriverWait wait = new WebDriverWait(driver, 30);
     String search_input_name = null;
-    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("inner_search_form")));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inner_search_form")));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("search-field__input")));
     search_input_name = "q";
+    String search_input_xpath = String.format("//form[@id='inner_search_form']/div[@class='search-field__wrap']/input[@name='%s']", search_input_name);
+    wait.until(ExpectedConditions.elementToBeClickable(By.xpath(search_input_xpath)));
+    WebElement element = driver.findElement(By.xpath(search_input_xpath));
+    element.clear();
+    element.sendKeys(search_keyword );
+    element.sendKeys(Keys.RETURN);
+    
+    String pubsFoundCssSelector = "ul[class*='tabs-menu_habrahabr'] a[class*='tab-item tab-item_current']";
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(pubsFoundCssSelector)));
+    element = driver.findElement(By.cssSelector(pubsFoundCssSelector)); 
+    Pattern pattern = Pattern.compile("(\\d+)");
+    Matcher matcher = pattern.matcher(element.getText());
+    int publicationsFound = 0;
+    if (matcher.find()) {
+      publicationsFound  = Integer.parseInt(matcher.group(1) ) ;
+      System.err.println("Publication count " + publicationsFound );
+    } else { 
+      System.err.println("No publications");
+    }
+    assertTrue( publicationsFound >= expected );
+  }
 
-    String search_input_xpath = String.format("//form[@id='inner_search_form']/input[@name='%s']", search_input_name);
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderOpenOfficeSpreadsheet" )
+  public void test2(String search_keyword, double expected) throws InterruptedException {
+
+    driver.get(baseUrl);
+    WebDriverWait wait = new WebDriverWait(driver, 30);
+    String search_input_name = null;
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inner_search_form")));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("search-field__input")));
+    search_input_name = "q";
+    String search_input_xpath = String.format("//form[@id='inner_search_form']/div[@class='search-field__wrap']/input[@name='%s']", search_input_name);
     wait.until(ExpectedConditions.elementToBeClickable(By.xpath(search_input_xpath)));
     WebElement element = driver.findElement(By.xpath(search_input_xpath));
     element.clear();
@@ -177,6 +208,38 @@ public class AppTest
       {"spock", 10.0},
     };
   }
+
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description="Finds a publication", dataProvider = "dataProviderExcel2007" )
+  public void test3(String search_keyword, double expected) throws InterruptedException {
+
+    driver.get(baseUrl);
+    WebDriverWait wait = new WebDriverWait(driver, 30);
+    String search_input_name = null;
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("inner_search_form")));
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("search-field__input")));
+    search_input_name = "q";
+    String search_input_xpath = String.format("//form[@id='inner_search_form']/div[@class='search-field__wrap']/input[@name='%s']", search_input_name);
+    wait.until(ExpectedConditions.elementToBeClickable(By.xpath(search_input_xpath)));
+    WebElement element = driver.findElement(By.xpath(search_input_xpath));
+    element.clear();
+    element.sendKeys(search_keyword );
+    element.sendKeys(Keys.RETURN);
+    
+    String pubsFoundCssSelector = "ul[class*='tabs-menu_habrahabr'] a[class*='tab-item tab-item_current']";
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(pubsFoundCssSelector)));
+    element = driver.findElement(By.cssSelector(pubsFoundCssSelector)); 
+    Pattern pattern = Pattern.compile("(\\d+)");
+    Matcher matcher = pattern.matcher(element.getText());
+    int publicationsFound = 0;
+    if (matcher.find()) {
+      publicationsFound  = Integer.parseInt(matcher.group(1) ) ;
+      System.err.println("Publication count " + publicationsFound );
+    } else { 
+      System.err.println("No publications");
+    }
+    assertTrue( publicationsFound >= expected );
+  }
+
 
   /*
    * Reads test data {<SEARCH>,<COUNT>} from Excel 2007 sheet with the following columns (ID is ignored):

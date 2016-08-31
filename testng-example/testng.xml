@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite name="Suite 1" verbose="10">
+<suite name="Suite 1" verbose="10" configfailurepolicy="continue">
   <parameter name="selenium.host" value="127.0.0.1"/>
   <parameter name="selenium.port" value="4444"/>
   <parameter name="selenium.browser" value="firefox"/>
-  <test name="AppTest parseSearchResult">
+  <test name="AppTest parseSearchResult" preserve-order="true" parallel="false">
     <classes>
       <class name="com.mycompany.app.AppTest"/>
       <methods>
-        <include name="parseSearchResult"/>
+        <include name="test1"/>
+        <include name="test2"/>
+        <include name="test3"/>
       </methods>
     </classes>
   </test>
