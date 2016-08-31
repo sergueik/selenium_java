@@ -9,8 +9,8 @@
       <class name="com.mycompany.app.AppTest"/>
       <methods>
         <include name="test1"/>
-        <include name="test2"/>
-        <include name="test3"/>
+        <exclude name="test2"/>
+        <exclude name="test3"/>
       </methods>
     </classes>
   </test>
