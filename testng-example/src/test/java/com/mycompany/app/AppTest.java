@@ -142,7 +142,7 @@ public class AppTest
   @BeforeMethod
   // NOTE: cannot change signature of the method to include annotation:
   // org.testng.TestNGException:
-  // Method handleTestMethodName requires 3 parameters but 0 were supplied in the @Configuration annotation.
+  // Method handleTestMethodInformation requires 3 parameters but 0 were supplied in the @Configuration annotation.
   public void handleTestMethodInformation(final Method method, final ITestContext context /*, IDataProviderAnnotation annotation */){
     String suiteName = context.getCurrentXmlTest().getSuite().getName();
     System.err.println("Suite: " + suiteName);
@@ -161,8 +161,7 @@ public class AppTest
     Set<java.lang.String> attributeNames = ((IAttributes)context).getAttributeNames();
     if (attributeNames.size() > 0 ) {
       for (String attributeName : attributeNames) {
-        System.out.print("Attribute: " + attributeName + " = ");
-        System.out.println(((IAttributes)context).getAttribute(attributeName));
+        System.out.print("Attribute: " + attributeName + " = " + ((IAttributes)context).getAttribute(attributeName));
       }      
     }
   }
