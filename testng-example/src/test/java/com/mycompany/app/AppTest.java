@@ -115,8 +115,9 @@ public class AppTest
   public String seleniumBrowser = null;
   public String baseUrl = "http://habrahabr.ru/search/?";  
 
-  @BeforeMethod
-  public void setupBeforeSuite( ITestContext context ) throws InterruptedException {
+  
+  @BeforeClass(alwaysRun = true)
+  public void setupBeforeClass(final ITestContext context) throws InterruptedException {
     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
     seleniumHost = context.getCurrentXmlTest().getParameter("selenium.host");
@@ -139,11 +140,11 @@ public class AppTest
     }
   }  
   
-  @BeforeMethod
   // NOTE: cannot change signature of the method to include annotation:
   // org.testng.TestNGException:
   // Method handleTestMethodInformation requires 3 parameters but 0 were supplied in the @Configuration annotation.
-  public void handleTestMethodInformation(final Method method, final ITestContext context /*, IDataProviderAnnotation annotation */){
+  @BeforeMethod
+  public void handleTestMethodInformation(final ITestContext context, final Method method/*, IDataProviderAnnotation annotation */){
     String suiteName = context.getCurrentXmlTest().getSuite().getName();
     System.err.println("Suite: " + suiteName);
     String testName = context.getCurrentXmlTest().getName();
@@ -181,7 +182,7 @@ public class AppTest
     parseSearchResult(search_keyword, expected);
   }
 
-  @AfterMethod
+  @AfterClass(alwaysRun = true)
   public void cleanupSuite() {
     driver.close();
     driver.quit();
