@@ -69,7 +69,7 @@ public class AppTest {
 	private static WebDriver driver;
 	private WebElement element = null;
 	private String selector = null;
-	private static String SiteURL = "http://www.tripadvisor.com/";
+	private static String baseURL = "http://www.tripadvisor.com/";
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
@@ -83,18 +83,22 @@ public class AppTest {
 		driver = new FirefoxDriver(capabilities);
 	}
 
-	@Test
-	public void verifyTextTest() throws Exception {
-		driver.get(SiteURL);
+	@Before
+	public void beforeTest() throws Exception {
+		driver.get(baseURL);
 	}
-
+	
 	@AfterClass
 	public static void tearDown() throws Exception {
-		driver.close();
 		driver.quit();
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());
 		}
 	}
+	
+	@Test
+	public void verifyText() throws Exception {
+	}
+
 
 }
