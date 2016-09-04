@@ -80,7 +80,7 @@ public class AppTest {
 		// alternatively one can add geckodriver to system path
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		capabilities.setCapability("marionette", true);
-		WebDriver driver = new FirefoxDriver(capabilities);
+		driver = new FirefoxDriver(capabilities);
 	}
 
 	@Test
