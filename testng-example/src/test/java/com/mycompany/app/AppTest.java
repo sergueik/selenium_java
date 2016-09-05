@@ -1,11 +1,14 @@
 package com.mycompany.app;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -37,9 +40,8 @@ import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
-// import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,34 +67,26 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-// custom testng data providers
-
-import java.util.Iterator;
+// testng data providers
 
 import org.apache.poi.ss.usermodel.Cell;
-
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellReference;
 
-// OLE2 Office Documents needs HSSF
 
-import java.io.File;
-import java.io.InputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-
+// OLE2 Office Documents
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-// Office 2007+ XML needs XSSF
+// Office 2007+ XML
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;  
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-// OpenOffice  
+// OpenOffice
 import org.jopendocument.dom.spreadsheet.MutableCell;
 import org.jopendocument.dom.spreadsheet.Sheet;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
@@ -104,18 +98,18 @@ import org.testng.annotations.*;
 import org.testng.internal.annotations.*;
 import org.testng.internal.Attributes;
 import java.lang.reflect.Method;
+
 // https://groups.google.com/forum/#!topic/testng-users/J437qa5PSx8
 
 
 public class AppTest
-{  
+{
   public RemoteWebDriver driver = null;
   public String seleniumHost = null;
   public String seleniumPort = null;
   public String seleniumBrowser = null;
-  public String baseUrl = "http://habrahabr.ru/search/?";  
+  public String baseUrl = "http://habrahabr.ru/search/?";
 
-  
   @BeforeClass(alwaysRun = true)
   public void setupBeforeClass(final ITestContext context) throws InterruptedException {
     DesiredCapabilities capabilities = DesiredCapabilities.firefox();
@@ -127,7 +121,7 @@ public class AppTest
     capabilities =   new DesiredCapabilities(seleniumBrowser, "", Platform.ANY);
 
     try {
-      String hubUrl = "http://"+  seleniumHost  + ":" + seleniumPort   +  "/wd/hub";
+      String hubUrl = "http://" + seleniumHost + ":" + seleniumPort + "/wd/hub";
       driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
     } catch (MalformedURLException ex) { }
 
@@ -138,8 +132,8 @@ public class AppTest
     }  catch(Exception ex) {
       System.err.println(ex.toString());
     }
-  }  
-  
+  }
+
   // NOTE: cannot change signature of the method to include annotation:
   // org.testng.TestNGException:
   // Method handleTestMethodInformation requires 3 parameters but 0 were supplied in the @Configuration annotation.
@@ -149,36 +143,35 @@ public class AppTest
     System.err.println("Suite: " + suiteName);
     String testName = context.getCurrentXmlTest().getName();
     System.err.println("Test: " + testName);
-    String methodName = method.getName();  
+    String methodName = method.getName();
     System.err.println("Method: " + methodName);
     // String dataProvider = ((IDataProvidable)annotation).getDataProvider();
     // System.err.println("Data Provider: " + dataProvider);
     Map<String, String> parameters = (((TestRunner) context).getTest()).getParameters();
     Set<String> keys =  parameters.keySet();
     for (String key : keys) {
-      System.out.print("Parameter: " + key + " = ");
-      System.out.println(parameters.get(key));
+      System.out.println("Parameter: " + key + " = " + parameters.get(key));
     }
     Set<java.lang.String> attributeNames = ((IAttributes)context).getAttributeNames();
     if (attributeNames.size() > 0 ) {
       for (String attributeName : attributeNames) {
         System.out.print("Attribute: " + attributeName + " = " + ((IAttributes)context).getAttribute(attributeName));
-      }      
+      }
     }
   }
-  
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "dataProviderExcel2003"  )
+
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel_2003" )
   public void test1(String search_keyword, double expected) throws InterruptedException {
-    parseSearchResult(search_keyword, expected);  
+    parseSearchResult(search_keyword, expected);
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "dataProviderOpenOfficeSpreadsheet" )
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "OpenOfficeSpreadsheet" )
   public void test2(String search_keyword, double expected) throws InterruptedException {
     parseSearchResult(search_keyword, expected);
   }
 
-  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "dataProviderExcel2007" )
-  public void test3(String search_keyword, double expected) throws InterruptedException {  
+  @Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel2007" )
+  public void test3(String search_keyword, double expected) throws InterruptedException {
     parseSearchResult(search_keyword, expected);
   }
 
@@ -196,7 +189,7 @@ public class AppTest
       {"spock", 10.0},
     };
   }
-  
+
   private void parseSearchResult(String search_keyword, double expected) throws InterruptedException {
     driver.get(baseUrl);
     WebDriverWait wait = new WebDriverWait(driver, 30);
@@ -210,73 +203,79 @@ public class AppTest
     element.clear();
     element.sendKeys(search_keyword );
     element.sendKeys(Keys.RETURN);
-  
+
     String pubsFoundCssSelector = "ul[class*='tabs-menu_habrahabr'] a[class*='tab-item tab-item_current']";
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(pubsFoundCssSelector)));
-    element = driver.findElement(By.cssSelector(pubsFoundCssSelector));  
+    element = driver.findElement(By.cssSelector(pubsFoundCssSelector));
     Pattern pattern = Pattern.compile("(\\d+)");
     Matcher matcher = pattern.matcher(element.getText());
     int publicationsFound = 0;
     if (matcher.find()) {
       publicationsFound  = Integer.parseInt(matcher.group(1) ) ;
       System.err.println("Publication count " + publicationsFound );
-    } else {  
+    } else {
       System.err.println("No publications");
     }
     assertTrue( publicationsFound >= expected );
   }
-
 
   /*
    * Reads test data {<SEARCH>,<COUNT>} from Excel 2007 sheet with the following columns (ID is ignored):
    * ID(0) SEARCH(1) COUNT(2)
    * 1.0   junit(1)  100.0
    */
-  
-  @DataProvider(parallel = false)
+
+  @DataProvider(parallel = false, name = "Excel2007"  )
   public Object[][] dataProviderExcel2007() {
-  
+
+    HashMap<String, String> columns = new HashMap<String, String>();
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
-  
-    String filename = "data_2007.xlsx";  
+
+    String filename = "data_2007.xlsx";
     try{
 
       XSSFWorkbook wb = new XSSFWorkbook(filename );
       XSSFSheet sheet = wb.getSheetAt(0);
       XSSFRow row;
       XSSFCell cell;
-      String name = "";
+      String search = "";
       double count = 0;
-
-      Iterator rows = sheet.rowIterator();  
+      int id = 0;
+      Iterator rows = sheet.rowIterator();
       while (rows.hasNext()) {
         row = (XSSFRow) rows.next();
-        if (row.getRowNum() == 0){ // skip the header
+
+        if (row.getRowNum() == 0){
+          // skip the header
+          Iterator cells = row.cellIterator();
+          while (cells.hasNext()) {
+            cell = (XSSFCell) cells.next();
+            String header = cell.getStringCellValue();
+            String column = CellReference.convertNumToColString(cell.getColumnIndex());
+            System.err.println(cell.getColumnIndex() +  " = " + column + " " + header );
+            columns.put(column, header);
+          }
           continue;
         }
         Iterator cells = row.cellIterator();
         while (cells.hasNext()) {
           cell = (XSSFCell) cells.next();
-          if (cell.getColumnIndex() == 2) {  
-            if (cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC) {
-              count = cell.getNumericCellValue();
-            } else {
-              count = 0;
-            }
+          if (columns.get(CellReference.convertNumToColString(cell.getColumnIndex())).equals("ID")  ) {
+            assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_NUMERIC);
+            id = (int)cell.getNumericCellValue();
           }
-          if (cell.getColumnIndex() == 1) {  
-            if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING) {
-              name = cell.getStringCellValue();
-            } else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC){
-              name = Double.toString(cell.getNumericCellValue());
-            } else {
-              // TODO: Boolean, Formula, Errors
-              name = "";
-            }
+          if (CellReference.convertNumToColString(cell.getColumnIndex()).equals("B")) {
+            assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_STRING);
+            search = cell.getStringCellValue();
+          }
+          if (CellReference.convertNumToColString(cell.getColumnIndex()).equals("C")  ) {
+            assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_NUMERIC);
+            count = cell.getNumericCellValue();
           }
         }
-        dataRow = new Object[]{name, count} ;
+        System.err.println(String.format("Row ID:%d\tSEARCH:'%s'\tCOUNT:%d" , id, search, (int)count));
+        dataRow = new Object[]{search, count} ;
         data.add(dataRow);
       }
     }  catch (Exception e) {
@@ -292,13 +291,13 @@ public class AppTest
    * ID(0) SEARCH(1) COUNT(2)
    * 1.0   junit(1)  100.0
    */
-  @DataProvider(parallel = false , name = "dataProviderExcel2003" )
+  @DataProvider(parallel = false, name = "Excel2003" )
   public Object[][] dataProviderExcel2003() {
-  
+
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
-  
-    String filename = "data_2003.xls";  
+
+    String filename = "data_2003.xls";
     try{
       InputStream ExcelFileToRead = new FileInputStream(filename );
       HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
@@ -310,7 +309,7 @@ public class AppTest
       String name = "";
       double count = 0;
 
-      Iterator rows = sheet.rowIterator();  
+      Iterator rows = sheet.rowIterator();
       while (rows.hasNext()) {
         row = (HSSFRow) rows.next();
         if (row.getRowNum() == 0){ // skip the header
@@ -319,14 +318,14 @@ public class AppTest
         Iterator cells = row.cellIterator();
         while (cells.hasNext()) {
           cell = (HSSFCell) cells.next();
-          if (cell.getColumnIndex() == 2) {  
+          if (cell.getColumnIndex() == 2) {
             if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
               count = cell.getNumericCellValue();
             } else {
               count = 0;
             }
           }
-          if (cell.getColumnIndex() == 1) {  
+          if (cell.getColumnIndex() == 1) {
             if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
               name = cell.getStringCellValue();
             } else if(cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC){
@@ -347,28 +346,28 @@ public class AppTest
     data.toArray( dataArray );
     return dataArray;
   }
-  
+
   /*
    * Reads test data {<SEARCH>,<COUNT>} from OpenoOffice spreadsheet with the following columns (ID is ignored):
    * ID(0) SEARCH(1) COUNT(2)
    * 1.0   junit(1)  100.0
    */
-  
-  @DataProvider(parallel = false)
+
+  @DataProvider(parallel = false, name = "OpenOfficeSpreadsheet")
   public Object[][] dataProviderOpenOfficeSpreadsheet() {
-  
+
     List<Object[]> data = new ArrayList<Object[]>();
     Object[] dataRow = { };
-  
-    String filename = "data.ods";  
+
+    String filename = "data.ods";
     Sheet sheet;
 
     String name = "";
     double count = 0;
-  
+
     try{
       File file = new File(filename);
-      sheet = SpreadSheet.createFromFile(file).getSheet(0); // can pass sheet name as string  
+      sheet = SpreadSheet.createFromFile(file).getSheet(0); // can pass sheet name as string
       int nColCount = sheet.getColumnCount();
       int nRowCount = sheet.getRowCount();
       MutableCell cell = null;
@@ -376,9 +375,9 @@ public class AppTest
         if (sheet.getCellAt(0, nRowIndex).getValue() == null || sheet.getCellAt(0, nRowIndex).getValue() == "") {
           break ;
         }
-        name = sheet.getCellAt(1, nRowIndex).getValue().toString() ;
+        name = sheet.getCellAt(1, nRowIndex).getValue().toString();
         count = Double.valueOf(sheet.getCellAt(2, nRowIndex).getValue().toString() );
-        dataRow = new Object[]{name, count} ;
+        dataRow = new Object[]{name, count};
         data.add(dataRow);
       }
     } catch (IOException e) {
@@ -388,5 +387,5 @@ public class AppTest
     data.toArray( dataArray );
     return dataArray;
   }
-  
+
 }
