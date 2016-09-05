@@ -8,8 +8,8 @@
     <classes>
       <class name="com.mycompany.app.AppTest"/>
       <methods>
-        <include name="test3"/>
-        <exclude name="test2"/>
+        <exclude name="test3"/>
+        <include name="test2"/>
         <exclude name="test1"/>
       </methods>
     </classes>
