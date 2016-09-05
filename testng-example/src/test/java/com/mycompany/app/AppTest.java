@@ -70,8 +70,8 @@ import org.openqa.selenium.WebElement;
 
 // testng data providers
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
+// import org.apache.poi.ss.usermodel.Cell;
+// import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellReference;
 
 // OLE2 Office Documents
@@ -91,6 +91,9 @@ import org.jopendocument.dom.spreadsheet.MutableCell;
 import org.jopendocument.dom.spreadsheet.Sheet;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 import org.jopendocument.dom.ODValueType;
+import org.jopendocument.dom.spreadsheet.Table;
+import org.jopendocument.dom.spreadsheet.Cell;
+import org.jopendocument.dom.spreadsheet.Range;
 
 // http://testngtricks.blogspot.com/2013/05/how-to-provide-data-to-dataproviders.html
 
@@ -382,13 +385,13 @@ public class AppTest {
 
 		try {
 			File file = new File(filename);
-			sheet = SpreadSheet.createFromFile(file).getSheet(0);
-			// can also pass sheet name as string
+			// can also pass sheet index or name as string
+			sheet = SpreadSheet.createFromFile(file).getFirstSheet();
 			int nColCount = sheet.getColumnCount();
 			int nRowCount = sheet.getRowCount();
-			MutableCell cell = null;
+			Cell cell = null;
 			for (int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
-				String header = sheet.getCellAt(nColIndex, 0).getValue().toString();
+				String header = sheet.getImmutableCellAt(nColIndex, 0).getValue().toString();
 				if (StringUtils.isBlank(header)) {
 					break;
 				}
@@ -396,10 +399,18 @@ public class AppTest {
 				System.err.println(nColIndex + " = " + column + " " + header);
 				columns.put(column, header);
 			}
-			for (int nRowIndex = 1; nRowIndex < nRowCount && StringUtils.isNotBlank(sheet.getCellAt(0, nRowIndex).getValue().toString()); nRowIndex++) {
-				for (int nColIndex = 0; nColIndex < nColCount && StringUtils.isNotBlank(sheet.getCellAt(nColIndex, nRowIndex)
+      // often there may be no ranges defined
+      Set<String>rangeeNames = sheet.getRangesNames();
+      Iterator rangeNamesIterator = rangeeNames.iterator();
+
+      while(rangeNamesIterator.hasNext()) {
+        System.err.println("Range = " + rangeNamesIterator.next());
+      }
+      // isCellBlank has protected access in Table 
+			for (int nRowIndex = 1; nRowIndex < nRowCount && StringUtils.isNotBlank(sheet.getImmutableCellAt(0, nRowIndex).getValue().toString()); nRowIndex++) {
+				for (int nColIndex = 0; nColIndex < nColCount && StringUtils.isNotBlank(sheet.getImmutableCellAt(nColIndex, nRowIndex)
 							.getValue().toString()); nColIndex++) {
-					cell = sheet.getCellAt(nColIndex, nRowIndex);
+					cell = sheet.getImmutableCellAt(nColIndex, nRowIndex);
 					String cellName = CellReference.convertNumToColString(nColIndex);
 
 					if (columns.get(cellName).equals("COUNT")) {
