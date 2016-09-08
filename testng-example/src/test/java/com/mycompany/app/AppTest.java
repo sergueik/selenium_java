@@ -203,9 +203,9 @@ public class AppTest {
 	private void parseSearchResult(String search_keyword, double expected_count)
 			throws InterruptedException {
 		driver.get(baseUrl);
-    
-    				System.err.println(String.format("SEARCH:'%s'\tCOUNT:%d",
-						search_keyword, (int) expected_count));
+
+		System.err.println(String.format("SEARCH:'%s'\tCOUNT:%d", search_keyword,
+				(int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		String search_input_name = null;
@@ -241,8 +241,10 @@ public class AppTest {
 		assertTrue(publicationsFound >= expected_count);
 	}
 
+	// http://stackoverflow.com/questions/666477/possible-to-pass-parameters-to-testng-dataprovider
 	@DataProvider(parallel = false, name = "Excel2007")
-	public Object[][] dataProviderExcel2007() {
+	public Object[][] dataProviderExcel2007(ITestContext context) {
+		// String testParam = context.getCurrentXmlTest().getParameter("test_param");
 
 		HashMap<String, String> columns = new HashMap<String, String>();
 		List<Object[]> data = new ArrayList<Object[]>();
@@ -281,7 +283,8 @@ public class AppTest {
 				Iterator cells = row.cellIterator();
 				while (cells.hasNext()) {
 					cell = (XSSFCell) cells.next();
-					cellColumn = CellReference.convertNumToColString(cell.getColumnIndex());
+					cellColumn = CellReference.convertNumToColString(cell
+							.getColumnIndex());
 					if (columns.get(cellColumn).equals("ID")) {
 						assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_NUMERIC);
 						id = (int) cell.getNumericCellValue();
@@ -391,7 +394,8 @@ public class AppTest {
 			int nRowCount = sheet.getRowCount();
 			Cell cell = null;
 			for (int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
-				String header = sheet.getImmutableCellAt(nColIndex, 0).getValue().toString();
+				String header = sheet.getImmutableCellAt(nColIndex, 0).getValue()
+						.toString();
 				if (StringUtils.isBlank(header)) {
 					break;
 				}
@@ -399,17 +403,21 @@ public class AppTest {
 				System.err.println(nColIndex + " = " + column + " " + header);
 				columns.put(column, header);
 			}
-      // often there may be no ranges defined
-      Set<String>rangeeNames = sheet.getRangesNames();
-      Iterator rangeNamesIterator = rangeeNames.iterator();
+			// often there may be no ranges defined
+			Set<String> rangeeNames = sheet.getRangesNames();
+			Iterator rangeNamesIterator = rangeeNames.iterator();
 
-      while(rangeNamesIterator.hasNext()) {
-        System.err.println("Range = " + rangeNamesIterator.next());
-      }
-      // isCellBlank has protected access in Table 
-			for (int nRowIndex = 1; nRowIndex < nRowCount && StringUtils.isNotBlank(sheet.getImmutableCellAt(0, nRowIndex).getValue().toString()); nRowIndex++) {
-				for (int nColIndex = 0; nColIndex < nColCount && StringUtils.isNotBlank(sheet.getImmutableCellAt(nColIndex, nRowIndex)
-							.getValue().toString()); nColIndex++) {
+			while (rangeNamesIterator.hasNext()) {
+				System.err.println("Range = " + rangeNamesIterator.next());
+			}
+			// isCellBlank has protected access in Table
+			for (int nRowIndex = 1; nRowIndex < nRowCount
+					&& StringUtils.isNotBlank(sheet.getImmutableCellAt(0, nRowIndex)
+							.getValue().toString()); nRowIndex++) {
+				for (int nColIndex = 0; nColIndex < nColCount
+						&& StringUtils
+								.isNotBlank(sheet.getImmutableCellAt(nColIndex, nRowIndex)
+										.getValue().toString()); nColIndex++) {
 					cell = sheet.getImmutableCellAt(nColIndex, nRowIndex);
 					String cellName = CellReference.convertNumToColString(nColIndex);
 
