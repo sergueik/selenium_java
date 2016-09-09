@@ -113,8 +113,8 @@ public class AppTest {
 	public String baseUrl = "http://habrahabr.ru/search/?";
 
 	@BeforeClass(alwaysRun = true)
-	public void setupBeforeClass(final ITestContext context)
-			throws InterruptedException {
+	public void setupBeforeClass(final ITestContext context) throws InterruptedException {
+
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
 		seleniumHost = context.getCurrentXmlTest().getParameter("selenium.host");
@@ -140,12 +140,12 @@ public class AppTest {
 	}
 
 	// NOTE: cannot change signature of the method to include annotation:
-	// org.testng.TestNGException:
+  // handleTestMethodInformation(final ITestContext context,	final Method method, IDataProviderAnnotation annotation )
+	// runtime TestNGException:
 	// Method handleTestMethodInformation requires 3 parameters but 0 were
 	// supplied in the @Configuration annotation.
 	@BeforeMethod
-	public void handleTestMethodInformation(final ITestContext context,
-			final Method method/* , IDataProviderAnnotation annotation */) {
+	public void handleTestMethodInformation(final ITestContext context,	final Method method) {
 		String suiteName = context.getCurrentXmlTest().getSuite().getName();
 		System.err.println("Suite: " + suiteName);
 		String testName = context.getCurrentXmlTest().getName();
@@ -171,19 +171,19 @@ public class AppTest {
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel_2003")
-	public void test1(String search_keyword, double expected)
+	public void test_with_Excel2003(String search_keyword, double expected)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "OpenOfficeSpreadsheet")
-	public void test2(String search_keyword, double expected)
+	public void test_with_OpenOfficeSpreadsheet(String search_keyword, double expected)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel2007")
-	public void test3(String search_keyword, double expected)
+	public void test_with_Excel2007(String search_keyword, double expected)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
@@ -243,7 +243,9 @@ public class AppTest {
 
 	// http://stackoverflow.com/questions/666477/possible-to-pass-parameters-to-testng-dataprovider
 	@DataProvider(parallel = false, name = "Excel2007")
-	public Object[][] dataProviderExcel2007(ITestContext context) {
+	public Object[][] createData_from_Excel2007(final ITestContext context, final Method method) {
+    
+    System.out.println("Caller test method name: " + method.getName());
 		// String testParam = context.getCurrentXmlTest().getParameter("test_param");
 
 		HashMap<String, String> columns = new HashMap<String, String>();
@@ -317,7 +319,7 @@ public class AppTest {
 	 * 100.0
 	 */
 	@DataProvider(parallel = false, name = "Excel2003")
-	public Object[][] dataProviderExcel2003() {
+	public Object[][] createData_from_Excel2003() {
 
 		List<Object[]> data = new ArrayList<Object[]>();
 		Object[] dataRow = {};
@@ -373,7 +375,7 @@ public class AppTest {
 	}
 
 	@DataProvider(parallel = false, name = "OpenOfficeSpreadsheet")
-	public Object[][] dataProviderOpenOfficeSpreadsheet() {
+	public Object[][] createData_from_OpenOfficeSpreadsheet() {
 
 		HashMap<String, String> columns = new HashMap<String, String>();
 		List<Object[]> data = new ArrayList<Object[]>();
