@@ -9,7 +9,7 @@
       <class name="com.mycompany.app.AppTest"/>
       <methods>
         <include name="test_with_Excel2007"/>
-        <include name="test_with_OpenOfficeSpreadsheet"/>
+        <exclude name="test_with_OpenOfficeSpreadsheet"/>
         <exclude name="test_with_Excel2003"/>
       </methods>
     </classes>

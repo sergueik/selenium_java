@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -15,13 +14,11 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
 import java.nio.charset.Charset;
-
 import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,7 +30,6 @@ import javax.servlet.ServletException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -47,7 +43,6 @@ import static org.junit.Assert.*;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.Dimension;
@@ -101,11 +96,13 @@ import org.testng.*;
 import org.testng.annotations.*;
 import org.testng.internal.annotations.*;
 import org.testng.internal.Attributes;
+
 import java.lang.reflect.Method;
 
 // https://groups.google.com/forum/#!topic/testng-users/J437qa5PSx8
 
 public class AppTest {
+
 	public RemoteWebDriver driver = null;
 	public String seleniumHost = null;
 	public String seleniumPort = null;
@@ -113,7 +110,8 @@ public class AppTest {
 	public String baseUrl = "http://habrahabr.ru/search/?";
 
 	@BeforeClass(alwaysRun = true)
-	public void setupBeforeClass(final ITestContext context) throws InterruptedException {
+	public void setupBeforeClass(final ITestContext context)
+			throws InterruptedException {
 
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
@@ -140,31 +138,34 @@ public class AppTest {
 	}
 
 	// NOTE: cannot change signature of the method to include annotation:
-  // handleTestMethodInformation(final ITestContext context,	final Method method, IDataProviderAnnotation annotation )
+	// handleTestMethodInformation(final ITestContext context, final Method
+	// method, IDataProviderAnnotation annotation )
 	// runtime TestNGException:
 	// Method handleTestMethodInformation requires 3 parameters but 0 were
 	// supplied in the @Configuration annotation.
 	@BeforeMethod
-	public void handleTestMethodInformation(final ITestContext context,	final Method method) {
+	public void handleTestMethodInformation(final ITestContext context,
+			final Method method) {
 		String suiteName = context.getCurrentXmlTest().getSuite().getName();
-		System.err.println("Suite: " + suiteName);
+		System.err.println("BeforeMethod Suite: " + suiteName);
 		String testName = context.getCurrentXmlTest().getName();
-		System.err.println("Test: " + testName);
+		System.err.println("BeforeMethod Test: " + testName);
 		String methodName = method.getName();
-		System.err.println("Method: " + methodName);
+		System.err.println("BeforeMethod Method: " + methodName);
 		// String dataProvider = ((IDataProvidable)annotation).getDataProvider();
 		// System.err.println("Data Provider: " + dataProvider);
 		Map<String, String> parameters = (((TestRunner) context).getTest())
 				.getParameters();
 		Set<String> keys = parameters.keySet();
 		for (String key : keys) {
-			System.out.println("Parameter: " + key + " = " + parameters.get(key));
+			System.out.println("BeforeMethod Parameter: " + key + " = "
+					+ parameters.get(key));
 		}
 		Set<java.lang.String> attributeNames = ((IAttributes) context)
 				.getAttributeNames();
 		if (attributeNames.size() > 0) {
 			for (String attributeName : attributeNames) {
-				System.out.print("Attribute: " + attributeName + " = "
+				System.out.print("BeforeMethod Attribute: " + attributeName + " = "
 						+ ((IAttributes) context).getAttribute(attributeName));
 			}
 		}
@@ -177,8 +178,8 @@ public class AppTest {
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "OpenOfficeSpreadsheet")
-	public void test_with_OpenOfficeSpreadsheet(String search_keyword, double expected)
-			throws InterruptedException {
+	public void test_with_OpenOfficeSpreadsheet(String search_keyword,
+			double expected) throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
 
@@ -204,8 +205,8 @@ public class AppTest {
 			throws InterruptedException {
 		driver.get(baseUrl);
 
-		System.err.println(String.format("SEARCH:'%s'\tCOUNT:%d", search_keyword,
-				(int) expected_count));
+		System.err.println(String.format("SEARCH:'%s'\tEXECTED COUNT:%d",
+				search_keyword, (int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		String search_input_name = null;
@@ -243,10 +244,27 @@ public class AppTest {
 
 	// http://stackoverflow.com/questions/666477/possible-to-pass-parameters-to-testng-dataprovider
 	@DataProvider(parallel = false, name = "Excel2007")
-	public Object[][] createData_from_Excel2007(final ITestContext context, final Method method) {
-    
-    System.out.println("Caller test method name: " + method.getName());
-		// String testParam = context.getCurrentXmlTest().getParameter("test_param");
+	public Object[][] createData_from_Excel2007(final ITestContext context,
+			final Method method) {
+
+		String suiteName = context.getCurrentXmlTest().getSuite().getName();
+		System.err.println("Data Provider Caller Suite: " + suiteName);
+		String testName = context.getCurrentXmlTest().getName();
+		System.err.println("Data Provider Caller Test: " + testName);
+		String methodName = method.getName();
+
+		System.out.println("Data Provider Caller Method: " + method.getName());
+		// String testParam =
+		// context.getCurrentXmlTest().getParameter("test_param");
+
+		@SuppressWarnings("deprecation")
+		Map<String, String> parameters = (((TestRunner) context).getTest())
+				.getParameters();
+		Set<String> keys = parameters.keySet();
+		for (String key : keys) {
+			System.out.println("Data Provider Caller Parameter: " + key + " = "
+					+ parameters.get(key));
+		}
 
 		HashMap<String, String> columns = new HashMap<String, String>();
 		List<Object[]> data = new ArrayList<Object[]>();
@@ -255,8 +273,11 @@ public class AppTest {
 		String filename = "data_2007.xlsx";
 		try {
 
+			String sheetName = "Employee Data";
 			XSSFWorkbook wb = new XSSFWorkbook(filename);
-			XSSFSheet sheet = wb.getSheetAt(0);
+			XSSFSheet sheet = wb.getSheet(sheetName);
+			// XSSFSheet sheet = wb.getSheetAt(0);
+			// sheet.getSheetName();
 			XSSFRow row;
 			XSSFCell cell;
 			int cellIndex = 0;
@@ -313,11 +334,6 @@ public class AppTest {
 		return dataArray;
 	}
 
-	/*
-	 * Reads test data {<SEARCH>,<COUNT>} from Excel 2003 OLE binary file with the
-	 * following columns (ID is ignored): ID(0) SEARCH(1) COUNT(2) 1.0 junit(1)
-	 * 100.0
-	 */
 	@DataProvider(parallel = false, name = "Excel2003")
 	public Object[][] createData_from_Excel2003() {
 
@@ -329,7 +345,9 @@ public class AppTest {
 			InputStream ExcelFileToRead = new FileInputStream(filename);
 			HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
 
-			HSSFSheet sheet = wb.getSheetAt(0);
+			// HSSFSheet sheet = wb.getSheetAt(0);
+			String sheetName = "Employee Data";
+			HSSFSheet sheet = wb.getSheet(sheetName);
 			HSSFRow row;
 			HSSFCell cell;
 
@@ -390,8 +408,10 @@ public class AppTest {
 
 		try {
 			File file = new File(filename);
-			// can also pass sheet index or name as string
-			sheet = SpreadSheet.createFromFile(file).getFirstSheet();
+			String sheetName = "Employee Data";
+			sheet = SpreadSheet.createFromFile(file).getSheet(sheetName);
+			// sheet = SpreadSheet.createFromFile(file).getFirstSheet();
+			System.err.println("Sheet name: " + sheet.getName());
 			int nColCount = sheet.getColumnCount();
 			int nRowCount = sheet.getRowCount();
 			Cell cell = null;
