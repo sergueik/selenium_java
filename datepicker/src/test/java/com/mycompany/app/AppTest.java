@@ -24,6 +24,7 @@ import java.util.Set;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 import java.util.concurrent.TimeUnit;
 
@@ -98,9 +99,16 @@ public class AppTest {
 		wait.pollingEvery(polling, TimeUnit.MILLISECONDS);
 		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 		calendar = new GregorianCalendar();
-		calendar.add(Calendar.DAY_OF_YEAR, 4); // 4 days advance
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+		calendar.add(Calendar.DAY_OF_YEAR, 4);
+		// SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+    // for 4-digit yer for locale-specific dateFormat, use workaround 
+    // http://stackoverflow.com/questions/7796321/simpledateformat-pattern-based-on-locale
+    DateFormat dateFormatLocale =  DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
+    SimpleDateFormat simpleDateFormatLocale = (SimpleDateFormat) dateFormatLocale;
+    String pattern = simpleDateFormatLocale.toPattern().replaceAll("\\byy\\b", "yyyy");
+    SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 		dateString = dateFormat.format(calendar.getTime());
+    System.err.println("Testing date: " + dateString);
 		driver.get(baseURL);
 	}
 
@@ -133,24 +141,24 @@ public class AppTest {
 		highlight(element);
 		setDate(frame, cssSelector, dateString);
 		System.err.println("datepicker input value: "
-				+ element.getAttribute("value"));
+			+ element.getAttribute("value"));
 		System.err.println("datepicker getDate(): " + getDate(frame, cssSelector));
 	}
 
-  @Test
+	// http://software-testing.ru/forum/index.php?/topic/31835-peredacha-daty-v-pole/
+	// keyboard navigation works with some jqueryUI-deriver datepicker widgets
+	// e.g. https://yt.ua/ru/railway
+	@Test
 	public void keyboardNavigationTest() throws Exception {
 		String cssSelector = "#datepicker";
 		WebElement element = frame.findElement(By.cssSelector(cssSelector));
 		highlight(element);
 		element.click();
 		WebElement dateWidget = driver.findElement(By
-				.xpath("//*[@id = 'ui-datepicker-div' ]"));
-		// http://software-testing.ru/forum/index.php?/topic/31835-peredacha-daty-v-pole/
+			.xpath("//*[@id = 'ui-datepicker-div' ]"));
 		dateWidget.sendKeys(Keys.ARROW_RIGHT);
 		dateWidget.sendKeys(Keys.ENTER);
-		String yesrString = String.format("%d", calendar.get(Calendar.YEAR));
-		String monthString = new SimpleDateFormat("MMM").format(calendar.getTime());
-  }
+	}
 
 	@Test
 	public void setDateTest() throws Exception {
@@ -163,9 +171,9 @@ public class AppTest {
 
 		element.click();
 		WebElement dateWidget = driver.findElement(By
-				.xpath("//*[@id = 'ui-datepicker-div' ]"));
+			.xpath("//*[@id = 'ui-datepicker-div' ]"));
 		Enumeration<WebElement> elements = Collections.enumeration(dateWidget
-				.findElements(By.tagName("td")));
+			.findElements(By.tagName("td")));
 		String dayString = String.format("%d", calendar.get(Calendar.DAY_OF_MONTH));
 		while (elements.hasMoreElements()) {
 			WebElement currentElement = elements.nextElement();
@@ -174,18 +182,29 @@ public class AppTest {
 			}
 			if (currentElement.getText().equals(dayString)) {
 				highlight(currentElement);
-				System.err.println("datepicker widget date: "
-						+ currentElement.getText());
+				System.err.println("day of month: " + currentElement.getText());
 			}
 		}
+		WebElement monthElement = driver
+			.findElement(By
+				.xpath("//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-month' ]"));
+		assertEquals(new SimpleDateFormat("MMMM").format(calendar.getTime()),
+			monthElement.getText());
+		System.err.println("month: " + monthElement.getText());
+		WebElement yearElement = driver
+			.findElement(By
+				.xpath("//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-year' ]"));
+		assertEquals(String.format("%d", calendar.get(Calendar.YEAR)),
+			yearElement.getText());
+		System.err.println("year: " + yearElement.getText());
 	}
 
 	private String getDate(WebDriver driver, String cssSelector)
-			throws InterruptedException {
+		throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.cssSelector(cssSelector)));
+			.cssSelector(cssSelector)));
 		Object result = executeScript(String.format(
-				"$('%s').datepicker('getDate')", cssSelector));
+			"$('%s').datepicker('getDate')", cssSelector));
 		if (result != null) {
 			return result.toString();
 		} else {
@@ -194,7 +213,7 @@ public class AppTest {
 	}
 
 	private void setDate(WebDriver driver, String cssSelector, String date)
-			throws InterruptedException {
+		throws InterruptedException {
 		// Java 8 style
 		/*
 		 * new WebDriverWait(driver, flexible_wait).until( (WebDriver d) ->
@@ -202,7 +221,7 @@ public class AppTest {
 		 */
 		// Java 7 style
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.cssSelector(cssSelector)));
+			.cssSelector(cssSelector)));
 		// alternatively use defaultDate instead of setDate:
 		// $('#dateselector').datepicker('option', 'defaultDate', targetDate);
 		// http://stackoverflow.com/questions/606463/jquery-datepicker-set-selected-date-on-the-fly
@@ -218,7 +237,7 @@ public class AppTest {
 	}
 
 	private void highlight(WebElement element, long highlight)
-			throws InterruptedException {
+		throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(element));
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight);
@@ -228,11 +247,10 @@ public class AppTest {
 	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver);
+				.cast(driver);
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
 		}
 	}
-
 }
