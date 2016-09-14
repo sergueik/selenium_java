@@ -87,9 +87,10 @@ public class AppTest {
 	private static long highlight = 100;
 	private static long afterTest = 10000;
 	private static String baseURL = "https://ya.ru/";
+  
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private final String username = "sergueik2016";
-	private final String password = "i011155";
+	private final String username = "";
+	private final String password = "";
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -133,7 +134,7 @@ public class AppTest {
 		username_element.sendKeys(username);
 		WebElement username_login_element = driver.findElement(By
 				.cssSelector("form.new-auth-form input[name='login']"));
-		System.err.println("username: "
+		System.err.println("Username: "
 				+ username_login_element.getAttribute("value"));
 		WebElement password_element = driver.findElement(By
 				.xpath("//form/div[2]/label/span/input"));
@@ -142,26 +143,25 @@ public class AppTest {
 		password_element.sendKeys(password);
 		WebElement password_login_element = driver.findElement(By
 				.cssSelector("form.new-auth-form input[name='passwd']"));
-		System.err.println("password: "
+		System.err.println("Password: "
 				+ password_login_element.getAttribute("value"));
-		WebElement link_element = driver.findElement(By
+		WebElement login_link_element = driver.findElement(By
 				.cssSelector("form.new-auth-form span.new-auth-submit a.nb-button"));
-		String link = link_element.getAttribute("href");
-		System.err.println("login link: " + link);
-		String retpathPattern = "https://passport.yandex.ru/auth/\\?mode=qr&retpath=(.+)$";
+		String login_href = login_link_element.getAttribute("href");
+		System.err.println("Login href: " + login_href);
 
-		Pattern pattern = Pattern.compile(retpathPattern);
-		Matcher matcher = pattern.matcher(link);
+		Pattern pattern = Pattern.compile("https://passport.yandex.ru/auth/\\?mode=qr&retpath=(.+)$");
+		Matcher matcher = pattern.matcher(login_href);
 		String retpath = null;
 		if (matcher.find()) {
 			retpath = java.net.URLDecoder
 					.decode(matcher.group(1).toString(), "UTF-8");
 		}
-		System.err.println("login retpath: " + retpath);
-		WebElement button_element = driver.findElement(By
+		System.err.println("Login retpath: " + retpath);
+		WebElement login_button_element = driver.findElement(By
 				.cssSelector("form.new-auth-form span.new-auth-submit button"));
-		highlight(button_element);
-		button_element.click();
+		highlight(login_button_element);
+		login_button_element.click();
 		wait.until(ExpectedConditions.urlContains(retpath));
 
 		String currentURL = driver.getCurrentUrl();
@@ -198,11 +198,22 @@ public class AppTest {
 
 		WebElement confirm_logout_element = driver.findElement(By
 				.xpath("//div[5]/div[2]/table/tbody/tr/td/div[3]/div/a"));
+    String logout_href = confirm_logout_element.getAttribute("href");
+    System.err.println("Logout href: " + logout_href );    
 		highlight(confirm_logout_element);
 		confirm_logout_element.click();
-		// TODO: confirm and wait for retpath
-		// wait.until(ExpectedConditions.urlContains(retpath));
+    retpath = null;
+    pattern = Pattern.compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");  
 
+    matcher = pattern.matcher(logout_href);
+		if (matcher.find()) {
+			retpath = java.net.URLDecoder
+					.decode(matcher.group(1).toString(), "UTF-8");
+		}    
+    System.err.println("Logout relpath: " + retpath );    
+		// NOTE: do not wait for retpath
+    String finalUrl = "https://www.yandex.ru/";
+		wait.until(ExpectedConditions.urlContains(finalUrl));
 	}
 
 	private void highlight(WebElement element) throws InterruptedException {
