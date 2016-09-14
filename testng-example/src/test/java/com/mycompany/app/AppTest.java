@@ -23,6 +23,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import java.util.logging.Level;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -54,7 +56,12 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.Platform;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.logging.LogEntries;
+import org.openqa.selenium.logging.LogEntry;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -113,21 +120,12 @@ public class AppTest {
 	public void setupBeforeClass(final ITestContext context)
 			throws InterruptedException {
 
-		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-
-		seleniumHost = context.getCurrentXmlTest().getParameter("selenium.host");
-		seleniumPort = context.getCurrentXmlTest().getParameter("selenium.port");
-		seleniumBrowser = context.getCurrentXmlTest().getParameter(
-				"selenium.browser");
-
-		capabilities = new DesiredCapabilities(seleniumBrowser, "", Platform.ANY);
-
-		try {
-			String hubUrl = "http://" + seleniumHost + ":" + seleniumPort + "/wd/hub";
-			driver = new RemoteWebDriver(new URL(hubUrl), capabilities);
-		} catch (MalformedURLException ex) {
-		}
-
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		LoggingPreferences logging_preferences = new LoggingPreferences();
+		logging_preferences.enable(LogType.BROWSER, Level.ALL);
+		capabilities.setCapability(CapabilityType.LOGGING_PREFS,
+				logging_preferences);
+		driver = new ChromeDriver(capabilities);
 		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
 			driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
@@ -191,8 +189,10 @@ public class AppTest {
 
 	@AfterClass(alwaysRun = true)
 	public void cleanupSuite() {
-		driver.close();
-		driver.quit();
+		if (driver != null) {
+			driver.close();
+			driver.quit();
+		}
 	}
 
 	@DataProvider(parallel = true)
@@ -205,7 +205,7 @@ public class AppTest {
 			throws InterruptedException {
 		driver.get(baseUrl);
 
-		System.err.println(String.format("SEARCH:'%s'\tEXECTED COUNT:%d",
+		System.err.println(String.format("SEARCH:'%s'\tEXPECTED MINIMAL COUNT:%d",
 				search_keyword, (int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
