@@ -11,6 +11,7 @@ import java.net.URLDecoder;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.Hashtable;
@@ -25,6 +26,10 @@ import java.util.concurrent.TimeUnit;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
@@ -69,6 +74,10 @@ import static java.lang.Boolean.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONException;
+
 public class AppTest {
 
 	private static WebDriver driver;
@@ -83,10 +92,10 @@ public class AppTest {
 	private static long highlight = 100;
 	private static long afterTest = 1000;
 	private static String baseURL = "https://ya.ru/";
-  private static String finalUrl = "https://www.yandex.ru/";
+	private static String finalUrl = "https://www.yandex.ru/";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private final String username = "";
-	private final String password = "";
+	private final String username = "sergueik2016";
+	private final String password = "i011155";
 	static Formatter formatter;
 	static StringBuilder loggingSb;
 
@@ -125,25 +134,54 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
 	@Test
 	public void getCookieTest() throws Exception {
 
 		String loginUrl = doLogin();
 		Set<Cookie> cookies = driver.manage().getCookies();
 		System.err.println("Cookies:");
+		/*
+		 * public Cookie(java.lang.String name, java.lang.String value,
+		 * java.lang.String domain, java.lang.String path, java.util.Date expiry,
+		 * boolean isSecure, boolean isHttpOnly)
+		 * 
+		 * Creates a cookie.
+		 */
+		JSONArray cookieJSONArray = new JSONArray();
 		for (Cookie cookie : cookies) {
 			System.err.println(formatter.format(
-					"name: \"%s\"\nvalue: \"%s\"\ndomain: \"%s\"\npath: \"%s\"\n\n",
-					cookie.getName(), cookie.getValue(), cookie.getDomain(),
-					cookie.getPath()).toString());
+					"Name: '%s'\n" + "Value: '%s'\n" + "Domain: '%s'\n" + "Path: '%s'\n"
+							+ "Expiry: '%tc'\n" + "Secure: '%b'\n" + "HttpOnly: '%b'\n"
+							+ "\n", cookie.getName(), cookie.getValue(), cookie.getDomain(),
+					cookie.getPath(), cookie.getExpiry(), cookie.isSecure(),
+					cookie.isHttpOnly()).toString());
+			JSONObject cookieJSONObject = new JSONObject(cookie);
+			// System.err.println(cookieJSONObject.toString());
+			cookieJSONArray.put(cookieJSONObject);
 		}
+    JSONObject cookiesJSONObject = new JSONObject();
+    cookiesJSONObject.put("cookies", cookieJSONArray );
+		// System.err.println(cookiesJSONObject.toString());
+    /*
+    {
+        "name": "yandex_login",
+        "domain": ".yandex.ru",
+        "secure": false,
+        "path": "/",
+        "value": "sergueik2016",
+        "httpOnly": false,
+        "expiry": "Mon Jan 18 22:14:07 EST 2038"
+    },
+    ...
+    */
 		doLogout();
 	}
 
+	@Ignore
 	@Test
 	public void useCookieTest() throws Exception {
 		String loginUrl = doLogin();
+		System.err.println("Getting the cookies");
 		Set<Cookie> cookies = driver.manage().getCookies();
 		System.err.println("Closing the browser");
 		driver.close();
@@ -226,8 +264,8 @@ public class AppTest {
 	}
 
 	private void doLogout() {
-    
-    assertTrue(driver.getCurrentUrl().matches(".*#inbox"));
+
+		assertTrue(driver.getCurrentUrl().matches(".*#inbox"));
 		WebElement user_element = driver.findElement(By
 				.cssSelector("div.mail-App-Header div.mail-User div.mail-User-Name"));
 		highlight(user_element);
@@ -244,27 +282,20 @@ public class AppTest {
 		String logout_href = confirm_logout_element.getAttribute("href");
 		System.err.println("Logout href: " + logout_href);
 		highlight(confirm_logout_element);
-    /*
-		String retpath = null;
-		Pattern pattern = Pattern
-				.compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
-
-		Matcher matcher = pattern.matcher(logout_href);
-		if (matcher.find()) {
-			try {
-				retpath = java.net.URLDecoder.decode(matcher.group(1).toString(),
-						"UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// ignore
-			}
-		}
-		// NOTE: do not wait for retpath
-		System.err.println("Logout relpath: " + retpath);
-    */
+		/*
+		 * String retpath = null; Pattern pattern = Pattern
+		 * .compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
+		 * 
+		 * Matcher matcher = pattern.matcher(logout_href); if (matcher.find()) { try
+		 * { retpath = java.net.URLDecoder.decode(matcher.group(1).toString(),
+		 * "UTF-8"); } catch (UnsupportedEncodingException e) { // ignore } } //
+		 * NOTE: do not wait for retpath System.err.println("Logout relpath: " +
+		 * retpath);
+		 */
 		confirm_logout_element.click();
 		try {
 			new WebDriverWait(driver, 60).until(ExpectedConditions
-		.urlContains(finalUrl));
+					.urlContains(finalUrl));
 		} catch (UnreachableBrowserException e) {
 			// TODO
 		}
