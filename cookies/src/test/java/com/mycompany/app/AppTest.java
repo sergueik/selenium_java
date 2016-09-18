@@ -94,8 +94,8 @@ public class AppTest {
 	private static String baseURL = "https://ya.ru/";
 	private static String finalUrl = "https://www.yandex.ru/";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private final String username = "sergueik2016";
-	private final String password = "i011155";
+	private final String username = "";
+	private final String password = "";
 	static Formatter formatter;
 	static StringBuilder loggingSb;
 
