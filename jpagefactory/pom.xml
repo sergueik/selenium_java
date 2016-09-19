@@ -36,6 +36,12 @@
   </developers>
   <dependencies>
     <dependency>
+      <groupId>com.jcabi</groupId>
+      <artifactId>jcabi-matchers</artifactId>
+      <version>1.3</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.jprotractor</groupId>
       <artifactId>jprotractor</artifactId>
       <version>${jprotractor.version}</version>

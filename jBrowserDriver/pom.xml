@@ -23,19 +23,19 @@ NOTE: not adding https://maven-repository.com/artifact/com.machinepublishers/jbr
   </repositories>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>4.12</junit.version>
     <commons-exec.version>1.3</commons-exec.version>
-    <commons-lang.version>2.6</commons-lang.version>
     <commons-io.version>2.5</commons-io.version>
-    <selenium.version>2.53.0</selenium.version>
-    <selenium-firefox-driver.version>2.52.0</selenium-firefox-driver.version>
-    <selenium-chrome-driver.version>2.52.0</selenium-chrome-driver.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <jbrowserdriver.version>0.16.3</jbrowserdriver.version>
-    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
+    <commons-lang.version>2.6</commons-lang.version>
     <!-- jbrowserdriver does not work with Java 7 -->
     <java.version>1.7</java.version>
     <java.version>1.7</java.version>
+    <jbrowserdriver.version>0.16.3</jbrowserdriver.version>
+    <junit.version>4.12</junit.version>
+    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
+    <selenium.version>2.53.0</selenium.version>
+    <selenium-chrome-driver.version>2.52.0</selenium-chrome-driver.version>
+    <selenium-firefox-driver.version>2.52.0</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
