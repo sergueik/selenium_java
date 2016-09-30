@@ -40,7 +40,7 @@ public class App {
   static private Predicate<WebElement> hasClass;
   static private Predicate<WebElement> hasAttr;
   static private Predicate<WebElement> hasText;
-  
+
 	public static void main(String[] args) throws InterruptedException,
 			java.io.IOException {
 
@@ -86,18 +86,18 @@ public class App {
 			assertTrue(String.format("Unexpected title '%s'",
 					row.getAttribute("role")),
 					row.getAttribute("role").matches(row_role_attribute));
-      // 
+      //
       hasText = e -> e.getText().matches("Software.*");
 			List<WebElement> cells = row.findElements(By.xpath("td"));
       List<WebElement> webElementsWithText = cells.stream()
         .filter(hasText).collect(Collectors.toList());
       for (WebElement e: webElementsWithText) {
-        
+
 			assertTrue(String.format("Unexpected Text '%s'",
 					e.getText()),
 					e.getText().matches("Software.*"));
 			 System.out.println(e.getText());
-        
+
       }
 			cell_num = 1;
 			String checkColumn = cells.get(cell_num).getText();
@@ -136,7 +136,7 @@ public class App {
 			Thread.sleep(highlight);
 		if (driver instanceof JavascriptExecutor) {
 			((JavascriptExecutor) driver).executeScript(
-					"arguments[0].style.border=''", element);
+					"arguments[0].style.border=''", new Object[]{ element });
 		}
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
