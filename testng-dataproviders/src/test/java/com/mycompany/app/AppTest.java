@@ -97,8 +97,6 @@ import org.jopendocument.dom.spreadsheet.Table;
 import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Range;
 
-// http://testngtricks.blogspot.com/2013/05/how-to-provide-data-to-dataproviders.html
-
 import org.testng.*;
 import org.testng.annotations.*;
 import org.testng.internal.annotations.*;
@@ -106,16 +104,28 @@ import org.testng.internal.Attributes;
 
 import java.lang.reflect.Method;
 
-// https://groups.google.com/forum/#!topic/testng-users/J437qa5PSx8
 
 public class AppTest {
 
 	public RemoteWebDriver driver = null;
+
+  // for grid testing
 	public String seleniumHost = null;
 	public String seleniumPort = null;
 	public String seleniumBrowser = null;
+  
 	public String baseUrl = "http://habrahabr.ru/search/?";
+  
+  public static final String TEST_ID_STR = "Row ID";
+	public static final String TEST_EXPEDCTED_COUNT = "Expected minimum link count";
+	public static final String TEST_DESC_STR = "Search keyword";
 
+  private static long implicit_wait_interval = 3;
+	private static int flexible_wait_interval = 5;
+	private static int page_load_timeout_interval = 30;
+	private static long wait_polling_interval = 500;
+	private static long highlight_interval = 100;
+  
 	@BeforeClass(alwaysRun = true)
 	public void setupBeforeClass(final ITestContext context)
 			throws InterruptedException {
@@ -126,10 +136,20 @@ public class AppTest {
 		capabilities.setCapability(CapabilityType.LOGGING_PREFS,
 				logging_preferences);
 		driver = new ChromeDriver(capabilities);
-		try {
+    /*
+   * FirefoxProfile profile = new FirefoxProfile();
+   * profile.setPreference("browser.download.folderList",2);
+   * profile.setPreference("browser.download.manager.showWhenStarting",false);
+   * profile.setPreference("browser.download.dir","c:\downloads");
+   * profile.setPreference
+   * ("browser.helperApps.neverAsk.saveToDisk","text/csv"); WebDriver driver =
+   * new FirefoxDriver(profile); //new RemoteWebDriver(new
+   * URL("http://localhost:4444/wd/hub"), capability);
+   */
+	try {
 			driver.manage().window().setSize(new Dimension(600, 800));
-			driver.manage().timeouts().pageLoadTimeout(60, TimeUnit.SECONDS);
-			driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(page_load_timeout_interval, TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
 		} catch (Exception ex) {
 			System.err.println(ex.toString());
 		}
@@ -205,7 +225,7 @@ public class AppTest {
 			throws InterruptedException {
 		driver.get(baseUrl);
 
-		System.err.println(String.format("SEARCH:'%s'\tEXPECTED MINIMAL COUNT:%d",
+		System.err.println(String.format("Search term:'%s'\tExpected minimum link count:%d",
 				search_keyword, (int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
@@ -242,7 +262,6 @@ public class AppTest {
 		assertTrue(publicationsFound >= expected_count);
 	}
 
-	// http://stackoverflow.com/questions/666477/possible-to-pass-parameters-to-testng-dataprovider
 	@DataProvider(parallel = false, name = "Excel2007")
 	public Object[][] createData_from_Excel2007(final ITestContext context,
 			final Method method) {
@@ -321,7 +340,7 @@ public class AppTest {
 						count = cell.getNumericCellValue();
 					}
 				}
-				System.err.println(String.format("Row ID:%d\tSEARCH:'%s'\tCOUNT:%d",
+				System.err.println(String.format("Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d",
 						id, search, (int) count));
 				dataRow = new Object[] { search, count };
 				data.add(dataRow);
@@ -458,7 +477,7 @@ public class AppTest {
 					}
 				}
 
-				System.err.println(String.format("Row ID:%d\tSEARCH:'%s'\tCOUNT:%d",
+				System.err.println(String.format("Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d",
 						id, search, (int) count));
 				dataRow = new Object[] { search, count };
 				data.add(dataRow);
