@@ -15,9 +15,10 @@
     <java.version>1.7</java.version>
     <jOpenDocument.version>1.3</jOpenDocument.version>
     <junit.version>4.12</junit.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <poi.version>3.14</poi.version>
+    <poiooxml.version>3.14</poiooxml.version>
     <selenium.version>2.47.0</selenium.version>
     <selenium-chrome-driver.version>2.47.0</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>2.47.0</selenium-firefox-driver.version>
@@ -53,12 +54,12 @@
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>${poi.version}</version>
+      <version>${poiooxml.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml-schemas</artifactId>
-      <version>${poi.version}</version>
+      <version>${poiooxml.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>

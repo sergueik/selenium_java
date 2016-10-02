@@ -14,6 +14,9 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -97,6 +100,11 @@ import org.jopendocument.dom.spreadsheet.Table;
 import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Range;
 
+// JSON
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONArray;
+
 import org.testng.*;
 import org.testng.annotations.*;
 import org.testng.internal.annotations.*;
@@ -104,28 +112,27 @@ import org.testng.internal.Attributes;
 
 import java.lang.reflect.Method;
 
-
 public class AppTest {
 
 	public RemoteWebDriver driver = null;
 
-  // for grid testing
+	// for grid testing
 	public String seleniumHost = null;
 	public String seleniumPort = null;
 	public String seleniumBrowser = null;
-  
+
 	public String baseUrl = "http://habrahabr.ru/search/?";
-  
-  public static final String TEST_ID_STR = "Row ID";
+
+	public static final String TEST_ID_STR = "Row ID";
 	public static final String TEST_EXPEDCTED_COUNT = "Expected minimum link count";
 	public static final String TEST_DESC_STR = "Search keyword";
 
-  private static long implicit_wait_interval = 3;
+	private static long implicit_wait_interval = 3;
 	private static int flexible_wait_interval = 5;
 	private static int page_load_timeout_interval = 30;
 	private static long wait_polling_interval = 500;
 	private static long highlight_interval = 100;
-  
+
 	@BeforeClass(alwaysRun = true)
 	public void setupBeforeClass(final ITestContext context)
 			throws InterruptedException {
@@ -136,20 +143,22 @@ public class AppTest {
 		capabilities.setCapability(CapabilityType.LOGGING_PREFS,
 				logging_preferences);
 		driver = new ChromeDriver(capabilities);
-    /*
-   * FirefoxProfile profile = new FirefoxProfile();
-   * profile.setPreference("browser.download.folderList",2);
-   * profile.setPreference("browser.download.manager.showWhenStarting",false);
-   * profile.setPreference("browser.download.dir","c:\downloads");
-   * profile.setPreference
-   * ("browser.helperApps.neverAsk.saveToDisk","text/csv"); WebDriver driver =
-   * new FirefoxDriver(profile); //new RemoteWebDriver(new
-   * URL("http://localhost:4444/wd/hub"), capability);
-   */
-	try {
+		/*
+		 * FirefoxProfile profile = new FirefoxProfile();
+		 * profile.setPreference("browser.download.folderList",2);
+		 * profile.setPreference("browser.download.manager.showWhenStarting",false);
+		 * profile.setPreference("browser.download.dir","c:\downloads");
+		 * profile.setPreference
+		 * ("browser.helperApps.neverAsk.saveToDisk","text/csv"); WebDriver driver =
+		 * new FirefoxDriver(profile); //new RemoteWebDriver(new
+		 * URL("http://localhost:4444/wd/hub"), capability);
+		 */
+		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
-			driver.manage().timeouts().pageLoadTimeout(page_load_timeout_interval, TimeUnit.SECONDS);
-			driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+			driver.manage().timeouts()
+					.pageLoadTimeout(page_load_timeout_interval, TimeUnit.SECONDS);
+			driver.manage().timeouts()
+					.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
 		} catch (Exception ex) {
 			System.err.println(ex.toString());
 		}
@@ -189,20 +198,26 @@ public class AppTest {
 		}
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel_2003")
-	public void test_with_Excel2003(String search_keyword, double expected)
+	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2003")
+	public void test_with_Excel_2003(String search_keyword, double expected)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "OpenOfficeSpreadsheet")
-	public void test_with_OpenOfficeSpreadsheet(String search_keyword,
+	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "OpenOffice Spreadsheet")
+	public void test_with_OpenOffice_Spreadsheet(String search_keyword,
 			double expected) throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "Finds a publication", dataProvider = "Excel2007")
-	public void test_with_Excel2007(String search_keyword, double expected)
+	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2007")
+	public void test_with_Excel_2007(String search_keyword, double expected)
+			throws InterruptedException {
+		parseSearchResult(search_keyword, expected);
+	}
+
+	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "JSON")
+	public void test_with_JSON(String search_keyword, double expected)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected);
 	}
@@ -215,18 +230,13 @@ public class AppTest {
 		}
 	}
 
-	@DataProvider(parallel = true)
-	public Object[][] dataProviderInline() {
-		return new Object[][] { { "junit", 100.0 }, { "testng", 30.0 },
-				{ "spock", 10.0 }, };
-	}
-
 	private void parseSearchResult(String search_keyword, double expected_count)
 			throws InterruptedException {
 		driver.get(baseUrl);
 
-		System.err.println(String.format("Search term:'%s'\tExpected minimum link count:%d",
-				search_keyword, (int) expected_count));
+		System.err.println(String.format(
+				"Search term:'%s'\tExpected minimum link count:%d", search_keyword,
+				(int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		String search_input_name = null;
@@ -262,7 +272,14 @@ public class AppTest {
 		assertTrue(publicationsFound >= expected_count);
 	}
 
-	@DataProvider(parallel = false, name = "Excel2007")
+	// static disconnected data provider
+	@DataProvider(parallel = true)
+	public Object[][] dataProviderInline() {
+		return new Object[][] { { "junit", 100.0 }, { "testng", 30.0 },
+				{ "spock", 10.0 }, };
+	}
+
+	@DataProvider(parallel = false, name = "Excel 2007")
 	public Object[][] createData_from_Excel2007(final ITestContext context,
 			final Method method) {
 
@@ -340,8 +357,9 @@ public class AppTest {
 						count = cell.getNumericCellValue();
 					}
 				}
-				System.err.println(String.format("Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d",
-						id, search, (int) count));
+				System.err.println(String.format(
+						"Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d", id,
+						search, (int) count));
 				dataRow = new Object[] { search, count };
 				data.add(dataRow);
 			}
@@ -353,7 +371,7 @@ public class AppTest {
 		return dataArray;
 	}
 
-	@DataProvider(parallel = false, name = "Excel2003")
+	@DataProvider(parallel = false, name = "Excel 2003")
 	public Object[][] createData_from_Excel2003() {
 
 		List<Object[]> data = new ArrayList<Object[]>();
@@ -411,7 +429,7 @@ public class AppTest {
 		return dataArray;
 	}
 
-	@DataProvider(parallel = false, name = "OpenOfficeSpreadsheet")
+	@DataProvider(parallel = false, name = "OpenOffice Spreadsheet")
 	public Object[][] createData_from_OpenOfficeSpreadsheet() {
 
 		HashMap<String, String> columns = new HashMap<String, String>();
@@ -477,8 +495,9 @@ public class AppTest {
 					}
 				}
 
-				System.err.println(String.format("Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d",
-						id, search, (int) count));
+				System.err.println(String.format(
+						"Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d", id,
+						search, (int) count));
 				dataRow = new Object[] { search, count };
 				data.add(dataRow);
 			}
@@ -486,6 +505,69 @@ public class AppTest {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
+		}
+		Object[][] dataArray = new Object[data.size()][];
+		data.toArray(dataArray);
+		return dataArray;
+	}
+
+	static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
+
+	// https://processing.org/reference/JSONArray.html
+	// https://processing.org/reference/JSONObject.html
+	@DataProvider(parallel = false, name = "JSON")
+	public Object[][] createData_from_JSON(final ITestContext context,
+			final Method method) throws org.json.JSONException {
+
+		String filename = "data.json";
+		List<Object[]> data = new ArrayList<Object[]>();
+		Object[] dataRow = {};
+		String search = "";
+		double count = 0;
+
+		JSONArray hashesDataArray = new JSONArray();
+		ArrayList<String> hashes = new ArrayList<String>();
+		try {
+			String dataString = readFile(filename, Charset.forName("UTF-8"));
+			hashesDataArray = new JSONArray(dataString);
+		} catch (org.json.JSONException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < hashesDataArray.length(); i++) {
+			String entry = hashesDataArray.getString(i); // possible
+																										// org.json.JSONException
+			hashes.add(entry);
+		}
+		assertTrue(hashes.size() > 0);
+		for (String entry : hashes) {
+			JSONObject entryObj = new JSONObject();
+			try {
+				entryObj = new JSONObject(entry);
+			} catch (org.json.JSONException e) {
+				e.printStackTrace();
+			}
+			Iterator<String> entryKeyIterator = entryObj.keys();
+
+			while (entryKeyIterator.hasNext()) {
+				String entryKey = entryKeyIterator.next();
+				String entryData = entryObj.get(entryKey).toString();
+				// System.err.println(entryKey + " = " + entryData);
+				switch (entryKey) {
+				case "keyword":
+					search = entryData;
+					break;
+				case "count":
+					count = Double.valueOf(entryData);
+					break;
+				}
+			}
+			dataRow = new Object[] { search, count };
+			data.add(dataRow);
 		}
 		Object[][] dataArray = new Object[data.size()][];
 		data.toArray(dataArray);
