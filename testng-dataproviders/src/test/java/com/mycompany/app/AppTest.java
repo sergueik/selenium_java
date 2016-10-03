@@ -45,9 +45,6 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.Dimension;
@@ -101,9 +98,9 @@ import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Range;
 
 // JSON
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONArray;
 
 import org.testng.*;
 import org.testng.annotations.*;
@@ -303,8 +300,8 @@ public class AppTest {
 		}
 
 		HashMap<String, String> columns = new HashMap<String, String>();
-		List<Object[]> data = new ArrayList<Object[]>();
-		Object[] dataRow = {};
+		List<Object[]> testData = new ArrayList<Object[]>();
+		Object[] testDataRow = {};
 
 		String filename = "data_2007.xlsx";
 		try {
@@ -358,24 +355,24 @@ public class AppTest {
 					}
 				}
 				System.err.println(String.format(
-						"Row ID:%d\tSearch keyword:'%s'\tExpected minimum link count:%d", id,
-						search_keyword, (int) expected_count));
-				dataRow = new Object[] { search_keyword, expected_count };
-				data.add(dataRow);
+						"Row ID:%d\tSearch keyword:'%s'\tExpected minimum link count:%d",
+						id, search_keyword, (int) expected_count));
+				testDataRow = new Object[] { search_keyword, expected_count };
+				testData.add(testDataRow);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Object[][] dataArray = new Object[data.size()][];
-		data.toArray(dataArray);
-		return dataArray;
+		Object[][] testDataArray = new Object[testData.size()][];
+		testData.toArray(testDataArray);
+		return testDataArray;
 	}
 
 	@DataProvider(parallel = false, name = "Excel 2003")
 	public Object[][] createData_from_Excel2003() {
 
-		List<Object[]> data = new ArrayList<Object[]>();
-		Object[] dataRow = {};
+		List<Object[]> testData = new ArrayList<Object[]>();
+		Object[] testDataRow = {};
 
 		String filename = "data_2003.xls";
 		try {
@@ -418,23 +415,23 @@ public class AppTest {
 						}
 					}
 				}
-				dataRow = new Object[] { search_keyword, expected_count };
-				data.add(dataRow);
+				testDataRow = new Object[] { search_keyword, expected_count };
+				testData.add(testDataRow);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		Object[][] dataArray = new Object[data.size()][];
-		data.toArray(dataArray);
-		return dataArray;
+		Object[][] testDataArray = new Object[testData.size()][];
+		testData.toArray(testDataArray);
+		return testDataArray;
 	}
 
 	@DataProvider(parallel = false, name = "OpenOffice Spreadsheet")
 	public Object[][] createData_from_OpenOfficeSpreadsheet() {
 
 		HashMap<String, String> columns = new HashMap<String, String>();
-		List<Object[]> data = new ArrayList<Object[]>();
-		Object[] dataRow = {};
+		List<Object[]> testData = new ArrayList<Object[]>();
+		Object[] testDataRow = {};
 
 		String filename = "data.ods";
 		Sheet sheet;
@@ -498,49 +495,52 @@ public class AppTest {
 				System.err.println(String.format(
 						"Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d", id,
 						search_keyword, (int) expected_count));
-				dataRow = new Object[] { search_keyword, expected_count };
-				data.add(dataRow);
+				testDataRow = new Object[] { search_keyword, expected_count };
+				testData.add(testDataRow);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (NullPointerException e) {
 			e.printStackTrace();
 		}
-		Object[][] dataArray = new Object[data.size()][];
-		data.toArray(dataArray);
-		return dataArray;
+		Object[][] testDataArray = new Object[testData.size()][];
+		testData.toArray(testDataArray);
+		return testDataArray;
 	}
 
-	static String readFile(String path, Charset encoding) throws IOException {
-		byte[] encoded = Files.readAllBytes(Paths.get(path));
-		return new String(encoded, encoding);
-	}
-
-	// https://processing.org/reference/JSONArray.html
-	// https://processing.org/reference/JSONObject.html
 	@DataProvider(parallel = false, name = "JSON")
 	public Object[][] createData_from_JSON(final ITestContext context,
 			final Method method) throws org.json.JSONException {
 
 		String filename = "data.json";
-		List<Object[]> data = new ArrayList<Object[]>();
-		Object[] dataRow = {};
+		JSONObject allTestData = new JSONObject();
+		List<Object[]> testData = new ArrayList<Object[]>();
+		ArrayList<String> hashes = new ArrayList<String>();
 		String search_keyword = "";
 		double expected_count = 0;
 
-		JSONArray hashesDataArray = new JSONArray();
-		ArrayList<String> hashes = new ArrayList<String>();
+		JSONArray rows = new JSONArray();
+
 		try {
-			String dataString = readFile(filename, Charset.forName("UTF-8"));
-			hashesDataArray = new JSONArray(dataString);
+			allTestData = new JSONObject(readFile(filename, Charset.forName("UTF-8")));
 		} catch (org.json.JSONException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		for (int i = 0; i < hashesDataArray.length(); i++) {
-			String entry = hashesDataArray.getString(i); // possible
-																										// org.json.JSONException
+		String testName = "test";
+
+		assertTrue(allTestData.has(testName));
+		String dataString = allTestData.getString(testName);
+
+		try {
+			rows = new JSONArray(dataString);
+		} catch (org.json.JSONException e) {
+			e.printStackTrace();
+		}
+		for (int i = 0; i < rows.length(); i++) {
+			String entry = rows.getString(i); // possible
+			// org.json.JSONException
 			hashes.add(entry);
 		}
 		assertTrue(hashes.size() > 0);
@@ -566,12 +566,16 @@ public class AppTest {
 					break;
 				}
 			}
-			dataRow = new Object[] { search_keyword, expected_count };
-			data.add(dataRow);
+			testData.add(new Object[] { search_keyword, expected_count });
 		}
-		Object[][] dataArray = new Object[data.size()][];
-		data.toArray(dataArray);
-		return dataArray;
+		Object[][] testDataArray = new Object[testData.size()][];
+		testData.toArray(testDataArray);
+		return testDataArray;
+	}
+
+	static String readFile(String path, Charset encoding) throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
 	}
 
 }
