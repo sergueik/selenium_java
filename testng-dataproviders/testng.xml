@@ -8,10 +8,10 @@
     <classes>
       <class name="com.mycompany.app.AppTest"/>
       <methods>
-        <exclude name="test_with_Excel_2007"/>
+        <include name="test_with_Excel_2007"/>
         <include name="test_with_JSON"/>
-        <exclude name="test_with_OpenOffice_Spreadsheet"/>
-        <exclude name="test_with_Excel_2003"/>
+        <include name="test_with_OpenOffice_Spreadsheet"/>
+        <include name="test_with_Excel_2003"/>
       </methods>
     </classes>
   </test>

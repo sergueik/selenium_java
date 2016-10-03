@@ -124,7 +124,7 @@ public class AppTest {
 	public String baseUrl = "http://habrahabr.ru/search/?";
 
 	public static final String TEST_ID_STR = "Row ID";
-	public static final String TEST_EXPEDCTED_COUNT = "Expected minimum link count";
+	public static final String TEST_EXPECTED_COUNT = "Expected minimum link count";
 	public static final String TEST_DESC_STR = "Search keyword";
 
 	private static long implicit_wait_interval = 3;
@@ -199,27 +199,27 @@ public class AppTest {
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2003")
-	public void test_with_Excel_2003(String search_keyword, double expected)
+	public void test_with_Excel_2003(String search_keyword, double expected_count)
 			throws InterruptedException {
-		parseSearchResult(search_keyword, expected);
+		parseSearchResult(search_keyword, expected_count);
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "OpenOffice Spreadsheet")
 	public void test_with_OpenOffice_Spreadsheet(String search_keyword,
-			double expected) throws InterruptedException {
-		parseSearchResult(search_keyword, expected);
+			double expected_count) throws InterruptedException {
+		parseSearchResult(search_keyword, expected_count);
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2007")
-	public void test_with_Excel_2007(String search_keyword, double expected)
+	public void test_with_Excel_2007(String search_keyword, double expected_count)
 			throws InterruptedException {
-		parseSearchResult(search_keyword, expected);
+		parseSearchResult(search_keyword, expected_count);
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "JSON")
-	public void test_with_JSON(String search_keyword, double expected)
+	public void test_with_JSON(String search_keyword, double expected_count)
 			throws InterruptedException {
-		parseSearchResult(search_keyword, expected);
+		parseSearchResult(search_keyword, expected_count);
 	}
 
 	@AfterClass(alwaysRun = true)
@@ -235,7 +235,7 @@ public class AppTest {
 		driver.get(baseUrl);
 
 		System.err.println(String.format(
-				"Search term:'%s'\tExpected minimum link count:%d", search_keyword,
+				"Search keyword:'%s'\tExpected minimum link count:%d", search_keyword,
 				(int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
@@ -318,8 +318,8 @@ public class AppTest {
 			XSSFCell cell;
 			int cellIndex = 0;
 			String cellColumn = "";
-			String search = "";
-			double count = 0;
+			String search_keyword = "";
+			double expected_count = 0;
 			int id = 0;
 			Iterator rows = sheet.rowIterator();
 			while (rows.hasNext()) {
@@ -350,17 +350,17 @@ public class AppTest {
 					}
 					if (cellColumn.equals("B")) {
 						assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_STRING);
-						search = cell.getStringCellValue();
+						search_keyword = cell.getStringCellValue();
 					}
 					if (cellColumn.equals("C")) {
 						assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_NUMERIC);
-						count = cell.getNumericCellValue();
+						expected_count = cell.getNumericCellValue();
 					}
 				}
 				System.err.println(String.format(
-						"Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d", id,
-						search, (int) count));
-				dataRow = new Object[] { search, count };
+						"Row ID:%d\tSearch keyword:'%s'\tExpected minimum link count:%d", id,
+						search_keyword, (int) expected_count));
+				dataRow = new Object[] { search_keyword, expected_count };
 				data.add(dataRow);
 			}
 		} catch (Exception e) {
@@ -388,8 +388,8 @@ public class AppTest {
 			HSSFRow row;
 			HSSFCell cell;
 
-			String name = "";
-			double count = 0;
+			String search_keyword = "";
+			double expected_count = 0;
 
 			Iterator rows = sheet.rowIterator();
 			while (rows.hasNext()) {
@@ -402,23 +402,23 @@ public class AppTest {
 					cell = (HSSFCell) cells.next();
 					if (cell.getColumnIndex() == 2) {
 						if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-							count = cell.getNumericCellValue();
+							expected_count = cell.getNumericCellValue();
 						} else {
-							count = 0;
+							expected_count = 0;
 						}
 					}
 					if (cell.getColumnIndex() == 1) {
 						if (cell.getCellType() == HSSFCell.CELL_TYPE_STRING) {
-							name = cell.getStringCellValue();
+							search_keyword = cell.getStringCellValue();
 						} else if (cell.getCellType() == HSSFCell.CELL_TYPE_NUMERIC) {
-							name = Double.toString(cell.getNumericCellValue());
+							search_keyword = Double.toString(cell.getNumericCellValue());
 						} else {
 							// TODO: Boolean, Formula, Errors
-							name = "";
+							search_keyword = "";
 						}
 					}
 				}
-				dataRow = new Object[] { name, count };
+				dataRow = new Object[] { search_keyword, expected_count };
 				data.add(dataRow);
 			}
 		} catch (Exception e) {
@@ -439,8 +439,8 @@ public class AppTest {
 		String filename = "data.ods";
 		Sheet sheet;
 
-		String search = "";
-		double count = 0;
+		String search_keyword = "";
+		double expected_count = 0;
 		int id = 0;
 
 		try {
@@ -482,11 +482,11 @@ public class AppTest {
 
 					if (columns.get(cellName).equals("COUNT")) {
 						assertEquals(cell.getValueType(), ODValueType.FLOAT);
-						count = Double.valueOf(cell.getValue().toString());
+						expected_count = Double.valueOf(cell.getValue().toString());
 					}
 					if (columns.get(cellName).equals("SEARCH")) {
 						assertEquals(cell.getValueType(), ODValueType.STRING);
-						search = cell.getTextValue();
+						search_keyword = cell.getTextValue();
 					}
 					if (columns.get(cellName).equals("ID")) {
 						System.err.println("Column: " + columns.get(cellName));
@@ -497,8 +497,8 @@ public class AppTest {
 
 				System.err.println(String.format(
 						"Row ID:%d\tSearch term:'%s'\tExpected minimum link count:%d", id,
-						search, (int) count));
-				dataRow = new Object[] { search, count };
+						search_keyword, (int) expected_count));
+				dataRow = new Object[] { search_keyword, expected_count };
 				data.add(dataRow);
 			}
 		} catch (IOException e) {
@@ -525,8 +525,8 @@ public class AppTest {
 		String filename = "data.json";
 		List<Object[]> data = new ArrayList<Object[]>();
 		Object[] dataRow = {};
-		String search = "";
-		double count = 0;
+		String search_keyword = "";
+		double expected_count = 0;
 
 		JSONArray hashesDataArray = new JSONArray();
 		ArrayList<String> hashes = new ArrayList<String>();
@@ -559,14 +559,14 @@ public class AppTest {
 				// System.err.println(entryKey + " = " + entryData);
 				switch (entryKey) {
 				case "keyword":
-					search = entryData;
+					search_keyword = entryData;
 					break;
 				case "count":
-					count = Double.valueOf(entryData);
+					expected_count = Double.valueOf(entryData);
 					break;
 				}
 			}
-			dataRow = new Object[] { search, count };
+			dataRow = new Object[] { search_keyword, expected_count };
 			data.add(dataRow);
 		}
 		Object[][] dataArray = new Object[data.size()][];

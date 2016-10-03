@@ -5,7 +5,8 @@ This project exercises [testng dataProviders](http://testng.org/doc/documentatio
   * Excel 2003 OLE documents - Horrible SpreadSheet Format [org.apache.poi.hssf.usermodel.*)](http://shanmugavelc.blogspot.com/2011/08/apache-poi-read-excel-for-use-of.html) 
   * Excel 2007 OOXML (.xlsx) - XML SpreadSheet Format [org.apache.poi.xssf.usermodel.*](http://howtodoinjava.com/2013/06/19/readingwriting-excel-files-in-java-poi-tutorial/)
   * OpenOffice Calc [org.jopendocument.dom.spreadsheet.*](http://www.programcreek.com/java-api-examples/index.php?api=org.jopendocument.dom.spreadsheet.Sheet)
-
+  * custom JSON [org.json.JSON*](http://www.programcreek.com/java-api-examples/org.json.JSONArray)
+  
 ### Links
  
  * [xml testng DataProviders](http://testngtricks.blogspot.com/2013/05/how-to-provide-data-to-dataproviders.html)
@@ -16,7 +17,7 @@ This project exercises [testng dataProviders](http://testng.org/doc/documentatio
  * [barancev/testng_samples](https://github.com/barancev/testng_samples)
  * [ahussan/DataDriven](https://github.com/ahussan/DataDriven)
  * [poi ppt](https://www.tutorialspoint.com/apache_poi_ppt/apache_poi_ppt_quick_guide.htm)
- * [JSON dataprovider](http://paypal.github.io/SeLion/html/java-docs/1.0.0/dataproviders-apis/com/paypal/selion/platform/dataprovider/impl/JsonDataProviderImpl.html)
+ * [paypal/SeLion data providers](https://github.com/paypal/SeLion/tree/develop/dataproviders/src/main/java/com/paypal/selion/platform/dataprovider)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
