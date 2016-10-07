@@ -1,45 +1,63 @@
+# standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox , Fluxbox and autologin
+# based on : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
+
+
+
 update_selenium_app_stack = ENV.fetch('UPDATE_SELENIUM_APP_STACK', '')
-basedir = ENV.fetch('USERPROFILE', '')
-basedir = ENV.fetch('HOME', '') if basedir == ''
+basedir = ENV.fetch('HOME','')  || ENV.fetch('USERPROFILE', '')
 box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
 basedir = basedir.gsub('\\', '/')
 selenium_version = ENV.fetch('SELENIUM_VERSION', '2.47')
 chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '2.16')
-
-# standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox and autologin
-# origin : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
+chrome_version = ENV.fetch('CHROME_VERSION', '50.0.2661.75')
+available_chrome_versions = %w|
+    53.0.2785.116
+    52.0.2743.116
+    51.0.2704.84
+    50.0.2661.75
+    49.0.2623.75
+    48.0.2564.109
+    |
+unless available_chrome_versions.include?(chrome_version)
+  puts "Available specific old Chrome versions:\n" + available_chrome_versions.join("\n")
+  exit
+end
 
 VAGRANTFILE_API_VERSION = '2'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'ubuntu/trusty64'
-  config_vm_box_name ='trusty-server-cloudimg-amd64-vagrant-disk1.box'
+  # Localy cached images from http://www.vagrantbox.es/ and  http://dev.modern.ie/tools/vms/linux/
+  # config_vm_box_name ='trusty-server-cloudimg-amd64-vagrant-disk1.box'
   config_vm_box_name = 'trusty-server-amd64-vagrant-selenium.box'
-  config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}" 
-
+  config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}"
   config.vm.network :forwarded_port, guest:4444, host:4444
   config.vm.network :private_network, ip: '192.168.33.10'
-
   config.vm.provision 'shell', inline: <<-END_OF_SHELL_PROVISION
 
 #!/bin/sh
 #=========================================================
 UPDATE_SELENIUM_APP_STACK='#{update_selenium_app_stack}'
-# set -x 
+# set -x
 #=========================================================
 echo 'Install the packages...'
 #=========================================================
-sudo apt-get update
-sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty firefox wget
+sudo apt-get -qq update
+sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty wget
+
+#=========================================================
+echo 'Install the latest Firefox'
+#=========================================================
+sudo apt-get -qqy install firefox
 
 #=========================================================
 echo "Set autologin for the Vagrant user..."
 #=========================================================
 sudo sed -i '$ d' /etc/init/tty1.conf
-sudo echo "exec /sbin/rungetty --autologin vagrant tty1" >> /etc/init/tty1.conf
+sudo echo 'exec /sbin/rungetty --autologin vagrant tty1' >> /etc/init/tty1.conf
 
 #=========================================================
 cat <<EOF>> .profile
-if [ !-e "/tmp/.X0-lock" ] ; then
+if [ !-e '/tmp/.X0-lock' ] ; then
   echo -n 'Start X on login...'
   startx
 else
@@ -51,41 +69,58 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
 
   echo 'Updating Selenium app stack...'
   SELENIUM_VERSION='#{selenium_version}'
-  if [ "$SELENIUM_VERSION" = '' ] 
+  if [ "$SELENIUM_VERSION" = '' ]
   then
     #=========================================================
-    echo "Download latest selenium server..."
+    echo "Download latest Selenium Server..."
     #=========================================================
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
   else
     #=========================================================
-    echo "Download selenium server version ${SELENIUM_VERSION} ..."
+    echo "Download Selenium Server version ${SELENIUM_VERSION} ..."
     #=========================================================
     RELEASE_REGEX=$(echo "/.*<Key>(${SELENIUM_VERSION}[^>]+selenium-server-standalone[^<]+)/&& print \\$1")
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e"${RELEASE_REGEX}")
   fi
-  echo "Downloading Selenium from \\"https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}\\""
-  wget -nv -O selenium-server-standalone.jar "https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}" 
+  export URL="https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}"
+  echo "Downloading Selenium from \\"${URL}\\""
+  wget -nv -O selenium-server-standalone.jar $URL
   chown vagrant:vagrant selenium-server-standalone.jar
 
+  CHROME_VERSION='#{chrome_version}'
+  if [ "$CHROME_VERSION" = '' ]
+  then
   #=========================================================
   echo "Download the latest chrome..."
   #=========================================================
   wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+  sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
   sudo dpkg -i google-chrome-stable_current_amd64.deb
   sudo rm google-chrome-stable_current_amd64.deb
   sudo apt-get install -qqy -f google-chrome-stable
 
-  # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+  # http://askubuntu.com/questions/79280/how-to-install-chrome-browser-properly-via-command-line
+  # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
   # sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
   # sudo apt-get update
   # sudo apt-get install google-chrome-stable
-  # https://dw.uptodown.com/dwn/gTqQucBStVTk-lzILoc3LH9BeK-I0eeLsW8MZ9xlkCocDgWjO_nIdOJmFyavzkKZY2MfGCwi0gvMiiIKXn7g7dhyrUwHEkpnQMKqEHHTv7AfYvz41pwVGcIQj4X6LY8Y/guJv-QUCwm9Cdi_c5x2rhzJ7qxoE-A8F3iVoqCQy7RFQSI4gyEFLnd0V0dv8sXQRvTGZZ7F0h73RPozajVPIQvZvrHfqMD6rwuwmWeqhbbzQSu-HfrnqsmuIqhPvd4V0/orMuiQ0WyDLZrd6UmgOxN8vQoO5zhcTLijMTXBpu3c9drIZ7NlrEiNvjwCpFa5gBDVNxZA581d8RsFkdfTBMmTmfqIfOamDrjiHoGDqFLzjwcHUopCi_UPL8PQgn4UAr/7-MijyptygWBa73iL5GR-XvCctvGO7N2oJHsLnI7LKc=/
   #=========================================================
-  #=========================================================
-  # 
+  else
+  # Using: http://www.slimjet.com/chrome/google-chrome-old-version.php
+  # NOTE: not every old version is available from this URL
+  # See also: https://google-chrome.en.uptodown.com/ubuntu/old
+  sudo apt-get remove -qqy -f google-chrome-stable
+  echo "Installing chrome version ${CHROME_VERSION}"
+  export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
+  echo "Downloading Chrome from ${URL}"
+  wget -nv $URL
+  sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
+  sudo dpkg -i "chrome64_${CHROME_VERSION}.deb"
+  sudo rm "chrome64_${CHROME_VERSION}.deb"
+  fi
+
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
-  if [ "$CHROMEDRIVER_VERSION" = '' ] 
+  if [ "$CHROMEDRIVER_VERSION" = '' ]
   then
     echo 'Download latest chrome driver...'
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
@@ -115,7 +150,7 @@ tmux send-keys -t chrome-driver:0 './chromedriver' C-m
 tmux new-session -d -s selenium
 tmux send-keys -t selenium:0 'export DISPLAY=:0' C-m
 tmux send-keys -t selenium:0 'java $LAUNCHER_OPTS -jar selenium-server-standalone.jar' C-m
-tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub;  done' C-m
+tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub; done' C-m
 
 EOF
 chmod +x tmux.sh
