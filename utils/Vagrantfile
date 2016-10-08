@@ -1,14 +1,14 @@
-# standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox , Fluxbox and autologin
+# Standalone ubuntu box with tmux-driven Fluxbox autologin and  Selenium Server, Chrome and Firefox 
 # based on : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
 
-update_selenium_app_stack = ENV.fetch('UPDATE_SELENIUM_APP_STACK', '')
-basedir = ENV.fetch('HOME','')  || ENV.fetch('USERPROFILE', '')
-box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
-basedir = basedir.gsub('\\', '/')
+provision_selenium = ENV.fetch('PROVISION_SELENIUM', '')
 selenium_version = ENV.fetch('SELENIUM_VERSION', '2.47')
 chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '2.16')
 firefox_version = ENV.fetch('FIREFOX_VERSION', '40.0.3')
 chrome_version = ENV.fetch('CHROME_VERSION', '50.0.2661.75')
+
+
+# check if requested Chrome version is available on http://www.slimjetbrowser.com
 available_chrome_versions = %w|
     53.0.2785.116
     52.0.2743.116
@@ -20,9 +20,13 @@ available_chrome_versions = %w|
 unless available_chrome_versions.include?(chrome_version)
   puts "Very few specific old Chrome versions available :\n" + available_chrome_versions.join("\n")
   exit
+  # See also: https://google-chrome.en.uptodown.com/ubuntu/old
 end
 
 VAGRANTFILE_API_VERSION = '2'
+basedir = ENV.fetch('HOME','') || ENV.fetch('USERPROFILE', '')
+box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
+basedir = basedir.gsub('\\', '/')
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'ubuntu/trusty64'
   # Localy cached images from http://www.vagrantbox.es/ and  http://dev.modern.ie/tools/vms/linux/
@@ -31,7 +35,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}"
   config.vm.network :forwarded_port, guest:4444, host:4444
   config.vm.network :private_network, ip: '192.168.33.10'
-  config.vm.provision 'shell', inline: <<-END_OF_SHELL_PROVISION
+  config.vm.provision 'shell', inline: <<-END_OF_PROVISION
 
 #!/bin/sh
 #=========================================================
@@ -41,13 +45,11 @@ echo 'Install the packages...'
 #=========================================================
 sudo apt-get -qq update
 sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty wget
-
 #=========================================================
 echo "Set autologin for the Vagrant user..."
 #=========================================================
 sudo sed -i '$ d' /etc/init/tty1.conf
 sudo echo 'exec /sbin/rungetty --autologin vagrant tty1' >> /etc/init/tty1.conf
-
 #=========================================================
 cat <<EOF>> .profile
 if [ ! -e '/tmp/.X0-lock' ] ; then
@@ -58,13 +60,13 @@ else
 fi
 EOF
 
-UPDATE_SELENIUM_APP_STACK='#{update_selenium_app_stack}'
-if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
-
+PROVISION_SELENIUM='#{provision_selenium}'
+if [ "$PROVISION_SELENIUM" != '' ] ; then
+  #================-==========================================
   echo 'Updating Selenium app stack...'
+  #===========================================================
 
   FIREFOX_VERSION='#{firefox_version}'
-
   if [ "$FIREFOX_VERSION" = '' ]
   then
     #=========================================================
@@ -75,19 +77,13 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
     #=========================================================
     echo "Install the Firefox version ${FIREFOX_VERSION}"
     #=========================================================
-    FIREFOX_HOME=~vagrant/firefox
     URL="https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2"
     FIREFOX_ARCHIVE="/var/tmp/firefox-${FIREFOX_VERSION}.tar.bz2"
     wget -O $FIREFOX_ARCHIVE -nv $URL
-    mkdir -p $FIREFOX_HOME
-    pushd $FIREFOX_HOME
-    cd ..
-    tar xjvf $FIREFOX_ARCHIVE
-    sudo cp -R $FIREFOX_HOME /usr/lib
-    sudo rm -f /usr/lib/firefox/browser/extensions
-    sudo cp -R $FIREFOX_HOME/browser /usr/lib/firefox
-    # chown -R vagrant:vagrant $FIREFOX_HOME
-    # rm -rf $FIREFOX_HOME
+    pushd /home/vagrant
+    mkdir -p firefox
+    tar xjf $FIREFOX_ARCHIVE
+    sudo cp -R firefox /usr/lib
     popd
   fi
 
@@ -100,70 +96,69 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
   else
     #=========================================================
-    echo "Download Selenium Server version ${SELENIUM_VERSION} ..."
+    echo "Download Selenium version ${SELENIUM_VERSION} ..."
     #=========================================================
     RELEASE_REGEX=$(echo "/.*<Key>(${SELENIUM_VERSION}[^>]+selenium-server-standalone[^<]+)/&& print \\$1")
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e"${RELEASE_REGEX}")
   fi
   export URL="https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}"
+  #=========================================================
   echo "Downloading Selenium from \\"${URL}\\""
+  #=========================================================
   wget -nv -O selenium-server-standalone.jar $URL
   chown vagrant:vagrant selenium-server-standalone.jar
 
   CHROME_VERSION='#{chrome_version}'
   if [ "$CHROME_VERSION" = '' ]
-  then
-  #=========================================================
-  echo "Download the latest Chrome..."
-  #=========================================================
-  wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
-  sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
-  sudo dpkg -i google-chrome-stable_current_amd64.deb
-  sudo rm google-chrome-stable_current_amd64.deb
-  sudo apt-get install -qqy -f google-chrome-stable
-
-  # http://askubuntu.com/questions/79280/how-to-install-chrome-browser-properly-via-command-line
-  # wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-  # sudo sh -c 'echo "deb https://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/google.list'
-  # sudo apt-get update
-  # sudo apt-get install google-chrome-stable
-  #=========================================================
+    then
+    #=========================================================
+    echo "Download the latest Chrome..."
+    #=========================================================
+    # http://askubuntu.com/questions/79280/how-to-install-chrome-browser-properly-via-command-line
+    wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
+    sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
+    sudo dpkg -i google-chrome-stable_current_amd64.deb
+    sudo rm google-chrome-stable_current_amd64.deb
+    sudo apt-get install -qqy -f google-chrome-stable
   else
-  # Using: http://www.slimjet.com/chrome/google-chrome-old-version.php
-  # NOTE: not every old version is available from this URL
-  # See also: https://google-chrome.en.uptodown.com/ubuntu/old
-  sudo apt-get remove -qqy -f google-chrome-stable
-  echo "Installing Chrome version ${CHROME_VERSION}"
-  export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
-  echo "Downloading Chrome from ${URL}"
-  wget -nv $URL
-  sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
-  sudo dpkg -i "chrome64_${CHROME_VERSION}.deb"
-  sudo rm "chrome64_${CHROME_VERSION}.deb"
+    sudo apt-get remove -qqy -f google-chrome-stable
+    echo "Installing Chrome version ${CHROME_VERSION}"
+    export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
+    echo "Downloading Chrome from ${URL}"
+    wget -nv $URL
+    sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
+    sudo dpkg -i "chrome64_${CHROME_VERSION}.deb"
+    sudo rm "chrome64_${CHROME_VERSION}.deb"
   fi
 
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
   if [ "$CHROMEDRIVER_VERSION" = '' ]
   then
+    #=========================================================
     echo 'Download latest Chrome Driver...'
+    #=========================================================
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
   else
     echo "Download Chrome Driver version ${CHROMEDRIVER_VERSION} ..."
   fi
   wget -O "/var/tmp/chromedriver_linux64.zip" -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-  pushd ~vagrant
-  unzip -fo "/var/tmp/chromedriver_linux64.zip"
-  # sudo rm chromedriver_linux64.zip
+  pushd /home/vagrant
+  unzip -o "/var/tmp/chromedriver_linux64.zip"
   ls
   chown vagrant:vagrant chromedriver
   popd
 fi
 
-# options for java runtime.
-export LAUNCHER_OPTS='-Xmn512M -Xms1G -Xmx1G'
+#=========================================================
+echo -n 'Set screen resolution'
+#=========================================================
+
+cat <<EOF>> /home/vagrant/.fluxbox/startup
+xrandr -s 1280x800
+EOF
 
 #=========================================================
-echo -n 'Install tmux scripts...'
+echo -n 'Install tmux scripts'
 #=========================================================
 cat <<EOF> tmux.sh
 #!/bin/sh
@@ -175,7 +170,9 @@ tmux send-keys -t chrome-driver:0 './chromedriver' C-m
 
 tmux new-session -d -s selenium
 tmux send-keys -t selenium:0 'export DISPLAY=:0' C-m
-tmux send-keys -t selenium:0 'export PATH="/home/vagrant/firefox:$PATH"; java $LAUNCHER_OPTS -jar selenium-server-standalone.jar' C-m
+
+# NOTE options for java runtime.
+tmux send-keys -t selenium:0 'java -Xmn512M -Xms1G -Xmx1G -jar selenium-server-standalone.jar' C-m
 tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub; sleep 120; done' C-m
 
 EOF
@@ -183,33 +180,35 @@ chmod +x tmux.sh
 chown vagrant:vagrant tmux.sh
 
 #=========================================================
-echo -n "Install startup scripts..."
+echo -n 'Install startup scripts'
 #=========================================================
 cat <<EOF> /etc/X11/Xsession.d/9999-common_start
 #!/bin/sh
-~/tmux.sh &
+/home/vagrant/tmux.sh &
 xterm -fa fixed &
 EOF
 chmod +x /etc/X11/Xsession.d/9999-common_start
 
 #=========================================================
-echo -n "Add host alias..."
+echo -n 'Add host alias'
 #=========================================================
 echo '192.168.33.1 host'| tee /etc/hosts
 
 #=========================================================
-echo "Reboot the VM"
+echo 'Reboot the VM'
 #=========================================================
 sudo reboot
 
-  END_OF_SHELL_PROVISION
+  END_OF_PROVISION
 
-  config.vm.provider :virtualbox do |vb|
-    vb.gui = true
-    vb.customize ['modifyvm', :id, '--memory', box_memory ]
-    vb.customize ['setextradata', 'global', 'GUI/MaxGuestResolution', 'any']
-    vb.customize ['setextradata', :id, 'CustomVideoMode1', '1280x960x32']
-# supported by fluxbox
+  config.vm.provider :virtualbox do |v|
+    v.gui = true
+    v.name = 'Selenium Fluxbox'
+    v.customize ['modifyvm', :id, '--memory', box_memory ]
+    v.customize ['modifyvm', :id, '--vram', '16']
+    v.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+    v.customize ['setextradata', 'global', 'GUI/MaxGuestResolution', 'any']
+    v.customize ['setextradata', :id, 'CustomVideoMode1', '1280x900x32']
+    # supported by fluxbox
   end
 end
-
