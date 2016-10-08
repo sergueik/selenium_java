@@ -1,14 +1,13 @@
 # standalone ubuntu box with tmux-driven selenium server, Chrome, Firefox , Fluxbox and autologin
 # based on : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
 
-
-
 update_selenium_app_stack = ENV.fetch('UPDATE_SELENIUM_APP_STACK', '')
 basedir = ENV.fetch('HOME','')  || ENV.fetch('USERPROFILE', '')
 box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
 basedir = basedir.gsub('\\', '/')
 selenium_version = ENV.fetch('SELENIUM_VERSION', '2.47')
 chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '2.16')
+firefox_version = ENV.fetch('FIREFOX_VERSION', '40.0.3')
 chrome_version = ENV.fetch('CHROME_VERSION', '50.0.2661.75')
 available_chrome_versions = %w|
     53.0.2785.116
@@ -19,7 +18,7 @@ available_chrome_versions = %w|
     48.0.2564.109
     |
 unless available_chrome_versions.include?(chrome_version)
-  puts "Available specific old Chrome versions:\n" + available_chrome_versions.join("\n")
+  puts "Very few specific old Chrome versions available :\n" + available_chrome_versions.join("\n")
   exit
 end
 
@@ -36,18 +35,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
 #!/bin/sh
 #=========================================================
-UPDATE_SELENIUM_APP_STACK='#{update_selenium_app_stack}'
 # set -x
 #=========================================================
 echo 'Install the packages...'
 #=========================================================
 sudo apt-get -qq update
 sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty wget
-
-#=========================================================
-echo 'Install the latest Firefox'
-#=========================================================
-sudo apt-get -qqy install firefox
 
 #=========================================================
 echo "Set autologin for the Vagrant user..."
@@ -57,7 +50,7 @@ sudo echo 'exec /sbin/rungetty --autologin vagrant tty1' >> /etc/init/tty1.conf
 
 #=========================================================
 cat <<EOF>> .profile
-if [ !-e '/tmp/.X0-lock' ] ; then
+if [ ! -e '/tmp/.X0-lock' ] ; then
   echo -n 'Start X on login...'
   startx
 else
@@ -65,9 +58,39 @@ else
 fi
 EOF
 
+UPDATE_SELENIUM_APP_STACK='#{update_selenium_app_stack}'
 if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
 
   echo 'Updating Selenium app stack...'
+
+  FIREFOX_VERSION='#{firefox_version}'
+
+  if [ "$FIREFOX_VERSION" = '' ]
+  then
+    #=========================================================
+    echo 'Install the latest Firefox'
+    #=========================================================
+    sudo apt-get -qqy install firefox
+  else
+    #=========================================================
+    echo "Install the Firefox version ${FIREFOX_VERSION}"
+    #=========================================================
+    FIREFOX_HOME=~vagrant/firefox
+    URL="https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2"
+    FIREFOX_ARCHIVE="/var/tmp/firefox-${FIREFOX_VERSION}.tar.bz2"
+    wget -O $FIREFOX_ARCHIVE -nv $URL
+    mkdir -p $FIREFOX_HOME
+    pushd $FIREFOX_HOME
+    cd ..
+    tar xjvf $FIREFOX_ARCHIVE
+    sudo cp -R $FIREFOX_HOME /usr/lib
+    sudo rm -f /usr/lib/firefox/browser/extensions
+    sudo cp -R $FIREFOX_HOME/browser /usr/lib/firefox
+    # chown -R vagrant:vagrant $FIREFOX_HOME
+    # rm -rf $FIREFOX_HOME
+    popd
+  fi
+
   SELENIUM_VERSION='#{selenium_version}'
   if [ "$SELENIUM_VERSION" = '' ]
   then
@@ -91,7 +114,7 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
   if [ "$CHROME_VERSION" = '' ]
   then
   #=========================================================
-  echo "Download the latest chrome..."
+  echo "Download the latest Chrome..."
   #=========================================================
   wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
   sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
@@ -110,7 +133,7 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
   # NOTE: not every old version is available from this URL
   # See also: https://google-chrome.en.uptodown.com/ubuntu/old
   sudo apt-get remove -qqy -f google-chrome-stable
-  echo "Installing chrome version ${CHROME_VERSION}"
+  echo "Installing Chrome version ${CHROME_VERSION}"
   export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
   echo "Downloading Chrome from ${URL}"
   wget -nv $URL
@@ -122,15 +145,18 @@ if [ "$UPDATE_SELENIUM_APP_STACK" != '' ] ; then
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
   if [ "$CHROMEDRIVER_VERSION" = '' ]
   then
-    echo 'Download latest chrome driver...'
+    echo 'Download latest Chrome Driver...'
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
   else
-    echo "Download chrome driver version ${CHROMEDRIVER_VERSION} ..."
+    echo "Download Chrome Driver version ${CHROMEDRIVER_VERSION} ..."
   fi
-  wget -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-  unzip -fo chromedriver_linux64.zip
-  sudo rm chromedriver_linux64.zip
+  wget -O "/var/tmp/chromedriver_linux64.zip" -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+  pushd ~vagrant
+  unzip -fo "/var/tmp/chromedriver_linux64.zip"
+  # sudo rm chromedriver_linux64.zip
+  ls
   chown vagrant:vagrant chromedriver
+  popd
 fi
 
 # options for java runtime.
@@ -149,8 +175,8 @@ tmux send-keys -t chrome-driver:0 './chromedriver' C-m
 
 tmux new-session -d -s selenium
 tmux send-keys -t selenium:0 'export DISPLAY=:0' C-m
-tmux send-keys -t selenium:0 'java $LAUNCHER_OPTS -jar selenium-server-standalone.jar' C-m
-tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub; done' C-m
+tmux send-keys -t selenium:0 'export PATH="/home/vagrant/firefox:$PATH"; java $LAUNCHER_OPTS -jar selenium-server-standalone.jar' C-m
+tmux send-keys -t selenium:0 'for cnt in {0..10}; do wget -O- http://127.0.0.1:4444/wd/hub; sleep 120; done' C-m
 
 EOF
 chmod +x tmux.sh
