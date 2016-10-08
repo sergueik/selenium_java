@@ -3,7 +3,7 @@
 Vagrantfile for standalone Ubuntu box with tmux-driven Fluxbox autologin and Selenium Server, Chrome and Firefox
 based on [Anomen/vagrant-selenium](https://github.com/Anomen/vagrant-selenium/blob/master/script.sh).
 
-![box](https://raw.githubusercontent.com/sergueik/selenium_java/fluxbox/master/screenshots/box.png)
+![box](https://github.com/sergueik/selenium_java/blob/master/fluxbox/screenshots/box.png)
 
 ### Usage
 ```
