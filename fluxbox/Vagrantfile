@@ -2,13 +2,12 @@
 # based on : https://github.com/Anomen/vagrant-selenium/blob/master/script.sh
 
 provision_selenium = ENV.fetch('PROVISION_SELENIUM', '')
-selenium_version = ENV.fetch('SELENIUM_VERSION', '2.47')
-chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '2.16')
-firefox_version = ENV.fetch('FIREFOX_VERSION', '40.0.3')
-chrome_version = ENV.fetch('CHROME_VERSION', '50.0.2661.75')
+selenium_version = ENV.fetch('SELENIUM_VERSION', '') 
+chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '')
+firefox_version = ENV.fetch('FIREFOX_VERSION', '')
+chrome_version = ENV.fetch('CHROME_VERSION', '')
 
-
-# check if requested Chrome version is available on http://www.slimjetbrowser.com
+# check if requested Chrome version is available on http://www.slimjetbrowser.com 
 available_chrome_versions = %w|
     53.0.2785.116
     52.0.2743.116
@@ -17,8 +16,10 @@ available_chrome_versions = %w|
     49.0.2623.75
     48.0.2564.109
     |
-unless available_chrome_versions.include?(chrome_version)
+    
+unless chrome_version.empty? or chrome_version =~ /(?:beta|stable|unstable)/ or available_chrome_versions.include?(chrome_version)
   puts "Very few specific old Chrome versions available :\n" + available_chrome_versions.join("\n")
+  puts 'Alternatively, CHROME_VERSION can be set to "stable", "unstable" or "beta"'
   exit
   # See also: https://google-chrome.en.uptodown.com/ubuntu/old
 end
@@ -63,7 +64,7 @@ EOF
 PROVISION_SELENIUM='#{provision_selenium}'
 if [ "$PROVISION_SELENIUM" != '' ] ; then
   #================-==========================================
-  echo 'Updating Selenium app stack...'
+  echo 'Updating Selenium app stack'
   #===========================================================
 
   FIREFOX_VERSION='#{firefox_version}'
@@ -91,12 +92,12 @@ if [ "$PROVISION_SELENIUM" != '' ] ; then
   if [ "$SELENIUM_VERSION" = '' ]
   then
     #=========================================================
-    echo "Download latest Selenium Server..."
+    echo 'Download latest Selenium Server'
     #=========================================================
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
   else
     #=========================================================
-    echo "Download Selenium version ${SELENIUM_VERSION} ..."
+    echo "Download Selenium version ${SELENIUM_VERSION}"
     #=========================================================
     RELEASE_REGEX=$(echo "/.*<Key>(${SELENIUM_VERSION}[^>]+selenium-server-standalone[^<]+)/&& print \\$1")
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e"${RELEASE_REGEX}")
@@ -112,7 +113,7 @@ if [ "$PROVISION_SELENIUM" != '' ] ; then
   if [ "$CHROME_VERSION" = '' ]
     then
     #=========================================================
-    echo "Download the latest Chrome..."
+    echo 'Download the latest Chrome'
     #=========================================================
     # http://askubuntu.com/questions/79280/how-to-install-chrome-browser-properly-via-command-line
     wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
@@ -121,14 +122,24 @@ if [ "$PROVISION_SELENIUM" != '' ] ; then
     sudo rm google-chrome-stable_current_amd64.deb
     sudo apt-get install -qqy -f google-chrome-stable
   else
-    sudo apt-get remove -qqy -f google-chrome-stable
-    echo "Installing Chrome version ${CHROME_VERSION}"
-    export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
-    echo "Downloading Chrome from ${URL}"
-    wget -nv $URL
-    sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
-    sudo dpkg -i "chrome64_${CHROME_VERSION}.deb"
-    sudo rm "chrome64_${CHROME_VERSION}.deb"
+    case $CHROME_VERSION in
+      beta|stable|unstable)
+        wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add - 
+        apt-add-repository http://dl.google.com/linux/chrome/deb/
+        apt-get -qq update
+        apt-get install google-chrome-${CHROME_VERSION}     
+      ;;
+      *)
+        sudo apt-get remove -qqy -f google-chrome-stable
+        echo "Installing Chrome version ${CHROME_VERSION}"
+        export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
+        echo "Downloading Chrome from ${URL}"
+        wget -nv $URL
+        sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
+        sudo dpkg -i "chrome64_${CHROME_VERSION}.deb"
+        sudo rm "chrome64_${CHROME_VERSION}.deb"
+      ;;
+      esac
   fi
 
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
