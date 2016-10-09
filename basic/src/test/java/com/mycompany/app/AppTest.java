@@ -26,6 +26,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 import org.apache.commons.lang.exception.ExceptionUtils;
 
 import org.junit.After;
@@ -33,11 +36,8 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
+import org.junit.Ignore;
 import org.junit.Test;
-
 import org.junit.experimental.categories.Category;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
@@ -64,10 +64,10 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import static java.lang.Boolean.*;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import static java.lang.Boolean.*;
+import static java.lang.Float.*;
+import java.lang.Float;
 
 public class AppTest {
 
@@ -83,9 +83,13 @@ public class AppTest {
 	private static String cssSelectorOfElementFinderScript;
 	private static String cssSelectorOfElementAlternativeFinderScript;
 	private static String xpathOfElementFinderScript;
+	private static String getStyleScript;
 	private static String baseUrl = "http://www.tripadvisor.com/";
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
+
+	private static Pattern pattern;
+	private static Matcher matcher;
 
 	@BeforeClass
 	public static void setUp() {
@@ -111,17 +115,20 @@ public class AppTest {
 			cssSelectorOfElementFinderScript = getScriptContent("cssSelectorOfElement.js");
 			cssSelectorOfElementAlternativeFinderScript = getScriptContent("cssSelectorOfElementAlternative.js");
 			xpathOfElementFinderScript = getScriptContent("xpathOfElement.js");
+			getStyleScript = getScriptContent("getStyle.js");
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
 		}
 	}
 
+	@Ignore
 	@Test
 	public void verifyTextTest() {
 		assertEquals("Hotels", findElement("link_text", "Hotels").getText());
 	}
 
+	@Ignore
 	@Test
 	public void xpathOfElementTest() {
 		element = findElement("link_text", "Hotels");
@@ -136,6 +143,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementWithIdInParentTest() {
 		element = findElement("link_text", "Hotels");
@@ -151,6 +159,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementTest() {
 		element = findElement("css_selector", "input#mainSearch");
@@ -159,6 +168,7 @@ public class AppTest {
 		assertEquals("input#mainSearch", selector);
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementWithIdTest() {
 		element = findElement("id", "searchbox");
@@ -166,6 +176,7 @@ public class AppTest {
 		highlight(element);
 	}
 
+	@Ignore
 	@Test
 	public void testcssSelectorOfElementAlternative() {
 		element = findElement("id", "searchbox");
@@ -183,6 +194,50 @@ public class AppTest {
 		}
 	}
 
+	@Test
+	public void testStyleOfElement() {
+
+		element = findElement("link_text", "Hotels");
+		assertThat(element, notNullValue());
+		highlight(element);
+		String style = styleOfElement(element);
+		System.err.println("style:\n" + style);
+		String colorAttribute = styleOfElement(element, "color");
+		String heightAttribute = styleOfElement(element, "height");
+		String widthAttribute = styleOfElement(element, "width");
+
+		// assertions of certain CSS attributes
+    try {
+      Assert.assertTrue(colorAttribute.equals("rgb(255, 255, 255)"));
+    } catch (AssertionError) {
+      // slurp
+    }
+    pattern = Pattern.compile("\\((\\d+),");
+    matcher = pattern.matcher(colorAttribute);
+		if (matcher.find()) {
+			int red = Integer.parseInt(matcher.group(1).toString());
+			Assert.assertTrue(red > 254);
+		}
+		System.err.println("color:" + colorAttribute);
+
+    try {
+      Assert.assertTrue(widthAttribute.equals("36.6667px")); // fragile !      
+    } catch (AssertionError) {
+      // slurp
+    }
+    pattern = Pattern.compile("([\\d\\.]+)px");
+    matcher = pattern.matcher(widthAttribute);
+		if (matcher.find()) {
+      Float mask = new Float("20.75f");
+			Float width = mask.parseFloat(matcher.group(1).toString());
+			Assert.assertTrue(width > 36.5);
+		}
+		System.err.println("width:" + widthAttribute);
+		Assert.assertTrue(height.equals("12px"));
+		// print css values
+		System.err.println("height:" + heightAttribute);
+	}
+
 	@AfterClass
 	public static void tearDown() throws Exception {
 		driver.close();
@@ -194,6 +249,10 @@ public class AppTest {
 
 	private String cssSelectorOfElement(WebElement element) {
 		return (String) executeScript(cssSelectorOfElementFinderScript, element);
+	}
+
+	private String styleOfElement(WebElement element, Object... arguments) {
+		return (String) executeScript(getStyleScript, element, arguments);
 	}
 
 	private String cssSelectorOfElementAlternative(WebElement element) {
@@ -224,7 +283,8 @@ public class AppTest {
 	}
 
 	private String xpathOfElement(WebElement element) {
-		return (String) executeScript(xpathOfElementFinderScript, new Object[] { element });
+		return (String) executeScript(xpathOfElementFinderScript,
+				new Object[] { element });
 	}
 
 	public Object executeScript(String script, Object... arguments) {
