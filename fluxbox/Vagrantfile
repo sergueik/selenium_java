@@ -136,7 +136,7 @@ then
   unzip -o $ARCHIVE
   ls
   chown vagrant:vagrant chromedriver
-  echo Installed Chrome Driver version $(./chromedriver --version)
+  echo Installed Chrome Driver version $(./chromedriver --version| head -1 | cut -f 2 -d ' ')
   popd
   #=========================================================
   GECKODRIVER_VERSION='#{geckodriver_version}'
@@ -145,7 +145,7 @@ then
     echo Download the latest Gecko Driver version $GECKODRIVER_VERSION
   else
     echo Determine the latest version of Gecko Driver
-    GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | perl -ne 'if ($_ =~ /\/mozilla\/geckodriver\/releases\/download\/v([\d\.]+)/){ print $1, $/}' | head -1)
+    GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | perl -ne 'if ($_ =~ /\\/mozilla\\/geckodriver\\/releases\\/download\\/v([\\d\\.]+)/){ print $1, $/}' | head -1)
   fi
   URL="https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
   echo Downloading GECKODRIVER version $GECKODRIVER_VERSION from $URL
@@ -155,7 +155,7 @@ then
   tar -xzf $ARCHIVE
   ls
   chown vagrant:vagrant geckodriver
-  echo Installed Gecko Driver version $(./geckodriver --version)
+  echo Installed Gecko Driver version $(./geckodriver --version | head -1 | cut -f 2 -d ' ')
   # TODO: geckodriver     ERROR   Address in use (os error 98)
 fi
 #=========================================================
