@@ -2,6 +2,7 @@ provision_selenium = ENV.fetch('PROVISION_SELENIUM', '')
 selenium_version = ENV.fetch('SELENIUM_VERSION', '')
 chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '')
 firefox_version = ENV.fetch('FIREFOX_VERSION', '')
+geckodriver_version = ENV.fetch('GECKODRIVER_VERSION', '')
 chrome_version = ENV.fetch('CHROME_VERSION', '')
 
 # check if requested Chrome version is available on http://www.slimjetbrowser.com
@@ -129,12 +130,33 @@ then
     echo Download latest Chrome Driver
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
   fi
-  wget -O "/var/tmp/chromedriver_linux64.zip" -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+  ARCHIVE='/var/tmp/chromedriver_linux64.zip'
+  wget -O $ARCHIVE -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
   pushd /home/vagrant
-  unzip -o '/var/tmp/chromedriver_linux64.zip'
+  unzip -o $ARCHIVE
   ls
   chown vagrant:vagrant chromedriver
+  echo Installed Chrome Driver version $(./chromedriver --version)
   popd
+  #=========================================================
+  GECKODRIVER_VERSION='#{geckodriver_version}'
+  if [[ $GECKODRIVER_VERSION ]]
+  then
+    echo Download the latest Gecko Driver version $GECKODRIVER_VERSION
+  else
+    echo Determine the latest version of Gecko Driver
+    GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | perl -ne 'if ($_ =~ /\/mozilla\/geckodriver\/releases\/download\/v([\d\.]+)/){ print $1, $/}' | head -1)
+  fi
+  URL="https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
+  echo Downloading GECKODRIVER version $GECKODRIVER_VERSION from $URL
+  ARCHIVE='/var/tmp/geckodriver_linux64.tar.gz'
+  sudo wget -O $ARCHIVE -nv $URL
+  pushd /home/vagrant
+  tar -xzf $ARCHIVE
+  ls
+  chown vagrant:vagrant geckodriver
+  echo Installed Gecko Driver version $(./geckodriver --version)
+  # TODO: geckodriver     ERROR   Address in use (os error 98)
 fi
 #=========================================================
 echo Set screen resolution
