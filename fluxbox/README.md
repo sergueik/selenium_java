@@ -1,33 +1,45 @@
 ### Info
 
-Vagrantfile for standalone Ubuntu box with Fluxbox, [tmux]](https://github.com/tmux/tmux) autologin, Selenium Server, Chrome and Firefox
-based on [Anomen/vagrant-selenium](https://github.com/Anomen/vagrant-selenium/blob/master/script.sh).
+Vagrantfile for standalone Ubuntu box containing
+ * Fluxbox,
+ * [tmux]](https://github.com/tmux/tmux) autologin,
+ * Selenium Server,
+ * Chrome/ Chrome Driver
+ * Firefox with optional Gecko Driver
+
+Based on [Anomen/vagrant-selenium](https://github.com/Anomen/vagrant-selenium/blob/master/script.sh)
 
 ![box](https://github.com/sergueik/selenium_java/blob/master/fluxbox/screenshots/box.png)
 
 ### Usage
+
+Download the box image [trusty-server-amd64-vagrant-selenium.box](https://atlas.hashicorp.com/ubuntu/boxes/trusty64) locally.
 ```
 export PROVISION_SELENIUM=true
+vagrant up
 ```
-optionally, specific versions of Selenium Server, Firefox, Chrome and Chromedriver can be set through
-`SELENIUM_VERSION`, `FIREFOX_VERSION`,`CHROME_VERSION`, `CHROMEDRIVER_VERSION`, e.g.:
+The "bleeding edge" versions of the drivers do not always work well together.
+Therefore one may wish to provision instance with old versions of software.
+Specific versions of Selenium Server, Firefox, Chrome, Chrome Driver  etc. can be set through
+`SELENIUM_VERSION`, `FIREFOX_VERSION`,`CHROME_VERSION`, `CHROMEDRIVER_VERSION`.
+
+Below is an example of a supported  combination of old versions:
 ```
 export SELENIUM_VERSION=2.47
-export CHROMEDRIVER_VERSION=CHROMEDRIVER_VERSION=2.16
+export CHROMEDRIVER_VERSION=2.16
 export FIREFOX_VERSION=40.0.3
 export CHROME_VERSION=50.0.2661.75
 ```
-followed by
-```
-vagrant up
-```
 
-The `CHROME_VERSION` can also set to  `stable`, `unstable` or `beta` - the relevant version of Chrome browser `.deb` package will be installed from the 
+For Chrome, the `CHROME_VERSION` can also set to  `stable`, `unstable` or `beta` - forcing the
+specific version of Chrome browser `.deb` package to be installed from the
 [google repository](https://www.google.com/linuxrepositories/).
 
-A handful of old Chrome build debian packages can be downloaded from [http://www.slimjetbrowser.com](http://www.slimjetbrowser.com) - check if desired version is available. 
+A handful of old Chrome build debian packages the box can download ws found on [http://www.slimjetbrowser.com](http://www.slimjetbrowser.com).
+It is quite limited - check if desired version is available.
 
-Accessing the `http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/` for a valid past build is work in progress. 
+Probing [http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/](http://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/) and /or [https://google-chrome.en.uptodown.com/ubuntu/old](https://google-chrome.en.uptodown.com/ubuntu/old) for a valid past Chrome build is a
+work in progress.
 
 Note:
 
