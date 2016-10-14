@@ -212,4 +212,4 @@ EOF
 
 java $LAUNCHER_OPTS $SELENIUM_NODE_OPTS &
 # echo $NODE_PID
-# ps ax | grep [j]ava
+# ps ax | grep [j]avas

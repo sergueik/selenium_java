@@ -16,16 +16,16 @@ fi
 
 # Only one selenium hub can run at a time
 # This code detects the already running instances.
-RUNNING_HUB_PID=$(sudo netstat -npl | grep $HUB_PORT | awk '{print $7}'| grep '/java'|head -1 | sed 's/\/.*$//')
-if [[ $RUNNING_HUB_PID ]]
+HUB_PID=$(sudo netstat -npl | grep $HUB_PORT | awk '{print $7}'| grep '/java'|head -1 | sed 's/\/.*$//')
+if [[ $HUB_PID ]]
 then
-  echo killing java process $RUNNING_HUB_PID
-  ps -ocomm -oargs -p $RUNNING_HUB_PID
+  echo killing java process $HUB_PID
+  ps -ocomm -oargs -p $HUB_PID
   # alternarive
-  # sudo ps ax -opid,comm,args |  grep java |  grep $HUB_PORT 2>/dev/null| tail -1 | awk  '{print $1}' | xargs kill -HUP
+  # sudo ps ax -opid,comm,args | grep java | grep $HUB_PORT 2>/dev/null| tail -1 | awk '{print $1}' | xargs kill -HUP
   # sleep 1
   # sending HUP
-  kill -HUP $RUNNING_HUB_PID
+  kill -HUP $HUB_PID
   # echo
 fi
 
