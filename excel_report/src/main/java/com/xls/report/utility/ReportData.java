@@ -14,12 +14,27 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.xls.report.config.Configuration;
 import com.xls.report.config.ExcelConfiguration;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.xls.report.config.ElementLocator;
 
 /**
  * @author - rahul.rathore
@@ -38,101 +53,170 @@ public class ReportData {
 	private static String exceptionTrace = "";
 	private static String sheetName = "";
 	private static Map<String, Map<String, ArrayList<String>>> testMethodDataMap = null;
-	
-	public static Map<String, Map<String, ArrayList<String>>> getTestMethodDetail(String xmlFile) throws SAXException, IOException, ParserConfigurationException {
+
+  private static DocumentBuilderFactory fact;
+	private static DocumentBuilder build;
+  
+
+  public static Document getDocument(String xmlFile) throws SAXException,
+			IOException, ParserConfigurationException {
+		fact = DocumentBuilderFactory.newInstance();
+		build = fact.newDocumentBuilder();
+		return build.parse(xmlFile);
+	}
+
+	public static Map<String, Map<String, ArrayList<String>>> getTestMethodDetail(
+			String xmlFile) throws SAXException, IOException,
+			ParserConfigurationException {
 		testMethodDataMap = new HashMap<String, Map<String, ArrayList<String>>>();
-		Map<String,ArrayList<String>> testDetailMap = null;
+		Map<String, ArrayList<String>> testDetailMap = null;
 		ArrayList<String> testMethodDataList = null;
-		Document doc = DocBuilder.getDocument(xmlFile);
+		Document doc = getDocument(xmlFile);
 		doc.getDocumentElement().normalize();
-		list = NodeFactory.getNodeList(doc,Configuration.aTestNode); // for getting test nodes
+		list = getNodeList(doc, Configuration.testNode); // for getting
+																											// test nodes
 
 		for (int i = 0; i < list.getLength(); i++) {
-			testDetailMap = new HashMap<String,ArrayList<String>>();
-			classNodeList = NodeFactory.getEleListByTagName(list.item(i), Configuration.aClassNode);
-			sheetName = NodeFactory.getNameAttribute(list.item(i), Configuration.aNameAttribute);
-			
+			testDetailMap = new HashMap<String, ArrayList<String>>();
+			classNodeList = getEleListByTagName(list.item(i),
+					Configuration.classNode);
+			sheetName = getNameAttribute(list.item(i), Configuration.nameAttribute);
+
 			for (int j = 0; j < classNodeList.getLength(); j++) {
-				classNodeName = NodeFactory.getNameAttribute(classNodeList.item(j), Configuration.aNameAttribute);
-				methodNodeList = NodeFactory.getEleListByTagName(classNodeList.item(j), Configuration.aTestMethodNode); 
+				classNodeName = getNameAttribute(classNodeList.item(j),
+						Configuration.nameAttribute);
+				methodNodeList = getEleListByTagName(classNodeList.item(j),
+						Configuration.testMethodNode);
 
 				for (int k = 0; k < methodNodeList.getLength(); k++) {
 					testMethodDataList = new ArrayList<String>();
-					testMethodName = NodeFactory.getNameAttribute(methodNodeList.item(k), Configuration.aNameAttribute);
-					testMethodStatus = NodeFactory.getNameAttribute(methodNodeList.item(k),Configuration.aStatusAttribute);
-					
-					if(NodeFactory.isDataProviderPresent(methodNodeList.item(k), Configuration.aDataProviderAttribute)){
+					testMethodName = getNameAttribute(methodNodeList.item(k),
+							Configuration.nameAttribute);
+					testMethodStatus = getNameAttribute(methodNodeList.item(k),
+							Configuration.statusAttribute);
+
+					if (isDataProviderPresent(methodNodeList.item(k),
+							Configuration.dataProviderAttribute)) {
 						String name = "";
-						for(int m = 0; m < NodeFactory.getEleListByTagName(methodNodeList.item(k), Configuration.aValueAttribute).getLength(); m++){
-							name = name + "," + NodeFactory.getEleListByTagName(methodNodeList.item(k), Configuration.aValueAttribute).item(m).getTextContent().trim();
+						for (int m = 0; m < getEleListByTagName(methodNodeList.item(k),
+								Configuration.valueAttribute).getLength(); m++) {
+							name = name
+									+ ","
+									+ getEleListByTagName(methodNodeList.item(k),
+													Configuration.valueAttribute).item(m)
+											.getTextContent().trim();
 						}
-						testMethodName = testMethodName + "(" + name.substring(1, name.length()) + ")";
+						testMethodName = testMethodName + "("
+								+ name.substring(1, name.length()) + ")";
 					}
-					testMethodDataList.add(Configuration.aTestNameIndex, classNodeName + "." + testMethodName);
-					testMethodDataList.add(Configuration.aTestStatusIndex, testMethodStatus);
-					
+					testMethodDataList.add(Configuration.testNameIndex, classNodeName
+							+ "." + testMethodName);
+					testMethodDataList.add(Configuration.testStatusIndex,
+							testMethodStatus);
+
 					if ("fail".equalsIgnoreCase(testMethodStatus)) {
-						exceptionNodeList = NodeFactory.getEleListByTagName(methodNodeList.item(k), Configuration.aExceptionNode);
-						exceptionTraceNodeList = NodeFactory.getEleListByTagName(methodNodeList.item(k), Configuration.aMessageAttribute);
-						exceptionTrace = exceptionTraceNodeList.item(Configuration.aFirstIndex).getTextContent();
-						expMessage = NodeFactory.getNameAttribute(exceptionNodeList.item(Configuration.aFirstIndex), Configuration.aClassNode);
-						testMethodDataList.add(Configuration.aExceptionMsgIndex, expMessage);
-						testMethodDataList.add(Configuration.aExceptionStackTrace, ExcelConfiguration.transformExpMessage(exceptionTrace).trim());
+						exceptionNodeList = getEleListByTagName(methodNodeList.item(k),
+								Configuration.exceptionNode);
+						exceptionTraceNodeList = getEleListByTagName(
+								methodNodeList.item(k), Configuration.messageAttribute);
+						exceptionTrace = exceptionTraceNodeList.item(
+								Configuration.firstIndex).getTextContent();
+						expMessage = getNameAttribute(
+								exceptionNodeList.item(Configuration.firstIndex),
+								Configuration.classNode);
+						testMethodDataList
+								.add(Configuration.exceptionMsgIndex, expMessage);
+						testMethodDataList.add(Configuration.exceptionStackTrace,
+								ExcelConfiguration.transformExpMessage(exceptionTrace).trim());
+					} else {
+						testMethodDataList.add(Configuration.exceptionMsgIndex, " ");
+						testMethodDataList.add(Configuration.exceptionStackTrace, " ");
 					}
-					else{
-						testMethodDataList.add(Configuration.aExceptionMsgIndex, " ");
-						testMethodDataList.add(Configuration.aExceptionStackTrace, " ");
-					}
-					testDetailMap.put(testMethodDataList.get(Configuration.aFirstIndex),testMethodDataList);
+					testDetailMap.put(testMethodDataList.get(Configuration.firstIndex),
+							testMethodDataList);
 				}
 			}
 			testMethodDataMap.put(sheetName, testDetailMap);
 		}
 		return testMethodDataMap;
 	}
-	
-	public static XSSFWorkbook createExcelFile(HashMap<String, Map<String, ArrayList<String>>> data) {
+
+	public static XSSFWorkbook createExcelFile(
+			HashMap<String, Map<String, ArrayList<String>>> data) {
 		XSSFWorkbook book = new XSSFWorkbook();
 		XSSFCellStyle failCelStyle = book.createCellStyle();
 		XSSFCellStyle passCelStyle = book.createCellStyle();
-		
-		for(String sheetNameKey : data.keySet()){
+
+		for (String sheetNameKey : data.keySet()) {
 			XSSFSheet sheet = book.createSheet(sheetNameKey);
-			XSSFRow row = ExcelConfiguration.CreateHeader(book,sheet,Configuration.aHeader);
-			HashMap<String, ArrayList<String>> testMethods = (HashMap<String, ArrayList<String>>) data.get(sheetNameKey);
+			XSSFRow row = ExcelConfiguration.CreateHeader(book, sheet,
+					Configuration.header);
+			HashMap<String, ArrayList<String>> testMethods = (HashMap<String, ArrayList<String>>) data
+					.get(sheetNameKey);
 			int l = 1;
-			
-			for(String testMethod : testMethods.keySet()){
+
+			for (String testMethod : testMethods.keySet()) {
 				passCelStyle.setFillForegroundColor(HSSFColor.BRIGHT_GREEN.index);
 				failCelStyle.setFillForegroundColor(HSSFColor.RED.index);
 				passCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 				failCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
 				row = sheet.createRow(l++);
-				XSSFCell cellName = row.createCell(Configuration.aTestNameIndex);
+				XSSFCell cellName = row.createCell(Configuration.testNameIndex);
 				cellName.setCellValue(testMethod);
 				ArrayList<String> testData = testMethods.get(testMethod);
-				XSSFCell cellStatus = row.createCell(Configuration.aTestStatusIndex);
-				
-				if ("fail".equalsIgnoreCase(testData.get(Configuration.aTestStatusIndex))) {
+				XSSFCell cellStatus = row.createCell(Configuration.testStatusIndex);
+
+				if ("fail".equalsIgnoreCase(testData
+						.get(Configuration.testStatusIndex))) {
 					cellStatus.setCellStyle(failCelStyle);
-					cellStatus.setCellValue(testData.get(Configuration.aTestStatusIndex));
-					XSSFCell expCell = row.createCell(Configuration.aExceptionMsgIndex);
-					expCell.setCellValue(testData.get(Configuration.aExceptionMsgIndex));
-					XSSFCell exceptionTraceCell = row.createCell(Configuration.aExceptionStackTrace);
-					exceptionTraceCell.setCellValue(testData.get(Configuration.aExceptionStackTrace).trim());
-					XSSFCell locatorCell = row.createCell(Configuration.aLocatorIndex);
-					locatorCell.setCellValue(JsonUtility.deserializeJsonObject(testData.get(Configuration.aExceptionStackTrace).trim()));
+					cellStatus.setCellValue(testData.get(Configuration.testStatusIndex));
+					XSSFCell expCell = row.createCell(Configuration.exceptionMsgIndex);
+					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
+					XSSFCell exceptionTraceCell = row
+							.createCell(Configuration.exceptionStackTrace);
+					exceptionTraceCell.setCellValue(testData.get(
+							Configuration.exceptionStackTrace).trim());
+					XSSFCell locatorCell = row.createCell(Configuration.locatorIndex);
+					String text = testData.get(Configuration.exceptionStackTrace).trim();
+					String jsonString = null;
+					Gson gson = new GsonBuilder().create();
+					int sIndex = text.indexOf('{');
+					int eIndex = text.indexOf('}');
+					jsonString = (sIndex == -1 || eIndex == -1) ? "" : text.substring(
+							sIndex, (eIndex + 1));
+					ElementLocator locator = gson.fromJson(jsonString,
+							ElementLocator.class);
+					locatorCell.setCellValue((locator == null) ? "" : locator.toString());
 				} else {
 					cellStatus.setCellStyle(passCelStyle);
-					cellStatus.setCellValue(testData.get(Configuration.aTestStatusIndex));
-					XSSFCell expCell = row.createCell(Configuration.aExceptionMsgIndex);
-					expCell.setCellValue(testData.get(Configuration.aExceptionMsgIndex));
-					XSSFCell exceptionTraceCell = row.createCell(Configuration.aExceptionStackTrace);
-					exceptionTraceCell.setCellValue(testData.get(Configuration.aExceptionStackTrace).trim());
+					cellStatus.setCellValue(testData.get(Configuration.testStatusIndex));
+					XSSFCell expCell = row.createCell(Configuration.exceptionMsgIndex);
+					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
+					XSSFCell exceptionTraceCell = row
+							.createCell(Configuration.exceptionStackTrace);
+					exceptionTraceCell.setCellValue(testData.get(
+							Configuration.exceptionStackTrace).trim());
 				}
 			}
 		}
 		return book;
+	}
+
+	public static NodeList getNodeList(Document document, String nodeName) {
+		return document.getElementsByTagName(nodeName);
+	}
+
+	public static String getNameAttribute(Node node, String attribute) {
+		return ((Element) node).getAttribute(attribute);
+	}
+
+	public static NodeList getEleListByTagName(Node node, String tagName) {
+		return ((Element) node).getElementsByTagName(tagName);
+	}
+
+	public static boolean isDataProviderPresent(Node node,
+			final String dataProvider) {
+		return (getNameAttribute(node, "data-provider").length() >= 1);
 	}
 
 }

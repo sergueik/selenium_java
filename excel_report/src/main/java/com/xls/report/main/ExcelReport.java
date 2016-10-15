@@ -17,8 +17,12 @@ import org.xml.sax.SAXException;
 
 import com.xls.report.config.Configuration;
 import com.xls.report.config.ExcelConfiguration;
-import com.xls.report.utility.FileName;
 import com.xls.report.utility.ReportData;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 
 /**
  * @author - rahul.rathore
@@ -28,12 +32,22 @@ public class ExcelReport {
 	private static FileOutputStream _reportFile;
 	private static XSSFWorkbook _book;
 
+	private static DateFormat dateFormat;
+	private static Calendar cal;
+
+  public static String getFileName() {
+		dateFormat = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
+		cal = Calendar.getInstance();
+		return "Excel_Report_" + dateFormat.format(cal.getTime()) + ".xlsx";
+	}
+  
 	public static String generateReport(String xmlFile) throws SAXException,
 			IOException, ParserConfigurationException {
 		HashMap<String, Map<String, ArrayList<String>>> data = (HashMap<String, Map<String, ArrayList<String>>>) ReportData
 				.getTestMethodDetail(xmlFile);
 		_book = ReportData.createExcelFile(data);
-		String fileName = FileName.getFileName();
+		String fileName = getFileName();
+        
 		_reportFile = new FileOutputStream(new File(fileName));
 		_book.write(_reportFile);
 		_reportFile.close();
@@ -72,7 +86,7 @@ public class ExcelReport {
 		}
 
 		_book = ReportData.createExcelFile(data);
-		String fileName = FileName.getFileName();
+		String fileName = getFileName();
 		_reportFile = new FileOutputStream(new File(fileName));
 		_book.write(_reportFile);
 		_reportFile.close();

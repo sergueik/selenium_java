@@ -98,10 +98,10 @@ public class ExcelConfiguration {
 		int i = xlSheet.getFirstRowNum() + 1;
 		for (; i <= xlSheet.getLastRowNum(); i++) {
 			row = xlSheet.getRow(i);
-			if (sheetMap.get(row.getCell(Configuration.aTestNameIndex)
+			if (sheetMap.get(row.getCell(Configuration.testNameIndex)
 					.getStringCellValue()) == null) {
 				ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
-				sheetMap.put(row.getCell(Configuration.aTestNameIndex)
+				sheetMap.put(row.getCell(Configuration.testNameIndex)
 						.getStringCellValue(), newData);
 			}
 		}
@@ -129,19 +129,19 @@ public class ExcelConfiguration {
 		for (; i <= xlSheet.getLastRowNum(); i++) {
 			row = xlSheet.getRow(i);
 			ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
-			sheetMap.put(row.getCell(Configuration.aTestNameIndex)
+			sheetMap.put(row.getCell(Configuration.testNameIndex)
 					.getStringCellValue(), newData);
 		}
 		return (HashMap<String, ArrayList<String>>) sheetMap;
 	}
 
 	public static String transformExpMessage(String aMesg) {
-		if (aMesg.indexOf(Configuration.aTransformKeyword) != -1) {
+		if (aMesg.indexOf(Configuration.transformKeyword) != -1) {
 			aMesg = aMesg
-					.substring(0, aMesg.indexOf(Configuration.aTransformKeyword));
-			if (aMesg.indexOf(Configuration.aTransformKeywordTwo) != -1) {
+					.substring(0, aMesg.indexOf(Configuration.transformKeyword));
+			if (aMesg.indexOf(Configuration.transformKeywordTwo) != -1) {
 				return aMesg.substring(0,
-						aMesg.indexOf(Configuration.aTransformKeywordTwo));
+						aMesg.indexOf(Configuration.transformKeywordTwo));
 			}
 			return aMesg;
 		}

@@ -10,39 +10,19 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
-/**
- * Unit test for simple App.
- */
 public class AppTest extends TestCase {
-	/**
-	 * Create the test case
-	 *
-	 * @param testName
-	 *            name of the test case
-	 */
 	public AppTest(String testName) {
 		super(testName);
 	}
 
-	/**
-	 * @return the suite of tests being tested
-	 */
 	public static Test suite() {
 		return new TestSuite(AppTest.class);
 	}
 
-	/**
-	 * Rigourous Test :-)
-	 * 
-	 * @throws ParserConfigurationException
-	 * @throws IOException
-	 * @throws SAXException
-	 * @throws InterruptedException
-	 */
 	public void testCreateReport() throws SAXException, IOException,
 			ParserConfigurationException, InterruptedException {
-		assertTrue(ExcelReport.generateReport(
-				"testngxmlfiles\\testng-results.xml").length() > 1);
+		assertTrue(ExcelReport.generateReport("testngxmlfiles\\testng-results.xml")
+				.length() > 1);
 		Thread.sleep(2000);
 		/*
 		 * assertTrue(ExcelReport.generateReport(
