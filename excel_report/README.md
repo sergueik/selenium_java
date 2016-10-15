@@ -3,7 +3,9 @@ This directory contains a clone of [TestNG Excel Report Generator](https://githu
 
 This java api converts `testng-result.xml` to an excel report with columns
 
-|TestCase Name    |package, class, method name | 
+|column           |data                        | 
+| ----------------|:--------------------------:|
+|Test Case Name   |package, class, method name | 
 |Status           |pass or fail                |
 |Exception        |exceptions thrown           |
 |Exception Message|stack trace                 |
