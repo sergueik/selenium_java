@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="2" passed="2">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Suite" duration-ms="46" started-at="2015-05-23T12:58:54Z" finished-at="2015-05-23T12:58:54Z">
+    <groups>
+    </groups>
+    <test name="Annotations" duration-ms="46" started-at="2015-05-23T12:58:54Z" finished-at="2015-05-23T12:58:54Z">
+      <class name="testcase.testOne.MainClass">
+        <test-method status="PASS" signature="testCaseOne(java.lang.String, java.lang.String)[pri:0, instance:testcase.testOne.MainClass@f25b18]" name="testCaseOne" duration-ms="16" started-at="2015-05-23T20:58:54Z" data-provider="name" finished-at="2015-05-23T20:58:54Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[a]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[b]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testCaseOne -->
+        <test-method status="PASS" signature="testCaseOne(java.lang.String, java.lang.String)[pri:0, instance:testcase.testOne.MainClass@f25b18]" name="testCaseOne" duration-ms="15" started-at="2015-05-23T20:58:54Z" data-provider="name" finished-at="2015-05-23T20:58:54Z">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[c]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[d]]>
+              </value>
+            </param>
+          </params>
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testCaseOne -->
+      </class> <!-- testcase.testOne.MainClass -->
+    </test> <!-- Annotations -->
+  </suite> <!-- Suite -->
+</testng-results>

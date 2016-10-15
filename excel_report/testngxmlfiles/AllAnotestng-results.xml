@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="1" total="2" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Suite" duration-ms="27" started-at="2015-05-23T08:55:46Z" finished-at="2015-05-23T08:55:47Z">
+    <groups>
+    </groups>
+    <test name="Annotations" duration-ms="27" started-at="2015-05-23T08:55:46Z" finished-at="2015-05-23T08:55:47Z">
+      <class name="testcase.testOne.MainClass">
+        <test-method status="PASS" signature="beforeSuite()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="beforeSuite" is-config="true" duration-ms="11" started-at="2015-05-23T16:55:46Z" finished-at="2015-05-23T16:55:46Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeSuite -->
+        <test-method status="PASS" signature="beforeTest()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="beforeTest" is-config="true" duration-ms="1" started-at="2015-05-23T16:55:46Z" finished-at="2015-05-23T16:55:46Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeTest -->
+        <test-method status="PASS" signature="beforeClass()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="beforeClass" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:46Z" finished-at="2015-05-23T16:55:46Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeClass -->
+        <test-method status="PASS" signature="testCaseOne()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="testCaseOne" duration-ms="7" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testCaseOne -->
+        <test-method status="PASS" signature="beforeMethod()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="beforeMethod" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeMethod -->
+        <test-method status="Pass" signature="testCaseTwo()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="testCaseTwo" duration-ms="2" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- testCaseTwo -->
+		<test-method status="FAIL" signature="testCaseTwo()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="testCaseTwofail" duration-ms="2" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <exception class="java.lang.RuntimeException">
+            <message>
+              <![CDATA[Error]]>
+            </message>
+            <full-stacktrace>
+              <![CDATA[java.lang.RuntimeException: Error
+	at testcase.testOne.MainClass.testCaseTwo(MainClass.java:79)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(Unknown Source)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(Unknown Source)
+	at java.lang.reflect.Method.invoke(Unknown Source)
+	at org.testng.internal.MethodInvocationHelper.invokeMethod(MethodInvocationHelper.java:84)
+	at org.testng.internal.Invoker.invokeMethod(Invoker.java:714)
+	at org.testng.internal.Invoker.invokeTestMethod(Invoker.java:901)
+	at org.testng.internal.Invoker.invokeTestMethods(Invoker.java:1231)
+	at org.testng.internal.TestMethodWorker.invokeTestMethods(TestMethodWorker.java:127)
+	at org.testng.internal.TestMethodWorker.run(TestMethodWorker.java:111)
+	at org.testng.TestRunner.privateRun(TestRunner.java:767)
+	at org.testng.TestRunner.run(TestRunner.java:617)
+	at org.testng.SuiteRunner.runTest(SuiteRunner.java:334)
+	at org.testng.SuiteRunner.runSequentially(SuiteRunner.java:329)
+	at org.testng.SuiteRunner.privateRun(SuiteRunner.java:291)
+	at org.testng.SuiteRunner.run(SuiteRunner.java:240)
+	at org.testng.SuiteRunnerWorker.runSuite(SuiteRunnerWorker.java:52)
+	at org.testng.SuiteRunnerWorker.run(SuiteRunnerWorker.java:86)
+	at org.testng.TestNG.runSuitesSequentially(TestNG.java:1224)
+	at org.testng.TestNG.runSuitesLocally(TestNG.java:1149)
+	at org.testng.TestNG.run(TestNG.java:1057)
+	at org.testng.remote.RemoteTestNG.run(RemoteTestNG.java:111)
+	at org.testng.remote.RemoteTestNG.initAndRun(RemoteTestNG.java:204)
+	at org.testng.remote.RemoteTestNG.main(RemoteTestNG.java:175)
+]]>
+            </full-stacktrace>
+          </exception> <!-- java.lang.RuntimeException -->
+          <reporter-output>
+          </reporter-output>
+        </test-method> 
+        <test-method status="PASS" signature="beforeMethod()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="beforeMethod" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- beforeMethod -->
+        <test-method status="PASS" signature="AfterMethod()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="AfterMethod" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- AfterMethod -->
+        <test-method status="PASS" signature="AfterMethod()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="AfterMethod" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- AfterMethod -->
+        <test-method status="PASS" signature="AfterClass()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="AfterClass" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- AfterClass -->
+        <test-method status="PASS" signature="AfterTest()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="AfterTest" is-config="true" duration-ms="0" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- AfterTest -->
+        <test-method status="PASS" signature="AfterSuite()[pri:0, instance:testcase.testOne.MainClass@1f8aa07]" name="AfterSuite" is-config="true" duration-ms="1" started-at="2015-05-23T16:55:47Z" finished-at="2015-05-23T16:55:47Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- AfterSuite -->
+      </class> <!-- testcase.testOne.MainClass -->
+    </test> <!-- Annotations -->
+  </suite> <!-- Suite -->
+</testng-results>
