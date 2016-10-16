@@ -2,8 +2,10 @@
 **/.settings
 **/.classpath
 **/.project
+**/.gitignore
 **/work/**
 **/target/**
+**/*.log
 **/src/**/*.jar
 **/build/**
 **/test-output/**
