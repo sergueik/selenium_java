@@ -10,14 +10,14 @@ import ru.yandex.qatools.allure.annotations.Step;
  */
 public class OnFailure extends TestListenerAdapter {
 
-	@Step("Hi, I'm step in your testng listener")
+	@Step("The testng listener")
 	@Override
 	public void onTestFailure(ITestResult tr) {
 		createAttachment();
 	}
 
-	@Attachment("Hi, I'm attachment in your testng listener")
+	@Attachment("The  testng listener attachment")
 	public String createAttachment() {
-		return "iSteer's own attachment body!";
+		return "The attachment body";
 	}
 }
