@@ -43,7 +43,10 @@ public class SearchTest {
 
 	@Test(dataProvider = "dataProvider")
 	@Issues({ @Issue("A-1"), @Issue("B-2") })
-	@TestCaseId("T-3")
+	@Features("The feature")
+	@Stories("The Story")
+	@Severity(SeverityLevel.CRITICAL)
+  @TestCaseId("T-3")
 	public void parametrizedSearchTest(@Parameter String parameter)
 			throws Exception {
 		steps.searchXPath(parameter, "submit");

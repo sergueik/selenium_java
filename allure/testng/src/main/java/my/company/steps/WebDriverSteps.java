@@ -22,7 +22,6 @@ import ru.yandex.qatools.allure.annotations.Step;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
-
 import java.io.File;
 
 /**
@@ -41,16 +40,11 @@ public class WebDriverSteps {
 		driver.get(url);
 	}
 
-	@Step("Search by id \"{0}\", send \"{1}\"")
-	public void searchID(String id, String text) {
-		driver.findElement(By.id(id)).sendKeys(text);
-		driver.findElement(By.className("suggest2-form__button")).submit();
-	}
-
 	@Step("Search by XPath \"{0}\"")
-	public void searchXPath(String xpath, String type ) {
+	public void searchXPath(String xpath, String type) {
 		List<WebElement> elements = driver.findElements(By.xpath(xpath));
 		WebElement element = elements.get(0);
+		// ArrayIndexOutOfBoundsException exception will mark a test as broken.
 		assertThat(element.getAttribute("type"), containsString(type));
 	}
 
