@@ -1,5 +1,11 @@
 Feature: Login Feature
 
+  @test    
+   Scenario: Check login page
+    Given I go to the start page
+    When I enter username "cat" and password "be123456"
+    Then I am logged in
+    
   @test
     Scenario: Customer Login
     Given I go to the home page

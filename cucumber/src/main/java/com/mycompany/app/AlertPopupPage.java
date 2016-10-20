@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 public class AlertPopupPage {
 
 	private static WebElement element = null;
-	private static String alertId = "fancy_notification_content";
+	private static  String alertId = "fancy_notification_content";
 
 	public static WebElement Alert_Meg(WebDriver driver) {
 		element = driver.findElement(By.id(alertId));

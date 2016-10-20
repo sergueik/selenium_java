@@ -6,6 +6,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+
 public class HomePage {
 
 	private static WebElement element = null;
@@ -22,6 +25,7 @@ public class HomePage {
 	public static WebElement account_Btn(WebDriver driver) {
 		// element = driver.findElement(By.id("account"));
     element = driver.findElement(By.cssSelector("div#account"));
+		assertThat(element, notNullValue());
 		return element;
 	}
 

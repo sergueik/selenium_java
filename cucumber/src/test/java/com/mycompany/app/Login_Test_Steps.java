@@ -25,6 +25,7 @@ import cucumber.api.java.en.When;
  */
 
 public class Login_Test_Steps {
+  
 	public static WebDriver driver;
 	public static WebDriverWait wait;
 	String emptyMsg = "Please enter your username and password.";
@@ -56,13 +57,11 @@ public class Login_Test_Steps {
 		HomePage.login(driver, userName, pwd);
 	}
 
-	// @Ignore
 	@Then("^I am logged in$")
 	public void i_am_logged_in() throws Throwable {
 		assertTrue(HomePage.pageTitle(driver).contentEquals(pageTitle));
 	}
 
-	// @Ignore
 	@Then("^error message should throw$")
 	public void error_message_should_throw() throws Throwable {
 		String errorMsg = "ERROR";
@@ -70,7 +69,6 @@ public class Login_Test_Steps {
 				LoginPage.wrong_Response_Message(driver), errorMsg));
 	}
 
-	// @Ignore
 	@Then("^empty notice message should throw$")
 	public void empty_notice_message_should_throw() throws Throwable {
 		String emptyMsg = "Please enter your username and password.";

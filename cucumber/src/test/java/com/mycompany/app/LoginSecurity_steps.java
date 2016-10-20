@@ -29,15 +29,15 @@ public class LoginSecurity_steps {
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 	}
 
-	/*
-	 * @After public void testDown(){ driver.quit(); }
-	 */
+	@After
+	public void testDown() {
+		driver.quit();
+	}
 
 	@Ignore
-	@Given("^open en firefox browser$")
+	@Given("^I am at the home page$")
 	public void open_en_firefox_browser() throws Throwable {
 		driver.get("http://store.demoqa.com");
-		// HomePage.login(driver, "cat", "be123456");
 	}
 
 	@Ignore
@@ -50,7 +50,7 @@ public class LoginSecurity_steps {
 	@Ignore
 	@Then("^the page shows \"([^\"]*)\"$")
 	public void the_page_shows(String arg1) throws Throwable {
-		String remindMsg = "You must be logged in to use this page. Please use the form below to login to your account.";
+		String remindMsg = arg1;
 		assertTrue(LoginPage.account_Login_Remind_Msg(driver).getText()
 				.contains(remindMsg));
 	}
