@@ -1,8 +1,31 @@
-Feature: Login Functionality Feature
+Feature: Login Feature
 
-In order to ensure Login Functionality works,
-I want to run the cucumber test to verify it is working
+  @test
+    Scenario: Customer Login
+    Given I go to the home page
+    When I continue as "Customer Login"
+    Then I should be able to choose customer
+    
+  @test
+    Scenario: Bank Manager Login
+    Given I go to the home page
+    When I continue as "Bank Manager Login"
+    Then I should see "Add Customer"
+    And I should see "Open Account"
+    And I should see "Customers"
 
+  @positiveScenario
+    Scenario Outline: Existing Customer Login 
+    Given I go to the home page
+    When I continue as "Customer Login"
+    When I login as "<FirstName>", "<LastName>"
+    Then I am greeted by "<FirstName>", "<LastName>"
+    And I can choose my acccounts "<AccountNumbers>"
+    Examples:
+      |AccountNumbers|FirstName|LastName|
+      |1001,1002,1003|Hermoine |Granger |
+      |1004,1005,1006|Harry    |Potter  |
+    
 @negaviveScenario        
 Scenario Outline: 01 Unsuccessful login 
   Given I go to the start page
@@ -22,11 +45,3 @@ Scenario Outline: 02 Unsuccessful login with empty info
     |userName         |Password    |
     |                 |    		   |
        
-@positiveScenario
-Scenario Outline: 03 Successful login 
-  Given I go to the start page
-  When I enter username "<userName>" and password "<Password>"
-  Then I am logged in
-  Examples:
-    |userName       |Password |
-    |cat            |be123456 |                
