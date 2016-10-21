@@ -9,53 +9,64 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginPage {
+	
 	private static WebElement element = null;
 	private static WebDriverWait wait;
+	private static WebDriver driver;
 
-	public static WebElement account_Btn(WebDriver driver) {
+	public static WebDriver getDriver() {
+		return driver;
+	}
+
+	public static void setDriver(WebDriver value) {
+		driver = value;
+	}
+
+	public static WebElement account_Btn() {
 		element = driver.findElement(By.cssSelector("div#account"));
 		return element;
 	}
 
-	public static WebElement login_Btn(WebDriver driver) {
+	public static WebElement login_Btn() {
 		element = driver.findElement(By.id("login"));
 
 		return element;
 	}
 
-	public static WebElement log_Input(WebDriver driver) {
+	public static WebElement log_Input() {
 		wait = new WebDriverWait(driver, 30);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("log")));
 		element = driver.findElement(By.id("log"));
 		return element;
 	}
 
-	public static WebElement pwd_Input(WebDriver driver) {
+	public static WebElement pwd_Input() {
 		element = driver.findElement(By.id("pwd"));
 		return element;
 	}
 
-	public static WebElement wrong_Response_Message(WebDriver driver) {
+	public static WebElement wrong_Response_Message() {
 		wait = new WebDriverWait(driver, 30);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("response")));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By
+				.className("response")));
 		element = driver.findElement(By.className("response"));
 		return element;
 	}
-  
-  public static boolean MessageShown(WebDriver driver, String message){
-		wait = new WebDriverWait(driver, 30);
-  		wait.until(ExpectedConditions.textToBePresentInElement(
-				wrong_Response_Message(driver), message));    
-        return true;
-  }
 
-	public static String getLoginErrorMsg(WebDriver driver) {
-		System.out.println("----------------"
-				+ wrong_Response_Message(driver).getText());
-		return wrong_Response_Message(driver).getText();
+	public static boolean MessageShown(String message) {
+		wait = new WebDriverWait(driver, 30);
+		wait.until(ExpectedConditions.textToBePresentInElement(
+				wrong_Response_Message(), message));
+		return true;
 	}
 
-	public static WebElement account_Login_Remind_Msg(WebDriver driver) {
+	public static String getLoginErrorMsg() {
+		System.out.println("----------------"
+				+ wrong_Response_Message().getText());
+		return wrong_Response_Message().getText();
+	}
+
+	public static WebElement account_Login_Remind_Msg() {
 		element = driver.findElement(By.className("myaccount"));
 		return element;
 	}
