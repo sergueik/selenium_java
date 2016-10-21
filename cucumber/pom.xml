@@ -20,7 +20,6 @@
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>2.47.0</selenium.version>
-    <spring-version>4.2.5.RELEASE</spring-version>
   </properties>
   <dependencies>
     <dependency>
@@ -69,21 +68,6 @@
       <groupId>info.cukes</groupId>
       <artifactId>cucumber-junit</artifactId>
       <version>${cucumber-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>info.cukes</groupId>
-      <artifactId>cucumber-spring</artifactId>
-      <version>${cucumber-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${spring-version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <version>${spring-version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
