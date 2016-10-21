@@ -3,9 +3,14 @@ package com.mycompany.app;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class LoginPage {
 	private static WebElement element = null;
+	private static WebDriverWait wait;
 
 	public static WebElement account_Btn(WebDriver driver) {
 		element = driver.findElement(By.cssSelector("div#account"));
@@ -14,11 +19,13 @@ public class LoginPage {
 
 	public static WebElement login_Btn(WebDriver driver) {
 		element = driver.findElement(By.id("login"));
-    
+
 		return element;
 	}
 
 	public static WebElement log_Input(WebDriver driver) {
+		wait = new WebDriverWait(driver, 30);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("log")));
 		element = driver.findElement(By.id("log"));
 		return element;
 	}

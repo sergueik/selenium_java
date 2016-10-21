@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.mycompany</groupId>
-  <artifactId>cucumber-spring</artifactId>
+  <artifactId>cucumber</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <name>Cucumber</name>
   <description/>
@@ -11,7 +11,7 @@
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
-    <cucumber-version>1.2.4</cucumber-version>
+    <cucumber-version>1.2.5</cucumber-version>
     <java.version>1.7</java.version>
     <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
     <junit.version>4.12</junit.version>
