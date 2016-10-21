@@ -71,8 +71,8 @@ public class Login_Steps {
 		assertTrue(LoginPage.account_Login_Remind_Msg(driver).getText()
 				.contains(remindMsg));
 	}
-  // --------
-  
+
+	// --------
   
 	@When("^I enter username \"([^\"]*)\" and password \"([^\"]*)\"$")
 	public void loginWithUsernameAndPassword(String userName, String pwd)
@@ -83,6 +83,17 @@ public class Login_Steps {
 	@Then("^I am logged in$")
 	public void loggedIn() throws Throwable {
 		assertTrue(HomePage.pageTitle(driver).contentEquals(pageTitle));
+	}
+  // --------
+  
+  	@Then("^error message should throw$")
+	public void errorMessage() throws Throwable {
+    assertTrue(LoginPage.MessageShown(driver, "ERROR"));
+	}
+
+	@Then("^empty notice message should throw$")
+	public void noticeMessage() throws Throwable {
+    assertTrue(LoginPage.MessageShown(driver, "Please enter your username and password."));
 	}
 
 }

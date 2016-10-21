@@ -36,9 +36,18 @@ public class LoginPage {
 	}
 
 	public static WebElement wrong_Response_Message(WebDriver driver) {
+		wait = new WebDriverWait(driver, 30);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("response")));
 		element = driver.findElement(By.className("response"));
 		return element;
 	}
+  
+  public static boolean MessageShown(WebDriver driver, String message){
+		wait = new WebDriverWait(driver, 30);
+  		wait.until(ExpectedConditions.textToBePresentInElement(
+				wrong_Response_Message(driver), message));    
+        return true;
+  }
 
 	public static String getLoginErrorMsg(WebDriver driver) {
 		System.out.println("----------------"
