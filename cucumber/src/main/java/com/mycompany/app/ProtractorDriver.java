@@ -44,20 +44,19 @@ import com.jprotractor.NgWebElement;
 
 public class ProtractorDriver {
 
-	public static WebDriver driver;
-	public static NgWebDriver ngDriver;
-	private static WebDriverWait wait;
-	static int implicitWait = 10;
-	static int flexibleWait = 5;
-	static long pollingInterval = 500;
-	private static Actions actions;
-	private static final Logger log = LogManager
-			.getLogger(ProtractorDriver.class);
-	private static int highlightInterval = 100;
+	public WebDriver driver;
+	public NgWebDriver ngDriver;
+	private WebDriverWait wait;
+	int implicitWait = 10;
+	int flexibleWait = 5;
+	long pollingInterval = 500;
+	private Actions actions;
+	private final Logger log = LogManager.getLogger(ProtractorDriver.class);
+	private int highlightInterval = 100;
 
-	@Before
-	public void init() throws MalformedURLException {
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+	public ProtractorDriver() {
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
 
@@ -65,43 +64,37 @@ public class ProtractorDriver {
 				+ System.getProperty("file.separator") + "target"
 				+ System.getProperty("file.separator");
 
-		driver = new ChromeDriver(capabilities);
+		// driver = new ChromeDriver(capabilities);
+		driver = new FirefoxDriver(capabilities);
 		ngDriver = new NgWebDriver(driver);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
 	}
 
-	@After
-	public void tearDown(Scenario scenario) {
-		if (driver != null) {
-			driver.quit();
-		}
-	}
-
-	public static void waitForElementVisible(By locator) {
+	public void waitForElementVisible(By locator) {
 		log.info("Waiting for element visible for locator: {}", locator);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 	}
 
-	public static void waitForElementVisible(By locator, long timeout) {
+	public void waitForElementVisible(By locator, long timeout) {
 		log.info("Waiting for element visible for locator: {}", locator);
 		WebDriverWait wait = new WebDriverWait(driver, timeout);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 	}
 
-	public static void waitForElementPresent(By locator) {
+	public void waitForElementPresent(By locator) {
 		log.info("Waiting for element present  for locator: {}", locator);
 		wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public static void waitForElementPresent(By locator, long timeout) {
+	public void waitForElementPresent(By locator, long timeout) {
 		log.info("Waiting for element present for locator: {}", locator);
 		WebDriverWait wait = new WebDriverWait(driver, timeout);
 		wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public static void waitForPageLoad() {
+	public void waitForPageLoad() {
 		log.info("Wait for page load via JS...");
 		String state = "";
 		int counter = 0;
@@ -120,13 +113,13 @@ public class ProtractorDriver {
 
 	}
 
-	public static boolean isAttributePresent(By locator, String attribute) {
+	public boolean isAttributePresent(By locator, String attribute) {
 		log.info("Is Attribute Present for locator: {}, attribute: {}", locator,
 				attribute);
 		return ngDriver.findElement(locator).getAttribute(attribute) != null;
 	}
 
-	public static void selectDropdownByIndex(By locator, int index) {
+	public void selectDropdownByIndex(By locator, int index) {
 		log.info("Select Dropdown for locator: {} and index: {}", locator, index);
 		try {
 			Select select = new Select(ngDriver.findElement(locator));
@@ -135,8 +128,8 @@ public class ProtractorDriver {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void clickJS(By locator) {
+
+	public void clickJS(By locator) {
 		log.info("Clicking on locator via JS: {}", locator);
 		wait.until(ExpectedConditions.elementToBeClickable(ngDriver
 				.findElement(locator)));
@@ -144,48 +137,48 @@ public class ProtractorDriver {
 				ngDriver.findElement(locator).getWrappedElement());
 	}
 
-	public static void scrollIntoView(By locator) {
+	public void scrollIntoView(By locator) {
 		log.info("Scrolling into view: {}", locator);
 		((JavascriptExecutor) driver).executeScript(
 				"arguments[0].scrollIntoView(true);", ngDriver.findElement(locator)
 						.getWrappedElement());
 	}
 
-	public static void mouseOver(By locator) {
+	public void mouseOver(By locator) {
 		log.info("Mouse over: {}", locator);
 		actions.moveToElement(ngDriver.findElement(locator).getWrappedElement())
 				.build().perform();
 	}
 
-	public static void click(By locator) {
+	public void click(By locator) {
 		log.info("Clicking: {}", locator);
 		ngDriver.findElement(locator).click();
 	}
 
-	public static void clear(By locator) {
+	public void clear(By locator) {
 		log.info("Clearing input: {}", locator);
 		ngDriver.findElement(locator).clear();
 	}
 
-	public static void sendKeys(By locator, String text) {
+	public void sendKeys(By locator, String text) {
 		log.info("Typing \"{}\" into locator: {}", text, locator);
 		ngDriver.findElement(locator).sendKeys(text);
 	}
 
-	public static String getText(By locator) {
+	public String getText(By locator) {
 		String text = ngDriver.findElement(locator).getText();
 		log.info("The string at {} is: {}", locator, text);
 		return text;
 	}
 
-	public static String getAttributeValue(By locator, String attribute) {
+	public String getAttributeValue(By locator, String attribute) {
 		String value = ngDriver.findElement(locator).getAttribute(attribute);
 		log.info("The attribute \"{}\" value of {} is: {}", attribute, locator,
 				value);
 		return value;
 	}
 
-	public static boolean isElementVisible(By locator) {
+	public boolean isElementVisible(By locator) {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			log.info("Element {} is visible", locator);
@@ -196,7 +189,7 @@ public class ProtractorDriver {
 		}
 	}
 
-	public static boolean isElementNotVisible(By locator) {
+	public boolean isElementNotVisible(By locator) {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			log.info("Element {} is visible", locator);
@@ -207,12 +200,12 @@ public class ProtractorDriver {
 		}
 	}
 
-	public static String getBodyText() {
+	public String getBodyText() {
 		log.info("Getting boby text");
 		return ngDriver.findElement(By.tagName("body")).getText();
 	}
 
-	public static void highlight(By locator) throws InterruptedException {
+	public void highlight(By locator) throws InterruptedException {
 		log.info("Highlighting element {}", locator);
 		WebElement element = ngDriver.findElement(locator);
 		((JavascriptExecutor) driver).executeScript(

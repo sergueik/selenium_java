@@ -11,33 +11,39 @@ import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
-import com.mycompany.app.ProtractorDriver;
-
 public class AngularCalculatorPage {
 
-  private final By _valueBox = NgBy.model("first");
-  private final By _goButton = NgBy.partialButtonText("Go");  // By.id("gobutton");
-  private final By _result = NgBy.binding("latest");
+	private final By valueBox = NgBy.model("first");
+	private final By button = NgBy.partialButtonText("Go"); // By.id("gobutton");
+	private final By result = NgBy.binding("latest");
+	private ProtractorDriver driver;
 
-  public void isAngularPagePageDisplayed(String url) {
-    ProtractorDriver.ngDriver.get(url);
-    ProtractorDriver.waitForElementVisible(_valueBox);
-  }
+	public ProtractorDriver getDriver() {
+		return driver;
+	}
 
-  public void enterValue(String model, String value) {
-    ProtractorDriver.sendKeys(NgBy.model(model), value);
-  }
+	public void setDriver(ProtractorDriver value) {
+		driver = value;
+	}
 
-  public void evaluateResult() {
-    ProtractorDriver.click(_goButton);
-  }
+	public void isPageDisplayed(String url) {
+		driver.ngDriver.get(url);
+		driver.waitForElementVisible(valueBox);
+	}
 
-  public String getDisplayedResult() throws InterruptedException{
-    Thread.sleep(3000);
-    ProtractorDriver.ngDriver.waitForAngular();
-    ProtractorDriver.waitForElementVisible(_result);
-    ProtractorDriver.highlight(_result);
-    return ProtractorDriver.getText(_result);
-  }
+	public void enterValue(String model, String value) {
+		driver.sendKeys(NgBy.model(model), value);
+	}
 
+	public void evaluateResult() {
+		driver.click(button);
+	}
+
+	public String getDisplayedResult() throws InterruptedException {
+		Thread.sleep(3000);
+		driver.ngDriver.waitForAngular();
+		driver.waitForElementVisible(result);
+		driver.highlight(result);
+		return driver.getText(result);
+	}
 }
