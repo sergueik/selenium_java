@@ -22,9 +22,8 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
-//  TODO:
-// import org.openqa.selenium.phantomjs.PhantomJSDriver;
-// import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.Platform;
 
 import org.openqa.selenium.remote.CapabilityType;
@@ -55,8 +54,8 @@ public class ProtractorDriver {
 	private int highlightInterval = 100;
 
 	public ProtractorDriver() {
-		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
 
@@ -64,8 +63,8 @@ public class ProtractorDriver {
 				+ System.getProperty("file.separator") + "target"
 				+ System.getProperty("file.separator");
 
-		// driver = new ChromeDriver(capabilities);
-		driver = new FirefoxDriver(capabilities);
+		driver = new ChromeDriver(capabilities);
+		// driver = new FirefoxDriver(capabilities);
 		ngDriver = new NgWebDriver(driver);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);

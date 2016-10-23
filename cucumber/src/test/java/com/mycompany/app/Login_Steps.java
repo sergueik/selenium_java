@@ -50,9 +50,6 @@ public class Login_Steps {
 
 	@Given("^I go to the start page$")
 	public void goStartPage() throws Throwable {
-		// Cucumber framework does not appear to recognize Before / After annotation
-		// of the Junit framework
-		// setup();
 		driver.navigate().to("http://store.demoqa.com");
 	}
 
@@ -90,7 +87,7 @@ public class Login_Steps {
 	@Then("^I am logged in$")
 	public void loggedIn() throws Throwable {
 		LoginPage.setDriver(driver);
-		HomePage.setDriver(driver);    
+		HomePage.setDriver(driver);
 		assertTrue(HomePage.pageTitle().contentEquals(pageTitle));
 	}
 
