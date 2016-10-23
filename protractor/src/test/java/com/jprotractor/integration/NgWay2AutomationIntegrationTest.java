@@ -2,6 +2,7 @@ package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -193,7 +194,7 @@ public class NgWay2AutomationIntegrationTest {
 		assertTrue(currency.getText().matches("^(?:Dollar|Pound|Rupee)$"));
 		highlight(currency);
 
-		// And I can switch to any of my accounts
+		// And I can switch to every account owned
 		ArrayList<String> avaliableAccounts = new ArrayList<String>();
 		Enumeration<WebElement> accounts = Collections.enumeration(ngDriver
 				.findElements(NgBy.options("account for account in Accounts")));
@@ -208,6 +209,11 @@ public class NgWay2AutomationIntegrationTest {
 			assertFalse(matcher.find());
 			avaliableAccounts.add(otherAccountId);
 		}
+    
+		// And I can find some of my accounts - note the usage of CollecionUtils
+    assertTrue(CollectionUtils.containsAny(avaliableAccounts,  new ArrayList<String>(Arrays.asList(customerAccounts))));
+
+		// And I can find every my account
 		assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays
 				.asList(customerAccounts))));
 		
