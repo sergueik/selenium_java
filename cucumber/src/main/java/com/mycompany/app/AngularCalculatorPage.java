@@ -13,33 +13,33 @@ import com.jprotractor.NgWebElement;
 
 public class AngularCalculatorPage {
 
-	private final By valueBox = NgBy.model("first");
-	private final By button = NgBy.partialButtonText("Go"); // By.id("gobutton");
-	private final By result = NgBy.binding("latest");
-	private ProtractorDriver driver;
+	private static final By valueBox = NgBy.model("first");
+	private static final By button = NgBy.partialButtonText("Go"); // By.id("gobutton");
+	private static final By result = NgBy.binding("latest");
+	private static ProtractorDriver driver;
 
-	public ProtractorDriver getDriver() {
+	public static ProtractorDriver getDriver() {
 		return driver;
 	}
 
-	public void setDriver(ProtractorDriver value) {
+	public static void setDriver(ProtractorDriver value) {
 		driver = value;
 	}
 
-	public void isPageDisplayed(String url) {
+	public static void isPageDisplayed(String url) {
 		driver.ngDriver.get(url);
 		driver.waitForElementVisible(valueBox);
 	}
 
-	public void enterValue(String model, String value) {
+	public static void enterValue(String model, String value) {
 		driver.sendKeys(NgBy.model(model), value);
 	}
 
-	public void evaluateResult() {
+	public static void evaluateResult() {
 		driver.click(button);
 	}
 
-	public String getDisplayedResult() throws InterruptedException {
+	public static String getDisplayedResult() throws InterruptedException {
 		Thread.sleep(3000);
 		driver.ngDriver.waitForAngular();
 		driver.waitForElementVisible(result);

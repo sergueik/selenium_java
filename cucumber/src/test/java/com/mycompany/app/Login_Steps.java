@@ -35,18 +35,22 @@ public class Login_Steps {
 	String emptyMsg = "Please enter your username and password.";
 	String pageTitle = "Your Account | ONLINE STORE";
 
-	@Before
+	@Before("@Regular")
 	public void setup() {
 		driver = new FirefoxDriver();
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 		driver.manage().window().maximize();
 		WebDriverWait wait = new WebDriverWait(driver, 30);
+		LoginPage.setDriver(driver);
+		HomePage.setDriver(driver);
 	}
 
-	@After
+	@After("@Regular")
 	public void tearDown() {
 		driver.quit();
 	}
+
+  // -- for screnario: Login Page Security Warning
 
 	@Given("^I go to the start page$")
 	public void goStartPage() throws Throwable {
@@ -59,7 +63,6 @@ public class Login_Steps {
 	// will raise cucumber.runtime.DuplicateStepDefinitionException
 	@When("^I go to Account page$")
 	public void goToAccountPage() throws Throwable {
-		LoginPage.setDriver(driver);
 		driver.navigate().to(
 				"http://store.demoqa.com/products-page/your-account/?login=1");
 	}
@@ -67,43 +70,34 @@ public class Login_Steps {
 	// Can not create duplicates - e.g. Some_Other_Steps cannot have its own
 	// version of pageShows
 	@Then("^The page shows \"([^\"]*)\"$")
-	public void pageShows(String arg1) throws Throwable {
-		String remindMsg = arg1;
-		LoginPage.setDriver(driver);
-		assertTrue(LoginPage.account_Login_Remind_Msg().getText()
-				.contains(remindMsg));
+	public void pageShows(String messsage) throws Throwable {
+		assertTrue(LoginPage.accountMessage().getText().contains(messsage));
 	}
 
-	// --------
+	// for scenario: Ability to Login
 
 	@When("^I enter username \"([^\"]*)\" and password \"([^\"]*)\"$")
 	public void loginWithUsernameAndPassword(String userName, String pwd)
 			throws Throwable {
-		LoginPage.setDriver(driver);
-		HomePage.setDriver(driver);
 		HomePage.login(userName, pwd);
 	}
 
 	@Then("^I am logged in$")
-	public void loggedIn() throws Throwable {
-		LoginPage.setDriver(driver);
-		HomePage.setDriver(driver);
+	public void confirmLoggedIn() throws Throwable {
 		assertTrue(HomePage.pageTitle().contentEquals(pageTitle));
 	}
 
-	// --------
+	// for scenario: Failed Login
 
 	@Then("^error message should throw$")
 	public void errorMessage() throws Throwable {
-		LoginPage.setDriver(driver);
-		assertTrue(LoginPage.MessageShown("ERROR"));
+		assertTrue(LoginPage.isResponseMessageShown("ERROR"));
 	}
 
 	@Then("^empty notice message should throw$")
 	public void noticeMessage() throws Throwable {
-		LoginPage.setDriver(driver);
 		assertTrue(LoginPage
-				.MessageShown("Please enter your username and password."));
+				.isResponseMessageShown("Please enter your username and password."));
 	}
 
 }

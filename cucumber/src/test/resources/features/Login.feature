@@ -1,7 +1,8 @@
+@Regular
 Feature: Login page
 
   @test
-  Scenario: Check Security Warning of Login Page
+  Scenario: Login Page Security Warning
     Given I go to the start page
     When I go to Account page
     Then The page shows "You must be logged in to use this page."
@@ -9,7 +10,7 @@ Feature: Login page
 
   # The same step description annotated as When will be found through Given
   @test
-  Scenario: Check ability to login
+  Scenario: Ability to Login
     Given I go to Account page
     When I enter username "cat" and password "be123456"
     Then I am logged in

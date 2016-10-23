@@ -18,7 +18,7 @@ import cucumber.api.SnippetType;
 		"src/test/resources/features"
 	}, 
 	glue = {
-		"com.mycompany"
+		"com.mycompany.app"
 	}, 
 	tags = {
 		"@test",

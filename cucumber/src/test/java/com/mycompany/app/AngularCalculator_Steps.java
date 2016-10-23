@@ -22,41 +22,39 @@ import com.mycompany.app.ProtractorDriver;
 
 public class AngularCalculator_Steps {
 
-	private AngularCalculatorPage page;
 	private ProtractorDriver driver;
 
-	@Before
+	@Before("@Angular")
 	public void setup() {
-		page = new AngularCalculatorPage();
 		driver = new ProtractorDriver();
-		page.setDriver(driver);
+		AngularCalculatorPage.setDriver(driver);
 	}
 
-	@After
+	@After("@Angular")
 	public void tearDown() {
-		driver.ngDriver.quit();
+		driver.quit();
 	}
 
 	@Given("^I open angular page url \"(.*)\"$")
 	public void I_open_angular_page_url(String url) throws InterruptedException {
-		page.isPageDisplayed(url);
+		AngularCalculatorPage.isPageDisplayed(url);
 	}
 
 	@When("^I enter \"([^\"]*)\" into \"([^\"]*)\"$")
 	public void I_enter_value(String value, String model)
 			throws InterruptedException {
-		page.enterValue(model, value);
+		AngularCalculatorPage.enterValue(model, value);
 	}
 
 	@When("^I evaluate result$")
 	public void I_evaluate_result() throws InterruptedException {
-		page.evaluateResult();
+		AngularCalculatorPage.evaluateResult();
 		Thread.sleep(1000);
 	}
 
 	@Then("^I should get \"([^\"]*)\"$")
 	public void i_should_get(String value) throws Throwable {
-		assertThat(page.getDisplayedResult(), containsString(value));
+		assertThat(AngularCalculatorPage.getDisplayedResult(), containsString(value));
 	}
 
 }

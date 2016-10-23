@@ -28,8 +28,8 @@ public class LoginPage {
 	}
 
 	public static WebElement login_Btn() {
-		element = driver.findElement(By.id("login"));
-
+    WebElement form = driver.findElement(By.id("ajax_loginform")); 
+		element = form.findElement(By.id("login"));
 		return element;
 	}
 
@@ -41,11 +41,12 @@ public class LoginPage {
 	}
 
 	public static WebElement pwd_Input() {
-		element = driver.findElement(By.id("pwd"));
+    WebElement form = driver.findElement(By.id("ajax_loginform")); 
+		element = form.findElement(By.id("pwd"));
 		return element;
 	}
 
-	public static WebElement wrong_Response_Message() {
+	public static WebElement responseMessage() {
 		wait = new WebDriverWait(driver, 30);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By
 				.className("response")));
@@ -53,20 +54,20 @@ public class LoginPage {
 		return element;
 	}
 
-	public static boolean MessageShown(String message) {
+	public static boolean isResponseMessageShown(String message) {
 		wait = new WebDriverWait(driver, 30);
 		wait.until(ExpectedConditions.textToBePresentInElement(
-				wrong_Response_Message(), message));
+				responseMessage(), message));
 		return true;
 	}
 
 	public static String getLoginErrorMsg() {
 		System.out.println("----------------"
-				+ wrong_Response_Message().getText());
-		return wrong_Response_Message().getText();
+				+ responseMessage().getText());
+		return responseMessage().getText();
 	}
 
-	public static WebElement account_Login_Remind_Msg() {
+	public static WebElement accountMessage() {
 		element = driver.findElement(By.className("myaccount"));
 		return element;
 	}
