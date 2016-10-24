@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- origin: http://jsfiddle.net/uftHelp/bx2btm2k/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js">
+</script>
+</head>
+<body>
+<div ng-app>
+  Show Me:
+  <input type = "checkbox" ng-model="Color"/>
+  <div ng-show = "Color" style="width:50px;height:50px;background-color:red;"></div>
+  Hide Me:
+  <input type = "checkbox" ng-model="hideColor"/>
+  <div ng-hide = "hideColor" style="width:50px;height:50px;background-color:green;"></div>
+</div>
+</body>
+</html>

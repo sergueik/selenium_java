@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<!-- origin // http://jsfiddle.net/sahilosheal/mew1kk6j/ -->
+<!-- wait samle:
+
+def static wait(String location, long timeout = 20) {
+        new WebDriverWait(DriverManager.getWebDriver(), timeout).pollingEvery(2, TimeUnit.SECONDS).until(new ExpectedCondition<Boolean>() {
+            @Override
+            public Boolean apply(WebDriver d) {
+                return (d.findElements(By.cssSelector(location)).size() == 0);
+            }
+        })
+    }
+-->
+<head>
+<style>
+td { padding: 5px; }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js">
+</script>
+<script src="http://spin.js.org/spin.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/angular-spinner/0.6.1/angular-spinner.js">
+</script>
+<script type="text/javascript">
+angular.module('myApp', ['appServices', 'angularSpinner']).controller('appCtrl', function($scope, data, usSpinnerService) {
+    $scope.delete = function() {
+        $scope.data = 'deleting data...';
+        usSpinnerService.spin('spinner-1');
+        data.getIP().then(function(promise) {
+            usSpinnerService.stop('spinner-1');
+            if (angular.isObject(promise.data)) {
+                $scope.data = 'data was deleted!';
+                console.log(promise.data);
+            }
+        });
+    }
+})
+
+angular.module('appServices', []).factory('data', function($http, $q, $interval) {
+    var factory = {};
+    factory.getIP = function() {
+
+        var deferred = $q.defer();
+        $interval(function() { //wait 3 seconds before execute the post
+            deferred.resolve(
+                $http.post('http://ip.jsontest.com/', {
+                    /* POST variables here */
+                    procces_id: new Date().getMilliseconds()
+                }).success(function(data, status, headers, config) {
+                    return data;
+                }).error(function(data, status, headers, config) {
+                    return {
+                        "status": false
+                    };
+                })
+            );
+        }, 3000, 1);
+        return deferred.promise;
+
+    };
+    return factory;
+});
+</script>
+</head>
+  <body ng-controller="appCtrl">
+<div>
+    <button ng-click="delete()">Delete Data</button>
+    <span us-spinner="{radius:10, width:4, length: 8}" spinner-key="spinner-1" spinner-start-active="stop"></span>
+    {{data}}
+</div>
+  </body>
+</html>
