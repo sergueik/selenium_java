@@ -129,7 +129,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
 	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
-	// @Ignore
+	// // @Ignore
 	@Test
 	public void testCustomerLogin() throws Exception {
 		if (isCIBuild) {
@@ -186,6 +186,13 @@ public class NgWay2AutomationIntegrationTest {
 		matcher = pattern.matcher(ng_accountNo.getText());
 		assertFalse(matcher.find());
 
+		// alternative to java.util.regex
+		ArrayList<String> oneAcountArray = new ArrayList<String>();
+		oneAcountArray.add(ng_accountNo.getText());
+		assertTrue(CollectionUtils.containsAny(oneAcountArray,
+				new ArrayList<String>(Arrays.asList(customerAccounts))));
+		oneAcountArray.clear();
+
 		WebElement balance = ngDriver.findElement(NgBy.binding("amount"));
 		assertTrue(balance.getText().matches("^\\d+$"));
 		highlight(balance);
@@ -209,23 +216,19 @@ public class NgWay2AutomationIntegrationTest {
 			assertFalse(matcher.find());
 			avaliableAccounts.add(otherAccountId);
 		}
-    
-		// And I can find some of my accounts - note the usage of CollecionUtils
-    assertTrue(CollectionUtils.containsAny(avaliableAccounts,  new ArrayList<String>(Arrays.asList(customerAccounts))));
 
 		// And I can find every my account
 		assertTrue(avaliableAccounts.containsAll(new HashSet<String>(Arrays
 				.asList(customerAccounts))));
-		
-		accounts = Collections.enumeration(ngDriver
-				.findElements(NgBy.options("account for account in Accounts")));
+
+		accounts = Collections.enumeration(ngDriver.findElements(NgBy
+				.options("account for account in Accounts")));
 
 		while (accounts.hasMoreElements()) {
 			WebElement currentAccount = accounts.nextElement();
-				System.err.println(currentAccount.getText());
-				currentAccount.click();
+			System.err.println(currentAccount.getText());
+			currentAccount.click();
 		}
-
 	}
 
 	// @Ignore
@@ -311,7 +314,7 @@ public class NgWay2AutomationIntegrationTest {
 		WebElement customer = customers.get(random_customer_index);
 		String customerName = customer.getText();
 		System.err.println(customerName);
-		
+
 		customer.click();
 		NgWebElement ng_selectCurrencies = ngDriver.findElement(NgBy
 				.model("currency"));
@@ -333,7 +336,7 @@ public class NgWay2AutomationIntegrationTest {
 		actions.moveToElement(submitButton).build().perform();
 		highlight(submitButton);
 		submitButton.click();
-		String newAccount = null; 
+		String newAccount = null;
 		try {
 			alert = seleniumDriver.switchTo().alert();
 			String alert_text = alert.getText();
@@ -351,7 +354,7 @@ public class NgWay2AutomationIntegrationTest {
 		} catch (NoAlertPresentException ex) {
 			// Alert not present
 			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
-      // observed in Chrome. Ignore
+			// observed in Chrome. Ignore
 			// return;
 		} catch (WebDriverException ex) {
 			// fullStackTrace =
@@ -383,16 +386,18 @@ public class NgWay2AutomationIntegrationTest {
 			if (currentCustomer.getText().indexOf(customerName) >= 0) {
 				// System.err.println("Current customer: " + currentCustomer.getText());
 				highlight(currentCustomer);
-				NgWebElement ng_currentCustomer = new NgWebElement(ngDriver, currentCustomer);
-				Enumeration<WebElement> accountsEnum = Collections.enumeration(ng_currentCustomer
-						.findElements(NgBy.repeater("account in cust.accountNo")));
+				NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,
+						currentCustomer);
+				Enumeration<WebElement> accountsEnum = Collections
+						.enumeration(ng_currentCustomer.findElements(NgBy
+								.repeater("account in cust.accountNo")));
 				while (accountsEnum.hasMoreElements()) {
 					// find the account
 					WebElement currentAccount = accountsEnum.nextElement();
 					if (currentAccount.getText().indexOf(newAccount) >= 0) {
 						highlight(currentAccount);
 					}
-					}
+				}
 			}
 		}
 	}
