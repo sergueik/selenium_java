@@ -7,12 +7,10 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.IOException;
-
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -26,8 +24,10 @@ import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -145,5 +145,19 @@ public class CommonFunctions {
 		} else {
 			throw new RuntimeException("Script execution failed.");
 		}
+	}
+
+	// custom wait e.g. while Login light box is visible
+	public static void waitWhileElementIsVisible(By locator) {
+		final By _locator = locator;
+		new WebDriverWait(seleniumDriver, flexibleWait).pollingEvery(
+				pollingInterval, TimeUnit.SECONDS).until(
+				new ExpectedCondition<Boolean>() {
+					@Override
+					public Boolean apply(WebDriver o) {
+						return (o.findElements(_locator).size() == 0);
+					}
+				});
+
 	}
 }

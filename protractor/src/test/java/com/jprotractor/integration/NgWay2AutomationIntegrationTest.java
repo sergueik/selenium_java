@@ -109,6 +109,59 @@ public class NgWay2AutomationIntegrationTest {
 		ngDriver.navigate().to(baseUrl);
 	}
 
+	@Test
+	public void testLogintToWay2AutomationSite() throws InterruptedException{
+		String login_url = "http://way2automation.com/way2auto_jquery/index.php";
+		String username = System.getenv("TEST_USERNAME");
+		String password = System.getenv("TEST_PASSWORD");
+    WebDriver driver = ngDriver.getWrappedDriver();
+		//
+		driver.navigate().to(login_url);
+    Thread.sleep(1000);
+		// signup
+
+    wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("load_box")));
+		WebElement load_form = driver
+				.findElement(By
+						.cssSelector("div#load_box.popupbox form#load_form"));
+		highlight(load_form );
+
+		WebElement signup_link = load_form
+				.findElement(By
+						.cssSelector("a.fancybox[href='#login']"));
+		actions.moveToElement(signup_link).build().perform();
+		highlight(signup_link);
+		signup_link.click();
+		// enter username
+		WebElement login_username = driver
+				.findElement(By
+						.cssSelector("div#login.popupbox form#load_form input[name='username']"));
+		highlight(login_username);
+		login_username.sendKeys(username);
+		// enter password
+		WebElement login_password = driver
+				.findElement(By
+						.cssSelector("div#login.popupbox form#load_form input[type='password'][name='password']"));
+		highlight(login_password);
+		login_password.sendKeys(password);
+		// click "Login"
+		actions
+				.moveToElement(
+						driver.findElement(By
+								.cssSelector("div#login.popupbox form#load_form [value='Submit']")))
+				.click().build().perform();
+		// wait until the login popup box disappears with .Net delegate
+		// .net / jave 8: 
+		// wait.Until(d =>
+		// (d.FindElements(By.CssSelector("div#login.popupbox")).Count == 0));
+    if (driver.findElement(By.className("popupbox")).isDisplayed()){
+    	System.err.println("waiting while popup box is visible");
+      CommonFunctions.waitWhileElementIsVisible(By
+				.cssSelector("div#login.popupbox"));
+    }
+    	System.err.println("Popup box is not diplayed");
+	}
+
 	/*
 	 * 
 	 * Feature: Login Feature
@@ -129,7 +182,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
 	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
-	// // @Ignore
+	// @Ignore
 	@Test
 	public void testCustomerLogin() throws Exception {
 		if (isCIBuild) {
