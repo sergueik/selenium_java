@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<TestRun id="6e03b379-5354-453d-8650-9e980225cc9a" name="sergueik@SERGUEIK42 2014-12-21 17:13:16" runUser="sergueik42\sergueik" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <TestSettings name="Default Test Settings" id="d9a83df2-92ed-490d-a3c7-34bc3f6fe541">
+    <Deployment userDeploymentRoot="C:\developer\sergueik\csharp\selenium\mstest\test1" useDefaultDeploymentRoot="false" runDeploymentRoot="sergueik_SERGUEIK42 2014-12-21 17_13_16" />
+    <Execution>
+      <TestTypeSpecific />
+      <AgentRule name="Execution Agents">
+      </AgentRule>
+    </Execution>
+  </TestSettings>
+  <Times creation="2014-12-21T17:13:16.7257311-05:00" queuing="2014-12-21T17:13:16.9861055-05:00" start="2014-12-21T17:13:17.0461919-05:00" finish="2014-12-21T17:13:37.6426623-05:00" />
+  <ResultSummary outcome="Failed">
+    <Counters total="2" executed="2" passed="1" error="0" failed="1" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+  </ResultSummary>
+  <TestDefinitions>
+    <UnitTest name="Test_1" storage="sample\bin\debug\sample.dll" id="622f180d-db9d-c94f-886a-190becfed416">
+      <Execution id="622d9b91-be3e-4ae6-a212-96c624717d4f" />
+      <TestMethod codeBase="C:/developer/sergueik/csharp/selenium/mstest/test1/Sample/bin/Debug/Sample.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="SeleniumTests.SeleniumTest, Sample, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Test_1" />
+    </UnitTest>
+    <UnitTest name="Test_2" storage="sample\bin\debug\sample.dll" id="c3c79f80-db39-8791-6754-60164e5a58fe">
+      <Execution id="f3099cad-a4c5-48e1-a5a4-64ecd6b98c0a" />
+      <TestMethod codeBase="C:/developer/sergueik/csharp/selenium/mstest/test1/Sample/bin/Debug/Sample.DLL" adapterTypeName="Microsoft.VisualStudio.TestTools.TestTypes.Unit.UnitTestAdapter, Microsoft.VisualStudio.QualityTools.Tips.UnitTest.Adapter, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" className="SeleniumTests.SeleniumTest, Sample, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null" name="Test_2" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestLists>
+    <TestList name="Results Not in a List" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="All Loaded Results" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <TestEntries>
+    <TestEntry testId="622f180d-db9d-c94f-886a-190becfed416" executionId="622d9b91-be3e-4ae6-a212-96c624717d4f" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestEntry testId="c3c79f80-db39-8791-6754-60164e5a58fe" executionId="f3099cad-a4c5-48e1-a5a4-64ecd6b98c0a" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <Results>
+    <UnitTestResult executionId="622d9b91-be3e-4ae6-a212-96c624717d4f" testId="622f180d-db9d-c94f-886a-190becfed416" testName="Test_1" computerName="SERGUEIK42" duration="00:00:09.9649271" startTime="2014-12-21T17:13:17.0461919-05:00" endTime="2014-12-21T17:13:27.1996319-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="622d9b91-be3e-4ae6-a212-96c624717d4f">
+    </UnitTestResult>
+    <UnitTestResult executionId="f3099cad-a4c5-48e1-a5a4-64ecd6b98c0a" testId="c3c79f80-db39-8791-6754-60164e5a58fe" testName="Test_2" computerName="SERGUEIK42" duration="00:00:10.4113089" startTime="2014-12-21T17:13:27.2096463-05:00" endTime="2014-12-21T17:13:37.6226335-05:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Failed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="f3099cad-a4c5-48e1-a5a4-64ecd6b98c0a">
+      <Output>
+        <ErrorInfo>
+          <Message>Assert.IsTrue failed. Cruises | Carnival Cruise Deals: Caribbean, Bahamas, Alaska, Mexico</Message>
+          <StackTrace>   at SeleniumTests.SeleniumTest.Test_2() in c:\developer\sergueik\csharp\selenium\mstest\test1\Sample\Test.cs:line 92
+</StackTrace>
+        </ErrorInfo>
+      </Output>
+    </UnitTestResult>
+  </Results>
+</TestRun>
