@@ -1,12 +1,13 @@
-﻿Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Program", "Program\Program.csproj", "{1ACABC83-DF5A-4942-83CE-615E15DEDCED}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{A8AAC6ED-6C92-423C-BE77-0C8F1D191EAA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{CAA3B681-1D35-4E36-BA57-44C68CB33D3E}"
 	ProjectSection(SolutionItems) = preProject
-		Local.testsettings = Local.testsettings
-		mstest.vsmdi = generator.vsmdi
-		TraceAndTestImpact.testsettings = generator.testsettings
+		.nuget\packages.config = .nuget\packages.config
 	EndProjectSection
 EndProject
 Global

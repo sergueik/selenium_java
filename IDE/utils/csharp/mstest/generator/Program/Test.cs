@@ -13,7 +13,6 @@ using OpenQA.Selenium.Support.UI;
 using OpenQA.Selenium.Firefox;
 using OpenQA.Selenium.IE;
 
-// TODO : App.config 
 namespace SeleniumTests
 {
     [TestClass]
@@ -42,23 +41,20 @@ namespace SeleniumTests
             verificationErrors = new StringBuilder();
             DesiredCapabilities capability = DesiredCapabilities.Firefox();
             driver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), capability);
-
             driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(20));
             driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.FromSeconds(50));
             driver.Manage().Window.Maximize();
             driver.Navigate();
-
         }
 
         [TestMethod]
-        public void Test()
+        public void SkeletonTestMethod()
         {
             // Arrange
             driver.Url = "http://www.wikipedia.org";
             driver.Navigate().GoToUrl(driver.Url);
             // Act
             // WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10)) ;
-
             //Find the Element and create an object so we can use it
             IWebElement queryBox = driver.FindElement(By.Id("searchInput"));
             //Work with the Element that's on the page
