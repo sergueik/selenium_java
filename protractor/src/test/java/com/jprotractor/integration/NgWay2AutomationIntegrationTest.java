@@ -117,7 +117,7 @@ public class NgWay2AutomationIntegrationTest {
     WebDriver driver = ngDriver.getWrappedDriver();
 		//
 		driver.navigate().to(login_url);
-    Thread.sleep(1000);
+   //  Thread.sleep(1000);
 		// signup
 
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("load_box")));
@@ -144,6 +144,7 @@ public class NgWay2AutomationIntegrationTest {
 						.cssSelector("div#login.popupbox form#load_form input[type='password'][name='password']"));
 		highlight(login_password);
 		login_password.sendKeys(password);
+		// to try the method, can always invoke it before submiting the credentias
 		// click "Login"
 		actions
 				.moveToElement(
@@ -154,12 +155,12 @@ public class NgWay2AutomationIntegrationTest {
 		// .net / jave 8: 
 		// wait.Until(d =>
 		// (d.FindElements(By.CssSelector("div#login.popupbox")).Count == 0));
-    if (driver.findElement(By.className("popupbox")).isDisplayed()){
-    	System.err.println("waiting while popup box is visible");
-      CommonFunctions.waitWhileElementIsVisible(By
-				.cssSelector("div#login.popupbox"));
-    }
-    	System.err.println("Popup box is not diplayed");
+		if (driver.findElement(By.cssSelector("div#login.popupbox")).isDisplayed()) {
+			System.err.println("Waiting while Login Popup Box is visible");
+			CommonFunctions.waitWhileElementIsVisible(By
+					.cssSelector("div#login.popupbox input[type='hidden'][name='action']"));
+		}
+    System.err.println("Login Popup Box is not diplayed");
 	}
 
 	/*
@@ -182,7 +183,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
 	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
-	// @Ignore
+	@Ignore
 	@Test
 	public void testCustomerLogin() throws Exception {
 		if (isCIBuild) {
@@ -284,7 +285,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testEvaluateTransactionDetails() throws Exception {
 		if (isCIBuild) {
@@ -346,7 +347,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testOpenAccount() throws Exception {
 		if (isCIBuild) {
@@ -455,7 +456,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testSortCustomerAccounts() throws Exception {
 		if (isCIBuild) {
@@ -488,7 +489,7 @@ public class NgWay2AutomationIntegrationTest {
 		assertThat(first_customer.getText(), containsString(last_customer_name));
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testListTransactions() throws Exception {
 		if (isCIBuild) {
@@ -548,7 +549,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testAddCustomer() throws Exception {
 		if (isCIBuild) {
@@ -662,7 +663,7 @@ public class NgWay2AutomationIntegrationTest {
 		// TODO: assert the customers.count change
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testInvitateNewCustomerToOpenAccount() throws Exception {
 		if (isCIBuild) {
@@ -765,7 +766,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDepositAndWithdraw() throws Exception {
 		if (isCIBuild) {

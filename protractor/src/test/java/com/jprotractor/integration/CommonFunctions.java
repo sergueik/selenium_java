@@ -155,6 +155,7 @@ public class CommonFunctions {
 				new ExpectedCondition<Boolean>() {
 					@Override
 					public Boolean apply(WebDriver o) {
+						System.err.println("Size: " + o.findElements(_locator).size());
 						return (o.findElements(_locator).size() == 0);
 					}
 				});
