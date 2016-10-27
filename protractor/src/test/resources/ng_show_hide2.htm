@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- origin: http://jsfiddle.net/3pxnLc7j/ -->
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular.js">
+</script>
+<script type="text/javascript">
+
+angular.module('testApp', [])
+ .service('showAlertSrvc', ['$timeout', function($timeout) {
+        return function(delay) {
+            var result = {hidden:true};
+            $timeout(function() {
+                result.hidden=false;
+            }, delay);
+            return result;
+        };
+    }])
+.controller('testController', function($scope, showAlertSrvc){
+    $scope.test = showAlertSrvc(1000);
+})
+</script>
+</head>
+<body>
+<div ng-app="testApp" ng-controller="testController">
+    <span ng-show="test.hidden">Not Visible!</span>
+    <span ng-show="!test.hidden">Visible</span>
+</div>
+</body>
+</html>
