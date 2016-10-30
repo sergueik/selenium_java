@@ -32,9 +32,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}"
   config.vm.network :forwarded_port, guest:4444, host:4444
   config.vm.network :private_network, ip: '192.168.33.10'
+  # Configure common synced folder
+  config.vm.synced_folder './' , '/vagrant'
   config.vm.provision 'shell', inline: <<-END_OF_PROVISION
-
-#!/bin/sh
+#!/bin/bash
 # set -x
 
 #=========================================================
@@ -62,15 +63,20 @@ then
   FIREFOX_VERSION='#{firefox_version}'
   if [[ $FIREFOX_VERSION ]]
   then
-    echo Install the Firefox version ${FIREFOX_VERSION}
-    URL="https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2"
-    FIREFOX_ARCHIVE="/var/tmp/firefox-${FIREFOX_VERSION}.tar.bz2"
-    wget -O $FIREFOX_ARCHIVE -nv $URL
-    pushd /home/vagrant
-    mkdir -p firefox
-    tar xjf $FIREFOX_ARCHIVE
+    echo Install Firefox version ${FIREFOX_VERSION}
+    cd /vagrant
+    PACKAGE_ARCHIVE="firefox-${FIREFOX_VERSION}.tar.bz2"
+    if [ ! -e $PACKAGE_ARCHIVE ]
+    then
+      URL="https://ftp.mozilla.org/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/${PACKAGE_ARCHIVE}"
+      wget -O $PACKAGE_ARCHIVE -nv $URL
+    else
+      echo Using already downloaded archive $PACKAGE_ARCHIVE
+    fi
+    mkdir -p /home/vagrant/firefox
+    cd /home/vagrant
+    tar xjf "/vagrant/${PACKAGE_ARCHIVE}"
     sudo cp -R firefox /usr/lib
-    popd
   else
     echo Install the latest Firefox
     sudo apt-get -qqy install firefox
@@ -85,10 +91,20 @@ then
   else
     echo Download latest Selenium Server
     SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
+    SELENIUM_VERSION=$(echo $SELENIUM_RELEASE | sed -n 's/.*selenium-server-standalone-\\([0-9][0-9.]*\\).jar/\\1/p')
   fi
-  export URL="https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}"
-  echo Downloading Selenium from $URL
-  wget -nv -O selenium-server-standalone.jar $URL
+  PACKAGE_ARCHIVE="selenium-server-standalone-${SELENIUM_VERSION}.jar"
+  cd /vagrant
+  if [ ! -e $PACKAGE_ARCHIVE ]
+  then
+    URL="https://selenium-release.storage.googleapis.com/${SELENIUM_RELEASE}"
+    echo Downloading Selenium $PACKAGE_ARCHIVE from $URL
+    wget -O $PACKAGE_ARCHIVE -nv $URL
+  else
+    echo Using already downloaded $PACKAGE_ARCHIVE
+  fi
+  cp $PACKAGE_ARCHIVE /home/vagrant/selenium-server-standalone.jar
+  cd /home/vagrant
   chown vagrant:vagrant selenium-server-standalone.jar
   #=========================================================
   CHROME_VERSION='#{chrome_version}'
@@ -105,6 +121,7 @@ then
         sudo apt-get remove -qqy -f google-chrome-stable
         echo Installing Chrome version $CHROME_VERSION
         export URL="http://www.slimjetbrowser.com/chrome/lnx/chrome64_${CHROME_VERSION}.deb"
+        # TODO: caching
         echo Downloading Chrome from $URL
         wget -nv $URL
         sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
@@ -115,11 +132,13 @@ then
   else
     echo Download the latest Chrome
     # http://askubuntu.com/questions/79280/how-to-install-chrome-browser-properly-via-command-line
+    cd /tmp
     wget -nv "https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb"
     sudo apt-get install -qqy libxss1 libappindicator1 libindicator7
     sudo dpkg -i google-chrome-stable_current_amd64.deb
     sudo rm google-chrome-stable_current_amd64.deb
     sudo apt-get install -qqy -f google-chrome-stable
+    cd -
   fi
   #=========================================================
   CHROMEDRIVER_VERSION='#{chromedriver_version}'
@@ -130,14 +149,17 @@ then
     echo Download latest Chrome Driver
     CHROMEDRIVER_VERSION=$(curl -# "http://chromedriver.storage.googleapis.com/LATEST_RELEASE")
   fi
-  ARCHIVE='/var/tmp/chromedriver_linux64.zip'
-  wget -O $ARCHIVE -nv "http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
-  pushd /home/vagrant
-  unzip -o $ARCHIVE
+  PACKAGE_ARCHIVE='chromedriver_linux64.zip'
+  cd /vagrant
+  if [ ! -e $PACKAGE_ARCHIVE ]; then
+    URL="http://chromedriver.storage.googleapis.com/${CHROMEDRIVER_VERSION}/chromedriver_linux64.zip"
+    wget -O $PACKAGE_ARCHIVE -nv $URL
+  fi
+  cd /home/vagrant
+  unzip -o "/vagrant/${PACKAGE_ARCHIVE}"
   ls
   chown vagrant:vagrant chromedriver
   echo Installed Chrome Driver version $(./chromedriver --version| head -1 | cut -f 2 -d ' ')
-  popd
   #=========================================================
   GECKODRIVER_VERSION='#{geckodriver_version}'
   if [[ $GECKODRIVER_VERSION ]]
@@ -148,15 +170,14 @@ then
     GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | perl -ne 'if ($_ =~ /\\/mozilla\\/geckodriver\\/releases\\/download\\/v([\\d\\.]+)/){ print $1, $/}' | head -1)
   fi
   URL="https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
-  echo Downloading GECKODRIVER version $GECKODRIVER_VERSION from $URL
   ARCHIVE='/var/tmp/geckodriver_linux64.tar.gz'
+  echo Downloading GECKODRIVER version $GECKODRIVER_VERSION from $URL
   sudo wget -O $ARCHIVE -nv $URL
-  pushd /home/vagrant
+  cd /home/vagrant
   tar -xzf $ARCHIVE
-  ls
   chown vagrant:vagrant geckodriver
   echo Installed Gecko Driver version $(./geckodriver --version | head -1 | cut -f 2 -d ' ')
-  # TODO: geckodriver     ERROR   Address in use (os error 98)
+  # TODO: geckodriver ERROR Address in use (os error 98)
 fi
 #=========================================================
 echo Set screen resolution
