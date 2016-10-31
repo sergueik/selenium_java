@@ -86,11 +86,10 @@ then
   if [[ $SELENIUM_VERSION ]]
   then
     echo Download Selenium version $SELENIUM_VERSION
-    RELEASE_REGEX=$(echo "/.*<Key>(${SELENIUM_VERSION}[^>]+selenium-server-standalone[^<]+)/&& print \\$1")
-    SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e"${RELEASE_REGEX}")
+    SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | sed -n "s/.*<Key>\\\\(${SELENIUM_VERSION}\\\\/selenium-server-standalone[^<][^>]*\\\\)<\\\\/Key>.*/\\\\1/p")
   else
     echo Download latest Selenium Server
-    SELENIUM_RELEASE=$(curl -# "https://selenium-release.storage.googleapis.com/" | perl -n -e'/.*<Key>([^>]+selenium-server-standalone[^<]+)/ && print $1')
+    SELENIUM_RELEASE=$(curl -# https://selenium-release.storage.googleapis.com/ | sed -n 's/.*<Key>\\([^>][^>]*selenium-server-standalone[^<][^<]*\\)<\\/Key>.*/\\1/p')
     SELENIUM_VERSION=$(echo $SELENIUM_RELEASE | sed -n 's/.*selenium-server-standalone-\\([0-9][0-9.]*\\).jar/\\1/p')
   fi
   PACKAGE_ARCHIVE="selenium-server-standalone-${SELENIUM_VERSION}.jar"
@@ -157,9 +156,9 @@ then
   fi
   cd /home/vagrant
   unzip -o "/vagrant/${PACKAGE_ARCHIVE}"
-  ls
   chown vagrant:vagrant chromedriver
   echo Installed Chrome Driver version $(./chromedriver --version| head -1 | cut -f 2 -d ' ')
+  echo Done
   #=========================================================
   GECKODRIVER_VERSION='#{geckodriver_version}'
   if [[ $GECKODRIVER_VERSION ]]
@@ -167,7 +166,7 @@ then
     echo Download the latest Gecko Driver version $GECKODRIVER_VERSION
   else
     echo Determine the latest version of Gecko Driver
-    GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | perl -ne 'if ($_ =~ /\\/mozilla\\/geckodriver\\/releases\\/download\\/v([\\d\\.]+)/){ print $1, $/}' | head -1)
+    GECKODRIVER_VERSION=$(curl -insecure -L -# https://github.com/mozilla/geckodriver/releases | sed -n 's/.*<a href="\\/mozilla\\/geckodriver\\/releases\\/download\\/v\\([0-9.][0-9.]*\\)\\/geckodriver-.*-linux64.*/\\1/p' | head -1)
   fi
   URL="https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VERSION}/geckodriver-v${GECKODRIVER_VERSION}-linux64.tar.gz"
   ARCHIVE='/var/tmp/geckodriver_linux64.tar.gz'

@@ -1,78 +1,48 @@
 ﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading;
-using System.Linq.Expressions;
-using System.Collections.Generic;
-using System.Linq;
+using System.Runtime.InteropServices;
 
-using NUnit.Framework;
-
-using OpenQA.Selenium;
-using OpenQA.Selenium.Remote;
-using OpenQA.Selenium.Support.UI;
-using OpenQA.Selenium.Firefox;
-using OpenQA.Selenium.IE;
-
-namespace SeleniumTests
+public class AdjPriv
 {
-    [TestFixture]
-    public class Test
+    [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
+    internal static extern bool AdjustTokenPrivileges(IntPtr htok, bool disall, ref TokPriv1Luid newst, int len, IntPtr prev, IntPtr relen);
+
+    [DllImport("advapi32.dll", ExactSpelling = true, SetLastError = true)]
+    internal static extern bool OpenProcessToken(IntPtr h, int acc, ref IntPtr phtok);
+
+    [DllImport("advapi32.dll", SetLastError = true)]
+    internal static extern bool LookupPrivilegeValue(string host, string name, ref long pluid);
+
+    [StructLayout(LayoutKind.Sequential, Pack = 1)]
+    internal struct TokPriv1Luid
     {
-        private RemoteWebDriver driver;
-        private StringBuilder verificationErrors;
+        public int Count;
+        public long Luid;
+        public int Attr;
+    }
 
-        [SetUp]
-        public void SetupTest()
+    internal const int SE_PRIVILEGE_ENABLED = 0x00000002;
+    internal const int SE_PRIVILEGE_DISABLED = 0x00000000;
+    internal const int TOKEN_QUERY = 0x00000008;
+    internal const int TOKEN_ADJUST_PRIVILEGES = 0x00000020;
+    public static bool EnablePrivilege(long processHandle, string privilege, bool disable)
+    {
+        bool retVal;
+        TokPriv1Luid tp;
+        IntPtr hproc = new IntPtr(processHandle);
+        IntPtr htok = IntPtr.Zero;
+        retVal = OpenProcessToken(hproc, TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, ref htok);
+        tp.Count = 1;
+        tp.Luid = 0;
+        if (disable)
         {
-            verificationErrors = new StringBuilder();
-            DesiredCapabilities capability = DesiredCapabilities.Firefox();
-            driver = new RemoteWebDriver(new Uri("http://localhost:4444/wd/hub"), capability);
-
-            driver.Manage().Timeouts().ImplicitlyWait(TimeSpan.FromSeconds(20));
-            driver.Manage().Timeouts().SetPageLoadTimeout(TimeSpan.FromSeconds(50));
-            driver.Manage().Window.Maximize();
-            driver.Navigate();
+            tp.Attr = SE_PRIVILEGE_DISABLED;
         }
-
-        [TearDown]
-        public void TeardownTest()
+        else
         {
-            try
-            {
-                driver.Quit();
-            }
-            catch (Exception)
-            {
-                // Ignore errors if unable to close the browser
-            }
-            Assert.AreEqual("", verificationErrors.ToString());
+            tp.Attr = SE_PRIVILEGE_ENABLED;
         }
-
-        [Test]
-        public void SkeletonTest()
-        {
-            // Arrange
-            String url = "http://www.wikipedia.org";
-            String searchTest = "Carnival Cruise Lines";
-            driver.Navigate().GoToUrl(url);
-            // Act
-            WebDriverWait wait = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-            try
-            {
-                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
-                verificationErrors.Append(e.Message);
-            }
-
-            IWebElement element = driver.FindElement(By.Id("searchInput"));
-            element.SendKeys(searchTest);
-            element.SendKeys(Keys.ArrowDown);
-            element.Submit();
-            // Assert
-            Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
-        }
+        retVal = LookupPrivilegeValue(null, privilege, ref tp.Luid);
+        retVal = AdjustTokenPrivileges(htok, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
+        return retVal;
     }
 }

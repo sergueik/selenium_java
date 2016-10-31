@@ -1,10 +1,10 @@
 ### Info
 
 Vagrantfile for standalone Ubuntu box containing
- * Fluxbox,
- * [tmux]](https://github.com/tmux/tmux) autologin,
- * Selenium Server,
- * Chrome/ Chrome Driver
+ * Fluxbox
+ * [tmux]](https://github.com/tmux/tmux) autologin
+ * Selenium Server
+ * Chrome and Chrome Driver
  * Firefox with optional Gecko Driver
 
 Based on [Anomen/vagrant-selenium](https://github.com/Anomen/vagrant-selenium/blob/master/script.sh)
@@ -22,6 +22,10 @@ The "bleeding edge" versions of the drivers do not always work well together (e.
 Therefore one may wish to provision instance with old versions of software.
 Specific versions of Selenium Server, Firefox, Gecko Driver, Chrome, Chrome Driver can be set through the environment variables
 `SELENIUM_VERSION`, `FIREFOX_VERSION`, `GECKODRIVER_VERSION`, `CHROME_VERSION`, `CHROMEDRIVER_VERSION`.
+
+The error 
+![box](https://github.com/sergueik/selenium_java/blob/master/fluxbox/screenshots/session_error.png)
+indicates a versions mismatch between Selenium, Geckodriver and Firefox, ChromeDriver and Chrome.
 
 Below is an example of a supported  combination of old versions (except for `GECKODRIVER_VERSION`):
 ```
