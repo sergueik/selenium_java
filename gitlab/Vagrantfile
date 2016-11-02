@@ -2,6 +2,8 @@
 # https://gitlab.com/qzchenwl/vagrant-gitlab
 # http://blog.bobbyallen.me/2014/01/11/setup-your-own-private-gitlab-server-using-gitlab-and-ubuntu-server-12-04-lts/
 # https://www.digitalocean.com/community/tutorials/how-to-set-up-gitlab-as-your-very-own-private-gitlab-clone
+# https://docs.gitlab.com/ee/api/
+
 basedir = ENV.fetch('HOME','') || ENV.fetch('USERPROFILE', '')
 basedir = basedir.gsub('\\', '/')
 
@@ -40,10 +42,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       end
     end
   end
+  # Configure common synced folder
+  config.vm.synced_folder './' , '/vagrant'
   # Enable provisioning with a shell script
   config.vm.provision 'shell', inline: <<-END_OF_PROVISION
 
-  #!/bin/sh
+  #!/bin/bash
   # set -x
   echo Install the packages
   export DEBIAN_FRONTEND=noninteractive
@@ -52,29 +56,40 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   debconf-set-selections <<< "postfix postfix/mailname string $HOSTNAME"
   debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
   sudo apt-get -qqy install curl openssh-server ca-certificates postfix
-  GITLAB_VERSION='#{gitlab_version}'
-  if [[ $GITLAB_VERSION ]]
+  SELECTED_GITLAB_VERSION='#{gitlab_version}'
+  if [[ $SELECTED_GITLAB_VERSION ]]
     then
-      case $CHROME_VERSION in
-        latest|auto|stable)
-          https://about.gitlab.com/downloads/#ubuntu1404
-          echo Downloading and running setup script from https://packages.gitlab.com
+      case $SELECTED_GITLAB_VERSION in
+        auto)
+          # Does not work ?
+          echo Downloading and running Gitlab setup script from https://packages.gitlab.com
           curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
           sudo apt-get install gitlab-ce
         ;;
+        latest)
+          echo Determine the latest version of Gitlab
+          PACKAGE_ARCHIVE=$(curl -insecure -L -# https://packages.gitlab.com/gitlab/gitlab-ce | \\
+          sed -n 's/<a href="\\/gitlab\\/gitlab-ce\\/packages\\/ubuntu\\/trusty\\/\\(.*\\)">.*/\\1/p' | head -1)
+          GITLAB_VERSION=$(echo $PACKAGE_ARCHIVE|sed  -n 's/gitlab-ce_\\(.*\\)_amd64.deb/\\1/p')
+        ;;
         *)
-          # manual https://packages.gitlab.com/gitlab/gitlab-ce
-          pushd /vagrant
-          # place PACKAGE_ARCHIVE on a mounted folder, possible to pre-download on the host
-          PACKAGE_ARCHIVE="gitlab-ce_${GITLAB_VERSION}_amd64.deb"
-          if [ ! -e $PACKAGE_ARCHIVE ]; then
-            URL="https://packages.gitlab.com/gitlab/gitlab-ce/packages/ubuntu/trusty/${PACKAGE_ARCHIVE}"
-            wget -O $PACKAGE_ARCHIVE -nv $URL
-          fi
-          sudo dpkg -i $PACKAGE_ARCHIVE
-          sudo gitlab-ctl reconfigure
+          GITLAB_VERSION=$SELECTED_GITLAB_VERSION
         ;;
       esac
+      if [[ $GITLAB_VERSION ]]
+      then
+        pushd /vagrant
+        PACKAGE_ARCHIVE="gitlab-ce_${GITLAB_VERSION}_amd64.deb"
+        if [ ! -e $PACKAGE_ARCHIVE ]; then
+          URL="https://packages.gitlab.com/gitlab/gitlab-ce/packages/ubuntu/trusty/${PACKAGE_ARCHIVE}/download"
+          echo Downloading Gitlab version $GITLAB_VERSION from $URL
+          wget -O $PACKAGE_ARCHIVE -nv $URL
+        else
+          echo using previously downloaded $PACKAGE_ARCHIVE
+        fi
+        sudo dpkg -i $PACKAGE_ARCHIVE
+        sudo gitlab-ctl reconfigure
+      fi
     fi
   END_OF_PROVISION
   # first time login credentials: root / 5iveL!fe
