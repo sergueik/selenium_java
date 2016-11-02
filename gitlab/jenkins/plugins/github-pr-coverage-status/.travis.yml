@@ -1,0 +1,8 @@
+language: java
+
+install: ./install-dependencies.sh
+
+jdk:
+  - oraclejdk7
+
+script: mvn package jacoco:report coveralls:report
