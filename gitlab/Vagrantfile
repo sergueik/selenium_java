@@ -1,0 +1,97 @@
+# based on:
+# https://gitlab.com/qzchenwl/vagrant-gitlab
+# http://blog.bobbyallen.me/2014/01/11/setup-your-own-private-gitlab-server-using-gitlab-and-ubuntu-server-12-04-lts/
+# https://www.digitalocean.com/community/tutorials/how-to-set-up-gitlab-as-your-very-own-private-gitlab-clone
+basedir = ENV.fetch('HOME','') || ENV.fetch('USERPROFILE', '')
+basedir = basedir.gsub('\\', '/')
+
+box_gui = (ENV.fetch('BOX_GUI', '') =~ (/^(true|t|yes|y|1)$/i))
+box_memory = ENV.fetch('BOX_MEMORY', '2048').to_i
+box_name = ENV.fetch('BOX_NAME', 'Gitlab')
+box_hostname = ENV.fetch('BOX_HOSTNAME', 'gitlab.example.com')
+debug = (ENV.fetch('DEBUG', 'false') =~ (/^(true|t|yes|y|1)$/i))
+gitlab_version = ENV.fetch('GITLAB_VERSION', '8.13.1-ce.0') # 7.7.2-omnibus.5.4.2.ci-1
+http_proxy = ENV.fetch('HTTP_PROXY', nil)
+static_ip = ENV.fetch('STATIC_IP', '192.168.33.10')
+vagrant_use_proxy = ENV.fetch('VAGRANT_USE_PROXY', nil)
+
+VAGRANTFILE_API_VERSION = '2'
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.box = 'ubuntu/trusty64'
+  config.vm.hostname = box_hostname
+  # Localy cached vagrant box images from http://www.vagrantbox.es/ and  http://dev.modern.ie/tools/vms/linux/
+  config_vm_box_name = 'trusty-server-amd64-vagrant-selenium.box'
+  config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}"
+  config.vm.network 'forwarded_port', guest: 80, host: 8080
+  config.vm.network 'forwarded_port', guest: 22, host: 8022
+  config.vm.network :private_network, ip: static_ip
+  # Configure Proxy authentication
+  if vagrant_use_proxy
+    if http_proxy
+      if Vagrant.has_plugin?('vagrant-proxyconf')
+        # Windows-specific case
+        # A proxy should be specified in the form of http://[user:pass@]host:port.
+        # without the domain part and with percent signs doubled - Vagrant and Ruby still use batch files on Windows
+        # https://gitlab.com/tmatilai/vagrant-proxyconf
+        # https://gitlab.com/WinRb/vagrant-windows
+        config.proxy.http = http_proxy.gsub('%%','%')
+        config.proxy.https = http_proxy.gsub('%%','%')
+        config.proxy.no_proxy = 'localhost,127.0.0.1'
+      end
+    end
+  end
+  # Enable provisioning with a shell script
+  config.vm.provision 'shell', inline: <<-END_OF_PROVISION
+
+  #!/bin/sh
+  # set -x
+  echo Install the packages
+  export DEBIAN_FRONTEND=noninteractive
+  sudo apt-get -qq update
+  sudo apt-get -qqy install build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl git-core openssh-server redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev
+  debconf-set-selections <<< "postfix postfix/mailname string $HOSTNAME"
+  debconf-set-selections <<< "postfix postfix/main_mailer_type string 'Internet Site'"
+  sudo apt-get -qqy install curl openssh-server ca-certificates postfix
+  GITLAB_VERSION='#{gitlab_version}'
+  if [[ $GITLAB_VERSION ]]
+    then
+      case $CHROME_VERSION in
+        latest|auto|stable)
+          https://about.gitlab.com/downloads/#ubuntu1404
+          echo Downloading and running setup script from https://packages.gitlab.com
+          curl -sS https://packages.gitlab.com/install/repositories/gitlab/gitlab-ce/script.deb.sh | sudo bash
+          sudo apt-get install gitlab-ce
+        ;;
+        *)
+          # manual https://packages.gitlab.com/gitlab/gitlab-ce
+          pushd /vagrant
+          # place PACKAGE_ARCHIVE on a mounted folder, possible to pre-download on the host
+          PACKAGE_ARCHIVE="gitlab-ce_${GITLAB_VERSION}_amd64.deb"
+          if [ ! -e $PACKAGE_ARCHIVE ]; then
+            URL="https://packages.gitlab.com/gitlab/gitlab-ce/packages/ubuntu/trusty/${PACKAGE_ARCHIVE}"
+            wget -O $PACKAGE_ARCHIVE -nv $URL
+          fi
+          sudo dpkg -i $PACKAGE_ARCHIVE
+          sudo gitlab-ctl reconfigure
+        ;;
+      esac
+    fi
+  END_OF_PROVISION
+  # first time login credentials: root / 5iveL!fe
+  config.vm.provider :virtualbox do |v|
+    v.customize ['modifyvm', :id, '--memory', box_memory ]
+    if box_gui
+      v.customize ['modifyvm', :id, '--vram', '16']
+      v.customize ['modifyvm', :id, '--clipboard', 'bidirectional']
+      v.customize ['setextradata', 'global', 'GUI/MaxGuestResolution', 'any']
+    end
+    v.gui = box_gui
+    v.name = box_name
+  end
+end
+if debug
+  puts "box_name=#{box_name}"
+  puts "box_gui=#{box_gui}"
+  puts "gitlab_version=#{gitlab_version}"
+  puts "static_ip=#{static_ip}"
+end
