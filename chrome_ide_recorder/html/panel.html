@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html ng-csp ng-app ng-cloak>
+<head>
+    <meta charset="utf-8">
+    <title>panel</title>
+
+    <link rel="stylesheet" href="/css/angular-ui.min.css">
+    <link rel="stylesheet" href="/css/panel.css">
+
+    <script src="/lib/jsdeferred.js"></script>
+    <script src="/lib/lodash.custom.min.js"></script>
+    <script src="/lib/zepto.min.js"></script>
+    <script src="/lib/backbone-min.js"></script>
+
+    <script src="/lib/angular.min.js"></script>
+    <script src="/lib/angular-ui.min.js"></script>
+
+    <script src="/js/panel/selenium_ide.js"></script>
+
+    <script src="/js/panel/model/TestComand.js"></script>
+    <script src="/js/panel/model/TestCase.js"></script>
+    <script src="/js/panel/model/TestCases.js"></script>
+
+    <script src="/js/panel/ctrl/menuPanel.js"></script>
+    <script src="/js/panel/ctrl/messages.js"></script>
+    <script src="/js/panel/ctrl/testCase.js"></script>
+    <script src="/js/panel/ctrl/testCommand.js"></script>
+    <script src="/js/panel.js"></script>
+</head>
+<body>
+
+<div id="content">
+
+    <div ng-controller="menuPanelCtrl">
+        <div class="wrap">
+            <label for="baseURL">Base URL</label><input type="text" id="baseURL" ng-model="baseURL">
+            <button id="quitBrowser" ng-click="quitBrowser()">quit</button>
+            <hr>
+            <ul>
+                <li class="speedLine"><label for="operationSpeed"><span>fast</span><span>slow</span></label><input type="range" id="operationSpeed" value="0" ng-model="operationSpeed" ng-change="changeOperationSpeed()"></li>
+                <li><button id="executeTestCase" ng-click="executeTestCase()" ng-disabled="testExecuting"><img src="/img/panel/play_all.png"></button></li>
+                <!--<li><button id="executeTestCommand"><img src="/img/panel/play_current.png"></button></li>>-->
+                <!--<li><button id="stopTest"><img src="/img/panel/stop.png"></button></li>-->
+                <li><input type="checkbox" id="operationRecording" ng-model="operationRecording" checked><label for="operationRecording"><img src="/img/panel/rec_start.png"><img src="/img/panel/rec_stop.png"></label></li>
+            </ul>
+        </div>
+    </div><!-- #menuPanelCtrl -->
+
+    <div ng-controller="testCaseCtrl">
+        <div class="wrap">
+            testCaseCtrl
+        </div>
+    </div><!-- #testCaseCtrl -->
+
+    <div ng-controller="testCommandCtrl">
+        <div class="wrap">
+            <div class="commandsWrap">
+                <table class="commands">
+                    <tr>
+                        <th>Command</th>
+                        <th>Target</th>
+                        <th>Value</th>
+                    </tr>
+                    <tr ng-repeat="command in testCase.models" ng-click="selectLine(command)" ng-class="{selected: command.get('selected')}">
+                        <td>{{ command.attributes.name }}</td>
+                        <td>{{ command.attributes.selector }}</td>
+                        <td>{{ command.attributes.value }}</td>
+                    </tr>
+                </table>
+            </div>
+            <table>
+                <tr>
+                    <td>Command</td>
+                    <td><select ng-model="selectedCommand.attributes.name" ng-options="obj.value as obj.text for obj in commandList"></select></td>
+                </tr>
+                <tr>
+                    <td>Target</td>
+                    <td><input type="text" ng-model="selectedCommand.attributes.selector"><button>Search</button></td>
+                </tr>
+                <tr>
+                    <td>Value</td>
+                    <td><input type="text" ng-model="selectedCommand.attributes.value"></td>
+                </tr>
+            </table>
+        </div>
+    </div><!-- #testCommandCtrl -->
+
+    <div ng-controller="messagesCtrl">
+        <div class="wrap">
+            messagesCtrl
+        </div>
+    </div><!-- #messagesCtrl -->
+
+</div><!-- #content -->
+
+</body>
+</html>
