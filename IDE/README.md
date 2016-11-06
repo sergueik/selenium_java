@@ -16,6 +16,12 @@ Executes JavaScript in the browser, receives the [JSON object](https://processin
 #### Right Click
 Work in progress
 
+### External projects
+
+ * [ebailey/SeleniumIDE](https://github.com/ebailey-vp/SeleniumIDE)
+ * [alex-levashev/SelenumIDE](https://github.com/alex-levashev/SeleniumIDE)
+ * [selenese-runner-java](https://github.com/vmi/selenese-runner-java)
+
 ### Author
 ------
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
