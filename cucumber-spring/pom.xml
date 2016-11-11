@@ -12,8 +12,7 @@
     <spring-version>4.2.5.RELEASE</spring-version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
-    <selenium.version>2.47.0</selenium.version>
-    <!-- NOTE: 2.53.0 has https://samebug.io/exceptions/508086/java.lang.NoClassDefFoundError/orgopenqaseleniumremoteservicedriverservicebuilder?soft=false -->
+    <selenium.version>2.53.0</selenium.version>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
     <java.version>1.7</java.version>
@@ -86,7 +85,7 @@
       <artifactId>jprotractor</artifactId>
       <version>${jprotractor.version}</version>
       <type>jar</type>
-<!--
+      <!--
       <scope>system</scope>
       <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
 -->
@@ -110,12 +109,26 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <phase>install</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
-              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.jprotractor</groupId>
+                  <artifactId>jprotractor</artifactId>
+                  <version>${jprotractor.version}</version>
+                  <type>jar</type>
+                  <!--
+                  <includes>com.jprotractor/*</includes>
+                  -->
+                </artifactItem>
+                  <!--
+                      <outputDirectory>${basedir}/src/main/resources</outputDirectory>
+                    -->
+                  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
