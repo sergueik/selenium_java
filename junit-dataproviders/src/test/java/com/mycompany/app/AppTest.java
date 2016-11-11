@@ -85,7 +85,7 @@ public class AppTest {
 	@DataProvider
 	public static Object[][] dataProviderStringIsNullOrEmpty() {
 		// @formatter:off
-		return new Object[][] { { null }, { "" }, };
+		return new Object[][] { { null }, { "" }, { "not null or empty"}};
 		// @formatter:on
 	}
 
@@ -107,6 +107,7 @@ public class AppTest {
 		// @formatter:on
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("dataProviderNotNullStringsSetInBeforeClass")
 	public void testNotNullStringsSetInBeforeClass(String str) {
@@ -124,6 +125,7 @@ public class AppTest {
 		// @formatter:on
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("dataProviderMultiply")
 	public void testMultiply(int a, int b, int c) {
@@ -153,6 +155,7 @@ public class AppTest {
 		// @formatter:on
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("dataProviderWithNonConstantObjects")
 	public void testWithNonConstantObjects(Calendar calendar1,
@@ -178,6 +181,7 @@ public class AppTest {
 		// @formatter:on
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("dataProviderFileExistence")
 	public void testFileExistence(File file, boolean expected) {
@@ -200,6 +204,7 @@ public class AppTest {
 		return result;
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("dataProviderNumberFormat")
 	public void testNumberFormat(Number number, String format, String expected) {
@@ -211,20 +216,22 @@ public class AppTest {
 		// Then:
 	}
 
-	// @formatter:off
+  @Ignore
 	@Test
+	// @formatter:off
 	@DataProvider({ 
 		",                 0", 
 		"a,                1",
 		"abc,              3", 
 		"veryLongString,  14",
 	})
-	// @formatter:off
+	// @formatter:on
 	public void testStringLength(String string, int length) {
 		// Expect:
 		assertThat(string.length(), is(length));
 	}
 
+  @Ignore
 	// @formatter:off
 	@Test
 	@DataProvider(value = { 
@@ -236,12 +243,13 @@ public class AppTest {
 		splitBy = "\\|", 
 		trimValues = true, 
 		convertNulls = true)
-	// @formatter:off
+	// @formatter:on
 	public void testStringLength2(String string, int length) {
 		// Expect:
 		assertThat(string.length(), is(length));
 	}
 
+  @Ignore
 	// @formatter:off
 	@Test
 	@DataProvider({ 
@@ -254,6 +262,7 @@ public class AppTest {
 		// Expect:
 	}
 
+  @Ignore
 	@Test
 	@DataProvider({ "null", "", })
 	public void testIsEmptyString2(String str) {
@@ -282,6 +291,7 @@ public class AppTest {
 		return new Object[][] { { testDataFile } };
 	}
 
+  @Ignore
 	@Test
 	@UseDataProvider("loadFromExternalFile")
 	@ExternalFile(format = ExternalFile.Format.CSV, value = "testdata.csv")
@@ -295,6 +305,7 @@ public class AppTest {
 		return result;
 	}
 
+  @Ignore
 	@Test
 	@DataProvider({ "Do it.\nOr let it." })
 	public void testWithStringContainingTabsNewlineAndCarriageReturn(
