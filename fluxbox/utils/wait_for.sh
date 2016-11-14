@@ -4,9 +4,9 @@ cmdname=$(basename $0)
 
 echoerr()
 {
-if [[ $QUIET -ne 1 ]]
+if [ "$QUIET" -ne "1" ]
 then
-  echo "$@" 1>&2
+	>&2	echo "$@"
 fi
 }
 
@@ -19,41 +19,46 @@ Usage:
 	$cmdname host:port [-s] [-t timeout] [-- command args]
 	-h HOST | --host=HOST	Host or IP under test
 	-p PORT | --port=PORT	TCP port under test
-  Alternatively, you specify the host and port as host:port
+	Alternatively, you specify the host and port as host:port
 	-s | --strict Only execute subcommand if the test succeeds
 	-q | --quiet	Don't output any status messages
 	-t TIMEOUT | --timeout=TIMEOUT Timeout in seconds, zero for no timeout
-	-- COMMAND ARGS	Execute command with args after the test finishes
+	-- COMMAND ARGS Execute command with args after the test finishes
 USAGE
 	exit 1
-# origin: https://github.com/double16/wait-for-it/blob/master/wait-for-it.sh
-}-
+	# based on: https://github.com/double16/wait-for-it/blob/master/wait-for-it.sh
+}
+
+
 wait_for()
 {
-	if [[ $TIMEOUT -gt 0 ]]; then
+	if [ $TIMEOUT -gt 0 ]
+	then
 		echoerr $cmdname: waiting $TIMEOUT seconds for $HOST:$PORT
 	else
-		echoerr $cmdname: waiting for $HOST:$PORT without a timeout
+		echoerr $cmdname: waiting for $HOST:$PORT forever
 	fi
 	start_ts=$(date +%s)
 	while :
 	do
 		nc -z $HOST $PORT >/dev/null 2>&1
-		result=$?
-		if [[ $result -eq 0 ]]; then
+		RESULT=$?
+		if [ $RESULT -eq 0 ]
+		then
 			end_ts=$(date +%s)
 			echoerr $cmdname: $HOST:$PORT is available after $((end_ts - start_ts)) seconds
 			break
 		fi
 		sleep 1
 	done
-	return $result
+	return $RESULT
 }
 
 wait_for_wrapper()
 {
 	# In order to support SIGINT during timeout: http://unix.stackexchange.com/a/57692
-	if [[ $QUIET -eq 1 ]]; then
+	if [ $QUIET -eq 1 ]
+	then
 		/usr/bin/timeout $TIMEOUT $0 --quiet --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
 	else
 		/usr/bin/timeout $TIMEOUT $0 --child --host=$HOST --port=$PORT --timeout=$TIMEOUT &
@@ -62,76 +67,87 @@ wait_for_wrapper()
 	trap "kill -INT -$PID" INT
 	wait $PID
 	RESULT=$?
-	if [[ $RESULT -ne 0 ]]; then
+	if [ $RESULT -ne 0 ]
+	then
 		echoerr $cmdname: timeout occurred after waiting $TIMEOUT seconds for $HOST:$PORT
 	fi
 	return $RESULT
 }
 
 # process arguments
-while [[ $# -gt 0 ]]
+while [ $# -gt 0 ]
 do
 	case "$1" in
 		*:* )
-      HOST=${1/:*/}
-      PORT=${1/*:/}
-      shift 1
+			HOST=${1/:*/}
+			PORT=${1/*:/}
+			shift 1
 		;;
 		--child)
-        CHILD=1
-        shift 1
+				CHILD=1
+				shift 1
 		;;
 		-q | --quiet)
-      QUIET=1
-      shift 1
+			QUIET=1
+			shift 1
 		;;
 		-s | --strict)
-      STRICT=1
-      shift 1
+			STRICT=1
+			shift 1
 		;;
 		-h)
-      HOST="$2"
-      if [[ $HOST == "" ]]; then break; fi
-      shift 2
+			HOST="$2"
+			if [ "$HOST" == "" ]
+			then
+				break
+			fi
+			shift 2
 		;;
 		--host=*)
-      HOST="${1#*=}"
-      shift 1
+			HOST="${1#*=}"
+			shift 1
 		;;
 		-p)
 		PORT="$2"
-      if [[ $PORT == "" ]]; then break; fi
-      shift 2
+			if [ "$PORT" == "" ]
+			then
+				break
+			fi
+			shift 2
 		;;
 		--port=*)
-      PORT="${1#*=}"
-      shift 1
+			PORT="${1#*=}"
+			shift 1
 		;;
 		-t)
-      TIMEOUT="$2"
-      if [[ $TIMEOUT == "" ]]; then break; fi
-      shift 2
+			TIMEOUT="$2"
+			if [ "$TIMEOUT" == "" ]
+			then
+				break
+			fi
+			shift 2
 		;;
-      --timeout=*)
-      TIMEOUT="${1#*=}"
-      shift 1
+			--timeout=*)
+			TIMEOUT="${1#*=}"
+			shift 1
 		;;
 		--)
-      shift
-      CLI="$@"
-      break
+			shift
+			COMMAND="$@"
+			break
 		;;
 		--help)
-      usage
+			usage
 		;;
 		*)
-      echoerr Unknown argument: $1
-      usage
+			echoerr Unknown argument: $1
+			usage
 		;;
 	esac
 done
 
-if [[ "$HOST" == "" || "$PORT" == "" ]]; then
+if [[ "$HOST" == "" || "$PORT" == "" ]]
+then
 	echoerr Error: you need to provide a host and port to test.
 	usage
 fi
@@ -141,12 +157,14 @@ STRICT=${STRICT:-0}
 CHILD=${CHILD:-0}
 QUIET=${QUIET:-0}
 
-if [[ $CHILD -gt 0 ]]; then
+if [ $CHILD -gt 0 ]
+then
 	wait_for
 	RESULT=$?
 	exit $RESULT
 else
-	if [[ $TIMEOUT -gt 0 ]]; then
+	if [ $TIMEOUT -gt 0 ]
+	then
 		wait_for_wrapper
 		RESULT=$?
 	else
@@ -155,13 +173,14 @@ else
 	fi
 fi
 
-if [[ "$CLI" != "" ]]; then
-	if [[ $RESULT -ne 0 && $STRICT -eq 1 ]]; then
+if [ "$COMMAND" != "" ]
+then
+	if [[ $RESULT -ne 0 && $STRICT -eq 1 ]]
+	then
 		echoerr $cmdname: strict mode, refusing to execute subprocess
 		exit $RESULT
 	fi
-	exec $CLI
+	exec $COMMAND
 else
 	exit $RESULT
 fi
-
