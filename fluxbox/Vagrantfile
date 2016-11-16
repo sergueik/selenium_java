@@ -5,8 +5,9 @@ firefox_version = ENV.fetch('FIREFOX_VERSION', '')
 geckodriver_version = ENV.fetch('GECKODRIVER_VERSION', '')
 chrome_version = ENV.fetch('CHROME_VERSION', '')
 
-# check if requested Chrome version is available on http://www.slimjetbrowser.com
+# check if requested Chrome version is available on http://www.slimjetbrowser.com/chrome/
 available_chrome_versions = %w|
+    54.0.2840.71
     53.0.2785.116
     52.0.2743.116
     51.0.2704.84

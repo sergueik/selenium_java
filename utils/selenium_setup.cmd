@@ -8,7 +8,7 @@ rem xml.exe http://xmlstar.sourceforge.net/download.php
 rem 7z.exe http://www.7-zip.org/
 rem jq.exe https://stedolan.github.io/jq/
 
-rem Define tool aliases
+rem define tool aliases
 if defined PROGRAMFILES(X86) (
     set OS=64BIT
     set JQ="C:\TOOLS\jq-win64.exe"
@@ -19,13 +19,20 @@ if defined PROGRAMFILES(X86) (
     set WGET="C:\TOOLS\wget.exe"
     set XMLSTARLET="C:\TOOLS\XMLSTARLET-1.6.1\xml.exe"
 )
-rem Alternatively may add to the PATH environment
+rem alternatively may add to the PATH environment
 set PATH=%PATH%;C:\TOOLS
 set PATH=%PATH%;C:\TOOLS\XMLSTARLET-1.6.1
 set PATH=%PATH%;C:\PROGRAM FILES\7-ZIP
 
-rem Stop selenium hub or standalone server
+rem stop Selenium hub or standalone server
 for /F "tokens=5 delims= " %%_ IN ('netstat -a -n -o ^| findstr :4444') do taskkill.exe /F /PID %%_
+
+
+rem the old versions of Chrome are available on http://www.slimjetbrowser.com/chrome/win/
+rem the currently installed Chrome version can be found from several registry locations
+rem reg.exe query "HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Google\Update\Clients\{8A69D345-D564-463c-AFF1-A69D9E530F96}" -v pv
+rem reg.exe query "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\App Paths\chrome.exe\"
+rem dir /od /ad /b "C:\Program Files (x86)\Google\Chrome\Application"
 
 :CHROMEDRIVER
 set CHROMEDRIVER_URL=https://chromedriver.storage.googleapis.com

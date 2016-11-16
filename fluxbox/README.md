@@ -38,9 +38,7 @@ For Chrome, the `CHROME_VERSION` can also set to `stable`, `unstable` or `beta` 
 the `.deb` package of selected build of Chrome browser to be installed from the
 [google repository](https://www.google.com/linuxrepositories/).
 
-A handful of old Chrome build debian packages the box can download ws found on [http://www.slimjetbrowser.com](http://www.slimjetbrowser.com).
-It is quite limited - check if desired version is available.
-
+A handful of old Chrome build debian packages the box can download from [http://www.slimjetbrowser.com](http://www.slimjetbrowser.com/chrome/lnx/) - check if desired version is available. There is also a relatively recent 32-bit package on this site.
 
 ### Limitations
   * The hub is available on `http://127.0.0.1:4444/wd/hub/static/resource/hub.html` shortly after the Virtual Box had rebooted - currently there is no visual cue on when the box is ready.
