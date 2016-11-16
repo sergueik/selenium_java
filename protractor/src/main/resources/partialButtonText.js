@@ -1,5 +1,5 @@
 /**
- * Find buttons by textual content.
+ * Find buttons by textual content fragment.
  *
  * arguments[0] {Element} The scope of the search.
  * arguments[1] {string} The partial text to match.

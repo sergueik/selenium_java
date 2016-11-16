@@ -1,18 +1,78 @@
-Note
-----
+### Note
 
 This github project is the 'development branch' of the collaborated project 
-[jProtratractor](https://github.com/caarlos0/jProtractor). It may be using a different version of java compiler but otherwise is nearly identical.
+[jProtractor](https://github.com/caarlos0/jProtractor). It may be using a different version of Java compiler but otherwise identical, just few commits ahead.
 
+#### Info
+The [Angular Protractor](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project. 
+However being a Javascript testing tool, __Protractor__ enforces one to (re)write the whole web page test suite in Javascript - which may not be acceptable solution.
 
-Info
-====
+This project and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net) try to make this unnecessary.
+On the other hand Protractor offers some advanced [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) which selenum Webdriver does not have. 
 
-Being  a JS testing tool, [Angular Protractor](https://github.com/angular/protractor) enforces one to (re)write the web page tests in Javascript - this project (and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)) tries to make this unnecessary.
-On the other hand Protractor offers some [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) that take advantage of Angular's features -  
-this is what this project tries to keep.
+These strategier take advantage of __Angular__ features -  
+this project allows the Java developer to use those strategies by supporting all Javascript methods __Protractor__ has plus few extra:
 
-Currently supported Angular Proractor methods:
+```javascript
+findBindings = function(binding, exactMatch, using, rootSelector)
+```
+Find a list of elements in the page by their angular binding.
+
+```javascript
+findByButtonText = function(searchText, using)
+```
+Find buttons by textual content
+```javascript
+findByCssContainingText = function(cssSelector, searchText, using)
+```
+Find elements by css selector and textual content
+```javascript
+findByModel = function(model, using, rootSelector)
+```
+Find elements by model name
+```javascript
+findByOptions = function(options, using)
+```
+Find elements by options
+```javascript
+findByPartialButtonText = function(searchText, using)
+```
+Find buttons by textual content fragment
+```javascript
+findAllRepeaterRows = function(using, repeater)
+```
+Find an array of elements matching a row within an ng-repeat
+```javascript
+findRepeaterColumn = function(repeater, exact, binding, using, rootSelector)
+```
+Find the elements in a column of an ng-repeat
+```javascript
+findRepeaterElement = function(repeater, exact, index, binding, using, rootSelector)
+```
+Find an element within an ng-repeat by its row and column.
+```javascript
+findSelectedOption = function(model, using)
+```
+Find selected option elements by model name
+```javascript
+findSelectedRepeaterOption = function(repeater, using)
+```
+Find selected option elements in the select implemented via repeater without a model.
+```javascript
+TestForAngular = function(attempts)
+```
+Tests whether the angular global variable is present on a page
+```javascript
+waitForAngular = function(rootSelector, callback)
+```
+Wait until Angular has finished rendering
+```javascript
+return angular.element(element).scope().$eval(expression)
+```
+Evaluate an Angular expression in the context of a given element.
+
+Each method borrowed from __Protractor__ is a Javascript snippet stored in a separate file under
+`src/main/java/resources`:
 ```
 binding.js
 buttonText.js
@@ -32,15 +92,19 @@ selectedRepeaterOption.js
 testForAngular.js
 waitForAngular.js
 ```
+#### Forum
+There is a [Protractor Java and c# Client](https://gctor Java and c# Clientroups.google.com/forum/#!forum/protractor-java--c-client) forum.
 
+#### Presentation on June 2016 South Florida Tester Meetup 
 
-Building
-========
-The following commands compile the project in console.
+![ Providing Protractor to Java / .Net](https://github.com/sergueik/selenium_java/blob/master/protractor/jProtractor.odp?raw=true)
 
-Windows
--------
-```
+#### Building
+To compile the project in console use the regular maven setup script:
+
+##### Windows
+
+```cmd
 set M2=c:\java\apache-maven-3.2.1\bin
 set M2_HOME=c:\java\apache-maven-3.2.1
 set MAVEN_OPTS=-Xms256m -Xmx512m
@@ -53,20 +117,16 @@ REM rd /s/q %USERPROFILE%\.M2
 set TRAVIS=true
 mvn clean package
 ```
-Linux
------
-```
+##### Linux
+```bash
 export TRAVIS=true
 mvn clean package
 ```
 
-Using with existing Java projects
-=================================
+#### Using `jProtractor` with existing Java projects
 
-Maven
------
-
-  * Copy `target\jprotractor-1.0-SNAPSHOT.jar` to your project `src/main/resources`:
+##### Maven
+Copy `target\jprotractor-1.0-SNAPSHOT.jar` into your project `src/main/resources`:
 
 ```
 +---src
@@ -78,13 +138,13 @@ Maven
             +---resources
 
 ```
-  * Add reference to the project `pom.xml` (a sample project is checked in) 
-```
+Add the reference to the project `pom.xml` (a sample project is checked in) 
+```xml
 <properties>
     <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
 </properties>
 ```
-```
+```xml
 <dependencies>
 <dependency>
      <groupId>com.jprotractor</groupId>
@@ -95,20 +155,19 @@ Maven
 </dependency>
 </dependencies>
 ```
-  * Add reference to the code:
-```
+Import jProractor classes in your code
+```java
 import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
   
 ```
 
-Ant
----
+##### Ant
 
-* Copy the `target\jprotractor-1.0-SNAPSHOT.jar`  in the same location oher dependency jars, e.g. `c:\java\selenium`,
-* Use the `build.xml` from a sample project provided or merge with your existing build file(s):
-```
+Copy the `target\jprotractor-1.0-SNAPSHOT.jar` in the same location oher dependency jars, e.g. `c:\java\selenium`,
+Use the `build.xml` from a sample project provided or merge with your existing build file(s):
+```xml
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <project name="example" basedir=".">
   <property name="build.dir" value="${basedir}/build"/>
@@ -141,20 +200,18 @@ Ant
 </project>
 
 ```
-* Add reference to the code:
-```
+Import jProractor classes in your code
+```java
 import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
-
 ```
 
-Example Test
-============
+### Example Test
 For desktop browser testing, run a Selenium node and Selenium hub on port 4444. Likewise, for Vagrant box browser testing have localhost port 4444 forwarded to the hub 4444
 Then create a typical TestNG test class with the annotated methods like below.
 
-```
+```java
 @BeforeClass
 public static void setup() throws IOException {
     DesiredCapabilities capabilities =   new DesiredCapabilities("firefox", "", Platform.ANY);
@@ -196,7 +253,7 @@ public void testCustomerLogin() throws Exception {
 }
 ```
 for CI build replace the Setup () with
-```
+```java
 @BeforeClass
 public static void setup() throws IOException {
 	seleniumDriver = new PhantomJSDriver();
@@ -204,12 +261,10 @@ public static void setup() throws IOException {
 }
 ```
 
+### Note
+PhantomJs allows loading Angular samples from `file://` context:
 
-Note
-----
-PhantomJs allows loading Angular samples from `file://` content:
-
-```
+```java
     seleniumDriver = new PhantomJSDriver();
     seleniumDriver.manage().window().setSize(new Dimension(width , height ));
     seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
@@ -222,16 +277,14 @@ PhantomJs allows loading Angular samples from `file://` content:
     ngDriver.navigate().to(uri);
     WebElement element = ngDriver.findElement(NgBy.repeater("item in items"));
     assertThat(element, notNullValue());
-
 ```
 Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
-Test setup
-----------
+### Test setup
 The project work on Linux with Java 1.7, Selenium 2.47, Firefox 40 (download desired version of firefox from
 [ubuntuzilla](https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/) or [ftp.mozilla.org](https://ftp.mozilla.org/pub/firefox/)) and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
 
-```
+```bash
 export NODE_PORT=5555
 export HUB_IP_ADDRESS=127.0.0.1
 export HUB_PORT=4444
@@ -245,17 +298,14 @@ java $LAUNCHER_OPTS  -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM
 
 export HUB_PORT=4444
 java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role hub  -port $HUB_PORT
-
 ```
-
-Related Projects 
-================
+### Related Projects 
   - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [ngWebDriver](https://github.com/paul-hammant/ngWebDriver)
   - [angular/protractor](https://github.com/angular/protractor) 
   - [bbaia/protractor-net](https://github.com/bbaia/protractor-net)
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
-
+  - [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory)
 
 Author
 ------
