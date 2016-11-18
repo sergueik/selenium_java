@@ -21,6 +21,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.seleniumhq.selenium.fluent.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -62,63 +63,50 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+
+// NOTE: this project is not using jUnit annotations
+// import static org.junit.Assert.assertThat;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
-// not using jUnit in this project
-// import static org.junit.Assert.assertThat;
+// Java 8  part
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class AppTest {
 
 	private FirefoxDriver driver;
 	private WebDriverWait wait;
 	private int flexibleWait = 5;
+	static int implicit_wait_interval = 1;
+	static int flexible_wait_interval = 5;
+	static long wait_polling_interval = 500;
 	private long pollingInterval = 500;
-
-	private Server webServer;
-
-	private String hashesFinderScript = null;
-	private String resultFinderScript = null;
+  private String baseUrl = "http://suvian.in/selenium";
 
 	@BeforeSuite
-	public void before_suite() throws Exception {
+	public void beforeSuiteMethod() throws Exception {
 		((StdErrLog) Log.getRootLogger()).setLevel(StdErrLog.LEVEL_OFF);
-		webServer = new Server(new QueuedThreadPool(5));
-		ServerConnector connector = new ServerConnector(webServer,
-				new HttpConnectionFactory());
-		connector.setPort(8080);
-		webServer.addConnector(connector);
-		ResourceHandler resource_handler = new ResourceHandler();
-		resource_handler.setDirectoriesListed(true);
-		resource_handler.setWelcomeFiles(new String[] { "index.html" });
-		resource_handler.setResourceBase("src/test/webapp");
-		HandlerList handlers = new HandlerList();
-		handlers
-				.setHandlers(new Handler[] { resource_handler, new DefaultHandler() });
-		webServer.setHandler(handlers);
-		webServer.start();
-
+    // Address already in use: bind
+    // temporarily using same project to two classes
 		driver = new FirefoxDriver();
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		hashesFinderScript = getScriptContent("hashesFinder.js");
-		resultFinderScript = getScriptContent("resultFinder.js");
 	}
 
 	@AfterSuite
-	public void after_suite() throws Exception {
-		Thread.sleep(1000);
+	public void afterSuiteMethod() throws Exception {
 		driver.quit();
-		webServer.stop();
 	}
 
 	@BeforeMethod
 	public void loadPage() {
-		driver.get("http://user:password@localhost:8080/");
+		driver.get(baseUrl);
 	}
 
 	@AfterMethod
@@ -127,69 +115,100 @@ public class AppTest {
 	}
 
 	@Test(enabled = true)
-	public void pageLaded() {
-		String tableCssSelector = "html body div table.sortable";
+	public void Test() {
+
+    // Arrange
+    driver.get("http://suvian.in/selenium/1.1link.html");
+    try{
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
+    // Act
+
+    // $x("//div[@class='intro-message']/h3[contains(text(), 'Link Successfully clicked')]")
+    // $$(".container .row .intro-message h3 a")
+   
+		String cssSelector = ".container .row .intro-message h3 a";    
+    String xpath = "//div[1]/div/div/div/div/h3[2]/a";
 		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
-				.cssSelector(tableCssSelector))));
+				.cssSelector(cssSelector))));
+    List<WebElement> elements = driver.findElements(By.xpath(xpath));
+		assertTrue(elements.size() > 0);
+    
+    // Assert
+    String linkText = "Click Here";
+    WebElement element = elements.get(0);
+    highlight(element);
+    assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
+    // Act
+    element.click();
 
-		assertTrue(driver.findElements(cssSelector(tableCssSelector)).size() > 0);
+    try{
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
+    linkText = "Link Successfully clicked";
+    cssSelector = ".container .row .intro-message h3";        
+		String className = "intro-message";
+    
+    elements = driver.findElements(By.className(className));
+    System.err.println("Text is: " + elements.get(0).getText());
+
+    // Wait page to load
+
+    try{
+      (new WebDriverWait(driver, 5))
+        .until(new ExpectedCondition<Boolean>() {
+          public Boolean apply(WebDriver d) {
+            WebElement e = d.findElement(By.className("intro-message")) ;
+            String t = e.getText();
+              Boolean result = t.contains("Link Successfully clicked");
+              System.err.println("in apply: Text = " + t + "\n result = " + result.toString());
+              return result;
+          }
+        });      
+    } catch(Exception e) {      
+    }
+    // http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
+    // http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
+    elements = driver.findElements(By.cssSelector(cssSelector));
+    Stream<WebElement> elementsStream = elements.stream(); 			//convert list to stream
+    elements = elementsStream.filter(o -> {
+      System.err.println("in filter: Text = " + o.getText());  
+      return (Boolean) (o.getText().equalsIgnoreCase("Link Successfully clicked"));
+      }).collect(Collectors.toList());	
+
+		assertThat(elements.size(), equalTo(1));
+    
+    // Assert
+    element = elements.get(0);
+    highlight(element);
+    assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
+    // Act
+  	elements.forEach(System.out::println);			//output : spring node
 	}
 
-	@Test(enabled = true)
-	public void testRunScript() {
-		String result = storeEval(hashesFinderScript, "");
-		assertFalse(result.isEmpty());
-		result = storeEval(hashesFinderScript);
-		assertFalse(result.isEmpty());
+	private void highlight(WebElement element) {
+		highlight(element, 100);
 	}
 
-	// https://processing.org/reference/JSONArray.html
-	@Test(enabled = true)
-	public void findHashes() {
-		ArrayList<String> hashes = new ArrayList<String>();
-		JSONArray hashesDataArray = new JSONArray(storeEval(hashesFinderScript));
-		for (int i = 0; i < hashesDataArray.length(); i++) {
-			hashes.add(hashesDataArray.getString(i));
+	private void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexible_wait_interval);
 		}
-		assertTrue(hashes.size() > 0);
-		for (String hash : hashes) {
-			System.err.println("Hash: " + hash);
+		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+    try{
+      wait.until(ExpectedConditions.visibilityOf(element));
+      if (driver instanceof JavascriptExecutor) {
+        ((JavascriptExecutor) driver).executeScript(
+            "arguments[0].style.border='3px solid yellow'", element);
+      }
+        Thread.sleep(highlight_interval);
+      if (driver instanceof JavascriptExecutor) {
+        ((JavascriptExecutor) driver).executeScript(
+            "arguments[0].style.border=''", element);
+      }
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
 		}
 	}
 
-	// https://processing.org/reference/JSONObject.html
-	@Test(enabled = true)
-	public void findResultsDetails() {
-		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
-				storeEval(hashesFinderScript)));
-		Iterator<String> masterServerIterator = resultObj.keys();
-		while (masterServerIterator.hasNext()) {
-			String masterServer = masterServerIterator.next();
-			JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
-			for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
-				System.err.println(masterServer + " " + resultDataArray.get(cnt));
-			}
-		}
-	}
-
-	private String storeEval(String script, String... input) {
-		String result = null;
-		if (driver instanceof JavascriptExecutor) {
-			result = (String) ((JavascriptExecutor) driver).executeScript(script,
-					input);
-		}
-		return result;
-	}
-
-	protected String getScriptContent(String scriptName) throws Exception {
-		try {
-			final InputStream stream = AppTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new Exception(scriptName);
-		}
-	}
 }
