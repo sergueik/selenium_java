@@ -37,8 +37,7 @@ namespace SeleniumTests
         private String baseUrl = "http://suvian.in/selenium";
 
         [SetUp]
-        public void SetupTest()
-        {
+        public void SetupTest() {
             verificationErrors = new StringBuilder();
             // driver = new ChromeDriver();
             driver = new FirefoxDriver();
@@ -69,8 +68,7 @@ namespace SeleniumTests
         }
 
         [TestFixtureTearDown]
-        public void TestFixtureTearDownMethod()
-        {
+        public void TestFixtureTearDownMethod() {
         }
 
         // explore Selenium WebDriver testing  practice site from https://groups.google.com/forum/#!topic/selenium-users/JXggllPayGE
@@ -80,12 +78,9 @@ namespace SeleniumTests
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.1link.html");
             // Act
-            try
-            {
-                wait.Until(OpenQA.Selenium.Support.UI.ExpectedConditions.ElementIsVisible(By.CssSelector("div.container div.row div.col-lg-12 div.intro-message a")));
-            }
-            catch (Exception e)
-            {
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("div.container div.row div.col-lg-12 div.intro-message a")));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -95,101 +90,104 @@ namespace SeleniumTests
             // Act
             element.Click();
             // Wait page to load
+            string linkText = "Link Successfully clicked";
             try {
                 wait.Until(d => {
                     IWebElement e = d.FindElement(By.ClassName("intro-message"));
-                    return (e.Text.IndexOf("Link Successfully clicked") > -1);
+                    return (e.Text.IndexOf(linkText) > -1);
                 });
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-            
+
             // Assert
-            IWebElement element2 = null;
-            String matcher = "(?i:" + "программа на c#" + "|" + "Link Successfully clicked" + ")";
+            element = driver.FindElement(By.ClassName("intro-message"));
+            Assert.IsTrue(element.Text.IndexOf(linkText) > -1, element.Text);
+            // Asserts of case-insensitive link search - many will fail
+            element = null;
+            String matcher = "(?i:" + "программа на c#" + "|" + linkText + ")";
             try {
                 wait.Until(d => {
-                    ReadOnlyCollection<IWebElement> a = d.FindElements(By.XPath("//div[@class='intro-message']/h3"));
-                    element2 = a.First(o =>
+                    element = d.FindElements(By.XPath("//div[@class='intro-message']/h3")).First(o =>
                         Regex.IsMatch(o.Text, matcher, RegexOptions.IgnoreCase)
                     );
-                    return (element2 != null);
+                    return (element != null);
                 });
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-            Assert.IsTrue(element2.Text.IndexOf("Link Successfully clicked") > -1, element2.Text);
-            
+            Assert.IsTrue(element.Text.IndexOf(linkText) > -1, element.Text);
+
             // the following attempts would all fail
             try {
                 wait.Until(d => {
-                    IWebElement e = d.FindElement(By.XPath("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), 'Link Successfully clicked')]"));
-                    return (e.Text.IndexOf("Link Successfully clicked") > -1);
+                    IWebElement e = d.FindElement(By.XPath(
+                        String.Format("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), '{0}')]", linkText)));
+                    return (e.Text.IndexOf(linkText) > -1);
                 });
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
             try {
-              wait.Until(d => { 
-                  ReadOnlyCollection<IWebElement> e = d.FindElements(By.XPath("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), 'Link Successfully clicked')]")); 
-                  return(e.Count > 0 );
-              });
+                wait.Until(d => {
+                    ReadOnlyCollection<IWebElement> e = d.FindElements(By.XPath(String.Format("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), '{0}')]", linkText)));
+                    return (e.Count > 0);
+                });
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-
-            element = driver.FindElement(By.ClassName("intro-message"));
-            Assert.IsTrue(element.Text.IndexOf("Link Successfully clicked") > -1, element.Text);
-            // 
-            element = driver.FindElement(By.XPath("//div[@class='intro-message']/h3")); 
-            Assert.IsTrue(element.Text.IndexOf("Link Successfully clicked") > -1, element.Text);
-            ReadOnlyCollection<IWebElement>elements;
-            elements = driver.FindElements(By.XPath("//div[@class='intro-message']/h3[contains(text(), 'Link Successfully clicked')]"));
+            element = driver.FindElement(By.XPath("//div[@class='intro-message']/h3"));
+            Assert.IsTrue(element.Text.IndexOf(linkText) > -1, element.Text);
+            ReadOnlyCollection<IWebElement> elements;
+            elements = driver.FindElements(By.XPath(String.Format("//div[@class='intro-message']/h3[contains(text(), 'Link Successfully clicked')]", linkText)));
             Assert.IsTrue((elements.Count > 0));
             elements = driver.FindElements(By.XPath("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), 'Link Successfully clicked')]"));
-			// would fail            
-			//  Assert.IsTrue((elements.Count > 0));
+            try {
+                // would fail            
+                Assert.IsTrue((elements.Count > 0));
+            } catch (Exception e) {
+                verificationErrors.Append(e.Message);
+            }
         }
 
         [Test]
         public void Test2()
         {
+        	String text = "test";
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.2text_field.html");
-            // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            // Wait to load
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("namefield")));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
+            // Act
+            IWebElement element = driver.FindElement(By.Id("namefield"));
+            element.SendKeys(text);
             // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            Assert.IsTrue(element.GetAttribute("value").IndexOf(text) > -1, element.GetAttribute("value"));
         }
 
         [Test]
-        public void Test3()
-        {
+        public void Test3() {
+
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.3age_plceholder.html");
-            // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            // Wait to load
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("agefield")));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
+            // Act
+        	String text = "42";
+        	IWebElement element = driver.FindElement(By.Id("agefield"));
+            element.Clear();
+            element.SendKeys(text);
             // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            Assert.IsTrue(element.GetAttribute("value").IndexOf(text) > -1, element.GetAttribute("value"));
         }
 
         [Test]
