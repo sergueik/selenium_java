@@ -127,17 +127,21 @@ public class CommonFunctions {
 		highlightInterval = value;
 	}
 
-	public static void highlight(WebElement element) throws InterruptedException {
-		int flexibleWait = 5;
-		long pollingInterval = 500;
-		WebDriverWait wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		wait.until(ExpectedConditions.visibilityOf(element));
-		executeScript("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlightInterval);
-		executeScript("arguments[0].style.border=''", element);
+	public static void highlight(WebElement element) {
+		if (wait == null) {
+			wait = new WebDriverWait(seleniumDriver, flexibleWait);
+      wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		}
+    try{
+      wait.until(ExpectedConditions.visibilityOf(element));
+      executeScript("arguments[0].style.border='3px solid yellow'", element);
+      Thread.sleep(highlightInterval);
+      executeScript("arguments[0].style.border=''", element);
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
 	}
-
+  
 	public static Object executeScript(String script, Object... args) {
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;

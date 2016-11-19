@@ -106,7 +106,7 @@ public class NgDragDropTest {
 	}
 
 	@Before
-	public void beforeEach() throws InterruptedException {
+	public void beforeEach() {
 		ngDriver.navigate().to(baseUrl);
 	}
 
@@ -118,7 +118,7 @@ public class NgDragDropTest {
 
 	// @Ignore
 	@Test
-	public void testDragAndDrop() throws InterruptedException, Exception {
+	public void testDragAndDrop() {
 
 		NgWebElement ng_board = ngDriver.findElement(NgBy.model("kanbanBoard"));
 
@@ -172,15 +172,19 @@ public class NgDragDropTest {
 		actions
 				.dragAndDropBy(source_card, 0,
 						target_card_location.y - source_card_location.y).build().perform();
-		Thread.sleep(1000);
+    try{
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 		// works
 		actions.clickAndHold(source_card).moveToElement(target_card).release()
 				.build().perform();
 		ngDriver.waitForAngular();
-		Thread.sleep(1000);
+    try{
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 

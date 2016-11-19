@@ -107,7 +107,7 @@ public class NgDatePickerTest {
 	}
 
 	@Test
-	public void testDatePickerDirectSelect() throws Exception {
+	public void testDatePickerDirectSelect() {
 		NgWebElement ng_result;
 		try {
 			ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput"));
@@ -118,7 +118,6 @@ public class NgDatePickerTest {
 		} catch (Exception e) {
 			throw (e);
 		}
-
 		ng_result = ngDriver.findElement(NgBy.model("data.dateDropDownInput",
 				"[data-ng-app]"));
 		assertThat(ng_result, notNullValue());
@@ -220,7 +219,7 @@ public class NgDatePickerTest {
 		seleniumDriver.quit();
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 

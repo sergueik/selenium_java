@@ -101,7 +101,7 @@ public class NgMultiSelectTest {
 	}
 
 	@Test
-	public void testSelectCarsOneByOne() throws Exception {
+	public void testSelectCarsOneByOne() {
 
 		// Given we are using multiselect directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
@@ -122,7 +122,7 @@ public class NgMultiSelectTest {
 			NgWebElement ng_car = ngDriver.findElement(NgBy.repeaterElement(
 					"i in items", rowNum, "i.label"));
 			System.err.println("* " + ng_car.evaluate("i.label").toString());
-			highlight(ng_car);
+			CommonFunctions.highlight(ng_car);
 			ng_car.click();
       selectedCarCount ++ ;
 		}
@@ -146,7 +146,7 @@ public class NgMultiSelectTest {
 	}
 
 	@Test
-	public void testSelectAll() throws Exception {
+	public void testSelectAll() {
     
 		// Given we are using multiselect directive for selecting cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
@@ -164,7 +164,7 @@ public class NgMultiSelectTest {
 				.cssSelector("button[ng-click='checkAll()']"));
 		assertThat(checkAll, notNullValue());
 		assertTrue(checkAll.isDisplayed());
-		highlight(checkAll);
+		CommonFunctions.highlight(checkAll);
 		checkAll.click();
 		// Then every car is selected	
 		List<WebElement> cars = ng_directive.findElements(NgBy
@@ -198,10 +198,6 @@ public class NgMultiSelectTest {
 	public static void teardown() {
 		ngDriver.close();
 		seleniumDriver.quit();
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		CommonFunctions.highlight(element);
 	}
 
 }

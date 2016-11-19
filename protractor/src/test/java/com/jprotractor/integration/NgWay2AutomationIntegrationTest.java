@@ -89,7 +89,7 @@ public class NgWay2AutomationIntegrationTest {
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
 
 	@BeforeClass
-	public static void setup() throws IOException, InterruptedException {
+	public static void setup() throws IOException {
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
@@ -104,20 +104,18 @@ public class NgWay2AutomationIntegrationTest {
 	}
 
 	@Before
-	public void beforeEach() throws InterruptedException {
+	public void beforeEach() {
 		// Given I am on Home page
-		ngDriver.navigate().to(baseUrl);
+      ngDriver.navigate().to(baseUrl);      
 	}
 
 	@Test
-	public void testLogintToWay2AutomationSite() throws InterruptedException{
+	public void testSiteLogint() {
 		String login_url = "http://way2automation.com/way2auto_jquery/index.php";
 		String username = System.getenv("TEST_USERNAME");
 		String password = System.getenv("TEST_PASSWORD");
     WebDriver driver = ngDriver.getWrappedDriver();
-		//
 		driver.navigate().to(login_url);
-   //  Thread.sleep(1000);
 		// signup
 
     wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("load_box")));
@@ -185,7 +183,7 @@ public class NgWay2AutomationIntegrationTest {
 	 */
 	@Ignore
 	@Test
-	public void testCustomerLogin() throws Exception {
+	public void testCustomerLogin() {
 		if (isCIBuild) {
 			return;
 		}
@@ -287,7 +285,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testEvaluateTransactionDetails() throws Exception {
+	public void testEvaluateTransactionDetails() throws InterruptedException {
 		if (isCIBuild) {
 			return;
 		}
@@ -349,7 +347,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testOpenAccount() throws Exception {
+	public void testOpenAccount() throws InterruptedException {
 		if (isCIBuild) {
 			return;
 		}
@@ -458,7 +456,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testSortCustomerAccounts() throws Exception {
+	public void testSortCustomerAccounts() throws InterruptedException {
 		if (isCIBuild) {
 			return;
 		}
@@ -491,7 +489,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testListTransactions() throws Exception {
+	public void testListTransactions() {
 		if (isCIBuild) {
 			return;
 		}
@@ -532,7 +530,10 @@ public class NgWay2AutomationIntegrationTest {
 		highlight(transactions);
 		transactions.click();
 		// wait until transactions are loaded
-		Thread.sleep(500);
+    try{
+      Thread.sleep(500);
+    } catch (InterruptedException e) {}
+
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
 				NgBy.repeater("tx in transactions")).getWrappedElement()));
 		Iterator<WebElement> transactionTypeColumns = ngDriver.findElements(
@@ -551,7 +552,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testAddCustomer() throws Exception {
+	public void testAddCustomer() {
 		if (isCIBuild) {
 			return;
 		}
@@ -654,18 +655,22 @@ public class NgWay2AutomationIntegrationTest {
 		// .. in slow motion
 		actions.moveToElement(deleteCustomerButton.getWrappedElement())
 				.clickAndHold().build().perform();
-		Thread.sleep(100);
+    try{
+      Thread.sleep(100);
+    } catch (InterruptedException e) {}
 		actions.release().build().perform();
 		// let the customers reload
 		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(NgBy
 				.repeater("cust in Customers"))));
-		Thread.sleep(100);
+    try{
+      Thread.sleep(100);
+    } catch (InterruptedException e) {}
 		// TODO: assert the customers.count change
 	}
 
 	@Ignore
 	@Test
-	public void testInvitateNewCustomerToOpenAccount() throws Exception {
+	public void testInvitateNewCustomerToOpenAccount() {
 		if (isCIBuild) {
 			return;
 		}
@@ -768,7 +773,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	@Ignore
 	@Test
-	public void testDepositAndWithdraw() throws Exception {
+	public void testDepositAndWithdraw() {
 		if (isCIBuild) {
 			return;
 		}
@@ -834,7 +839,11 @@ public class NgWay2AutomationIntegrationTest {
 		int finalBalance = Integer.parseInt(ngDriver.findElement(
 				NgBy.binding("amount")).getText());
 		assertTrue(finalBalance == 100 + initialBalance);
-		Thread.sleep(500);
+    
+    try{
+      Thread.sleep(500);
+    } catch (InterruptedException e) {}
+    
 		// switch to "Home" screen
 		ngDriver.findElement(NgBy.buttonText("Home")).click();
 		// customer login
@@ -897,7 +906,7 @@ public class NgWay2AutomationIntegrationTest {
 		seleniumDriver.quit();
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 

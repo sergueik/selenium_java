@@ -94,7 +94,7 @@ public class NgButtonTest {
 
 
 	@Test
-	public void testButtonNgIf() throws Exception {
+	public void testButtonNgIf() {
 		//if (isCIBuild) { // Alert not handled by PhantomJS
 		//	return;
 		//}
@@ -102,7 +102,7 @@ public class NgButtonTest {
 
 		WebElement button = seleniumDriver.findElement(By.cssSelector("button.btn"));
 		ngDriver.waitForAngular();
-		highlight(button);
+		CommonFunctions.highlight(button);
 		NgWebElement ng_button = new NgWebElement(ngDriver, button);
 		assertThat(ng_button, notNullValue());
 		assertThat(ng_button.getAttribute("ng-click"), equalTo("house.frontDoor.open()"));
@@ -125,7 +125,7 @@ public class NgButtonTest {
 			return;
 		}
 		button = seleniumDriver.findElement(By.cssSelector("button.btn"));
-		highlight(button);
+		CommonFunctions.highlight(button);
 		ng_button = new NgWebElement(ngDriver, button);
 		assertThat(ng_button, notNullValue());
 		assertThat(ng_button.getAttribute("ng-click"), equalTo("house.frontDoor.close()"));
@@ -140,16 +140,16 @@ public class NgButtonTest {
 	}
 	
 	@Test
-	public void testButtonStateText() throws Exception {
+	public void testButtonStateText() {
 		//if (isCIBuild) { // Alert not handled by PhantomJS
 		//	return;
 		//}
 		getPageContent("ng_watch_ng_if.htm");				
 		WebElement button = seleniumDriver.findElement(By.cssSelector("button.btn"));
 		ngDriver.waitForAngular();
-		highlight(button);
+		CommonFunctions.highlight(button);
 		NgWebElement ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
-		highlight(ng_status);
+		CommonFunctions.highlight(ng_status);
 		assertTrue(ng_status.getText().matches("The door is closed"));
 		System.err.println("Initially: " + ng_status.getText());
 		button.click();
@@ -163,7 +163,7 @@ public class NgButtonTest {
 			return;
 		}
 		ng_status = ngDriver.findElement(NgBy.binding("house.frontDoor.isOpen"));
-		highlight(ng_status);
+		CommonFunctions.highlight(ng_status);
 		System.err.println("Finally: " + ng_status.getText());
 		assertThat(ng_status.getText(), matchesPattern(".+open"));
 	}
@@ -174,13 +174,11 @@ public class NgButtonTest {
 		seleniumDriver.quit();		
 	}
 
-	private static void getPageContent(String pagename) throws InterruptedException{
+	private static void getPageContent(String pagename) {
 		String baseUrl = CommonFunctions.getPageContent(pagename) ;
 		ngDriver.navigate().to(baseUrl);
-		Thread.sleep(500);
-	}
-
-	private static void highlight(WebElement element) throws InterruptedException {
-		CommonFunctions.highlight(element);
+    try{
+      Thread.sleep(500);
+    } catch (InterruptedException e) {}
 	}
 }
