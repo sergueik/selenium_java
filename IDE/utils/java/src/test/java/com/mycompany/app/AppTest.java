@@ -14,6 +14,9 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 import org.openqa.selenium.*;
 import static org.openqa.selenium.By.*;
@@ -120,7 +123,7 @@ public class AppTest {
   // validate in Firebug
   // $x("xpath to validate")
   // $$("cssSelector to validate")
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void Test0() {
 
     // Arrange
@@ -146,9 +149,6 @@ public class AppTest {
     cssSelector = ".container .row .intro-message h3";
 		String className = "intro-message";
 
-    elements = driver.findElements(By.className(className));
-    System.err.println("Text is: " + elements.get(0).getText());
-
     // Wait page to load
     try {
       wait.until(ExpectedConditions.urlContains("1.1link_validate.html"));
@@ -156,7 +156,8 @@ public class AppTest {
 		}
 
     // Assert
-    try{
+    // 1. enclosing element, good as a wait until condition
+    try {
       (new WebDriverWait(driver, 5))
         .until(new ExpectedCondition<Boolean>() {
           public Boolean apply(WebDriver d) {
@@ -168,6 +169,52 @@ public class AppTest {
           }
         });
     } catch(Exception e) {
+      System.err.println("Exception: "+ e.toString());
+    }
+    // 2. Iterator
+    try {
+      (new WebDriverWait(driver, 5))
+        .until(new ExpectedCondition<WebElement>() {
+          public WebElement apply(WebDriver d) {
+            Iterator<WebElement> i = d.findElements(By.cssSelector("div.container div.row div.intro-message h3")).iterator();
+            WebElement result = null;
+            while (i.hasNext()) {
+              WebElement e = (WebElement) i.next();
+              System.err.println("in apply iterator (1): Text = " + e.getText());
+              if ( e.getText().contains("Navigate Back")){
+                result = e;
+                break;
+              }
+            }
+            return result;
+          }
+        });
+    } catch(Exception e) {
+      System.err.println("Exception: "+ e.toString());
+    }
+
+    // 2. Alternative Iterator
+    try {
+      (new WebDriverWait(driver, 5))
+        .until(new ExpectedCondition<WebElement>() {
+          public WebElement apply(WebDriver d) {
+            Iterator<WebElement> i = d.findElements(By.cssSelector("div.container div.row div.intro-message h3")).iterator();
+            WebElement result = null;
+            Pattern pattern = Pattern.compile("(?:" + "Navigate Back" + ")",  java.util.regex.Pattern.CASE_INSENSITIVE);
+            while (i.hasNext()) {
+              WebElement e = (WebElement) i.next();
+              System.err.println("in apply iterator (2): Text = " + e.getText());
+              Matcher matcher = pattern.matcher(e.getText());
+              if (matcher.find()) {
+                result = e;
+                break;
+              }
+            }
+            return result;
+          }
+        });
+    } catch(Exception e) {
+      System.err.println("Exception: "+ e.toString());
     }
 
     // http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
