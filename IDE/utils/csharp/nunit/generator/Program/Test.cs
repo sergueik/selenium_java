@@ -84,7 +84,8 @@ namespace SeleniumTests
                 verificationErrors.Append(e.Message);
             }
 
-            IWebElement element = driver.FindElement(By.CssSelector("div.container div.row div.col-lg-12 div.intro-message a"));
+	    	// use http://csslint.net/ to write better css selectors 
+            IWebElement element = driver.FindElement(By.CssSelector(".container .row .col-lg-12 .intro-message a"));
             // Assert
             Assert.IsTrue(element.Text.IndexOf("Click Here") > -1, element.Text);
             // Act
@@ -172,7 +173,6 @@ namespace SeleniumTests
 
         [Test]
         public void Test3() {
-
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.3age_plceholder.html");
             // Wait to load
@@ -182,12 +182,14 @@ namespace SeleniumTests
                 verificationErrors.Append(e.Message);
             }
             // Act
-        	String text = "42";
+        	String text = "4242424242";
         	IWebElement element = driver.FindElement(By.Id("agefield"));
+        	int maxlength = 0;
+            int.TryParse(element.GetAttribute("maxlength"), out maxlength);
             element.Clear();
-            element.SendKeys(text);
+            element.SendKeys(text.Substring(0, maxlength));
             // Assert
-            Assert.IsTrue(element.GetAttribute("value").IndexOf(text) > -1, element.GetAttribute("value"));
+            Assert.IsTrue(text.IndexOf(element.GetAttribute("value")) > -1, element.GetAttribute("value"));
         }
 
         [Test]
@@ -195,19 +197,31 @@ namespace SeleniumTests
         {
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.4gender_dropdown.html");
-            // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message select")));
+            } catch (Exception e) {
+                verificationErrors.Append(e.Message);
             }
-            catch (Exception e)
-            {
+            // Act
+            IWebElement element = driver.FindElement(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message select"));
+            SelectElement selectElement = new SelectElement(element);
+            // Assert
+            try {
+	            selectElement.SelectByText("Male"); // case sensitive
+	            Assert.IsNotNull(selectElement.SelectedOption);
+            } catch (Exception e) {
+                verificationErrors.Append(e.Message);
+            }
+            IWebElement option = null;
+        	try {
+            	option = selectElement.Options.First( o => o.Text.Equals("male", StringComparison.InvariantCultureIgnoreCase));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
-            // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            Assert.IsNotNull(option);
+            selectElement.SelectByIndex(1);
+            StringAssert.AreEqualIgnoringCase("male", selectElement.SelectedOption.Text );
         }
 
         [Test]
