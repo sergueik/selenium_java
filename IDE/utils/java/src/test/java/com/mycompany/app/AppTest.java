@@ -20,6 +20,7 @@ import static org.openqa.selenium.By.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.seleniumhq.selenium.fluent.*;
+import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.Select;
@@ -114,8 +115,8 @@ public class AppTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true)
-	public void Test() {
+	@Test(enabled = false)
+	public void Test0() {
 
     // Arrange
     driver.get("http://suvian.in/selenium/1.1link.html");
@@ -126,14 +127,14 @@ public class AppTest {
 
     // $x("//div[@class='intro-message']/h3[contains(text(), 'Link Successfully clicked')]")
     // $$(".container .row .intro-message h3 a")
-   
-		String cssSelector = ".container .row .intro-message h3 a";    
+
+		String cssSelector = ".container .row .intro-message h3 a";
     String xpath = "//div[1]/div/div/div/div/h3[2]/a";
 		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
 				.cssSelector(cssSelector))));
     List<WebElement> elements = driver.findElements(By.xpath(xpath));
 		assertTrue(elements.size() > 0);
-    
+
     // Assert
     String linkText = "Click Here";
     WebElement element = elements.get(0);
@@ -146,13 +147,18 @@ public class AppTest {
       Thread.sleep(1000);
     } catch (InterruptedException e) {}
     linkText = "Link Successfully clicked";
-    cssSelector = ".container .row .intro-message h3";        
+    cssSelector = ".container .row .intro-message h3";
 		String className = "intro-message";
-    
+
     elements = driver.findElements(By.className(className));
     System.err.println("Text is: " + elements.get(0).getText());
 
     // Wait page to load
+    try {
+      wait.until(ExpectedConditions.urlContains("1.1link_validate.html"));
+		} catch (UnreachableBrowserException e) {
+			// TODO
+		}
 
     try{
       (new WebDriverWait(driver, 5))
@@ -164,26 +170,63 @@ public class AppTest {
               System.err.println("in apply: Text = " + t + "\n result = " + result.toString());
               return result;
           }
-        });      
-    } catch(Exception e) {      
+        });
+    } catch(Exception e) {
     }
     // http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
     // http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
     elements = driver.findElements(By.cssSelector(cssSelector));
     Stream<WebElement> elementsStream = elements.stream(); 			//convert list to stream
     elements = elementsStream.filter(o -> {
-      System.err.println("in filter: Text = " + o.getText());  
+      System.err.println("in filter: Text = " + o.getText());
       return (Boolean) (o.getText().equalsIgnoreCase("Link Successfully clicked"));
       }).collect(Collectors.toList());	
 
 		assertThat(elements.size(), equalTo(1));
-    
+
     // Assert
     element = elements.get(0);
     highlight(element);
     assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
     // Act
   	elements.forEach(System.out::println);			//output : spring node
+	}
+
+	@Test(enabled = true)
+	public void Test1() {
+
+    // Arrange
+    driver.get("http://suvian.in/selenium/1.1link.html");
+
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
+				.cssSelector(".container .row .intro-message h3 a"))));
+    List<WebElement> elements = driver.findElements(By.xpath("//div[1]/div/div/div/div/h3[2]/a"));
+		assertTrue(elements.size() > 0);
+
+    // Act
+    WebElement element = elements.get(0);
+    highlight(element);
+    assertTrue(element.getText().equalsIgnoreCase("Click Here"), element.getText());
+    element.click();
+
+    // Wait page to load
+    try{
+      (new WebDriverWait(driver, 5))
+        .until(new ExpectedCondition<Boolean>() {
+          public Boolean apply(WebDriver d) {
+            return d.findElement(By.className("intro-message")).getText().contains("Link Successfully clicked");
+          }
+        });
+    } catch(Exception e) {
+    }
+
+    // Assert
+    elements = driver.findElements(By.cssSelector(".container .row .intro-message h3")).stream().filter(o ->o.getText().equalsIgnoreCase("Link Successfully clicked")).collect(Collectors.toList());	
+		assertThat(elements.size(), equalTo(1));
+    element = elements.get(0);
+    highlight(element);
+    assertTrue(element.getText().equalsIgnoreCase("Link Successfully clicked"), element.getText());
+  	elements.forEach(System.out::println);			// output :  ??
 	}
 
 	private void highlight(WebElement element) {
