@@ -97,7 +97,7 @@ public class NgIgnoreSyncTest {
   
   // @Ignore
   @Test
-  public void testNonAngular() throws Exception {
+  public void testNonAngular() {
     if (isCIBuild) {
       return;	
     }
@@ -121,7 +121,7 @@ public class NgIgnoreSyncTest {
   }
   // @Ignore
   @Test
-  public void testNonAngularIgnoreSync() throws Exception {
+  public void testNonAngularIgnoreSync() {
     if (isCIBuild) {
       return;	
     }

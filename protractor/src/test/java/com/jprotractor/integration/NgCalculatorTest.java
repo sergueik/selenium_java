@@ -110,8 +110,8 @@ public class NgCalculatorTest {
 		assertThat(element, notNullValue());
 		highlight(element);
 		element.sendKeys("2");
-		element = ngDriver.findElement(NgBy
-				.options("value for (key, value) in operators"));
+		element = ngDriver
+				.findElement(NgBy.options("value for (key, value) in operators"));
 		assertThat(element, notNullValue());
 		element.click();
 		element = ngDriver.findElement(NgBy.buttonText("Go!"));

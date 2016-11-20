@@ -105,7 +105,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testDatePickerDirectSelect() throws Exception {
+	public void testDatePickerDirectSelect() {
 		getPageContent("ng_datepicker.htm");
 		// can not test official page - it is not an Angular app.
 		// http://dalelotts.github.io/angular-bootstrap-datetimepicker/
@@ -205,7 +205,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testDatePickerNavigation() throws Exception {
+	public void testDatePickerNavigation() {
 		getPageContent("ng_datepicker.htm");
 		WebElement ng_result = ngDriver.findElement(NgBy
 				.model("data.inputOnTimeSet"));
@@ -255,7 +255,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testEvaluate() throws Exception {
+	public void testEvaluate() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -283,7 +283,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testUpload1() throws Exception {
+	public void testUpload1() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -330,7 +330,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testUpload3() throws Exception {
+	public void testUpload3() {
 		if (isCIBuild) {
 			return;
 		}
@@ -361,7 +361,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testEvaluateEvenOdd() throws Exception {
+	public void testEvaluateEvenOdd() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -390,7 +390,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindRepeaterElement() throws Exception {
+	public void testFindRepeaterElement() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -419,7 +419,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindElementByRepeaterColumn() throws Exception {
+	public void testFindElementByRepeaterColumn() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -450,7 +450,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindSelectedtOptionWithAlert() throws Exception {
+	public void testFindSelectedtOptionWithAlert() {
 
 		getPageContent("ng_selected_option.htm");
 		List<WebElement> elements = ngDriver.findElements(NgBy
@@ -488,7 +488,9 @@ public class NgLocalFileTest {
 				System.err.println("Selecting option: " + option.getText());
 				option.click();
 				if (!isCIBuild) {
-					Thread.sleep(1000);
+          try {
+              Thread.sleep(500);
+            } catch (InterruptedException e) {}
 				}
 				if (!isCIBuild) {
 					try {
@@ -530,13 +532,15 @@ public class NgLocalFileTest {
 		System.err.println("countSelected = " + valueOfCountSelected);
 		assertThat(valueOfCountSelected, equalTo(2));
 		if (!isCIBuild) {
-			Thread.sleep(1000);
+      try {
+          Thread.sleep(500);
+        } catch (InterruptedException e) {}
 		}
 	}
 
 	@Ignore
 	@Test
-	public void testFindSelectedtOption() throws Exception {
+	public void testFindSelectedtOption() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -564,7 +568,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testChangeSelectedtOption() throws Exception {
+	public void testChangeSelectedtOption() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -603,7 +607,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testChangeSelectedRepeaterOption() throws Exception {
+	public void testChangeSelectedRepeaterOption() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -679,7 +683,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testMultiSelect2() throws Exception {
+	public void testMultiSelect2() {
 		getPageContent("ng_multi_select2.htm");
 		WebElement button = ngDriver
 				.findElement(By
@@ -728,7 +732,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testMultiSelect() throws Exception {
+	public void testMultiSelect() {
 		getPageContent("ng_multi_select.htm");
 		WebElement element = ngDriver.findElement(NgBy.model("selectedValues"));
 		// use core Selenium
@@ -795,7 +799,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindElementByRepeaterWithBeginEnd() throws Exception {
+	public void testFindElementByRepeaterWithBeginEnd() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -857,7 +861,7 @@ public class NgLocalFileTest {
 
 	// @Ignore
 	// @Test
-	// public void testFindRepeaterElement() throws Exception {
+	// public void testFindRepeaterElement() {
 	// if (!isCIBuild) {
 	// return;
 	// }

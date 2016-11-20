@@ -70,8 +70,8 @@ public class CommonFunctions {
 			// profile.setEnableNativeEvents(false);
 			// capabilities.setCapability("firefox_profile", profile);
 
-			seleniumDriver = new RemoteWebDriver(new URL(
-					"http://127.0.0.1:4444/wd/hub"), capabilities);
+			seleniumDriver = new RemoteWebDriver(
+					new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
 			return seleniumDriver;
 		} else {
 			DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs",
@@ -130,18 +130,18 @@ public class CommonFunctions {
 	public static void highlight(WebElement element) {
 		if (wait == null) {
 			wait = new WebDriverWait(seleniumDriver, flexibleWait);
-      wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+			wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		}
-    try{
-      wait.until(ExpectedConditions.visibilityOf(element));
-      executeScript("arguments[0].style.border='3px solid yellow'", element);
-      Thread.sleep(highlightInterval);
-      executeScript("arguments[0].style.border=''", element);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
+			Thread.sleep(highlightInterval);
+			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
 	}
-  
+
 	public static Object executeScript(String script, Object... args) {
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;
@@ -154,9 +154,9 @@ public class CommonFunctions {
 	// custom wait e.g. while Login light box is visible
 	public static void waitWhileElementIsVisible(By locator) {
 		final By _locator = locator;
-		new WebDriverWait(seleniumDriver, flexibleWait).pollingEvery(
-				pollingInterval, TimeUnit.SECONDS).until(
-				new ExpectedCondition<Boolean>() {
+		new WebDriverWait(seleniumDriver, flexibleWait)
+				.pollingEvery(pollingInterval, TimeUnit.SECONDS)
+				.until(new ExpectedCondition<Boolean>() {
 					@Override
 					public Boolean apply(WebDriver o) {
 						System.err.println("Size: " + o.findElements(_locator).size());
