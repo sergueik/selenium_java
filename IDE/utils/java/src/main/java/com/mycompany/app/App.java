@@ -26,7 +26,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import java.lang.RuntimeException;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Assert;
+import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.junit.Assert.*;
 
 public class App {

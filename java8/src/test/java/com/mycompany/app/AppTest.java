@@ -1,22 +1,31 @@
 package com.mycompany.app;
 
-import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.HttpConnectionFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.MovedContextHandler;
-import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.log.Log;
-import org.eclipse.jetty.util.log.StdErrLog;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import java.util.concurrent.TimeUnit;
+
+// Java 8  part
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 
 import org.openqa.selenium.*;
 import static org.openqa.selenium.By.*;
@@ -30,22 +39,11 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import java.util.concurrent.TimeUnit;
-
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.startsWith;
@@ -54,53 +52,30 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
-
-import org.json.*;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-
-// NOTE: this project is not using jUnit annotations
-// import static org.junit.Assert.assertThat;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
-
-// Java 8  part
-import java.util.stream.Stream;
-import java.util.stream.Collectors;
 
 public class AppTest {
 
 	private FirefoxDriver driver;
 	private WebDriverWait wait;
+	static Actions actions;
+  private Predicate<WebElement> hasClass;
+  private Predicate<WebElement> hasAttr;
+  private Predicate<WebElement> hasText;
 	private int flexibleWait = 5;
-	static int implicit_wait_interval = 1;
-	static int flexible_wait_interval = 5;
-	static long wait_polling_interval = 500;
+	private int implicitWait = 1;
 	private long pollingInterval = 500;
   private String baseUrl = "http://suvian.in/selenium";
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
-		((StdErrLog) Log.getRootLogger()).setLevel(StdErrLog.LEVEL_OFF);
-    // Address already in use: bind
-    // temporarily using same project to two classes
-		driver = new FirefoxDriver();
-		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+    driver = new FirefoxDriver();
+    driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+    wait = new WebDriverWait(driver, flexibleWait);
+    wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 	}
 
 	@AfterSuite
@@ -118,13 +93,13 @@ public class AppTest {
 		driver.get("about:blank");
 	}
 
-  // this test contains extra debugging in the ExpectedConditions anonimous class and filter
-  // this test is somewat redundant, used for debugging
-  // validate in Firebug
-  // $x("xpath to validate")
-  // $$("cssSelector to validate")
+	// the Test0 contains extra debugging in the ExpectedConditions anonimous class and filter
+	// this test is somewat redundant, used for debugging
+	// validate in Firebug
+	// $x("xpath to validate")
+	// $$("cssSelector to validate")
 	@Test(enabled = true)
-	public void Test0() {
+	public void test0() {
 
     // Arrange
     driver.get("http://suvian.in/selenium/1.1link.html");
@@ -132,11 +107,11 @@ public class AppTest {
       Thread.sleep(1000);
     } catch (InterruptedException e) {}
 
-		String cssSelector = ".container .row .intro-message h3 a";
+    String cssSelector = ".container .row .intro-message h3 a";
     String xpath = "//div[1]/div/div/div/div/h3[2]/a";
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(cssSelector))));
+    wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(cssSelector))));
     List<WebElement> elements = driver.findElements(By.xpath(xpath));
-		assertTrue(elements.size() > 0);
+    assertTrue(elements.size() > 0);
 
     // Act
     String linkText = "Click Here";
@@ -160,6 +135,7 @@ public class AppTest {
     try {
       (new WebDriverWait(driver, 5))
         .until(new ExpectedCondition<Boolean>() {
+          @Override
           public Boolean apply(WebDriver d) {
             WebElement e = d.findElement(By.className("intro-message")) ;
             String t = e.getText();
@@ -175,6 +151,7 @@ public class AppTest {
     try {
       (new WebDriverWait(driver, 5))
         .until(new ExpectedCondition<WebElement>() {
+          @Override
           public WebElement apply(WebDriver d) {
             Iterator<WebElement> i = d.findElements(By.cssSelector("div.container div.row div.intro-message h3")).iterator();
             WebElement result = null;
@@ -197,6 +174,7 @@ public class AppTest {
     try {
       (new WebDriverWait(driver, 5))
         .until(new ExpectedCondition<WebElement>() {
+          @Override
           public WebElement apply(WebDriver d) {
             Iterator<WebElement> i = d.findElements(By.cssSelector("div.container div.row div.intro-message h3")).iterator();
             WebElement result = null;
@@ -234,7 +212,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = true)
-	public void Test1() {
+	public void test1() {
 
     // Arrange
     driver.get("http://suvian.in/selenium/1.1link.html");
@@ -258,6 +236,7 @@ public class AppTest {
     try{
       (new WebDriverWait(driver, 5))
         .until(new ExpectedCondition<Boolean>() {
+          @Override
           public Boolean apply(WebDriver d) {
             return d.findElement(By.className("intro-message")).getText().contains("Link Successfully clicked");
           }
@@ -276,7 +255,7 @@ public class AppTest {
 
 
 	@Test(enabled = false)
-	public void Test2() {
+	public void test2() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.2text_field.html");
 
@@ -293,7 +272,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test3() {
+	public void test3() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.3age_plceholder.html");
 
@@ -309,25 +288,27 @@ public class AppTest {
     // Assert
 	}
 
-	@Test(enabled = false)
-	public void Test4() {
+	@Test(enabled = true)
+	public void test4() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
-
-    wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-    // Act
-
     // Wait page to load
-    try {
-      wait.until(ExpectedConditions.urlContains("1.4gender_dropdown_validate.html"));
-      } catch (UnreachableBrowserException e) {
-      }
+    wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(".intro-header .container .row .col-lg-12 .intro-message select"))));
+    // Act
+    WebElement element = driver.findElement(By.cssSelector(".intro-header .container .row .col-lg-12 .intro-message select"));
+    Select select = new Select(element);
+    String optionString = "Male";
+    // create predicate driven case-insensitive option search
+    hasText = o -> o.getText().matches("(?i:" + optionString.toLowerCase() + ")");
+    List<WebElement> options = select.getOptions().stream().filter(hasText).collect(Collectors.toList());
     // Assert
+		assertThat(options.size(), equalTo(1));
+    element = options.get(0);
+    assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
 	@Test(enabled = false)
-	public void Test5() {
+	public void test5() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.5married_radio.html");
 
@@ -344,7 +325,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test6() {
+	public void test6() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.6checkbox.html");
 
@@ -361,7 +342,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test7() {
+	public void test7() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.7button.html");
 
@@ -378,7 +359,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test8() {
+	public void test8() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.8copyAndPasteText.html");
 
@@ -395,7 +376,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test9() {
+	public void test9() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.9copyAndPasteTextAdvanced.html");
 
@@ -412,7 +393,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test10() {
+	public void test10() {
     // Arrange
     driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
 
@@ -429,7 +410,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test11() {
+	public void test11() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.1alert.html");
 
@@ -446,7 +427,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test12() {
+	public void test12() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
 
@@ -463,7 +444,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test13() {
+	public void test13() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.3frame.html");
 
@@ -480,7 +461,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test14() {
+	public void test14() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.4mouseHover.html");
 
@@ -497,7 +478,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test15() {
+	public void test15() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.5resize.html");
 
@@ -514,7 +495,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test16() {
+	public void test16() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.6liCount.html");
 
@@ -531,7 +512,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test17() {
+	public void test17() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.7waitUntil.html");
 
@@ -548,7 +529,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test18() {
+	public void test18() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.8progressBar.html");
 
@@ -565,7 +546,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test19() {
+	public void test19() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
 
@@ -582,7 +563,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test20() {
+	public void test20() {
     // Arrange
     driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
 
@@ -599,7 +580,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test21() {
+	public void test21() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.1fileupload.html");
 
@@ -616,7 +597,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test22() {
+	public void test22() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
 
@@ -633,7 +614,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test23() {
+	public void test23() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.3javaemail.html");
 
@@ -650,7 +631,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test24() {
+	public void test24() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.4readWriteExcel.html");
 
@@ -667,7 +648,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test25() {
+	public void test25() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
 
@@ -684,7 +665,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test26() {
+	public void test26() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.6copyTextFromTextField.html");
 
@@ -701,7 +682,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test27() {
+	public void test27() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
@@ -718,7 +699,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test28() {
+	public void test28() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.8screeshotToEmail.html");
 
@@ -735,7 +716,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test29() {
+	public void test29() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.9FacebookTest.html");
 
@@ -752,7 +733,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = false)
-	public void Test30() {
+	public void test30() {
     // Arrange
     driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
 
@@ -774,9 +755,9 @@ public class AppTest {
 
 	private void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
-			wait = new WebDriverWait(driver, flexible_wait_interval);
+			wait = new WebDriverWait(driver, flexibleWait);
 		}
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
     try{
       wait.until(ExpectedConditions.visibilityOf(element));
       if (driver instanceof JavascriptExecutor) {
