@@ -101,7 +101,7 @@ public class NgSvgTest {
 	}
 
 	@Test
-	public void testCircles() throws Exception {
+	public void testCircles() {
 		// if (isCIBuild) { // Alert not handled by PhantomJS
 		// return;
 		// }
@@ -153,7 +153,9 @@ public class NgSvgTest {
 						+ css_selector_of(circle));
 			}
 		}
-		Thread.sleep(1000);
+    try{
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 	}
 
 	@AfterClass
@@ -162,14 +164,15 @@ public class NgSvgTest {
 		seleniumDriver.quit();
 	}
 
-	private static void getPageContent(String pagename)
-			throws InterruptedException {
+	private static void getPageContent(String pagename) {
 		String baseUrl = CommonFunctions.getPageContent(pagename);
 		ngDriver.navigate().to(baseUrl);
-		Thread.sleep(500);
+    try{
+      Thread.sleep(500);
+    } catch (InterruptedException e) {}
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 

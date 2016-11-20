@@ -105,7 +105,7 @@ public class NgQualityShepherdTest {
 	}
 
 	@Test
-	public void testAddFriend() throws Exception {
+	public void testAddFriend() {
 		// When we add a friend
 		String friendName = "John Doe";
 		int friendCount = ngDriver.findElements(NgBy.repeater("row in rows"))
@@ -131,7 +131,7 @@ public class NgQualityShepherdTest {
 	}
 
 	@Test
-	public void testSearchAndDeleteFriend() throws Exception {
+	public void testSearchAndDeleteFriend() {
 		// Given we pick friend to delete
 		List<WebElement> friendNames = ngDriver.findElements(NgBy.repeaterColumn(
 				"row in rows", "row"));
@@ -187,7 +187,7 @@ public class NgQualityShepherdTest {
 	@Ignore
 	// TODO
 	@Test
-	public void testRemoveAllFriends() throws Exception {
+	public void testRemoveAllFriends() {
 		ngDriver.waitForAngular();
 		List<WebElement> elements = ngDriver.findElements(NgBy
 				.repeater("row in rows"));
@@ -200,7 +200,7 @@ public class NgQualityShepherdTest {
 		seleniumDriver.quit();
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 }

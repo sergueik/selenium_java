@@ -1,6 +1,7 @@
 package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang.math.IntRange;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -65,7 +66,7 @@ import com.jprotractor.NgWebElement;
  * Integration tests of AngularUI - Slider demo
  * https://htmlpreview.github.io/?https
  * ://github.com/angular-ui/ui-slider/master/demo/index.html
- * 
+ *
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -106,7 +107,7 @@ public class NgSliderTest {
 	}
 
 	@Test
-	public void testSliderKeyPress() throws Exception {
+	public void testSliderKeyPress() {
 		if (isCIBuild) {
 			return;
 		}
@@ -123,7 +124,7 @@ public class NgSliderTest {
 		CommonFunctions.setHighlightTimeout(10);
 		WebElement sliderElement = sliderContainerElement.findElement(By
 				.className("ui-slider-handle"));
-		for (int cnt = 0; cnt != 10; cnt++) {
+		for (int cnt: new IntRange(1, 10).toArray()) {
 			sliderElement.sendKeys(Keys.ARROW_RIGHT);
 			highlight(sliderElement);
 		}
@@ -141,7 +142,7 @@ public class NgSliderTest {
 	}
 
 	@Test
-	public void testSliderMouseMove() throws Exception {
+	public void testSliderMouseMove() {
 		if (isCIBuild) {
 			return;
 		}
@@ -163,9 +164,10 @@ public class NgSliderTest {
 			actions.moveByOffset(width / 20, 0);
 			actions.release();
 			actions.build().perform();
+      try{
 			Thread.sleep(100);
+      } catch (InterruptedException e) {}
 		}
-
 		WebElement sliderValueElement = sliderElements.get(1);
 		assertThat(sliderValueElement.getTagName(), equalTo("input"));
 		actions.moveToElement(sliderValueElement).build().perform();
@@ -179,7 +181,7 @@ public class NgSliderTest {
 		seleniumDriver.quit();
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 }

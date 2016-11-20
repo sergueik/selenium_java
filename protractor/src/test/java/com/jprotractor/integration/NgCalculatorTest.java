@@ -101,7 +101,7 @@ public class NgCalculatorTest {
 	}
 
 	@Test
-	public void testAddition() throws Exception {
+	public void testAddition() {
 		NgWebElement element = ngDriver.findElement(NgBy.model("first"));
 		assertThat(element, notNullValue());
 		highlight(element);
@@ -130,7 +130,7 @@ public class NgCalculatorTest {
 		seleniumDriver.quit();
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 

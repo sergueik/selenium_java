@@ -65,7 +65,7 @@ import com.jprotractor.NgWebElement;
 
 /**
  * Local file Integration tests
- * 
+ *
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -741,7 +741,7 @@ public class NgLocalFileTest {
 				break;
 			}
 			if (parseBoolean(option.getAttribute("selected"))) {
-				System.err.println("Selected:  '" + option.getText() + "' value = "
+				System.err.println("Selected:	'" + option.getText() + "' value = "
 						+ option.getAttribute("value"));
 				// option.click();
 				data.add(option.getAttribute("value"));
@@ -809,7 +809,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindElementByOptions() throws Exception {
+	public void testFindElementByOptions() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -825,7 +825,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindElementByModel() throws Exception {
+	public void testFindElementByModel() {
 		// NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("ng_pattern_validate.htm");
 		WebElement input = ngDriver.findElement(NgBy.model("myVal"));
@@ -873,7 +873,7 @@ public class NgLocalFileTest {
 	// NOTE: failing in Linux VM: PhantomJS has crashed
 	@Ignore
 	@Test
-	public void testElementTextIsGenerated() throws Exception {
+	public void testElementTextIsGenerated() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -897,7 +897,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testDropDownWatch() throws Exception {
+	public void testDropDownWatch() {
 		// NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
 		getPageContent("ng_dropdown_watch.htm");
 		String optionsCountry = "country for country in countries";
@@ -923,7 +923,9 @@ public class NgLocalFileTest {
 		Select selectCountries = new Select(ngDriver.findElement(NgBy
 				.model("country")));
 		selectCountries.selectByVisibleText("china");
-		Thread.sleep(1000);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 		WebElement selectedOptionCountry = ngDriver.findElement(NgBy
 				.selectedOption(optionsCountry));
 		try {
@@ -978,13 +980,15 @@ public class NgLocalFileTest {
 		}
 
 		if (!isCIBuild) {
-			Thread.sleep(1000);
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {}
 		}
 	}
 
 	@Ignore
 	@Test
-	public void testFindRepeaterRows() throws Exception {
+	public void testFindRepeaterRows() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -1005,7 +1009,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testOrderByColumnField() throws Exception {
+	public void testOrderByColumnField() {
 		// Given there is a sorted data grid
 		getPageContent("ng_headers_sort_example1.htm");
 		String[] headers = new String[] { "First Name", "Last Name", "Age" };
@@ -1038,7 +1042,7 @@ public class NgLocalFileTest {
 				// String binding = header_columns.get(header);
 				String binding = "emp." + ng_row.evaluate(field);
 				System.err.println("Sorted by: " + field + ": " + binding
-						+ ", Reverse:  " + reverseSort /* sortOrders[cnt] */);
+						+ ", Reverse:	" + reverseSort /* sortOrders[cnt] */);
 
 				// Iterate over all rows, selected column
 				Iterator<WebElement> iteratorEmp = rows.iterator();
@@ -1083,7 +1087,7 @@ public class NgLocalFileTest {
 	// TODO: separate into class AngularUISelect.java
 	@Ignore
 	@Test
-	public void testAngularUISelectHandleSelectedAndAvailable() throws Exception {
+	public void testAngularUISelectHandleSelectedAndAvailable() {
 		getPageContent("ng_ui_select_example1.htm");
 		List<WebElement> selectedColors = ngDriver.findElements(NgBy
 				.repeater("$item in $select.selected"));
@@ -1119,7 +1123,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testAngularUISelectHandleSearch() throws Exception {
+	public void testAngularUISelectHandleSearch() {
 		getPageContent("ng_ui_select_example1.htm");
 		String searchText = "Ma";
 		WebElement search = ngDriver.findElement(By
@@ -1141,7 +1145,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testAngularUISelectHandleDeselect() throws Exception {
+	public void testAngularUISelectHandleDeselect() {
 		getPageContent("ng_ui_select_example1.htm");
 		List<WebElement> selectedColors = ngDriver.findElements(NgBy
 				.repeater("$item in $select.selected"));
@@ -1170,7 +1174,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testFindAllBindings() throws Exception {
+	public void testFindAllBindings() {
 		if (!isCIBuild) {
 			return;
 		}
@@ -1195,7 +1199,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testHover() throws InterruptedException {
+	public void testHover() {
 		getPageContent("ng_hover1.htm");
 		// Hover over menu
 		WebElement element = seleniumDriver.findElement(By.id("hover"));
@@ -1221,7 +1225,9 @@ public class NgLocalFileTest {
 		actions.moveByOffset(0, 300).build().perform();
 		// NOTE: cannot find div[ng-show='true'] nor div[show='true']
 		// Wait for the tooltip div to get visible
-		Thread.sleep(1000);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 		actions.moveToElement(element).build().perform();
 		try {
 			wait.until(ExpectedConditions.visibilityOf(seleniumDriver.findElement(By
@@ -1232,13 +1238,15 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testDropDown() throws Exception {
+	public void testDropDown() {
 		if (!isCIBuild) {
 			return;
 		}
 		// TODO: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("ng_dropdown.htm");
-		Thread.sleep(1000);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 		String optionsCountry = "country for (country, states) in countries";
 		List<WebElement> elementsCountries = ngDriver.findElements(NgBy
 				.options(optionsCountry));
@@ -1265,7 +1273,9 @@ public class NgLocalFileTest {
 				.model("states")));
 
 		selectCountries.selectByValue("Australia");
-		Thread.sleep(1000);
+    try {
+      Thread.sleep(1000);
+    } catch (InterruptedException e) {}
 
 		WebElement selectedOptionCountry = ngDriver.findElement(NgBy
 				.selectedOption(optionsCountry));
@@ -1293,7 +1303,7 @@ public class NgLocalFileTest {
 
 	// @Ignore
 	@Test
-	public void testDragAndDrop() throws InterruptedException, Exception {
+	public void testDragAndDrop() {
 		getPageContent("ng_drag_and_drop1.htm");
 
 		Enumeration<WebElement> ng_cars = Collections.enumeration(ngDriver
@@ -1331,7 +1341,7 @@ public class NgLocalFileTest {
 
 	@Ignore
 	@Test
-	public void testDragAndDropSimulate() throws InterruptedException, Exception {
+	public void testDragAndDropSimulate() {
 		getPageContent("ng_drag_and_drop1.htm");
 
 		Enumeration<WebElement> ng_cars = Collections.enumeration(ngDriver
@@ -1359,29 +1369,35 @@ public class NgLocalFileTest {
 		seleniumDriver.quit();
 	}
 
-	private static void getPageContent(String pagename)
-			throws InterruptedException {
+	// NOTE: a different implementation exists in CommonFunctions
+	private static void getPageContent(String pagename) {
 		String baseUrl = CommonFunctions.getPageContent(pagename);
 		ngDriver.navigate().to(baseUrl);
-		Thread.sleep(500);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {}
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element) {
 		CommonFunctions.highlight(element);
 	}
 
-	private static String getIdentity(WebElement element)
-			throws InterruptedException {
+	private static String getIdentity(WebElement element){
+    String result = null;
 		String script = "return angular.identity(angular.element(arguments[0])).html();";
 		// returns too little HTML information in Java
-		return CommonFunctions.executeScript(script, element).toString();
+    try {
+      result = CommonFunctions.executeScript(script, element).toString();
+    } catch(Exception e) {}
+    return result;
 	}
 
 	private static void dragAndDrop(WebElement sourceElement,
-			WebElement destinationElement) throws Exception {
+			WebElement destinationElement) {
 		String script = "simulateDragDrop.js";
-		CommonFunctions.executeScript(CommonFunctions.getScriptContent(script),
-				sourceElement, destinationElement);
+    try {
+      CommonFunctions.executeScript(CommonFunctions.getScriptContent(script), sourceElement, destinationElement);
+      } catch(Exception e) {}
 	}
 
 }
