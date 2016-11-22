@@ -233,9 +233,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -253,9 +251,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -273,9 +269,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -293,9 +287,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -313,9 +305,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -325,23 +315,31 @@ namespace SeleniumTests
         }
 
         [Test]
-        public void Test10()
-        {
+        public void Test10() {
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.10selectElementFromDD.html");
             // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("div.intro-header div.container div.row div.col-lg-12 div.intro-message div.dropdown button.dropbtn")));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
+            IWebElement element = driver.FindElement(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message .dropdown button.dropbtn"));
             // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            StringAssert.AreEqualIgnoringCase( "Click Me to open a Menu" , element.Text);
+            element.Click();
+            
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.Id("myDropdown")));
+            } catch (Exception e) {
+                verificationErrors.Append(e.Message);
+            }
+            
+            IWebElement  option = null;
+            String matcher = "(?i:option 2)";
+            option = driver.FindElement(By.Id("myDropdown")).FindElements(By.TagName("a")).First(o => Regex.IsMatch(o.Text, matcher, RegexOptions.IgnoreCase));
+            Assert.IsNotNull(option);
         }
 
         [Test]
@@ -465,17 +463,13 @@ namespace SeleniumTests
         }
 
         [Test]
-        public void Test17()
-        {
+        public void Test17() {
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/2.7waitUntil.html");
             // Act
-            try
-            {
+            try  {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -493,9 +487,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -513,9 +505,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -533,9 +523,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -553,9 +541,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -573,9 +559,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -593,9 +577,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -613,9 +595,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -633,9 +613,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -653,9 +631,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -673,9 +649,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -693,9 +667,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -713,9 +685,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -733,9 +703,7 @@ namespace SeleniumTests
             try
             {
                 // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
@@ -756,9 +724,7 @@ namespace SeleniumTests
             try
             {
                 wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }
-            catch (Exception e)
-            {
+            }   catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
