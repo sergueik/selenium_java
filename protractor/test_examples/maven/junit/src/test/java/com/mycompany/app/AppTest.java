@@ -117,13 +117,14 @@ public class AppTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		// final FirefoxProfile profile = new FirefoxProfile();
-		// profile.setEnableNativeEvents(false);
-		// seleniumDriver = new FirefoxDriver(profile);
-		System.setProperty("webdriver.chrome.driver",
-				"c:/java/selenium/chromedriver.exe");
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		seleniumDriver = new ChromeDriver(capabilities);
+		final FirefoxProfile profile = new FirefoxProfile();
+		profile.setEnableNativeEvents(false);
+		seleniumDriver = new FirefoxDriver(profile);
+    // NOTE: can be unstable if test run on desktop and chrome browser allowed to do updates
+		// System.setProperty("webdriver.chrome.driver",
+		//		"c:/java/selenium/chromedriver.exe");
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// seleniumDriver = new ChromeDriver(capabilities);
 
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
