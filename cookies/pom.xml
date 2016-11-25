@@ -7,6 +7,14 @@
   <version>1.1-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
+  <developers>
+    <developer>
+      <name>Serguei Kouzmine</name>
+      <email>kouzmine_serguei@yahoo.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/sergueik</organizationUrl>
+    </developer>
+  </developers>
   <properties>  
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commons-exec.version>1.3</commons-exec.version>
