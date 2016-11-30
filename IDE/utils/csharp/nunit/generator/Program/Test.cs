@@ -31,7 +31,7 @@ namespace SeleniumTests
         private const int window_height = 600;
         private const int script_wait_seconds = 60;
         private const int wait_seconds = 3;
-        private int highlight_timeout = 1000;
+        private const int highlight_timeout = 1000;
         private Actions actions;
         private WebDriverWait wait;
         private String baseUrl = "http://suvian.in/selenium";
@@ -139,6 +139,7 @@ namespace SeleniumTests
                 verificationErrors.Append(e.Message);
             }
             element = driver.FindElement(By.XPath("//div[@class='intro-message']/h3"));
+            Highlight(driver,element);
             Assert.IsTrue(element.Text.IndexOf(linkText) > -1, element.Text);
             ReadOnlyCollection<IWebElement> elements;
             elements = driver.FindElements(By.XPath(String.Format("//div[@class='intro-message']/h3[contains(text(), 'Link Successfully clicked')]", linkText)));
@@ -167,6 +168,7 @@ namespace SeleniumTests
             // Act
             IWebElement element = driver.FindElement(By.Id("namefield"));
             element.SendKeys(text);
+            Highlight(driver, element);
             // Assert
             Assert.IsTrue(element.GetAttribute("value").IndexOf(text) > -1, element.GetAttribute("value"));
         }
@@ -229,17 +231,40 @@ namespace SeleniumTests
         {
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.5married_radio.html");
-            // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }   catch (Exception e) {
+            try {            	
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
+                // Are you married ?
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
 
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
-            // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            // Act..
+            // NOTE: Exercise page lacks formatting to allow one distinguish yes from no options by label text in a "Selenium way"
+            // inspect the raw form text to determine option value to select
+            String status = "Yes";
+            String line =  Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.Contains(status));
+        	String matcher = "value=\\\"([^\"]*)\\\"";
+        	// NOTE: groups index starts with a 1
+        	String value = null;
+        	if ( Regex.IsMatch(line, matcher, RegexOptions.IgnoreCase)) {
+        		MatchCollection Matches = new Regex(matcher).Matches(line);
+	            foreach (Match Match in Matches) {
+	                if (Match.Length != 0) {
+	                    foreach (Capture Capture in Match.Groups[1].Captures) {
+	                        if (value == null) {
+	                    		value = Capture.ToString();
+	            			}
+	            		}
+	            	}
+            	}
+
+        	}
+        	Console.Error.WriteLine(String.Format("value=>\"{0}\"", value));
+            // locate the needed radio button option specifying the option value
+            IWebElement element = driver.FindElement(By.XPath(String.Format("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='{0}']", value)));
+            Highlight(driver, element);
+            element.SendKeys(OpenQA.Selenium.Keys.Space);
+            Assert.IsTrue(element.Selected);
         }
 
         [Test]
@@ -734,6 +759,12 @@ namespace SeleniumTests
             element.Submit();
             // Assert
             Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+        }
+        
+        public void Highlight( IWebDriver driver, IWebElement element) {
+	        ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].style.border='3px solid yellow'", element);
+            Thread.Sleep(highlight_timeout);
+            ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].style.border=''", element);
         }
     }
 }
