@@ -76,8 +76,8 @@ public class App {
   
   private static WebDriver driver;
   static String baseUrl = "http://www.freetranslation.com/";
-  static int implicit_wait_interval = 1;
   static int flexible_wait_interval = 5;
+  static long implicit_wait_interval = 3;
   static long wait_polling_interval = 500;
   static WebDriverWait wait;
   static Actions actions;
@@ -95,7 +95,7 @@ public class App {
 
   @Before
   public static void setUp() throws Exception  {
-    long implicit_wait_interval = 3;
+    
     DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
     driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
     // TODO:
@@ -122,7 +122,7 @@ public class App {
   @Test
   public static void testUpload()  throws Exception   {
     
-    // Wait for page loading  logo / title 
+    // Wait for the page to load ( check that  logo / title is updated ) 
     WebElement element = driver.findElement(By.cssSelector("a.brand"));
     assertThat(element.getAttribute("title"),containsString("Translate text, documents and websites for free"));
 
@@ -171,26 +171,28 @@ public class App {
   }
 
   @After
-  public static void tearDown()  throws Exception
-  {
+  public static void tearDown()  throws Exception {
     driver.quit();
   }
   
   private static void highlight(WebElement element) throws InterruptedException {
-
     highlight(element, 100);
   }
   
-  private static void highlight(WebElement element, long highlight_interval) throws InterruptedException {
+	public static void highlight(WebElement element, int highlight_interval) {
     if (wait == null)         {
       wait = new WebDriverWait(driver, flexible_wait_interval );
+      wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
     }
-    wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+		try {
     wait.until(ExpectedConditions.visibilityOf(element));
     javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
     Thread.sleep(highlight_interval);
 		javascriptExecutor.executeScript("arguments[0].style.border=''", element);
-  }
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+	}
 
   // HTTP GET request FROM http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
   private static void sendGet(String url) throws Exception {
@@ -215,10 +217,7 @@ public class App {
     while ((inputLine = in.readLine()) != null) {
       response.append(inputLine);
     }
-    in.close();
-
-    // Print result
-    System.err.println(response.toString());
+    in.close();    System.err.println(response.toString());
 
   }
 }
