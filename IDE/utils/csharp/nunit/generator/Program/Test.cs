@@ -39,8 +39,8 @@ namespace SeleniumTests
         [SetUp]
         public void SetupTest() {
             verificationErrors = new StringBuilder();
-            // driver = new ChromeDriver();
-            driver = new FirefoxDriver();
+            // driver = new FirefoxDriver();
+            driver = new ChromeDriver(System.IO.Directory.GetCurrentDirectory());
 
             driver.Manage().Cookies.DeleteAllCookies();
             driver.Manage().Window.Size = new System.Drawing.Size(window_width, window_height);
@@ -87,7 +87,7 @@ namespace SeleniumTests
 	    	// use http://csslint.net/ to write better css selectors 
             IWebElement element = driver.FindElement(By.CssSelector(".container .row .col-lg-12 .intro-message a"));
             // Assert
-            Assert.IsTrue(element.Text.IndexOf("Click Here") > -1, element.Text);
+            Assert.IsTrue(element.Text.IndexOf("Click Here",StringComparison.InvariantCultureIgnoreCase) > -1, element.Text);
             // Act
             element.Click();
             // Wait page to load
@@ -95,7 +95,7 @@ namespace SeleniumTests
             try {
                 wait.Until(d => {
                     IWebElement e = d.FindElement(By.ClassName("intro-message"));
-                    return (e.Text.IndexOf(linkText) > -1);
+                    return (e.Text.IndexOf(linkText,StringComparison.InvariantCultureIgnoreCase) > -1);
                 });
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
@@ -241,8 +241,13 @@ namespace SeleniumTests
             // Act..
             // NOTE: Exercise page lacks formatting to allow one distinguish yes from no options by label text in a "Selenium way"
             // inspect the raw form text to determine option value to select
-            String status = "Yes";
-            String line =  Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.Contains(status));
+            String status = "no";
+            String line = Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.IndexOf(status,StringComparison.InvariantCultureIgnoreCase) > -1);
+            // contains() is case-sensitive
+            // Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.Contains(status));
+        	// Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => Regex.IsMatch(o, status, RegexOptions.IgnoreCase));            
+            
+            
         	String matcher = "value=\\\"([^\"]*)\\\"";
         	// NOTE: groups index starts with a 1
         	String value = null;
@@ -264,6 +269,10 @@ namespace SeleniumTests
             IWebElement element = driver.FindElement(By.XPath(String.Format("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='{0}']", value)));
             Highlight(driver, element);
             element.SendKeys(OpenQA.Selenium.Keys.Space);
+            Thread.Sleep(1000);
+            Assert.IsFalse(element.Selected);
+            element.Click();
+            Thread.Sleep(1000);
             Assert.IsTrue(element.Selected);
         }
 
