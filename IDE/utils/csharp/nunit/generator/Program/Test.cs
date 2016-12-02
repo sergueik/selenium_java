@@ -84,7 +84,7 @@ namespace SeleniumTests
                 verificationErrors.Append(e.Message);
             }
 
-	    	// use http://csslint.net/ to write better css selectors 
+	        // use http://csslint.net/ to write better css selectors
             IWebElement element = driver.FindElement(By.CssSelector(".container .row .col-lg-12 .intro-message a"));
             // Assert
             Assert.IsTrue(element.Text.IndexOf("Click Here",StringComparison.InvariantCultureIgnoreCase) > -1, element.Text);
@@ -146,7 +146,7 @@ namespace SeleniumTests
             Assert.IsTrue((elements.Count > 0));
             elements = driver.FindElements(By.XPath("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), 'Link Successfully clicked')]"));
             try {
-                // would fail            
+                // would fail
                 Assert.IsTrue((elements.Count > 0));
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
@@ -231,7 +231,7 @@ namespace SeleniumTests
         {
             // Arrange
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.5married_radio.html");
-            try {            	
+            try {
                 wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
                 // Are you married ?
             } catch (Exception e) {
@@ -242,37 +242,35 @@ namespace SeleniumTests
             // NOTE: Exercise page lacks formatting to allow one distinguish yes from no options by label text in a "Selenium way"
             // inspect the raw form text to determine option value to select
             String status = "no";
-            String line = Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.IndexOf(status,StringComparison.InvariantCultureIgnoreCase) > -1);
+            String line = Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.IndexOf(status, StringComparison.InvariantCultureIgnoreCase) > -1);
             // contains() is case-sensitive
             // Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.Contains(status));
-        	// Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => Regex.IsMatch(o, status, RegexOptions.IgnoreCase));            
-            
-            
-        	String matcher = "value=\\\"([^\"]*)\\\"";
-        	// NOTE: groups index starts with a 1
-        	String value = null;
-        	if ( Regex.IsMatch(line, matcher, RegexOptions.IgnoreCase)) {
-        		MatchCollection Matches = new Regex(matcher).Matches(line);
-	            foreach (Match Match in Matches) {
-	                if (Match.Length != 0) {
-	                    foreach (Capture Capture in Match.Groups[1].Captures) {
-	                        if (value == null) {
-	                    		value = Capture.ToString();
-	            			}
-	            		}
-	            	}
-            	}
+            // Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => Regex.IsMatch(o, status, RegexOptions.IgnoreCase));
 
-        	}
-        	Console.Error.WriteLine(String.Format("value=>\"{0}\"", value));
+            String matcher = "value=\\\"([^\"]*)\\\"";
+            // NOTE: groups index starts with a 1
+            String value = null;
+            if (Regex.IsMatch(line, matcher, RegexOptions.IgnoreCase)) {
+                MatchCollection Matches = new Regex(matcher).Matches(line);
+                foreach (Match Match in Matches) {
+                    if (Match.Length != 0) {
+                        foreach (Capture Capture in Match.Groups[1].Captures) {
+                            if (value == null) {
+                                value = Capture.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            Console.Error.WriteLine(String.Format("value=>\"{0}\"", value));
             // locate the needed radio button option specifying the option value
             IWebElement element = driver.FindElement(By.XPath(String.Format("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='{0}']", value)));
             Highlight(driver, element);
             element.SendKeys(OpenQA.Selenium.Keys.Space);
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             Assert.IsFalse(element.Selected);
             element.Click();
-            Thread.Sleep(1000);
+            Thread.Sleep(500);
             Assert.IsTrue(element.Selected);
         }
 
@@ -280,18 +278,56 @@ namespace SeleniumTests
         public void Test6()
         {
             // Arrange
+            List<String> hobbies = new List<String>() { "Singing", "Dancing" };
             driver.Navigate().GoToUrl("http://suvian.in/selenium/1.6checkbox.html");
-            // Act
-            try
-            {
-                // wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
-            }   catch (Exception e) {
+            try {
+                wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
+            } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
+            try {
+                wait.Until(e => e.FindElement(
+                    By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Select your hobbies", StringComparison.InvariantCultureIgnoreCase) > -1);
 
-            // IWebElement element = driver.FindElement(By.Id("searchInput"));
+            } catch (Exception e) {
+                verificationErrors.Append(e.Message);
+            }
+            // Act
+            IWebElement element = driver.FindElement(By.CssSelector("input[id]")).FindElement(By.XPath(".."));
+
+            Dictionary<String, String> inputIds = element.FindElements(By.CssSelector("label[for]")).ToDictionary(o => o.Text, o => o.GetAttribute("for"));
+            List<IWebElement> checkboxes = new List<IWebElement>();
+            foreach (String text in hobbies) {
+                Console.Error.WriteLine("input#{0}", inputIds[text]);
+                // input#1 is not a valid CssSelector
+                try {
+                    checkboxes.Add(element.FindElement(By.CssSelector(String.Format("input#{0}", inputIds[text]))));
+                } catch (OpenQA.Selenium.InvalidSelectorException e) {
+                    Console.Error.WriteLine("ignored: {0}", e.ToString());
+                    // invalid selector: An invalid or illegal selector was specified
+                }
+                checkboxes.Add(element.FindElement(By.XPath(String.Format("input[@id='{0}']", inputIds[text]))));
+            }
+
+            checkboxes.ForEach(o => o.Click());
+
             // Assert
-            // Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+            Assert.AreEqual(hobbies.Count, driver.FindElements(By.CssSelector(".container .intro-message input")).Count(o => o.GetAttribute("selected") != null));
+
+            List<IWebElement> elements = driver.FindElements(By.XPath("//input[@id]")).Where(o => {
+                String selected = o.GetAttribute("selected");
+                if (selected != null && selected.Equals("true")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }).ToList();
+            Assert.AreEqual(hobbies.Count, elements.Count);
+            Assert.AreEqual(hobbies.Count, element.FindElements(By.CssSelector("input[id]")).Count(o => {
+                try {
+                    return Boolean.Parse(o.GetAttribute("selected").ToString());
+                } catch (Exception e) { return false; }
+            }));
         }
 
         [Test]
@@ -363,13 +399,13 @@ namespace SeleniumTests
             // Assert
             StringAssert.AreEqualIgnoringCase( "Click Me to open a Menu" , element.Text);
             element.Click();
-            
+
             try {
                 wait.Until(ExpectedConditions.ElementIsVisible(By.Id("myDropdown")));
             } catch (Exception e) {
                 verificationErrors.Append(e.Message);
             }
-            
+
             IWebElement  option = null;
             String matcher = "(?i:option 2)";
             option = driver.FindElement(By.Id("myDropdown")).FindElements(By.TagName("a")).First(o => Regex.IsMatch(o.Text, matcher, RegexOptions.IgnoreCase));
@@ -769,7 +805,7 @@ namespace SeleniumTests
             // Assert
             Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
         }
-        
+
         public void Highlight( IWebDriver driver, IWebElement element) {
 	        ((IJavaScriptExecutor)driver).ExecuteScript("arguments[0].style.border='3px solid yellow'", element);
             Thread.Sleep(highlight_timeout);

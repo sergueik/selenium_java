@@ -95,10 +95,12 @@
   <Target Name="BeforeBuild">
   </Target>
   <Target Name="AfterBuild">
+  </Target>
+  -->
+  <Target Name="AfterBuild">
   <!-- TODO: debug why this does not work -->
     <Copy SourceFiles="..\packages\WebDriver.ChromeDriver.win32.2.24.0.0\content\chromedriver.exe" DestinationFolder="$(OutputPath)"></Copy>
   </Target>
-  -->
   <Target Name="CompileAll" DependsOnTargets="ResolveAssemblyReferences">
     <Message Text="Reference = @(Reference)" />
     <Message Text="ReferencePath = @(ReferencePath)" />
