@@ -127,7 +127,7 @@ namespace SeleniumTests
 			try {
 				wait.Until(d => {
 					IWebElement e = d.FindElement(By.XPath(
-						                               String.Format("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), '{0}')]", linkText)));
+						                String.Format("//div[@class='intro-message']/h3[contains(translate(text(), 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЬЫЪЭЮЯ', 'abcdefghijklmnopqrstuvwxyzабвгдеёжзиклмнопрстуфхцчшщьыъэюя'), '{0}')]", linkText)));
 					return (e.Text.IndexOf(linkText) > -1);
 				});
 			} catch (Exception e) {
@@ -331,7 +331,7 @@ namespace SeleniumTests
 			Assert.AreEqual(hobbies.Count, element.FindElements(By.CssSelector("input[id]")).Count(o => {
 				try {
 					return Boolean.Parse(o.GetAttribute("selected").ToString());
-				} catch (Exception e) {
+				} catch (Exception) {
 					return false;
 				}
 			}));
@@ -441,16 +441,36 @@ namespace SeleniumTests
 		{
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/2.1alert.html");
-			// Act
 			try {
-				// wait.Until(ExpectedConditions.ElementIsVisible(By.Id("searchInput")));
+				wait.Until(e => e.FindElement(
+					By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Click the button to display an alert box", StringComparison.InvariantCultureIgnoreCase) > -1);
 			} catch (Exception e) {
 				verificationErrors.Append(e.Message);
 			}
+			// Act
 
-			// IWebElement element = driver.FindElement(By.Id("searchInput"));
+			IWebElement element = driver.FindElement(By.ClassName("intro-message")).FindElement(By.TagName("button"));
+			Assert.IsNotNull(element);
+			element.Click();
+			// confirm
+			IAlert alert = null;
+			String text = null;
+			try {
+				alert = driver.SwitchTo().Alert();
+				text = alert.Text;
+			} catch (NoAlertPresentException ex) {
+				// Alert not present
+				verificationErrors.Append(ex.StackTrace);
+			} catch (WebDriverException ex) {
+				// Alert not handled by PhantomJS
+				verificationErrors.Append(ex.StackTrace);
+			}
 			// Assert
-			// Assert.IsTrue(driver.Title.IndexOf(searchTest) > -1, driver.Title);
+			StringAssert.StartsWith("I am an alert box !", text);
+			StringAssert.Contains("Click on OK to close me.", text);
+			if (alert != null) {
+				alert.Accept();
+			}
 		}
 
 		[Test]
