@@ -107,12 +107,13 @@ public class NgDatePickerTest {
 	}
 
 	// uses Embedded calendar
+	// @Ignore
 	@Test
 	public void testHighlightCurrentMonthDays() {
 		NgWebElement ng_datepicker = null;
 		// Arrange
-    final String searchText = "Embedded calendar";
-    try {
+		final String searchText = "Embedded calendar";
+		try {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
@@ -147,7 +148,8 @@ public class NgDatePickerTest {
 			System.err.println("Exception: " + e.toString());
 		}
 
-		WebElement[] dates = ng_datepicker.findElements(NgBy.repeater("dateObject in week.dates"))
+		WebElement[] dates = ng_datepicker
+				.findElements(NgBy.repeater("dateObject in week.dates"))
 				.toArray(new WebElement[0]);
 		assertTrue(dates.length >= 28);
 		Boolean foundDate = false;
@@ -175,7 +177,26 @@ public class NgDatePickerTest {
 	@Test
 	public void testBrowse() {
 		// Arrange
-    final String searchText = "Drop-down Datetime with input box";
+		final String searchText = "Drop-down Datetime with input box";
+		WebElement contaiter = null;
+		try {
+			contaiter = wait.until(
+					ExpectedConditions.visibilityOf(driver.findElement(By.xpath(String
+							.format("//div[@class='col-sm-6']//*[contains(text(),'%s')]",
+									searchText)))));
+			highlight(contaiter);
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		try {
+			contaiter = wait
+					.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+							String.format("//*[text()[contains(.,'%s')]]", searchText)))));
+			highlight(contaiter);
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+
 		try {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
@@ -201,97 +222,50 @@ public class NgDatePickerTest {
 		}
 
 		// Act
-    NgWebElement ng_datepicker_input = ngDriver
-        .findElement(NgBy.model("data.dateDropDownInput"));
-		actions.moveToElement(ng_datepicker_input.getWrappedElement()).build().perform();
+		NgWebElement ng_datepicker_input = ngDriver
+				.findElement(NgBy.model("data.dateDropDownInput"));
+		actions.moveToElement(ng_datepicker_input.getWrappedElement()).build()
+				.perform();
 		highlight(ng_datepicker_input);
 		NgWebElement ng_calendar_button = ngDriver
 				.findElement(By.cssSelector(".input-group-addon"));
 		assertThat(ng_calendar_button, notNullValue());
 		highlight(ng_calendar_button);
-		actions.moveToElement(ng_calendar_button.getWrappedElement()).click().build()
-				.perform();
-    // NgWebElement ng_datepicker
-    NgWebElement ng_dropdown = ngDriver
+		actions.moveToElement(ng_calendar_button.getWrappedElement()).click()
+				.build().perform();
+		// NgWebElement ng_datepicker
+		NgWebElement ng_dropdown = ngDriver
 				.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
 		assertThat(ng_dropdown, notNullValue());
 		highlight(ng_dropdown);
 		// Assert
-    NgWebElement ng_display = ng_dropdown.findElement(NgBy.binding("data.previousViewDate.display", "[data-ng-app]"));
+		NgWebElement ng_display = ng_dropdown.findElement(
+				NgBy.binding("data.previousViewDate.display", "[data-ng-app]"));
 		assertThat(ng_display, notNullValue());
 		Pattern pattern = Pattern.compile("\\d{4}\\-(?<month>\\w{3})");
 		Matcher matcher = pattern.matcher(ng_display.getText());
 		assertTrue(matcher.find());
 		// Act
-    String[] months = {
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Dec",
-      "Jan"
-    };
-    String display_month = matcher.group("month") ;
-    String next_month = months[java.util.Arrays.asList(months).indexOf(display_month) + 1];
-    System.err.println("Current month: " + display_month);
-    System.err.println("Expect to find next month: " + next_month);
-    WebElement ng_next_month = ng_display.findElement(By.xpath("..")).findElement(By.className("right"));
+		String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec", "Jan" };
+		String display_month = matcher.group("month");
+		String next_month = months[java.util.Arrays.asList(months)
+				.indexOf(display_month) + 1];
+		System.err.println("Current month: " + display_month);
+		System.err.println("Expect to find next month: " + next_month);
+		WebElement ng_next_month = ng_display.findElement(By.xpath(".."))
+				.findElement(By.className("right"));
 		assertThat(ng_next_month, notNullValue());
-    highlight(ng_next_month);
-    try{
-      Thread.sleep(100);
-    } catch (InterruptedException e) {}
-    ng_next_month.click();
-    assertTrue(ng_display.getText().contains(next_month));
-    highlight(ng_display);
+		highlight(ng_next_month);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		ng_next_month.click();
+		assertTrue(ng_display.getText().contains(next_month));
+		highlight(ng_display);
 		// Assert
-    System.err.println("Next month: " + ng_display.getText());
-/*
-NgWebElement ng_display = ngDriver.FindElement(NgBy.Binding("data.previousViewDate.display", true, "[data-ng-app]"));
-			Assert.IsNotNull(ng_display);
-			String dateDattern = @"\d{4}\-(?<month>\w{3})";
-
-			Regex dateDatternReg = new Regex(dateDattern);
-
-			Assert.IsTrue(dateDatternReg.IsMatch(ng_display.Text));
-			ngDriver.Highlight(ng_display);
-			String display_month = ng_display.Text.FindMatch(dateDattern);
-
-			String[] months = {
-				"Jan",
-				"Feb",
-				"Mar",
-				"Apr",
-				"May",
-				"Jun",
-				"Jul",
-				"Aug",
-				"Sep",
-				"Oct",
-				"Dec",
-				"Jan"
-			};
-
-			String next_month = months[Array.IndexOf(months, display_month) + 1];
-
-			Console.Error.WriteLine("Current month: " + display_month);
-			Console.Error.WriteLine("Expect to find next month: " + next_month);
-			IWebElement ng_right = ng_display.FindElement(By.XPath("..")).FindElement(By.ClassName("right"));
-			Assert.IsNotNull(ng_right);
-			ngDriver.Highlight(ng_right, 100);
-			ng_right.Click();
-			Assert.IsTrue(ng_display.Text.Contains(next_month));
-			ngDriver.Highlight(ng_display);
-			Console.Error.WriteLine("Next month: " + ng_display.Text);
-
-*/
-	}
+		System.err.println("Next month: " + ng_display.getText());
+		}
 
 	// @Ignore
 	@Test
@@ -299,7 +273,7 @@ NgWebElement ng_display = ngDriver.FindElement(NgBy.Binding("data.previousViewDa
 
 		NgWebElement ng_datepicker;
 		// Arrange
-    final String searchText = "Drop-down Datetime with input box";
+		final String searchText = "Drop-down Datetime with input box";
 		try {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
