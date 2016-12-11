@@ -19,6 +19,7 @@ import java.nio.charset.Charset;
 // error: a type with the same simple name is already defined by the single-type-import of TimeoutException
 // import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
 import java.util.Properties;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FileUtils;
@@ -31,6 +32,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import net.lightbody.bmp.core.har.Har;
+import net.lightbody.bmp.core.har.HarEntry;
+import net.lightbody.bmp.core.har.HarLog;
 import net.lightbody.bmp.proxy.CaptureType;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
@@ -71,7 +74,7 @@ public class App {
 	private static WebDriverWait wait = null;
 	private static WebElement element = null;
 
-	private static BrowserMobProxy proxy = null;
+	private static BrowserMobProxy proxyServer = null;
 	private static Proxy seleniumProxy = null;
 
 	private static String selenium_host = "localhost";
@@ -81,13 +84,14 @@ public class App {
 
 	private static String baseUrl = "www.imdb.com";
 	private static String filePath = "test.har";
+	private static String urlFragment = "http://pubads.g.doubleclick.net";
 	private static String search = "The Matrix";
 
 	public static void main(String[] args) throws InterruptedException {
 
-		proxy = new BrowserMobProxyServer();
-		proxy.start(0);
-		seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
+		proxyServer = new BrowserMobProxyServer();
+		proxyServer.start(0);
+		seleniumProxy = ClientUtil.createSeleniumProxy(proxyServer);
 
 		// initialize Selenium driver
 		// TODO: exercise using the proxy with remote driver
@@ -130,10 +134,10 @@ public class App {
 		}
 		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT,
+		proxyServer.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT,
 				CaptureType.RESPONSE_CONTENT);
 		// create a new HAR
-		proxy.newHar(baseUrl);
+		proxyServer.newHar(baseUrl);
 		System.err.println("created a new HAR for " + baseUrl);
 		// needs longer timeout in the presence of the proxy
 		wait = new WebDriverWait(driver, 10, 500);
@@ -156,13 +160,30 @@ public class App {
 			System.out.println(e.toString());
 		} finally {
 			try {
-				Har har = proxy.getHar();
-				har.writeTo(new FileOutputStream(filePath));
+				Har har = proxyServer.getHar();
+				HarLog harLog = har.getLog();
+        // sample entry processing 
+				List<HarEntry> entries = harLog.getEntries();				
+				for (HarEntry entry : entries) {
+					if (entry.getRequest().getUrl().contains(urlFragment)) {
+						System.err.println(String.format("url: %s", entry.getRequest().getUrl()));
+					}
+				}
+				// reset the har
+				proxyServer.newHar();
+        
+        // dump the har to the file
+        FileOutputStream outputStream = new FileOutputStream(filePath);
+				har.writeTo(outputStream);
 				System.out.println(String.format("har written to: %s", filePath));
 			} catch (IOException e) {
 				System.out.println(e.toString());
-			}
-			proxy.stop();
+			} finally {
+        outputStream.close();
+      }
+    
+      // finish the run
+      proxyServer.stop();
 			driver.close();
 			driver.quit();
 		}
