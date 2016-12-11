@@ -4,14 +4,22 @@
 package com.mycompany.app;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
+import java.net.BindException;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.Charset;
+// error: a type with the same simple name is already defined by the single-type-import of TimeoutException
+// import java.util.concurrent.TimeoutException;
 import java.util.concurrent.TimeUnit;
 import java.util.Properties;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.http.Header;
@@ -21,78 +29,67 @@ import org.apache.http.HttpResponse;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.openqa.selenium.WebElement;
 
-// import net.lightbody.bmp.proxy.ProxyServer;
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.proxy.CaptureType;
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
 
-import org.openqa.selenium.Dimension;
-
-import org.openqa.selenium.Platform;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
-import org.openqa.selenium.interactions.Actions;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+// import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.By;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.Dimension;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.Proxy;
 import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
-import org.openqa.selenium.firefox.FirefoxDriver;
-// import org.openqa.selenium.firefox.ProfileManager;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.OutputType;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.Proxy;
-
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.BindException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.Properties;
+import org.openqa.selenium.WebElement;
 
 public class App {
 
 	private static RemoteWebDriver driver = null;
-	private static String selenium_host = null;
-	private static String selenium_port = null;
-	private static String selenium_browser = null;
-	private static String selenium_run = null;
-	private static Properties props = new Properties();
+	private static WebDriverWait wait = null;
+	private static WebElement element = null;
+
+	private static BrowserMobProxy proxy = null;
+	private static Proxy seleniumProxy = null;
+
+	private static String selenium_host = "localhost";
+	private static String selenium_port = "4444";
+	private static String selenium_browser = "firefox";
+	private static String selenium_run = "local";
+
 	private static String baseUrl = "www.imdb.com";
+	private static String filePath = "test.har";
+	private static String search = "The Matrix";
 
 	public static void main(String[] args) throws InterruptedException {
 
-		selenium_host = "localhost";
-		selenium_port = "4444";
-		selenium_browser = "firefox";
-		selenium_run = "local";
+		proxy = new BrowserMobProxyServer();
+		proxy.start(0);
+		seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
 
-    BrowserMobProxy proxy = new BrowserMobProxyServer();
-    proxy.start(0);
-
-    // get the Selenium proxy object
-    Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
-
-		// initialize driver
+		// initialize Selenium driver
 		// TODO: exercise using the proxy with remote driver
 		if (selenium_browser.compareToIgnoreCase("remote") == 0) {
 			String hub = "http://" + selenium_host + ":" + selenium_port + "/wd/hub";
@@ -119,47 +116,52 @@ public class App {
 				System.setProperty("webdriver.chrome.driver",
 						"c:/java/selenium/chromedriver.exe");
 				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-        /*
-        String m_proxy = <host> + ":" + <port>;
-        proxy.setHttpProxy(m_proxy).setFtpProxy(m_proxy);
-        */
-				capabilities.setCapability(CapabilityType.PROXY, proxy);
+				/*
+				 * String m_proxy = <host> + ":" + <port>;
+				 * proxy.setHttpProxy(m_proxy).setFtpProxy(m_proxy);
+				 */
+				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				driver = new ChromeDriver(capabilities);
 			} else {
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-				capabilities.setCapability(CapabilityType.PROXY, proxy);
+				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				driver = new FirefoxDriver(capabilities);
 			}
 		}
-		driver.manage().window().setSize(new Dimension(600, 800));
 		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
-		try {
-
-      proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-			// create a new HAR
-			proxy.newHar(baseUrl);
-			System.err.println("create a new HAR for " + baseUrl);
-		} catch (Exception ex) {
-			System.out.println(ex.toString());
-		}
+		proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT,
+				CaptureType.RESPONSE_CONTENT);
+		// create a new HAR
+		proxy.newHar(baseUrl);
+		System.err.println("created a new HAR for " + baseUrl);
+		// needs longer timeout in the presence of the proxy
+		wait = new WebDriverWait(driver, 10, 500);
 		try {
 			driver.get("http://" + baseUrl + "/");
-			WebDriverWait wait = new WebDriverWait(driver, 30);
 			// wait for the page to load
-			wait.until(ExpectedConditions
-					.visibilityOfElementLocated(By.cssSelector("#home_img_holder")));
-      // TODO: multi-step transaction
+			element = wait.until(ExpectedConditions
+					.visibilityOfElementLocated(By.cssSelector("#navbar-query")));
+			// TODO: multi-step transaction
+			element.sendKeys(search);
+			driver.findElement(By.cssSelector("#navbar-submit-button")).click();
+			// wait for the search results
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
+					"#main > div.article > h1.findHeader > span.findSearchTerm")));
 			// print the node information
 			// System.out.println(getIPOfNode(driver));
-
-			Har har = proxy.getHar();
-			String filePath = "test.har";
-			har.writeTo(new FileOutputStream(filePath));
-			System.out.println(String.format("har written to: %s", filePath));
-		} catch (IOException ex) {
-			System.out.println(ex.toString());
+		} catch (org.openqa.selenium.TimeoutException e) {
+			System.out.println(e.toString());
+		} catch (Exception e) {
+			System.out.println(e.toString());
 		} finally {
+			try {
+				Har har = proxy.getHar();
+				har.writeTo(new FileOutputStream(filePath));
+				System.out.println(String.format("har written to: %s", filePath));
+			} catch (IOException e) {
+				System.out.println(e.toString());
+			}
 			proxy.stop();
 			driver.close();
 			driver.quit();
@@ -188,7 +190,9 @@ public class App {
 				hostFound = myURL.getHost();
 			}
 		} catch (Exception e) {
-      // java.lang.ClassCastException: org.openqa.selenium.firefox.FirefoxDriver$LazyCommandExecutor cannot be cast to org.openqa.selenium.remote.HttpCommandExecutor
+			// java.lang.ClassCastException:
+			// org.openqa.selenium.firefox.FirefoxDriver$LazyCommandExecutor cannot be
+			// cast to org.openqa.selenium.remote.HttpCommandExecutor
 			System.err.println(e);
 		}
 		return hostFound;
