@@ -85,19 +85,19 @@ public class AppTest {
 	@DataProvider
 	public static Object[][] dataProviderStringIsNullOrEmpty() {
 		// @formatter:off
-		return new Object[][] { { null }, { "" }, { "not null or empty"}};
+		return new Object[][] { { null }, { "" } /*, { "non-empty" } */};
 		// @formatter:on
 	}
 
 	@Test
 	@UseDataProvider("dataProviderStringIsNullOrEmpty")
-	public void testIsEmptyString(String string) {
-		// Given:
-
+	public void testIsEmptyString(String input) {
+		// Given:		
+    System.err.println(
+				String.format("Test: input = %s", input));
 		// When:
-
 		// Then:
-		assertTrue((string == null) ? true : string.isEmpty());
+		assertTrue((input == null) ? true : input.isEmpty());
 	}
 
 	@DataProvider
@@ -110,7 +110,7 @@ public class AppTest {
   @Ignore
 	@Test
 	@UseDataProvider("dataProviderNotNullStringsSetInBeforeClass")
-	public void testNotNullStringsSetInBeforeClass(String str) {
+	public void testNotNullStringsSetInBeforeClass(String input) {
 		// Given:
 
 		// Expected:
@@ -125,11 +125,13 @@ public class AppTest {
 		// @formatter:on
 	}
 
-  @Ignore
+  // @Ignore
 	@Test
 	@UseDataProvider("dataProviderMultiply")
 	public void testMultiply(int a, int b, int c) {
-		// Expect:
+		System.err.println(
+				String.format("Test: inputs = %d,%d expected result = %d", a, b, c));
+		// Expect:    
 		assertThat(a * b, is(c));
 	}
 
@@ -144,14 +146,16 @@ public class AppTest {
 		tomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
 		// @formatter:off
-		return new Object[][] { { yesterday, yesterday, false },
-				{ yesterday, now, true }, { yesterday, tomorrow, true },
-
-				{ now, yesterday, false }, { now, now, false },
-				{ now, tomorrow, true },
-
-				{ tomorrow, yesterday, false }, { tomorrow, now, false },
-				{ tomorrow, tomorrow, false }, };
+		return new Object[][] { 
+      { yesterday, yesterday, false },
+      { yesterday, now, true }, 
+      { yesterday, tomorrow, true },
+      { now, yesterday, false }, 
+      { now, now, false },
+      { now, tomorrow, true },
+      { tomorrow, yesterday, false }, 
+      { tomorrow, now, false },
+      { tomorrow, tomorrow, false }, };
 		// @formatter:on
 	}
 
@@ -204,16 +208,19 @@ public class AppTest {
 		return result;
 	}
 
-  @Ignore
+  // @Ignore
 	@Test
 	@UseDataProvider("dataProviderNumberFormat")
-	public void testNumberFormat(Number number, String format, String expected) {
+	public void testNumberFormat(Number value, String format, String expected) {
 		// Given:
+		System.err.println(
+				String.format("Test: inputs value = %d, format = '%s' expected result = %s", value, format, expected));
 
 		// When:
-		String result = String.format(format, number);
+		String result = String.format(format, value);
 
 		// Then:
+    assertThat(String.format(format, value) , equalTo(expected));
 	}
 
   @Ignore

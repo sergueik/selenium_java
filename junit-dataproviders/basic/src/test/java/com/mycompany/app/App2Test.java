@@ -2,6 +2,7 @@ package com.mycompany.app;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.File;
@@ -102,36 +103,51 @@ public class App2Test {
 	@Parameters(name = "url = {0}")
 	public static Iterable<Object[]> data() {
 		List<Object[]> testData = new ArrayList<Object[]>();
+		List<Object> dataRow = new ArrayList<Object>();
+		String separator = ",";
+		BufferedReader reader = null;
+		String line;
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("./data.txt"));
-			String line;
+			reader = new BufferedReader(new FileReader("./data.txt"));
 			while ((line = reader.readLine()) != null) {
-				testData.add(new Object[] { line });
+				// load comma-separated columns
+				testData.add(line.split(separator));
+				// this alwo works for single item per line 
+        // no need to 
+				// testData.add(new Object[] { line });
 			}
 			reader.close();
 		} catch (IOException e) {
-
+			// cat process multiple exception type,
+			// SomeExceptionType|AnotherExceptionType
+			e.printStackTrace();
 		}
-		// return to function signature
 		return testData;
 	}
 
-	// java 8 style, somewhat excessive
+	// java 8 style, somewhat excessive ?
 	@Parameters(name = "url = {0}")
 	public static Collection<Object[]> data8() {
-		List<String> urls = new ArrayList<>();
+		List<String> lines = new ArrayList<>();
+		BufferedReader reader = null;
+		String line;
 		try {
-			BufferedReader reader = new BufferedReader(new FileReader("./data.txt"));
-			String url;
-			while ((url = reader.readLine()) != null) {
-				urls.add(url);
+			reader = new BufferedReader(new FileReader("./data.txt"));
+			while ((line = reader.readLine()) != null) {
+				lines.add(line);
 			}
-			reader.close();
 		} catch (IOException e) {
-
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				try {
+					reader.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
 		}
-		// return to function signature
-		return urls.stream().map(o -> new String[] { o })
+		return lines.stream().map(o -> new String[] { o })
 				.collect(Collectors.toList());
 	}
 }

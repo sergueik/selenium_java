@@ -110,6 +110,12 @@ public class App1Test {
 				{ 3, 2 }, { 4, 3 }, { 5, 5 }, { 6, 8 } });
 	}
 
+	// inline static disconnected data provider, different signature
+	@Parameters
+	public static Iterable<Object> dataStatic() {
+		return Arrays.asList("first test", "second test");
+	}
+
 	public int computeFibonacci(int n) {
 		int result = 0;
 
@@ -120,5 +126,4 @@ public class App1Test {
 		}
 		return result;
 	}
-
 }
