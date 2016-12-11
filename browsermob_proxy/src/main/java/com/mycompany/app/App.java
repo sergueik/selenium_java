@@ -86,48 +86,14 @@ public class App {
 		selenium_browser = "firefox";
 		selenium_run = "local";
 
-    
     BrowserMobProxy proxy = new BrowserMobProxyServer();
     proxy.start(0);
 
     // get the Selenium proxy object
     Proxy seleniumProxy = ClientUtil.createSeleniumProxy(proxy);
-    
-    /*
-    // longer way:
-    // http://automated-testing.info/t/browsermob-proxy-java-webdriver-pomogite-zapustit-prostejshij-test/4531/24
-    try {
-      ServerSocket socket = new ServerSocket(0);
-      localProxyPort.set(socket.getLocalPort());
-      socket.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    ProxyServer server = new ProxyServer(localProxyPort.get());
-    try {
-      server.start();
-      server.setCaptureContent(true);
-      server.setCaptureHeaders(true);
-      server.newHar("test");
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    proxyServer.set(server);
-    */
-    // old way:
-    /*
-		ProxyServer proxyServer = new ProxyServer(4444);
-    
-    
-		proxyServer.start();
-		// captures the mouse movements and navigations
-		proxyServer.setCaptureHeaders(true);
-		proxyServer.setCaptureContent(true);
-		// set the Selenium proxy property
-		org.openqa.selenium.Proxy proxy = proxyServer.seleniumProxy();
-    */ 
+
 		// initialize driver
-		// Remote configuration - not using the proxy
+		// TODO: exercise using the proxy with remote driver
 		if (selenium_browser.compareToIgnoreCase("remote") == 0) {
 			String hub = "http://" + selenium_host + ":" + selenium_port + "/wd/hub";
 			DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -154,8 +120,6 @@ public class App {
 						"c:/java/selenium/chromedriver.exe");
 				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
         /*
-        // https://github.com/sskorol/selenium-camp-samples
-        // habrahabr.ru/post/209752/
         String m_proxy = <host> + ":" + <port>;
         proxy.setHttpProxy(m_proxy).setFtpProxy(m_proxy);
         */
@@ -171,10 +135,8 @@ public class App {
 		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS);
 		driver.manage().timeouts().implicitlyWait(20, TimeUnit.SECONDS);
 		try {
-      
-      // enable more detailed HAR capture, if desired (see CaptureType for the complete list)
+
       proxy.enableHarCaptureTypes(CaptureType.REQUEST_CONTENT, CaptureType.RESPONSE_CONTENT);
-    
 			// create a new HAR
 			proxy.newHar(baseUrl);
 			System.err.println("create a new HAR for " + baseUrl);
@@ -187,24 +149,9 @@ public class App {
 			// wait for the page to load
 			wait.until(ExpectedConditions
 					.visibilityOfElementLocated(By.cssSelector("#home_img_holder")));
-/*
-			String value1 = "ddlDestinations";
-			WebElement element = wait.until(ExpectedConditions.elementToBeClickable(
-					By.xpath(String.format("//select[@id='%s']", value1))));
-
-			System.out.println(element.getAttribute("id"));
-			Actions builder = new Actions(driver);
-			builder.moveToElement(element).build().perform();
-
-			String csspath_selector2 = "div.find-cruise-submit > a";
-			WebElement element2 = driver
-					.findElement(By.cssSelector(csspath_selector2));
-			System.out.println(element2.getText());
-			new Actions(driver).moveToElement(element2).click().build().perform();
-			Thread.sleep(5000);
-*/
+      // TODO: multi-step transaction
 			// print the node information
-			System.out.println(getIPOfNode(driver));
+			// System.out.println(getIPOfNode(driver));
 
 			Har har = proxy.getHar();
 			String filePath = "test.har";

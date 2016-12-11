@@ -9,11 +9,8 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- NOTE:  artifactId has changed since version 2.0.0 
-      this may not be correct in
-      https://github.com/lightbody/browsermob-proxy/releases
-      it was: browsermob-proxy
-      it becomes: browsermob-core
+    <!-- NOTE: the artifactId is dfferent for 2.0.0 and older and for 2.1.x 
+      this information in https://github.com/lightbody/browsermob-proxy/releases may not be correct 
       incorrectly named artifact would lead to an error
       Could not resolve dependencies for project com.mycompany.app:app:jar:1.1-SNAPSHOT: 
       Failure to find net.lightbody.bmp:browsermob-proxy:jar:2.1.0-beta-5    
