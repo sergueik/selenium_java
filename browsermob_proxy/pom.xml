@@ -9,18 +9,30 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- NOTE:  artifactId has changed since version 2.0.0 
+      this may not be correct in
+      https://github.com/lightbody/browsermob-proxy/releases
+      it was: browsermob-proxy
+      it becomes: browsermob-core
+      incorrectly named artifact would lead to an error
+      Could not resolve dependencies for project com.mycompany.app:app:jar:1.1-SNAPSHOT: 
+      Failure to find net.lightbody.bmp:browsermob-proxy:jar:2.1.0-beta-5    
+    -->    
+    <browsermob-proxy.version>2.0.0</browsermob-proxy.version>
+    <browsermob-proxy.artifactId>browsermob-proxy</browsermob-proxy.artifactId>
+    <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
+    <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <java.version>1.7</java.version>
     <junit.version>4.12</junit.version>
+    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
-    <browsermob-proxy.version>2.0.0</browsermob-proxy.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>2.47.0</selenium.version>
-    <selenium-firefox-driver.version>2.47.0</selenium-firefox-driver.version>
+    <selenium.version>2.53.0</selenium.version>
+    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -87,9 +99,9 @@
     </dependency>
     <dependency>
       <groupId>net.lightbody.bmp</groupId>
-      <artifactId>browsermob-proxy</artifactId>
+      <artifactId>${browsermob-proxy.artifactId}</artifactId>
       <version>${browsermob-proxy.version}</version>
-      <exclusions>
+      <exclusions>      
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-api</artifactId>
