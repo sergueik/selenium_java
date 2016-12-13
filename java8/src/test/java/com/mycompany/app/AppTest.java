@@ -205,6 +205,7 @@ public class AppTest {
 		}
 
 		// 3. Alternative wait, functional style, with Optional <WebElement>
+		// http://www.nurkiewicz.com/2013/08/optional-in-java-8-cheat-sheet.html
 		try {
 			WebElement checkElement = (new WebDriverWait(driver, 5))
 					.until(new ExpectedCondition<WebElement>() {
@@ -357,7 +358,7 @@ public class AppTest {
 		assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test5() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -366,6 +367,32 @@ public class AppTest {
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
 
 		// Act
+		String label = "yes";
+		String elementContents = driver
+				.findElement(By.xpath(
+						"//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form"))
+				.getAttribute("outerHTML");
+
+		String splitLines = "<br/?>";
+		ArrayList<String> lines = new ArrayList<String>(
+				Arrays.asList(elementContents.split(splitLines)));
+		String line = lines.stream()
+				.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Pattern pattern = Pattern.compile("value=\\\"([^\"]*)\\\"");
+		Matcher matcher = pattern.matcher(line);
+		String checkboxValue = null;
+		if (matcher.find()) {
+			checkboxValue = matcher.group(1);
+			System.err.println("checkox value " + checkboxValue);
+		} else {
+			
+			System.err.println("checkox value not found");
+			
+		}
+		if (checkboxValue != null){
+			WebElement element = driver.findElement(By.xpath(String.format("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='%s']", checkboxValue)));
+			highlight(element);
+		}
 
 		// Wait page to load
 		try {
