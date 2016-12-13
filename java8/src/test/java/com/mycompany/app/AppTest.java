@@ -14,7 +14,6 @@ import java.util.Optional;
 
 import java.util.concurrent.TimeUnit;
 
-// Java 8  part
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -45,11 +44,13 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -359,48 +360,97 @@ public class AppTest {
 	}
 
 	@Test(enabled = true)
-	public void test5() {
+	public void test5_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
 
 		wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
 
-		// Act
 		String label = "yes";
 		String elementContents = driver
 				.findElement(By.xpath(
 						"//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form"))
 				.getAttribute("outerHTML");
 
-		String splitLines = "<br/?>";
-		ArrayList<String> lines = new ArrayList<String>(
-				Arrays.asList(elementContents.split(splitLines)));
-		String line = lines.stream()
-				.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
-		Pattern pattern = Pattern.compile("value=\\\"([^\"]*)\\\"");
-		Matcher matcher = pattern.matcher(line);
+		String line = new ArrayList<String>(
+				Arrays.asList(elementContents.split("<br/?>"))).stream()
+						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
 		String checkboxValue = null;
 		if (matcher.find()) {
 			checkboxValue = matcher.group(1);
-			System.err.println("checkox value " + checkboxValue);
+			System.err.println("checkox value = " + checkboxValue);
 		} else {
-			
 			System.err.println("checkox value not found");
-			
 		}
-		if (checkboxValue != null){
-			WebElement element = driver.findElement(By.xpath(String.format("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='%s']", checkboxValue)));
-			highlight(element);
+		WebElement checkBoxElement = null;
+		if (checkboxValue != null) {
+			checkBoxElement = driver.findElement(By.xpath(String.format(
+					"//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='%s']",
+					checkboxValue)));
 		}
+		// Act
+		assertThat(checkBoxElement, notNullValue());
+		highlight(checkBoxElement);
+		checkBoxElement.sendKeys(Keys.SPACE);
+		// Assert
+		// NOTE: behaves differently in C#
+		assertTrue(checkBoxElement.isSelected());
+	}
 
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("1.5married_radio_validate.html"));
-		} catch (UnreachableBrowserException e) {
+	@Test(enabled = true)
+	public void test5_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.5married_radio.html");
+
+		wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+
+		String label = "no";
+		WebElement formElement = driver.findElement(By.cssSelector(
+				".intro-header .container .row .col-lg-12 .intro-message form"));
+		String elementContents = formElement.getAttribute("outerHTML");
+
+		String line = new ArrayList<String>(
+				Arrays.asList(elementContents.split("<br/?>"))).stream()
+						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
+		String checkboxValue = null;
+		if (matcher.find()) {
+			checkboxValue = matcher.group(1);
+			System.err.println("checkox value = " + checkboxValue);
+		} else {
+			System.err.println("checkox value not found");
+		}
+		WebElement checkBoxElement = null;
+		if (checkboxValue != null) {
+			checkBoxElement = formElement.findElement(By.cssSelector(
+					String.format("input[name='married'][value='%s']", checkboxValue)));
 		}
 		// Assert
+		assertThat(checkBoxElement, notNullValue());
+		highlight(checkBoxElement);
+		// Act
+		checkBoxElement.sendKeys(Keys.SPACE);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+		// Assert
+		// NOTE: behaves differently in C#
+		assertTrue(checkBoxElement.isSelected());
+		// Act
+		checkBoxElement.click();
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+			// ignore
+		}
+		// Assert
+		assertTrue(checkBoxElement.isSelected());
+
 	}
 
 	@Test(enabled = false)
