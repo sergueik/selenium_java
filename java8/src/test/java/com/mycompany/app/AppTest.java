@@ -515,9 +515,9 @@ public class AppTest {
 	}
 
 	// NOTE: this test is broken
-	// following-sibling of a label finds the wrong checkbox
-	// preceding-sibling always finds the checkbox#1
-	@Test(enabled = true)
+	// following-sibling of a label finds the wrong check box
+	// preceding-sibling always finds the check box #1
+	@Test(enabled = false)
 	public void test6_2() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -553,7 +553,64 @@ public class AppTest {
 		assertTrue(checkBoxes.size() > 0);
 
 		checkBoxes.stream().forEach(o -> {
-			System.err.println("checkbox element: " + o.getAttribute("outerHTML"));
+			highlight(o);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+
+			}
+			o.click();
+		});
+		// Assert
+		assertTrue(
+				driver
+						.findElements(By.cssSelector(
+								".container .intro-message input[type='checkbox']"))
+						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
+	}
+
+	// reverse usage of following-sibling to locate check box by its label
+	@Test(enabled = true)
+	public void test6_3() {
+		// Arrange
+		ArrayList<String> hobbies = new ArrayList<String>(
+				Arrays.asList("Singing", "Dancing", "Sports"));
+		driver.get("http://suvian.in/selenium/1.6checkbox.html");
+		WebElement checkElement = null;
+		try {
+			checkElement = (new WebDriverWait(driver, 5))
+					.until(new ExpectedCondition<WebElement>() {
+						@Override
+						public WebElement apply(WebDriver d) {
+							return d
+									.findElements(By.cssSelector(
+											"div.container div.row div.intro-message h3"))
+									.stream().filter(o -> o.getText().toLowerCase()
+											.indexOf("select your hobbies") > -1)
+									.findFirst().get();
+						}
+					});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		assertThat(checkElement, notNullValue());
+		// Act
+		List<WebElement> checkBoxes = checkElement
+				.findElements(By.xpath("..//input[@type = 'checkbox']")).stream()
+				.filter(o -> {
+					WebElement label = o
+							.findElement(By.xpath("following-sibling::label"));
+					if (hobbies.contains(label.getText())) {
+						System.err
+								.println(String.format("checkbox element %s: '%s'",
+										o.getAttribute("id"), label.getText()));
+						return true;
+					} else {
+						return false;
+					}
+				}).collect(Collectors.toList());
+		assertTrue(checkBoxes.size() > 0);
+		checkBoxes.stream().forEach(o -> {
 			highlight(o);
 			try {
 				Thread.sleep(100);
