@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hamcrest.CoreMatchers;
 import org.openqa.selenium.*;
 import static org.openqa.selenium.By.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -100,7 +101,7 @@ public class AppTest {
 	// validate in Firebug
 	// $x("xpath to validate")
 	// $$("cssSelector to validate")
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test0() {
 
 		// Arrange
@@ -251,7 +252,7 @@ public class AppTest {
 		assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test1() {
 
 		// Arrange
@@ -338,7 +339,7 @@ public class AppTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
@@ -444,9 +445,11 @@ public class AppTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = true)
-	public void test6() {
+	@Test(enabled = false)
+	public void test6_1() {
 		// Arrange
+		ArrayList<String> hobbies = new ArrayList<String>(
+				Arrays.asList("Singing", "Dancing"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		try {
 			WebElement checkElement = (new WebDriverWait(driver, 5))
@@ -472,8 +475,6 @@ public class AppTest {
 				.findElement(By.xpath(".."));
 		assertThat(formElement, notNullValue());
 		highlight(formElement);
-		ArrayList<String> hobbies = new ArrayList<String>(
-				Arrays.asList("Singing", "Dancing"));
 		List<WebElement> inputElements = formElement
 				.findElements(By.cssSelector("label[for]")).stream()
 				.filter(o -> hobbies.contains(o.getText()))
@@ -510,6 +511,62 @@ public class AppTest {
 
 		assertTrue(
 				formElement.findElements(By.cssSelector("input[type='checkbox']"))
+						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
+	}
+
+	// NOTE: this test is broken
+	// following-sibling of a label finds the wrong checkbox
+	// preceding-sibling always finds the checkbox#1
+	@Test(enabled = true)
+	public void test6_2() {
+		// Arrange
+		ArrayList<String> hobbies = new ArrayList<String>(
+				Arrays.asList("Singing", "Dancing", "Sports"));
+		driver.get("http://suvian.in/selenium/1.6checkbox.html");
+		WebElement checkElement = null;
+		try {
+			checkElement = (new WebDriverWait(driver, 5))
+					.until(new ExpectedCondition<WebElement>() {
+						@Override
+						public WebElement apply(WebDriver d) {
+							return d
+									.findElements(By.cssSelector(
+											"div.container div.row div.intro-message h3"))
+									.stream().filter(o -> o.getText().toLowerCase()
+											.indexOf("select your hobbies") > -1)
+									.findFirst().get();
+						}
+					});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		assertThat(checkElement, notNullValue());
+		// Act
+		List<WebElement> elements = checkElement
+				.findElements(By.xpath("..//label[@for]")).stream()
+				.filter(o -> hobbies.contains(o.getText()))
+				.collect(Collectors.toList());
+		assertTrue(elements.size() > 0);
+		List<WebElement> checkBoxes = elements.stream()
+				.map(o -> o.findElement(By.xpath("preceding-sibling::input")))
+				.collect(Collectors.toList());
+		assertTrue(checkBoxes.size() > 0);
+
+		checkBoxes.stream().forEach(o -> {
+			System.err.println("checkbox element: " + o.getAttribute("outerHTML"));
+			highlight(o);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+
+			}
+			o.click();
+		});
+		// Assert
+		assertTrue(
+				driver
+						.findElements(By.cssSelector(
+								".container .intro-message input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
