@@ -154,6 +154,7 @@ public class AppTest {
 		// 2. Expected condition with Iterator, uses String methods
 		try {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<WebElement>() {
+
 				@Override
 				public WebElement apply(WebDriver d) {
 					Iterator<WebElement> elementsIterator = d
@@ -172,7 +173,9 @@ public class AppTest {
 					return result;
 				}
 			});
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
 
@@ -234,7 +237,7 @@ public class AppTest {
 		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
 		elements = driver.findElements(By.cssSelector(cssSelector));
 		Stream<WebElement> elementsStream = elements.stream(); // convert list to
-																														// stream
+		// stream
 		elements = elementsStream.filter(o -> {
 			System.err.println("in filter: Text = " + o.getText());
 			return (Boolean) (o.getText()
@@ -359,7 +362,7 @@ public class AppTest {
 		assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test5_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -399,7 +402,7 @@ public class AppTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test5_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -428,20 +431,9 @@ public class AppTest {
 			checkBoxElement = formElement.findElement(By.cssSelector(
 					String.format("input[name='married'][value='%s']", checkboxValue)));
 		}
-		// Assert
+		// Act
 		assertThat(checkBoxElement, notNullValue());
 		highlight(checkBoxElement);
-		// Act
-		checkBoxElement.sendKeys(Keys.SPACE);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// ignore
-		}
-		// Assert
-		// NOTE: behaves differently in C#
-		assertTrue(checkBoxElement.isSelected());
-		// Act
 		checkBoxElement.click();
 		try {
 			Thread.sleep(500);
@@ -450,25 +442,75 @@ public class AppTest {
 		}
 		// Assert
 		assertTrue(checkBoxElement.isSelected());
-
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test6() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		try {
+			WebElement checkElement = (new WebDriverWait(driver, 5))
+					.until(new ExpectedCondition<WebElement>() {
+						@Override
+						public WebElement apply(WebDriver d) {
+							return d
+									.findElements(By.cssSelector(
+											"div.container div.row div.intro-message h3"))
+									.stream().filter(o -> o.getText().toLowerCase()
+											.indexOf("select your hobbies") > -1)
+									.findFirst().get();
+						}
+					});
+			System.err
+					.println("element check: " + checkElement.getAttribute("innerHTML"));
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
 
 		// Act
+		WebElement formElement = driver.findElement(By.cssSelector("input[id]"))
+				.findElement(By.xpath(".."));
+		assertThat(formElement, notNullValue());
+		highlight(formElement);
+		ArrayList<String> hobbies = new ArrayList<String>(
+				Arrays.asList("Singing", "Dancing"));
+		List<WebElement> inputElements = formElement
+				.findElements(By.cssSelector("label[for]")).stream()
+				.filter(o -> hobbies.contains(o.getText()))
+				.collect(Collectors.toList());
+		Map<String, String> inputIds = inputElements.stream().collect(
+				Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
+		ArrayList<WebElement> checkboxes = new ArrayList<WebElement>();
+		for (String hobby : hobbies) {
+			try {
+				System.err.println("finding: " + inputIds.get(hobby));
+				checkboxes.add(formElement.findElement(
+						// will throw exception
+						By.cssSelector(String.format("input#%s", inputIds.get(hobby)))));
+			} catch (InvalidSelectorException e) {
+				System.err.println("ignored: " + e.toString());
+			}
+			try {
+				checkboxes.add(formElement.findElement(
+						// will not throw exception
+						By.xpath(String.format("input[@id='%s']", inputIds.get(hobby)))));
+			} catch (Exception e) {
+				System.err.println("ignored: " + e.toString());
+			}
 
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("1.6checkbox_validate.html"));
-		} catch (UnreachableBrowserException e) {
 		}
+		checkboxes.stream().forEach(o ->
+
+		{
+			highlight(o);
+			o.click();
+		});
+
 		// Assert
+
+		assertTrue(
+				formElement.findElements(By.cssSelector("input[type='checkbox']"))
+						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
 	@Test(enabled = false)
