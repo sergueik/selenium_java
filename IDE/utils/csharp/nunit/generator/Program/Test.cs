@@ -337,11 +337,14 @@ namespace SeleniumTests
 			}));
 		}
 
+		// NOTE: this test is broken
+		// following-sibling::input of a label finds the wrong checkbox
+		// preceding-sibling::input always finds the checkbox#1
 		[Test]
 		public void Test6a()
 		{
 			// Arrange
-			List<String> hobbies = new List<String>() { "Singing", "Dancing" };
+			List<String> hobbies = new List<String>() { "Singing", "Dancing",  "Sports" };
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.6checkbox.html");
 			try {
 				wait.Until(e => e.FindElement(
@@ -351,7 +354,18 @@ namespace SeleniumTests
 			}
 			// Act
 			List<IWebElement> elements = driver.FindElements(By.CssSelector("label[for]")).Where(o => hobbies.Contains(o.Text)).ToList();
-			elements.ForEach(o => o.FindElement(By.XPath("following-sibling::input")).Click());
+			elements.ForEach(o => {
+
+				// Console.Error.WriteLine(o.FindElement(By.XPath("..")).GetAttribute("innerHTML"));
+				IWebElement c = o.FindElement(By.XPath("following-sibling::input"));
+				Assert.IsNotNull(c);
+				// Console.Error.WriteLine(o.GetAttribute("outerHTML"));
+				Console.Error.WriteLine(c.GetAttribute("outerHTML"));
+				Highlight(driver, c);
+				Thread.Sleep(1000);
+				c.Click();
+			});
+
 			// Assert
 			Assert.AreEqual(hobbies.Count, driver.FindElements(By.CssSelector(".container .intro-message input")).Count(o => o.GetAttribute("selected") != null));
 		}
