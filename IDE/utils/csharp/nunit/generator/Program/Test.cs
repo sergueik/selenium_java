@@ -81,12 +81,7 @@ namespace SeleniumTests
 		{
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.1link.html");
-			// Act
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("div.container div.row div.col-lg-12 div.intro-message a")));
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector("div.container div.row div.col-lg-12 div.intro-message a")));
 
 			// use http://csslint.net/ to write better css selectors
 			IWebElement element = driver.FindElement(By.CssSelector(".container .row .col-lg-12 .intro-message a"));
@@ -164,11 +159,7 @@ namespace SeleniumTests
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.2text_field.html");
 			// Wait to load
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.Id("namefield")));
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.Id("namefield")));
 			// Act
 			IWebElement element = driver.FindElement(By.Id("namefield"));
 			element.SendKeys(text);
@@ -183,11 +174,7 @@ namespace SeleniumTests
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.3age_plceholder.html");
 			// Wait to load
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.Id("agefield")));
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.Id("agefield")));
 			// Act
 			String text = "4242424242";
 			IWebElement element = driver.FindElement(By.Id("agefield"));
@@ -204,11 +191,7 @@ namespace SeleniumTests
 		{
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.4gender_dropdown.html");
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message select")));
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message select")));
 			// Act
 			IWebElement element = driver.FindElement(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message select"));
 			SelectElement selectElement = new SelectElement(element);
@@ -236,17 +219,12 @@ namespace SeleniumTests
 		{
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.5married_radio.html");
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
-				// Are you married ?
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
 
 			// Act..
 			// NOTE: Exercise page lacks formatting to allow one distinguish yes from no options by label text in a "Selenium way"
 			// inspect the raw form text to determine option value to select
-			String status = "no";
+			String status = "yes";
 			String line = Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.IndexOf(status, StringComparison.InvariantCultureIgnoreCase) > -1);
 			// contains() is case-sensitive
 			// Regex.Split(driver.FindElement(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form")).GetAttribute("outerHTML"), "<br/?>").First(o => o.Contains(status));
@@ -280,16 +258,12 @@ namespace SeleniumTests
 		}
 
 		[Test]
-		public void Test6()
+		public void Test6_1()
 		{
 			// Arrange
 			List<String> hobbies = new List<String>() { "Singing", "Dancing" };
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.6checkbox.html");
-			try {
-				wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(ExpectedConditions.ElementIsVisible(By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")));
 			try {
 				wait.Until(e => e.FindElement(
 					By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Select your hobbies", StringComparison.InvariantCultureIgnoreCase) > -1);
@@ -328,9 +302,9 @@ namespace SeleniumTests
 				}
 			}).ToList();
 			Assert.AreEqual(hobbies.Count, elements.Count);
-			Assert.AreEqual(hobbies.Count, element.FindElements(By.CssSelector("input[id]")).Count(o => {
+			Assert.AreEqual(hobbies.Count, element.FindElements(By.CssSelector("input[id]")).Count(checkbox => {
 				try {
-					return Boolean.Parse(o.GetAttribute("selected").ToString());
+					return checkbox.Selected;
 				} catch (Exception) {
 					return false;
 				}
@@ -338,33 +312,60 @@ namespace SeleniumTests
 		}
 
 		// NOTE: this test is broken
-		// following-sibling::input of a label finds the wrong checkbox
-		// preceding-sibling::input always finds the checkbox#1
+		// label follows the check box therefore
+		// the following-sibling to find the check box by its label
+		// does not seem to be appropriate
+		// however preceding-sibling always finds the check box #1 and can not be relied upon
+		// - see the test6_3 for the solution
+		
 		[Test]
-		public void Test6a()
+		public void Test6_2()
 		{
 			// Arrange
-			List<String> hobbies = new List<String>() { "Singing", "Dancing",  "Sports" };
+			List<String> hobbies = new List<String>() {
+				"Singing",
+				"Dancing",
+				"Sports"
+			};
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.6checkbox.html");
-			try {
-				wait.Until(e => e.FindElement(
-					By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Select your hobbies", StringComparison.InvariantCultureIgnoreCase) > -1);
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(e => e.FindElement(
+				By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Select your hobbies", StringComparison.InvariantCultureIgnoreCase) > -1);
 			// Act
 			List<IWebElement> elements = driver.FindElements(By.CssSelector("label[for]")).Where(o => hobbies.Contains(o.Text)).ToList();
-			elements.ForEach(o => {
-
-				// Console.Error.WriteLine(o.FindElement(By.XPath("..")).GetAttribute("innerHTML"));
-				IWebElement c = o.FindElement(By.XPath("following-sibling::input"));
-				Assert.IsNotNull(c);
-				// Console.Error.WriteLine(o.GetAttribute("outerHTML"));
-				Console.Error.WriteLine(c.GetAttribute("outerHTML"));
-				Highlight(driver, c);
-				Thread.Sleep(1000);
-				c.Click();
+			elements.ForEach(label => {
+				IWebElement checkbox = label.FindElement(By.XPath("following-sibling::input"));
+				Assert.IsNotNull(checkbox);
+				Console.Error.WriteLine(checkbox.GetAttribute("outerHTML"));
+				checkbox.Click();
 			});
+			Thread.Sleep(100);
+
+			// Assert
+			Assert.AreEqual(hobbies.Count, driver.FindElements(By.CssSelector(".container .intro-message input")).Count(o => o.GetAttribute("selected") != null));
+		}
+
+		[Test]
+		public void Test6_3()
+		{
+			// Arrange
+			List<String> hobbies = new List<String>() {
+				"Singing",
+				"Dancing",
+				"Sports"
+			};
+			driver.Navigate().GoToUrl("http://suvian.in/selenium/1.6checkbox.html");
+			// wait for the page to load 
+			wait.Until(e => e.FindElement(
+				By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Select your hobbies", StringComparison.InvariantCultureIgnoreCase) > -1);
+			// Act
+			IWebElement formElement = driver.FindElement(By.CssSelector(".intro-header .container .row .col-lg-12 .intro-message "));
+			Assert.IsNotNull(formElement);
+			List<IWebElement> checkBoxes = formElement.FindElements(By.CssSelector("input[type='checkbox']")).Where(checkbox => {
+				IWebElement label = checkbox.FindElement(By.XPath("following-sibling::label"));
+				return (Boolean)(label != null && hobbies.Contains(label.Text));
+			}).ToList();
+			checkBoxes.ForEach(element => element.Click());
+			Thread.Sleep(100);
 
 			// Assert
 			Assert.AreEqual(hobbies.Count, driver.FindElements(By.CssSelector(".container .intro-message input")).Count(o => o.GetAttribute("selected") != null));
@@ -455,12 +456,8 @@ namespace SeleniumTests
 		{
 			// Arrange
 			driver.Navigate().GoToUrl("http://suvian.in/selenium/2.1alert.html");
-			try {
-				wait.Until(e => e.FindElement(
-					By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Click the button to display an alert box", StringComparison.InvariantCultureIgnoreCase) > -1);
-			} catch (Exception e) {
-				verificationErrors.Append(e.Message);
-			}
+			wait.Until(e => e.FindElement(
+				By.XPath("//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/h3")).Text.IndexOf("Click the button to display an alert box", StringComparison.InvariantCultureIgnoreCase) > -1);
 			// Act
 
 			IWebElement element = driver.FindElement(By.ClassName("intro-message")).FindElement(By.TagName("button"));
