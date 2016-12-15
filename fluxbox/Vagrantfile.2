@@ -192,11 +192,12 @@ then
   then
     echo Downloading Oracle JDK
     # https://www.digitalocean.com/community/tutorials/how-to-manually-install-oracle-java-on-a-debian-or-ubuntu-vps
+    # Unsupported major.minor version 52.0 - Java version mismatch
     pushd /vagrant
     PACKAGE_ARCHIVE=jdk-linux-x64.tar.gz
     URL="http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-x64.tar.gz"
     sudo wget -O $PACKAGE_ARCHIVE --header "Cookie: oraclelicense=accept-securebackup-cookie" -nv $URL
-    mkdir /opt/oracle-jdk 2>/dev/null
+    mkdir /opt/oracle-jdk
     tar -zxf $PACKAGE_ARCHIVE -C /opt/oracle-jdk
     update-alternatives --install /usr/bin/java java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
     update-alternatives --set /usr/bin/java java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
