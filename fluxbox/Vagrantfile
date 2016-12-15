@@ -4,6 +4,7 @@ chromedriver_version = ENV.fetch('CHROMEDRIVER_VERSION', '')
 firefox_version = ENV.fetch('FIREFOX_VERSION', '')
 geckodriver_version = ENV.fetch('GECKODRIVER_VERSION', '')
 chrome_version = ENV.fetch('CHROME_VERSION', '')
+use_oracle_java = ENV.fetch('USE_ORACLE_JAVA', '')
 
 # check if requested Chrome version is available on http://www.slimjetbrowser.com/chrome/
 available_chrome_versions = %w|
@@ -178,6 +179,24 @@ then
   chown vagrant:vagrant geckodriver
   echo Installed Gecko Driver version $(./geckodriver --version | head -1 | cut -f 2 -d ' ')
   # TODO: geckodriver ERROR Address in use (os error 98)
+  #=========================================================
+  USE_ORACLE_JAVA='#{use_oracle_java}'
+  if [[ $USE_ORACLE_JAVA ]]
+  then
+    echo Downloading Oracle JDK
+    # https://www.github.com/nirbhaypatil/centos7-protractorjs/master/provision/provision.sh
+    # https://www.digitalocean.com/community/tutorials/how-to-manually-install-oracle-java-on-a-debian-or-ubuntu-vps
+    pushd /vagrant
+    PACKAGE_ARCHIVE=jdk-linux-x64.tar.gz
+    URL="http://download.oracle.com/otn-pub/java/jdk/8u5-b13/jdk-8u5-linux-x64.tar.gz"
+    # sudo wget -q --no-cookies --no-check-certificate --header "Cookie: gpw_e24=http%3A%2F%2Fwww.oracle.com%2F; oraclelicense=accept-securebackup-cookie" $URL
+    sudo wget -O $PACKAGE_ARCHIVE -q --header "Cookie: oraclelicense=accept-securebackup-cookie" $URL
+    mkdir /opt/oracle-jdk
+    tar -zxf $PACKAGE_ARCHIVE -C /opt/oracle-jdk
+    update-alternatives --install /usr/bin/java java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
+    update-alternatives --install /usr/bin/javac javac /opt/oracle-jdk/jdk1.8.0_05/bin/javac 100
+    popd
+  fi
 fi
 #=========================================================
 echo Set screen resolution
