@@ -45,6 +45,12 @@ echo Install the packages
 sudo apt-get -qq update
 sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty wget
 #=========================================================
+echo Install the OpenJDK 8 backport for trusty
+sudo add-apt-repository ppa:webupd8team/java -y
+sudo apt-get -qq update
+sudo apt-get -qqy install oracle-java8-installer
+sudo apt-get -qqy install oracle-java8-set-default
+#=========================================================
 echo Set autologin for the Vagrant user
 sudo sed -i '$ d' /etc/init/tty1.conf
 sudo echo 'exec /sbin/rungetty --autologin vagrant tty1' >> /etc/init/tty1.conf
