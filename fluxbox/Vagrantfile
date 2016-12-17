@@ -31,6 +31,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.box = 'ubuntu/trusty64'
   # Localy cached vagrant box images from http://www.vagrantbox.es/ and  http://dev.modern.ie/tools/vms/linux/
   config_vm_box_name = 'trusty-server-amd64-vagrant-selenium.box'
+  # config_vm_box_name = 'ubuntu-16.04-2.3.1.virtualbox.box'
   config.vm.box_url = "file://#{basedir}/Downloads/#{config_vm_box_name}"
   config.vm.network :forwarded_port, guest:4444, host:4444
   config.vm.network :private_network, ip: '192.168.33.10'
@@ -46,10 +47,18 @@ sudo apt-get -qq update
 sudo apt-get -qqy install fluxbox xorg unzip vim default-jre rungetty wget
 #=========================================================
 echo Install the OpenJDK 8 backport for trusty
-sudo add-apt-repository ppa:webupd8team/java -y
-sudo apt-get -qq update
-sudo apt-get -qqy install oracle-java8-installer
-sudo apt-get -qqy install oracle-java8-set-default
+if false ; then
+  # installing the oracle 8 JDK from ppa:webupd8team/java still stops on Oracle Licence Agreement prompt
+  # for alternative install set USE_ORACLE_JAVA
+  sudo add-apt-repository ppa:webupd8team/java -y
+  sudo apt-get -qq update
+  sudo apt-get -qqy install oracle-java8-installer
+  sudo apt-get -qqy install oracle-java8-set-default
+fi
+sudo add-apt-repository -y ppa:openjdk-r/ppa
+sudo apt-get -qqy update
+sudo apt-get install -qqy openjdk-8-jdk
+update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
 #=========================================================
 echo Set autologin for the Vagrant user
 sudo sed -i '$ d' /etc/init/tty1.conf
@@ -205,9 +214,9 @@ then
     mkdir /opt/oracle-jdk 2>/dev/null
     tar -zxf $PACKAGE_ARCHIVE -C /opt/oracle-jdk
     update-alternatives --install /usr/bin/java java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
-    update-alternatives --set /usr/bin/java java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
+    update-alternatives --set java /opt/oracle-jdk/jdk1.8.0_05/bin/java 100
     update-alternatives --install /usr/bin/javac javac /opt/oracle-jdk/jdk1.8.0_05/bin/javac 100
-    update-alternatives --set /usr/bin/javac javac /opt/oracle-jdk/jdk1.8.0_05/bin/javac 100
+    update-alternatives --set javac /opt/oracle-jdk/jdk1.8.0_05/bin/javac 100
     popd
   fi
 fi
