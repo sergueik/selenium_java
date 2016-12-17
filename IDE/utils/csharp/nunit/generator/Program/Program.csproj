@@ -32,7 +32,8 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Test.cs" />
+    <Compile Include="SuvianTests.cs" />
+    <Compile Include="JqueryBarRatingTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
@@ -40,7 +41,6 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-
   <ItemGroup>
     <Content Include="..\packages\PhantomJS.2.1.1\tools\phantomjs\phantomjs.exe">
       <Link>phantomjs.exe</Link>
@@ -98,8 +98,9 @@
   </Target>
   -->
   <Target Name="AfterBuild">
-  <!-- TODO: debug why this does not work -->
-    <Copy SourceFiles="..\packages\WebDriver.ChromeDriver.win32.2.24.0.0\content\chromedriver.exe" DestinationFolder="$(OutputPath)"></Copy>
+    <!-- TODO: debug why this does not work -->
+    <Copy SourceFiles="..\packages\WebDriver.ChromeDriver.win32.2.24.0.0\content\chromedriver.exe" DestinationFolder="$(OutputPath)">
+    </Copy>
   </Target>
   <Target Name="CompileAll" DependsOnTargets="ResolveAssemblyReferences">
     <Message Text="Reference = @(Reference)" />

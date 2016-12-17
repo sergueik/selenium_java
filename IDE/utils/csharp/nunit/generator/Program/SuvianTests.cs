@@ -23,7 +23,7 @@ using OpenQA.Selenium.PhantomJS;
 namespace SeleniumTests
 {
 	[TestFixture]
-	public class Test
+	public class SuvianTests
 	{
 		private IWebDriver driver;
 		private StringBuilder verificationErrors;
