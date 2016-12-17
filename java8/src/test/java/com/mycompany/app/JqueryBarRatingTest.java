@@ -105,7 +105,7 @@ public class JqueryBarRatingTest {
 		// Arrange
 		WebElement bar = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"section.section-examples div.examples div.row div.col div.box-example-square div.box-body div.br-theme-bars-square"))));
+						"section.section-examples div.examples div.box-example-square div.box-body div.br-theme-bars-square"))));
 
 		// Act
 		// NOTE: relative xpath selector
@@ -143,7 +143,7 @@ public class JqueryBarRatingTest {
 		// Arrange
 		WebElement bar = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"div.examples div.row div.col div.box-example-reversed"))));
+						"div.examples div.box-example-reversed"))));
 		// Act
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
@@ -164,9 +164,40 @@ public class JqueryBarRatingTest {
 			} catch (InterruptedException e) {
 			}
 		});
-		
-		
-		
+	}
+
+	@Test(enabled = true)
+	public void test3() {
+		// Arrange 
+		WebElement bar = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"section.section-examples div.box-example-movie div.br-theme-bars-movie"))));
+		// Act
+		List<WebElement> ratingElements = bar
+				.findElements(By.xpath(".//a[@data-rating-value]"));
+		assertTrue(ratingElements.size() > 0);
+		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
+				.toMap(o -> o.getAttribute("data-rating-text"), Function.identity()));
+		ratings.keySet().stream().forEach(o -> {
+			WebElement r = ratings.get(o);
+			assertThat(r, notNullValue());
+			// hover
+			actions.moveToElement(r).build().perform();
+			highlight(r);
+			// Assert
+			WebElement comment = bar.findElement(By.xpath(".//*[contains(@class, 'br-current-rating')]"));
+      assertThat(comment.getText(), equalTo(o));
+      // NOTE: there is a hidden select sibling element. The selected option does not appear to be updated 
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+			}
+      final String script = "var result = $(\"section.section-examples div.box-example-movie div.br-theme-bars-movie select#example-movie option[selected='selected']\");return result.val();";
+      if (driver instanceof JavascriptExecutor) {
+          Object result = ((JavascriptExecutor) driver).executeScript(script);
+          System.err.println("Select option value: " + result.toString());
+      }
+		});
 	}
 
 	private void highlight(WebElement element) {
