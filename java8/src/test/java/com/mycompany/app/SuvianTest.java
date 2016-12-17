@@ -52,6 +52,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertTrue;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -59,7 +63,7 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
-public class AppTest {
+public class SuvianTest {
 
 	private FirefoxDriver driver;
 	private WebDriverWait wait;
@@ -78,6 +82,7 @@ public class AppTest {
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(driver);
 	}
 
 	@AfterSuite
@@ -339,7 +344,7 @@ public class AppTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
@@ -363,7 +368,7 @@ public class AppTest {
 		assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test5_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -403,7 +408,7 @@ public class AppTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test5_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -445,7 +450,7 @@ public class AppTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test6_1() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -515,31 +520,29 @@ public class AppTest {
 	}
 
 	// NOTE: this test is broken
-	// following-sibling of a label finds the wrong check box
-	// preceding-sibling always finds the check box #1
-	@Test(enabled = false)
+	// label follows the check box therefore
+	// the following-sibling to find the check box by its label does not seem to
+	// be appropriate
+	// - see the test6_3 for the solution
+	// however preceding-sibling always finds the check box #1
+	@Test(enabled = true)
 	public void test6_2() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
-		WebElement checkElement = null;
-		try {
-			checkElement = (new WebDriverWait(driver, 5))
-					.until(new ExpectedCondition<WebElement>() {
-						@Override
-						public WebElement apply(WebDriver d) {
-							return d
-									.findElements(By.cssSelector(
-											"div.container div.row div.intro-message h3"))
-									.stream().filter(o -> o.getText().toLowerCase()
-											.indexOf("select your hobbies") > -1)
-									.findFirst().get();
-						}
-					});
-		} catch (Exception e) {
-			System.err.println("Exception: " + e.toString());
-		}
+		WebElement checkElement = (new WebDriverWait(driver, 5))
+				.until(new ExpectedCondition<WebElement>() {
+					@Override
+					public WebElement apply(WebDriver d) {
+						return d
+								.findElements(By
+										.cssSelector("div.container div.row div.intro-message h3"))
+								.stream().filter(o -> o.getText().toLowerCase()
+										.indexOf("select your hobbies") > -1)
+								.findFirst().get();
+					}
+				});
 		assertThat(checkElement, notNullValue());
 		// Act
 		List<WebElement> elements = checkElement
@@ -570,7 +573,7 @@ public class AppTest {
 	}
 
 	// reverse usage of following-sibling to locate check box by its label
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test6_3() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -601,9 +604,8 @@ public class AppTest {
 					WebElement label = o
 							.findElement(By.xpath("following-sibling::label"));
 					if (hobbies.contains(label.getText())) {
-						System.err
-								.println(String.format("checkbox element %s: '%s'",
-										o.getAttribute("id"), label.getText()));
+						System.err.println(String.format("checkbox element %s: '%s'",
+								o.getAttribute("id"), label.getText()));
 						return true;
 					} else {
 						return false;
@@ -626,7 +628,7 @@ public class AppTest {
 								".container .intro-message input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
-
+	
 	@Test(enabled = false)
 	public void test7() {
 		// Arrange
