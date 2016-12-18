@@ -103,30 +103,30 @@ public class JqueryBarRatingTest {
 	@Test(enabled = true)
 	public void test1() {
 		// Arrange
-		WebElement bar = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"section.section-examples div.examples div.box-example-square div.box-body div.br-theme-bars-square"))));
-
+		WebElement bar = wait.until((WebDriver d) -> {
+			WebElement element = null;
+			try {
+				element = d.findElement(By.cssSelector(
+						"section.section-examples div.examples div.box-example-square div.box-body div.br-theme-bars-square"));
+			} catch (Exception e) {
+				return null;
+			}
+			return (element.isDisplayed()) ? element : null;
+		});
 		// Act
 		// NOTE: relative xpath selector
-		assertTrue(bar
-				.findElements(By.xpath("//a[@data-rating-value]")).size() > 7);
-		// TODO: unique test
+		assertTrue(
+				bar.findElements(By.xpath("//a[@data-rating-value]")).size() > 7);
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
-		for (WebElement element : ratingElements) {
-			System.err.println(
-					"Rating element: " + element.getAttribute("data-rating-text"));
-		}
 		assertTrue(ratingElements.size() > 0);
+		// TODO: test that result set elements are unique ?
 		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
 				.toMap(o -> o.getAttribute("data-rating-text"), Function.identity()));
 		//
 		ratings.keySet().stream().forEach(o -> {
-			System.err.println("Rating text: " + o);
+			System.err.println("Mouse over rating: " + o);
 			WebElement r = ratings.get(o);
-			assertThat(r, notNullValue());
-
 			// hover
 			actions.moveToElement(r).build().perform();
 			highlight(r);
@@ -141,9 +141,8 @@ public class JqueryBarRatingTest {
 	@Test(enabled = true)
 	public void test2() {
 		// Arrange
-		WebElement bar = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"div.examples div.box-example-reversed"))));
+		WebElement bar = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector("div.examples div.box-example-reversed"))));
 		// Act
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
@@ -157,8 +156,10 @@ public class JqueryBarRatingTest {
 			actions.moveToElement(r).build().perform();
 			highlight(r);
 			// Assert
-			WebElement comment = bar.findElement(By.xpath(".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
-      assertThat(comment.getText(), equalTo(o));
+			WebElement comment = bar.findElement(By.xpath(
+					".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
+			assertThat(comment.getText(), equalTo(o));
+			System.err.println("Mouse over rating: " + o);
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -168,10 +169,13 @@ public class JqueryBarRatingTest {
 
 	@Test(enabled = true)
 	public void test3() {
-		// Arrange 
-		WebElement bar = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"section.section-examples div.box-example-movie div.br-theme-bars-movie"))));
+		// Arrange
+		// custom Expected Condition static Helper class
+		WebElement bar = (WebElement) wait.until(Helper.oneOfElementsLocatedVisible(
+				By.xpath(
+						"//section[contains(@class, 'section-examples')]//div[contains(@class, 'box-example-movie')]//div[contains(@class, 'br-widget')]"),
+				By.cssSelector(
+						"section.section-examples div.box-example-movie div.br-widget")));
 		// Act
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
@@ -184,19 +188,23 @@ public class JqueryBarRatingTest {
 			// hover
 			actions.moveToElement(r).build().perform();
 			highlight(r);
+			r.click();
 			// Assert
-			WebElement comment = bar.findElement(By.xpath(".//*[contains(@class, 'br-current-rating')]"));
-      assertThat(comment.getText(), equalTo(o));
-      // NOTE: there is a hidden select sibling element. The selected option does not appear to be updated 
+			WebElement comment = bar
+					.findElement(By.xpath(".//*[contains(@class, 'br-current-rating')]"));
+			assertThat(comment.getText(), equalTo(o));
+			System.err.println("Mouse over rating: " + o);
+			// NOTE: there is a hidden select sibling element. The selected option
+			// does not appear to be updated
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 			}
-      final String script = "var result = $(\"section.section-examples div.box-example-movie div.br-theme-bars-movie select#example-movie option[selected='selected']\");return result.val();";
-      if (driver instanceof JavascriptExecutor) {
-          Object result = ((JavascriptExecutor) driver).executeScript(script);
-          System.err.println("Select option value: " + result.toString());
-      }
+			final String script = "var result = $(\"section.section-examples div.box-example-movie div.br-theme-bars-movie select#example-movie option[selected='selected']\");return result.val();";
+			if (driver instanceof JavascriptExecutor) {
+				Object result = ((JavascriptExecutor) driver).executeScript(script);
+				System.err.println("Select option value: " + result.toString());
+			}
 		});
 	}
 
@@ -225,4 +233,29 @@ public class JqueryBarRatingTest {
 		}
 	}
 
+	public static class Helper {
+		// for complex expected Condition, based on
+		// http://stackoverflow.com/questions/14840884/wait-untilexpectedconditions-visibilityof-element1-or-element2
+
+		public static ExpectedCondition<WebElement> oneOfElementsLocatedVisible(
+				By... bys) {
+			return new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver driver) {
+					for (By by : Arrays.asList(bys)) {
+						WebElement element;
+						try {
+							System.err.println("Locator : " + by.toString());
+							element = driver.findElement(by);
+						} catch (Exception e) {
+							continue;
+						}
+						if (element.isDisplayed())
+							return element;
+					}
+					return null;
+				}
+			};
+		}
+	}
 }
