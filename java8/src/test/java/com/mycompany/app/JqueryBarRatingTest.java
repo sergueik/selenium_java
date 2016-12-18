@@ -141,14 +141,23 @@ public class JqueryBarRatingTest {
 	@Test(enabled = true)
 	public void test2() {
 		// Arrange
-		WebElement bar = wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector("div.examples div.box-example-reversed"))));
-		// Act
+
+		wait.until(ExpectedConditions.or(
+				// NOTE: Boolean
+				ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("div.examples div.box-example-reversed")),
+				ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("div.examples div.box-example-reversed"))));
+
+		WebElement bar = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("div.examples div.box-example-reversed")));
+
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
 		assertTrue(ratingElements.size() > 0);
 		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
 				.toMap(o -> o.getAttribute("data-rating-text"), Function.identity()));
+		// Act
 		ratings.keySet().stream().forEach(o -> {
 			WebElement r = ratings.get(o);
 			assertThat(r, notNullValue());
