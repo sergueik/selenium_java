@@ -73,7 +73,7 @@ import static org.testng.AssertJUnit.fail;
 
 public class AppTest {
 
-	private AppiumDriver driver;
+	private AppiumDriver<WebElement> driver;
 
 	private WebDriverWait wait;
 	static Actions actions;
@@ -125,7 +125,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = true)
-	public void Test() {
+	public void Test1() {
 		// Arrange
 		WebElement bar = wait.until((WebDriver d) -> {
 			WebElement element = null;
@@ -161,6 +161,8 @@ public class AppTest {
 				.println(String.format("Element Location: %d , %d", point.x, point.y));
 		int bottom = point.y;
 		int cnt = 0;
+		// NOTE: standalone apk just for swipe:
+		// http://www.software-testing-tutorials-automation.com/2015/11/appium-how-to-swipe-vertical-and.html
 		while (bottom > screenHeight / 2) {
 			driver.findElementByTagName("body").sendKeys(Keys.DOWN);
 			try {
@@ -187,7 +189,6 @@ public class AppTest {
 
 		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
 				.toMap(o -> o.getAttribute("data-rating-text"), Function.identity()));
-		//
 		ratings.keySet().stream().forEach(o -> {
 			System.err.println("Mouse over rating: " + o);
 			WebElement r = ratings.get(o);
@@ -198,7 +199,64 @@ public class AppTest {
 			} catch (InterruptedException e) {
 			}
 		});
-		// Assert
+		// TODO: Assert: attribute change
+	}
+
+	@Test(enabled = true)
+	public void Test2() {
+		// Arrange
+		WebElement bar = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("div.examples div.box-example-reversed")));
+		assertThat(bar, notNullValue());
+		WebElement comment = bar.findElement(By.xpath(
+				".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		System.err.println(
+				String.format("About to scroll to text: '%s'", comment.getText()));
+		try {
+			driver.scrollTo(comment.getText());
+		} catch (WebDriverException e) {
+			System.err.println("Exception: " + e.getMessage() );
+			// unknown error: Unsupported locator strategy: -android uiautomator
+			System.err.println("Exception: " + e.toString());
+		}
+
+		HashMap<String, Object> scrollObject = new HashMap<String, Object>();
+		scrollObject.put("direction", "down");
+		try {
+			System.err.println("About to scroll down with Javascriptt");
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript("mobile: scroll",
+						scrollObject);
+			}
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		/*
+		 * http://stackoverflow.com/questions/23339742/how-to-perform-swipe-using-
+		 * appium-in-java-for-android-native-app
+		 */
+
+		try {
+			driver.swipe(100, 200, 100, 600, 1000);
+		} catch (WebDriverException e) {
+			System.err.println("Exception: " + e.getMessage() );
+			// Not yet implemented.
+		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	public static void swipeUpElement(AppiumDriver<WebElement> driver,
+			WebElement element, int duration) {
+		int bottomY = element.getLocation().getY() - 200;
+		driver.swipe(element.getLocation().getX(), element.getLocation().getY(),
+				element.getLocation().getX(), bottomY, duration);
 	}
 
 }
