@@ -20,6 +20,8 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.naming.spi.DirStateFactory.Result;
+
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.ios.IOSDriver;
@@ -78,6 +80,8 @@ public class AppTest {
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
+	private int screenHeight = 800;
+	private int screenWidth = 480;
 	private String baseUrl = "http://antenna.io/demo/jquery-bar-rating/examples/";
 
 	@BeforeSuite
@@ -93,6 +97,15 @@ public class AppTest {
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
+		try {
+			Dimension dimensions = driver.manage().window().getSize();
+			// unknown error: operation is unsupported on Android
+			// keep code for emulation tests
+			screenWidth = dimensions.getWidth();
+			screenHeight = dimensions.getHeight();
+		} catch (WebDriverException e) {
+
+		}
 	}
 
 	@AfterSuite
@@ -112,7 +125,7 @@ public class AppTest {
 	}
 
 	@Test(enabled = true)
-	public void Test2() {
+	public void Test() {
 		// Arrange
 		WebElement bar = wait.until((WebDriver d) -> {
 			WebElement element = null;
@@ -126,18 +139,6 @@ public class AppTest {
 		});
 		assertThat(bar, notNullValue());
 		actions.moveToElement(bar).build().perform();
-		/*
-		try {
-			Rectangle rect = bar.getRect();
-			System.err.println(String.format("Rectangle: %d , %d", rect.x, rect.y));
-		} catch (Exception e) {
-			// error: Could not proxy command to remote server.
-			// Original error: 404 - unknown command:
-			// session/.../element/.../rect
-			// it also hangs the Appium
-			System.err.println("Exception: " + e.toString());
-		}
-		*/
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -147,32 +148,39 @@ public class AppTest {
 		// http://stackoverflow.com/questions/22703159/selenium-movebyoffset-doesnt-do-anything
 		Action moveM = actions.moveByOffset(0, -100).build();
 		moveM.perform();
-		for (int cnt = 0; cnt != 15; cnt++) {
+		/*
+		 * try { Rectangle rect = bar.getRect(); System.err.println(String.format(
+		 * "Rectangle: %d , %d", rect.x, rect.y)); } catch (Exception e) { // error:
+		 * Could not proxy command to remote server. // Original error: 404 -
+		 * unknown command: // session/.../element/.../rect // it also appear to
+		 * hang the Appium, even inside the try / catch block System.err.println(
+		 * "Exception: " + e.toString()); }
+		 */
+		Point point = bar.getLocation();
+		System.err
+				.println(String.format("Element Location: %d , %d", point.x, point.y));
+		int bottom = point.y;
+		int cnt = 0;
+		while (bottom > screenHeight / 2) {
 			driver.findElementByTagName("body").sendKeys(Keys.DOWN);
-			try {
-				Point point = bar.getLocation();
-				// ((JavascriptExecutor)driver).executeScript("return
-				// arguments[0].getBoundingClientRect()[\"top\"]")
-				System.err.println(
-						String.format("Location: %d , %d / %d", point.x, point.y, cnt));
-			} catch (Exception e) {
-				// error: Could not proxy command to remote server.
-				// Original error: 404 - unknown command:
-				// session/f8abfc31025e07403f4c5695cb87d463/element/0.41199909150600433-1/rect
-				System.err.println("Exception: " + e.toString());
-			}
 			try {
 				if (driver instanceof JavascriptExecutor) {
 					Long result = (Long) ((JavascriptExecutor) driver).executeScript(
-							"return arguments[0].getBoundingClientRect()[\"top\"]", bar);
-					System.err.println(String.format("Top: %d", result));
+							"return arguments[0].getBoundingClientRect()[\"bottom\"]", bar);
+					bottom = result.intValue();
+					System.err.println(String.format("Bottom: %d, cnt: %d", bottom, cnt));
 				}
+				cnt++;
 			} catch (Exception e) {
 				System.err.println("Exception: " + e.toString());
 			}
-
+			// Assert
 		}
 
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
 		assertTrue(ratingElements.size() > 0);
@@ -184,9 +192,9 @@ public class AppTest {
 			System.err.println("Mouse over rating: " + o);
 			WebElement r = ratings.get(o);
 			// hover
-			actions.moveToElement(r).click().build().perform();
+			actions.moveToElement(r).build().perform();
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(250);
 			} catch (InterruptedException e) {
 			}
 		});
