@@ -167,8 +167,6 @@ public class AppTest {
 				.println(String.format("Element Location: %d , %d", point.x, point.y));
 		int bottom = point.y;
 		int cnt = 0;
-		// NOTE: standalone apk just for swipe:
-		// http://www.software-testing-tutorials-automation.com/2015/11/appium-how-to-swipe-vertical-and.html
 		while (bottom > screenHeight / 2) {
 			driver.findElementByTagName("body").sendKeys(Keys.DOWN);
 			try {
@@ -217,52 +215,26 @@ public class AppTest {
 		WebElement comment = bar.findElement(By.xpath(
 				".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-		System.err.println(
-				String.format("About to scroll to text: '%s'", comment.getText()));
-		try {
-			driver.scrollTo(comment.getText());
-		} catch (WebDriverException e) {
-			System.err.println("Exception: " + e.getMessage());
-			// unknown error: Unsupported locator strategy: -android uiautomator
-			System.err.println("Exception: " + e.toString());
-		}
-
-		HashMap<String, Object> scrollObject = new HashMap<String, Object>();
-		scrollObject.put("direction", "down");
-		try {
-			System.err.println("About to scroll down with Javascriptt");
+			System.err.println("About to scroll down with Javascript");
 			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript("mobile: scroll",
-						scrollObject);
+				Long result = (Long) ((JavascriptExecutor) driver).executeScript(
+						"return arguments[0].getBoundingClientRect()[\"top\"]", bar);
+				int top = result.intValue();
+				System.err.println(String.format("Before scroll: %d", top));
+				((JavascriptExecutor) driver)
+						.executeScript(String.format("scroll(0, %d);", top));
+				result = (Long) ((JavascriptExecutor) driver).executeScript(
+						"return arguments[0].getBoundingClientRect()[\"top\"]", bar);
+				top = result.intValue();
+				System.err.println(String.format("After scroll: %d", top));
 			}
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
-		/*
-		 * http://stackoverflow.com/questions/23339742/how-to-perform-swipe-using-
-		 * appium-in-java-for-android-native-app
-		 */
 
-		try {
-			driver.swipe(100, 200, 100, 600, 1000);
-		} catch (WebDriverException e) {
-			System.err.println("Exception: " + e.getMessage());
-			// Not yet implemented.
-		}
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 	}
-
-	public static void swipeUpElement(AppiumDriver<WebElement> driver,
-			WebElement element, int duration) {
-		int bottomY = element.getLocation().getY() - 200;
-		driver.swipe(element.getLocation().getX(), element.getLocation().getY(),
-				element.getLocation().getX(), bottomY, duration);
-	}
-
 }
