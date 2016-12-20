@@ -28,6 +28,7 @@ import io.appium.java_client.ios.IOSDriver;
 import io.appium.java_client.remote.MobileCapabilityType;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -85,13 +86,18 @@ public class AppTest {
 	private String baseUrl = "http://antenna.io/demo/jquery-bar-rating/examples/";
 
 	@BeforeSuite
-	public void beforeSuiteMethod() throws Exception {
+	public void beforeSuiteMethod() {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setCapability(MobileCapabilityType.DEVICE_NAME,
 				"Nexus_4_API_22");
 		capabilities.setCapability(MobileCapabilityType.BROWSER_NAME, "Browser");
-		driver = new AndroidDriver<WebElement>(
-				new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+		try {
+
+			driver = new AndroidDriver<WebElement>(
+					new URL("http://127.0.0.1:4723/wd/hub"), capabilities);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		driver.manage().deleteAllCookies();
 		wait = new WebDriverWait(driver, flexibleWait);
@@ -219,7 +225,7 @@ public class AppTest {
 		try {
 			driver.scrollTo(comment.getText());
 		} catch (WebDriverException e) {
-			System.err.println("Exception: " + e.getMessage() );
+			System.err.println("Exception: " + e.getMessage());
 			// unknown error: Unsupported locator strategy: -android uiautomator
 			System.err.println("Exception: " + e.toString());
 		}
@@ -243,7 +249,7 @@ public class AppTest {
 		try {
 			driver.swipe(100, 200, 100, 600, 1000);
 		} catch (WebDriverException e) {
-			System.err.println("Exception: " + e.getMessage() );
+			System.err.println("Exception: " + e.getMessage());
 			// Not yet implemented.
 		}
 		try {
