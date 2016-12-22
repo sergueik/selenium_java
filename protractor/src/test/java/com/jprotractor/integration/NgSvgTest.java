@@ -21,16 +21,11 @@ import java.util.Set;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
 import org.junit.Test;
 
 import org.openqa.selenium.Alert;
@@ -60,7 +55,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Local file Integration tests
+ * SVG tests
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
@@ -178,9 +173,8 @@ public class NgSvgTest {
 
 	private static String getIdentity(WebElement element)
 			throws InterruptedException {
-		String script = "return angular.identity(angular.element(arguments[0])).html();";
-		// returns too little HTML information in Java
-		return CommonFunctions.executeScript(script, element).toString();
+		// returns too little HTML information
+		return executeScript("return angular.identity(angular.element(arguments[0])).html();", element).toString();
 	}
 
 	private static String xpath_of(WebElement element) {
@@ -208,7 +202,7 @@ public class NgSvgTest {
 				+ "         if (sibling_element.nodeType === 1 && sibling_element.tagName.toLowerCase() === elementTagName) {\n"
 				+ "             sibling_count++;\n" + "         }\n" + "     }\n"
 				+ "     return;\n" + " };\n" + " return get_xpath_of(arguments[0]);\n";
-		return (String) execute_script(script, element);
+		return (String) executeScript(script, element);
 	}
 
 	private static String css_selector_of(WebElement element) {
@@ -236,19 +230,18 @@ public class NgSvgTest {
 				+ "path.unshift(selector);\n" + "element = element.parentNode;\n"
 				+ "}\n" + "return path.join(' > ');\n" + "} \n"
 				+ "return get_css_selector_of(arguments[0]);\n";
-		return (String) execute_script(script, element);
+		return (String) executeScript(script, element);
 
 	}
 
 	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.JavascriptExecutor
-	public static Object execute_script(String script, Object... args) {
+	public static Object executeScript(String script, Object... args) {
 		if (seleniumDriver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) seleniumDriver;
 			return javascriptExecutor.executeScript(script, args);
 		} else {
 			throw new RuntimeException(
-					"Script execution is only available for WebDrivers that implement "
-							+ "the JavascriptExecutor interface.");
+					"Script execution failed.");
 		}
 	}
 

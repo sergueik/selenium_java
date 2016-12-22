@@ -65,7 +65,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Testing http://dalelotts.github.io/angular-bootstrap-datetimepicker/
+ * Datetime Picker tests
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
@@ -104,12 +104,12 @@ public class NgDatePickerTest {
 
 	@Before
 	public void beforeEach() {
-    // TODO: investigate the failure under TRAVIS 
-    assumeFalse(isCIBuild);
+		// TODO: investigate the failure under TRAVIS
+		assumeFalse(isCIBuild);
 		ngDriver.navigate().to(baseUrl);
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
 	// uses Embedded calendar
 	public void testHighlightCurrentMonthDays() {
@@ -176,9 +176,9 @@ public class NgDatePickerTest {
 		assertTrue(foundDate);
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
-  // uses DateTime Picker dropdown with input box
+	// uses DateTime Picker dropdown with input box
 	public void testBrowse() {
 		// Arrange
 		final String searchText = "Drop-down Datetime with input box";
@@ -250,7 +250,8 @@ public class NgDatePickerTest {
 		Matcher matcher = pattern.matcher(ng_display.getText());
 		assertTrue(matcher.find());
 		// Act
-		String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Dec", "Jan" };
+		String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+				"Sep", "Oct", "Dec", "Jan" };
 		String display_month = matcher.group("month");
 		String next_month = months[java.util.Arrays.asList(months)
 				.indexOf(display_month) + 1];
@@ -269,11 +270,11 @@ public class NgDatePickerTest {
 		highlight(ng_display);
 		// Assert
 		System.err.println("Next month: " + ng_display.getText());
-		}
+	}
 
-  // @Ignore
+	// @Ignore
 	@Test
-  // uses DateTime Picker dropdown with input box
+	// uses DateTime Picker dropdown with input box
 	public void testDirectSelect() {
 
 		NgWebElement ng_datepicker;
