@@ -73,7 +73,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 public class NgWay2AutomationIntegrationTest {
-	private static String fullStackTrace;
+
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	static WebDriverWait wait;

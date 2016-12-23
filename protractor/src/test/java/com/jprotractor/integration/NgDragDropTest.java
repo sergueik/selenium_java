@@ -1,11 +1,9 @@
 package com.jprotractor.integration;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import static java.lang.Boolean.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,14 +35,11 @@ import org.junit.Ignore;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -85,14 +80,11 @@ public class NgDragDropTest {
 	static boolean isCIBuild = false;
 	public static String localFile;
 	static StringBuilder sb;
-	static Formatter formatter;
-	private static String fullStackTrace;
 	public static String baseUrl = "https://a5hik.github.io/ng-sortable/#/kanban";
 
 	@BeforeClass
 	public static void setup() throws IOException {
 		sb = new StringBuilder();
-		formatter = new Formatter(sb, Locale.US);
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
@@ -129,8 +121,8 @@ public class NgDragDropTest {
 		highlight(column3);
 		NgWebElement ng_column3 = new NgWebElement(ngDriver, column3);
 		// alternative search
-		Enumeration<WebElement> elements = Collections.enumeration(ngDriver
-				.findElements(NgBy.repeater("column in kanbanBoard.columns")));
+		Enumeration<WebElement> elements = Collections.enumeration(
+				ngDriver.findElements(NgBy.repeater("column in kanbanBoard.columns")));
 		while (elements.hasMoreElements()) {
 			WebElement element = elements.nextElement();
 			System.err.println("id: " + element.getAttribute("id"));
@@ -141,9 +133,9 @@ public class NgDragDropTest {
 			}
 		}
 
-		Enumeration<WebElement> cards = Collections.enumeration(ng_column3
-				.findElement(NgBy.model("column.cards")).findElements(
-						NgBy.repeater("card in column.cards")));
+		Enumeration<WebElement> cards = Collections
+				.enumeration(ng_column3.findElement(NgBy.model("column.cards"))
+						.findElements(NgBy.repeater("card in column.cards")));
 
 		WebElement source_card = null;
 		WebElement target_card = null;
@@ -169,19 +161,20 @@ public class NgDragDropTest {
 		Point target_card_location = target_card.getLocation();
 		actions.moveToElement(source_card).build().perform();
 		// does not appear to work
-		actions
-				.dragAndDropBy(source_card, 0,
-						target_card_location.y - source_card_location.y).build().perform();
-    try{
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {}
+		actions.dragAndDropBy(source_card, 0,
+				target_card_location.y - source_card_location.y).build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		// works
 		actions.clickAndHold(source_card).moveToElement(target_card).release()
 				.build().perform();
 		ngDriver.waitForAngular();
-    try{
-      Thread.sleep(1000);
-    } catch (InterruptedException e) {}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	private static void highlight(WebElement element) {

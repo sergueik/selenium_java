@@ -7,10 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -31,12 +29,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
-import com.jprotractor.NgBy;
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
-
 /**
- * Common functions for integration testing
+ * Common functions for Protractor Integration testing
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

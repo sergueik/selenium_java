@@ -11,19 +11,14 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import org.openqa.selenium.Alert;
-import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 
-import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
 
 /**
  * Alternative waitForAngular tests based on example from https://github.com/ansiona/ProtractorDemoTest/blob/master/src/main/java/protractordemotest/pages/BasePage.java
