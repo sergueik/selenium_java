@@ -307,6 +307,6 @@ java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
   - [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory)
 
-Author
-------
+### Authors
+[Carlos Alexandro Becker](caarlos0@gmail.com)
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
