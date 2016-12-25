@@ -1,5 +1,8 @@
 package com.mycompany.app;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -14,12 +17,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
 import java.util.Set;
 
 import java.util.regex.Matcher;
@@ -94,10 +100,12 @@ public class AppTest {
 	private static String finalUrl = "https://www.yandex.ru/";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static Map<String, String> env = System.getenv();
-	private final String username = "";
-	private final String password = "";
+	private static String username = "";
+	private static String password = "";
 	private static Formatter formatter;
 	private static StringBuilder loggingSb;
+	private static String configurationFileName = "test.configuration";
+	private static String propertiesFileName = "test.properties";
 
 	@BeforeClass
 	public static void setUp() {
@@ -105,7 +113,11 @@ public class AppTest {
 		if (env.containsKey("DEBUG") && env.get("DEBUG").equals("true")) {
 			debug = true;
 		}
-
+		HashMap<String, String> propertiesMap = PropertiesParser
+				.getProperties(String.format("%s/src/test/resources/%s",
+						System.getProperty("user.dir"), propertiesFileName));
+		username = propertiesMap.get("username");
+		password = propertiesMap.get("password");
 		loggingSb = new StringBuilder();
 		formatter = new Formatter(loggingSb, Locale.US);
 		driver = new FirefoxDriver();
@@ -141,7 +153,7 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void getCookieTest() throws Exception {
 
@@ -182,7 +194,7 @@ public class AppTest {
 		doLogout();
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void useCookieTest() throws Exception {
 		String loginUrl = doLogin();
@@ -207,7 +219,7 @@ public class AppTest {
 		System.err.println("Waiting for inbox");
 		try {
 			wait.until(ExpectedConditions.urlContains("#inbox"));
-		} catch (TimeoutException|UnreachableBrowserException e) {
+		} catch (TimeoutException | UnreachableBrowserException e) {
 			verificationErrors.append(e.toString());
 		}
 		doLogout();
@@ -337,6 +349,37 @@ public class AppTest {
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+	private static class PropertiesParser {
+		public static HashMap<String, String> getProperties(final String fileName) {
+			Properties p = new Properties();
+			HashMap<String, String> propertiesMap = new HashMap<String, String>();
+			System.err
+					.println(String.format("Reading properties file: '%s'", fileName));
+			try {
+				p.load(new FileInputStream(fileName));
+				Enumeration e = p.propertyNames();
+
+				for (; e.hasMoreElements();) {
+					String key = e.nextElement().toString();
+					String val = p.get(key).toString();
+					System.out.println(String.format("Reading: '%s' = '%s'", key, val));
+					propertiesMap.put(key, val);
+				}
+
+			} catch (FileNotFoundException e) {
+				System.err.println(
+						String.format("Properties file was not found: '%s'", fileName));
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.err.println(
+						String.format("Properties file is not readable: '%s'", fileName));
+				e.printStackTrace();
+			}
+			return (propertiesMap);
+
 		}
 	}
 }
