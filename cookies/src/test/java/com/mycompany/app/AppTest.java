@@ -98,6 +98,7 @@ public class AppTest {
 	private static long afterTest = 1000;
 	private static String baseURL = "https://ya.ru/";
 	private static String finalUrl = "https://www.yandex.ru/";
+	private static String loginURL = "https://passport.yandex.ru";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static Map<String, String> env = System.getenv();
 	private static String username = "";
@@ -133,10 +134,10 @@ public class AppTest {
 	@Before
 	public void beforeTest() {
 		driver.get(baseURL);
-		WebElement mail_link_element = driver.findElement(By.cssSelector(
+		element = driver.findElement(By.cssSelector(
 				"table.layout__table tr.layout__header div.personal div.b-inline"));
-		highlight(mail_link_element);
-		mail_link_element.click();
+		highlight(element);
+		element.click();
 	}
 
 	@After
@@ -163,13 +164,6 @@ public class AppTest {
 		doLogin();
 		Set<Cookie> cookies = driver.manage().getCookies();
 		System.err.println("Cookies:");
-		/*
-		 * public Cookie(java.lang.String name, java.lang.String value,
-		 * java.lang.String domain, java.lang.String path, java.util.Date expiry,
-		 * boolean isSecure, boolean isHttpOnly)
-		 *
-		 * Creates a cookie.
-		 */
 		JSONArray cookieJSONArray = new JSONArray();
 		for (Cookie cookie : cookies) {
 			if (debug) {
@@ -205,8 +199,8 @@ public class AppTest {
 		Set<Cookie> cookies = driver.manage().getCookies();
 		System.err.println("Closing the browser");
 		wait = null;
+		System.err.println("re-open the browser, about to use the session cookies");
 		driver.close();
-		// open the new browser, use the cookies from the closed session
 		driver = new FirefoxDriver();
 		// re-initialize wait object
 		wait = new WebDriverWait(driver, flexibleWait);
@@ -228,32 +222,45 @@ public class AppTest {
 		doLogout();
 	}
 
-	private String doLogin() {
-		WebElement username_element = driver
-				.findElement(By.xpath("//form/div[1]/label/span/input"));
-		highlight(username_element);
-		username_element.clear();
-		username_element.sendKeys(username);
-		WebElement username_login_element = driver
-				.findElement(By.cssSelector("form.new-auth-form input[name='login']"));
-		System.err
-				.println("Username: " + username_login_element.getAttribute("value"));
-		WebElement password_element = driver
-				.findElement(By.xpath("//form/div[2]/label/span/input"));
-		highlight(password_element);
-		password_element.clear();
-		password_element.sendKeys(password);
-		WebElement password_login_element = driver
-				.findElement(By.cssSelector("form.new-auth-form input[name='passwd']"));
-		System.err
-				.println("Password: " + password_login_element.getAttribute("value"));
-		WebElement login_link_element = driver.findElement(
-				By.cssSelector("form.new-auth-form span.new-auth-submit a.nb-button"));
-		String login_href = login_link_element.getAttribute("href");
-		System.err.println("Login href: " + login_href);
+	@Ignore
+	@Test
+	public void useExpiredCookieLaterTest() {
+		/*
+		 * public Cookie(java.lang.String name, java.lang.String value,
+		 * java.lang.String domain, java.lang.String path, java.util.Date expiry,
+		 * boolean isSecure, boolean isHttpOnly)
+		 *
+		 * Creates a cookie.
+		 */
+	}
 
+	private String doLogin() {
+
+		// And I enter the username
+		element = driver.findElement(By.xpath("//form/div[1]/label/span/input"));
+		highlight(element);
+		element.clear();
+		element.sendKeys(username);
+		// Assert that input gets added to the background form
+		element = driver
+				.findElement(By.cssSelector("form.new-auth-form input[name='login']"));
+		System.err.println("Username: " + element.getAttribute("value"));
+		// And I enter the password
+		element = driver.findElement(By.xpath("//form/div[2]/label/span/input"));
+		highlight(element);
+		element.clear();
+		element.sendKeys(password);
+		// Assert that input gets added to the background form
+		element = driver
+				.findElement(By.cssSelector("form.new-auth-form input[name='passwd']"));
+		System.err.println("Password: " + element.getAttribute("value"));
+		// Evaluate the landing page URL
+		element = driver.findElement(
+				By.cssSelector("form.new-auth-form span.new-auth-submit a.nb-button"));
+		String login_href = element.getAttribute("href");
+		System.err.println("Login href: " + login_href);
 		Pattern pattern = Pattern
-				.compile("https://passport.yandex.ru/auth/\\?mode=qr&retpath=(.+)$");
+				.compile(String.format("%s/auth/\\?mode=qr&retpath=(.+)$", loginURL));
 		Matcher matcher = pattern.matcher(login_href);
 		String retpath = null;
 		if (matcher.find()) {
@@ -265,11 +272,34 @@ public class AppTest {
 			}
 		}
 		System.err.println("Login retpath: " + retpath);
-		WebElement login_button_element = driver.findElement(
+
+		// And I click the login button
+		element = driver.findElement(
 				By.cssSelector("form.new-auth-form span.new-auth-submit button"));
-		highlight(login_button_element);
-		login_button_element.click();
+		highlight(element);
+		String currentUrl = driver.getCurrentUrl();
+		element.click();
+
+		// wait until browser is away from the login page
+		System.err.println("Waiting to get away from " + loginURL);
+		try {
+			wait.until(
+					ExpectedConditions.not(ExpectedConditions.urlContains(loginURL)));
+		} catch (TimeoutException tex) {
+			// verify if the page warns about the invalid credentials
+			try {
+				element = driver.findElement(
+						By.cssSelector("div.layout-inner div.js-messages div.error-msg"));
+				verificationErrors.append("Getting error message " + element.getText());
+				System.err.println("Getting error message " + element.getText());
+			} catch (NoSuchElementException elex) {
+				// ignore
+			}
+			verificationErrors.append(tex.toString());
+		}
 		System.err.println("Waiting for " + retpath);
+
+		// wait until browser is on the landing page
 		wait.until(ExpectedConditions.urlContains(retpath));
 
 		String currentURL = driver.getCurrentUrl();
@@ -285,25 +315,29 @@ public class AppTest {
 
 	private void doLogout() {
 		assertTrue(driver.getCurrentUrl().matches(".*#inbox"));
-		WebElement user_element = driver.findElement(
-				By.cssSelector("div.mail-App-Header div.mail-User div.mail-User-Name"));
-		highlight(user_element);
-		user_element.click();
 
-		WebElement logout_element = driver.findElement(By.cssSelector(
+		// When I am logged on user
+		element = driver.findElement(
+				By.cssSelector("div.mail-App-Header div.mail-User div.mail-User-Name"));
+		highlight(element);
+		element.click();
+		// And I am about to log off
+		element = driver.findElement(By.cssSelector(
 				"body.mail-Page-Body div.ui-dialog div._nb-popup-content div.b-user-dropdown-content-with-exit div.b-mail-dropdown__item a.ns-action"));
-		highlight(logout_element);
-		logout_element.click();
+		highlight(element);
+		element.click();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 
 		}
-		WebElement confirm_logout_element = driver.findElement(
+		// And I confirm I am going to log off
+		element = driver.findElement(
 				By.xpath("//div[5]/div[2]/table/tbody/tr/td/div[3]/div/a"));
-		String logout_href = confirm_logout_element.getAttribute("href");
+		// Evaluate logout URL
+		String logout_href = element.getAttribute("href");
 		System.err.println("Logout href: " + logout_href);
-		highlight(confirm_logout_element);
+		highlight(element);
 		/*
 		 * String retpath = null; Pattern pattern = Pattern
 		 * .compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
@@ -315,17 +349,17 @@ public class AppTest {
 		 * retpath);
 		 */
 		String currentUrl = driver.getCurrentUrl();
-		confirm_logout_element.click();
+		element.click();
 		try {
 			wait.until(
 					ExpectedConditions.not(ExpectedConditions.urlContains(currentUrl)));
-		} catch (TimeoutException | UnreachableBrowserException e) {
+		} catch (TimeoutException e) {
 			verificationErrors.append(e.toString());
 		}
 
 		try {
 			wait.until(ExpectedConditions.urlContains(finalUrl));
-		} catch (UnreachableBrowserException e) {
+		} catch (TimeoutException e) {
 			// TODO
 		}
 	}
