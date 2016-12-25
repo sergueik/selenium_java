@@ -113,6 +113,9 @@ public class AppTest {
 		if (env.containsKey("DEBUG") && env.get("DEBUG").equals("true")) {
 			debug = true;
 		}
+		TestConfigurationParser
+				.getConfiguration(String.format("%s/src/test/resources/%s",
+						System.getProperty("user.dir"), configurationFileName));
 		HashMap<String, String> propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/test/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
@@ -349,6 +352,36 @@ public class AppTest {
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+	private static class TestConfigurationParser {
+
+		private static Scanner loadTestData(final String fileName) {
+			Scanner scanner = null;
+			System.err
+					.println(String.format("Reading configuration file: '%s'", fileName));
+			try {
+				scanner = new Scanner(new File(fileName));
+			} catch (FileNotFoundException e) {
+				// fail(String.format("File '%s' was not found.", fileName));
+				System.err.println(
+						String.format("Configuration file was not found: '%s'", fileName));
+				e.printStackTrace();
+			}
+			return scanner;
+		}
+
+		public static List<String[]> getConfiguration(final String fileName) {
+			ArrayList<String[]> listOfData = new ArrayList<>();
+			Scanner testData = loadTestData(fileName);
+			while (testData.hasNext()) {
+				String line = testData.next();
+				String[] tokens = line.split("\\|");
+				listOfData.add(tokens);
+			}
+			testData.close();
+			return listOfData;
 		}
 	}
 
