@@ -1,18 +1,17 @@
 package com.mycompany.app;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.StringBuilder;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,11 +21,27 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import java.util.logging.Level;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.concurrent.TimeUnit;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Formatter;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -152,10 +167,10 @@ public class AppTest {
 		 */
 		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
-			driver.manage().timeouts()
-					.pageLoadTimeout(page_load_timeout_interval, TimeUnit.SECONDS);
-			driver.manage().timeouts()
-					.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+			driver.manage().timeouts().pageLoadTimeout(page_load_timeout_interval,
+					TimeUnit.SECONDS);
+			driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
+					TimeUnit.SECONDS);
 		} catch (Exception ex) {
 			System.err.println(ex.toString());
 		}
@@ -182,8 +197,8 @@ public class AppTest {
 				.getParameters();
 		Set<String> keys = parameters.keySet();
 		for (String key : keys) {
-			System.out.println("BeforeMethod Parameter: " + key + " = "
-					+ parameters.get(key));
+			System.out.println(
+					"BeforeMethod Parameter: " + key + " = " + parameters.get(key));
 		}
 		Set<java.lang.String> attributeNames = ((IAttributes) context)
 				.getAttributeNames();
@@ -231,31 +246,30 @@ public class AppTest {
 			throws InterruptedException {
 		driver.get(baseUrl);
 
-		System.err.println(String.format(
-				"Search keyword:'%s'\tExpected minimum link count:%d", search_keyword,
-				(int) expected_count));
+		System.err.println(
+				String.format("Search keyword:'%s'\tExpected minimum link count:%d",
+						search_keyword, (int) expected_count));
 
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		String search_input_name = null;
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.id("inner_search_form")));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.className("search-field__input")));
+		wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.id("inner_search_form")));
+		wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.className("search-field__input")));
 		search_input_name = "q";
-		String search_input_xpath = String
-				.format(
-						"//form[@id='inner_search_form']/div[@class='search-field__wrap']/input[@name='%s']",
-						search_input_name);
-		wait.until(ExpectedConditions.elementToBeClickable(By
-				.xpath(search_input_xpath)));
+		String search_input_xpath = String.format(
+				"//form[@id='inner_search_form']/div[@class='search-field__wrap']/input[@name='%s']",
+				search_input_name);
+		wait.until(
+				ExpectedConditions.elementToBeClickable(By.xpath(search_input_xpath)));
 		WebElement element = driver.findElement(By.xpath(search_input_xpath));
 		element.clear();
 		element.sendKeys(search_keyword);
 		element.sendKeys(Keys.RETURN);
 
 		String pubsFoundCssSelector = "ul[class*='tabs-menu_habrahabr'] a[class*='tab-item tab-item_current']";
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-				.cssSelector(pubsFoundCssSelector)));
+		wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(pubsFoundCssSelector)));
 		element = driver.findElement(By.cssSelector(pubsFoundCssSelector));
 		Pattern pattern = Pattern.compile("(\\d+)");
 		Matcher matcher = pattern.matcher(element.getText());
@@ -303,11 +317,11 @@ public class AppTest {
 		List<Object[]> testData = new ArrayList<Object[]>();
 		Object[] testDataRow = {};
 
-		String filename = "data_2007.xlsx";
+		String fileName = "data_2007.xlsx";
 		try {
 
 			String sheetName = "Employee Data";
-			XSSFWorkbook wb = new XSSFWorkbook(filename);
+			XSSFWorkbook wb = new XSSFWorkbook(fileName);
 			XSSFSheet sheet = wb.getSheet(sheetName);
 			// XSSFSheet sheet = wb.getSheetAt(0);
 			// sheet.getSheetName();
@@ -330,8 +344,8 @@ public class AppTest {
 						String dataHeader = cell.getStringCellValue();
 						cellIndex = cell.getColumnIndex();
 						cellColumn = CellReference.convertNumToColString(cellIndex);
-						System.err.println(cellIndex + " = " + cellColumn + " "
-								+ dataHeader);
+						System.err
+								.println(cellIndex + " = " + cellColumn + " " + dataHeader);
 						columns.put(cellColumn, dataHeader);
 					}
 					continue;
@@ -339,8 +353,8 @@ public class AppTest {
 				Iterator cells = row.cellIterator();
 				while (cells.hasNext()) {
 					cell = (XSSFCell) cells.next();
-					cellColumn = CellReference.convertNumToColString(cell
-							.getColumnIndex());
+					cellColumn = CellReference
+							.convertNumToColString(cell.getColumnIndex());
 					if (columns.get(cellColumn).equals("ID")) {
 						assertEquals(cell.getCellType(), XSSFCell.CELL_TYPE_NUMERIC);
 						id = (int) cell.getNumericCellValue();
@@ -374,9 +388,9 @@ public class AppTest {
 		List<Object[]> testData = new ArrayList<Object[]>();
 		Object[] testDataRow = {};
 
-		String filename = "data_2003.xls";
+		String fileName = "data_2003.xls";
 		try {
-			InputStream ExcelFileToRead = new FileInputStream(filename);
+			InputStream ExcelFileToRead = new FileInputStream(fileName);
 			HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
 
 			// HSSFSheet sheet = wb.getSheetAt(0);
@@ -433,7 +447,7 @@ public class AppTest {
 		List<Object[]> testData = new ArrayList<Object[]>();
 		Object[] testDataRow = {};
 
-		String filename = "data.ods";
+		String fileName = "data.ods";
 		Sheet sheet;
 
 		String search_keyword = "";
@@ -441,7 +455,7 @@ public class AppTest {
 		int id = 0;
 
 		try {
-			File file = new File(filename);
+			File file = new File(fileName);
 			String sheetName = "Employee Data";
 			sheet = SpreadSheet.createFromFile(file).getSheet(sheetName);
 			// sheet = SpreadSheet.createFromFile(file).getFirstSheet();
@@ -470,10 +484,9 @@ public class AppTest {
 			for (int nRowIndex = 1; nRowIndex < nRowCount
 					&& StringUtils.isNotBlank(sheet.getImmutableCellAt(0, nRowIndex)
 							.getValue().toString()); nRowIndex++) {
-				for (int nColIndex = 0; nColIndex < nColCount
-						&& StringUtils
-								.isNotBlank(sheet.getImmutableCellAt(nColIndex, nRowIndex)
-										.getValue().toString()); nColIndex++) {
+				for (int nColIndex = 0; nColIndex < nColCount && StringUtils
+						.isNotBlank(sheet.getImmutableCellAt(nColIndex, nRowIndex)
+								.getValue().toString()); nColIndex++) {
 					cell = sheet.getImmutableCellAt(nColIndex, nRowIndex);
 					String cellName = CellReference.convertNumToColString(nColIndex);
 
@@ -512,7 +525,7 @@ public class AppTest {
 	public Object[][] createData_from_JSON(final ITestContext context,
 			final Method method) throws org.json.JSONException {
 
-		String filename = "data.json";
+		String fileName = "data.json";
 		JSONObject allTestData = new JSONObject();
 		List<Object[]> testData = new ArrayList<Object[]>();
 		ArrayList<String> hashes = new ArrayList<String>();
@@ -522,7 +535,9 @@ public class AppTest {
 		JSONArray rows = new JSONArray();
 
 		try {
-			allTestData = new JSONObject(readFile(filename, Charset.forName("UTF-8")));
+			byte[] encoded = Files.readAllBytes(Paths.get(fileName));
+			allTestData = new JSONObject(
+					new String(encoded, Charset.forName("UTF-8")));
 		} catch (org.json.JSONException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -569,6 +584,57 @@ public class AppTest {
 			testData.add(new Object[] { search_keyword, expected_count });
 		}
 		Object[][] testDataArray = new Object[testData.size()][];
+		testData.toArray(testDataArray);
+		return testDataArray;
+	}
+
+	@Target(ElementType.METHOD)
+	@Retention(RetentionPolicy.RUNTIME)
+	public @interface DataFileParameters {
+		String path();
+		String encoding() default "UTF-8";
+	}
+
+	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "csv")
+	@DataFileParameters(path = "data.csv")
+	public void testSomething(Object...args) {
+		// ...
+	}
+
+	@DataProvider(parallel = false, name = "csv")
+	public String[][] createData_from_csv(final ITestContext context,
+			final Method method) {
+		Scanner scanner = null;
+		List<String[]> testData = new ArrayList<>();
+		String[] data = null;
+		String separator = "|";
+		String fileName = null;
+		String encoding = null;
+		DataFileParameters parameters = method
+				.getAnnotation(DataFileParameters.class);
+		if (parameters != null) {
+
+			fileName = parameters.path();
+			encoding = parameters.encoding();
+		} else {
+			throw new RuntimeException("Missing DataFileParameters annotation");
+		}
+		System.err
+				.println(String.format("Reading configuration file: '%s'", fileName));
+		try {
+			scanner = new Scanner(new File(fileName));
+			while (scanner.hasNext()) {
+				String line = scanner.next();
+				data = line.split(Pattern.compile("(\\||\\|/)").matcher(separator)
+						.replaceAll("\\\\$1"));
+				testData.add(data);
+			}
+			scanner.close();
+		} catch (FileNotFoundException e) {
+			System.err.println(String.format("File was not found: '%s'", fileName));
+			e.printStackTrace();
+		}
+		String[][] testDataArray = new String[testData.size()][];
 		testData.toArray(testDataArray);
 		return testDataArray;
 	}
