@@ -408,13 +408,18 @@ public class AppTest {
 
 		public static List<String[]> getConfiguration(final String fileName) {
 			ArrayList<String[]> listOfData = new ArrayList<>();
-			Scanner testData = loadTestData(fileName);
-			while (testData.hasNext()) {
-				String line = testData.next();
-				String[] tokens = line.split("\\|");
-				listOfData.add(tokens);
+			Scanner scanner = loadTestData(fileName);
+			String separator = "|";
+			while (scanner.hasNext()) {
+				String line = scanner.next();
+				String[] data = line.split(Pattern.compile("(\\||\\|/)")
+						.matcher(separator).replaceAll("\\\\$1"));
+				for (String entry : data){
+					System.err.println("data entry: " + entry);
+				}
+				listOfData.add(data);
 			}
-			testData.close();
+			scanner.close();
 			return listOfData;
 		}
 	}
@@ -427,10 +432,9 @@ public class AppTest {
 					.println(String.format("Reading properties file: '%s'", fileName));
 			try {
 				p.load(new FileInputStream(fileName));
-				Enumeration e = p.propertyNames();
-
+				Enumeration<String> e = (Enumeration<String>) p.propertyNames();
 				for (; e.hasMoreElements();) {
-					String key = e.nextElement().toString();
+					String key = e.nextElement();
 					String val = p.get(key).toString();
 					System.out.println(String.format("Reading: '%s' = '%s'", key, val));
 					propertiesMap.put(key, val);
