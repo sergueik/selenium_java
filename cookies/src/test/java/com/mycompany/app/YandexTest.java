@@ -82,7 +82,7 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class AppTest {
+public class YandexTest {
 
 	private static WebDriver driver;
 	private static WebDriver frame;
