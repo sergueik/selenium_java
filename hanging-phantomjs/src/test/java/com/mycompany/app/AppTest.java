@@ -105,7 +105,7 @@ public class AppTest {
 
 		executePhantomJS(String.format(
 				"var page = this; page.uploadFile('input[id=fileupload]', '%s' );",
-				testFilePath));
+				testFilePath.replaceAll("\\\\", "/")));
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {

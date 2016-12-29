@@ -1,7 +1,6 @@
 package com.mycompany.app;
 
-import java.awt.Toolkit;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -21,6 +20,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.concurrent.TimeUnit;
 
@@ -85,42 +87,48 @@ public class AppTest {
 
 	private static WebDriver driver;
 	private static WebDriver frame;
-	public static WebDriverWait wait;
-	public static Actions actions;
-	private WebElement element = null;
-	private String selector = null;
+	private static WebDriverWait wait;
+	private static Actions actions;
+	private static WebElement element = null;
+	private static String selector = null;
 	private static long implicit_wait_interval = 3;
 	private static int flexible_wait_interval = 5;
 	private static long wait_polling_interval = 500;
-  private static long afterTest_interval = 1000;
-  private static long highlight_interval = 100;
+	private static long afterTest_interval = 1000;
+	private static long highlight_interval = 100;
 	private static String cssSelectorOfElementFinderScript;
 	private static String cssSelectorOfElementAlternativeFinderScript;
 	private static String xpathOfElementFinderScript;
-	private static String baseUrl = "http://www.tripadvisor.com/";
+	private static String baseURL = "http://www.tripadvisor.com/";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	static Formatter formatter;
-	static StringBuilder loggingSb;
+	private static Formatter formatter;
+	private static StringBuilder loggingSb;
+	private static String testFileName = "test.txt";
+	private static String testFilePath = new File(testFileName).getAbsolutePath();
+	private static final Logger log = LogManager.getLogger(AppTest.class);
 
 	@BeforeClass
 	public static void setUp() throws Exception {
 		loggingSb = new StringBuilder();
 		formatter = new Formatter(loggingSb, Locale.US);
-    // driver = new JBrowserDriver(Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
-    driver = new PhantomJSDriver();
+		// driver = new JBrowserDriver(
+		//		Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
+		driver = new PhantomJSDriver();
+		// driver = new FirefoxDriver();
 		wait = new WebDriverWait(driver, flexible_wait_interval);
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		driver.get(baseUrl);
-		driver.manage().timeouts()
-				.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
-		cssSelectorOfElementFinderScript = getScriptContent("cssSelectorOfElement.js");
-		cssSelectorOfElementAlternativeFinderScript = getScriptContent("cssSelectorOfElementAlternative.js");
+		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
+				TimeUnit.SECONDS);
+		cssSelectorOfElementFinderScript = getScriptContent(
+				"cssSelectorOfElement.js");
+		cssSelectorOfElementAlternativeFinderScript = getScriptContent(
+				"cssSelectorOfElementAlternative.js");
 		xpathOfElementFinderScript = getScriptContent("xpathOfElement.js");
-		driver.get(baseUrl);
+		driver.get(baseURL);
 	}
 
 	@Before
-	public void beforeTest()  {
+	public void beforeTest() {
 	}
 
 	@After
@@ -130,13 +138,87 @@ public class AppTest {
 	@AfterClass
 	public static void tearDown() throws Exception {
 		Thread.sleep(afterTest_interval);
-		driver.close();
-		driver.quit();
+		if (driver instanceof JBrowserDriver) {
+			// jbrowserDriver does not support close() / quit() ?
+		} else {
+			driver.close();
+			driver.quit();
+		}
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());
 		}
 	}
 
+	@Test
+	public void test1SendKeys() {
+		driver.get("http://blueimp.github.io/jQuery-File-Upload/basic.html");
+		// http://siptv.eu/converter/
+		// html body div#outerContainer div#container div.cell_odd form#file_form
+		// table#url_table tbody tr td input#file
+		element = driver.findElement(By.id("fileupload"));
+		assertThat(element, notNullValue());
+		// highlight(element);
+
+		assertTrue(element.getAttribute("multiple") != null);
+		// This fixes the problem with hanging PhantomJS:
+		executeScript("$('#fileupload').removeAttr('multiple');");
+		element.sendKeys(testFilePath);
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+
+		}
+		element = driver.findElement(By.className("progress-bar"));
+		assertThat(element.getAttribute("class"),
+				containsString("progress-bar-success"));
+		element = driver.findElement(By.id("files"));
+		assertThat(element.getText(), containsString(testFileName));
+	}
+
+	@Test
+	public void test2SendKeys() {
+		driver.get("http://siptv.eu/converter/");
+		element = driver
+				.findElement(By.cssSelector("div#container form#file_form input#file"));
+		assertThat(element, notNullValue());
+		highlight(element);
+
+		element.sendKeys(testFilePath);
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+
+		}
+		assertThat(element.getAttribute("value"), containsString(testFileName));
+
+		element = driver.findElement(
+				By.cssSelector("div#container form#file_form input#submit"));
+		element.click();
+	}
+
+	@Test
+	public void testExecutePhantomJS() {
+		if (driver instanceof PhantomJSDriver) {
+			
+			driver.get("http://siptv.eu/converter/");
+			element = driver.findElement(
+					By.cssSelector("div#container form#file_form input#file"));
+			assertThat(element, notNullValue());
+
+			((PhantomJSDriver) driver).executePhantomJS(String.format(
+					"var page = this; page.uploadFile('input[id=file]', '%s' );",
+					testFilePath.replaceAll("\\\\", "/")));
+			try {
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+
+			}
+			assertThat(element.getAttribute("value"), containsString(testFileName));
+		}
+	}
+
+  
+	@Ignore
 	@Test
 	public void verifyTextTest() throws Exception {
 		try {
@@ -147,7 +229,8 @@ public class AppTest {
 		}
 
 	}
-	
+
+	@Ignore
 	@Test
 	public void xpathOfElementTest() throws Exception {
 		try {
@@ -167,6 +250,7 @@ public class AppTest {
 
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementWithIdInParentTest() throws Exception {
 		try {
@@ -187,6 +271,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementTest() throws Exception {
 		try {
@@ -199,6 +284,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void cssSelectorOfElementWithIdTest() throws Exception {
 		try {
@@ -211,6 +297,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testcssSelectorOfElementAlternative() throws Exception {
 
@@ -232,7 +319,6 @@ public class AppTest {
 
 			verificationErrors.append(e.toString());
 		}
-
 	}
 
 	private String cssSelectorOfElement(WebElement element) {
@@ -243,7 +329,6 @@ public class AppTest {
 		return (String) executeScript(cssSelectorOfElementAlternativeFinderScript,
 				element);
 	}
-
 
 	private String xpathOfElement(WebElement element) {
 		return (String) executeScript(xpathOfElementFinderScript, element);
@@ -277,8 +362,8 @@ public class AppTest {
 			String extended_css_selector = String.format("%s  %s",
 					parent_css_selector, selectorValue);
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.cssSelector(extended_css_selector)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.cssSelector(extended_css_selector)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -289,8 +374,8 @@ public class AppTest {
 					selectorValue);
 
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.xpath(extended_xpath)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.xpath(extended_xpath)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -321,8 +406,8 @@ public class AppTest {
 		}
 		if (selectorKind == "id") {
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.id(selectorValue)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.id(selectorValue)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -331,8 +416,8 @@ public class AppTest {
 		if (selectorKind == "classname") {
 
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.className(selectorValue)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.className(selectorValue)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -340,8 +425,8 @@ public class AppTest {
 		}
 		if (selectorKind == "link_text") {
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.linkText(selectorValue)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.linkText(selectorValue)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -349,8 +434,8 @@ public class AppTest {
 		}
 		if (selectorKind == "css_selector") {
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.cssSelector(selectorValue)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.cssSelector(selectorValue)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -359,8 +444,8 @@ public class AppTest {
 		if (selectorKind == "xpath") {
 
 			try {
-				wait.until(ExpectedConditions.visibilityOfElementLocated(By
-						.xpath(selectorValue)));
+				wait.until(ExpectedConditions
+						.visibilityOfElementLocated(By.xpath(selectorValue)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
