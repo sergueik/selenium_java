@@ -64,6 +64,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import com.machinepublishers.jbrowserdriver.Timezone;
+import com.machinepublishers.jbrowserdriver.UserAgent;
 import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import com.machinepublishers.jbrowserdriver.Settings;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
@@ -86,9 +87,7 @@ import org.json.JSONException;
 public class AppTest {
 
 	private static WebDriver driver;
-	private static WebDriver frame;
 	private static WebDriverWait wait;
-	private static Actions actions;
 	private static WebElement element = null;
 	private static String selector = null;
 	private static long implicit_wait_interval = 3;
@@ -101,19 +100,18 @@ public class AppTest {
 	private static String xpathOfElementFinderScript;
 	private static String baseURL = "http://www.tripadvisor.com/";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static Formatter formatter;
 	private static StringBuilder loggingSb;
 	private static String testFileName = "test.txt";
-	private static String testFilePath = new File(testFileName).getAbsolutePath();
+	private static String testFilePath = new File(testFileName).getAbsolutePath()
+			.replaceAll("\\\\", "/");
 	private static final Logger log = LogManager.getLogger(AppTest.class);
 
 	@BeforeClass
 	public static void setUp() throws Exception {
 		loggingSb = new StringBuilder();
-		formatter = new Formatter(loggingSb, Locale.US);
-		// driver = new JBrowserDriver(
-		//		Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
-		driver = new PhantomJSDriver();
+		driver = new JBrowserDriver(
+				Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
+		// driver = new PhantomJSDriver();
 		// driver = new FirefoxDriver();
 		wait = new WebDriverWait(driver, flexible_wait_interval);
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
@@ -149,18 +147,18 @@ public class AppTest {
 		}
 	}
 
+	// the jquery file upload plugin issue:
+	// https://github.com/MachinePublishers/jBrowserDriver/issues/110
+	// the file upload plugin issue:
+	// https://github.com/MachinePublishers/jBrowserDriver/issues/143
 	@Test
 	public void test1SendKeys() {
 		driver.get("http://blueimp.github.io/jQuery-File-Upload/basic.html");
-		// http://siptv.eu/converter/
-		// html body div#outerContainer div#container div.cell_odd form#file_form
-		// table#url_table tbody tr td input#file
 		element = driver.findElement(By.id("fileupload"));
 		assertThat(element, notNullValue());
 		// highlight(element);
 
 		assertTrue(element.getAttribute("multiple") != null);
-		// This fixes the problem with hanging PhantomJS:
 		executeScript("$('#fileupload').removeAttr('multiple');");
 		element.sendKeys(testFilePath);
 		try {
@@ -199,7 +197,7 @@ public class AppTest {
 	@Test
 	public void testExecutePhantomJS() {
 		if (driver instanceof PhantomJSDriver) {
-			
+
 			driver.get("http://siptv.eu/converter/");
 			element = driver.findElement(
 					By.cssSelector("div#container form#file_form input#file"));
@@ -207,7 +205,7 @@ public class AppTest {
 
 			((PhantomJSDriver) driver).executePhantomJS(String.format(
 					"var page = this; page.uploadFile('input[id=file]', '%s' );",
-					testFilePath.replaceAll("\\\\", "/")));
+					testFilePath));
 			try {
 				Thread.sleep(2000);
 			} catch (InterruptedException e) {
@@ -217,7 +215,6 @@ public class AppTest {
 		}
 	}
 
-  
 	@Ignore
 	@Test
 	public void verifyTextTest() throws Exception {

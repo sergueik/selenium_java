@@ -28,7 +28,7 @@ NOTE: not adding https://maven-repository.com/artifact/com.machinepublishers/jbr
     <commons-lang.version>2.6</commons-lang.version>
     <java.version>1.8</java.version>
     <java.version>1.8</java.version>
-    <jbrowserdriver.version>0.16.3</jbrowserdriver.version>
+    <jbrowserdriver.version>0.17.3</jbrowserdriver.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
