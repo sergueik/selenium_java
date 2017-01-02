@@ -344,7 +344,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
@@ -368,7 +368,7 @@ public class SuvianTest {
 		assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test5_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -408,7 +408,7 @@ public class SuvianTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test5_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -450,7 +450,7 @@ public class SuvianTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test6_1() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -525,7 +525,7 @@ public class SuvianTest {
 	// be appropriate
 	// - see the test6_3 for the solution
 	// however preceding-sibling always finds the check box #1
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test6_2() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -628,7 +628,7 @@ public class SuvianTest {
 								".container .intro-message input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
-	
+
 	@Test(enabled = false)
 	public void test7() {
 		// Arrange
@@ -741,22 +741,60 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
-	public void test13() {
+	@Test(enabled = true)
+	public void test13_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
+				By.cssSelector(".container .row .intro-message iframe")));
 
 		// Act
+		WebElement buttonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
 
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("2.3frame_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
+		assertThat(buttonElement, notNullValue());
+		buttonElement.click();
 		// Assert
+		try {
+			// confirm alert
+			driver.switchTo().alert().accept();
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
+	}
+
+	@Test(enabled = true)
+	public void test13_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.3frame.html");
+
+		WebElement frameElement = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector(".container .row .intro-message iframe")));
+		assertThat(frameElement, notNullValue());
+		driver.switchTo().frame(frameElement);
+		// Act
+		WebElement buttonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
+
+		assertThat(buttonElement, notNullValue());
+		buttonElement.click();
+		// Assert
+		try {
+			// confirm alert
+			driver.switchTo().alert().accept();
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
 	}
 
 	@Test(enabled = false)
