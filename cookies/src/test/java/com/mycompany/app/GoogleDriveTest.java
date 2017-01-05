@@ -127,8 +127,9 @@ public class GoogleDriveTest {
 	}
 
 	@After
-	public void afterTest() {
-		// Log off
+  public void resetBrowser() {
+                // load blank page
+                driver.get("about:blank");
 	}
 
 	@AfterClass
@@ -202,7 +203,6 @@ public class GoogleDriveTest {
 		}
 		System.err.println("Loading cookies");
 		for (Cookie cookie : cookies) {
-			debug = true;
 			if (debug) {
 				System.err.println(formatter
 						.format(
