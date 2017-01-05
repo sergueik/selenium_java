@@ -27,6 +27,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.hamcrest.CoreMatchers;
+
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+
 import org.openqa.selenium.*;
 import static org.openqa.selenium.By.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -797,22 +802,68 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
-	public void test14() {
+	@Test(enabled = true)
+	public void test14_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.4mouseHover.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
+		WebElement elementWithTooltip = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h3 a"))));
+		assertThat(elementWithTooltip, notNullValue());
+		// the link title attribute is present regardless of tooltip shown or not
+		// Assert
+		assertThat(elementWithTooltip.getAttribute("title"),
+				equalTo("This is a tooltip."));
 		// Act
+		actions.moveToElement(elementWithTooltip).build().perform();
+		// Assert
+		assertThat(elementWithTooltip.getAttribute("title"),
+				equalTo("This is a tooltip."));
+		// How to discover whether core HTML tooltip is displayed ?
 
-		// Wait page to load
+	}
+
+	// http://sqa.stackexchange.com/questions/14247/how-can-i-get-the-value-of-the-tooltip
+	@Test(enabled = true)
+	public void test14_2() {
+		// Arrange
+		driver.get("http://yuilibrary.com/yui/docs/charts/charts-pie.html");
+
+		WebElement elementWithTooltip = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//*[contains(@class,'yui3-svgSvgPieSlice')][@fill = '#66007f']"))));
+		assertThat(elementWithTooltip, notNullValue());
+
+		WebElement chartTitle = driver
+				.findElement(By.cssSelector("div#doc div.content h1"));
+		// Act
+		actions.moveToElement(chartTitle).build().perform();
 		try {
-			wait.until(ExpectedConditions.urlContains("2.4mouseHover_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
 		}
 		// Assert
+		// the tooltip element is present on the page regardless of mouse position,
+		// but is not visible.
+		assertThat((int) driver
+				.findElements(By.cssSelector("div[class $= 'chart-tooltip']")).stream()
+				.filter(o -> {
+					return (Boolean) (o.getAttribute("style")
+							.indexOf("visibility: hidden;") == -1);
+				}).count(), is(0));
+
+		// Act
+		actions.moveToElement(elementWithTooltip).build().perform();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		List<WebElement> tooltips = driver
+				.findElements(By.xpath("//div[contains(@id, '_tooltip')]"));
+		assertThat(tooltips.size(), is(1));
+		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
 	@Test(enabled = false)
