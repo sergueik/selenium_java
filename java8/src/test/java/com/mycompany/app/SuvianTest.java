@@ -1010,23 +1010,34 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test19() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
+		WebElement redBoxElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.cssSelector(".container .row .intro-message table div.redbox"))));
 		// Act
 
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("2.9greenColorBlock_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
 		// Assert
+		assertThat(redBoxElement, notNullValue());
+		// TODO:  computed style of that element
+		// assertThat(redBoxElement.getAttribute("background-color"), equalTo("red"));
+		System.err.println("Red Box background color: " +  redBoxElement.getAttribute("background-color") );
+		actions.moveToElement(redBoxElement).build().preform();
+		redBoxElement.click();
+		try {
+			// confirm alert
+			driver.switchTo().alert().accept();
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
+
 	}
 
 	@Test(enabled = false)
