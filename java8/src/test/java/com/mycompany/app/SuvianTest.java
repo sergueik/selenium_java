@@ -746,7 +746,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test13_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
@@ -773,7 +773,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test13_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
@@ -802,7 +802,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test14_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.4mouseHover.html");
@@ -825,7 +825,7 @@ public class SuvianTest {
 	}
 
 	// http://sqa.stackexchange.com/questions/14247/how-can-i-get-the-value-of-the-tooltip
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test14_2() {
 		// Arrange
 		driver.get("http://yuilibrary.com/yui/docs/charts/charts-pie.html");
@@ -884,21 +884,41 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
-	public void test16() {
+	@Test(enabled = true)
+	public void test16_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement book2 = driver
+				.findElements(
+						By.cssSelector(".container .row .intro-message ul#books li"))
+				.stream().filter(o -> {
+					return (Boolean) (o.getText().indexOf("Book 2") >= 0);
+				}).collect(Collectors.toList()).get(0);
+		assertThat(book2.getText(), containsString("Book 2"));
 
 		// Act
 
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("2.6liCount_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
+		driver
+				.findElements(
+						By.cssSelector(".container .row .intro-message ul#books li"))
+				.stream().filter(o -> {
+					return (Boolean) (o.getText().indexOf("Book") >= 0);
+				}).forEach(o -> {
+					try {
+						highlight(o);
+						o.click();
+					} catch (WebDriverException e) {
+						System.err.println(
+								String.format("Exception(ignored):\n%s", e.toString()));
+						/*
+						 * org.openqa.selenium.WebDriverException: Element is not clickable
+						 * at point (581.1999969482422, 50). Other element would receive the
+						 * click: <nav class="navbar navbar-default navbar-fixed-top topnav"
+						 * role="navigation"></nav>
+						 */
+					}
+				});
 		// Assert
 	}
 
