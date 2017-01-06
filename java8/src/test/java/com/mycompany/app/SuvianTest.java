@@ -889,13 +889,69 @@ public class SuvianTest {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
 
-		WebElement book2 = driver
+		WebElement book2 = driver.findElement(By.xpath(
+				"//div[@class='intro-message']/ul/li[ contains(text(), 'Book 2')]"));
+		assertThat(book2.getText(), containsString("Book 2"));
+
+		// Act
+		int count = 0;
+		Enumeration<WebElement> chapters = Collections
+				.enumeration(book2.findElements(By.cssSelector("ul li")));
+
+		while (chapters.hasMoreElements()) {
+			WebElement currentChapter = chapters.nextElement();
+			count++;
+			try {
+				highlight(currentChapter);
+				currentChapter.click();
+			} catch (WebDriverException e) {
+				System.err
+						.println(String.format("Exception (ignored):\n%s", e.toString()));
+				// Element is not clickable
+			}
+		}
+		// Assert
+		assertThat(count, is(7));
+		System.err.println(count);
+
+		WebElement resultElement = driver
+				.findElement(By.cssSelector("input#chapbook2"));
+		resultElement.clear();
+		resultElement.sendKeys(String.format("%d", count));
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@Test(enabled = true)
+	public void test16_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.6liCount.html");
+		// Act
+
+		List<WebElement> elements = driver
 				.findElements(
 						By.cssSelector(".container .row .intro-message ul#books li"))
 				.stream().filter(o -> {
-					return (Boolean) (o.getText().indexOf("Book 2") >= 0);
-				}).collect(Collectors.toList()).get(0);
-		assertThat(book2.getText(), containsString("Book 2"));
+					return (Boolean) (o.getText().indexOf("Book") > -1);
+				}).map(o -> o.findElements(By.cssSelector("ul li")))
+				.collect(ArrayList::new, List::addAll, List::addAll);
+		// http://stackoverflow.com/questions/25147094/turn-a-list-of-lists-into-a-list-using-lambdas
+
+		// Assert
+		assertThat(elements.size(), is(15));
+		System.err.println("Total:" + elements.size());
+		WebElement resultElement = driver
+				.findElement(By.cssSelector("input#chapall"));
+		resultElement.clear();
+		resultElement.sendKeys(String.format("%d", elements.size()));
+	}
+
+	@Test(enabled = true)
+	public void test16_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.6liCount.html");
 
 		// Act
 
@@ -903,23 +959,18 @@ public class SuvianTest {
 				.findElements(
 						By.cssSelector(".container .row .intro-message ul#books li"))
 				.stream().filter(o -> {
-					return (Boolean) (o.getText().indexOf("Book") >= 0);
+					CharSequence text = "Book";
+					return (Boolean) !(o.getText().contains(text));
 				}).forEach(o -> {
 					try {
 						highlight(o);
 						o.click();
 					} catch (WebDriverException e) {
 						System.err.println(
-								String.format("Exception(ignored):\n%s", e.toString()));
-						/*
-						 * org.openqa.selenium.WebDriverException: Element is not clickable
-						 * at point (581.1999969482422, 50). Other element would receive the
-						 * click: <nav class="navbar navbar-default navbar-fixed-top topnav"
-						 * role="navigation"></nav>
-						 */
+								String.format("Exception (ignored):\n%s", e.toString()));
+						// Element is not clickable
 					}
 				});
-		// Assert
 	}
 
 	@Test(enabled = false)
