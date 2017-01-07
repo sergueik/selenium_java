@@ -109,10 +109,10 @@ public class SuvianTest {
 
 	// the Test0 contains extra debugging in the ExpectedConditions anonimous
 	// class and filter
-	// this test is somewat redundant, used for debugging
-	// validate in Firebug
-	// $x("xpath to validate")
-	// $$("cssSelector to validate")
+	// this test is somewhat redundant, used for debugging
+	// Firebug console validation:
+	// $x("<xpath>")
+	// $$("<cssSelector>")
 	@Test(enabled = false)
 	public void test0() {
 
@@ -139,7 +139,6 @@ public class SuvianTest {
 
 		linkText = "Link Successfully clicked";
 		cssSelector = ".container .row .intro-message h3";
-		String className = "intro-message";
 
 		// Wait page to load
 		try {
@@ -153,8 +152,7 @@ public class SuvianTest {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
-					WebElement e = d.findElement(By.className("intro-message"));
-					String t = e.getText();
+					String t = d.findElement(By.className("intro-message")).getText();
 					Boolean result = t.contains("Link Successfully clicked");
 					System.err.println(
 							"in apply: Text = " + t + "\n result = " + result.toString());
@@ -177,8 +175,9 @@ public class SuvianTest {
 					WebElement result = null;
 					while (elementsIterator.hasNext()) {
 						WebElement e = (WebElement) elementsIterator.next();
-						System.err.println("in apply iterator (1): Text = " + e.getText());
-						if (e.getText().contains("Navigate Back")) {
+						String t = e.getText();
+						System.err.println("in apply iterator (1): Text = " + t);
+						if (t.contains("Navigate Back")) {
 							result = e;
 							break;
 						}
@@ -206,9 +205,9 @@ public class SuvianTest {
 									java.util.regex.Pattern.CASE_INSENSITIVE);
 							while (i.hasNext()) {
 								WebElement e = (WebElement) i.next();
-								System.err
-										.println("in apply iterator (2): Text = " + e.getText());
-								Matcher matcher = pattern.matcher(e.getText());
+								String t = e.getText();
+								System.err.println("in apply iterator (2): Text = " + t);
+								Matcher matcher = pattern.matcher(t);
 								if (matcher.find()) {
 									result = e;
 									break;
@@ -232,11 +231,10 @@ public class SuvianTest {
 									.findElements(By.cssSelector(
 											"div.container div.row div.intro-message h3"))
 									.stream().filter(o -> {
-										System.err
-												.println("in stream filter (3): Text = " + o.getText());
-										return (Boolean) (o.getText().contains("Navigate Back"));
+										String t = o.getText();
+										System.err.println("in stream filter (3): Text = " + t);
+										return (Boolean) (t.contains("Navigate Back"));
 									}).findFirst();
-
 							return (e.isPresent()) ? e.get() : (WebElement) null;
 						}
 					});
@@ -249,14 +247,23 @@ public class SuvianTest {
 		// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
 		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
 		elements = driver.findElements(By.cssSelector(cssSelector));
-		Stream<WebElement> elementsStream = elements.stream(); // convert list to
-		// stream
+		// longer version
+		Stream<WebElement> elementsStream = elements.stream();
 		elements = elementsStream.filter(o -> {
 			System.err.println("in filter: Text = " + o.getText());
 			return (Boolean) (o.getText()
 					.equalsIgnoreCase("Link Successfully clicked"));
 		}).collect(Collectors.toList());
 
+		// shorter version
+		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
+				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
+				.collect(Collectors.toList());
+		assertThat(elements.size(), equalTo(1));
+
+		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
+				.filter(o -> o.getText().equalsIgnoreCase("Link Successfully clicked"))
+				.collect(Collectors.toList());
 		assertThat(elements.size(), equalTo(1));
 
 		element = elements.get(0);
@@ -1068,24 +1075,27 @@ public class SuvianTest {
 
 		String style = styleOfElement(greenBoxElement);
 		System.err.println("style:\n" + style);
-		
-		String backgroundColorAttribute = styleOfElement(greenBoxElement, "background-color");
+
+		String backgroundColorAttribute = styleOfElement(greenBoxElement,
+				"background-color");
 		String heightAttribute = styleOfElement(greenBoxElement, "height");
 		String widthAttribute = styleOfElement(greenBoxElement, "width");
 
-		System.err.println("backgroundColorAttribute:\n" + backgroundColorAttribute);
-		
+		System.err
+				.println("backgroundColorAttribute:\n" + backgroundColorAttribute);
+
 		Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
 		Matcher matcher = pattern.matcher(backgroundColorAttribute);
-		int red = 0, green = 0, blue = 0  ;
-		
+		int red = 0, green = 0, blue = 0;
+
 		if (matcher.find()) {
 			red = Integer.parseInt(matcher.group(1).toString());
 			green = Integer.parseInt(matcher.group(2).toString());
 			blue = Integer.parseInt(matcher.group(3).toString());
 			assertTrue(red == 0);
 		}
-		pattern = Pattern.compile("\\(\\s*(?<red>\\d+),\\s*(?<green>\\d+),\\s*(?<blue>\\d+)\\)");
+		pattern = Pattern
+				.compile("\\(\\s*(?<red>\\d+),\\s*(?<green>\\d+),\\s*(?<blue>\\d+)\\)");
 		matcher = pattern.matcher(backgroundColorAttribute);
 		if (matcher.find()) {
 			red = Integer.parseInt(matcher.group("red").toString());
