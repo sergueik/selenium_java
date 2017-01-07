@@ -72,7 +72,8 @@ public class SuvianTest {
 
 	private FirefoxDriver driver;
 	private WebDriverWait wait;
-	static Actions actions;
+	private static Actions actions;
+	private static Alert alert;
 	private Predicate<WebElement> hasClass;
 	private Predicate<WebElement> hasAttr;
 	private Predicate<WebElement> hasText;
@@ -80,6 +81,7 @@ public class SuvianTest {
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
 	private String baseUrl = "http://suvian.in/selenium";
+	private static String getStyleScript;
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
@@ -884,7 +886,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test16_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -924,7 +926,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test16_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -948,7 +950,7 @@ public class SuvianTest {
 		resultElement.sendKeys(String.format("%d", elements.size()));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test16_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -1011,25 +1013,28 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = true)
-	public void test19() {
+	public void test19_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
 
-		WebElement redBoxElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By
-						.cssSelector(".container .row .intro-message table div.redbox"))));
+		WebElement greenBoxElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message table div.greenbox"))));
 		// Act
 
 		// Assert
-		assertThat(redBoxElement, notNullValue());
-		// TODO:  computed style of that element
-		// assertThat(redBoxElement.getAttribute("background-color"), equalTo("red"));
-		System.err.println("Red Box background color: " +  redBoxElement.getAttribute("background-color") );
-		actions.moveToElement(redBoxElement).build().preform();
-		redBoxElement.click();
+		assertThat(greenBoxElement, notNullValue());
+		// TODO: computed style of that element
+
+		actions.moveToElement(greenBoxElement).build().perform();
+		greenBoxElement.click();
 		try {
 			// confirm alert
-			driver.switchTo().alert().accept();
+			alert = driver.switchTo().alert();
+			String alert_text = alert.getText();
+			assertThat(alert_text, containsString("You clicked on Green"));
+
+			alert.accept();
 		} catch (NoAlertPresentException e) {
 			// Alert not present - ignore
 		} catch (WebDriverException e) {
@@ -1037,6 +1042,63 @@ public class SuvianTest {
 					.println("Alert was not handled : " + e.getStackTrace().toString());
 			return;
 		}
+
+	}
+
+	@Test(enabled = true)
+	public void test19_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
+
+		WebElement greenBoxElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message table div.greenbox"))));
+		// Act
+
+		// Assert
+		assertThat(greenBoxElement, notNullValue());
+		// simlified scipt for computed style of that element
+		String script = "var element = arguments[0]; window.document.defaultView.getComputedStyle(element, null).getPropertyValue('background-color');";
+
+		Object computedStyle = ((JavascriptExecutor) driver).executeScript(script,
+				greenBoxElement);
+
+		// System.err.println("Red Box background color: " +
+		// computedStyle.toString());
+
+		String style = styleOfElement(greenBoxElement);
+		System.err.println("style:\n" + style);
+		
+		String backgroundColorAttribute = styleOfElement(greenBoxElement, "background-color");
+		String heightAttribute = styleOfElement(greenBoxElement, "height");
+		String widthAttribute = styleOfElement(greenBoxElement, "width");
+
+		System.err.println("backgroundColorAttribute:\n" + backgroundColorAttribute);
+		
+		Pattern pattern = Pattern.compile("\\(\\s*(\\d+),\\s*(\\d+),\\s*(\\d+)\\)");
+		Matcher matcher = pattern.matcher(backgroundColorAttribute);
+		int red = 0, green = 0, blue = 0  ;
+		
+		if (matcher.find()) {
+			red = Integer.parseInt(matcher.group(1).toString());
+			green = Integer.parseInt(matcher.group(2).toString());
+			blue = Integer.parseInt(matcher.group(3).toString());
+			assertTrue(red == 0);
+		}
+		pattern = Pattern.compile("\\(\\s*(?<red>\\d+),\\s*(?<green>\\d+),\\s*(?<blue>\\d+)\\)");
+		matcher = pattern.matcher(backgroundColorAttribute);
+		if (matcher.find()) {
+			red = Integer.parseInt(matcher.group("red").toString());
+			green = Integer.parseInt(matcher.group("green").toString());
+			blue = Integer.parseInt(matcher.group("blue").toString());
+			assertTrue(green >= 128);
+		}
+		System.err.println("green:" + green);
+
+		System.err.println("heightAttribute:\n" + heightAttribute);
+		System.err.println("widthAttribute:\n" + widthAttribute);
+		// assertThat(greenBoxElement.getAttribute("background-color"),
+		// equalTo("red"));
 
 	}
 
@@ -1272,4 +1334,31 @@ public class SuvianTest {
 		}
 	}
 
+	private Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+	private String styleOfElement(WebElement element, Object... arguments) {
+		String getStyleScript = getScriptContent("getStyle.js");
+
+		return (String) executeScript(getStyleScript, element, arguments);
+	}
+
+	protected static String getScriptContent(String scriptName) {
+		try {
+			final InputStream stream = SuvianTest.class.getClassLoader()
+					.getResourceAsStream(scriptName);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			return new String(bytes, "UTF-8");
+		} catch (IOException e) {
+			throw new RuntimeException(scriptName);
+		}
+	}
 }
