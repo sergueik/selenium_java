@@ -35,10 +35,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import static org.openqa.selenium.By.*;
+import org.openqa.selenium.By;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.seleniumhq.selenium.fluent.*;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -75,14 +74,10 @@ public class SuvianTest {
 	private WebDriverWait wait;
 	private static Actions actions;
 	private static Alert alert;
-	private Predicate<WebElement> hasClass;
-	private Predicate<WebElement> hasAttr;
-	private Predicate<WebElement> hasText;
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
 	private String baseUrl = "http://suvian.in/selenium";
-	private static String getStyleScript;
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
@@ -221,6 +216,8 @@ public class SuvianTest {
 							return result;
 						}
 					});
+			assertThat(checkElement, notNullValue());
+
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
@@ -377,7 +374,7 @@ public class SuvianTest {
 		Select select = new Select(element);
 		String optionString = "Male";
 		// create predicate driven case-insensitive option search
-		hasText = o -> o.getText()
+		Predicate<WebElement> hasText = o -> o.getText()
 				.matches("(?i:" + optionString.toLowerCase() + ")");
 		List<WebElement> options = select.getOptions().stream().filter(hasText)
 				.collect(Collectors.toList());
@@ -1057,7 +1054,7 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test19_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1069,15 +1066,18 @@ public class SuvianTest {
 
 		// Assert
 		assertThat(greenBoxElement, notNullValue());
-		// simlified scipt for computed style of that element
-		String script = "var element = arguments[0]; window.document.defaultView.getComputedStyle(element, null).getPropertyValue('background-color');";
+		// simplified script for computed style an element does not work
+		String script = "var element = arguments[0];window.document.defaultView.getComputedStyle(element,null).getPropertyValue(arguments[1]);";
 
 		Object computedStyle = ((JavascriptExecutor) driver).executeScript(script,
-				greenBoxElement);
-
-		// System.err.println("Red Box background color: " +
-		// computedStyle.toString());
-
+				greenBoxElement, "background-color");
+		try {
+			System.err
+					.println("Red Box background color: " + computedStyle.toString());
+		} catch (NullPointerException e) {
+			System.err.println(
+					"Script does not return the value : " + e.toString());
+		}
 		String style = styleOfElement(greenBoxElement);
 		System.err.println("style:\n" + style);
 
@@ -1192,7 +1192,7 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = false)
-	public void test24() {
+	public void test24_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.4readWriteExcel.html");
 
@@ -1210,20 +1210,57 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
-	public void test25() {
+	@Test(enabled = true)
+	public void test25_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
+		WebElement link = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
 		// Act
 
-		// Wait page to load
+		assertThat(link, notNullValue());
+		assertThat(link.getText(), containsString("Generate Scorecard"));
+		link.click();
+
+		// Wait page to update
+
 		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.5cricketScorecard_validate.html"));
+			wait.until(SuvianTest::hasScoreMethod);
+		} catch (UnreachableBrowserException e) {
+		}
+		// Assert
+	}
+
+	static boolean hasScoreMethod(WebDriver driver) {
+		return (boolean) (driver
+				.findElement(By.cssSelector(
+						".container .row .intro-message table tbody tr td p#sachinruns"))
+				.getText().trim().length() > 0);
+	}
+
+	@Test(enabled = true)
+	public void test25_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
+
+		WebElement link = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		// Act
+
+		assertThat(link, notNullValue());
+		assertThat(link.getText(), containsString("Generate Scorecard"));
+		link.click();
+
+		// Wait page to update
+		com.google.common.base.Predicate<WebDriver> hasScore = d -> {
+			return (boolean) (d
+					.findElement(By.cssSelector(
+							".container .row .intro-message table tbody tr td p#sachinruns"))
+					.getText().trim().length() > 0);
+		};
+		try {
+			wait.until(hasScore);
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
