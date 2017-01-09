@@ -33,6 +33,8 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
+
 import static org.openqa.selenium.By.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -58,7 +60,6 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
 
@@ -70,7 +71,7 @@ import static org.testng.AssertJUnit.fail;
 
 public class SuvianTest {
 
-	private FirefoxDriver driver;
+	private WebDriver driver;
 	private WebDriverWait wait;
 	private static Actions actions;
 	private static Alert alert;
@@ -85,7 +86,10 @@ public class SuvianTest {
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
-		driver = new FirefoxDriver();
+		// driver = new FirefoxDriver();
+		System.setProperty("webdriver.chrome.driver",
+				"c:/java/selenium/chromedriver.exe");
+		driver = new ChromeDriver();
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -201,8 +205,9 @@ public class SuvianTest {
 									By.cssSelector("div.container div.row div.intro-message h3"))
 									.iterator();
 							WebElement result = null;
-							Pattern pattern = Pattern.compile("(?:" + "Navigate Back" + ")",
-									java.util.regex.Pattern.CASE_INSENSITIVE);
+							// "(?:" + "Navigate Back" + ")"
+							Pattern pattern = Pattern.compile("Navigate Back",
+									Pattern.CASE_INSENSITIVE);
 							while (i.hasNext()) {
 								WebElement e = (WebElement) i.next();
 								String t = e.getText();
@@ -1019,7 +1024,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test19_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1052,7 +1057,7 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test19_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1224,23 +1229,42 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test26() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.6copyTextFromTextField.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement sourceElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message form textarea[name='field_one']"))));
+		assertThat(sourceElement, notNullValue());
+		WebElement targetElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[@class = 'container']//div[@class = 'row']//div[@class = 'intro-message']//form/textarea[@name='field_two']"))));
+		assertThat(targetElement, notNullValue());
 
 		// Act
-
-		// Wait page to load
+		String text = sourceElement.getText();
+		executeScript("arguments[0].removeAttribute('readonly');", sourceElement);
+		sourceElement.clear();
+		targetElement.sendKeys((CharSequence) text);
 		try {
-			wait.until(ExpectedConditions
-					.urlContains("3.6copyTextFromTextField_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
 		}
 		// Assert
+		String textValue = executeScript("return arguments[0].value;",
+				targetElement).toString();
+		assertThat(textValue, containsString(text));
+		System.err.println("value = " + textValue);
+
+		assertThat(targetElement.getAttribute("value"), containsString(text));
+		// Assert
+		try {
+			assertThat(targetElement.getText(), containsString(text));
+		} catch (AssertionError e) {
+			System.err.println("Exception(ignoredd): " + e.toString());
+			// new textArea value is not possible to retrieve with getText()
+		}
 	}
 
 	@Test(enabled = false)
