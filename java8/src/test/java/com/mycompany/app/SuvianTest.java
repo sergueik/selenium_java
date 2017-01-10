@@ -1240,7 +1240,6 @@ public class SuvianTest {
 								.trim(),
 						o -> Integer.parseInt(
 								o.findElement(By.cssSelector("td:nth-of-type(2)")).getText())));
-		// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
 		List<Map.Entry<String, Integer>> playerScoresList = new LinkedList<>(
 				playerScores.entrySet());
 		Collections.sort(playerScoresList,
@@ -1333,6 +1332,48 @@ public class SuvianTest {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
+	}
+
+	@Test(enabled = true)
+	public void test25_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
+
+		WebElement link = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		assertThat(link, notNullValue());
+
+		// Act
+		link.click();
+
+		// Wait page to update
+		try {
+			wait.until((com.google.common.base.Predicate<WebDriver>) (d -> d
+					.findElement(By.cssSelector(
+							".container .row .intro-message table tbody tr td p#sachinruns"))
+					.getText().trim().length() > 0));
+		} catch (UnreachableBrowserException e) {
+		}
+		Map<String, Integer> playerScores = driver
+				.findElements(
+						By.cssSelector(".container .row .intro-message table tbody tr"))
+				.stream()
+				.collect(Collectors.toMap(
+						o -> o.findElement(By.xpath("td[1]")).getText().trim(),
+						o -> Integer.parseInt(o.findElement(By.xpath("td[2]")).getText())));
+		// Assert
+		LinkedHashMap<String, Integer> playerScoresList = sortByValue(playerScores);
+		// TODO :  finish 
+	}
+
+	// sorting example from
+	// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortByValue(
+			Map<K, V> map) {
+		return map.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1, e2) -> e1, LinkedHashMap::new));
 	}
 
 	@Test(enabled = true)
