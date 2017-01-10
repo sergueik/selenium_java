@@ -8,6 +8,8 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1230,6 +1232,37 @@ public class SuvianTest {
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
+		List<WebElement> rowElements = driver.findElements(
+				By.cssSelector(".container .row .intro-message table tbody tr"));
+		Map<String, Integer> playerScores = rowElements.stream()
+				.collect(Collectors.toMap(
+						o -> o.findElement(By.cssSelector("td:nth-of-type(1)")).getText()
+								.trim(),
+						o -> Integer.parseInt(
+								o.findElement(By.cssSelector("td:nth-of-type(2)")).getText())));
+		// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+		List<Map.Entry<String, Integer>> playerScoresList = new LinkedList<>(
+				playerScores.entrySet());
+		Collections.sort(playerScoresList,
+				new Comparator<Map.Entry<String, Integer>>() {
+					@Override
+					public int compare(Map.Entry<String, Integer> first,
+							Map.Entry<String, Integer> second) {
+						return (second.getValue()).compareTo(first.getValue());
+					}
+				});
+
+		String bestScoringPlayerName = playerScoresList.get(0).getKey();
+		WebElement playerNameInput = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("form.form-inline input#score[name='topscorer']"))));
+		playerNameInput.clear();
+		playerNameInput.sendKeys(bestScoringPlayerName);
+		System.err.println(bestScoringPlayerName);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	static boolean hasScoreMethod(WebDriver driver) {
@@ -1296,6 +1329,10 @@ public class SuvianTest {
 						.cssSelector("form.form-inline input#score[name='sachinruns']"))));
 		scoreInput.clear();
 		scoreInput.sendKeys(String.format("%d", scoreSachin));
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	@Test(enabled = true)
