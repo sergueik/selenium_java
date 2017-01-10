@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.StringUtils;
 import org.hamcrest.CoreMatchers;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -1075,8 +1076,7 @@ public class SuvianTest {
 			System.err
 					.println("Red Box background color: " + computedStyle.toString());
 		} catch (NullPointerException e) {
-			System.err.println(
-					"Script does not return the value : " + e.toString());
+			System.err.println("Script does not return the value : " + e.toString());
 		}
 		String style = styleOfElement(greenBoxElement);
 		System.err.println("style:\n" + style);
@@ -1264,6 +1264,38 @@ public class SuvianTest {
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
+		List<Integer> scores = driver
+				.findElements(By.cssSelector(
+						".container .row .intro-message table tbody tr td:nth-of-type(2) p[id]"))
+				.stream().map(e -> Integer.parseInt(e.getText().trim()))
+				.collect(Collectors.toList());
+		Collections.sort(scores, Collections.reverseOrder());
+		int maxScore = scores.get(0);
+		int minScore = scores.get(scores.size() - 1);
+		assertTrue(maxScore >= minScore);
+
+		List<String> players = driver
+				.findElements(By.cssSelector(
+						".container .row .intro-message table tbody tr td:nth-of-type(1)"))
+				.stream().filter(o -> {
+					WebElement s = o.findElement(By.xpath("following-sibling::td"));
+					return (Boolean) (Integer.parseInt(s.getText()) == maxScore);
+				}).map(e -> e.getText()).collect(Collectors.toList());
+		System.err.println(players.get(0));
+		WebElement playerNameInput = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("form.form-inline input#score[name='topscorer']"))));
+		playerNameInput.clear();
+		playerNameInput.sendKeys(StringUtils.join(players, ","));
+		Integer scoreSachin = Integer.parseInt(driver
+				.findElement(By.cssSelector(
+						".container .row .intro-message table tbody tr td p#sachinruns"))
+				.getText().trim());
+		WebElement scoreInput = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.cssSelector("form.form-inline input#score[name='sachinruns']"))));
+		scoreInput.clear();
+		scoreInput.sendKeys(String.format("%d", scoreSachin));
 	}
 
 	@Test(enabled = true)
