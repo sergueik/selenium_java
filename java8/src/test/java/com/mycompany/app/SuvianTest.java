@@ -151,7 +151,7 @@ public class SuvianTest {
 		// Assert
 		// 1. Expected Condition uses enclosing element
 		try {
-			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
+			wait.until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
 					String t = d.findElement(By.className("intro-message")).getText();
@@ -166,7 +166,7 @@ public class SuvianTest {
 		}
 		// 2. Expected condition with Iterator, uses String methods
 		try {
-			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<WebElement>() {
+			wait.until(new ExpectedCondition<WebElement>() {
 
 				@Override
 				public WebElement apply(WebDriver d) {
@@ -195,30 +195,30 @@ public class SuvianTest {
 
 		// 2. Alternative Iterator, uses Regex methods
 		try {
-			WebElement checkElement = (new WebDriverWait(driver, 5))
-					.until(new ExpectedCondition<WebElement>() {
-						@Override
-						public WebElement apply(WebDriver d) {
-							Iterator<WebElement> i = d.findElements(
+			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					Iterator<WebElement> i = d
+							.findElements(
 									By.cssSelector("div.container div.row div.intro-message h3"))
-									.iterator();
-							WebElement result = null;
-							// "(?:" + "Navigate Back" + ")"
-							Pattern pattern = Pattern.compile("Navigate Back",
-									Pattern.CASE_INSENSITIVE);
-							while (i.hasNext()) {
-								WebElement e = (WebElement) i.next();
-								String t = e.getText();
-								System.err.println("in apply iterator (2): Text = " + t);
-								Matcher matcher = pattern.matcher(t);
-								if (matcher.find()) {
-									result = e;
-									break;
-								}
-							}
-							return result;
+							.iterator();
+					WebElement result = null;
+					// "(?:" + "Navigate Back" + ")"
+					Pattern pattern = Pattern.compile("Navigate Back",
+							Pattern.CASE_INSENSITIVE);
+					while (i.hasNext()) {
+						WebElement e = (WebElement) i.next();
+						String t = e.getText();
+						System.err.println("in apply iterator (2): Text = " + t);
+						Matcher matcher = pattern.matcher(t);
+						if (matcher.find()) {
+							result = e;
+							break;
 						}
-					});
+					}
+					return result;
+				}
+			});
 			assertThat(checkElement, notNullValue());
 
 		} catch (Exception e) {
@@ -228,21 +228,20 @@ public class SuvianTest {
 		// 3. Alternative wait, functional style, with Optional <WebElement>
 		// http://www.nurkiewicz.com/2013/08/optional-in-java-8-cheat-sheet.html
 		try {
-			WebElement checkElement = (new WebDriverWait(driver, 5))
-					.until(new ExpectedCondition<WebElement>() {
-						@Override
-						public WebElement apply(WebDriver d) {
-							Optional<WebElement> e = d
-									.findElements(By.cssSelector(
-											"div.container div.row div.intro-message h3"))
-									.stream().filter(o -> {
-										String t = o.getText();
-										System.err.println("in stream filter (3): Text = " + t);
-										return (Boolean) (t.contains("Navigate Back"));
-									}).findFirst();
-							return (e.isPresent()) ? e.get() : (WebElement) null;
-						}
-					});
+			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					Optional<WebElement> e = d
+							.findElements(
+									By.cssSelector("div.container div.row div.intro-message h3"))
+							.stream().filter(o -> {
+								String t = o.getText();
+								System.err.println("in stream filter (3): Text = " + t);
+								return (Boolean) (t.contains("Navigate Back"));
+							}).findFirst();
+					return (e.isPresent()) ? e.get() : (WebElement) null;
+				}
+			});
 			System.err
 					.println("element check: " + checkElement.getAttribute("innerHTML"));
 		} catch (Exception e) {
@@ -302,7 +301,7 @@ public class SuvianTest {
 		}
 		// Inspect enclosing element to confirm the page loaded
 		try {
-			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
+			wait.until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
 					return (Boolean) d.findElement(By.className("intro-message"))
@@ -476,18 +475,17 @@ public class SuvianTest {
 				Arrays.asList("Singing", "Dancing"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		try {
-			WebElement checkElement = (new WebDriverWait(driver, 5))
-					.until(new ExpectedCondition<WebElement>() {
-						@Override
-						public WebElement apply(WebDriver d) {
-							return d
-									.findElements(By.cssSelector(
-											"div.container div.row div.intro-message h3"))
-									.stream().filter(o -> o.getText().toLowerCase()
-											.indexOf("select your hobbies") > -1)
-									.findFirst().get();
-						}
-					});
+			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					return d
+							.findElements(
+									By.cssSelector("div.container div.row div.intro-message h3"))
+							.stream().filter(o -> o.getText().toLowerCase()
+									.indexOf("select your hobbies") > -1)
+							.findFirst().get();
+				}
+			});
 			System.err
 					.println("element check: " + checkElement.getAttribute("innerHTML"));
 		} catch (Exception e) {
@@ -550,18 +548,17 @@ public class SuvianTest {
 		ArrayList<String> hobbies = new ArrayList<String>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
-		WebElement checkElement = (new WebDriverWait(driver, 5))
-				.until(new ExpectedCondition<WebElement>() {
-					@Override
-					public WebElement apply(WebDriver d) {
-						return d
-								.findElements(By
-										.cssSelector("div.container div.row div.intro-message h3"))
-								.stream().filter(o -> o.getText().toLowerCase()
-										.indexOf("select your hobbies") > -1)
-								.findFirst().get();
-					}
-				});
+		WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				return d
+						.findElements(
+								By.cssSelector("div.container div.row div.intro-message h3"))
+						.stream().filter(o -> o.getText().toLowerCase()
+								.indexOf("select your hobbies") > -1)
+						.findFirst().get();
+			}
+		});
 		assertThat(checkElement, notNullValue());
 		// Act
 		List<WebElement> elements = checkElement
@@ -600,18 +597,17 @@ public class SuvianTest {
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		WebElement checkElement = null;
 		try {
-			checkElement = (new WebDriverWait(driver, 5))
-					.until(new ExpectedCondition<WebElement>() {
-						@Override
-						public WebElement apply(WebDriver d) {
-							return d
-									.findElements(By.cssSelector(
-											"div.container div.row div.intro-message h3"))
-									.stream().filter(o -> o.getText().toLowerCase()
-											.indexOf("select your hobbies") > -1)
-									.findFirst().get();
-						}
-					});
+			checkElement = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					return d
+							.findElements(
+									By.cssSelector("div.container div.row div.intro-message h3"))
+							.stream().filter(o -> o.getText().toLowerCase()
+									.indexOf("select your hobbies") > -1)
+							.findFirst().get();
+				}
+			});
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
@@ -1006,23 +1002,45 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = false)
-	public void test18() {
+	public void test18_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement button1 = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message button:nth-of-type(1)"))));
+		assertThat(button1, notNullValue());
+		assertThat(button1.getAttribute("disabled"), nullValue());
+
+		WebElement button2 = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message button#button2"))));
+		assertThat(button2, notNullValue());
+		assertThat(button2.getAttribute("disabled"), notNullValue());
+
+		WebElement progressBar = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message div.w3-progress-container div#myBar"))));
+		assertThat(progressBar, notNullValue());
+		assertThat(progressBar.getAttribute("style"), notNullValue());
 
 		// Act
-
-		// Wait page to load
+		button1.click();
+		// Wait button2 to become enabled - brute force
 		try {
-			wait.until(
-					ExpectedConditions.urlContains("2.8progressBar_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			(new WebDriverWait(driver, 60)).until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					String t = button2.getAttribute("disabled");
+					return (t == null);
+				}
+			});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
 		}
 		// Assert
 	}
+
 
 	@Test(enabled = false)
 	public void test19_1() {
@@ -1057,7 +1075,7 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test19_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1176,43 +1194,6 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = false)
-	public void test23() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/3.3javaemail.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("3.3javaemail_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test24_1() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/3.4readWriteExcel.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.4readWriteExcel_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = true)
 	public void test25_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -1271,7 +1252,7 @@ public class SuvianTest {
 				.getText().trim().length() > 0);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test25_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -1334,7 +1315,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test25_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -1363,7 +1344,7 @@ public class SuvianTest {
 						o -> Integer.parseInt(o.findElement(By.xpath("td[2]")).getText())));
 		// Assert
 		LinkedHashMap<String, Integer> playerScoresList = sortByValue(playerScores);
-		// TODO :  finish 
+		// TODO : finish
 	}
 
 	// sorting example from
@@ -1376,7 +1357,7 @@ public class SuvianTest {
 						(e1, e2) -> e1, LinkedHashMap::new));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test26() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.6copyTextFromTextField.html");
@@ -1428,44 +1409,6 @@ public class SuvianTest {
 		try {
 			wait.until(ExpectedConditions
 					.urlContains("3.7correspondingRadio_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test28() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/3.8screeshotToEmail.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.8screeshotToEmail_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test29() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/3.9FacebookTest.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.9FacebookTest_validate.html"));
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
