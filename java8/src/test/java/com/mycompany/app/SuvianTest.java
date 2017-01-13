@@ -1087,8 +1087,18 @@ public class SuvianTest {
 			System.err.println("Exception: " + e.toString());
 		}
 		// Assert
-		assertThat(button2.getAttribute("disabled"), nullValue());
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// TODO: add Javascript to evaluate the disabled attribute that should be found changing
+		assertThat(button2.getAttribute("disabled"), is("true"));
+		System.err.println("Button 2 : " + button2.getAttribute("outerHTML"));
 		button2.click();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		try {
 			// confirm alert
 			driver.switchTo().alert().accept();
