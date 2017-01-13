@@ -1041,6 +1041,65 @@ public class SuvianTest {
 		// Assert
 	}
 
+	@Test(enabled = true)
+	public void test18_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.8progressBar.html");
+
+		// html body div.intro-header div.container div.row div.col-lg-12
+		// div.intro-message button.w3-btn.w3-dark-grey
+		WebElement button1 = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message button:nth-of-type(1)"))));
+		assertThat(button1, notNullValue());
+		assertThat(button1.getAttribute("disabled"), nullValue());
+
+		WebElement button2 = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("button2"))));
+		assertThat(button2, notNullValue());
+		assertThat(button2.getAttribute("disabled"), notNullValue());
+
+		WebElement progressBar = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("myBar"))));
+		assertThat(progressBar, notNullValue());
+		assertThat(progressBar.getAttribute("style"), notNullValue());
+		WebElement progressBarContainer = progressBar.findElement(By.xpath(".."));
+		int denom = Integer.parseInt(
+				styleOfElement(progressBarContainer, "width").replace("px", ""));
+		// Act
+		button1.click();
+
+		// Wait progressBar to reach 100%
+		try {
+			(new WebDriverWait(driver, 60)).until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					Pattern p = Pattern.compile("([0-9.]+)px",
+							Pattern.DOTALL | Pattern.CASE_INSENSITIVE);
+					float percentage = Float.parseFloat(
+							p.matcher(styleOfElement(progressBar, "width")).replaceAll("$1"))
+							/ denom;
+					System.err.println("Progress Bar: " + percentage);
+					return (percentage >= .97);
+				}
+			});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		// Assert
+		assertThat(button2.getAttribute("disabled"), nullValue());
+		button2.click();
+		try {
+			// confirm alert
+			driver.switchTo().alert().accept();
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
+	}
 
 	@Test(enabled = false)
 	public void test19_1() {
