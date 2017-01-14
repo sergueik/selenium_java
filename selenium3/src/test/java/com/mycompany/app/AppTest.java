@@ -1,7 +1,5 @@
 package com.mycompany.app;
 
-import java.awt.Toolkit;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.IOException;
@@ -59,7 +57,8 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import static java.lang.Boolean.*;
+
+import com.google.gson.JsonObject;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -79,7 +78,29 @@ public class AppTest {
 				"c:/java/selenium/geckodriver.exe");
 		// alternatively one can add geckodriver to system path
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		// alternatively set "marionette" capability to false to use legacy
+		// FirefoxDriver
 		capabilities.setCapability("marionette", true);
+		FirefoxProfile profile = new FirefoxProfile();
+		JsonObject options = new JsonObject();
+		JsonObject log = new JsonObject();
+
+		log.addProperty("level", "trace");
+		options.add("log", log);
+		capabilities.setCapability("moz:firefoxOptions", options);
+		profile.setAcceptUntrustedCertificates(true);
+		profile.setAssumeUntrustedCertificateIssuer(true);
+		profile.setEnableNativeEvents(false);
+		System.out.println(System.getProperty("user.dir"));
+
+		try {
+			profile.AddExtension(new File(System.getProperty("user.dir"),
+					"/resources/JSErrorCollector.xpi"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 		driver = new FirefoxDriver(capabilities);
 	}
 
@@ -87,7 +108,7 @@ public class AppTest {
 	public void beforeTest() throws Exception {
 		driver.get(baseURL);
 	}
-	
+
 	@AfterClass
 	public static void tearDown() throws Exception {
 		driver.quit();
@@ -95,10 +116,9 @@ public class AppTest {
 			throw new Exception(verificationErrors.toString());
 		}
 	}
-	
+
 	@Test
 	public void verifyText() throws Exception {
 	}
-
 
 }
