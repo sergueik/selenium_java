@@ -1,5 +1,6 @@
 package com.mycompany.app;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.IOException;
@@ -74,34 +75,50 @@ public class AppTest {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
+		// alternatively one can add Geckodriver to system path
 		System.setProperty("webdriver.gecko.driver",
 				"c:/java/selenium/geckodriver.exe");
-		// alternatively one can add geckodriver to system path
+		// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		// alternatively set "marionette" capability to false to use legacy
 		// FirefoxDriver
-		capabilities.setCapability("marionette", true);
+		capabilities.setCapability("marionette", false);
+		// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+		capabilities.setCapability("locationContextEnabled", false);
+		capabilities.setCapability("acceptSslCerts", true);
 		FirefoxProfile profile = new FirefoxProfile();
 		JsonObject options = new JsonObject();
 		JsonObject log = new JsonObject();
 
 		log.addProperty("level", "trace");
 		options.add("log", log);
+		// geckodriver 0.11.0 introduces a new firefoxOptions dictionary that is
+		// much like chromeOptions
+		// https://github.com/mozilla/geckodriver/issues/228
+		// Note: older versions of Selenium driver may crash with
+		// Firefox option was set, but is not a FirefoxOption:
+		// {"log":{"level":"trace"}}
 		capabilities.setCapability("moz:firefoxOptions", options);
 		profile.setAcceptUntrustedCertificates(true);
 		profile.setAssumeUntrustedCertificateIssuer(true);
 		profile.setEnableNativeEvents(false);
+
 		System.out.println(System.getProperty("user.dir"));
 
 		try {
-			profile.AddExtension(new File(System.getProperty("user.dir"),
+			profile.addExtension(new File(System.getProperty("user.dir"),
 					"/resources/JSErrorCollector.xpi"));
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-		driver = new FirefoxDriver(capabilities);
+		try {
+			driver = new FirefoxDriver(capabilities);
+		} catch (WebDriverException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot initialize Firefox driver");
+		}
 	}
 
 	@Before
@@ -110,10 +127,12 @@ public class AppTest {
 	}
 
 	@AfterClass
-	public static void tearDown() throws Exception {
-		driver.quit();
+	public static void tearDown() {
+		if (driver != null) {
+			driver.quit();
+		}
 		if (verificationErrors.length() != 0) {
-			throw new Exception(verificationErrors.toString());
+			throw new RuntimeException(verificationErrors.toString());
 		}
 	}
 
