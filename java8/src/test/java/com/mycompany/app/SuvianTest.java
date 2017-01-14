@@ -876,22 +876,42 @@ public class SuvianTest {
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test15() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
+		WebElement textAreaElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h3 textarea"))));
+		assertThat(textAreaElement, notNullValue());
+		System.err.println(textAreaElement.getSize().width);
+		System.err.println(textAreaElement.getSize().height);
+		WebElement lineElement = driver.findElement(
+				By.cssSelector(".container .row .intro-message h3 hr.intro-divider"));
+		assertThat(lineElement, notNullValue());
+		System.err.println(lineElement.getSize().width);
 		// Act
-
-		// Wait page to load
+		int distance = (lineElement.getSize().width - textAreaElement.getSize().width) / 2;
+		highlight(textAreaElement);
+		
+		actions.moveToElement(textAreaElement,textAreaElement.getSize().width / 2,textAreaElement.getSize().height /2 ).clickAndHold();
+		actions.build().perform();
 		try {
-			wait.until(ExpectedConditions.urlContains("2.5resize_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
 		}
+		actions.moveByOffset(0, distance).build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		
+		actions.release().build().perform();
 		// Assert
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	@Test(enabled = false)
@@ -1040,7 +1060,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test18_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
@@ -1090,8 +1110,9 @@ public class SuvianTest {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		System.err.println("Button2 attribute check (1) : " + button2.getAttribute("outerHTML"));
-		button2.click();    
+		System.err.println(
+				"Button2 attribute check (1) : " + button2.getAttribute("outerHTML"));
+		button2.click();
 		try {
 			// confirm alert
 			driver.switchTo().alert().accept();
@@ -1102,11 +1123,12 @@ public class SuvianTest {
 					.println("Alert was not handled : " + e.getStackTrace().toString());
 			return;
 		}
-    // NOTE: latency
-		System.err.println("Button2 attribute check (2) : " + button2.getAttribute("outerHTML"));
+		// NOTE: latency
+		System.err.println(
+				"Button2 attribute check (2) : " + button2.getAttribute("outerHTML"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test18_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
@@ -1150,7 +1172,8 @@ public class SuvianTest {
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
-		System.err.println("Button2 attribute check (3) : " + button2.getAttribute("outerHTML"));
+		System.err.println(
+				"Button2 attribute check (3) : " + button2.getAttribute("outerHTML"));
 	}
 
 	@Test(enabled = false)
