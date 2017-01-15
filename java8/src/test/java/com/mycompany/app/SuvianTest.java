@@ -80,7 +80,7 @@ public class SuvianTest {
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
-	private String baseUrl = "http://suvian.in/selenium";
+	private String baseURL = "http://suvian.in/selenium";
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
@@ -101,7 +101,7 @@ public class SuvianTest {
 
 	@BeforeMethod
 	public void loadPage() {
-		driver.get(baseUrl);
+		driver.get(baseURL);
 	}
 
 	@AfterMethod
@@ -876,7 +876,7 @@ public class SuvianTest {
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test15() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
@@ -891,10 +891,12 @@ public class SuvianTest {
 		assertThat(lineElement, notNullValue());
 		System.err.println(lineElement.getSize().width);
 		// Act
-		int distance = (lineElement.getSize().width - textAreaElement.getSize().width) / 2;
+		int distance = (lineElement.getSize().width
+				- textAreaElement.getSize().width) / 2;
 		highlight(textAreaElement);
-		
-		actions.moveToElement(textAreaElement,textAreaElement.getSize().width / 2,textAreaElement.getSize().height /2 ).clickAndHold();
+
+		actions.moveToElement(textAreaElement, textAreaElement.getSize().width / 2,
+				textAreaElement.getSize().height / 2).clickAndHold();
 		actions.build().perform();
 		try {
 			Thread.sleep(1000);
@@ -905,7 +907,7 @@ public class SuvianTest {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
-		
+
 		actions.release().build().perform();
 		// Assert
 		try {
@@ -1325,6 +1327,30 @@ public class SuvianTest {
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
+	}
+	// only find first 25 lines of code
+	@Test(enabled = true)
+	public void test23_1() {
+		// Arrange
+		driver.get("https://codemirror.net/demo/simplemode.html");
+		WebElement codeElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.xpath("//div[@id = 'code']//div[@class='CodeMirror-code']"))));
+		assertThat(codeElement, notNullValue());
+		// Act
+
+		List<WebElement> codeLines = driver.findElements(By.cssSelector(
+				"div#code div.CodeMirror-code pre[role='presentation'] span[role='presentation']"));
+
+		// Assert
+		assertTrue(codeLines.size() > 0);
+		System.err.println(String.format("%d Lines of code:", codeLines.size()));
+		List<String> code = codeLines.stream().map(e -> {
+			actions.moveToElement(e);
+			return e.getText();
+		}).collect(Collectors.toList());
+
+		code.stream().forEach(e -> System.err.println(e));
 	}
 
 	@Test(enabled = false)
