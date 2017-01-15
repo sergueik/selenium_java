@@ -263,6 +263,7 @@ public class SuvianTest {
 		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
 				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
 				.collect(Collectors.toList());
+
 		assertThat(elements.size(), equalTo(1));
 
 		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
@@ -626,6 +627,7 @@ public class SuvianTest {
 						return false;
 					}
 				}).collect(Collectors.toList());
+
 		assertTrue(checkBoxes.size() > 0);
 		checkBoxes.stream().forEach(o -> {
 			highlight(o);
@@ -1328,8 +1330,9 @@ public class SuvianTest {
 		}
 		// Assert
 	}
-	// only find first 25 lines of code
-	@Test(enabled = true)
+
+	// only loads first 25 lines of code
+	@Test(enabled = false)
 	public void test23_1() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1346,11 +1349,52 @@ public class SuvianTest {
 		assertTrue(codeLines.size() > 0);
 		System.err.println(String.format("%d Lines of code:", codeLines.size()));
 		List<String> code = codeLines.stream().map(e -> {
+			executeScript("arguments[0].scrollIntoView(true);", e);
 			actions.moveToElement(e);
+			highlight(e);
 			return e.getText();
 		}).collect(Collectors.toList());
 
 		code.stream().forEach(e -> System.err.println(e));
+	}
+
+	// loads all code
+	@Test(enabled = true)
+	public void test23_2() {
+		// Arrange
+		driver.get("https://codemirror.net/demo/simplemode.html");
+		WebElement codeElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.xpath("//div[@id = 'code']//div[@class='CodeMirror-code']"))));
+		assertThat(codeElement, notNullValue());
+		// Act
+
+		WebElement codeLine = driver.findElement(By.cssSelector(
+				"div#code div.CodeMirror-code pre[role='presentation']:nth-of-type(1)"));
+
+		// Assert
+		assertThat(codeLine, notNullValue());
+		while (true) {
+			try {
+				List<WebElement> codeLinesFollowing = codeLine
+						.findElements(By.xpath("following-sibling::pre"));
+				if (codeLinesFollowing.size() == 0) {
+					System.err
+							.println("No following code lines after: " + codeLine.getText());
+					break;
+				}
+				executeScript("arguments[0].scrollIntoView(true);",
+						codeLinesFollowing.get(0));
+				actions.moveToElement(codeLine);
+				highlight(codeLine);
+				System.err.println(codeLine.getText());
+				codeLine = codeLinesFollowing.get(0);
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				break;
+			}
+		}
 	}
 
 	@Test(enabled = false)
