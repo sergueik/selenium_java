@@ -42,6 +42,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.By;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.HasInputDevices;
+import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -137,6 +141,7 @@ public class SuvianTest {
 		WebElement element = elements.get(0);
 		highlight(element);
 		assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
+
 		element.click();
 
 		linkText = "Link Successfully clicked";
@@ -878,16 +883,18 @@ public class SuvianTest {
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
-	@Test(enabled = false)
-	public void test15() {
-    // Arrange
+	@Test(enabled = true)
+	public void test15_1() {
+		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
 		WebElement textAreaElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector(".container .row .intro-message h3 textarea"))));
 		assertThat(textAreaElement, notNullValue());
-		System.err.println("Text area original width: " + textAreaElement.getSize().width);
-		System.err.println("Text area original height: " + textAreaElement.getSize().height);
+		System.err.println(
+				"Text area original width: " + textAreaElement.getSize().width);
+		System.err.println(
+				"Text area original height: " + textAreaElement.getSize().height);
 		WebElement lineElement = driver.findElement(
 				By.cssSelector(".container .row .intro-message h3 hr.intro-divider"));
 		assertThat(lineElement, notNullValue());
@@ -909,8 +916,94 @@ public class SuvianTest {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		System.err.println("Text area new width: " + textAreaElement.getSize().getWidth());
-		System.err.println("Text area new height: " + textAreaElement.getSize().getHeight());
+		System.err.println(
+				"Text area new width: " + textAreaElement.getSize().getWidth());
+		System.err.println(
+				"Text area new height: " + textAreaElement.getSize().getHeight());
+	}
+
+	@Test(enabled = true)
+	public void test15_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.1link.html");
+
+		String cssSelector = ".container .row .intro-message h3 a";
+		WebElement element = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		assertTrue(element.getText().equalsIgnoreCase("click here"),
+				element.getText());
+
+		// Act
+		highlight(element);
+
+		Mouse mouse = ((HasInputDevices) driver).getMouse();
+		Coordinates coords = ((Locatable) element).getCoordinates();
+		System.err.println(String.format("Mouse click at: (%-4d, %-4d)",
+				coords.inViewPort().x, coords.inViewPort().y));
+		mouse.click(coords);
+
+		// Wait page to load
+		try {
+			wait.until(ExpectedConditions.urlContains("1.1link_validate.html"));
+		} catch (UnreachableBrowserException e) {
+		}
+
+		// Assert
+		try {
+			wait.until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+          return  d.findElement(By.className("intro-message")).getText().contains("Link Successfully clicked");
+				}
+			});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+	}
+
+	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.interactions.Mouse
+	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.interactions.internal.Coordinates
+	// http://grepcode.com/file/repo1.maven.org/maven2/org.seleniumhq.selenium/selenium-api/2.40.0/org/openqa/selenium/interactions/Mouse.java#Mouse.mouseMove%28org.openqa.selenium.interactions.internal.Coordinates%2Clong%2Clong%29
+	@Test(enabled = false)
+	public void test15_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.5resize.html");
+		WebElement textAreaElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h3 textarea"))));
+		assertThat(textAreaElement, notNullValue());
+		System.err.println(textAreaElement.getSize().width);
+		System.err.println(textAreaElement.getSize().height);
+		WebElement lineElement = driver.findElement(
+				By.cssSelector(".container .row .intro-message h3 hr.intro-divider"));
+		assertThat(lineElement, notNullValue());
+		// Act
+		int distance = (lineElement.getSize().width
+				- textAreaElement.getSize().width) / 2;
+		highlight(textAreaElement);
+		int xOffset = textAreaElement.getSize().getWidth() - 1;
+		int yOffset = textAreaElement.getSize().getHeight() - 1;
+		Mouse mouse = ((HasInputDevices) driver).getMouse();
+		Locatable locatable = (Locatable) textAreaElement;
+		Coordinates coords = locatable.getCoordinates();
+		System.err.println(String.format("Mouse down at: (%d,%d)",
+				coords.inViewPort().x, coords.inViewPort().y));
+		mouse.mouseMove(coords, xOffset, yOffset);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		mouse.mouseDown(coords);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		mouse.mouseUp(coords);
+		mouse.click(coords);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	@Test(enabled = false)
@@ -1327,7 +1420,7 @@ public class SuvianTest {
 	}
 
 	// only loads first 25 lines of code
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test23_1() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1353,7 +1446,7 @@ public class SuvianTest {
 	}
 
 	// loads all code
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test23_2() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
