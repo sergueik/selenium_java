@@ -880,42 +880,37 @@ public class SuvianTest {
 
 	@Test(enabled = false)
 	public void test15() {
-		// Arrange
+    // Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
 		WebElement textAreaElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector(".container .row .intro-message h3 textarea"))));
 		assertThat(textAreaElement, notNullValue());
-		System.err.println(textAreaElement.getSize().width);
-		System.err.println(textAreaElement.getSize().height);
+		System.err.println("Text area original width: " + textAreaElement.getSize().width);
+		System.err.println("Text area original height: " + textAreaElement.getSize().height);
 		WebElement lineElement = driver.findElement(
 				By.cssSelector(".container .row .intro-message h3 hr.intro-divider"));
 		assertThat(lineElement, notNullValue());
-		System.err.println(lineElement.getSize().width);
+		System.err.println("Line element width: " + lineElement.getSize().width);
 		// Act
 		int distance = (lineElement.getSize().width
-				- textAreaElement.getSize().width) / 2;
+				- textAreaElement.getSize().width);
 		highlight(textAreaElement);
+		int xOffset = textAreaElement.getSize().getWidth() - 1;
+		int yOffset = textAreaElement.getSize().getHeight() - 1;
+		System.err
+				.println(String.format("Click and hold at (%d,%d)", xOffset, yOffset));
 
-		actions.moveToElement(textAreaElement, textAreaElement.getSize().width / 2,
-				textAreaElement.getSize().height / 2).clickAndHold();
-		actions.build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-		actions.moveByOffset(0, distance).build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-
+		actions.moveToElement(textAreaElement, xOffset, yOffset).clickAndHold()
+				.moveByOffset(distance, 0);
 		actions.release().build().perform();
 		// Assert
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
+		System.err.println("Text area new width: " + textAreaElement.getSize().getWidth());
+		System.err.println("Text area new height: " + textAreaElement.getSize().getHeight());
 	}
 
 	@Test(enabled = false)
