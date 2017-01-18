@@ -1365,7 +1365,7 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = true)
-	public void test20() {
+	public void test20_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
 
@@ -1379,34 +1379,48 @@ public class SuvianTest {
 		WebElement dropElement = wait.until(ExpectedConditions
 				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
 		assertThat(dropElement, notNullValue());
-		assertThat(dropElement.getText(),
-				containsString("Drop Here"));
+		assertThat(dropElement.getText(), containsString("Drop Here"));
 
 		// Act
-		actions = new Actions(driver);
-		// failing attempt
-		// actions.clickAndHold(draggableElement).moveToElement(dropElement)
-		// .release().build().perform();
-		//try {
-		//	Thread.sleep(1000);
-		//} catch (InterruptedException e) {
-		//}
-		// working attempt
+		// Few failing attempts
+		// Attempt #1
+		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
+				.build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
+		// Attempt #2
+		actions.dragAndDrop(draggableElement, dropElement).build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
+		// Attempt #3
 		Point source_location = draggableElement.getLocation();
 		highlight(draggableElement);
 		Point target_location = dropElement.getLocation();
-
-		// actions.dragAndDrop(draggableElement, dropElement).build().perform();
-		//try {
-		//	Thread.sleep(1000);
-		//} catch (InterruptedException e) {
-		//}
-		
 		actions.dragAndDropBy(draggableElement, 0,
 				target_location.y - source_location.y).build().perform();
-		actions.release().build().perform();
+		actions.release().build();
+		actions.perform();
 
-		// Wait page to update		
+		// Attempt #4
+		Mouse mouse = ((HasInputDevices) driver).getMouse();
+		Coordinates source_coords = ((Locatable) draggableElement).getCoordinates();
+		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
+		System.err.println(String.format("Mouse down at: (%-4d, %-4d)",
+				source_coords.inViewPort().x, source_coords.inViewPort().y));
+		mouse.mouseDown(source_coords);
+
+		mouse.mouseMove(source_coords, 0, target_location.y - source_location.y);
+		System.err.println(String.format("Mouse up at: (%-4d, %-4d)",
+				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
+		mouse.mouseUp(target_coords);
+
+		// Wait page to update
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
@@ -1434,22 +1448,59 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test22() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement draggableElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getAttribute("src"),
+				containsString("img/img_logo.gif"));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
 
 		// Act
-
-		// Wait page to load
+		// Attempt #1
+		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
+				.build().perform();
 		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.2dragAndDrop_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
 		}
+
+		// Attempt #2
+		actions.dragAndDrop(draggableElement, dropElement).build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
+		// Attempt #3
+		Point source_location = draggableElement.getLocation();
+		highlight(draggableElement);
+		Point target_location = dropElement.getLocation();
+		actions.dragAndDropBy(draggableElement, 0,
+				target_location.y - source_location.y).build().perform();
+		actions.release().build();
+		actions.perform();
+
+		// Attempt #4
+		Mouse mouse = ((HasInputDevices) driver).getMouse();
+		Coordinates source_coords = ((Locatable) draggableElement).getCoordinates();
+		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
+		System.err.println(String.format("Mouse down at: (%-4d, %-4d)",
+				source_coords.inViewPort().x, source_coords.inViewPort().y));
+		mouse.mouseDown(source_coords);
+
+		mouse.mouseMove(source_coords, 0, target_location.y - source_location.y);
+		System.err.println(String.format("Mouse up at: (%-4d, %-4d)",
+				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
+		mouse.mouseUp(target_coords);
+
 		// Assert
 	}
 
