@@ -883,7 +883,7 @@ public class SuvianTest {
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test15_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
@@ -922,7 +922,7 @@ public class SuvianTest {
 				"Text area new height: " + textAreaElement.getSize().getHeight());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test15_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
@@ -953,7 +953,8 @@ public class SuvianTest {
 			wait.until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
-          return  d.findElement(By.className("intro-message")).getText().contains("Link Successfully clicked");
+					return d.findElement(By.className("intro-message")).getText()
+							.contains("Link Successfully clicked");
 				}
 			});
 		} catch (Exception e) {
@@ -1363,22 +1364,55 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test20() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement draggableElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h5#drag1 strong"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(),
+				containsString("Drop Here"));
 
 		// Act
+		actions = new Actions(driver);
+		// failing attempt
+		// actions.clickAndHold(draggableElement).moveToElement(dropElement)
+		// .release().build().perform();
+		//try {
+		//	Thread.sleep(1000);
+		//} catch (InterruptedException e) {
+		//}
+		// working attempt
+		Point source_location = draggableElement.getLocation();
+		highlight(draggableElement);
+		Point target_location = dropElement.getLocation();
 
-		// Wait page to load
+		// actions.dragAndDrop(draggableElement, dropElement).build().perform();
+		//try {
+		//	Thread.sleep(1000);
+		//} catch (InterruptedException e) {
+		//}
+		
+		actions.dragAndDropBy(draggableElement, 0,
+				target_location.y - source_location.y).build().perform();
+		actions.release().build().perform();
+
+		// Wait page to update		
 		try {
-			wait.until(
-					ExpectedConditions.urlContains("2.10dragAndDrop_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
 		}
+
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
 	}
 
