@@ -1364,7 +1364,7 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -1448,7 +1448,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test22() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
@@ -1565,6 +1565,36 @@ public class SuvianTest {
 				break;
 			}
 		}
+	}
+
+	// only loads first 35 lines of code
+	@Test(enabled = true)
+	public void test23_3() {
+		// Arrange
+		driver.get("https://codemirror.net/demo/simplemode.html");
+		WebElement codeElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.xpath("//div[@id = 'code']//div[@class='CodeMirror-code']"))));
+		assertThat(codeElement, notNullValue());
+		// Act
+
+		// brute force ?
+		int cnt = 0;
+		while (true) {
+			cnt++;
+			try {
+				WebElement codeLine = codeElement.findElement(By.cssSelector(
+						String.format("pre[role='presentation']:nth-of-type(%d)", cnt)));
+				assertThat(codeLine, notNullValue());
+				executeScript("arguments[0].scrollIntoView(true);", codeLine);
+				highlight(codeLine);
+				System.err.println(codeLine.getText());
+			} catch (NoSuchElementException e) {
+				// e.printStackTrace();
+				break;
+			}
+		}
+		// Assert
 	}
 
 	@Test(enabled = false)
