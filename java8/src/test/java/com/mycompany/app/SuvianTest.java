@@ -1813,20 +1813,25 @@ public class SuvianTest {
 				.orElseThrow(RuntimeException::new);
 		WebElement inputElement = itemElement
 				.findElement(By.xpath("input[@type='radio'][@name='country']"));
-		// Assert
 		assertThat(inputElement, notNullValue());
 		inputElement.click();
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
+		// Assert
 		String script = "var radios = document.getElementsByTagName('input');\n"
-				+ "var value;" + "for (var i = 0; i < radios.length; i++) {"
-				+ "    if (radios[i].type === 'radio' && radios[i].checked) {"
-				+ "        value = radios[i].value;       " + "    }"
-				+ "} return value;";
-		String result = executeScript(script).toString();
-		System.err.println("Result : " +  result);
+				+ "var checkedRadioItemNumber = 1; for (var cnt = 0; cnt < radios.length; cnt++) {\n"
+				+ "if (radios[cnt].type === 'radio' && radios[cnt].checked) {\n"
+				+ "checkedRadioItemNumber = cnt; }\n"
+				+ "}\n"
+        + "var value = radios[checkedRadioItemNumber].value;" 
+        + "return (checkedRadioItemNumber + 1).toString();";
+		String checkedRadioItemNumber = executeScript(script).toString();
+		System.err.println("Checked is Radio item #" + checkedRadioItemNumber);
+		itemElement = itemList.findElement(By.xpath(String.format("li[%s]", checkedRadioItemNumber)));
+		assertThat(itemElement, notNullValue());
+		System.err.println("Result : " + itemElement.getText());
 	}
 
 	@Test(enabled = false)
