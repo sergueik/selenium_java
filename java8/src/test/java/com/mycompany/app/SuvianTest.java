@@ -1568,7 +1568,7 @@ public class SuvianTest {
 	}
 
 	// only loads first 35 lines of code
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test23_3() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1799,23 +1799,34 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test27() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
+		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
+		assertThat(itemList, notNullValue());
 		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions
-					.urlContains("3.7correspondingRadio_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
+		WebElement itemElement = itemList.findElements(By.tagName("li")).stream()
+				.filter(o -> o.getText().contains((CharSequence) "India")).findFirst()
+				.orElseThrow(RuntimeException::new);
+		WebElement inputElement = itemElement
+				.findElement(By.xpath("input[@type='radio'][@name='country']"));
 		// Assert
+		assertThat(inputElement, notNullValue());
+		inputElement.click();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+		}
+		String script = "var radios = document.getElementsByTagName('input');\n"
+				+ "var value;" + "for (var i = 0; i < radios.length; i++) {"
+				+ "    if (radios[i].type === 'radio' && radios[i].checked) {"
+				+ "        value = radios[i].value;       " + "    }"
+				+ "} return value;";
+		String result = executeScript(script).toString();
+		System.err.println("Result : " +  result);
 	}
 
 	@Test(enabled = false)
