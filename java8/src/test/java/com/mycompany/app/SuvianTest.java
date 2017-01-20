@@ -259,8 +259,9 @@ public class SuvianTest {
 		// longer version
 		Stream<WebElement> elementsStream = elements.stream();
 		elements = elementsStream.filter(o -> {
-			System.err.println("in filter: Text = " + o.getText());
-			return (Boolean) (o.getText()
+      String t = o.getText();
+			System.err.println("(in filter) Text: " + t);
+			return (Boolean) (t
 					.equalsIgnoreCase("Link Successfully clicked"));
 		}).collect(Collectors.toList());
 
@@ -1800,7 +1801,7 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = true)
-	public void test27() {
+	public void test27_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
@@ -1823,15 +1824,47 @@ public class SuvianTest {
 		String script = "var radios = document.getElementsByTagName('input');\n"
 				+ "var checkedRadioItemNumber = 1; for (var cnt = 0; cnt < radios.length; cnt++) {\n"
 				+ "if (radios[cnt].type === 'radio' && radios[cnt].checked) {\n"
-				+ "checkedRadioItemNumber = cnt; }\n"
-				+ "}\n"
-        + "var value = radios[checkedRadioItemNumber].value;" 
-        + "return (checkedRadioItemNumber + 1).toString();";
+				+ "checkedRadioItemNumber = cnt; }\n}\n"
+				+ "var value = radios[checkedRadioItemNumber].value;"
+				+ "return (checkedRadioItemNumber + 1).toString();";
 		String checkedRadioItemNumber = executeScript(script).toString();
 		System.err.println("Checked is Radio item #" + checkedRadioItemNumber);
-		itemElement = itemList.findElement(By.xpath(String.format("li[%s]", checkedRadioItemNumber)));
+		itemElement = itemList
+				.findElement(By.xpath(String.format("li[%s]", checkedRadioItemNumber)));
 		assertThat(itemElement, notNullValue());
 		System.err.println("Result : " + itemElement.getText());
+	}
+
+	@Test(enabled = true)
+	public void test27_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
+
+		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
+		assertThat(itemList, notNullValue());
+		// Act
+		WebElement itemElement = itemList.findElements(By.tagName("li")).stream()
+				.filter(o -> o.getText().contains((CharSequence) "India")).findFirst()
+				.orElseThrow(RuntimeException::new);
+		WebElement inputElement = itemElement
+				.findElement(By.xpath("input[@type='radio'][@name='country']"));
+		assertThat(inputElement, notNullValue());
+		inputElement.click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert 
+		Optional<WebElement> result = driver
+				.findElements(By.tagName("input")).stream()
+				.filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
+				.filter(o -> o.getAttribute("checked") != null).findFirst();
+		WebElement checkedRadioButton = (result.isPresent())
+				? result.get() : null;
+		assertThat(checkedRadioButton, notNullValue());
+		System.err.println("Result : " + checkedRadioButton.getAttribute("value") + " "
+				+ checkedRadioButton.getAttribute("checked"));
 	}
 
 	@Test(enabled = false)
