@@ -259,10 +259,9 @@ public class SuvianTest {
 		// longer version
 		Stream<WebElement> elementsStream = elements.stream();
 		elements = elementsStream.filter(o -> {
-      String t = o.getText();
+			String t = o.getText();
 			System.err.println("(in filter) Text: " + t);
-			return (Boolean) (t
-					.equalsIgnoreCase("Link Successfully clicked"));
+			return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
 		}).collect(Collectors.toList());
 
 		// shorter version
@@ -1805,15 +1804,9 @@ public class SuvianTest {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
-		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
-		assertThat(itemList, notNullValue());
-		// Act
-		WebElement itemElement = itemList.findElements(By.tagName("li")).stream()
-				.filter(o -> o.getText().contains((CharSequence) "India")).findFirst()
-				.orElseThrow(RuntimeException::new);
-		WebElement inputElement = itemElement
-				.findElement(By.xpath("input[@type='radio'][@name='country']"));
+		WebElement inputElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[@class='intro-message']/ul[@id='tst']/li[.='India']/input[@type='radio'][@name='country']"))));
 		assertThat(inputElement, notNullValue());
 		inputElement.click();
 		try {
@@ -1829,8 +1822,8 @@ public class SuvianTest {
 				+ "return (checkedRadioItemNumber + 1).toString();";
 		String checkedRadioItemNumber = executeScript(script).toString();
 		System.err.println("Checked is Radio item #" + checkedRadioItemNumber);
-		itemElement = itemList
-				.findElement(By.xpath(String.format("li[%s]", checkedRadioItemNumber)));
+		WebElement itemElement = driver.findElement(By.xpath(
+				String.format("//ul[@id='tst']/li[%s]", checkedRadioItemNumber)));
 		assertThat(itemElement, notNullValue());
 		System.err.println("Result : " + itemElement.getText());
 	}
@@ -1844,27 +1837,26 @@ public class SuvianTest {
 				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
 		assertThat(itemList, notNullValue());
 		// Act
-		WebElement itemElement = itemList.findElements(By.tagName("li")).stream()
-				.filter(o -> o.getText().contains((CharSequence) "India")).findFirst()
-				.orElseThrow(RuntimeException::new);
-		WebElement inputElement = itemElement
-				.findElement(By.xpath("input[@type='radio'][@name='country']"));
-		assertThat(inputElement, notNullValue());
+
+		WebElement inputElement = itemList.findElements(By.tagName("li")).stream()
+				.filter(o -> o.getText().contains((CharSequence) "India"))
+				.map(o -> o
+						.findElement(By.xpath("input[@type='radio'][@name='country']")))
+				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		// Assert 
-		Optional<WebElement> result = driver
-				.findElements(By.tagName("input")).stream()
-				.filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
+		// Assert
+		Optional<WebElement> result = driver.findElements(By.tagName("input"))
+				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
 				.filter(o -> o.getAttribute("checked") != null).findFirst();
-		WebElement checkedRadioButton = (result.isPresent())
-				? result.get() : null;
+		WebElement checkedRadioButton = (result.isPresent()) ? result.get() : null;
 		assertThat(checkedRadioButton, notNullValue());
-		System.err.println("Result : " + checkedRadioButton.getAttribute("value") + " "
-				+ checkedRadioButton.getAttribute("checked"));
+		System.err.println(String.format("Value : %s\tChecked: %s",
+				checkedRadioButton.getAttribute("value"),
+				checkedRadioButton.getAttribute("checked")));
 	}
 
 	@Test(enabled = false)
