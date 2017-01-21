@@ -1777,6 +1777,7 @@ public class SuvianTest {
 		// Act
 		String text = sourceElement.getText();
 		executeScript("arguments[0].removeAttribute('readonly');", sourceElement);
+		// arguments[0].removeAttribute('readonly',0)
 		sourceElement.clear();
 		targetElement.sendKeys((CharSequence) text);
 		try {
@@ -1799,7 +1800,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test27_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -1828,7 +1829,7 @@ public class SuvianTest {
 		System.err.println("Result : " + itemElement.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test27_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -1859,21 +1860,48 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test30() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement calendarElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message h4 input[name='calendar']"))));
+		int xOffset = calendarElement.getSize().getWidth() - 5;
+		int yOffset = calendarElement.getSize().getHeight() - 5;
+		System.err.println(String.format("Hover at (%d, %d)", xOffset, yOffset));
 
-		// Act
-
-		// Wait page to load
+		actions.moveToElement(calendarElement, xOffset, yOffset);
+		actions.build().perform();
 		try {
-			wait.until(
-					ExpectedConditions.urlContains("3.10select1stFriday_validate.html"));
-		} catch (UnreachableBrowserException e) {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+		calendarElement.sendKeys("01/21/2017");
+		actions.moveToElement(calendarElement, xOffset, yOffset).click().build()
+				.perform();
+
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// NOTE: unable to locate individual calendar dates elements with Selenium
+		// WebDriver
+		driver.findElements(By.xpath("//*[contains(text(),'28')]")).stream()
+				.forEach(o -> {
+					System.err.println(o.getAttribute("outerHTML"));
+				});
+		try {
+			for (int i = 0; i != 8; i++) {
+				calendarElement.sendKeys(Keys.ARROW_RIGHT);
+				Thread.sleep(100);
+			}
+		} catch (InterruptedException e) {
+		}
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
 		}
 		// Assert
 	}
