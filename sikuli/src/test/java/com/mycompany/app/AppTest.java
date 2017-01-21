@@ -50,10 +50,10 @@ import org.hamcrest.CoreMatchers.*;
 import org.junit.Assert.*;
 
 import org.sikuli.script.FindFailed;
+import org.sikuli.script.Match;
 import org.sikuli.script.Screen;
 import org.sikuli.script.Pattern;
 
-// https://www.youtube.com/watch?v=8OfnQEfzfmw
 public class AppTest {
 
 	// private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -63,12 +63,12 @@ public class AppTest {
 	private static WebDriverWait wait;
 	private static Actions actions;
 	private static Screen screen;
+	private static Pattern pattern = null;
 
 	private static int flexibleWait = 5;
 	private static int implicitWait = 1;
 	private static long pollingInterval = 500;
 	private static int sikuliTimeout = 5;
-	private File tmpFile = null;
 
 	@BeforeClass
 	public static void setUp() {
@@ -89,15 +89,49 @@ public class AppTest {
 	}
 
 	@Test
+	public void testCalendar() {
+		driver.navigate().to(getPageContent("calendar.html"));
+		WebElement calendarElement = wait.until(ExpectedConditions.visibilityOf(
+				driver.findElement(By.cssSelector("input[name='calendar']"))));
+		int xOffset = calendarElement.getSize().getWidth() - 5;
+		int yOffset = calendarElement.getSize().getHeight() - 5;
+		System.err.println(String.format("Hover at (%d, %d)", xOffset, yOffset));
+
+		actions.moveToElement(calendarElement, xOffset, yOffset);
+		actions.build().perform();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		String calendarDropDownImage = fullPath("calendar_dropdown_1920x1080.png");
+		try {
+			screen.exists(calendarDropDownImage, sikuliTimeout);
+			screen.click(calendarDropDownImage, 0);
+		} catch (FindFailed e) {
+			verificationErrors.append(e.toString());
+		}
+		String monthNavigateImage = fullPath("month_navigate_1920x1080.png");
+		Match match = screen.exists(monthNavigateImage, sikuliTimeout);
+		System.err.format("Clicking at: %d, %d", match.x, match.y);
+		// hides the calendar - only useful for debugginn durine script development
+		// match.highlight((float) 3.0);
+		match.offset(-20, 0).click();
+		try {
+			Thread.sleep(10000);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@Ignore
+	@Test
+	// https://www.youtube.com/watch?v=8OfnQEfzfmw
 	public void testUpload() {
-		String openButtonImage = AppTest.class.getClassLoader()
-				.getResource("open_1920x1080.png").getPath();
-		String filenameTextBoxImage = AppTest.class.getClassLoader()
-				.getResource("filename_1920x1080.png").getPath();
+		String filenameTextBoxImage = fullPath("filename_1920x1080.png");
+		String openButtonImage = fullPath("open_1920x1080.png");
 		Pattern filenameTextBox = new Pattern(filenameTextBoxImage);
 		driver.navigate().to(getPageContent("upload.html"));
 		try {
-			tmpFile = File.createTempFile("foo", ".png");
+			File tmpFile = File.createTempFile("foo", ".png");
 			WebElement element = driver.findElement(By.tagName("input"));
 			element.click();
 			try {
@@ -134,8 +168,7 @@ public class AppTest {
 			URI uri = AppTest.class.getClassLoader().getResource(pagename).toURI();
 			System.err.println("Testing: " + uri.toString());
 			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-																			// supported in -source 1.6
+		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -175,4 +208,9 @@ public class AppTest {
 							+ "the JavascriptExecutor interface.");
 		}
 	}
+
+	private String fullPath(String fileName) {
+		return AppTest.class.getClassLoader().getResource(fileName).getPath();
+	}
+
 }
