@@ -1095,22 +1095,47 @@ public class SuvianTest {
 				});
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test17() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.7waitUntil.html");
 
-		wait.until(ExpectedConditions.visibilityOf(driver
+		WebElement clickElement = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
+		assertThat(clickElement, notNullValue());
+		assertThat(clickElement.getText(), containsString("Click Me"));
 		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("2.7waitUntil_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
+		long startTime = System.currentTimeMillis();
+		clickElement.click();
 		// Assert
+		long sleepInterval = 1000;
+		long maxRetry = 30;
+		while (true) {
+			try {
+				// confirm alert
+				driver.switchTo().alert().accept();
+				break;
+			} catch (NoAlertPresentException e) {
+				// Alert not present - ignore
+				long checkTime = System.currentTimeMillis() - startTime;
+				System.err.format("Alert not present after %d sec\n",
+						(int) (checkTime / 1000));
+				// check if waited long enough already
+				if (Math.ceil(checkTime / sleepInterval) > maxRetry + 1) {
+					throw new RuntimeException();
+				}
+				try {
+					System.err.println(String.format("Sleep %4.2f sec",
+							Math.ceil(sleepInterval / 1000)));
+					Thread.sleep(sleepInterval);
+				} catch (InterruptedException e2) {
+				}
+			} catch (Exception e) {
+				System.err
+						.println("Unexpected exception : " + e.getStackTrace().toString());
+				throw new RuntimeException();
+			}
+		}
 	}
 
 	@Test(enabled = false)
@@ -1860,7 +1885,7 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test30() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
@@ -1888,7 +1913,7 @@ public class SuvianTest {
 		}
 		// NOTE: unable to locate individual calendar dates elements with Selenium
 		// WebDriver
-		driver.findElements(By.xpath("//*[contains(text(),'28')]")).stream()
+		driver.findElements(By.xpath("//*[contains(@class,'calendar')]")).stream()
 				.forEach(o -> {
 					System.err.println(o.getAttribute("outerHTML"));
 				});
