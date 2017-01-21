@@ -1108,7 +1108,7 @@ public class SuvianTest {
 		long startTime = System.currentTimeMillis();
 		clickElement.click();
 		// Assert
-		long sleepInterval = 1000;
+		long retryInterval = 1000;
 		long maxRetry = 30;
 		while (true) {
 			try {
@@ -1117,22 +1117,27 @@ public class SuvianTest {
 				break;
 			} catch (NoAlertPresentException e) {
 				// Alert not present - ignore
-				long checkTime = System.currentTimeMillis() - startTime;
-				System.err.format("Alert not present after %d sec\n",
-						(int) (checkTime / 1000));
+				long checkRetryDelay = System.currentTimeMillis() - startTime;
+				long delaySecond = (checkRetryDelay / 1000) % 60;
+				long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
+				long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
+				String delayTime = String.format("%02d:%02d:%02d", delayHour,
+						delayMinute, delaySecond);
+
+				System.err.format("Alert not present after %s\n", delayTime);
 				// check if waited long enough already
-				if (Math.ceil(checkTime / sleepInterval) > maxRetry + 1) {
+				if (Math.ceil(checkRetryDelay / retryInterval) > maxRetry + 1) {
 					throw new RuntimeException();
 				}
 				try {
 					System.err.println(String.format("Sleep %4.2f sec",
-							Math.ceil(sleepInterval / 1000)));
-					Thread.sleep(sleepInterval);
+							Math.ceil(retryInterval / 1000)));
+					Thread.sleep(retryInterval);
 				} catch (InterruptedException e2) {
 				}
 			} catch (Exception e) {
 				System.err
-						.println("Unexpected exception : " + e.getStackTrace().toString());
+						.println("Unexpected exception: " + e.getStackTrace().toString());
 				throw new RuntimeException();
 			}
 		}
