@@ -48,10 +48,16 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import org.sikuli.basics.Settings;
+
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Match;
-import org.sikuli.script.Screen;
 import org.sikuli.script.Pattern;
+import org.sikuli.script.Screen;
+
+import org.bytedeco.javacpp.*;
+import static org.bytedeco.javacpp.lept.*;
+import static org.bytedeco.javacpp.tesseract.*;
 
 public class AppTest {
 
@@ -78,6 +84,12 @@ public class AppTest {
 		driver = new ChromeDriver();
 		screen = new Screen();
 		screen.setAutoWaitTimeout(sikuliTimeout);
+		Settings.MoveMouseDelay = 1;
+		Settings.Highlight = false;
+		Settings.setShowActions(true);
+		Settings.OcrTextRead = true;
+		// the following setting does not work
+		Settings.OcrDataPath = System.getProperty("user.dir") + "\\tessdata";
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
@@ -123,8 +135,7 @@ public class AppTest {
 		// Month Navigation
 		String monthNavigateImage = fullPath("month_navigate_1920x1080.png");
 		match = screen.exists(monthNavigateImage, sikuliTimeout);
-		// System.err.format("Clicking at: %d, %d", match.x, match.y);
-		// Sikuli highlight method forces the chrome native calendar to close
+		// Sikuli highlight method would force the Chrome native calendar to close
 		// only useful for debugging during script development
 		// match.highlight((float) 3.0);
 		match.offset(-32, 0).click();
@@ -141,7 +152,6 @@ public class AppTest {
 		// Year Navigation
 		String yearDropdownImage = "year_dropdown_1920x1080.png";
 		match = screen.exists(fullPath(yearDropdownImage), sikuliTimeout);
-		// match.highlight((float) 3.0);
 		match.offset(-40, 0).click();
 		try {
 			Thread.sleep(1000);
@@ -155,7 +165,11 @@ public class AppTest {
 			if (!done) {
 				match = screen.exists(fullPath(image), sikuliTimeout);
 				if (match != null) {
-					// match.highlight((float) 3.0);
+					String text = match.text();
+					System.err.format("Sikuli read: '%s'\n", text);
+					// if --- no text --- is printed
+					// make sure tessdata is copied to
+					// ${env:APPDATA}\Sikulix\SikulixTesseract\tessdata
 					match.click();
 					done = true;
 				}
