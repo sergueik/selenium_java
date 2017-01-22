@@ -2,6 +2,8 @@ package com.mycompany.app;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
+import org.hamcrest.CoreMatchers.*;
+import org.junit.Assert.*;
 
 import java.net.BindException;
 import java.net.MalformedURLException;
@@ -11,12 +13,13 @@ import java.net.URL;
 import java.io.File;
 
 import java.io.IOException;
-import java.io.IOException;
 import java.lang.RuntimeException;
 
 import java.lang.Boolean.*;
 
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.After;
@@ -29,25 +32,21 @@ import org.junit.Test;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-
-import org.hamcrest.CoreMatchers.*;
-import org.junit.Assert.*;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 import org.sikuli.script.FindFailed;
 import org.sikuli.script.Match;
@@ -64,6 +63,7 @@ public class AppTest {
 	private static Actions actions;
 	private static Screen screen;
 	private static Pattern pattern = null;
+	private static Match match = null;
 
 	private static int flexibleWait = 5;
 	private static int implicitWait = 1;
@@ -84,8 +84,16 @@ public class AppTest {
 	}
 
 	@Before
-	public void loadPage() {
+	public void loadiBlankPage() {
 		driver.get("about:blank");
+	}
+
+	@AfterClass
+	public static void tearDown() {
+		driver.quit();
+		if (verificationErrors.length() != 0) {
+			throw new RuntimeException(verificationErrors.toString());
+		}
 	}
 
 	@Test
@@ -93,16 +101,18 @@ public class AppTest {
 		driver.navigate().to(getPageContent("calendar.html"));
 		WebElement calendarElement = wait.until(ExpectedConditions.visibilityOf(
 				driver.findElement(By.cssSelector("input[name='calendar']"))));
-		int xOffset = calendarElement.getSize().getWidth() - 5;
-		int yOffset = calendarElement.getSize().getHeight() - 5;
+		int xOffset = calendarElement.getSize().getWidth() - 2;
+		int yOffset = calendarElement.getSize().getHeight() - 2;
 		System.err.println(String.format("Hover at (%d, %d)", xOffset, yOffset));
 
-		actions.moveToElement(calendarElement, xOffset, yOffset);
-		actions.build().perform();
+		actions.moveToElement(calendarElement, xOffset, yOffset).build().perform();
+		// Sometimes hover is not enough here for some reason
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
+		actions.moveToElement(calendarElement, xOffset, yOffset).click().build()
+				.perform();
 		String calendarDropDownImage = fullPath("calendar_dropdown_1920x1080.png");
 		try {
 			screen.exists(calendarDropDownImage, sikuliTimeout);
@@ -110,14 +120,49 @@ public class AppTest {
 		} catch (FindFailed e) {
 			verificationErrors.append(e.toString());
 		}
+		// Month Navigation
 		String monthNavigateImage = fullPath("month_navigate_1920x1080.png");
-		Match match = screen.exists(monthNavigateImage, sikuliTimeout);
-		System.err.format("Clicking at: %d, %d", match.x, match.y);
-		// hides the calendar - only useful for debugginn durine script development
+		match = screen.exists(monthNavigateImage, sikuliTimeout);
+		// System.err.format("Clicking at: %d, %d", match.x, match.y);
+		// Sikuli highlight method forces the chrome native calendar to close
+		// only useful for debugging during script development
 		// match.highlight((float) 3.0);
-		match.offset(-20, 0).click();
+		match.offset(-32, 0).click();
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		match = screen.exists(monthNavigateImage, sikuliTimeout);
+		match.offset(32, 0).click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Year Navigation
+		String yearDropdownImage = "year_dropdown_1920x1080.png";
+		match = screen.exists(fullPath(yearDropdownImage), sikuliTimeout);
+		// match.highlight((float) 3.0);
+		match.offset(-40, 0).click();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
+		ArrayList<String> yearImages = new ArrayList<>(Arrays.asList(
+				new String[] { "jan_1920x1080.png", "jan_highlight_1920x1080.png" }));
+		Boolean done = false;
+		for (String image : yearImages) {
+			if (!done) {
+				match = screen.exists(fullPath(image), sikuliTimeout);
+				if (match != null) {
+					// match.highlight((float) 3.0);
+					match.click();
+					done = true;
+				}
+			}
+		}
+		try {
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 	}
@@ -126,9 +171,8 @@ public class AppTest {
 	@Test
 	// https://www.youtube.com/watch?v=8OfnQEfzfmw
 	public void testUpload() {
-		String filenameTextBoxImage = fullPath("filename_1920x1080.png");
 		String openButtonImage = fullPath("open_1920x1080.png");
-		Pattern filenameTextBox = new Pattern(filenameTextBoxImage);
+		Pattern filenameTextBox = new Pattern(fullPath("filename_1920x1080.png"));
 		driver.navigate().to(getPageContent("upload.html"));
 		try {
 			File tmpFile = File.createTempFile("foo", ".png");
@@ -152,14 +196,6 @@ public class AppTest {
 			}
 		} catch (IOException e) {
 			throw new RuntimeException(e.toString());
-		}
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		driver.quit();
-		if (verificationErrors.length() != 0) {
-			throw new RuntimeException(verificationErrors.toString());
 		}
 	}
 
