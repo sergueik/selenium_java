@@ -55,10 +55,6 @@ import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Screen;
 
-import org.bytedeco.javacpp.*;
-import static org.bytedeco.javacpp.lept.*;
-import static org.bytedeco.javacpp.tesseract.*;
-
 public class AppTest {
 
 	// private Logger logger = Logger.getLogger(this.getClass().getName());

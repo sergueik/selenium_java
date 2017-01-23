@@ -17,14 +17,8 @@
     <selenium.version>2.53.1</selenium.version>
     <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
     <sikulixapi.version>1.1.0</sikulixapi.version>
-    <tesseract.version>3.04.01-1.2</tesseract.version>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.bytedeco.javacpp-presets</groupId>
-      <artifactId>tesseract</artifactId>
-      <version>${tesseract.version}</version>
-    </dependency>
     <dependency>
       <groupId>com.jcabi</groupId>
       <artifactId>jcabi-matchers</artifactId>
