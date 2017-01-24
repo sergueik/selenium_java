@@ -244,14 +244,13 @@ public class AppTest {
 		}
 	}
 
-	public Object execute_script(String script, Object... args) {
+	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
-			return javascriptExecutor.executeScript(script, args);
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			return javascriptExecutor.executeScript(script, arguments);
 		} else {
-			throw new RuntimeException(
-					"Script execution is only available for WebDrivers that implement "
-							+ "the JavascriptExecutor interface.");
+			throw new RuntimeException("Script execution failed.");
 		}
 	}
 
@@ -259,4 +258,10 @@ public class AppTest {
 		return AppTest.class.getClassLoader().getResource(fileName).getPath();
 	}
 
+  // http://stackoverflow.com/questions/21093570/force-page-zoom-at-100-with-js
+  // http://samples.msdn.microsoft.com/workshop/samples/author/dhtml/refs/zoom.htm#
+	private void zoomPage() {
+		String script = "document.body.style.zoom = (top.window.screen.height - 70) / Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);";
+		executeScript(script);
+	}
 }
