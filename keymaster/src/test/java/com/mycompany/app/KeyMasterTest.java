@@ -159,7 +159,7 @@ public class KeyMasterTest {
 			driver.switchTo().alert().accept();
 		} catch (NoAlertPresentException e) {
 			throw new RuntimeException("Alert was not present.");
-			
+
 		} catch (WebDriverException e) {
 			System.err
 					.println("Alert was not handled : " + e.getStackTrace().toString());
@@ -206,11 +206,13 @@ public class KeyMasterTest {
 		}
 	}
 
-	private String runKeyMaster(WebElement element, Object... arguments) {
-		String helperScript = getScriptContent("keymaster.js");
-		executeScript(helperScript, element, arguments);
-		String testScript = "key('o, enter, left', function(){ console.log('o, enter or left pressed!'); window.alert('o, enter or left pressed!');});";
-		return (String) executeScript(testScript, element, arguments);
+	private void runKeyMaster(WebElement element, Object... arguments) {
+		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
+				getScriptContent("keymaster.js"),
+				"key('o, enter, left', function(){ window.alert('o, enter or left pressed!');});"));
+		for (String script : scripts) {
+			executeScript(script, element, arguments);
+		}
 	}
 
 	protected static String getScriptContent(String scriptName) {
