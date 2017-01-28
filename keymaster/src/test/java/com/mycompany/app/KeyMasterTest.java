@@ -96,10 +96,11 @@ public class KeyMasterTest {
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
-		driver = new FirefoxDriver();
-		// System.setProperty("webdriver.chrome.driver",
-		// "c:/java/selenium/chromedriver.exe");
-		// driver = new ChromeDriver();
+		// NOTE: actions CTRL-right click does not work well with Firefox
+		// driver = new FirefoxDriver();
+		System.setProperty("webdriver.chrome.driver",
+		"c:/java/selenium/chromedriver.exe");
+		driver = new ChromeDriver();
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -121,13 +122,17 @@ public class KeyMasterTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = true, priority = 1)
 	public void testStatic() {
 		driver.get(getPageContent("test1.html"));
 		WebElement header = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		highlight(header);
-		header.sendKeys("o");
+		actions.moveToElement(header).sendKeys("o").build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		// Assert
 		try {
 			// confirm alert
@@ -145,14 +150,18 @@ public class KeyMasterTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = true, priority = 2)
 	public void testDynamic() {
 		driver.get(getPageContent("test2.html"));
 		WebElement header = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
-		runKeyMaster(header);
+		runKeyMaster();
 		highlight(header);
-		header.sendKeys("o");
+		actions.moveToElement(header).sendKeys("o").build().perform();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 		// Assert
 		try {
 			// confirm alert
@@ -165,8 +174,22 @@ public class KeyMasterTest {
 					.println("Alert was not handled : " + e.getStackTrace().toString());
 			return;
 		}
+	}
+
+	@Test(enabled = true , priority = 3)
+	public void testElementSearch() {
+		driver.get(getPageContent("test2.html"));
+		WebElement header = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
+		runKeyMasterElementSearch();
+		highlight(header);
+		// header.sendKeys("o");
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(header).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+		// Assert
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 		}
 	}
@@ -206,12 +229,22 @@ public class KeyMasterTest {
 		}
 	}
 
-	private void runKeyMaster(WebElement element, Object... arguments) {
+	private void runKeyMaster() {
 		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
 				getScriptContent("keymaster.js"),
 				"key('o, enter, left', function(){ window.alert('o, enter or left pressed!');});"));
 		for (String script : scripts) {
-			executeScript(script, element, arguments);
+			executeScript(script);
+		}
+	}
+
+	private void runKeyMasterElementSearch() {
+		ArrayList<String> scripts = new ArrayList<String>(
+				Arrays.asList(
+						getScriptContent("keymaster.js"),
+						getScriptContent("ElementSearch.js")));
+		for (String script : scripts) {
+			executeScript(script);
 		}
 	}
 
