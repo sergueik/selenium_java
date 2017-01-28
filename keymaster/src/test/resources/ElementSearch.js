@@ -192,9 +192,9 @@ getElementId = function(element) {
 
   handler = function(event) {
     hello("handler");
-   // if (document.SWD_Page_Recorder == null) {
-   //   return;
-   // }
+    if (document.SWD_Page_Recorder == null) {
+      return;
+    }
     if (event.target === document.body || prev === event.target) {
       return;
     }
@@ -212,9 +212,9 @@ getElementId = function(element) {
   rightClickHandler = function(event) {
     var JsonData, body, eventPreventingResult, mxy, path, root, target, txy, xpath, css_selector, id;
     hello("rightClickHandler");
-    // if (document.SWD_Page_Recorder == null) {
-    //  return;
-    //}
+    if (document.SWD_Page_Recorder == null) {
+      return;
+    }
     if (event.ctrlKey) {
       if (event == null) {
         event = window.event;
@@ -423,4 +423,3 @@ getElementId = function(element) {
   }
 
 }).call(this);
-
