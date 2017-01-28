@@ -13,7 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import java.util.function.Function;
@@ -29,28 +29,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang.StringUtils;
-import org.hamcrest.CoreMatchers;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.InvalidSelectorException;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
-import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -58,16 +60,16 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+import org.hamcrest.CoreMatchers;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.testng.Assert.assertTrue;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -87,7 +89,7 @@ public class SuvianTest {
 	private String baseURL = "about:blank";
 
 	@BeforeSuite
-	public void beforeSuiteMethod() throws Exception {
+	public void beforeSuite() throws Exception {
 		// driver = new FirefoxDriver();
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
@@ -99,23 +101,20 @@ public class SuvianTest {
 	}
 
 	@AfterSuite
-	public void afterSuiteMethod() throws Exception {
+	public void afterSuite() throws Exception {
 		driver.quit();
 	}
 
 	@BeforeMethod
-	public void loadPage() {
+	public void BeforeMethod() {
 		driver.get(baseURL);
 	}
 
 	@AfterMethod
-	public void resetBrowser() {
+	public void AfterMethod() {
 		driver.get("about:blank");
 	}
 
-	// the Test0 contains extra debugging in the ExpectedConditions anonimous
-	// class and filter
-	// this test is somewhat redundant, used for debugging
 	// Firebug console validation:
 	// $x("<xpath>")
 	// $$("<cssSelector>")
@@ -129,23 +128,19 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 
-		String cssSelector = ".container .row .intro-message h3 a";
-		String xpath = "//div[1]/div/div/div/div/h3[2]/a";
-		wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector(cssSelector))));
-		List<WebElement> elements = driver.findElements(By.xpath(xpath));
+		wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//div[1]/div/div/div/div/h3[2]/a"));
 		assertTrue(elements.size() > 0);
 
 		// Act
-		String linkText = "Click Here";
 		WebElement element = elements.get(0);
 		highlight(element);
-		assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
+		assertTrue(element.getText().equalsIgnoreCase("Click Here"),
+				element.getText());
 
 		element.click();
-
-		linkText = "Link Successfully clicked";
-		cssSelector = ".container .row .intro-message h3";
 
 		// Wait page to load
 		try {
@@ -162,7 +157,7 @@ public class SuvianTest {
 					String t = d.findElement(By.className("intro-message")).getText();
 					Boolean result = t.contains("Link Successfully clicked");
 					System.err.println(
-							"in apply: Text = " + t + "\n result = " + result.toString());
+							"in apply: Text = " + t + "\nresult = " + result.toString());
 					return result;
 				}
 			});
@@ -255,7 +250,8 @@ public class SuvianTest {
 
 		// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
 		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
-		elements = driver.findElements(By.cssSelector(cssSelector));
+		elements = driver
+				.findElements(By.cssSelector(".container .row .intro-message h3"));
 		// longer version
 		Stream<WebElement> elementsStream = elements.stream();
 		elements = elementsStream.filter(o -> {
@@ -265,20 +261,25 @@ public class SuvianTest {
 		}).collect(Collectors.toList());
 
 		// shorter version
-		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
+		elements = driver
+				.findElements(By.cssSelector(".container .row .intro-message h3"))
+				.stream()
 				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
 				.collect(Collectors.toList());
 
 		assertThat(elements.size(), equalTo(1));
 
-		elements = driver.findElements(By.cssSelector(cssSelector)).stream()
+		elements = driver
+				.findElements(By.cssSelector(".container .row .intro-message h3"))
+				.stream()
 				.filter(o -> o.getText().equalsIgnoreCase("Link Successfully clicked"))
 				.collect(Collectors.toList());
 		assertThat(elements.size(), equalTo(1));
 
 		element = elements.get(0);
 		highlight(element);
-		assertTrue(element.getText().equalsIgnoreCase(linkText), element.getText());
+		assertTrue(element.getText().equalsIgnoreCase("Link Successfully clicked"),
+				element.getText());
 	}
 
 	@Test(enabled = false)
@@ -299,9 +300,7 @@ public class SuvianTest {
 		assertTrue(element.getText().equalsIgnoreCase("Click Here"),
 				element.getText());
 		element.click();
-
-		// Wait page to load
-		try {
+		try { // Wait page to load
 			wait.until(ExpectedConditions.urlContains("1.1link_validate.html"));
 		} catch (UnreachableBrowserException e) {
 		}
@@ -332,48 +331,10 @@ public class SuvianTest {
 	}
 
 	@Test(enabled = false)
-	public void test2() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.2text_field.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("1.2text_field_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test3() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.3age_plceholder.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("1.3age_plceholder_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
 	public void test4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
-		// Wait page to load
-		wait.until(
+		wait.until( // Wait page to load
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						".intro-header .container .row .col-lg-12 .intro-message select"))));
 		// Act
@@ -528,9 +489,7 @@ public class SuvianTest {
 			}
 
 		}
-		checkboxes.stream().forEach(o ->
-
-		{
+		checkboxes.stream().forEach(o -> {
 			highlight(o);
 			o.click();
 		});
@@ -598,9 +557,9 @@ public class SuvianTest {
 	@Test(enabled = false)
 	public void test6_3() {
 		// Arrange
+		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		ArrayList<String> hobbies = new ArrayList<String>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
-		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		WebElement checkElement = null;
 		try {
 			checkElement = wait.until(new ExpectedCondition<WebElement>() {
@@ -649,99 +608,6 @@ public class SuvianTest {
 						.findElements(By.cssSelector(
 								".container .intro-message input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
-	}
-
-	@Test(enabled = false)
-	public void test7() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.7button.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("1.7button_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test8() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.8copyAndPasteText.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("1.8copyAndPasteText_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test9() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.9copyAndPasteTextAdvanced.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions
-					.urlContains("1.9copyAndPasteTextAdvanced_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test10() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions
-					.urlContains("1.10selectElementFromDD_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
-	}
-
-	@Test(enabled = false)
-	public void test11() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/2.1alert.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-
-		// Act
-
-		// Wait page to load
-		try {
-			wait.until(ExpectedConditions.urlContains("2.1alert_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
-		// Assert
 	}
 
 	@Test(enabled = false)
@@ -837,7 +703,7 @@ public class SuvianTest {
 		// Assert
 		assertThat(elementWithTooltip.getAttribute("title"),
 				equalTo("This is a tooltip."));
-		// How to discover whether core HTML tooltip is displayed ?
+		// How to discover whether core HTML tool tip is displayed ?
 
 	}
 
@@ -1110,6 +976,7 @@ public class SuvianTest {
 		// Assert
 		long retryInterval = 1000;
 		long maxRetry = 30;
+		String delayTime = null;
 		while (true) {
 			try {
 				// confirm alert
@@ -1121,8 +988,8 @@ public class SuvianTest {
 				long delaySecond = (checkRetryDelay / 1000) % 60;
 				long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
 				long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
-				String delayTime = String.format("%02d:%02d:%02d", delayHour,
-						delayMinute, delaySecond);
+				delayTime = String.format("%02d:%02d:%02d", delayHour, delayMinute,
+						delaySecond);
 
 				System.err.format("Alert not present after %s\n", delayTime);
 				// check if waited long enough already
@@ -1134,13 +1001,17 @@ public class SuvianTest {
 							Math.ceil(retryInterval / 1000)));
 					Thread.sleep(retryInterval);
 				} catch (InterruptedException e2) {
+					System.err.println("Unexpected Interrupted Exception: "
+							+ e.getStackTrace().toString());
+					throw new RuntimeException(e.toString());
 				}
 			} catch (Exception e) {
 				System.err
 						.println("Unexpected exception: " + e.getStackTrace().toString());
-				throw new RuntimeException();
+				throw new RuntimeException(e.toString());
 			}
 		}
+		System.err.format("Alert was confirmed at %s\n", delayTime);
 	}
 
 	@Test(enabled = false)
@@ -1188,8 +1059,6 @@ public class SuvianTest {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
 
-		// html body div.intro-header div.container div.row div.col-lg-12
-		// div.intro-message button.w3-btn.w3-dark-grey
 		WebElement button1 = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						".container .row .intro-message button:nth-of-type(1)"))));
