@@ -53,7 +53,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-
+import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -86,7 +86,8 @@ public class SuvianTest {
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
-	private String baseURL = "about:blank";
+	private static String baseURL = "about:blank";
+	private static final StringBuffer verificationErrors = new StringBuffer();
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
@@ -111,7 +112,11 @@ public class SuvianTest {
 	}
 
 	@AfterMethod
-	public void AfterMethod() {
+	public void AfterMethod(ITestResult result) {
+		if (verificationErrors.length() != 0) {
+			throw new RuntimeException(String.format("Error in the method %s : %s",
+					result.getMethod().getMethodName(), verificationErrors.toString()));
+		}
 		driver.get("about:blank");
 	}
 
@@ -608,6 +613,69 @@ public class SuvianTest {
 						.findElements(By.cssSelector(
 								".container .intro-message input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
+	}
+
+	@Test(enabled = true)
+	public void test10() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
+		WebElement buttonDropDown = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message div.dropdown button.dropbtn"))));
+
+		assertThat(buttonDropDown, notNullValue());
+		// Act
+		buttonDropDown.click();
+
+		wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message div.dropdown div#myDropdown"))));
+		List<WebElement> optionElements = driver
+				.findElements(By.cssSelector(
+						".container .row .intro-message div.dropdown div#myDropdown"))
+				.stream().filter(o -> o.getText().contains("Option 2"))
+				.collect(Collectors.toList());
+		assertTrue(optionElements.size() > 0);
+		String currentHandle = driver.getWindowHandle();
+		optionElements.get(0).click();
+
+		System.err.println("Inspecting driver Window handles");
+		Set<String> windowHandles = driver.getWindowHandles();
+		if (windowHandles.size() > 1) {
+			System.err.println(
+					"Found " + (windowHandles.size() - 1) + " additional tabs opened");
+		} else {
+			System.out.println("Thread: no other tabs");
+		}
+
+		Iterator<String> windowHandleIterator = windowHandles.iterator();
+		while (windowHandleIterator.hasNext()) {
+			String handle = (String) windowHandleIterator.next();
+			if (!handle.equals(currentHandle)) {
+				System.out.println("Switch to " + handle);
+				driver.switchTo().window(handle);
+				// Assert
+				try { // Wait page to reload
+					wait.until(new ExpectedCondition<Boolean>() {
+						@Override
+						public Boolean apply(WebDriver d) {
+							String t = d.getPageSource();
+							System.err.println(String.format("Page source:\n%s", t));
+							return t.contains(
+									"Congratulations.. You Selected option 2. Close this browser tab and proceed to end of Level 1.");
+						}
+					});
+				} catch (Exception e) {
+					System.err.println("Exception: " + e.toString());
+					verificationErrors.append(e.toString());
+					// throw new RuntimeException(e.toString());
+				}
+				// move, print attributes
+				System.out.println("Switch to main window.");
+				driver.switchTo().defaultContent();
+			}
+		}
+
 	}
 
 	@Test(enabled = false)
