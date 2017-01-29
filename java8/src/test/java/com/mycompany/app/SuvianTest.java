@@ -680,23 +680,54 @@ public class SuvianTest {
 		}
 	}
 
-  @Test(enabled = false)
+	@Test(enabled = true)
 	public void test12() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
-
-		wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		WebElement button = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message button.btn-warning"))));
+		assertThat(button, notNullValue());
+		final String currentHandle = driver.getWindowHandle();
 
 		// Act
+		button.click();
 
-		// Wait page to load
-		try {
-			wait.until(
-					ExpectedConditions.urlContains("2.2browserPopUp_validate.html"));
-		} catch (UnreachableBrowserException e) {
-		}
 		// Assert
+		try { // Wait for the new browser widow to get shown
+			String popupHandle = wait.until(new ExpectedCondition<String>() {
+				@Override
+				public String apply(WebDriver d) {
+					Boolean result = false;
+					System.err.println("Inspecting driver Window handles");
+					Set<String> windowHandles = d.getWindowHandles();
+					if (windowHandles.size() > 1) {
+						windowHandles.remove(currentHandle);
+						String s = (String) (windowHandles.toArray())[0];
+						System.err.println("Found popup window handle: " + s);
+						return s;
+					} else {
+						System.out.println("No popup found");
+						return null;
+					}
+				}
+			});
+			// Act
+			driver.switchTo().window(popupHandle);
+			System.out.println("Popup Title: " + driver.getTitle());
+			driver.close();
+			System.out.println("Closed popup");
+			driver.switchTo().window(currentHandle);
+			System.out.println("switched to parent window: " + currentHandle);
+			driver.switchTo().defaultContent();
+			System.out.println("switched to default content.");
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+			verificationErrors.append(e.toString());
+		}
+
+		// Assert
+		assertThat(driver.getWindowHandles().size(), is(1));
 	}
 
 	@Test(enabled = false)
