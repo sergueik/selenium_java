@@ -615,18 +615,17 @@ public class SuvianTest {
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test10() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
 		WebElement buttonDropDown = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						".container .row .intro-message div.dropdown button.dropbtn"))));
-
 		assertThat(buttonDropDown, notNullValue());
+
 		// Act
 		buttonDropDown.click();
-
 		wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						".container .row .intro-message div.dropdown div#myDropdown"))));
@@ -636,49 +635,52 @@ public class SuvianTest {
 				.stream().filter(o -> o.getText().contains("Option 2"))
 				.collect(Collectors.toList());
 		assertTrue(optionElements.size() > 0);
-		String currentHandle = driver.getWindowHandle();
+		final String currentHandle = driver.getWindowHandle();
+		final String text = "Congratulations.. You Selected option 2. Close this browser tab and proceed to end of Level 1.";
 		optionElements.get(0).click();
 
-		System.err.println("Inspecting driver Window handles");
-		Set<String> windowHandles = driver.getWindowHandles();
-		if (windowHandles.size() > 1) {
-			System.err.println(
-					"Found " + (windowHandles.size() - 1) + " additional tabs opened");
-		} else {
-			System.out.println("Thread: no other tabs");
-		}
-
-		Iterator<String> windowHandleIterator = windowHandles.iterator();
-		while (windowHandleIterator.hasNext()) {
-			String handle = (String) windowHandleIterator.next();
-			if (!handle.equals(currentHandle)) {
-				System.out.println("Switch to " + handle);
-				driver.switchTo().window(handle);
-				// Assert
-				try { // Wait page to reload
-					wait.until(new ExpectedCondition<Boolean>() {
-						@Override
-						public Boolean apply(WebDriver d) {
+		// Assert
+		try {
+			wait.until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					Boolean result = false;
+					System.err.println("Inspecting driver Window handles");
+					Set<String> windowHandles = d.getWindowHandles();
+					if (windowHandles.size() > 1) {
+						System.err.println("Found " + (windowHandles.size() - 1)
+								+ " additional tabs opened");
+					} else {
+						System.out.println("No other tabs found");
+						return false;
+					}
+					Iterator<String> windowHandleIterator = windowHandles.iterator();
+					while (windowHandleIterator.hasNext()) {
+						String handle = (String) windowHandleIterator.next();
+						if (!handle.equals(currentHandle)) {
+							System.out.println("Switch to: " + handle);
+							driver.switchTo().window(handle);
 							String t = d.getPageSource();
-							System.err.println(String.format("Page source:\n%s", t));
-							return t.contains(
-									"Congratulations.. You Selected option 2. Close this browser tab and proceed to end of Level 1.");
+							System.err.println(
+									String.format("Page source: %s", t.substring(0, 240)));
+							if (t.contains(text)) {
+								result = true;
+							}
+							System.out.println("Switch to the main window.");
+							driver.switchTo().defaultContent();
 						}
-					});
-				} catch (Exception e) {
-					System.err.println("Exception: " + e.toString());
-					verificationErrors.append(e.toString());
-					// throw new RuntimeException(e.toString());
+					}
+					return result;
 				}
-				// move, print attributes
-				System.out.println("Switch to main window.");
-				driver.switchTo().defaultContent();
-			}
+			});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+			verificationErrors.append(e.toString());
+			// throw new RuntimeException(e.toString());
 		}
-
 	}
 
-	@Test(enabled = false)
+  @Test(enabled = false)
 	public void test12() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
