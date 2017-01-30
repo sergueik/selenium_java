@@ -28,7 +28,7 @@ import java.io.InputStream;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -664,14 +664,14 @@ public class SuvianTest {
 							driver.switchTo().window(handle);
 							String t = d.getPageSource();
 							System.err.println(String.format("Page source: %s", t.substring(
-									org.apache.commons.lang.StringUtils.indexOf(t, "<body>"),
-									org.apache.commons.lang.StringUtils.indexOf(t, "</body>"))));
+									StringUtils.indexOf(t, "<body>"), t.length() - 1)));
 							if (t.contains(text)) {
 								System.err.println("Found text: " + text);
+
 								result = true;
 							}
 							if (result) {
-								System.err.println("Closing the browser tab: " + handle);
+								System.err.println("Close the browser tab: " + handle);
 								d.close();
 							}
 							System.err.println("Switch to the main window.");
@@ -1091,33 +1091,41 @@ public class SuvianTest {
 		// Assert
 		long retryInterval = 1000;
 		long maxRetry = 30;
-		String delayTime = null;
+		long checkRetryDelay = 0;
 		while (true) {
 			try {
 				// confirm alert
 				driver.switchTo().alert().accept();
 				break;
-			} catch (NoAlertPresentException ex1) {
+			} catch (NoAlertPresentException e) {
 				// check if waited long enough already
-				long checkRetryDelay = System.currentTimeMillis() - startTime;
-				long delaySecond = (checkRetryDelay / 1000) % 60;
-				long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
-				long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
-				delayTime = String.format("%02d:%02d:%02d", delayHour, delayMinute,
-						delaySecond);
-				System.err.format("Waited for %s...", delayTime);
+				checkRetryDelay = System.currentTimeMillis() - startTime;
 				if (Math.ceil(checkRetryDelay / retryInterval) > maxRetry + 1) {
+					System.err.format("Alert not present after %d second\n",
+							checkRetryDelay);
 					throw new RuntimeException();
 				}
 				try {
+					System.err.print(String.format("Sleep %4.2f sec ...",
+							Math.ceil(retryInterval / 1000)));
 					Thread.sleep(retryInterval);
-				} catch (InterruptedException ex2) {
-					System.err.println(
-							"Unexpected exception: " + ex2.getStackTrace().toString());
-					throw new RuntimeException(ex2.toString());
+				} catch (InterruptedException e2) {
+					System.err.println("Unexpected Interrupted Exception: "
+							+ e.getStackTrace().toString());
+					throw new RuntimeException(e.toString());
 				}
+			} catch (Exception e) {
+				System.err
+						.println("Unexpected exception: " + e.getStackTrace().toString());
+				throw new RuntimeException(e.toString());
 			}
 		}
+
+		long delaySecond = (checkRetryDelay / 1000) % 60;
+		long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
+		long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
+		String delayTime = String.format("%02d:%02d:%02d", delayHour, delayMinute,
+				delaySecond);
 		System.err.format("Alert was confirmed at %s\n", delayTime);
 	}
 
