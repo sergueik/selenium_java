@@ -53,6 +53,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -209,7 +210,7 @@ public class SuvianTest {
 							.iterator();
 					WebElement result = null;
 					// "(?:" + "Navigate Back" + ")"
-					Pattern pattern = Pattern.compile("Navigate Back",
+					Pattern pattern = Pattern.compile(Pattern.quote("Navigate Back"),
 							Pattern.CASE_INSENSITIVE);
 					while (i.hasNext()) {
 						WebElement e = (WebElement) i.next();
@@ -375,7 +376,8 @@ public class SuvianTest {
 		String line = new ArrayList<String>(
 				Arrays.asList(elementContents.split("<br/?>"))).stream()
 						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
-		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line); // Pattern.quote
+																																								// ?
 		String checkboxValue = null;
 		if (matcher.find()) {
 			checkboxValue = matcher.group(1);
@@ -615,7 +617,7 @@ public class SuvianTest {
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test10() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
@@ -658,15 +660,22 @@ public class SuvianTest {
 					while (windowHandleIterator.hasNext()) {
 						String handle = (String) windowHandleIterator.next();
 						if (!handle.equals(currentHandle)) {
-							System.out.println("Switch to: " + handle);
+							System.err.println("Switch to: " + handle);
 							driver.switchTo().window(handle);
 							String t = d.getPageSource();
-							System.err.println(
-									String.format("Page source: %s", t.substring(0, 240)));
+							System.err.println(String.format("Page source: %s", t.substring(
+									org.apache.commons.lang.StringUtils.indexOf(t, "<body>"),
+									org.apache.commons.lang.StringUtils.indexOf(t, "</body>"))));
 							if (t.contains(text)) {
+								System.err.println("Found text: " + text);
 								result = true;
 							}
-							System.out.println("Switch to the main window.");
+							if (result) {
+								System.err.println("Closing the browser tab: " + handle);
+								d.close();
+							}
+							System.err.println("Switch to the main window.");
+							driver.switchTo().window(currentHandle);
 							driver.switchTo().defaultContent();
 						}
 					}
@@ -727,7 +736,12 @@ public class SuvianTest {
 		}
 
 		// Assert
-		assertThat(driver.getWindowHandles().size(), is(1));
+		try {
+			assertThat(driver.getWindowHandles().size(), is(1));
+		} catch (AssertionError e) {
+			System.err.println("Exception: " + e.toString());
+			verificationErrors.append(e.toString());
+		}
 	}
 
 	@Test(enabled = false)
@@ -1083,33 +1097,25 @@ public class SuvianTest {
 				// confirm alert
 				driver.switchTo().alert().accept();
 				break;
-			} catch (NoAlertPresentException e) {
-				// Alert not present - ignore
+			} catch (NoAlertPresentException ex1) {
+				// check if waited long enough already
 				long checkRetryDelay = System.currentTimeMillis() - startTime;
 				long delaySecond = (checkRetryDelay / 1000) % 60;
 				long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
 				long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
 				delayTime = String.format("%02d:%02d:%02d", delayHour, delayMinute,
 						delaySecond);
-
-				System.err.format("Alert not present after %s\n", delayTime);
-				// check if waited long enough already
+				System.err.format("Waited for %s...", delayTime);
 				if (Math.ceil(checkRetryDelay / retryInterval) > maxRetry + 1) {
 					throw new RuntimeException();
 				}
 				try {
-					System.err.println(String.format("Sleep %4.2f sec",
-							Math.ceil(retryInterval / 1000)));
 					Thread.sleep(retryInterval);
-				} catch (InterruptedException e2) {
-					System.err.println("Unexpected Interrupted Exception: "
-							+ e.getStackTrace().toString());
-					throw new RuntimeException(e.toString());
+				} catch (InterruptedException ex2) {
+					System.err.println(
+							"Unexpected exception: " + ex2.getStackTrace().toString());
+					throw new RuntimeException(ex2.toString());
 				}
-			} catch (Exception e) {
-				System.err
-						.println("Unexpected exception: " + e.getStackTrace().toString());
-				throw new RuntimeException(e.toString());
 			}
 		}
 		System.err.format("Alert was confirmed at %s\n", delayTime);
