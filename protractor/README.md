@@ -1,3 +1,4 @@
+
 ### Note
 
 This github project is the 'development branch' of the collaborated project 
@@ -71,7 +72,8 @@ return angular.element(element).scope().$eval(expression)
 ```
 Evaluate an Angular expression in the context of a given element.
 
-Each method borrowed from __Protractor__ is a Javascript snippet stored in a separate file under
+The [Protractor By locators](http://www.protractortest.org/#/api?view=ProtractorBy) and a subset of Protractor Browser API 
+is borrowed from __Protractor__  project in a form of Javascript snippets - one file per method - stored in a separate file under
 `src/main/java/resources`:
 ```
 binding.js
@@ -306,7 +308,9 @@ java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_
   - [bbaia/protractor-net](https://github.com/bbaia/protractor-net)
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
   - [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory)
-
+  - [PiotrWysocki/globalsqa.com](https://github.com/PiotrWysocki/globalsqa.com) (NOTE: currently using regular Selenium locators with Angular pages)
+  - [http://www.globalsqa.com/angularjs-protractor-practice-site](http://www.globalsqa.com/angularjs-protractor-practice-site/)
+  
 ### Authors
 [Carlos Alexandro Becker](caarlos0@gmail.com)
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
