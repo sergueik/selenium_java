@@ -750,9 +750,13 @@ public class SuvianTest {
 	public void test12_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
-		WebElement button = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						".container .row .intro-message button.btn-warning"))));
+		wait.until(ExpectedConditions.textToBePresentInElement(
+				driver.findElement(By
+						.cssSelector(".container .row .intro-message button.btn-warning")),
+				"Click Me"));
+
+		WebElement button = driver.findElement(
+				By.cssSelector(".container .row .intro-message button.btn-warning"));
 		assertThat(button, notNullValue());
 		final String parentHandle = driver.getWindowHandle();
 
