@@ -617,7 +617,7 @@ public class SuvianTest {
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test10() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
@@ -663,8 +663,10 @@ public class SuvianTest {
 							System.err.println("Switch to: " + handle);
 							driver.switchTo().window(handle);
 							String t = d.getPageSource();
-							System.err.println(String.format("Page source: %s", t.substring(
-									StringUtils.indexOf(t, "<body>"), t.length() - 1)));
+							System.err.println(String.format("Page source: %s",
+									t.substring(
+											org.apache.commons.lang3.StringUtils.indexOf(t, "<body>"),
+											t.length() - 1)));
 							if (t.contains(text)) {
 								System.err.println("Found text: " + text);
 
@@ -689,15 +691,15 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
-	public void test12() {
+	@Test(enabled = false)
+	public void test12_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
 		WebElement button = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						".container .row .intro-message button.btn-warning"))));
 		assertThat(button, notNullValue());
-		final String currentHandle = driver.getWindowHandle();
+		final String parentHandle = driver.getWindowHandle();
 
 		// Act
 		button.click();
@@ -711,7 +713,7 @@ public class SuvianTest {
 					System.err.println("Inspecting driver Window handles");
 					Set<String> windowHandles = d.getWindowHandles();
 					if (windowHandles.size() > 1) {
-						windowHandles.remove(currentHandle);
+						windowHandles.remove(parentHandle);
 						String s = (String) (windowHandles.toArray())[0];
 						System.err.println("Found popup window handle: " + s);
 						return s;
@@ -726,8 +728,8 @@ public class SuvianTest {
 			System.out.println("Popup Title: " + driver.getTitle());
 			driver.close();
 			System.out.println("Closed popup");
-			driver.switchTo().window(currentHandle);
-			System.out.println("switched to parent window: " + currentHandle);
+			driver.switchTo().window(parentHandle);
+			System.out.println("switched to parent window: " + parentHandle);
 			driver.switchTo().defaultContent();
 			System.out.println("switched to default content.");
 		} catch (Exception e) {
@@ -735,6 +737,49 @@ public class SuvianTest {
 			verificationErrors.append(e.toString());
 		}
 
+		// Assert
+		try {
+			assertThat(driver.getWindowHandles().size(), is(1));
+		} catch (AssertionError e) {
+			System.err.println("Exception: " + e.toString());
+			verificationErrors.append(e.toString());
+		}
+	}
+
+	@Test(enabled = true)
+	public void test12_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
+		WebElement button = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message button.btn-warning"))));
+		assertThat(button, notNullValue());
+		final String parentHandle = driver.getWindowHandle();
+
+		// Act
+		button.click();
+		while (true) { // Wait for the new browser widow to get shown and close it
+			List<String> popupHandles = driver.getWindowHandles().stream()
+					.filter(((Predicate<String>) (o -> o.equalsIgnoreCase(parentHandle)))
+							.negate())
+					.collect(Collectors.toList());
+			if (popupHandles.size() > 0) {
+				driver.switchTo().window(popupHandles.get(0));
+				System.out.println("Popup Title: " + driver.getTitle());
+				driver.close();
+				System.out.println("Closed popup");
+				driver.switchTo().window(parentHandle);
+				System.out.println("switched to parent window: " + parentHandle);
+				driver.switchTo().defaultContent();
+				System.out.println("switched to default content.");
+				break;
+			} else {
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+				}
+			}
+		}
 		// Assert
 		try {
 			assertThat(driver.getWindowHandles().size(), is(1));
@@ -1076,7 +1121,7 @@ public class SuvianTest {
 				});
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test17() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.7waitUntil.html");
