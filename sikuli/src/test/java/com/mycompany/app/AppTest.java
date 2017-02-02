@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
@@ -104,6 +105,7 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testCalendar() {
 		driver.navigate().to(getPageContent("calendar.html"));
@@ -209,6 +211,116 @@ public class AppTest {
 		}
 	}
 
+	// @Ignore
+	@Test
+	// based on https://github.com/PiotrWysocki/phptravels.net
+	// /blob/master/src/test/java/net/phptravels/home/HeaderTopOnFirefox.java
+	public void test1Scroll() {
+		int width = 800;
+		int height = 600;
+		driver.manage().window().setSize(new Dimension(width, height));
+		String spanishFlagImage = fullPath("spanish_flag.png");
+		driver.get("http://phptravels.net/en");
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		// NOTE: goes even without
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+		try {
+			if (screen.exists(spanishFlagImage, sikuliTimeout) != null) {
+				System.err.println("Found Spanish language image.");
+				screen.click(spanishFlagImage, 0);
+			}
+		} catch (FindFailed e) {
+			System.err.println("Can not Find language image.");
+			verificationErrors.append(e.toString());
+		}
+
+		wait.until(ExpectedConditions.urlToBe("http://phptravels.net/es"));
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@Test
+	public void test2Scroll() {
+		int width = 400;
+		int height = 700;
+		driver.manage().window().setSize(new Dimension(width, height));
+		String ucrainianFlagImage = fullPath("uncrainian_flag.png");
+		driver.get("http://phptravels.net/en");
+		try {
+
+			WebElement navbarElement = wait
+					.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+							"//div[contains(@class, 'navbar')]//button[@class='navbar-toggle']"))));
+			System.err
+					.println("Found nabvar : " + navbarElement.getAttribute("class"));
+			highlight(navbarElement);
+			navbarElement.click();
+		} catch (Exception e) {
+
+			System.err.println("Ignored Exception : " + e.toString());
+
+		}
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		// NOTE: goes even without
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+		match = screen.exists(ucrainianFlagImage, sikuliTimeout);
+		if (match != null) {
+			System.err.println("Found Ucrainian language image.");
+			match.highlight((float) 1.0);
+			match.click();
+		} else {
+
+		}
+		wait.until(ExpectedConditions.urlToBe("http://phptravels.net/uk"));
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+	}
+
+	@Ignore
+	@Test
+	public void test3Scroll() {
+		int width = 800;
+		int height = 400;
+		driver.manage().window().setSize(new Dimension(width, height));
+		String spanishFlagImage = fullPath("spanish_flag.png");
+		driver.get("http://phptravels.net/en");
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		// NOTE: goes even without
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+		if (null != screen.exists(spanishFlagImage, sikuliTimeout)) {
+			try {
+				screen.click(spanishFlagImage, 0);
+			} catch (FindFailed e) {
+				verificationErrors.append(e.toString());
+			}
+		}
+		wait.until(ExpectedConditions.urlToBe("http://phptravels.net/es"));
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+
+	}
+
 	private String getPageContent(String pagename) {
 		try {
 			URI uri = AppTest.class.getClassLoader().getResource(pagename).toURI();
@@ -258,8 +370,13 @@ public class AppTest {
 		return AppTest.class.getClassLoader().getResource(fileName).getPath();
 	}
 
-  // http://stackoverflow.com/questions/21093570/force-page-zoom-at-100-with-js
-  // http://samples.msdn.microsoft.com/workshop/samples/author/dhtml/refs/zoom.htm#
+	// http://stackoverflow.com/questions/21093570/force-page-zoom-at-100-with-js
+	// http://samples.msdn.microsoft.com/workshop/samples/author/dhtml/refs/zoom.htm#
+	// http://jsfiddle.net/5RzJ8/
+	// var scale = 'scale(1)';
+	// document.body.style.webkitTransform = scale; // Chrome, Opera, Safari
+	// document.body.style.msTransform = scale; // IE 9
+	// document.body.style.transform = scale; // General
 	private void zoomPage() {
 		String script = "document.body.style.zoom = (top.window.screen.height - 70) / Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);";
 		executeScript(script);
