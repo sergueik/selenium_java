@@ -232,7 +232,7 @@ public class AppTest {
 		languageElement.click();
 		try {
 			if (screen.exists(spanishFlagImage, sikuliTimeout) != null) {
-				System.err.println("Found Spanish flag image.");
+				System.err.println("Found spanish flag image.");
 				screen.click(spanishFlagImage, 0);
 			}
 		} catch (FindFailed e) {
@@ -275,7 +275,7 @@ public class AppTest {
 		languageElement.click();
 		match = screen.exists(ucrainianFlagImage, sikuliTimeout);
 		if (match != null) {
-			System.err.println("Found Ucrainian flag image.");
+			System.err.println("Found ucrainian flag image.");
 			match.highlight((float) 1.0);
 			match.click();
 		} else {
@@ -288,7 +288,7 @@ public class AppTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testSikuliScroll() {
 		int width = 800;
@@ -349,7 +349,7 @@ public class AppTest {
 		while (!foundFlag) {
 			match = screen.exists(frenchFlagImage, sikuliTimeout);
 			if (match != null) {
-				System.err.println("Found French flag / language image.");
+				System.err.println("Found french flag / language image.");
 				match.highlight((float) 1.0);
 				match.click();
 				foundFlag = true;
@@ -359,7 +359,148 @@ public class AppTest {
 			}
 			if (keyCnt > 10) {
 				// give up
-				throw new RuntimeException("Cannot find French flag image.");
+				throw new RuntimeException("Cannot find french flag image.");
+			}
+		}
+		if (foundFlag) {
+			wait.until(ExpectedConditions.urlToBe("http://phptravels.net/fr"));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	// @Ignore
+	@Test
+	public void testSikuliDefultSimilarity() {
+		int width = 800;
+		int height = 400;
+		// With default settingd
+		// it will confuse malay flag with ucrainian
+		driver.manage().window().setSize(new Dimension(width, height));
+		String malayFlagImage = fullPath("malay_flag.png");
+		driver.get("http://phptravels.net/en");
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+
+		// Sikuli find or scroll is very slow
+		int keyCnt = 0;
+		boolean foundFlag = false;
+		while (!foundFlag) {
+			match = screen.exists(malayFlagImage, sikuliTimeout);
+			if (match != null) {
+				System.err.println("Thinks that found malay flag / language image.");
+				match.highlight((float) 1.0);
+				match.click();
+				foundFlag = true;
+			} else {
+				keyCnt++;
+				screen.type(Key.DOWN);
+			}
+			if (keyCnt > 10) {
+				// give up
+				throw new RuntimeException("Cannot find malay flag image.");
+			}
+		}
+		if (foundFlag) {
+			wait.until(ExpectedConditions.urlToBe("http://phptravels.net/uk"));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	@Ignore
+	@Test
+	public void testSikuliMinSimilarity() {
+		int width = 800;
+		int height = 400;
+		// With higher MinSimilarity settingd
+		// it will find the malay flag
+		Settings.MinSimilarity = 0.9;
+		driver.manage().window().setSize(new Dimension(width, height));
+		String malayFlagImage = fullPath("malay_flag.png");
+		driver.get("http://phptravels.net/en");
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+
+		// Sikuli find or scroll is very slow
+		int keyCnt = 0;
+		boolean foundFlag = false;
+		while (!foundFlag) {
+			match = screen.exists(malayFlagImage, sikuliTimeout);
+			if (match != null) {
+				System.err.println("Found malay flag / language image.");
+				match.highlight((float) 1.0);
+				match.click();
+				foundFlag = true;
+			} else {
+				keyCnt++;
+				screen.type(Key.DOWN);
+			}
+			if (keyCnt > 10) {
+				// give up
+				throw new RuntimeException("Cannot find malay flag image.");
+			}
+		}
+		if (foundFlag) {
+			wait.until(ExpectedConditions.urlToBe("http://phptravels.net/ms"));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	@Ignore
+	@Test
+	public void testSikuliScrollMiss() {
+		int width = 800;
+		int height = 400;
+		// Color differences are ignored by Sikuli
+		// it will confuse french and italian flags
+		// regardless of similarity setting
+		Settings.MinSimilarity = 0.9;
+		driver.manage().window().setSize(new Dimension(width, height));
+		String italianFlagImage = fullPath("italian_flag.png");
+		driver.get("http://phptravels.net/en");
+		WebElement languageElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
+
+		assertThat(languageElement, notNullValue());
+		highlight(languageElement);
+		languageElement.click();
+
+		// Sikuli find or scroll is very slow
+		int keyCnt = 0;
+		boolean foundFlag = false;
+		while (!foundFlag) {
+			match = screen.exists(italianFlagImage, sikuliTimeout);
+			if (match != null) {
+				System.err.println("Thinks that found italian flag / language image.");
+				match.highlight((float) 1.0);
+				match.click();
+				foundFlag = true;
+			} else {
+				keyCnt++;
+				screen.type(Key.DOWN);
+			}
+			if (keyCnt > 10) {
+				// give up
+				throw new RuntimeException("Cannot find italian flag image.");
 			}
 		}
 		if (foundFlag) {
