@@ -41,17 +41,20 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 import org.sikuli.basics.Settings;
 
 import org.sikuli.script.FindFailed;
+import org.sikuli.script.Key;
 import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Screen;
@@ -211,11 +214,11 @@ public class AppTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	// based on https://github.com/PiotrWysocki/phptravels.net
 	// /blob/master/src/test/java/net/phptravels/home/HeaderTopOnFirefox.java
-	public void test1Scroll() {
+	public void testSikuliFindBasic() {
 		int width = 800;
 		int height = 600;
 		driver.manage().window().setSize(new Dimension(width, height));
@@ -224,21 +227,18 @@ public class AppTest {
 		WebElement languageElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
 						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
-
-		// NOTE: goes even without
 		assertThat(languageElement, notNullValue());
 		highlight(languageElement);
 		languageElement.click();
 		try {
 			if (screen.exists(spanishFlagImage, sikuliTimeout) != null) {
-				System.err.println("Found Spanish language image.");
+				System.err.println("Found Spanish flag image.");
 				screen.click(spanishFlagImage, 0);
 			}
 		} catch (FindFailed e) {
-			System.err.println("Can not Find language image.");
+			System.err.println("Can not Find flag image.");
 			verificationErrors.append(e.toString());
 		}
-
 		wait.until(ExpectedConditions.urlToBe("http://phptravels.net/es"));
 		try {
 			Thread.sleep(100);
@@ -246,8 +246,9 @@ public class AppTest {
 		}
 	}
 
+	@Ignore
 	@Test
-	public void test2Scroll() {
+	public void testSikuliFindResponsive() {
 		int width = 400;
 		int height = 700;
 		driver.manage().window().setSize(new Dimension(width, height));
@@ -263,21 +264,18 @@ public class AppTest {
 			highlight(navbarElement);
 			navbarElement.click();
 		} catch (Exception e) {
-
 			System.err.println("Ignored Exception : " + e.toString());
-
 		}
 		WebElement languageElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
 						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
 
-		// NOTE: goes even without
 		assertThat(languageElement, notNullValue());
 		highlight(languageElement);
 		languageElement.click();
 		match = screen.exists(ucrainianFlagImage, sikuliTimeout);
 		if (match != null) {
-			System.err.println("Found Ucrainian language image.");
+			System.err.println("Found Ucrainian flag image.");
 			match.highlight((float) 1.0);
 			match.click();
 		} else {
@@ -290,35 +288,87 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void test3Scroll() {
+	public void testSikuliScroll() {
 		int width = 800;
 		int height = 400;
 		driver.manage().window().setSize(new Dimension(width, height));
-		String spanishFlagImage = fullPath("spanish_flag.png");
+		String frenchFlagImage = fullPath("french_flag.png");
 		driver.get("http://phptravels.net/en");
 		WebElement languageElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
 						"//div[contains(@class, 'navbar')]//a[@class='dropdown-toggle']"))));
 
-		// NOTE: goes even without
 		assertThat(languageElement, notNullValue());
 		highlight(languageElement);
 		languageElement.click();
-		if (null != screen.exists(spanishFlagImage, sikuliTimeout)) {
-			try {
-				screen.click(spanishFlagImage, 0);
-			} catch (FindFailed e) {
-				verificationErrors.append(e.toString());
+
+		// NOTE: has no effect
+		/*
+		 * languageElement.sendKeys(Keys.ARROW_DOWN);
+		 * actions.moveToElement(languageElement) .sendKeys(languageElement,
+		 * Keys.ARROW_DOWN).build().perform();
+		 */
+
+		// NOTE: with bad selector get unknown error: cannot focus element
+		/*
+		 * try { WebElement languageDropdownElement = wait
+		 * .until(ExpectedConditions.visibilityOf(driver
+		 * .findElement(By.cssSelector(
+		 * "body div.navbar div.container div.navbar div.navbar-collapse ul li"))));
+		 * assertThat(languageDropdownElement, notNullValue());
+		 * languageDropdownElement.sendKeys(Keys.ARROW_DOWN); } catch
+		 * (WebDriverException e) { System.err.println("Ignored Exception : " +
+		 * e.toString()); }
+		 */
+		// does not work: scrolls the whole page, drop down item list goes away
+		/*
+		 * WebElement navBarElement = wait
+		 * .until(ExpectedConditions.visibilityOf(driver
+		 * .findElement(By.cssSelector("div.navbar")))); assertThat(navBarElement,
+		 * notNullValue()); actions.sendKeys(navBarElement,
+		 * Keys.ARROW_DOWN).build().perform();
+		 */
+
+		// does not quite work: grabs the focus to and scrolls the whole page,
+		// drop down item list remains open
+		/*
+		 * try { WebElement languageDropdownElement = wait.until(
+		 * ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+		 * "body div.navbar div.container div.navbar div.navbar-collapse ul li"))));
+		 * assertThat(languageDropdownElement, notNullValue());
+		 * languageDropdownElement.sendKeys(Keys.ARROW_DOWN); } catch
+		 * (WebDriverException e) { System.err.println("Ignored Exception : " +
+		 * e.toString()); }
+		 */
+
+		// Sikuli find or scroll is very slow
+		int keyCnt = 0;
+		boolean foundFlag = false;
+		while (!foundFlag) {
+			match = screen.exists(frenchFlagImage, sikuliTimeout);
+			if (match != null) {
+				System.err.println("Found French flag / language image.");
+				match.highlight((float) 1.0);
+				match.click();
+				foundFlag = true;
+			} else {
+				keyCnt++;
+				screen.type(Key.DOWN);
+			}
+			if (keyCnt > 10) {
+				// give up
+				throw new RuntimeException("Cannot find French flag image.");
 			}
 		}
-		wait.until(ExpectedConditions.urlToBe("http://phptravels.net/es"));
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
+		if (foundFlag) {
+			wait.until(ExpectedConditions.urlToBe("http://phptravels.net/fr"));
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
 		}
-
 	}
 
 	private String getPageContent(String pagename) {
