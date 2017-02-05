@@ -86,6 +86,7 @@ public class KeyMasterTest {
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
 	private String baseURL = "about:blank";
+	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
@@ -106,7 +107,7 @@ public class KeyMasterTest {
 	}
 
 	@BeforeMethod
-	public void loadPage() {
+	public void loadBseURL() {
 		driver.get(baseURL);
 	}
 
@@ -115,7 +116,7 @@ public class KeyMasterTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true, priority = 1)
+	@Test(enabled = false, priority = 1)
 	public void testStatic() {
 		driver.get(getPageContent("keymaster.html"));
 		WebElement header = wait.until(
@@ -143,7 +144,7 @@ public class KeyMasterTest {
 		}
 	}
 
-	@Test(enabled = true, priority = 2)
+	@Test(enabled = false, priority = 2)
 	public void testDynamic() {
 		driver.get(getPageContent("blankpage.html"));
 		WebElement header = wait.until(
@@ -169,7 +170,7 @@ public class KeyMasterTest {
 		}
 	}
 
-	@Test(enabled = true, priority = 3)
+	@Test(enabled = false, priority = 3)
 	public void testElementSearch() {
 		driver.get(getPageContent("blankpage.html"));
 		WebElement header = wait.until(
@@ -182,7 +183,7 @@ public class KeyMasterTest {
 		actions.keyUp(Keys.CONTROL).build().perform();
 		// Assert
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
 	}
@@ -201,9 +202,51 @@ public class KeyMasterTest {
 		actions.keyUp(Keys.CONTROL).build().perform();
 		// Assert
 		try {
-			Thread.sleep(10000);
+			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
+		completeVisualSearch();
+		
+		// Assert
+		Object result = executeScript(getCommand);
+		/*
+		 * Result: { "Command": "GetXPathFromElement", "Caller":
+		 * "EventListener : mousedown", "CommandId":
+		 * "96102922-fac9-4a0c-9ae8-9cc06a38ea18", "CssSelector":
+		 * "article#home > section > div:nth-of-type(2) > div:nth-of-type(16) > div > farefinder-compact > div > div > div > h3 > span"
+		 * , "ElementId": "", "XPathValue":
+		 * "id(\"home\")/section[1]/div[2]/div[16]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
+		 * }
+		 */
+		System.err.println("Result: " + result.toString());
+	}
+
+	@Test(enabled = true, priority = 5)
+	public void testElementSearchWithInput() {
+		driver.get(getPageContent("blankpage.html"));
+		WebElement header = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		highlight(header);
+		// header.sendKeys("o");
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(header).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+
+		try {
+			Thread.sleep(200);
+		} catch (InterruptedException e) {
+		}
+
+		// Assert, Act
+		completeVisualSearch();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		Object result = executeScript(getCommand);
+		System.err.println("Result: " + result.toString());
 	}
 
 	private void highlight(WebElement element) {
@@ -217,20 +260,34 @@ public class KeyMasterTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'", element);
-			}
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
 			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver)
-						.executeScript("arguments[0].style.border=''", element);
-			}
+			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
 	}
 
+	private void completeVisualSearch() {
+		
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+		assertThat(swdControl, notNullValue());
+		// System.err.println("Swd Control:" +
+		// swdControl.getAttribute("innerHTML"));
+		WebElement swdCodeID = wait.until(ExpectedConditions
+				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
+		assertThat(swdCodeID, notNullValue());
+		swdCodeID.clear();
+		swdCodeID.sendKeys("test code id");
+		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
+				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
+		assertThat(swdControl, notNullValue()	);
+		highlight(swdCloseButton);
+		// Act
+		swdCloseButton.click();		
+	}
+	
 	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
