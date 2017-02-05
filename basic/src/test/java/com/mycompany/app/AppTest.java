@@ -129,7 +129,7 @@ public class AppTest {
 		assertEquals("Hotels", findElement("link_text", "Hotels").getText());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void test1() {
 		element = findElement("link_text", "Hotels");
@@ -144,7 +144,7 @@ public class AppTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void test2() {
 		element = findElement("link_text", "Hotels");
@@ -154,10 +154,6 @@ public class AppTest {
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
 				selector);
-        // Firebug:
-    // html body.ltr.domn_en_US.lang_en.globalNav2011_reset.css_commerce_buttons.flat_buttons.sitewide.xo_pin_user_review_to_top.track_back 
-    // div#PAGE.non_hotels_like.desktop.scopedSearch 
-    // div#HEAD div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled div.tabsBar ul.tabs li.tabItem.dropDownJS.jsNavMenu.hvrIE6 span.tabLink.arwLink a.arrow_text.pid2972
 		// without class attributes:
 		// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a"
 		try {
@@ -173,11 +169,13 @@ public class AppTest {
 	public void test3() {
 		element = findElement("link_text", "Hotels");
 		highlight(element);
+		selector = cssSelectorOfElement(element);
+		System.err.println("test 3: selector (standard): " + selector);
 		selector = cssSelectorOfElementAlternative(element);
 		System.err.println("test 3: selector (alternative) : " + selector);
-		//assertEquals(
-		//		"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled. > div..tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
-		//		selector);
+		assertEquals(
+				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
+				selector);
 		// without class attributes:
 		// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a"
 		try {
@@ -193,9 +191,9 @@ public class AppTest {
 	public void test4() {
 		element = findElement("css_selector", "input#mainSearch");
 		selector = cssSelectorOfElement(element);
-    // System.err.println("test 4: selector: " + selector);
+		// System.err.println("test 4: selector: " + selector);
 		assertEquals("input#mainSearch", selector);
-    highlight(element);
+		highlight(element);
 	}
 
 	@Ignore
@@ -205,7 +203,7 @@ public class AppTest {
 				.findElement(By.cssSelector("div span.label"));
 		selector = cssSelectorOfElement(element);
 		// System.err.println("test 5: selector: " + selector);
-		assertEquals("span#rdoFlights > div.header > span.label", selector);    
+		assertEquals("span#rdoFlights > div.header > span.label", selector);
 		highlight(element);
 	}
 
