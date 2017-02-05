@@ -84,11 +84,7 @@ public class AppTest {
 	private static int flexible_wait_interval = 5;
 	private static long wait_polling_interval = 500;
 	private static long highlight_interval = 100;
-	private static String cssSelectorOfElementFinderScript;
-	private static String cssSelectorOfElementAlternativeFinderScript;
-	private static String xpathOfElementFinderScript;
-	private static String getStyleScript;
-	private static String baseUrl = "http://www.tripadvisor.com/";
+	private static String baseURL = "http://www.tripadvisor.com/";
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(AppTest.class);
@@ -113,19 +109,17 @@ public class AppTest {
 
 		wait = new WebDriverWait(driver, flexible_wait_interval);
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		driver.get(baseUrl);
+		driver.get(baseURL);
 		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
 				TimeUnit.SECONDS);
-		try {
-			cssSelectorOfElementFinderScript = getScriptContent(
-					"cssSelectorOfElement.js");
-			cssSelectorOfElementAlternativeFinderScript = getScriptContent(
-					"cssSelectorOfElementAlternative.js");
-			xpathOfElementFinderScript = getScriptContent("xpathOfElement.js");
-			getStyleScript = getScriptContent("getStyle.js");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
+	}
+
+	@AfterClass
+	public static void tearDown() throws Exception {
+		driver.close();
+		driver.quit();
+		if (verificationErrors.length() != 0) {
+			throw new Exception(verificationErrors.toString());
 		}
 	}
 
@@ -135,9 +129,9 @@ public class AppTest {
 		assertEquals("Hotels", findElement("link_text", "Hotels").getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void xpathOfElementTest() {
+	public void test1() {
 		element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = xpathOfElement(element);
@@ -146,63 +140,106 @@ public class AppTest {
 			element = findElement("xpath", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
-			verificationErrors.append(e.toString());
+			verificationErrors.append("test 1: " + e.toString());
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void cssSelectorOfElementWithIdInParentTest() {
+	public void test2() {
 		element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = cssSelectorOfElement(element);
-		assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
+		System.err.println("test 2: selector: " + selector);
+		assertEquals(
+				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
 				selector);
+        // Firebug:
+    // html body.ltr.domn_en_US.lang_en.globalNav2011_reset.css_commerce_buttons.flat_buttons.sitewide.xo_pin_user_review_to_top.track_back 
+    // div#PAGE.non_hotels_like.desktop.scopedSearch 
+    // div#HEAD div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled div.tabsBar ul.tabs li.tabItem.dropDownJS.jsNavMenu.hvrIE6 span.tabLink.arwLink a.arrow_text.pid2972
+		// without class attributes:
+		// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a"
 		try {
 			element = findElement("css_selector", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
-			verificationErrors.append(e.toString());
+			verificationErrors.append("test 2: " + e.toString());
+		}
+	}
+
+	// @Ignore
+	@Test
+	public void test3() {
+		element = findElement("link_text", "Hotels");
+		highlight(element);
+		selector = cssSelectorOfElementAlternative(element);
+		System.err.println("test 3: selector (alternative) : " + selector);
+		//assertEquals(
+		//		"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled. > div..tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
+		//		selector);
+		// without class attributes:
+		// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a"
+		try {
+			element = findElement("css_selector", selector);
+			highlight(element);
+		} catch (NullPointerException e) {
+			verificationErrors.append("test 3: " + e.toString());
 		}
 	}
 
 	@Ignore
 	@Test
-	public void cssSelectorOfElementTest() {
+	public void test4() {
 		element = findElement("css_selector", "input#mainSearch");
 		selector = cssSelectorOfElement(element);
-		highlight(element);
+    // System.err.println("test 4: selector: " + selector);
 		assertEquals("input#mainSearch", selector);
+    highlight(element);
 	}
 
 	@Ignore
 	@Test
-	public void cssSelectorOfElementWithIdTest() {
+	public void test5() {
+		element = findElement("css_selector", "span#rdoFlights")
+				.findElement(By.cssSelector("div span.label"));
+		selector = cssSelectorOfElement(element);
+		// System.err.println("test 5: selector: " + selector);
+		assertEquals("span#rdoFlights > div.header > span.label", selector);    
+		highlight(element);
+	}
+
+	@Ignore
+	@Test
+	public void test6() {
 		element = findElement("id", "searchbox");
 		selector = cssSelectorOfElement(element);
+		// System.err.println("test 6: selector: " + selector);
+		assertEquals("input#searchbox", selector);
 		highlight(element);
 	}
 
 	@Ignore
 	@Test
-	public void testcssSelectorOfElementAlternative() {
+	public void test7() {
 		element = findElement("id", "searchbox");
 		highlight(element);
 		selector = cssSelectorOfElementAlternative(element);
-		// System.err.println("css_selector: " + selector );
+		// System.err.println("test 7: selector (alternative): " + selector);
 		assertEquals(
-				"form[name=\"PTPT_HAC_FORM\"] > div > div > label > input[name=\"q\"]",
+				"form[name=\"PTPT_HAC_FORM\"] > div.metaFormWrapper > div.metaFormLine.flex > label.ptptLabelWrap > input[name=\"q\"]",
 				selector);
 		try {
 			element = findElement("css_selector", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
-			verificationErrors.append(e.toString());
+			verificationErrors.append("test 7: " + e.toString());
 		}
 	}
 
+	@Ignore
 	@Test
-	public void testStyleOfElement() {
+	public void test8() {
 
 		element = findElement("link_text", "Hotels");
 		assertThat(element, notNullValue());
@@ -241,33 +278,26 @@ public class AppTest {
 		}
 		System.err.println("width:" + widthAttribute);
 
-    System.err.println("examine height attribute: " + heightAttribute);
+		System.err.println("examine height attribute: " + heightAttribute);
 		// broken after 431eac6a3baa
 		// Assert.assertTrue(height.equals("12px"));
 		// print css values
 		// System.err.println("height:" + heightAttribute);
 	}
 
-	@AfterClass
-	public static void tearDown() throws Exception {
-		driver.close();
-		driver.quit();
-		if (verificationErrors.length() != 0) {
-			throw new Exception(verificationErrors.toString());
-		}
-	}
-
 	private String cssSelectorOfElement(WebElement element) {
-		return (String) executeScript(cssSelectorOfElementFinderScript, element);
+		return (String) executeScript(getScriptContent("cssSelectorOfElement.js"),
+				element);
 	}
 
 	private String styleOfElement(WebElement element, Object... arguments) {
-		return (String) executeScript(getStyleScript, element, arguments);
+		return (String) executeScript(getScriptContent("getStyle.js"), element,
+				arguments);
 	}
 
 	private String cssSelectorOfElementAlternative(WebElement element) {
-		return (String) executeScript(cssSelectorOfElementAlternativeFinderScript,
-				element);
+		return (String) executeScript(
+				getScriptContent("cssSelectorOfElementAlternative.js"), element);
 	}
 
 	private void highlight(WebElement element) {
@@ -277,27 +307,22 @@ public class AppTest {
 	private static void highlight(WebElement element, long highlight) {
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'",
-						new Object[] { element });
-			}
+			executeScript("arguments[0].style.border='3px solid yellow'",
+					new Object[] { element });
 			Thread.sleep(highlight);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border=''", new Object[] { element });
-			}
+			executeScript("arguments[0].style.border=''", new Object[] { element });
+
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
 	}
 
 	private String xpathOfElement(WebElement element) {
-		return (String) executeScript(xpathOfElementFinderScript,
+		return (String) executeScript(getScriptContent("xpathOfElement.js"),
 				new Object[] { element });
 	}
 
-	public Object executeScript(String script, Object... arguments) {
+	public static Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver); // a.k.a. (JavascriptExecutor) driver;
@@ -426,7 +451,7 @@ public class AppTest {
 		return element;
 	}
 
-	protected static String getScriptContent(String scriptName) throws Exception {
+	protected static String getScriptContent(String scriptName) {
 		try {
 			final InputStream stream = AppTest.class.getClassLoader()
 					.getResourceAsStream(scriptName);
@@ -434,7 +459,7 @@ public class AppTest {
 			stream.read(bytes);
 			return new String(bytes, "UTF-8");
 		} catch (IOException e) {
-			throw new Exception(scriptName);
+			throw new RuntimeException("Cannot load file: " + scriptName);
 		}
 	}
 
@@ -600,11 +625,8 @@ public class AppTest {
 	public static void highlight(By locator) throws InterruptedException {
 		log.info("Highlighting element {}", locator);
 		WebElement element = driver.findElement(locator);
-		((JavascriptExecutor) driver)
-				.executeScript("arguments[0].style.border='3px solid yellow'", element);
+		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight_interval);
-		((JavascriptExecutor) driver).executeScript("arguments[0].style.border=''",
-				element);
+		executeScript("arguments[0].style.border=''", element);
 	}
-
 }

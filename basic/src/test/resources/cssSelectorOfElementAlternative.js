@@ -1,31 +1,32 @@
-cssSelectorOfElementAlternative = function(element) {
-	var query = '';
+cssSelectorOfElement = function(element) {
+	var selector = '';
 
 	if (element == document)
-		query = 'body';
+		selector = 'body';
 	else {
 		var attr = ['ng-model', 'ng-href', 'name', 'aria-label'].reduce(function(a, b) {
 			return a || (element.getAttribute(b) ? b : null);
 		}, null);
 		if (attr)
-			query = element.tagName.toLowerCase() + '[' + attr + '="' + element.getAttribute(attr).replace(/\\/g, '\\\\').replace(/\'/g, '\\\'').replace(/\"/g, '\\"').replace(/\0/g, '\\0') + '"]';
+			selector = element.tagName.toLowerCase() + '[' + attr + '="' + element.getAttribute(attr).replace(/\\/g, '\\\\').replace(/\'/g, '\\\'').replace(/\"/g, '\\"').replace(/\0/g, '\\0') + '"]';
+		else if (element.className)
+			selector = element.tagName.toLowerCase() + '.' + element.className.replace(/^\s+/,'').replace(/\s+$/,'').replace(/\s+/g, '.');
 		else
-			query = element.tagName.toLowerCase();
-
-		var nodes = element.parentNode.querySelectorAll(query);
+			selector = element.tagName.toLowerCase();
+		var nodes = element.parentNode.querySelectorAll(selector);
 		if (nodes && nodes.length > 1)
-      var elementIndex = Array.prototype.slice.call(nodes).indexOf(element);
-      if (elementIndex > 0 ) {
-        query += ':nth-of-type(' + (elementIndex + 1).toString() + ')';
-      }
+			var elementIndex = Array.prototype.slice.call(nodes).indexOf(element);
+		if (elementIndex > 0) {
+			selector += ':nth-of-type(' + (elementIndex + 1).toString() + ')';
+		}
 
-		query = query.replace(/\s/g, ' ');
+		selector = selector.replace(/\s/g, ' ');
 	}
 
-	if (document.querySelectorAll(query).length > 1 && element.parentNode)
-		query = cssSelectorOfElementAlternative(element.parentNode) + ' > ' + query;
+	if (document.querySelectorAll(selector).length > 1 && element.parentNode)
+		selector = cssSelectorOfElement(element.parentNode) + ' > ' + selector;
 
-	return query;
+	return selector;
 };
 
-return cssSelectorOfElementAlternative(arguments[0]);
+return cssSelectorOfElement(arguments[0]);

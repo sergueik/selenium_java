@@ -1,4 +1,4 @@
-cssSelectorOfElement = function (element) {
+cssSelectorOfElement = function(element) {
 	if (!(element instanceof Element))
 		return;
 	var path = [];
@@ -12,6 +12,8 @@ cssSelectorOfElement = function (element) {
 			}
 			path.unshift(selector);
 			break;
+		} else if (element.className) {
+			selector += '.' + element.className.replace(/^\s+/,'').replace(/\s+$/,'').replace(/\s+/g, '.');
 		} else {
 			var element_sibling = element;
 			var sibling_cnt = 1;
