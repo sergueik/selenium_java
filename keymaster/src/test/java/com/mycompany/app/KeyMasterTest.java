@@ -112,7 +112,7 @@ public class KeyMasterTest {
 	}
 
 	@BeforeMethod
-	public void loadBseURL() {
+	public void loadBaseURL() {
 		driver.get(baseURL);
 	}
 
@@ -124,67 +124,43 @@ public class KeyMasterTest {
 	@Test(enabled = false, priority = 1)
 	public void testStatic() {
 		driver.get(getPageContent("keymaster.html"));
-		WebElement header = wait.until(
+		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
-		highlight(header);
-		actions.moveToElement(header).sendKeys("o").build().perform();
+		highlight(element);
+		actions.moveToElement(element).sendKeys("o").build().perform();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 		// Assert
-		try {
-			// confirm alert
-			driver.switchTo().alert().accept();
-		} catch (NoAlertPresentException e) {
-			throw new RuntimeException("Alert was not present.");
-		} catch (WebDriverException e) {
-			System.err
-					.println("Alert was not handled : " + e.getStackTrace().toString());
-			return;
-		}
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		confirmAlertIsPresent();
 	}
 
 	@Test(enabled = false, priority = 2)
-	public void testDynamic() {
+	public void testBlankPageKeyMasterInjection() {
 		driver.get(getPageContent("blankpage.html"));
-		WebElement header = wait.until(
+		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		injectKeyMaster(Optional.<String> empty());
-		highlight(header);
-		actions.moveToElement(header).sendKeys("o").build().perform();
+		highlight(element);
+		actions.moveToElement(element).sendKeys("o").build().perform();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 		// Assert
-		try {
-			// confirm alert
-			driver.switchTo().alert().accept();
-		} catch (NoAlertPresentException e) {
-			throw new RuntimeException("Alert was not present.");
-
-		} catch (WebDriverException e) {
-			System.err
-					.println("Alert was not handled : " + e.getStackTrace().toString());
-			return;
-		}
+		confirmAlertIsPresent();
 	}
 
 	@Test(enabled = false, priority = 3)
-	public void testElementSearch() {
+	public void testBlankPageElementSearch() {
 		driver.get(getPageContent("blankpage.html"));
-		WebElement header = wait.until(
+		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
-		highlight(header);
-		// header.sendKeys("o");
+		highlight(element);
 		actions.keyDown(Keys.CONTROL).build().perform();
-		actions.moveToElement(header).contextClick().build().perform();
+		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
 		// Assert
 		try {
@@ -194,7 +170,7 @@ public class KeyMasterTest {
 	}
 
 	@Test(enabled = false, priority = 4)
-	public void testElementSearch2() {
+	public void testWebPageElementSearch() {
 		driver.get("https://www.ryanair.com/ie/en/");
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
@@ -219,31 +195,95 @@ public class KeyMasterTest {
 		readVisualSearchResult(result);
 	}
 
-	@Test(enabled = true, priority = 5)
-	public void testElementSearchWithInput() {
-		driver.get(getPageContent("blankpage.html"));
-		WebElement header = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
-		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
-		highlight(header);
-		String result = (String) executeScript(getCommand);
-		assertTrue(result.isEmpty());
-		// header.sendKeys("o");
-		actions.keyDown(Keys.CONTROL).build().perform();
-		actions.moveToElement(header).contextClick().build().perform();
-		actions.keyUp(Keys.CONTROL).build().perform();
-
+	@Test(enabled = false, priority = 5)
+	public void testWebPageVanillaKeyMasterInjection() {
+		driver.get("https://www.ryanair.com/ie/en/");
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+		injectKeyMaster(Optional.<String> empty());
+		highlight(element);
+		// Assert
+		actions.moveToElement(element).sendKeys("o").build().perform();
 		try {
-			Thread.sleep(200);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
+		// Assert
+		confirmAlertIsPresent();
+	}
 
-		// Assert, Act
-		completeVisualSearch();
+	// This test is failing
+	@Test(enabled = true, priority = 6)
+	public void testWebPageKeyMasterElementSearchInjection() {
+		driver.get("https://www.ryanair.com/ie/en/");
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		highlight(element);
+		// Act
+		actions.moveToElement(element).sendKeys("o").build().perform();
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
+		// Assert
+		confirmAlertIsPresent();
+    // Act
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(element).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+		// Assert
+		String result = executeScript(getCommand).toString();
+		assertFalse(result.isEmpty());
+		readVisualSearchResult(result);
+	}
+
+	@Test(enabled = true, priority = 7)
+	public void testBlankPageKeyMasterElementSearchInjection() {
+		driver.get(getPageContent("blankpage.html"));
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		highlight(element);
+		// Act
+		actions.moveToElement(element).sendKeys("o").build().perform();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		confirmAlertIsPresent();
+    // Act
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(element).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+		// Assert
+		String result = executeScript(getCommand).toString();
+		assertFalse(result.isEmpty());
+		readVisualSearchResult(result);
+	}
+
+	@Test(enabled = false, priority = 8)
+	public void testElementSearchResult() {
+		driver.get(getPageContent("blankpage.html"));
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		highlight(element);
+		String result = (String) executeScript(getCommand);
+		assertTrue(result.isEmpty());
+		// Act
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(element).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert, Act
+		completeVisualSearch();
 		// Assert
 		result = executeScript(getCommand).toString();
 		assertFalse(result.isEmpty());
@@ -326,10 +366,14 @@ public class KeyMasterTest {
 	private void injectKeyMaster(Optional<String> script) {
 
 		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
-				getScriptContent("keymaster.js"), script.isPresent() ? script.get()
-						: "key('o, enter, left', function(){ window.alert('o, enter or left pressed!');});"));
+				getScriptContent("keymaster.js"),
+				"key('o, enter, left', function(){ window.alert('o, enter or left pressed!');});"));
+		if (script.isPresent()) {
+			scripts.add(script.get());
+		}
 		for (String s : scripts) {
-			executeScript(s);
+			if (s != null)
+				executeScript(s);
 		}
 	}
 
@@ -354,6 +398,20 @@ public class KeyMasterTest {
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
 																			// supported in -source 1.6
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void confirmAlertIsPresent() {
+		try {
+			// confirm alert
+			driver.switchTo().alert().accept();
+		} catch (NoAlertPresentException e) {
+			throw new RuntimeException("Alert was not present.");
+
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
 		}
 	}
 }

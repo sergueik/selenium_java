@@ -84,6 +84,8 @@ getElementId = function(element) {
                  }
                  path.unshift(selector);
                  break;
+             } else if (element.className) {
+               selector += '.' + '.' + element.className.replace(/^\s+/,'').replace(/\s+$/,'').replace(/\s+/g, '.');
              } else {
                  var element_sibling = element;
                  var sibling_cnt = 1;
