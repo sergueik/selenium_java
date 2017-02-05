@@ -37,6 +37,7 @@ import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.endsWith;
 import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -75,6 +76,10 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class KeyMasterTest {
 
@@ -188,7 +193,7 @@ public class KeyMasterTest {
 		}
 	}
 
-	@Test(enabled = true, priority = 4)
+	@Test(enabled = false, priority = 4)
 	public void testElementSearch2() {
 		driver.get("https://www.ryanair.com/ie/en/");
 		WebElement element = wait.until(
@@ -196,6 +201,7 @@ public class KeyMasterTest {
 						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
 		highlight(element);
+		// Assert
 		// header.sendKeys("o");
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(element).contextClick().build().perform();
@@ -206,19 +212,11 @@ public class KeyMasterTest {
 		} catch (InterruptedException e) {
 		}
 		completeVisualSearch();
-		
+
 		// Assert
-		Object result = executeScript(getCommand);
-		/*
-		 * Result: { "Command": "GetXPathFromElement", "Caller":
-		 * "EventListener : mousedown", "CommandId":
-		 * "96102922-fac9-4a0c-9ae8-9cc06a38ea18", "CssSelector":
-		 * "article#home > section > div:nth-of-type(2) > div:nth-of-type(16) > div > farefinder-compact > div > div > div > h3 > span"
-		 * , "ElementId": "", "XPathValue":
-		 * "id(\"home\")/section[1]/div[2]/div[16]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
-		 * }
-		 */
-		System.err.println("Result: " + result.toString());
+		String result = (String) executeScript(getCommand);
+		assertFalse(result.isEmpty());
+		readVisualSearchResult(result);
 	}
 
 	@Test(enabled = true, priority = 5)
@@ -228,6 +226,8 @@ public class KeyMasterTest {
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
 		highlight(header);
+		String result = (String) executeScript(getCommand);
+		assertTrue(result.isEmpty());
 		// header.sendKeys("o");
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(header).contextClick().build().perform();
@@ -245,8 +245,33 @@ public class KeyMasterTest {
 		} catch (InterruptedException e) {
 		}
 		// Assert
-		Object result = executeScript(getCommand);
-		System.err.println("Result: " + result.toString());
+		result = executeScript(getCommand).toString();
+		assertFalse(result.isEmpty());
+		readVisualSearchResult(result);
+
+	}
+
+	private void readVisualSearchResult(final String result) {
+		System.err.println("Processing result: " + result);
+		ArrayList<String> keys = new ArrayList<String>();
+		try {
+			JSONObject resultObj = new JSONObject(result);
+			Iterator<String> keyIterator = resultObj.keys();
+			while (keyIterator.hasNext()) {
+				String key = keyIterator.next();
+				String val = resultObj.getString(key);
+				System.err.println(key + " " + val);
+				keys.add(key);
+				/*
+				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
+				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
+				 * dataArray.get(cnt)); }
+				 */
+			}
+		} catch (JSONException e) {
+
+		}
+		assertThat(keys, hasItem("ElementId"));
 	}
 
 	private void highlight(WebElement element) {
@@ -264,12 +289,12 @@ public class KeyMasterTest {
 			Thread.sleep(highlight_interval);
 			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
+			System.err.println("Ignored: " + e.toString());
 		}
 	}
 
 	private void completeVisualSearch() {
-		
+
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
@@ -282,12 +307,12 @@ public class KeyMasterTest {
 		swdCodeID.sendKeys("test code id");
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
-		assertThat(swdControl, notNullValue()	);
+		assertThat(swdControl, notNullValue());
 		highlight(swdCloseButton);
 		// Act
-		swdCloseButton.click();		
+		swdCloseButton.click();
 	}
-	
+
 	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
