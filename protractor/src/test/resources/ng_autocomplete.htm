@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<!-- origin:
+http://jsfiddle.net/9my6vx4x/ 
+https://github.com/jirikuchta/angular-szn-autocomplete
+-->
+<html>
+<head>
+<style>
+body {font: 11px arial, sans-serif; }
+
+#wrap {
+    max-width: 500px;
+    position: relative;
+}
+
+input[szn-autocomplete],
+.szn-autocomplete-shadow-input {
+    width: 100%;
+    border: 1px solid #707070;
+    color: #222;
+    padding: 5px 10px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.szn-autocomplete-shadow-input {
+    color: #666;
+}
+
+.szn-autocomplete-results {
+    padding: 0;
+    width: 100%;
+}
+
+.szn-autocomplete-results li {
+    padding: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+.szn-autocomplete-results h5 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: normal;
+}
+
+.szn-autocomplete-results p {
+    margin: 0;
+    white-space: normal;
+    font-size: 13px;
+}
+
+.szn-autocomplete-results .wordcount {
+    font-size: 13px;
+    color: #707070;
+}
+</style>
+<script src='https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.js'>
+</script>
+<script src='http://jirikuchta.github.io/angular-szn-autocomplete/src/angular-szn-autocomplete.js'>
+</script>
+<script type='text/javascript'>
+var myApp = angular.module('myApp', ['angular-szn-autocomplete', 'demo_template.htm']);
+
+myApp.controller('myCtrl', function($scope, $http) {
+
+    // directive configuration object
+    $scope.options = {
+        shadowInput: true,
+        highlightFirst: true,
+        searchMethod: 'search',
+        templateUrl: 'demo_template.htm'
+    };
+
+    $scope.search = function(query, deferred) {
+        var url = 'http://jkuchta.cz/wikisearch/?action=query&list=search&srsearch=intitle:' + query + '&format=json&srprop=wordcount%7Csnippet&continue&srlimit=5';
+
+        $http.get(url).success((function(deferred, data) { // send request     
+
+            // format data 
+            var results = [];
+            data.query.search.forEach(function(item) {
+                results.push({
+                    value: item.title,
+                    perex: item.snippet,
+                    wordcount: item.wordcount
+                });
+            });
+
+            // resolve the deferred object
+            deferred.resolve({
+                results: results
+            });
+        }).bind(this, deferred));
+    };
+});
+
+// custom template for popup
+angular.module('demo_template.htm', []).run(["$templateCache", function($templateCache) {
+    $templateCache.put('demo_template.htm',
+        '<ul ng-show="show" class="szn-autocomplete-results">\n' +
+        '<li szn-autocomplete-result  ng-repeat="result in results" ng-class="{selected: highlightIndex == $index}">\n' +
+        '<div><span view-as-html="result.value | sznAutocompleteBoldMatch:query"></span><span class="wordcount"> ({{result.wordcount}} words)</span></span></div>\n' +
+        '<p view-as-html="result.perex"></p>\n' +
+        '</li>\n' +
+        '</ul>'
+    );
+}]);
+</script>
+</head>
+<body ng-app='myApp' ng-controller='myCtrl'>
+  <div id='wrap'>
+    <input ng-model='query' szn-autocomplete='options' placeholder='Search for Wikipedia articles...'/> 
+  </div>
+</body>
+</html>
