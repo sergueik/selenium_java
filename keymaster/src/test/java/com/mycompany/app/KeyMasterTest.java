@@ -230,7 +230,7 @@ public class KeyMasterTest {
 		}
 		// Assert
 		confirmAlertIsPresent();
-    // Act
+		// Act
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
@@ -255,7 +255,7 @@ public class KeyMasterTest {
 		}
 		// Assert
 		confirmAlertIsPresent();
-    // Act
+		// Act
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
@@ -367,7 +367,7 @@ public class KeyMasterTest {
 
 		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
 				getScriptContent("keymaster.js"),
-				"key('o, enter, left', function(){ window.alert('o, enter or left pressed!');});"));
+				"key('o, enter, left', function(event, handler){ window.alert('o, enter or left pressed on target = ' + event.target.toString() +  ' srcElement = ' + event.srcElement.toString() + ' !');});"));
 		if (script.isPresent()) {
 			scripts.add(script.get());
 		}
@@ -395,16 +395,23 @@ public class KeyMasterTest {
 					.toURI();
 			System.err.println("Testing: " + uri.toString());
 			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-																			// supported in -source 1.6
+		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	// TODO: parameter
 	private void confirmAlertIsPresent() {
 		try {
+			alert = driver.switchTo().alert();
+			String alert_text = alert.getText();
+			System.err.println("Accepted alert: " + alert_text);
+			// Accepted alert: o, enter or left pressed on 
+			// target = [object HTMLBodyElement]
+			// srcElement = [object HTMLBodyElement] !
+			
 			// confirm alert
-			driver.switchTo().alert().accept();
+			alert.accept();
 		} catch (NoAlertPresentException e) {
 			throw new RuntimeException("Alert was not present.");
 
