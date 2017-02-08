@@ -35,9 +35,9 @@ public class SimpleToolBarEx {
 		Device dev = shell.getDisplay();
 
 		try {
-			newi = new Image(dev, "toolbar_new.png");
-			opei = new Image(dev, "toolbar_open.png");
-			quii = new Image(dev, "toolbar_quit.png");
+			newi = new Image(dev, System.getProperty("user.dir") + "/src/main/resources/" + "toolbar_new.png");
+			opei = new Image(dev, System.getProperty("user.dir") + "/src/main/resources/" + "toolbar_open.png");
+			quii = new Image(dev, System.getProperty("user.dir") + "/src/main/resources/" + "toolbar_quit.png");
 
 		} catch (Exception e) {
 
