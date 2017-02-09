@@ -27,6 +27,8 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+// import org.eclipse.equinox.common;
+// import  org.eclipse.core.commands;
 
 public class TableEx5 extends Dialog {
 	private Table table;
@@ -289,12 +291,12 @@ public class TableEx5 extends Dialog {
 	}
 
 	private Point getCellId(Point mouseLocation, TableViewer tableViewer) {
-		return null ;
+		// return null ;
 				
 				// getCell(org.eclipse.swt.graphics.Point) is not public in org.eclipse.jface.viewers.ColumnViewer; cannot be accessed from outside package
 				// need to update the pom.xml to access version 3.6.1.M20100825-0800  from
 				// http://download.osgeo.org/webdav/geotools/) 
-				/*
+				
 		ViewerCell cell = tableViewer.getCell(mouseLocation);
 		if (cell == null) {
 			return null;
@@ -302,7 +304,7 @@ public class TableEx5 extends Dialog {
 		int columnIndex = cell.getColumnIndex();
 		int rowIndex = tableViewer.getTable().indexOf((TableItem) cell.getItem());
 		return new Point(rowIndex, columnIndex);
-		*/
+		
 	}
 
 	private List<Point> getAllCellsBetweenTwoCells(Point selectionStartPoint,

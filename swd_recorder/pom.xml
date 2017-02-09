@@ -34,6 +34,11 @@
       <name>osgeo repo</name>
       <url>http://download.osgeo.org/webdav/geotools/</url>
     </repository>
+    <repository>
+      <id>seasar</id>
+      <name>seasar repo</name>
+      <url>https://www.seasar.org/maven/maven2</url>
+    </repository>
   </repositories>
   <dependencies>
     <dependency>
@@ -112,16 +117,27 @@
       <version>${eclipse.swt.version}</version>
     </dependency>
     -->
+    <!-- NOTE: platform dependent -->
     <dependency>
       <groupId>org.eclipse.swt.org.eclipse.swt.win32.win32.x86_64.4.3.swt</groupId>
       <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
       <version>${eclipse.swt.version}</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.eclipse/jface -->
+    <!--
+  <dependency>
+    <groupId>org.eclipse</groupId>
+    <artifactId>jface</artifactId>
+    <version>3.6.1.M20100825-0800</version>
+</dependency>
+
+    -->
+    <!-- TODO: A JNI error has occurred 
+    Exception in thread "main" java.lang.NoClassDefFoundError: org/eclipse/core/runtime/IStatus
+-->
     <dependency>
       <groupId>org.eclipse</groupId>
       <artifactId>jface</artifactId>
-      <version>3.3.0-I20070606-0010</version>
+      <version>3.5.2</version>
     </dependency>
   </dependencies>
   <dependencyManagement>

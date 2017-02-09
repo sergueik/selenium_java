@@ -1,6 +1,5 @@
 @echo OFF
 call mvn clean package install
-rem call mvn package install
 set TARGET=%CD%\target
 
 set MAIN_APP_CLASS=study.myswt.hello.HelloWorld
@@ -10,10 +9,12 @@ set MAIN_APP_CLASS=study.myswt.layouts.ButtonsEx
 set MAIN_APP_PACKAGE=study.myswt.dialog
 set MAIN_APP_PACKAGE=study.myswt.menus_toolbars
 set MAIN_APP_PACKAGE=study.myswt.layouts
+set MAIN_APP_PACKAGE=study.myswt.table
 set MAIN_APP_CLASS=MessageBoxEx2
 set MAIN_APP_CLASS=PopupMenuEx
 set MAIN_APP_CLASS=SimpleToolBarEx
 set MAIN_APP_CLASS=ButtonsEx
+set MAIN_APP_CLASS=TableEx5
 set SELENIUM_VERSION=2.53.0
 set SELENUM_HOME=c:\java\selenium\
 REM adding selenium-standalone to the CLASSPATH is not necessary.
