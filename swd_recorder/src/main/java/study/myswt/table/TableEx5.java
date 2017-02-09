@@ -49,6 +49,7 @@ public class TableEx5 extends Dialog {
 
 	/**
 	 * Create contents of the dialog.
+	 * 
 	 * @param parent
 	 */
 	@Override
@@ -291,20 +292,19 @@ public class TableEx5 extends Dialog {
 	}
 
 	private Point getCellId(Point mouseLocation, TableViewer tableViewer) {
-		// return null ;
-				
-				// getCell(org.eclipse.swt.graphics.Point) is not public in org.eclipse.jface.viewers.ColumnViewer; cannot be accessed from outside package
-				// need to update the pom.xml to access version 3.6.1.M20100825-0800  from
-				// http://download.osgeo.org/webdav/geotools/) 
-				
-		ViewerCell cell = tableViewer.getCell(mouseLocation);
-		if (cell == null) {
-			return null;
-		}
-		int columnIndex = cell.getColumnIndex();
-		int rowIndex = tableViewer.getTable().indexOf((TableItem) cell.getItem());
-		return new Point(rowIndex, columnIndex);
-		
+		return null;
+
+		// getCell(org.eclipse.swt.graphics.Point) is not public
+		// in org.eclipse.jface.viewers.ColumnViewer;
+		// prior to 3.4
+		// JNI exception with jface 3.3.0 and above (3.5.1, 3.6.1.M20100825-0800)
+		// java.lang.NoClassDefFoundError: org/eclipse/core/runtime/IStatus
+		/*
+		 * ViewerCell cell = tableViewer.getCell(mouseLocation); if (cell == null) {
+		 * return null; } int columnIndex = cell.getColumnIndex(); int rowIndex =
+		 * tableViewer.getTable().indexOf((TableItem) cell.getItem()); return new
+		 * Point(rowIndex, columnIndex);
+		 */
 	}
 
 	private List<Point> getAllCellsBetweenTwoCells(Point selectionStartPoint,
