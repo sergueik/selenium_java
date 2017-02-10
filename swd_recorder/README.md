@@ -47,6 +47,26 @@ The `pom.xml` declares `swt.jar` dependency in a platform-specific fashion:
     ...
 ```
 Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the `artifactId` specific to the host OS.
+
+As usual with Selenium, Application is ommlycapable of runing when the right combination of versions of Selenium jar, browser drivers and browsers is used.
+
+Few supported combination of old versions are listed below:
+|                      |              |
+|----------------------|--------------|
+| SELENIUM_VERSION     | 2.53         |
+| FIREFOX_VERSION      | 45.0.1       |
+| CHROME_VERSION       | 54.0.2840.71 |
+| CHROMEDRIVER_VERSION | 2.24         |
+
+|                      |              |
+|----------------------|--------------|
+| SELENIUM_VERSION     | 2.47         |
+| FIREFOX_VERSION      | 40.0.3       |
+| CHROME_VERSION       | 50.0.2661.75 |
+| CHROMEDRIVER_VERSION | 2.16         |
+
+This is why it may be worthwhile setting up Virtualbox to compile and run an instance in.
+
 Adding more form elements and code generator and providing the behavior is a work in progress.
 
 ### Mis. useful links
@@ -60,9 +80,7 @@ Adding more form elements and code generator and providing the behavior is a wor
   * [mono/xwt](https://github.com/mono/xwt)
   * [json2](https://github.com/douglascrockford/JSON-js)
   * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
-
-
-
+  * [swt dependency repositories](http://stackoverflow.com/questions/5096299/maven-project-swt-3-5-dependency-any-official-public-repo)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
