@@ -27,8 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-// import org.eclipse.equinox.common;
-// import  org.eclipse.core.commands;
+
 
 public class TableEx5 extends Dialog {
 	private Table table;

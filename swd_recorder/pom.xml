@@ -38,8 +38,7 @@ org.eclipse.swt.gtk.linux.x86_64
       <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
       <version>${eclipse.swt.version}</version>
     </dependency>    
-    <!-- NOTE: platform dependent, but can not include all due to some loader issue -->
-    
+    <!-- NOTE: platform dependent, but can not include all: due to some JVM loader issue -->    
     <dependency>
       <groupId>org.eclipse.swt.org.eclipse.swt.win32.win32.x86_64.4.3.swt</groupId>
       <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
@@ -176,6 +175,34 @@ org.eclipse.swt.gtk.linux.x86_64
           </execution>
         </executions>
       </plugin>
+<!-- origin: http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven 
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-antrun-plugin</artifactId>
+    <version>1.8</version>
+    <executions>
+        <execution>
+            <phase>install</phase>
+            <goals>
+                <goal>copy-dependencies</goal>
+                
+               //  [ERROR] Could not find goal 'copy-dependencies' in plugin org.apache.maven.plugins:maven-antrun-plugin:1.8 among available goals help, run -> [Help 1]
+                
+            </goals>
+            <configuration>
+                <exportAntProperties>true</exportAntProperties>
+                <target>
+                    <property environment="env"/>
+                    <condition property="install.path" value="${env.INSTALL_HOME}" else="C:\default-install-home">
+                        <isset property="env.INSTALL_HOME" />
+                    </condition>
+                    <echo message="${install.path}"/>
+                </target>
+            </configuration>
+        </execution>
+    </executions>
+</plugin>
+-->
     </plugins>
   </build>
   <repositories>
