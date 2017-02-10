@@ -80,9 +80,10 @@ import org.eclipse.swt.widgets.ToolItem;
 // based on:
 public class SimpleToolBarEx {
 
-	private Image newi;
-	private Image opei;
-	private Image quii;
+	private Image create_browser;
+	private Image visual_search;
+	private Image shutdown_icon;
+	private Image configure_app;
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -105,12 +106,14 @@ public class SimpleToolBarEx {
 		Device dev = shell.getDisplay();
 
 		try {
-			newi = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "toolbar_new.png");
-			opei = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "toolbar_open.png");
-			quii = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "toolbar_quit.png");
+			create_browser = new Image(dev, System.getProperty("user.dir")
+					+ "/src/main/resources/" + "applications_internet.png");
+			visual_search = new Image(dev, System.getProperty("user.dir")
+					+ "/src/main/resources/" + "old_edit_find.png");
+			configure_app = new Image(dev, System.getProperty("user.dir")
+					+ "/src/main/resources/" + "preferences_desktop.png");
+			shutdown_icon = new Image(dev, System.getProperty("user.dir")
+					+ "/src/main/resources/" + "shutdown-1.png");
 
 		} catch (Exception e) {
 
@@ -120,55 +123,72 @@ public class SimpleToolBarEx {
 
 		ToolBar toolBar = new ToolBar(shell, SWT.BORDER);
 
-		ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
-		item1.setImage(newi);
+		ToolItem create_browser_tool = new ToolItem(toolBar, SWT.PUSH);
+		create_browser_tool.setImage(create_browser);
 
-		ToolItem item2 = new ToolItem(toolBar, SWT.PUSH);
-		item2.setImage(opei);
+		ToolItem visual_search_tool = new ToolItem(toolBar, SWT.PUSH);
+		visual_search_tool.setImage(visual_search);
+
+
+		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
+		configure_app_tool.setImage(configure_app);
 
 		ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
-		ToolItem item3 = new ToolItem(toolBar, SWT.PUSH);
-		item3.setImage(quii);
+		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
+		shutdown_tool.setImage(shutdown_icon);
 
 		toolBar.pack();
 
-		item1.addListener(SWT.Selection, event -> {
+    configure_app_tool.setEnabled(false);
+    visual_search_tool.setEnabled(false);
+    
+		create_browser_tool.addListener(SWT.Selection, event -> {
 
 			/*
 			 * System.setProperty("webdriver.chrome.driver",
 			 * "c:/java/selenium/chromedriver.exe"); driver = new ChromeDriver();
 			 */
-			// keymaster.js does not work with Firefox
+			// keymaster.js does not work well with Firefox
+      create_browser_tool.setEnabled(false);
 			driver = new FirefoxDriver();
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 			wait = new WebDriverWait(driver, flexibleWait);
 			wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 			driver.get(baseURL);
 			driver.get("https://www.ryanair.com/ie/en/");
-			// getPageContent does not work with standalone app.
+			wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+      create_browser_tool.setEnabled(true);
+      visual_search_tool.setEnabled(true);
+
 			// driver.get(getPageContent("blankpage.html"));
 		});
 
-		item2.addListener(SWT.Selection, event -> {
+		visual_search_tool.addListener(SWT.Selection, event -> {
 			if (driver != null) {
-				injectKeyMaster(Optional.<String> empty());
-				// injectKeyMaster(Optional.of("key('o, enter, left', function(event,
+      visual_search_tool.setEnabled(false);
+				injectElementSearch(Optional.<String> empty());
+      visual_search_tool.setEnabled(true);
+				// injectElementSearch(Optional.of("key('o, enter, left', function(event,
 				// handler){ window.alert('o, enter or left pressed on target = ' +
 				// event.target.toString() + ' srcElement = ' +
 				// event.srcElement.toString() + ' !');});"));
 			}
 		});
-		item3.addListener(SWT.Selection, event -> {
+		shutdown_tool.addListener(SWT.Selection, event -> {
 			if (driver != null) {
+      shutdown_tool.setEnabled(false);
 				driver.quit();
+      shutdown_tool.setEnabled(true);
 			}
 			shell.getDisplay().dispose();
 			System.exit(0);
 		});
 
-		shell.setText("Simple toolbar");
-		shell.setSize(300, 250);
+		shell.setText("Selenium WebDriver Page Recorder");
+		shell.setSize(500, 150);
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -188,7 +208,7 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	private void injectKeyMaster(Optional<String> script) {
+	private void injectElementSearch(Optional<String> script) {
 		ArrayList<String> scripts = new ArrayList<String>(Arrays
 				.asList(getScriptContent("ElementSearch.js" /* "keymaster.js" */ )));
 		if (script.isPresent()) {
@@ -215,7 +235,7 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	// does not work in the standalone app
+  // getPageContent does not work with standalone app.
 	private String getPageContent(String pageName) {
 		try {
 			URI uri = this.getClass().getClassLoader().getResource(pageName).toURI();
@@ -229,10 +249,9 @@ public class SimpleToolBarEx {
 
 	@Override
 	public void finalize() {
-
-		newi.dispose();
-		opei.dispose();
-		quii.dispose();
+		create_browser.dispose();
+		visual_search.dispose();
+		shutdown_icon.dispose();
 	}
 
 	public static void main(String[] args) {
