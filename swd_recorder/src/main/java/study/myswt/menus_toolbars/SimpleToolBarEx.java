@@ -119,7 +119,7 @@ public class SimpleToolBarEx {
 		}
 
 		ToolBar toolBar = new ToolBar(shell, SWT.BORDER);
-		
+
 		ToolItem item1 = new ToolItem(toolBar, SWT.PUSH);
 		item1.setImage(newi);
 
@@ -134,12 +134,12 @@ public class SimpleToolBarEx {
 		toolBar.pack();
 
 		item1.addListener(SWT.Selection, event -> {
-			
+
 			/*
-			System.setProperty("webdriver.chrome.driver",
-					"c:/java/selenium/chromedriver.exe");
-			driver = new ChromeDriver();
-			*/
+			 * System.setProperty("webdriver.chrome.driver",
+			 * "c:/java/selenium/chromedriver.exe"); driver = new ChromeDriver();
+			 */
+			// keymaster.js does not work with Firefox
 			driver = new FirefoxDriver();
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -153,6 +153,10 @@ public class SimpleToolBarEx {
 		item2.addListener(SWT.Selection, event -> {
 			if (driver != null) {
 				injectKeyMaster(Optional.<String> empty());
+				// injectKeyMaster(Optional.of("key('o, enter, left', function(event,
+				// handler){ window.alert('o, enter or left pressed on target = ' +
+				// event.target.toString() + ' srcElement = ' +
+				// event.srcElement.toString() + ' !');});"));
 			}
 		});
 		item3.addListener(SWT.Selection, event -> {
@@ -185,9 +189,8 @@ public class SimpleToolBarEx {
 	}
 
 	private void injectKeyMaster(Optional<String> script) {
-		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
-				getScriptContent("keymaster.js"),
-				"key('o, enter, left', function(event, handler){ window.alert('o, enter or left pressed on target = ' + event.target.toString() +  ' srcElement = ' + event.srcElement.toString() + ' !');});"));
+		ArrayList<String> scripts = new ArrayList<String>(Arrays
+				.asList(getScriptContent("ElementSearch.js" /* "keymaster.js" */ )));
 		if (script.isPresent()) {
 			scripts.add(script.get());
 		}
@@ -200,7 +203,7 @@ public class SimpleToolBarEx {
 	}
 
 	private String getScriptContent(String scriptName) {
-		System.err.println("GettingScript content: " + scriptName);
+		System.err.println("Getting script content: " + scriptName);
 		try {
 			final InputStream stream = this.getClass().getClassLoader()
 					.getResourceAsStream(scriptName);
@@ -212,7 +215,7 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	// does not work in the main
+	// does not work in the standalone app
 	private String getPageContent(String pageName) {
 		try {
 			URI uri = this.getClass().getClassLoader().getResource(pageName).toURI();

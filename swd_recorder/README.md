@@ -2,15 +2,53 @@
 This is a replica of the Standard Widget Toolkit study project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
 which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com).
 
+![example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
+
 ### Goals
-The goal is to develop an SWT-based UI to [dzharii/Swd.StarterJ](https://github.com/dzharii/Swd.StarterJ).
 
+The goal is to develop [The Standard Widget Toolkit](https://www.eclipse.org/swt/) based successor of [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of Dmytro Zharii.
+Eventually a simplified look and feel of is planned.
+### Usage
 
-### Details
+The application can be run on a 32 or 64 bit Windows or Linux machine, or in Vagrantbox. It should run on OSX, but this has not been tested yet.
+To start the application run
+```cmd
+run.cmd
+```
+or
+```bash
+./run.sh
+```
+It will compile and package the project and run it from the `target` directory. A number of sample classes from the "Study SWT" project will eventually disappear, and the Xtext support will be added. Also, the application may be converted to an Eclipse plugin.
 
-# ${env.XXXXXXXX}
-# http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven
-# http://www.java2s.com/Code/Jar/s/Downloadswtwin64362jar.htm
+### Technical Details
+
+The `pom.xml` contains `swt.jar` dependency in a platform-specific fashion:
+
+```xml
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.swt.org.eclipse.swt.win32.win32.x86_64.${eclipse.swt.version}.swt</groupId>
+      <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+      <version>${eclipse.swt.version}</version>
+    </dependency>    
+    <!--
+    <dependency>
+      <groupId>org.eclipse.swt.org.eclipse.swt.gtk.linux.x86_64.${eclipse.swt.version}.swt</groupId>
+      <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
+      <version>${eclipse.swt.version}</version>
+    </dependency>
+    -->
+    <!--
+    <dependency>
+      <groupId>org.eclipse.swt.org.eclipse.swt.gtk.linux.x86.${eclipse.swt.version}.swt</groupId>
+      <artifactId>org.eclipse.swt.gtk.linux.x86</artifactId>
+      <version>${eclipse.swt.version}</version>
+    </dependency>
+    -->
+```
+Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the Windows or Ubuntu part according to the host OS.
+Adding more form elements and code generator and providing the behavior is a work in progress.
 
 ### Mis. useful links
   * [main swt snippets directory](https://www.eclipse.org/swt/snippets/)
@@ -21,8 +59,10 @@ The goal is to develop an SWT-based UI to [dzharii/Swd.StarterJ](https://github.
   * [fab1an/appkit toolkit for swt app design](https://github.com/fab1an/appkit)
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
   * [mono/xwt](https://github.com/mono/xwt)
+  * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
 
-  
-  
+
+
+
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
