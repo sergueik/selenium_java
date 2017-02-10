@@ -23,31 +23,30 @@ It will compile and package the project and run it from the `target` directory. 
 
 ### Technical Details
 
-The `pom.xml` contains `swt.jar` dependency in a platform-specific fashion:
+The `pom.xml` declares `swt.jar` dependency in a platform-specific fashion:
 
 ```xml
+  <properties>
+    <eclipse.swt.version>4.3</eclipse.swt.version>
+    <!--
+    <eclipse.swt.version>[3.6,4.5.0)</eclipse.swt.version>
+    -->
+    <eclipse.swt.artifactId>org.eclipse.swt.win32.win32.x86_64</eclipse.swt.artifactId>
+    <!--
+    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</eclipse.swt.artifactId>
+    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86</eclipse.swt.artifactId>
+    -->
+  </properties>
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.swt.org.eclipse.swt.win32.win32.x86_64.${eclipse.swt.version}.swt</groupId>
-      <artifactId>org.eclipse.swt.win32.win32.x86_64</artifactId>
+			<groupId>org.eclipse.swt</groupId>
+			<artifactId>${eclipse.swt.artifactId}</artifactId>
       <version>${eclipse.swt.version}</version>
-    </dependency>    
-    <!--
-    <dependency>
-      <groupId>org.eclipse.swt.org.eclipse.swt.gtk.linux.x86_64.${eclipse.swt.version}.swt</groupId>
-      <artifactId>org.eclipse.swt.gtk.linux.x86_64</artifactId>
-      <version>${eclipse.swt.version}</version>
-    </dependency>
-    -->
-    <!--
-    <dependency>
-      <groupId>org.eclipse.swt.org.eclipse.swt.gtk.linux.x86.${eclipse.swt.version}.swt</groupId>
-      <artifactId>org.eclipse.swt.gtk.linux.x86</artifactId>
-      <version>${eclipse.swt.version}</version>
-    </dependency>
-    -->
+			<!-- <version>[3.6,4.5.0)</version> -->
+		</dependency>
+    ...
 ```
-Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the Windows or Ubuntu part according to the host OS.
+Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the `artifactId` specific to the host OS.
 Adding more form elements and code generator and providing the behavior is a work in progress.
 
 ### Mis. useful links
@@ -59,6 +58,7 @@ Adding more form elements and code generator and providing the behavior is a wor
   * [fab1an/appkit toolkit for swt app design](https://github.com/fab1an/appkit)
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
   * [mono/xwt](https://github.com/mono/xwt)
+  * [json2](https://github.com/douglascrockford/JSON-js)
   * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
 
 
