@@ -1,9 +1,14 @@
 package study.myswt.menus_toolbars;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.RuntimeException;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
@@ -13,17 +18,24 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.concurrent.TimeUnit;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.Formatter;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Properties;
+import java.util.Scanner;
+import java.util.Set;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +43,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.*;
+
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.hamcrest.CoreMatchers;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -54,6 +69,8 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.internal.Coordinates;
@@ -106,15 +123,22 @@ public class SimpleToolBarEx {
 		Device dev = shell.getDisplay();
 
 		try {
-			create_browser = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "applications_internet.png");
-			visual_search = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "old_edit_find.png");
-			configure_app = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "preferences_desktop.png");
-			shutdown_icon = new Image(dev, System.getProperty("user.dir")
-					+ "/src/main/resources/" + "shutdown-1.png");
-
+			/*
+			 * create_browser = new Image(dev, System.getProperty("user.dir") +
+			 * "/src/main/resources/" + "applications_internet.png"); visual_search =
+			 * new Image(dev, System.getProperty("user.dir") + "/src/main/resources/"
+			 * + "old_edit_find.png"); configure_app = new Image(dev,
+			 * System.getProperty("user.dir") + "/src/main/resources/" +
+			 * "preferences_desktop.png"); shutdown_icon = new Image(dev,
+			 * System.getProperty("user.dir") + "/src/main/resources/" +
+			 * "shutdown-1.png");
+			 */
+			create_browser = new Image(dev,
+					getResourcePath("applications_internet.png"));
+			visual_search = new Image(dev, getResourcePath("old_edit_find.png"));
+			configure_app = new Image(dev,
+					getResourcePath("preferences_desktop.png"));
+			shutdown_icon = new Image(dev, getResourcePath("shutdown-1.png"));
 		} catch (Exception e) {
 
 			System.err.println("Cannot load images: " + e.getMessage());
@@ -125,32 +149,35 @@ public class SimpleToolBarEx {
 
 		ToolItem create_browser_tool = new ToolItem(toolBar, SWT.PUSH);
 		create_browser_tool.setImage(create_browser);
+    create_browser_tool.setToolTipText("Launches the browser");
 
 		ToolItem visual_search_tool = new ToolItem(toolBar, SWT.PUSH);
 		visual_search_tool.setImage(visual_search);
-
+    visual_search_tool.setToolTipText("Injects the script");
 
 		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
 		configure_app_tool.setImage(configure_app);
+    configure_app_tool.setToolTipText("Configures the app (disabled)");
 
 		ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
 		shutdown_tool.setImage(shutdown_icon);
+    shutdown_tool.setToolTipText("Quits the app");
 
 		toolBar.pack();
 
-    configure_app_tool.setEnabled(false);
-    visual_search_tool.setEnabled(false);
-    
-		create_browser_tool.addListener(SWT.Selection, event -> {
+		configure_app_tool.setEnabled(false);
+		visual_search_tool.setEnabled(false);
+
+		create_browser_tool.addListener(SWT.Selection, e -> {
 
 			/*
 			 * System.setProperty("webdriver.chrome.driver",
 			 * "c:/java/selenium/chromedriver.exe"); driver = new ChromeDriver();
 			 */
 			// keymaster.js does not work well with Firefox
-      create_browser_tool.setEnabled(false);
+			create_browser_tool.setEnabled(false);
 			driver = new FirefoxDriver();
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -158,30 +185,31 @@ public class SimpleToolBarEx {
 			driver.get(baseURL);
 			driver.get("https://www.ryanair.com/ie/en/");
 			wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
-      create_browser_tool.setEnabled(true);
-      visual_search_tool.setEnabled(true);
+					ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+							"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+			create_browser_tool.setEnabled(true);
+			visual_search_tool.setEnabled(true);
 
-			// driver.get(getPageContent("blankpage.html"));
+			// driver.get(getResourceURI("blankpage.html"));
 		});
 
-		visual_search_tool.addListener(SWT.Selection, event -> {
+		visual_search_tool.addListener(SWT.Selection, e -> {
 			if (driver != null) {
-      visual_search_tool.setEnabled(false);
+				visual_search_tool.setEnabled(false);
 				injectElementSearch(Optional.<String> empty());
-      visual_search_tool.setEnabled(true);
-				// injectElementSearch(Optional.of("key('o, enter, left', function(event,
+				visual_search_tool.setEnabled(true);
+				// injectElementSearch(Optional.of("key('o, enter, left',
+				// function(event,
 				// handler){ window.alert('o, enter or left pressed on target = ' +
 				// event.target.toString() + ' srcElement = ' +
 				// event.srcElement.toString() + ' !');});"));
 			}
 		});
-		shutdown_tool.addListener(SWT.Selection, event -> {
+		shutdown_tool.addListener(SWT.Selection, e -> {
 			if (driver != null) {
-      shutdown_tool.setEnabled(false);
+				shutdown_tool.setEnabled(false);
 				driver.quit();
-      shutdown_tool.setEnabled(true);
+				shutdown_tool.setEnabled(true);
 			}
 			shell.getDisplay().dispose();
 			System.exit(0);
@@ -235,16 +263,22 @@ public class SimpleToolBarEx {
 		}
 	}
 
-  // getPageContent does not work with standalone app.
-	private String getPageContent(String pageName) {
+	// getResourceURI does not work with standalone app.
+	private String getResourceURI(String resourceFileName) {
 		try {
-			URI uri = this.getClass().getClassLoader().getResource(pageName).toURI();
-			System.err.println(
-					String.format("Getting URL to %s : %s", pageName, uri.toString()));
+			URI uri = this.getClass().getClassLoader().getResource(resourceFileName)
+					.toURI();
+			System.err.println(String.format("Getting URI to %s : %s",
+					resourceFileName, uri.toString()));
 			return uri.toString();
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	private String getResourcePath(String resourceFileName) {
+    return String.format("%s/src/main/resources/%s",
+						System.getProperty("user.dir"), resourceFileName);
 	}
 
 	@Override
@@ -261,4 +295,70 @@ public class SimpleToolBarEx {
 		ex.finalize();
 		display.dispose();
 	}
+
+	private static class TestConfigurationParser {
+
+		private static Scanner loadTestData(final String fileName) {
+			Scanner scanner = null;
+			System.err
+					.println(String.format("Reading configuration file: '%s'", fileName));
+			try {
+				scanner = new Scanner(new File(fileName));
+			} catch (FileNotFoundException e) {
+				// fail(String.format("File '%s' was not found.", fileName));
+				System.err.println(
+						String.format("Configuration file was not found: '%s'", fileName));
+				e.printStackTrace();
+			}
+			return scanner;
+		}
+
+		public static List<String[]> getConfiguration(final String fileName) {
+			ArrayList<String[]> listOfData = new ArrayList<>();
+			Scanner scanner = loadTestData(fileName);
+			String separator = "|";
+			while (scanner.hasNext()) {
+				String line = scanner.next();
+				String[] data = line.split(Pattern.compile("(\\||\\|/)")
+						.matcher(separator).replaceAll("\\\\$1"));
+				for (String entry : data) {
+					System.err.println("data entry: " + entry);
+				}
+				listOfData.add(data);
+			}
+			scanner.close();
+			return listOfData;
+		}
+	}
+
+	private static class PropertiesParser {
+		public static HashMap<String, String> getProperties(final String fileName) {
+			Properties p = new Properties();
+			HashMap<String, String> propertiesMap = new HashMap<String, String>();
+			System.err
+					.println(String.format("Reading properties file: '%s'", fileName));
+			try {
+				p.load(new FileInputStream(fileName));
+				Enumeration<String> e = (Enumeration<String>) p.propertyNames();
+				for (; e.hasMoreElements();) {
+					String key = e.nextElement();
+					String val = p.get(key).toString();
+					System.out.println(String.format("Reading: '%s' = '%s'", key, val));
+					propertiesMap.put(key, val);
+				}
+
+			} catch (FileNotFoundException e) {
+				System.err.println(
+						String.format("Properties file was not found: '%s'", fileName));
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.err.println(
+						String.format("Properties file is not readable: '%s'", fileName));
+				e.printStackTrace();
+			}
+			return (propertiesMap);
+
+		}
+	}
+
 }

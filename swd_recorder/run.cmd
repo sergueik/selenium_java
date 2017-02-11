@@ -1,5 +1,5 @@
 @echo OFF
-call mvn clean package install
+call mvn package install
 set TARGET=%CD%\target
 
 set MAIN_APP_PACKAGE=study.myswt.menus_toolbars
