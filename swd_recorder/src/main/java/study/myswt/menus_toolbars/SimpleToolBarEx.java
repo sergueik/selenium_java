@@ -89,12 +89,38 @@ import org.json.JSONObject;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.ExpandBar;
+import org.eclipse.swt.widgets.ExpandItem;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
 
-// based on:
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.custom.ScrolledComposite;
+
 public class SimpleToolBarEx {
 
 	private Image create_browser;
@@ -109,30 +135,29 @@ public class SimpleToolBarEx {
 	private long pollingInterval = 500;
 	private String baseURL = "about:blank";
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
+	private RowLayout layout;
+	private Composite composite;
+	private static String[] Labels = { "Open application",
+			"Navigate to login page", "Something else" };
+	private static int step_index = 0;
+
+	private ToolBar toolBar;
 
 	public SimpleToolBarEx(Display display) {
-
 		initUI(display);
 	}
 
 	@SuppressWarnings("unused")
 	public void initUI(Display display) {
 
-		Shell shell = new Shell(display, SWT.SHELL_TRIM | SWT.CENTER);
-
+		// Shell shell = new Shell(display, SWT.CENTER | (SWT.SHELL_TRIM & (~SWT.RESIZE)));
+		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM );
+		Rectangle boundRect = new Rectangle(0, 0,  768, 324);
+    shell.setBounds(boundRect);
 		Device dev = shell.getDisplay();
 
 		try {
-			/*
-			 * create_browser = new Image(dev, System.getProperty("user.dir") +
-			 * "/src/main/resources/" + "applications_internet.png"); visual_search =
-			 * new Image(dev, System.getProperty("user.dir") + "/src/main/resources/"
-			 * + "old_edit_find.png"); configure_app = new Image(dev,
-			 * System.getProperty("user.dir") + "/src/main/resources/" +
-			 * "preferences_desktop.png"); shutdown_icon = new Image(dev,
-			 * System.getProperty("user.dir") + "/src/main/resources/" +
-			 * "shutdown-1.png");
-			 */
+
 			create_browser = new Image(dev,
 					getResourcePath("applications_internet.png"));
 			visual_search = new Image(dev, getResourcePath("old_edit_find.png"));
@@ -145,31 +170,40 @@ public class SimpleToolBarEx {
 			System.exit(1);
 		}
 
-		ToolBar toolBar = new ToolBar(shell, SWT.BORDER);
+		toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
 		ToolItem create_browser_tool = new ToolItem(toolBar, SWT.PUSH);
 		create_browser_tool.setImage(create_browser);
-    create_browser_tool.setToolTipText("Launches the browser");
+		create_browser_tool.setToolTipText("Launches the browser");
 
 		ToolItem visual_search_tool = new ToolItem(toolBar, SWT.PUSH);
 		visual_search_tool.setImage(visual_search);
-    visual_search_tool.setToolTipText("Injects the script");
+		visual_search_tool.setToolTipText("Injects the script");
 
 		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
 		configure_app_tool.setImage(configure_app);
-    configure_app_tool.setToolTipText("Configures the app (disabled)");
+		configure_app_tool.setToolTipText("Configures the app (disabled)");
 
 		ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
 		shutdown_tool.setImage(shutdown_icon);
-    shutdown_tool.setToolTipText("Quits the app");
+		shutdown_tool.setToolTipText("Quits the app");
 
 		toolBar.pack();
 
-		configure_app_tool.setEnabled(false);
+		// configure_app_tool.setEnabled(false);
 		visual_search_tool.setEnabled(false);
 
+		layout = new RowLayout();
+
+		layout.wrap = true;
+		layout.marginLeft = 5;
+		layout.marginTop = 5;
+		layout.marginRight = 5;
+		layout.marginBottom = 5;
+
+		shell.setLayout(layout);
 		create_browser_tool.addListener(SWT.Selection, e -> {
 
 			/*
@@ -193,18 +227,56 @@ public class SimpleToolBarEx {
 			// driver.get(getResourceURI("blankpage.html"));
 		});
 
-		visual_search_tool.addListener(SWT.Selection, e -> {
-			if (driver != null) {
-				visual_search_tool.setEnabled(false);
-				injectElementSearch(Optional.<String> empty());
-				visual_search_tool.setEnabled(true);
-				// injectElementSearch(Optional.of("key('o, enter, left',
-				// function(event,
-				// handler){ window.alert('o, enter or left pressed on target = ' +
-				// event.target.toString() + ' srcElement = ' +
-				// event.srcElement.toString() + ' !');});"));
+		configure_app_tool.addListener(SWT.Selection, e -> {
+			Button s = new Button(shell, SWT.PUSH);
+			if (step_index < Labels.length) {
+				s.setText(String.format("Step %d: %s", (int) (step_index + 1),
+						Labels[step_index]));
+			} else {
+				s.setText(String.format("Step %d", (int) (step_index + 1)));
 			}
+			step_index++;
+			Control[] children = shell.getChildren();
+			if (children.length == 0) {
+				s.setParent(shell);
+			} else {
+				s.moveBelow(children[children.length - 1]);
+			}
+			shell.layout(new Control[] { s });
+
+			// shell.layout(true, true);
+			final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
+			if (newSize.x > 500) {
+        shell.setBounds(boundRect);
+			}
+			shell.pack();
 		});
+
+		//
+		visual_search_tool.addSelectionListener(
+
+				new SelectionListener() {
+					@Override
+					public void widgetDefaultSelected(SelectionEvent e) {
+					}
+
+					@Override
+					public void widgetSelected(SelectionEvent e) {
+						if (driver != null) {
+							visual_search_tool.setEnabled(false);
+							injectElementSearch(Optional.<String> empty());
+							visual_search_tool.setEnabled(true);
+							// injectElementSearch(Optional.of("key('o, enter, left',
+							// function(event,
+							// handler){ window.alert('o, enter or left pressed on target = '
+							// +
+							// event.target.toString() + ' srcElement = ' +
+							// event.srcElement.toString() + ' !');});"));
+						}
+					}
+				});
+
+		// lambda style
 		shutdown_tool.addListener(SWT.Selection, e -> {
 			if (driver != null) {
 				shutdown_tool.setEnabled(false);
@@ -216,7 +288,7 @@ public class SimpleToolBarEx {
 		});
 
 		shell.setText("Selenium WebDriver Page Recorder");
-		shell.setSize(500, 150);
+		shell.setSize(500, 250);
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -277,8 +349,8 @@ public class SimpleToolBarEx {
 	}
 
 	private String getResourcePath(String resourceFileName) {
-    return String.format("%s/src/main/resources/%s",
-						System.getProperty("user.dir"), resourceFileName);
+		return String.format("%s/src/main/resources/%s",
+				System.getProperty("user.dir"), resourceFileName);
 	}
 
 	@Override
