@@ -57,7 +57,12 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
+// import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -92,6 +97,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -111,12 +117,15 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -130,6 +139,7 @@ public class SimpleToolBarEx {
 
 	private WebDriver driver;
 	private WebDriverWait wait;
+	private Actions actions;
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
@@ -150,10 +160,11 @@ public class SimpleToolBarEx {
 	@SuppressWarnings("unused")
 	public void initUI(Display display) {
 
-		// Shell shell = new Shell(display, SWT.CENTER | (SWT.SHELL_TRIM & (~SWT.RESIZE)));
-		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM );
-		Rectangle boundRect = new Rectangle(0, 0,  768, 324);
-    shell.setBounds(boundRect);
+		// Shell shell = new Shell(display, SWT.CENTER | (SWT.SHELL_TRIM &
+		// (~SWT.RESIZE)));
+		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM);
+		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
+		shell.setBounds(boundRect);
 		Device dev = shell.getDisplay();
 
 		try {
@@ -206,16 +217,17 @@ public class SimpleToolBarEx {
 		shell.setLayout(layout);
 		create_browser_tool.addListener(SWT.Selection, e -> {
 
-			/*
-			 * System.setProperty("webdriver.chrome.driver",
-			 * "c:/java/selenium/chromedriver.exe"); driver = new ChromeDriver();
-			 */
+			System.setProperty("webdriver.chrome.driver",
+					"c:/java/selenium/chromedriver.exe");
+			driver = new ChromeDriver();
+
 			// keymaster.js does not work well with Firefox
 			create_browser_tool.setEnabled(false);
-			driver = new FirefoxDriver();
+			// driver = new FirefoxDriver();
 			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 			wait = new WebDriverWait(driver, flexibleWait);
 			wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+			actions = new Actions(driver);
 			driver.get(baseURL);
 			driver.get("https://www.ryanair.com/ie/en/");
 			wait.until(
@@ -228,26 +240,34 @@ public class SimpleToolBarEx {
 		});
 
 		configure_app_tool.addListener(SWT.Selection, e -> {
-			Button s = new Button(shell, SWT.PUSH);
-			if (step_index < Labels.length) {
-				s.setText(String.format("Step %d: %s", (int) (step_index + 1),
-						Labels[step_index]));
-			} else {
-				s.setText(String.format("Step %d", (int) (step_index + 1)));
-			}
+			Button button = new Button(shell, SWT.PUSH);
+
+			button.setText((step_index < Labels.length)
+					? String.format("Step %d: %s", (int) (step_index + 1),
+							Labels[step_index])
+					: String.format("Step %d", (int) (step_index + 1)));
+
+			button.addListener(SWT.Selection, new Listener() {
+				@Override
+				public void handleEvent(Event e) {
+					boolean answer = MessageDialog.openConfirm(shell, button.getText(),
+							"Details ... ");
+				}
+			});
+
 			step_index++;
 			Control[] children = shell.getChildren();
 			if (children.length == 0) {
-				s.setParent(shell);
+				button.setParent(shell);
 			} else {
-				s.moveBelow(children[children.length - 1]);
+				button.moveBelow(children[children.length - 1]);
 			}
-			shell.layout(new Control[] { s });
+			shell.layout(new Control[] { button });
 
 			// shell.layout(true, true);
 			final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
 			if (newSize.x > 500) {
-        shell.setBounds(boundRect);
+				shell.setBounds(boundRect);
 			}
 			shell.pack();
 		});
@@ -257,14 +277,38 @@ public class SimpleToolBarEx {
 
 				new SelectionListener() {
 					@Override
-					public void widgetDefaultSelected(SelectionEvent e) {
+					public void widgetDefaultSelected(SelectionEvent event) {
 					}
 
 					@Override
-					public void widgetSelected(SelectionEvent e) {
+					public void widgetSelected(SelectionEvent event) {
 						if (driver != null) {
 							visual_search_tool.setEnabled(false);
 							injectElementSearch(Optional.<String> empty());
+							// NOTE: focus is lost
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException exception) {
+							}
+							WebElement element = wait.until(ExpectedConditions
+									.visibilityOf(driver.findElement(By.cssSelector(
+											"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+							highlight(element);
+							executeScript(String.format("scroll(0, %d);", -100));
+							actions.keyDown(Keys.CONTROL).build().perform();
+							actions.moveToElement(element).contextClick().build().perform();
+							actions.keyUp(Keys.CONTROL).build().perform();
+							// Assert
+							try {
+								Thread.sleep(100);
+							} catch (InterruptedException e) {
+							}
+
+							completeVisualSearch();
+							// Assert
+							String result = executeScript(getCommand).toString();
+							assertFalse(result.isEmpty());
+							readVisualSearchResult(result);
 							visual_search_tool.setEnabled(true);
 							// injectElementSearch(Optional.of("key('o, enter, left',
 							// function(event,
@@ -296,6 +340,68 @@ public class SimpleToolBarEx {
 				display.sleep();
 			}
 		}
+	}
+
+	private void readVisualSearchResult(final String result) {
+		System.err.println("Processing result: " + result);
+		ArrayList<String> keys = new ArrayList<String>();
+		try {
+			JSONObject resultObj = new JSONObject(result);
+			Iterator<String> keyIterator = resultObj.keys();
+			while (keyIterator.hasNext()) {
+				String key = keyIterator.next();
+				String val = resultObj.getString(key);
+				System.err.println(key + " " + val);
+				keys.add(key);
+				/*
+				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
+				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
+				 * dataArray.get(cnt)); }
+				 */
+			}
+		} catch (JSONException e) {
+
+		}
+		assertThat(keys, hasItem("ElementId"));
+	}
+
+	private void highlight(WebElement element) {
+		highlight(element, 100);
+	}
+
+	private void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
+			Thread.sleep(highlight_interval);
+			executeScript("arguments[0].style.border=''", element);
+		} catch (InterruptedException e) {
+			System.err.println("Ignored: " + e.toString());
+		}
+	}
+
+	private void completeVisualSearch() {
+
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+		assertThat(swdControl, notNullValue());
+		// System.err.println("Swd Control:" +
+		// swdControl.getAttribute("innerHTML"));
+		WebElement swdCodeID = wait.until(ExpectedConditions
+				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
+		assertThat(swdCodeID, notNullValue());
+		swdCodeID.clear();
+		swdCodeID.sendKeys("test code id");
+		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
+				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
+		assertThat(swdControl, notNullValue());
+		highlight(swdCloseButton);
+		// Act
+		swdCloseButton.click();
 	}
 
 	private Object executeScript(String script, Object... arguments) {
