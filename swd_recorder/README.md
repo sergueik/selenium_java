@@ -51,6 +51,7 @@ Due to some problem with JVM loader, these platform-dependent jars cannot be inc
 As usual with Selenium, Application is ommlycapable of runing when the right combination of versions of Selenium jar, browser drivers and browsers is used.
 
 Few supported combination of old versions are listed below:
+
 |                      |              |
 |----------------------|--------------|
 | SELENIUM_VERSION     | 2.53         |
@@ -72,6 +73,7 @@ Adding more form elements and code generator and providing the behavior is a wor
 ### Mis. useful links
   * [main swt snippets directory](https://www.eclipse.org/swt/snippets/)
   * [swt examples on javased.com](http://www.javased.com/?api=org.eclipse.swt.widgets.FileDialog)
+  * [SWT - Tutorial by Lars Vogel, Simon Scholz](http://www.vogella.com/tutorials/SWT/article.html)
   * [lcaron/opal - custom swt dialogs ](https://github.com/lcaron/opal)
   * [danlucraft/jruby-swt-cookbook](https://github.com/danlucraft/jruby-swt-cookbook)
   * [danlucraft/swt](https://github.com/danlucraft/swt)
