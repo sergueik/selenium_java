@@ -155,7 +155,7 @@ getElementId = function(element) {
     hello("createCommand");
     myJSONText = JSON.stringify(jsonData, null, 2);
     document.swdpr_command = myJSONText;
-    return bye("createCommand");
+    return bye("createCommand " + myJSONText);
   };
 
   addStyle = function(css) {
@@ -348,8 +348,8 @@ getElementId = function(element) {
 
     SWD_Page_Recorder.prototype.addElement = function() {
       var JsonData, XPathLocatorElement, codeIDTextElement, htmlIdElement;
-      hello("addElement");
       codeIDTextElement = document.getElementById("SwdPR_PopUp_CodeIDText");
+      hello("addElement " + codeIDTextElement.value );
       htmlIdElement = document.getElementById("SwdPR_PopUp_ElementId");
       CssSelectorElement = document.getElementById("SwdPR_PopUp_CssSelector");
       XPathLocatorElement = document.getElementById("SwdPR_PopUp_XPathLocator");
@@ -363,7 +363,7 @@ getElementId = function(element) {
         "ElementXPath": XPathLocatorElement.firstChild.nodeValue
       };
       createCommand(JsonData);
-      return bye("addElement >");
+      return bye('addElement ' + codeIDTextElement.value + '>');
     };
 
     return SWD_Page_Recorder;

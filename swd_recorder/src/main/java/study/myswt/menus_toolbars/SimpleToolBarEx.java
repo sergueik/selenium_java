@@ -66,9 +66,11 @@ import static org.junit.Assert.assertFalse;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
+// import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -136,6 +138,7 @@ public class SimpleToolBarEx {
 	private Image visual_search;
 	private Image shutdown_icon;
 	private Image configure_app;
+	private Image demo_icon;
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -149,6 +152,9 @@ public class SimpleToolBarEx {
 	private Composite composite;
 	private static String[] Labels = { "Open application",
 			"Navigate to login page", "Something else" };
+
+	private static int width = 900;
+	private static int height = 800;
 	private static int step_index = 0;
 
 	private ToolBar toolBar;
@@ -160,9 +166,7 @@ public class SimpleToolBarEx {
 	@SuppressWarnings("unused")
 	public void initUI(Display display) {
 
-		// Shell shell = new Shell(display, SWT.CENTER | (SWT.SHELL_TRIM &
-		// (~SWT.RESIZE)));
-		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM);
+		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
 		Device dev = shell.getDisplay();
@@ -175,6 +179,7 @@ public class SimpleToolBarEx {
 			configure_app = new Image(dev,
 					getResourcePath("preferences_desktop.png"));
 			shutdown_icon = new Image(dev, getResourcePath("shutdown-1.png"));
+			demo_icon = new Image(dev, getResourcePath("icon-demo.png"));
 		} catch (Exception e) {
 
 			System.err.println("Cannot load images: " + e.getMessage());
@@ -194,6 +199,10 @@ public class SimpleToolBarEx {
 		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
 		configure_app_tool.setImage(configure_app);
 		configure_app_tool.setToolTipText("Configures the app (disabled)");
+
+		ToolItem demo_app_tool = new ToolItem(toolBar, SWT.PUSH);
+		demo_app_tool.setImage(demo_icon);
+		demo_app_tool.setToolTipText("Demonstrates the app");
 
 		ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
 
@@ -221,21 +230,15 @@ public class SimpleToolBarEx {
 					"c:/java/selenium/chromedriver.exe");
 			driver = new ChromeDriver();
 
-			// keymaster.js does not work well with Firefox
 			create_browser_tool.setEnabled(false);
 			// driver = new FirefoxDriver();
-			driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
-			wait = new WebDriverWait(driver, flexibleWait);
-			wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-			actions = new Actions(driver);
+
+			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+					.setScriptTimeout(30, TimeUnit.SECONDS);
 			driver.get(baseURL);
-			driver.get("https://www.ryanair.com/ie/en/");
-			wait.until(
-					ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-							"#home div.specialofferswidget h3 > span:nth-child(1)"))));
 			create_browser_tool.setEnabled(true);
 			visual_search_tool.setEnabled(true);
-
 			// driver.get(getResourceURI("blankpage.html"));
 		});
 
@@ -273,52 +276,148 @@ public class SimpleToolBarEx {
 		});
 
 		//
-		visual_search_tool.addSelectionListener(
+		visual_search_tool.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
 
-				new SelectionListener() {
-					@Override
-					public void widgetDefaultSelected(SelectionEvent event) {
-					}
-
-					@Override
-					public void widgetSelected(SelectionEvent event) {
-						if (driver != null) {
-							visual_search_tool.setEnabled(false);
-							injectElementSearch(Optional.<String> empty());
-							// NOTE: focus is lost
-							try {
-								Thread.sleep(5000);
-							} catch (InterruptedException exception) {
-							}
-							WebElement element = wait.until(ExpectedConditions
-									.visibilityOf(driver.findElement(By.cssSelector(
-											"#home div.specialofferswidget h3 > span:nth-child(1)"))));
-							highlight(element);
-							executeScript(String.format("scroll(0, %d);", -100));
-							actions.keyDown(Keys.CONTROL).build().perform();
-							actions.moveToElement(element).contextClick().build().perform();
-							actions.keyUp(Keys.CONTROL).build().perform();
-							// Assert
-							try {
-								Thread.sleep(100);
-							} catch (InterruptedException e) {
-							}
-
-							completeVisualSearch();
-							// Assert
-							String result = executeScript(getCommand).toString();
-							assertFalse(result.isEmpty());
-							readVisualSearchResult(result);
-							visual_search_tool.setEnabled(true);
-							// injectElementSearch(Optional.of("key('o, enter, left',
-							// function(event,
-							// handler){ window.alert('o, enter or left pressed on target = '
-							// +
-							// event.target.toString() + ' srcElement = ' +
-							// event.srcElement.toString() + ' !');});"));
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (driver != null) {
+					visual_search_tool.setEnabled(false);
+					injectElementSearch(Optional.<String> empty());
+					String name = "";
+					Boolean haveTable = false;
+					/*
+					 * try { wait.until(new ExpectedCondition<Boolean>() {
+					 * 
+					 * @Override public Boolean apply(WebDriver d) { List<WebElement>
+					 * elements = d.findElements(By.id("SWDTable")); return
+					 * (elements.size() > 0); } }); } catch (Exception e) {
+					 * System.err.println("Exception: " + e.toString()); }
+					 */
+					while (name.isEmpty()) {
+						String result = executeScript(getCommand).toString();
+						if (!result.isEmpty()) {
+							name = readVisualSearchResult(result);
+						}
+						if (name.isEmpty()) {
+							break;
+						}
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException exception) {
 						}
 					}
-				});
+
+					Button button = new Button(shell, SWT.PUSH);
+					button.setText(
+							String.format("Step %d: %s", (int) (step_index + 1), name));
+
+					button.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							boolean answer = MessageDialog.openConfirm(shell,
+									button.getText(), "Details: ... ");
+						}
+					});
+
+					step_index++;
+					Control[] children = shell.getChildren();
+					if (children.length == 0) {
+						button.setParent(shell);
+					} else {
+						button.moveBelow(children[children.length - 1]);
+					}
+					shell.layout(new Control[] { button });
+
+					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
+							true);
+					if (newSize.x > 500) {
+						shell.setBounds(boundRect);
+					}
+					shell.pack();
+					visual_search_tool.setEnabled(true);
+				}
+			}
+		});
+
+		demo_app_tool.addSelectionListener(new SelectionListener() {
+			@Override
+			public void widgetDefaultSelected(SelectionEvent event) {
+			}
+
+			@Override
+			public void widgetSelected(SelectionEvent event) {
+				if (driver != null) {
+					demo_app_tool.setEnabled(false);
+					wait = new WebDriverWait(driver, flexibleWait);
+					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+					actions = new Actions(driver);
+					driver.manage().window()
+							.setPosition(new org.openqa.selenium.Point(600, 0));
+					driver.manage().window().setSize(new Dimension(width, height));
+					driver.get("https://www.ryanair.com/ie/en/");
+					wait.until(
+							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+					injectElementSearch(Optional.<String> empty());
+					// NOTE: with FF the CONTROL modifier is not sent
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException exception) {
+					}
+					WebElement element = wait.until(
+							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+					highlight(element);
+					executeScript(String.format("scroll(0, %d);", -100));
+					actions.keyDown(Keys.CONTROL).build().perform();
+					actions.moveToElement(element).contextClick().build().perform();
+					actions.keyUp(Keys.CONTROL).build().perform();
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+					}
+
+					completeVisualSearch();
+					String result = executeScript(getCommand).toString();
+					assertFalse(result.isEmpty());
+					String name = readVisualSearchResult(result);
+
+					Button button = new Button(shell, SWT.PUSH);
+
+					button.setText(
+							String.format("Step %d: %s", (int) (step_index + 1), name));
+
+					button.addListener(SWT.Selection, new Listener() {
+						@Override
+						public void handleEvent(Event e) {
+							boolean answer = MessageDialog.openConfirm(shell,
+									button.getText(), "Details ... ");
+						}
+					});
+
+					step_index++;
+					Control[] children = shell.getChildren();
+					if (children.length == 0) {
+						button.setParent(shell);
+					} else {
+						button.moveBelow(children[children.length - 1]);
+					}
+					shell.layout(new Control[] { button });
+
+					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
+							true);
+					if (newSize.x > 500) {
+						shell.setBounds(boundRect);
+					}
+					shell.pack();
+
+					demo_app_tool.setEnabled(true);
+				}
+			}
+		});
 
 		// lambda style
 		shutdown_tool.addListener(SWT.Selection, e -> {
@@ -342,8 +441,9 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	private void readVisualSearchResult(final String result) {
-		System.err.println("Processing result: " + result);
+	private String readVisualSearchResult(final String result) {
+		// System.err.println("Processing result: " + result);
+		String name = null;
 		ArrayList<String> keys = new ArrayList<String>();
 		try {
 			JSONObject resultObj = new JSONObject(result);
@@ -353,6 +453,9 @@ public class SimpleToolBarEx {
 				String val = resultObj.getString(key);
 				System.err.println(key + " " + val);
 				keys.add(key);
+				if (key.indexOf("CommandId") >= 0) {
+					name = val;
+				}
 				/*
 				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
 				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
@@ -363,6 +466,7 @@ public class SimpleToolBarEx {
 
 		}
 		assertThat(keys, hasItem("ElementId"));
+		return (keys.contains((Object) "ElementCodeName")) ? "ElementCodeName" : name;
 	}
 
 	private void highlight(WebElement element) {
@@ -415,8 +519,8 @@ public class SimpleToolBarEx {
 	}
 
 	private void injectElementSearch(Optional<String> script) {
-		ArrayList<String> scripts = new ArrayList<String>(Arrays
-				.asList(getScriptContent("ElementSearch.js" /* "keymaster.js" */ )));
+		ArrayList<String> scripts = new ArrayList<String>(
+				Arrays.asList(getScriptContent("ElementSearch.js")));
 		if (script.isPresent()) {
 			scripts.add(script.get());
 		}
