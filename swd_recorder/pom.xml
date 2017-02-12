@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>test</groupId>
   <artifactId>myswt</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>myswt</name>
   <url>http://maven.apache.org</url>
@@ -31,6 +31,7 @@
     <eclipse.swt.artifactId>org.eclipse.swt.cocoa.macosx</eclipse.swt.artifactId>
     <eclipse.swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</eclipse.swt.artifactId>
     -->
+    <opal.version>1.0.4</opal.version>
   </properties>
   <dependencies>
     <dependency>
@@ -43,6 +44,13 @@
       <groupId>org.eclipse</groupId>
       <artifactId>jface</artifactId>
       <version>3.3.0-I20070606-0010</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mihalis.opal</groupId>
+      <artifactId>opal</artifactId>
+      <version>${opal.version}</version>
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/opal-${opal.version}.jar</systemPath>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
