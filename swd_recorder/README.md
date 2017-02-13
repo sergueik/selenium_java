@@ -71,18 +71,35 @@ This is why it may be worthwhile setting up Virtualbox to compile and run an ins
 Adding more form elements and code generator and providing the behavior is a work in progress.
 
 ### Mis. useful links
-  * [main swt snippets directory](https://www.eclipse.org/swt/snippets/)
-  * [swt examples on javased.com](http://www.javased.com/?api=org.eclipse.swt.widgets.FileDialog)
+
+#### SWT
+  * [main SWT snippets directory](https://www.eclipse.org/swt/snippets/)
+  * [SWT examples on javased.com](http://www.javased.com/?api=org.eclipse.swt.widgets.FileDialog)
   * [SWT - Tutorial by Lars Vogel, Simon Scholz](http://www.vogella.com/tutorials/SWT/article.html)
   * [Opal Project (SWT new widgets library) by Laurent Caron](https://github.com/lcaron/opal)
+  * [Nebula - Supplemental Widgets for SWT](https://github.com/eclipse/nebula)
   * [danlucraft/jruby-swt-cookbook](https://github.com/danlucraft/jruby-swt-cookbook)
   * [danlucraft/swt](https://github.com/danlucraft/swt)
   * [fab1an/appkit toolkit for swt app design](https://github.com/fab1an/appkit)
+  * [SWT dependency repositories](http://stackoverflow.com/questions/5096299/maven-project-swt-3-5-dependency-any-official-public-repo)
+  * [Examples](http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/CatalogSWT-JFace-Eclipse.htm)
+  * [Examples](https://github.com/ReadyTalk/avian-swt-examples)
+
+#### Code Generation
+
+  * [Jtwig](http://jtwig.org/)
+  * [Thymeleaf](http://www.thymeleaf.org/)
+  * [StringTemplate](http://www.stringtemplate.org/)
+
+### Javascript injection
+  * [Keymaster](https://github.com/madrobby/keymaster)
+
+#### Other
+
+  * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
   * [mono/xwt](https://github.com/mono/xwt)
   * [json2](https://github.com/douglascrockford/JSON-js)
-  * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
-  * [swt dependency repositories](http://stackoverflow.com/questions/5096299/maven-project-swt-3-5-dependency-any-official-public-repo)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
