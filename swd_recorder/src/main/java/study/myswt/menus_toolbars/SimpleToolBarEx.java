@@ -112,6 +112,13 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -132,6 +139,8 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.ScrolledComposite;
 
+import org.mihalis.opal.breadcrumb.*;
+
 public class SimpleToolBarEx {
 
 	private Image create_browser;
@@ -139,6 +148,7 @@ public class SimpleToolBarEx {
 	private Image shutdown_icon;
 	private Image configure_app;
 	private Image demo_icon;
+	private Image page_icon;
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -157,6 +167,7 @@ public class SimpleToolBarEx {
 	private static int height = 800;
 	private static int step_index = 0;
 
+	private Breadcrumb bc;
 	private ToolBar toolBar;
 
 	public SimpleToolBarEx(Display display) {
@@ -180,11 +191,19 @@ public class SimpleToolBarEx {
 					getResourcePath("preferences_desktop.png"));
 			shutdown_icon = new Image(dev, getResourcePath("shutdown-1.png"));
 			demo_icon = new Image(dev, getResourcePath("icon-demo.png"));
+			page_icon = new Image(dev,
+					getResourcePath("page-white-text-width-icon.png"));
+
 		} catch (Exception e) {
 
 			System.err.println("Cannot load images: " + e.getMessage());
 			System.exit(1);
 		}
+
+		bc = new Breadcrumb(shell, SWT.BORDER);
+		// GridData cannot be cast to RowData
+		// bc.setLayoutData(
+		// new GridData(GridData.BEGINNING, GridData.CENTER, false, false));
 
 		toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
@@ -243,29 +262,29 @@ public class SimpleToolBarEx {
 		});
 
 		configure_app_tool.addListener(SWT.Selection, e -> {
-			Button button = new Button(shell, SWT.PUSH);
 
-			button.setText((step_index < Labels.length)
+			final BreadcrumbItem item = new BreadcrumbItem(bc,
+					SWT.CENTER | SWT.TOGGLE);
+
+			item.setData("Item " + String.valueOf(step_index));
+			item.setText((step_index < Labels.length)
 					? String.format("Step %d: %s", (int) (step_index + 1),
 							Labels[step_index])
 					: String.format("Step %d", (int) (step_index + 1)));
 
-			button.addListener(SWT.Selection, new Listener() {
+			item.setImage(page_icon);
+			item.setSelectionImage(page_icon);
+			item.addSelectionListener(new SelectionAdapter() {
 				@Override
-				public void handleEvent(Event e) {
-					boolean answer = MessageDialog.openConfirm(shell, button.getText(),
-							"Details ... ");
+				public void widgetSelected(final SelectionEvent e) {
+					System.out.println(
+							String.format("Clicked %s", e.item.getData().toString()));
+					boolean answer = MessageDialog.openConfirm(shell, item.getText(),
+							String.format("Details of %s", e.item.getData().toString()));
+
 				}
 			});
-
 			step_index++;
-			Control[] children = shell.getChildren();
-			if (children.length == 0) {
-				button.setParent(shell);
-			} else {
-				button.moveBelow(children[children.length - 1]);
-			}
-			shell.layout(new Control[] { button });
 
 			// shell.layout(true, true);
 			final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
@@ -419,7 +438,6 @@ public class SimpleToolBarEx {
 			}
 		});
 
-		// lambda style
 		shutdown_tool.addListener(SWT.Selection, e -> {
 			if (driver != null) {
 				shutdown_tool.setEnabled(false);
@@ -431,7 +449,7 @@ public class SimpleToolBarEx {
 		});
 
 		shell.setText("Selenium WebDriver Page Recorder");
-		shell.setSize(500, 250);
+		// shell.setSize(500, 250);
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -466,7 +484,8 @@ public class SimpleToolBarEx {
 
 		}
 		assertThat(keys, hasItem("ElementId"));
-		return (keys.contains((Object) "ElementCodeName")) ? "ElementCodeName" : name;
+		return (keys.contains((Object) "ElementCodeName")) ? "ElementCodeName"
+				: name;
 	}
 
 	private void highlight(WebElement element) {

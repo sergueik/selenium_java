@@ -14,6 +14,7 @@ import org.mihalis.opal.breadcrumb.*;
 /**
  * based on: simple snippet for the breadcrumb Widget by (c)Laurent Caron
  */
+ 
 public class BreadCrumpEx {
 
 	private static Image[] images;
@@ -47,7 +48,7 @@ public class BreadCrumpEx {
 				new GridData(GridData.END, GridData.CENTER, false, false));
 
 		createBreadcrumb(shell, SWT.BORDER, SWT.CENTER | SWT.TOGGLE, true);
-		new Label(shell, SWT.NONE);
+		// new Label(shell, SWT.NONE);
 
 	}
 
