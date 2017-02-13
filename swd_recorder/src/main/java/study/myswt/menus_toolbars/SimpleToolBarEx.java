@@ -94,50 +94,42 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.eclipse.swt.SWT;
+
+import org.eclipse.jface.dialogs.InputDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.ToolBar;
-import org.eclipse.swt.widgets.ToolItem;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.ToolBar;
+import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
-import org.eclipse.jface.dialogs.InputDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
-
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.custom.ScrolledComposite;
 
 import org.mihalis.opal.breadcrumb.*;
 
@@ -278,9 +270,14 @@ public class SimpleToolBarEx {
 				@Override
 				public void widgetSelected(final SelectionEvent e) {
 					System.out.println(
+
 							String.format("Clicked %s", e.item.getData().toString()));
-					boolean answer = MessageDialog.openConfirm(shell, item.getText(),
-							String.format("Details of %s", e.item.getData().toString()));
+					/*
+					 * boolean answer = MessageDialog.openConfirm(shell, item.getText(),
+					 * String.format("Details of %s", e.item.getData().toString()));
+					 */
+					// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ChildShellExample.htm
+					ChildShell cs = new ChildShell(Display.getCurrent(), shell);
 
 				}
 			});
@@ -309,7 +306,7 @@ public class SimpleToolBarEx {
 					Boolean haveTable = false;
 					/*
 					 * try { wait.until(new ExpectedCondition<Boolean>() {
-					 * 
+					 *
 					 * @Override public Boolean apply(WebDriver d) { List<WebElement>
 					 * elements = d.findElements(By.id("SWDTable")); return
 					 * (elements.size() > 0); } }); } catch (Exception e) {
@@ -381,7 +378,7 @@ public class SimpleToolBarEx {
 							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
 					injectElementSearch(Optional.<String> empty());
-					// NOTE: with FF the CONTROL modifier is not sent
+					// NOTE: with FF the CONTROL modifier appears to not be sent
 					try {
 						Thread.sleep(5000);
 					} catch (InterruptedException exception) {
@@ -660,6 +657,124 @@ public class SimpleToolBarEx {
 			return (propertiesMap);
 
 		}
+	}
+
+}
+
+// https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111
+class ChildShell {
+
+	ChildShell(Display display, Shell parent) {
+		Shell shell = new Shell(display);
+		shell.setSize(20, 20);
+		shell.open();
+		shell.setText("Step Details");
+		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
+		titleData.setText("Name of the step...");
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 4;
+		shell.setLayout(gl);
+		shell.setLayout(gl);
+
+		GridComposite gc = new GridComposite(shell);
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 4;
+		gc.setLayoutData(gd);
+		gd = new GridData();
+
+		RowComposite rc = new RowComposite(shell);
+		gd = new GridData(GridData.FILL_HORIZONTAL);
+		rc.setLayoutData(gd);
+		shell.addListener(SWT.Close, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				shell.dispose();
+			}
+		});
+
+		shell.setSize(350, 280);
+
+		while (!shell.isDisposed()) {
+			if (!display.readAndDispatch())
+				display.sleep();
+		}
+	}
+
+}
+
+class RowComposite extends Composite {
+
+	final Button buttonOK;
+	final Button buttonCancel;
+  
+	public RowComposite(Composite composite) {
+		
+		super(composite, SWT.NO_FOCUS);
+		RowLayout rl = new RowLayout();
+		rl.wrap = false;
+		rl.pack = false;
+		this.setLayout(rl);
+		buttonOK = new Button(this, SWT.BORDER | SWT.PUSH);
+		buttonOK.setText("OK");
+		buttonOK.setSize(30, 20);
+		buttonCancel = new Button(this, SWT.PUSH);
+		buttonCancel.setText("Cancel");
+		buttonCancel.setSize(30, 20);
+		buttonCancel.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent e) {
+				// System.out.println("Cancel was clicked");
+				composite.dispose();
+			}
+		});
+		buttonOK.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event e) {
+				composite.dispose();
+			}
+		});
+
+	}
+}
+
+class GridComposite extends Composite {
+
+	public GridComposite(Composite c) {
+		super(c, SWT.BORDER);
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 2;
+		this.setLayout(gl);
+		final Button cssSelectorRadio = new Button(this, SWT.RADIO);
+		cssSelectorRadio.setSelection(true);
+		cssSelectorRadio.setText("Css Selector");
+		cssSelectorRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
+		cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		cssSelectorData.setText("Css Selector...");
+
+		final Button xPathRadio = new Button(this, SWT.RADIO);
+		xPathRadio.setSelection(false);
+		xPathRadio.setText("XPath");
+		xPathRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
+		xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		xPathData.setText("XPath...");
+
+		final Button idRadio = new Button(this, SWT.RADIO);
+		idRadio.setSelection(false);
+		idRadio.setText("ID");
+		idRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
+		idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		idData.setText("ID...");
+
+		final Button textRadio = new Button(this, SWT.RADIO);
+		textRadio.setSelection(false);
+		textRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		textRadio.setText("Text");
+
+		final Text textData = new Text(this, SWT.SINGLE | SWT.BORDER);
+		textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		textData.setText("Text...");
 	}
 
 }
