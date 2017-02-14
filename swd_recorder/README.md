@@ -1,29 +1,39 @@
 ### Info
-This is a replica of the Standard Widget Toolkit study project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
-which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com).
+This is a OS-independent successor to the
+[Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
+Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt/), and [SWT new widgets library Opal Project by Laurent Caron](https://github.com/lcaron/opal)
 
 ![example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
 
 ### Goals
 
-The goal is to develop [The Standard Widget Toolkit](https://www.eclipse.org/swt/) based successor of [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of Dmytro Zharii.
-Eventually a simplified look and feel of is planned.
+Eventually the main functionality of SWD is to be achieved.
+
+UI is a work in progress: adding more form elements and the code generator is a work in progress.
+
+A number of basic examples from the
+Standard Widget Toolkit study project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
+(which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com))
+is currently checked in but will eventually disappear, and the code generator support will be added.
+
+Also, the standalone SWT application jar may be converted to an Eclipse plugin.
+
+The application can be run on a 32 or 64 bit Windows or Linux machine, or in Vagrantbox. It is expected to eventually run on OSX, but not yet.
+
 ### Usage
 
-The application can be run on a 32 or 64 bit Windows or Linux machine, or in Vagrantbox. It should run on OSX, but this has not been tested yet.
 To start the application run
-```cmd
-run.cmd
+```powershell
+. .\run.ps1
 ```
 or
 ```bash
 ./run.sh
 ```
-It will compile and package the project and run it from the `target` directory. A number of sample classes from the "Study SWT" project will eventually disappear, and the Xtext support will be added. Also, the application may be converted to an Eclipse plugin.
+This script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven 
+and runs it it from the `target` directory.
 
-### Technical Details
-
-The `pom.xml` declares `swt.jar` dependency in a platform-specific fashion:
+Currently `swt.jar` dependency is declared in the the `pom.xml` in a platform-specific fashion:
 
 ```xml
   <properties>
@@ -46,16 +56,17 @@ The `pom.xml` declares `swt.jar` dependency in a platform-specific fashion:
 		</dependency>
     ...
 ```
-Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the `artifactId` specific to the host OS.
+Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the OS-specific `artifactId` an comment the rest.
 
-As usual with Selenium, Application is ommlycapable of runing when the right combination of versions of Selenium jar, browser drivers and browsers is used.
+### Compinent Versions
+As usual with Selenium, Application only runnable with the matching combination of versions of Selenium jar, browser driver and browsers is used.
 
 Few supported combination of old versions are listed below:
 
 |                      |              |
 |----------------------|--------------|
-| SELENIUM_VERSION     | 2.53         |
-| FIREFOX_VERSION      | 45.0.1       |
+| SELENIUM_VERSION     | 2.53.1       |
+| FIREFOX_VERSION      | 45.0.1  or below      |
 | CHROME_VERSION       | 54.0.2840.71 |
 | CHROMEDRIVER_VERSION | 2.24         |
 
@@ -68,11 +79,10 @@ Few supported combination of old versions are listed below:
 
 This is why it may be worthwhile setting up Virtualbox to compile and run an instance in.
 
-Adding more form elements and code generator and providing the behavior is a work in progress.
-
-### Mis. useful links
+### Links
 
 #### SWT
+
   * [main SWT snippets directory](https://www.eclipse.org/swt/snippets/)
   * [SWT examples on javased.com](http://www.javased.com/?api=org.eclipse.swt.widgets.FileDialog)
   * [SWT - Tutorial by Lars Vogel, Simon Scholz](http://www.vogella.com/tutorials/SWT/article.html)
@@ -94,7 +104,7 @@ Adding more form elements and code generator and providing the behavior is a wor
 ### Javascript injection
   * [Keymaster](https://github.com/madrobby/keymaster)
 
-#### Other
+#### Misc.
 
   * [how to define conditional properties in maven](http://stackoverflow.com/questions/14430122/how-to-define-conditional-properties-in-maven)
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
