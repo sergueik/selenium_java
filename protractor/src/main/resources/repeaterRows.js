@@ -1,4 +1,23 @@
 /**
+ * Tests if an ngRepeat matches a repeater
+ *
+ * @param {string} ngRepeat The ngRepeat to test
+ * @param {string} repeater The repeater to test against
+ * @param {boolean} exact If the ngRepeat expression needs to match the whole
+ *   repeater (not counting any `track by ...` modifier) or if it just needs to
+ *   match a substring
+ * @return {boolean} If the ngRepeat matched the repeater
+ */
+var repeaterMatch = function(ngRepeat, repeater, exact) {
+  if (exact) {
+    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
+    split('=')[0].trim() == repeater;
+  } else {
+    return ngRepeat.indexOf(repeater) != -1;
+  }
+}
+
+/**
  * Find an array of elements matching a row within an ng-repeat.
  * Always returns an array of only one element for plain old ng-repeat.
  * Returns an array of all the elements in one segment for ng-repeat-start.
@@ -50,15 +69,6 @@ function findRepeaterRows(repeater, exact, index, using) {
   }
   var row = rows[index] || [], multiRow = multiRows[index] || [];
   return [].concat(row, multiRow);
-}
-
-function repeaterMatch(ngRepeat, repeater, exact) {
-  if (exact) {
-    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
-        split('=')[0].trim() == repeater;
-  } else {
-    return ngRepeat.indexOf(repeater) != -1;
-  }
 }
 
 var using = arguments[0] || document;

@@ -73,7 +73,8 @@ return angular.element(element).scope().$eval(expression)
 Evaluate an Angular expression in the context of a given element.
 
 The [Protractor By locators](http://www.protractortest.org/#/api?view=ProtractorBy) and a subset of Protractor Browser API 
-is borrowed from __Protractor__  project in a form of Javascript snippets - one file per method - stored in a separate file under
+is borrowed from __Protractor__  project's [clientsidescripts.js](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
+in a form of Javascript snippets - one file per method - stored in the
 `src/main/java/resources`:
 ```
 binding.js

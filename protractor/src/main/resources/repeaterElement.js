@@ -1,4 +1,23 @@
 /**
+ * Tests if an ngRepeat matches a repeater
+ *
+ * @param {string} ngRepeat The ngRepeat to test
+ * @param {string} repeater The repeater to test against
+ * @param {boolean} exact If the ngRepeat expression needs to match the whole
+ *   repeater (not counting any `track by ...` modifier) or if it just needs to
+ *   match a substring
+ * @return {boolean} If the ngRepeat matched the repeater
+ */
+var repeaterMatch = function(ngRepeat, repeater, exact) {
+  if (exact) {
+    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
+    split('=')[0].trim() == repeater;
+  } else {
+    return ngRepeat.indexOf(repeater) != -1;
+  }
+}
+
+/**
  * Find an element within an ng-repeat by its row and column.
  *
  * @param {string} repeater The text of the repeater, e.g. 'cat in cats'.
@@ -10,15 +29,6 @@
  *
  * @return {Array.<Element>} The element in an array.
  */
-
-function repeaterMatch(ngRepeat, repeater, exact) {
-  if (exact) {
-    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
-        split('=')[0].trim() == repeater;
-  } else {
-    return ngRepeat.indexOf(repeater) != -1;
-  }
-}
 
 var findRepeaterElement = function(repeater, exact, index, binding, using, rootSelector) {
   var matches = [];

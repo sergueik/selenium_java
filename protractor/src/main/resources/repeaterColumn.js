@@ -1,23 +1,34 @@
-        /**
-        * Find the elements in a column of an ng-repeat.
-        *
-        * @param {string} repeater The text of the repeater, e.g. 'cat in cats'.
-        * @param {boolean} exact Whether the repeater needs to be matched exactly
-        * @param {string} binding The column binding, e.g. '{{cat.name}}'.
-        * @param {Element} using The scope of the search.
-        * @param {string} rootSelector The selector to use for the root app element.
-        *
-        * @return {Array.WebElement} The elements in the column.
-        */
-
+/**
+ * Tests if an ngRepeat matches a repeater
+ *
+ * @param {string} ngRepeat The ngRepeat to test
+ * @param {string} repeater The repeater to test against
+ * @param {boolean} exact If the ngRepeat expression needs to match the whole
+ *   repeater (not counting any `track by ...` modifier) or if it just needs to
+ *   match a substring
+ * @return {boolean} If the ngRepeat matched the repeater
+ */
 var repeaterMatch = function(ngRepeat, repeater, exact) {
-    if (exact) {
-        return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
-        split('=')[0].trim() == repeater;
-    } else {
-        return ngRepeat.indexOf(repeater) != -1;
-    }
+  if (exact) {
+    return ngRepeat.split(' track by ')[0].split(' as ')[0].split('|')[0].
+    split('=')[0].trim() == repeater;
+  } else {
+    return ngRepeat.indexOf(repeater) != -1;
+  }
 }
+
+/**
+* Find the elements in a column of an ng-repeat.
+*
+* @param {string} repeater The text of the repeater, e.g. 'cat in cats'.
+* @param {boolean} exact Whether the repeater needs to be matched exactly
+* @param {string} binding The column binding, e.g. '{{cat.name}}'.
+* @param {Element} using The scope of the search.
+* @param {string} rootSelector The selector to use for the root app element.
+*
+* @return {Array.WebElement} The elements in the column.
+*/
+
 
 var findRepeaterColumn = function(repeater, exact, binding, using, rootSelector) {
     var matches = [];

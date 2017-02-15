@@ -104,7 +104,7 @@ public class NgLocalFileTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDatePickerDirectSelect() {
 		getPageContent("ng_datepicker.htm");
@@ -206,7 +206,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDatePickerNavigation() {
 		getPageContent("ng_datepicker.htm");
@@ -256,7 +256,7 @@ public class NgLocalFileTest {
 		System.err.println("Following month: " + ng_display.getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluate() {
 		if (!isCIBuild) {
@@ -284,7 +284,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testUpload1() {
 		if (!isCIBuild) {
@@ -331,7 +331,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testUpload3() {
 		if (isCIBuild) {
@@ -362,7 +362,7 @@ public class NgLocalFileTest {
 		button.click();
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluateEvenOdd() {
 		if (!isCIBuild) {
@@ -391,7 +391,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindRepeaterElement() {
 		if (!isCIBuild) {
@@ -420,7 +420,7 @@ public class NgLocalFileTest {
 		assertThat(elements.size(), equalTo(0));
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByRepeaterColumn() {
 		if (!isCIBuild) {
@@ -451,7 +451,7 @@ public class NgLocalFileTest {
 		assertTrue(cnt == 3);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindSelectedtOptionWithAlert() {
 
@@ -545,7 +545,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindSelectedtOption() {
 		if (!isCIBuild) {
@@ -573,7 +573,7 @@ public class NgLocalFileTest {
 		System.err.println("Selected option: " + element.getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChangeSelectedtOption() {
 		if (!isCIBuild) {
@@ -612,7 +612,7 @@ public class NgLocalFileTest {
 		assertThat(element.getText(), containsString("two"));
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChangeSelectedRepeaterOption() {
 		if (!isCIBuild) {
@@ -688,7 +688,7 @@ public class NgLocalFileTest {
 		System.err.println("selected option: " + ngElement.getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testMultiSelect2() {
 		getPageContent("ng_multi_select2.htm");
@@ -736,7 +736,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testMultiSelect() {
 		getPageContent("ng_multi_select.htm");
@@ -803,7 +803,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() {
 		if (!isCIBuild) {
@@ -817,7 +817,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(0).getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByOptions() {
 		if (!isCIBuild) {
@@ -833,7 +833,7 @@ public class NgLocalFileTest {
 		System.err.println(elements.get(1).getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindElementByModel() {
 		// NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
@@ -865,7 +865,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
-	// @Ignore
+	// // @Ignore
 	// @Test
 	// public void testFindRepeaterElement() {
 	// if (!isCIBuild) {
@@ -881,7 +881,7 @@ public class NgLocalFileTest {
 	// assertThat(elements.size(), equalTo(0));
 	// }
 	// NOTE: failing in Linux VM: PhantomJS has crashed
-	@Ignore
+	// @Ignore
 	@Test
 	public void testElementTextIsGenerated() {
 		if (!isCIBuild) {
@@ -905,7 +905,7 @@ public class NgLocalFileTest {
 		assertTrue(greeting_text.length() > 0);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDropDownWatch() {
 		// NOTE: works with Angular 1.2.13, fails withAngular 1.4.9
@@ -998,7 +998,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindRepeaterRows() {
 		if (!isCIBuild) {
@@ -1019,7 +1019,7 @@ public class NgLocalFileTest {
 		assertThat(todos.size(), equalTo(0));
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testOrderByColumnField() {
 		// Given there is a sorted data grid
@@ -1093,7 +1093,7 @@ public class NgLocalFileTest {
 	}
 
 	// TODO: separate into class AngularUISelect.java
-	@Ignore
+	// @Ignore
 	@Test
 	public void testAngularUISelectHandleSelectedAndAvailable() {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1130,7 +1130,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testAngularUISelectHandleSearch() {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1153,7 +1153,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testAngularUISelectHandleDeselect() {
 		getPageContent("ng_ui_select_example1.htm");
@@ -1183,7 +1183,7 @@ public class NgLocalFileTest {
 		System.err.println("Nothing is selected");
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testFindAllBindings() {
 		if (!isCIBuild) {
@@ -1208,7 +1208,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testHover() {
 		getPageContent("ng_hover1.htm");
@@ -1248,7 +1248,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDropDown() {
 		if (!isCIBuild) {
@@ -1315,7 +1315,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	// // @Ignore
 	@Test
 	public void testDragAndDrop() {
 		// TODO: investigate the failure under TRAVIS
@@ -1354,7 +1354,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDragAndDropSimulate() {
 		getPageContent("ng_drag_and_drop1.htm");
