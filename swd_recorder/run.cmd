@@ -13,10 +13,12 @@ PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 
 call mvn package install
 set TARGET=%CD%\target
-set PACKAGE_VERSION=0.0.2-SNAPSHOT
+set PACKAGE_VERSION=0.0.3-SNAPSHOT
 
 set MAIN_APP_PACKAGE=com.mycompany.app
-set MAIN_APP_CLASS=SimpleToolBarEx
+
+set MAIN_APP_CLASS=%1
+if "%MAIN_APP_CLASS%"=="" set MAIN_APP_CLASS=SimpleToolBarEx
 
 java -cp %TARGET%\myswt-%PACKAGE_VERSION%.jar;%TARGET%\lib\* ^
 %MAIN_APP_PACKAGE%.%MAIN_APP_CLASS%
