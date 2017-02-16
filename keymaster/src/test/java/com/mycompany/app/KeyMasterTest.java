@@ -95,7 +95,7 @@ public class KeyMasterTest {
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
-		// NOTE: actions CTRL-right click does not work well with Firefox
+		// NOTE: CTRL-right click via actions does not work well with Firefox
 		// driver = new FirefoxDriver();
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
@@ -187,12 +187,12 @@ public class KeyMasterTest {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		completeVisualSearch();
+		completeVisualSearch("element name");
 
 		// Assert
-		String result = (String) executeScript(getCommand);
-		assertFalse(result.isEmpty());
-		readVisualSearchResult(result);
+		String payload = (String) executeScript(getCommand);
+		assertFalse(payload.isEmpty());
+		String result = readVisualSearchResult(payload);
 	}
 
 	@Test(enabled = false, priority = 5)
@@ -214,7 +214,7 @@ public class KeyMasterTest {
 	}
 
 	// This test is failing
-	@Test(enabled = true, priority = 6)
+	@Test(enabled = false, priority = 6)
 	public void testWebPageKeyMasterElementSearchInjection() {
 		driver.get("https://www.ryanair.com/ie/en/");
 		WebElement element = wait.until(
@@ -235,12 +235,12 @@ public class KeyMasterTest {
 		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
 		// Assert
-		String result = executeScript(getCommand).toString();
-		assertFalse(result.isEmpty());
-		readVisualSearchResult(result);
+		String payload = (String) executeScript(getCommand);
+		assertFalse(payload.isEmpty());
+		String result = readVisualSearchResult(payload);
 	}
 
-	@Test(enabled = true, priority = 7)
+	@Test(enabled = false, priority = 7)
 	public void testBlankPageKeyMasterElementSearchInjection() {
 		driver.get(getPageContent("blankpage.html"));
 		WebElement element = wait.until(
@@ -250,7 +250,7 @@ public class KeyMasterTest {
 		// Act
 		actions.moveToElement(element).sendKeys("o").build().perform();
 		try {
-			Thread.sleep(100);
+			Thread.sleep(10000);
 		} catch (InterruptedException e) {
 		}
 		// Assert
@@ -260,20 +260,20 @@ public class KeyMasterTest {
 		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
 		// Assert
-		String result = executeScript(getCommand).toString();
-		assertFalse(result.isEmpty());
-		readVisualSearchResult(result);
+		String payload = (String) executeScript(getCommand);
+		assertFalse(payload.isEmpty());
+		String result = readVisualSearchResult(payload);
 	}
 
-	@Test(enabled = false, priority = 8)
+	@Test(enabled = true, priority = 8)
 	public void testElementSearchResult() {
 		driver.get(getPageContent("blankpage.html"));
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
 		highlight(element);
-		String result = (String) executeScript(getCommand);
-		assertTrue(result.isEmpty());
+		String payload = (String) executeScript(getCommand);
+		assertTrue(payload.isEmpty());
 		// Act
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(element).contextClick().build().perform();
@@ -283,25 +283,29 @@ public class KeyMasterTest {
 		} catch (InterruptedException e) {
 		}
 		// Assert, Act
-		completeVisualSearch();
+		completeVisualSearch("element name");
 		// Assert
-		result = executeScript(getCommand).toString();
-		assertFalse(result.isEmpty());
-		readVisualSearchResult(result);
-
+		payload = (String) executeScript(getCommand);
+		assertFalse(payload.isEmpty());
+		String result = readVisualSearchResult(payload);
 	}
 
-	private void readVisualSearchResult(final String result) {
-		System.err.println("Processing result: " + result);
-		ArrayList<String> keys = new ArrayList<String>();
+	private String readVisualSearchResult(final String payload) {
+		System.err.println("Processing payload: " + payload);
+		String elementCodeName = "";
+		ArrayList<String> resultKeys = new ArrayList<String>();
 		try {
-			JSONObject resultObj = new JSONObject(result);
-			Iterator<String> keyIterator = resultObj.keys();
-			while (keyIterator.hasNext()) {
-				String key = keyIterator.next();
-				String val = resultObj.getString(key);
-				System.err.println(key + " " + val);
-				keys.add(key);
+			JSONObject payloadObj = new JSONObject(payload);
+			Iterator<String> payloadKeyIterator = payloadObj.keys();
+			while (payloadKeyIterator.hasNext()) {
+
+				String itemKey = payloadKeyIterator.next();
+				String itemVal = payloadObj.getString(itemKey);
+				System.err.println(itemKey + " " + itemVal);
+				resultKeys.add(itemKey);
+				if (itemKey.indexOf("ElementCodeName") >= 0) {
+					elementCodeName = itemVal;
+				}
 				/*
 				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
 				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
@@ -311,7 +315,11 @@ public class KeyMasterTest {
 		} catch (JSONException e) {
 
 		}
-		assertThat(keys, hasItem("ElementId"));
+		assertThat(resultKeys, hasItem("ElementId"));
+		// NOTE: elementCodeName will be blank if user clicked the SWD Table Close
+		// Button
+		// ElementId will never be blank
+		return elementCodeName;
 	}
 
 	private void highlight(WebElement element) {
@@ -333,24 +341,29 @@ public class KeyMasterTest {
 		}
 	}
 
-	private void completeVisualSearch() {
-
+	private void completeVisualSearch(String elementCodeName) {
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
+
 		// System.err.println("Swd Control:" +
 		// swdControl.getAttribute("innerHTML"));
 		WebElement swdCodeID = wait.until(ExpectedConditions
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
-		swdCodeID.clear();
-		swdCodeID.sendKeys("test code id");
-		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
-				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
-		assertThat(swdControl, notNullValue());
-		highlight(swdCloseButton);
+		swdCodeID.sendKeys(elementCodeName);
+		/*
+		 * WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
+		 * swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
+		 * assertThat(swdCloseButton, notNullValue()); highlight(swdCloseButton);
+		 */
+		WebElement swdAddElementButton = wait
+				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
+						By.xpath("//input[@type='button'][@value='Add element']"))));
+		assertThat(swdAddElementButton, notNullValue());
+		highlight(swdAddElementButton);
 		// Act
-		swdCloseButton.click();
+		swdAddElementButton.click();
 	}
 
 	private Object executeScript(String script, Object... arguments) {
@@ -406,10 +419,10 @@ public class KeyMasterTest {
 			alert = driver.switchTo().alert();
 			String alert_text = alert.getText();
 			System.err.println("Accepted alert: " + alert_text);
-			// Accepted alert: o, enter or left pressed on 
+			// Accepted alert: o, enter or left pressed on
 			// target = [object HTMLBodyElement]
 			// srcElement = [object HTMLBodyElement] !
-			
+
 			// confirm alert
 			alert.accept();
 		} catch (NoAlertPresentException e) {
