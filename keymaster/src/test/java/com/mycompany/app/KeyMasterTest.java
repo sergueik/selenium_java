@@ -288,6 +288,12 @@ public class KeyMasterTest {
 		payload = (String) executeScript(getCommand);
 		assertFalse(payload.isEmpty());
 		String result = readVisualSearchResult(payload);
+		closeVisualSearch();
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+		}
+
 	}
 
 	private String readVisualSearchResult(final String payload) {
@@ -366,6 +372,19 @@ public class KeyMasterTest {
 		swdAddElementButton.click();
 	}
 
+	private void closeVisualSearch() {
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+		assertThat(swdControl, notNullValue());
+
+		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
+				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
+		assertThat(swdCloseButton, notNullValue());
+		highlight(swdCloseButton);
+		highlight(swdCloseButton);
+		swdCloseButton.click();
+	}
+
 	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
@@ -435,3 +454,4 @@ public class KeyMasterTest {
 		}
 	}
 }
+  
