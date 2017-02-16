@@ -396,16 +396,21 @@ public class SimpleToolBarEx {
 					} catch (InterruptedException e) {
 					}
 
-					completeVisualSearch();
-					String result = executeScript(getCommand).toString();
-					assertFalse(result.isEmpty());
-					String name = readVisualSearchResult(result);
+					completeVisualSearch("element name");
+					String payload = executeScript(getCommand).toString();
+					assertFalse(payload.isEmpty());
+					// String name = readVisualSearchResult(payload);
+
+					HashMap<String, String> data = new HashMap<String, String>();
+					String name = readVisualSearchResult(payload, Optional.of(data));
+
+					closeVisualSearch();
 
 					Button button = new Button(shell, SWT.PUSH);
 
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
-
+					button.setData(data);
 					button.addListener(SWT.Selection, new Listener() {
 						@Override
 						public void handleEvent(Event e) {
@@ -435,10 +440,21 @@ public class SimpleToolBarEx {
 			}
 		});
 
-		shutdown_tool.addListener(SWT.Selection, e -> {
+		shutdown_tool.addListener(SWT.Selection, event -> {
 			if (driver != null) {
 				shutdown_tool.setEnabled(false);
-				driver.quit();
+				try {
+					driver.close();
+					// driver.quit();
+				} catch (Exception e) {
+					System.err.println("Ignored exception: " + e.toString());
+					// WARNING: Process refused to die after 10 seconds,
+					// and couldn't taskkill it
+					// java.lang.NullPointerException: Unable to find executable for:
+					// taskkill
+					// when run from Powershell
+				}
+
 				shutdown_tool.setEnabled(true);
 			}
 			shell.getDisplay().dispose();
@@ -456,21 +472,25 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	private String readVisualSearchResult(final String result) {
-		// System.err.println("Processing result: " + result);
-		String name = null;
-		ArrayList<String> keys = new ArrayList<String>();
+	String readVisualSearchResult(String payload) {
+		return readVisualSearchResult(payload,
+				Optional.<HashMap<String, String>> empty());
+	}
+
+	private String readVisualSearchResult(final String payload,
+			Optional<HashMap<String, String>> parameters) {
+		System.err.println("Processing payload: " + payload);
+		Boolean collectResults = parameters.isPresent();
+		HashMap<String, String> collector = (collectResults) ? parameters.get()
+				: new HashMap<String, String>();
 		try {
-			JSONObject resultObj = new JSONObject(result);
-			Iterator<String> keyIterator = resultObj.keys();
-			while (keyIterator.hasNext()) {
-				String key = keyIterator.next();
-				String val = resultObj.getString(key);
-				System.err.println(key + " " + val);
-				keys.add(key);
-				if (key.indexOf("CommandId") >= 0) {
-					name = val;
-				}
+			JSONObject payloadObj = new JSONObject(payload);
+			Iterator<String> payloadKeyIterator = payloadObj.keys();
+			while (payloadKeyIterator.hasNext()) {
+
+				String itemKey = payloadKeyIterator.next();
+				String itemVal = payloadObj.getString(itemKey);
+				collector.put(itemKey, itemVal);
 				/*
 				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
 				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
@@ -480,9 +500,11 @@ public class SimpleToolBarEx {
 		} catch (JSONException e) {
 
 		}
-		assertThat(keys, hasItem("ElementId"));
-		return (keys.contains((Object) "ElementCodeName")) ? "ElementCodeName"
-				: name;
+		assertTrue(collector.containsKey("ElementId"));
+		// NOTE: elementCodeName will not be set if
+		// user clicked the SWD Table Close Button
+		// ElementId is always set
+		return collector.get("ElementCodeName");
 	}
 
 	private void highlight(WebElement element) {
@@ -504,23 +526,35 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	private void completeVisualSearch() {
-
+	private void completeVisualSearch(String elementCodeName) {
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
+
 		// System.err.println("Swd Control:" +
 		// swdControl.getAttribute("innerHTML"));
 		WebElement swdCodeID = wait.until(ExpectedConditions
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
-		swdCodeID.clear();
-		swdCodeID.sendKeys("test code id");
+		swdCodeID.sendKeys(elementCodeName);
+		WebElement swdAddElementButton = wait
+				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
+						By.xpath("//input[@type='button'][@value='Add element']"))));
+		assertThat(swdAddElementButton, notNullValue());
+		highlight(swdAddElementButton);
+		// Act
+		swdAddElementButton.click();
+	}
+
+	private void closeVisualSearch() {
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+		assertThat(swdControl, notNullValue());
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
-		assertThat(swdControl, notNullValue());
+		assertThat(swdCloseButton, notNullValue());
 		highlight(swdCloseButton);
-		// Act
+		highlight(swdCloseButton);
 		swdCloseButton.click();
 	}
 
@@ -706,9 +740,9 @@ class RowComposite extends Composite {
 
 	final Button buttonOK;
 	final Button buttonCancel;
-  
+
 	public RowComposite(Composite composite) {
-		
+
 		super(composite, SWT.NO_FOCUS);
 		RowLayout rl = new RowLayout();
 		rl.wrap = false;
