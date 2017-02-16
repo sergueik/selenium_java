@@ -107,8 +107,16 @@ public class KeyMasterTest {
 	}
 
 	@AfterSuite
-	public void afterSuiteMethod() throws Exception {
-		driver.quit();
+	public void afterSuiteMethod() {
+		try {
+			driver.quit();
+		} catch (Exception e) {
+			System.err.println("Ignored exception: " + e.toString());
+			// WARNING: Process refused to die after 10 seconds, 
+			// and couldn't taskkill it
+			// java.lang.NullPointerException: Unable to find executable for: taskkill
+			// when run from Powershell
+		}
 	}
 
 	@BeforeMethod
@@ -287,7 +295,13 @@ public class KeyMasterTest {
 		// Assert
 		payload = (String) executeScript(getCommand);
 		assertFalse(payload.isEmpty());
-		String result = readVisualSearchResult(payload);
+		HashMap<String, String> data = new HashMap<String, String>();
+		String result = readVisualSearchResult(payload, Optional.of(data));
+		for (String key : data.keySet()) {
+			System.err.println(key + ": " + data.get(key));
+		}
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+
 		closeVisualSearch();
 		try {
 			Thread.sleep(300);
@@ -296,10 +310,17 @@ public class KeyMasterTest {
 
 	}
 
-	private String readVisualSearchResult(final String payload) {
+	String readVisualSearchResult(String payload) {
+		return readVisualSearchResult(payload,
+				Optional.<HashMap<String, String>> empty());
+	}
+
+	private String readVisualSearchResult(final String payload,
+			Optional<HashMap<String, String>> parameters) {
 		System.err.println("Processing payload: " + payload);
-		String elementCodeName = "";
-		ArrayList<String> resultKeys = new ArrayList<String>();
+		Boolean collectResults = parameters.isPresent();
+		HashMap<String, String> collector = (collectResults) ? parameters.get()
+				: new HashMap<String, String>();
 		try {
 			JSONObject payloadObj = new JSONObject(payload);
 			Iterator<String> payloadKeyIterator = payloadObj.keys();
@@ -307,11 +328,7 @@ public class KeyMasterTest {
 
 				String itemKey = payloadKeyIterator.next();
 				String itemVal = payloadObj.getString(itemKey);
-				System.err.println(itemKey + " " + itemVal);
-				resultKeys.add(itemKey);
-				if (itemKey.indexOf("ElementCodeName") >= 0) {
-					elementCodeName = itemVal;
-				}
+				collector.put(itemKey, itemVal);
 				/*
 				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
 				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
@@ -321,30 +338,11 @@ public class KeyMasterTest {
 		} catch (JSONException e) {
 
 		}
-		assertThat(resultKeys, hasItem("ElementId"));
-		// NOTE: elementCodeName will be blank if user clicked the SWD Table Close
-		// Button
-		// ElementId will never be blank
-		return elementCodeName;
-	}
-
-	private void highlight(WebElement element) {
-		highlight(element, 100);
-	}
-
-	private void highlight(WebElement element, long highlight_interval) {
-		if (wait == null) {
-			wait = new WebDriverWait(driver, flexibleWait);
-		}
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'", element);
-			Thread.sleep(highlight_interval);
-			executeScript("arguments[0].style.border=''", element);
-		} catch (InterruptedException e) {
-			System.err.println("Ignored: " + e.toString());
-		}
+		assertTrue(collector.containsKey("ElementId"));
+		// NOTE: elementCodeName will not be set if
+		// user clicked the SWD Table Close Button
+		// ElementId is always set
+		return collector.get("ElementCodeName");
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
@@ -358,17 +356,11 @@ public class KeyMasterTest {
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
 		swdCodeID.sendKeys(elementCodeName);
-		/*
-		 * WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
-		 * swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
-		 * assertThat(swdCloseButton, notNullValue()); highlight(swdCloseButton);
-		 */
 		WebElement swdAddElementButton = wait
 				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
 						By.xpath("//input[@type='button'][@value='Add element']"))));
 		assertThat(swdAddElementButton, notNullValue());
 		highlight(swdAddElementButton);
-		// Act
 		swdAddElementButton.click();
 	}
 
@@ -396,7 +388,6 @@ public class KeyMasterTest {
 	}
 
 	private void injectKeyMaster(Optional<String> script) {
-
 		ArrayList<String> scripts = new ArrayList<String>(Arrays.asList(
 				getScriptContent("keymaster.js"),
 				"key('o, enter, left', function(event, handler){ window.alert('o, enter or left pressed on target = ' + event.target.toString() +  ' srcElement = ' + event.srcElement.toString() + ' !');});"));
@@ -406,6 +397,25 @@ public class KeyMasterTest {
 		for (String s : scripts) {
 			if (s != null)
 				executeScript(s);
+		}
+	}
+
+	private void highlight(WebElement element) {
+		highlight(element, 100);
+	}
+
+	private void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
+			Thread.sleep(highlight_interval);
+			executeScript("arguments[0].style.border=''", element);
+		} catch (InterruptedException e) {
+			System.err.println("Ignored: " + e.toString());
 		}
 	}
 
@@ -454,4 +464,3 @@ public class KeyMasterTest {
 		}
 	}
 }
-  
