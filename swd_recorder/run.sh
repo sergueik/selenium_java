@@ -11,9 +11,9 @@ pushd 'src/main/resources/'
 wget -O $JARFILE -nv $URL
 popd
 fi
-mvn clean package install
 
-MAIN_APP_PACKAGE='study.myswt.menus_toolbars'
+MAIN_APP_PACKAGE='com.mycompany.app'
 MAIN_APP_CLASS='SimpleToolBarEx'
 
+mvn clean package install
 java -cp target/myswt-$PROJECT_VERSION.jar:target/lib/* "$MAIN_APP_PACKAGE.$MAIN_APP_CLASS"

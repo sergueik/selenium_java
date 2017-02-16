@@ -9,13 +9,13 @@ set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
 set M2=%M2_HOME%\bin
 set MAVEN_OPTS=-Xms256m -Xmx512m
 
-PATH=%JAVA_HOME%\bin;%M2%
+PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 
 call mvn package install
 set TARGET=%CD%\target
 set PACKAGE_VERSION=0.0.2-SNAPSHOT
 
-set MAIN_APP_PACKAGE=study.myswt.menus_toolbars
+set MAIN_APP_PACKAGE=com.mycompany.app
 set MAIN_APP_CLASS=SimpleToolBarEx
 
 java -cp %TARGET%\myswt-%PACKAGE_VERSION%.jar;%TARGET%\lib\* ^

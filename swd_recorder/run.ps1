@@ -4,11 +4,11 @@ $env:JAVA_HOME = "c:\java\jdk${JAVA_VERSION}"
 $env:M2_HOME = "c:\java\apache-maven-${MAVEN_VERSION}"
 $env:M2 = "${env:M2_HOME}\bin"
 
-$env:PATH = "${env:PATH};${env:JAVA_HOME}\bin;${env:M2}"
-$env:JAVA_OPTS = $env:MAVEN_OPTS = @( '-Xms256m','-Xmx512m')
+$env:PATH = "${env:JAVA_HOME}\bin;${env:M2};${env:PATH}"
+$env:JAVA_OPTS = $env:MAVEN_OPTS = @('-Xms256m','-Xmx512m')
 
 $PROJECT_VERSION = '0.0.2-SNAPSHOT'
-$MAIN_APP_PACKAGE = 'study.myswt.menus_toolbars'
+$MAIN_APP_PACKAGE = 'com.mycompany.app'
 $MAIN_APP_CLASS = 'SimpleToolBarEx'
 
 # external dependencies
