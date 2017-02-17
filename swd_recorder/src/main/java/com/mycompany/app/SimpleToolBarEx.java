@@ -158,12 +158,20 @@ public class SimpleToolBarEx {
 	private static int width = 900;
 	private static int height = 800;
 	private static int step_index = 0;
+	private static String osName = null;
 
 	private Breadcrumb bc;
 	private ToolBar toolBar;
 
 	public SimpleToolBarEx(Display display) {
 		initUI(display);
+	}
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
 	}
 
 	@SuppressWarnings("unused")
@@ -235,14 +243,19 @@ public class SimpleToolBarEx {
 		layout.marginBottom = 5;
 
 		shell.setLayout(layout);
-		create_browser_tool.addListener(SWT.Selection, e -> {
-
-			System.setProperty("webdriver.chrome.driver",
-					"c:/java/selenium/chromedriver.exe");
-			driver = new ChromeDriver();
+		create_browser_tool.addListener(SWT.Selection, event -> {
+			System.err.println("OS: " + getOsName());
 
 			create_browser_tool.setEnabled(false);
-			// driver = new FirefoxDriver();
+			if (osName.startsWith("Windows")) {
+
+				System.setProperty("webdriver.chrome.driver",
+						"c:/java/selenium/chromedriver.exe");
+				driver = new ChromeDriver();
+
+			} else {
+				driver = new FirefoxDriver();
+			}
 
 			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
