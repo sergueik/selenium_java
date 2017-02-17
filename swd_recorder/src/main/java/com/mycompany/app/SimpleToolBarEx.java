@@ -97,8 +97,12 @@ import org.eclipse.swt.SWT;
 
 import org.eclipse.jface.dialogs.InputDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.layout.GridDataFactory;
+
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -141,6 +145,7 @@ public class SimpleToolBarEx {
 	private Image configure_app;
 	private Image demo_icon;
 	private Image page_icon;
+	private Image flowchart_icon;
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -177,6 +182,7 @@ public class SimpleToolBarEx {
 	@SuppressWarnings("unused")
 	public void initUI(Display display) {
 
+    getOsName();
 		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
@@ -193,6 +199,7 @@ public class SimpleToolBarEx {
 			demo_icon = new Image(dev, getResourcePath("icon-demo.png"));
 			page_icon = new Image(dev,
 					getResourcePath("page-white-text-width-icon.png"));
+			flowchart_icon = new Image(dev, getResourcePath("flowchartIcon_sm.png"));
 
 		} catch (Exception e) {
 
@@ -215,15 +222,21 @@ public class SimpleToolBarEx {
 		visual_search_tool.setImage(visual_search);
 		visual_search_tool.setToolTipText("Injects the script");
 
-		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
-		configure_app_tool.setImage(configure_app);
-		configure_app_tool.setToolTipText("Configures the app (disabled)");
+		ToolItem flowchart_tool = new ToolItem(toolBar, SWT.PUSH);
+		flowchart_tool.setImage(flowchart_icon);
+		flowchart_tool.setToolTipText("Generates the script");
+
+		ToolItem separator1 = new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem demo_app_tool = new ToolItem(toolBar, SWT.PUSH);
 		demo_app_tool.setImage(demo_icon);
 		demo_app_tool.setToolTipText("Demonstrates the app");
 
-		ToolItem separator = new ToolItem(toolBar, SWT.SEPARATOR);
+		ToolItem separator2 = new ToolItem(toolBar, SWT.SEPARATOR);
+
+		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
+		configure_app_tool.setImage(configure_app);
+		configure_app_tool.setToolTipText("Configures the app (disabled)");
 
 		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
 		shutdown_tool.setImage(shutdown_icon);
@@ -233,7 +246,8 @@ public class SimpleToolBarEx {
 
 		// configure_app_tool.setEnabled(false);
 		visual_search_tool.setEnabled(false);
-
+		flowchart_tool.setEnabled(false);
+		demo_app_tool.setEnabled(false);
 		layout = new RowLayout();
 
 		layout.wrap = true;
@@ -244,11 +258,10 @@ public class SimpleToolBarEx {
 
 		shell.setLayout(layout);
 		create_browser_tool.addListener(SWT.Selection, event -> {
-			System.err.println("OS: " + getOsName());
-
 			create_browser_tool.setEnabled(false);
+			// Currently testing with Firefox on Linux and OSX and Chrome on Windows
+			// System.err.println("OS: " + getOsName());
 			if (osName.startsWith("Windows")) {
-
 				System.setProperty("webdriver.chrome.driver",
 						"c:/java/selenium/chromedriver.exe");
 				driver = new ChromeDriver();
@@ -263,20 +276,26 @@ public class SimpleToolBarEx {
 			driver.get(baseURL);
 			create_browser_tool.setEnabled(true);
 			visual_search_tool.setEnabled(true);
+			demo_app_tool.setEnabled(true);
+			flowchart_tool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
 		});
 
-		configure_app_tool.addListener(SWT.Selection, e -> {
+		flowchart_tool.addListener(SWT.Selection, event -> {
+			shell.setData("Nothing here\n yet...");
+			ScrolledTextChildShellEx test = new ScrolledTextChildShellEx(
+					Display.getCurrent(), shell);
+		});
+
+		configure_app_tool.addListener(SWT.Selection, event -> {
 
 			final BreadcrumbItem item = new BreadcrumbItem(bc,
 					SWT.CENTER | SWT.TOGGLE);
-
 			item.setData("Item " + String.valueOf(step_index));
 			item.setText((step_index < Labels.length)
 					? String.format("Step %d: %s", (int) (step_index + 1),
 							Labels[step_index])
 					: String.format("Step %d", (int) (step_index + 1)));
-
 			item.setImage(page_icon);
 			item.setSelectionImage(page_icon);
 			item.addSelectionListener(new SelectionAdapter() {
@@ -291,7 +310,6 @@ public class SimpleToolBarEx {
 					 */
 					// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ChildShellExample.htm
 					ChildShell cs = new ChildShell(Display.getCurrent(), shell);
-
 				}
 			});
 			step_index++;
@@ -393,7 +411,7 @@ public class SimpleToolBarEx {
 					injectElementSearch(Optional.<String> empty());
 					// NOTE: with FF the CONTROL modifier appears to not be sent
 					try {
-						Thread.sleep(5000);
+						Thread.sleep(500);
 					} catch (InterruptedException exception) {
 					}
 					WebElement element = wait.until(
@@ -423,12 +441,16 @@ public class SimpleToolBarEx {
 
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
-					button.setData(data);
+					button.setData("origin", data);
+					button.setData("text",String.format("Step %d: %s", (int) (step_index + 1), name));
+
 					button.addListener(SWT.Selection, new Listener() {
 						@Override
-						public void handleEvent(Event e) {
+						public void handleEvent(Event event) {
+							Object into = event.widget.getData("origin");
+							String text = (String)event.widget.getData("text");
 							boolean answer = MessageDialog.openConfirm(shell,
-									button.getText(), "Details ... ");
+									button.getText(), String.format("Details of %s...", text));
 						}
 					});
 
@@ -824,4 +846,61 @@ class GridComposite extends Composite {
 		textData.setText("Text...");
 	}
 
+}
+
+class ScrolledTextChildShellEx {
+
+	protected Shell shell;
+	private Text text;
+	private String payload;
+
+	ScrolledTextChildShellEx(Display display, Shell parent) {
+
+		shell = new Shell(display);
+		payload = (String) parent.getData();
+		shell.setSize(20, 20);
+		shell.open();
+
+		createContents();
+		shell.setSize(450, 300);
+		shell.setText("Configuration");
+		shell.addListener(SWT.Close, new Listener() {
+
+			@Override
+			public void handleEvent(Event event) {
+				shell.dispose();
+			}
+		});
+
+		try {
+			while (!shell.isDisposed()) {
+				if (!display.readAndDispatch()) {
+					display.sleep();
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	protected void createContents() {
+		shell.setText("Generated QA source");
+		shell.setLayout(new GridLayout(2, false));
+
+		Label lblDomain = new Label(shell, SWT.NONE);
+		lblDomain.setLayoutData(GridDataFactory.fillDefaults().create());
+		lblDomain.setText("Name of the script");
+
+		text = new Text(shell, SWT.BORDER);
+		text.setLayoutData(
+				GridDataFactory.fillDefaults().grab(true, false).create());
+
+		final StyledText styledText = new StyledText(shell,
+				SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.WRAP);
+		styledText.setLayoutData(
+				GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
+		styledText.setText(payload);
+		Button btnWhois = new Button(shell, SWT.NONE);
+		btnWhois.setText("Save");
+	}
 }
