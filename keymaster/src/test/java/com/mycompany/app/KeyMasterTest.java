@@ -92,6 +92,7 @@ public class KeyMasterTest {
 	private long pollingInterval = 500;
 	private String baseURL = "about:blank";
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
+	private HashMap<String, String> data = new HashMap<String, String>();
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
@@ -109,10 +110,11 @@ public class KeyMasterTest {
 	@AfterSuite
 	public void afterSuiteMethod() {
 		try {
-			driver.quit();
+			driver.close();
+			// driver.quit();
 		} catch (Exception e) {
 			System.err.println("Ignored exception: " + e.toString());
-			// WARNING: Process refused to die after 10 seconds, 
+			// WARNING: Process refused to die after 10 seconds,
 			// and couldn't taskkill it
 			// java.lang.NullPointerException: Unable to find executable for: taskkill
 			// when run from Powershell
@@ -295,7 +297,6 @@ public class KeyMasterTest {
 		// Assert
 		payload = (String) executeScript(getCommand);
 		assertFalse(payload.isEmpty());
-		HashMap<String, String> data = new HashMap<String, String>();
 		String result = readVisualSearchResult(payload, Optional.of(data));
 		for (String key : data.keySet()) {
 			System.err.println(key + ": " + data.get(key));
@@ -317,7 +318,7 @@ public class KeyMasterTest {
 
 	private String readVisualSearchResult(final String payload,
 			Optional<HashMap<String, String>> parameters) {
-		System.err.println("Processing payload: " + payload);
+		// System.err.println("Processing payload: " + payload);
 		Boolean collectResults = parameters.isPresent();
 		HashMap<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
@@ -350,8 +351,6 @@ public class KeyMasterTest {
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
 
-		// System.err.println("Swd Control:" +
-		// swdControl.getAttribute("innerHTML"));
 		WebElement swdCodeID = wait.until(ExpectedConditions
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
@@ -372,7 +371,6 @@ public class KeyMasterTest {
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
 		assertThat(swdCloseButton, notNullValue());
-		highlight(swdCloseButton);
 		highlight(swdCloseButton);
 		swdCloseButton.click();
 	}
