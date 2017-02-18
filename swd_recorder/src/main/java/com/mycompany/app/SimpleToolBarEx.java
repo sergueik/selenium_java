@@ -182,7 +182,7 @@ public class SimpleToolBarEx {
 	@SuppressWarnings("unused")
 	public void initUI(Display display) {
 
-    getOsName();
+		getOsName();
 		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
@@ -259,13 +259,13 @@ public class SimpleToolBarEx {
 		shell.setLayout(layout);
 		create_browser_tool.addListener(SWT.Selection, event -> {
 			create_browser_tool.setEnabled(false);
-			// Currently testing with Firefox on Linux and OSX and Chrome on Windows
+			// Currently testing with Firefox on Linux and OSX and with Chrome on
+			// Windows
 			// System.err.println("OS: " + getOsName());
 			if (osName.startsWith("Windows")) {
 				System.setProperty("webdriver.chrome.driver",
 						"c:/java/selenium/chromedriver.exe");
 				driver = new ChromeDriver();
-
 			} else {
 				driver = new FirefoxDriver();
 			}
@@ -288,41 +288,49 @@ public class SimpleToolBarEx {
 		});
 
 		configure_app_tool.addListener(SWT.Selection, event -> {
+			/*
+			 * final BreadcrumbItem item = new BreadcrumbItem(bc, SWT.CENTER |
+			 * SWT.TOGGLE); item.setData("Item " + String.valueOf(step_index));
+			 * item.setText((step_index < Labels.length) ? String.format("Step %d: %s"
+			 * , (int) (step_index + 1), Labels[step_index]) : String.format("Step %d"
+			 * , (int) (step_index + 1))); item.setImage(page_icon);
+			 * item.setSelectionImage(page_icon); item.addSelectionListener(new
+			 * SelectionAdapter() {
+			 * 
+			 * @Override public void widgetSelected(final SelectionEvent e) {
+			 * System.out.println(
+			 * 
+			 * String.format("Clicked %s", e.item.getData().toString())); //
+			 * http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ChildShellExample.htm
+			 * ChildShell cs = new ChildShell(Display.getCurrent(), shell); } });
+			 * step_index++;
+			 * 
+			 * // shell.layout(true, true); final Point newSize =
+			 * shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true); if (newSize.x > 500)
+			 * { shell.setBounds(boundRect); } shell.pack();
+			 */
 
-			final BreadcrumbItem item = new BreadcrumbItem(bc,
-					SWT.CENTER | SWT.TOGGLE);
-			item.setData("Item " + String.valueOf(step_index));
-			item.setText((step_index < Labels.length)
-					? String.format("Step %d: %s", (int) (step_index + 1),
-							Labels[step_index])
-					: String.format("Step %d", (int) (step_index + 1)));
-			item.setImage(page_icon);
-			item.setSelectionImage(page_icon);
-			item.addSelectionListener(new SelectionAdapter() {
-				@Override
-				public void widgetSelected(final SelectionEvent e) {
-					System.out.println(
-
-							String.format("Clicked %s", e.item.getData().toString()));
-					/*
-					 * boolean answer = MessageDialog.openConfirm(shell, item.getText(),
-					 * String.format("Details of %s", e.item.getData().toString()));
-					 */
-					// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ChildShellExample.htm
-					ChildShell cs = new ChildShell(Display.getCurrent(), shell);
-				}
-			});
-			step_index++;
-
-			// shell.layout(true, true);
-			final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true);
-			if (newSize.x > 500) {
-				shell.setBounds(boundRect);
-			}
-			shell.pack();
 		});
 
-		//
+		/*
+		 * 
+		 * FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+		 * 
+		 * String[] filterNames = new String[] { "Java sources", "All Files (*)" };
+		 * 
+		 * String[] filterExtensions = new String[] { "*.java", "*" };
+		 * 
+		 * dialog.setFilterNames(filterNames);
+		 * dialog.setFilterExtensions(filterExtensions);
+		 * 
+		 * String path = dialog.open();
+		 * 
+		 * if (path != null) {
+		 * 
+		 * label.setText(path); label.pack(); shell.pack(); }
+		 * 
+		 */
+
 		visual_search_tool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
@@ -332,40 +340,86 @@ public class SimpleToolBarEx {
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
 					visual_search_tool.setEnabled(false);
+					wait = new WebDriverWait(driver, flexibleWait);
+					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+					actions = new Actions(driver);
 					injectElementSearch(Optional.<String> empty());
 					String name = "";
-					Boolean haveTable = false;
-					/*
-					 * try { wait.until(new ExpectedCondition<Boolean>() {
-					 *
-					 * @Override public Boolean apply(WebDriver d) { List<WebElement>
-					 * elements = d.findElements(By.id("SWDTable")); return
-					 * (elements.size() > 0); } }); } catch (Exception e) {
-					 * System.err.println("Exception: " + e.toString()); }
-					 */
-					while (name.isEmpty()) {
-						String result = executeScript(getCommand).toString();
-						if (!result.isEmpty()) {
-							name = readVisualSearchResult(result);
+					HashMap<String, String> data = new HashMap<String, String>(); // empty
+					Boolean waitingForData = true;
+					while (waitingForData) {
+						String payload = executeScript(getCommand).toString();
+						if (!payload.isEmpty()) {
+							// unfortunately, objects cannot suicide
+							data = new HashMap<String, String>();
+							name = readVisualSearchResult(payload, Optional.of(data));
+							if (name == null || name.isEmpty()) {
+								System.err.println("Rejected visual search data");
+
+							} else {
+								System.err.println(
+										String.format("Received data of the step: '%s'", name));
+								waitingForData = false;
+								break;
+							}
 						}
-						if (name.isEmpty()) {
-							break;
-						}
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException exception) {
+						if (waitingForData) {
+							try {
+								// TODO: add the code to
+								// check if waited long enough already
+								// test17
+								System.err.println("Waiting: ");
+								Thread.sleep(5000);
+							} catch (InterruptedException exception) {
+							}
 						}
 					}
 
+					closeVisualSearch();
+					/*
+					 * final BreadcrumbItem item = new BreadcrumbItem(bc, SWT.CENTER |
+					 * SWT.TOGGLE); item.setData("Item " + String.valueOf(step_index));
+					 * item.setText((step_index < Labels.length) ? String.format(
+					 * "Step %d: %s" , (int) (step_index + 1), Labels[step_index]) :
+					 * String.format("Step %d" , (int) (step_index + 1)));
+					 * item.setImage(page_icon); item.setSelectionImage(page_icon);
+					 * item.addSelectionListener(new SelectionAdapter() {
+					 * 
+					 * @Override public void widgetSelected(final SelectionEvent e) {
+					 * System.out.println(
+					 * 
+					 * String.format("Clicked %s", e.item.getData().toString())); //
+					 * http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ChildShellExample
+					 * .htm ChildShell cs = new ChildShell(Display.getCurrent(), shell); }
+					 * }); step_index++;
+					 * 
+					 * // shell.layout(true, true); final Point newSize =
+					 * shell.computeSize(SWT.DEFAULT, SWT.DEFAULT, true); if (newSize.x >
+					 * 500) { shell.setBounds(boundRect); } shell.pack();
+					 */
+
 					Button button = new Button(shell, SWT.PUSH);
+					for (String key : data.keySet()) {
+						System.err.println(key + ": " + data.get(key));
+					}
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
+					// button.setData("data", data); // TODO: JSON marchalling
+					String testData = data.get("ElementCssSelector");
+					System.err.println("Sending : " + testData);
+					button.setData("data", testData);
 
 					button.addListener(SWT.Selection, new Listener() {
 						@Override
 						public void handleEvent(Event e) {
+
+							// Object into = event.widget.getData("origin");
+							// String testData = (String) event.widget.getData("data");
+							String testData = (String) button.getData("data");
+							System.err.println("Receiving : " + testData);
+
 							boolean answer = MessageDialog.openConfirm(shell,
-									button.getText(), "Details: ... ");
+									button.getText(), String.format("Details: '%s'", testData));
 						}
 					});
 
@@ -442,13 +496,14 @@ public class SimpleToolBarEx {
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					button.setData("origin", data);
-					button.setData("text",String.format("Step %d: %s", (int) (step_index + 1), name));
+					button.setData("text",
+							String.format("Step %d: %s", (int) (step_index + 1), name));
 
 					button.addListener(SWT.Selection, new Listener() {
 						@Override
 						public void handleEvent(Event event) {
 							Object into = event.widget.getData("origin");
-							String text = (String)event.widget.getData("text");
+							String text = (String) event.widget.getData("text");
 							boolean answer = MessageDialog.openConfirm(shell,
 									button.getText(), String.format("Details of %s...", text));
 						}
@@ -585,10 +640,10 @@ public class SimpleToolBarEx {
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
+
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
 		assertThat(swdCloseButton, notNullValue());
-		highlight(swdCloseButton);
 		highlight(swdCloseButton);
 		swdCloseButton.click();
 	}
