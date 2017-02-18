@@ -762,9 +762,9 @@ class ChildShell {
 		}
 		shell.setSize(20, 20);
 		shell.open();
-		shell.setText(String.format("Step %s details", commandId));
+//		shell.setText(String.format("Step %s details", commandId));
 		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
-		titleData.setText("Name of the step...");
+		titleData.setText(String.format("Step %s details", data.get("ElementCodeName")));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 4;
 		shell.setLayout(gl);
