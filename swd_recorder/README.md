@@ -3,8 +3,9 @@ This is a OS-independent successor to the
 [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt/), and [SWT new widgets library Opal Project by Laurent Caron](https://github.com/lcaron/opal)
 
-![example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
+![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
+![Ubuntu Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
 ### Goals
 
 Eventually the main functionality of SWD is to be achieved.
@@ -113,3 +114,9 @@ This is why it may be worthwhile setting up Virtualbox to compile and run an ins
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
+
+JAVA_VERSION=1.8.0.112
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home
+export M2=$HOME/Downloads/apache-maven-$MAVEN_VERSION
+export PATH=/opt/apache-maven-3.3.9/bin:$PATH
