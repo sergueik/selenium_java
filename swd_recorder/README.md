@@ -1,5 +1,5 @@
 ### Info
-This is a OS-independent successor to the
+Selenium WebDriver Eclipse Toolkit is a OS-independent successor to the
 [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt/), and [SWT new widgets library Opal Project by Laurent Caron](https://github.com/lcaron/opal)
 
@@ -29,22 +29,25 @@ To start the application run
 . .\run.ps1
 ```
 or
+```cmd
+run.cmd
+```
+on Windows or
 ```bash
 ./run.sh
 ```
-This script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven
+on Linuxor Mac. The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven
 and runs it it from the `target` directory.
 
-### Toolbar buttons
+### Toolbar Buttons
 
-![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/launch.png)
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/launch.png)
 launches the browser
 
-![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/inject.png)
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/find.png)
 injects the [SWD Element Searcher script](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/ElementSearch.js) into the page then
-loops polling the page until the user selects some element via right click
+loops polling the page witing for user to select some element via right click and to fill and submit the form:
 ![SWD Table](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/swd_table.png)
-and fills and submits the form.
 
 The Java reads back the result once it available and adds a breadcrump button:
 ![breadcumps](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/breadcumps.png)
@@ -53,7 +56,7 @@ The breadcrump button opens the form dialog with the details of the element:
 ![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
 
 There is also a demo button that does these actions automatically:
-![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/demo.png)
+![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/demo.png)
 
 Currently project is hardcoded to use Chrome browser on Windows, and Firefox on the rest of platforms.
 The configuration will be added shotly - it will use a yaml, json or java properties file.
@@ -89,24 +92,20 @@ Due to some problem with JVM loader, these platform-dependent jars cannot be inc
 ### Compinent Versions
 As usual with Selenium, Application only runnable with the matching combination of versions of Selenium jar, browser driver and browsers is used.
 
-Few supported combination of old versions are listed below (you can download virtually every old build of Firefox from
-https://ftp.mozilla.org/pub/firefox/releases, for other browser location vary):
+Currently supported combination of versions is
 
 |                      |              |
 |----------------------|--------------|
 | SELENIUM_VERSION     | 2.53.1       |
-| FIREFOX_VERSION      | 45.0.1  or below      |
+| FIREFOX_VERSION      | 45.0.1       |
 | CHROME_VERSION       | 54.0.2840.71 |
 | CHROMEDRIVER_VERSION | 2.24         |
 
-|                      |              |
-|----------------------|--------------|
-| SELENIUM_VERSION     | 2.47         |
-| FIREFOX_VERSION      | 40.0.3       |
-| CHROME_VERSION       | 50.0.2661.75 |
-| CHROMEDRIVER_VERSION | 2.16         |
+One can download virtually every old build of Firefox from
+https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from
+http://www.slimjetbrowser.com/chrome/, for other browsers locations vary.
 
-This is why it may be worthwhile setting up Virtualbox to compile and run an instance in.
+This is why it may be worthwhile setting up Virtual Box to compile and run an instance in.
 
 ### Links
 

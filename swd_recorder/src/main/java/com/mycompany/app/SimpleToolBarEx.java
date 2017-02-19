@@ -124,6 +124,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -139,13 +140,15 @@ import org.mihalis.opal.breadcrumb.*;
 
 public class SimpleToolBarEx {
 
-	private Image create_browser;
-	private Image visual_search;
+	private Image launch_icon;
+	private Image find_icon;
 	private Image shutdown_icon;
-	private Image configure_app;
+	private Image preferences_icon;
 	private Image demo_icon;
 	private Image page_icon;
 	private Image flowchart_icon;
+	private Image open_icon;
+	private Image save_icon;
 
 	private WebDriver driver;
 	private WebDriverWait wait;
@@ -194,16 +197,15 @@ public class SimpleToolBarEx {
 
 		try {
 
-			create_browser = new Image(dev,
-					getResourcePath("applications_internet.png"));
-			visual_search = new Image(dev, getResourcePath("old_edit_find.png"));
-			configure_app = new Image(dev,
-					getResourcePath("preferences_desktop.png"));
-			shutdown_icon = new Image(dev, getResourcePath("shutdown-1.png"));
-			demo_icon = new Image(dev, getResourcePath("icon-demo.png"));
-			page_icon = new Image(dev,
-					getResourcePath("page-white-text-width-icon.png"));
-			flowchart_icon = new Image(dev, getResourcePath("flowchartIcon_sm.png"));
+			launch_icon = new Image(dev, getResourcePath("launch.png"));
+			find_icon = new Image(dev, getResourcePath("find.png"));
+			preferences_icon = new Image(dev, getResourcePath("preferences.png"));
+			shutdown_icon = new Image(dev, getResourcePath("quit.png"));
+			demo_icon = new Image(dev, getResourcePath("demo.png"));
+			page_icon = new Image(dev, getResourcePath("page.png"));
+			flowchart_icon = new Image(dev, getResourcePath("flowchart.png"));
+			open_icon = new Image(dev, getResourcePath("open.png"));
+			save_icon = new Image(dev, getResourcePath("save.png"));
 
 		} catch (Exception e) {
 
@@ -218,29 +220,39 @@ public class SimpleToolBarEx {
 
 		toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
-		ToolItem create_browser_tool = new ToolItem(toolBar, SWT.PUSH);
-		create_browser_tool.setImage(create_browser);
-		create_browser_tool.setToolTipText("Launches the browser");
+		ToolItem launch_tool = new ToolItem(toolBar, SWT.PUSH);
+		launch_tool.setImage(launch_icon);
+		launch_tool.setToolTipText("Launches the browser");
 
-		ToolItem visual_search_tool = new ToolItem(toolBar, SWT.PUSH);
-		visual_search_tool.setImage(visual_search);
-		visual_search_tool.setToolTipText("Injects the script");
+		ToolItem find_icon_tool = new ToolItem(toolBar, SWT.PUSH);
+		find_icon_tool.setImage(find_icon);
+		find_icon_tool.setToolTipText("Injects the script");
 
 		ToolItem flowchart_tool = new ToolItem(toolBar, SWT.PUSH);
 		flowchart_tool.setImage(flowchart_icon);
 		flowchart_tool.setToolTipText("Generates the script");
 
-		ToolItem separator1 = new ToolItem(toolBar, SWT.SEPARATOR);
+		new ToolItem(toolBar, SWT.SEPARATOR);
 
-		ToolItem demo_app_tool = new ToolItem(toolBar, SWT.PUSH);
-		demo_app_tool.setImage(demo_icon);
-		demo_app_tool.setToolTipText("Demonstrates the app");
+		ToolItem open_tool = new ToolItem(toolBar, SWT.PUSH);
+		open_tool.setImage(open_icon);
+		open_tool.setToolTipText("Reads the saved session");
 
-		ToolItem separator2 = new ToolItem(toolBar, SWT.SEPARATOR);
+		ToolItem save_tool = new ToolItem(toolBar, SWT.PUSH);
+		save_tool.setImage(save_icon);
+		save_tool.setToolTipText("Saves the session");
 
-		ToolItem configure_app_tool = new ToolItem(toolBar, SWT.PUSH);
-		configure_app_tool.setImage(configure_app);
-		configure_app_tool.setToolTipText("Configures the app (disabled)");
+		new ToolItem(toolBar, SWT.SEPARATOR);
+
+		ToolItem demo_tool = new ToolItem(toolBar, SWT.PUSH);
+		demo_tool.setImage(demo_icon);
+		demo_tool.setToolTipText("Demonstrates the app");
+
+		new ToolItem(toolBar, SWT.SEPARATOR);
+
+		ToolItem preferences_tool = new ToolItem(toolBar, SWT.PUSH);
+		preferences_tool.setImage(preferences_icon);
+		preferences_tool.setToolTipText("Configures the app (disabled)");
 
 		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
 		shutdown_tool.setImage(shutdown_icon);
@@ -248,10 +260,11 @@ public class SimpleToolBarEx {
 
 		toolBar.pack();
 
-		// configure_app_tool.setEnabled(false);
-		visual_search_tool.setEnabled(false);
+		// preferences_tool.setEnabled(false);
+		find_icon_tool.setEnabled(false);
 		flowchart_tool.setEnabled(false);
-		demo_app_tool.setEnabled(false);
+		demo_tool.setEnabled(false);
+		save_tool.setEnabled(false);
 		layout = new RowLayout();
 
 		layout.wrap = true;
@@ -261,8 +274,13 @@ public class SimpleToolBarEx {
 		layout.marginBottom = 5;
 
 		shell.setLayout(layout);
-		create_browser_tool.addListener(SWT.Selection, event -> {
-			create_browser_tool.setEnabled(false);
+
+		Label status = new Label(shell, SWT.BORDER);
+		status.setText("Loading");
+		status.pack();
+		shell.pack();
+		launch_tool.addListener(SWT.Selection, event -> {
+			launch_tool.setEnabled(false);
 			// Currently testing with Firefox on Linux and OSX and with Chrome on
 			// Windows
 			// System.err.println("OS: " + getOsName());
@@ -278,9 +296,9 @@ public class SimpleToolBarEx {
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 					.setScriptTimeout(30, TimeUnit.SECONDS);
 			driver.get(baseURL);
-			create_browser_tool.setEnabled(true);
-			visual_search_tool.setEnabled(true);
-			demo_app_tool.setEnabled(true);
+			launch_tool.setEnabled(true);
+			find_icon_tool.setEnabled(true);
+			demo_tool.setEnabled(true);
 			flowchart_tool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
 		});
@@ -291,20 +309,30 @@ public class SimpleToolBarEx {
 					Display.getCurrent(), shell);
 		});
 
-		configure_app_tool.addListener(SWT.Selection, event -> {
+		open_tool.addListener(SWT.Selection, event -> {
+			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
+			String[] filterNames = new String[] { "YAML sources", "All Files (*)" };
+			String[] filterExtensions = new String[] { "*.yaml", "*" };
+			dialog.setFilterNames(filterNames);
+			dialog.setFilterExtensions(filterExtensions);
+			String path = dialog.open();
+		});
+
+		save_tool.addListener(SWT.Selection, event -> {
+			FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+			dialog.setFilterNames(new String[] { "YAML Files", "All Files (*.*)" });
+			dialog.setFilterExtensions(new String[] { "*.yaml", "*.*" });
+			String homeDir = System.getProperty("user.home");
+			dialog.setFilterPath(homeDir); // Windows path
+			dialog.setFileName("test.yaml");
+			System.out.println("Save to: " + dialog.open());
+		});
+
+		preferences_tool.addListener(SWT.Selection, event -> {
 
 		});
 
-		/*
-		 FileDialog dialog = new FileDialog(shell, SWT.OPEN);
-		 String[] filterNames = new String[] { "Java sources", "All Files (*)" };
-		 String[] filterExtensions = new String[] { "*.java", "*" };
-		 dialog.setFilterNames(filterNames);
-		 dialog.setFilterExtensions(filterExtensions);
-		 String path = dialog.open(); 
-		 */
-
-		visual_search_tool.addSelectionListener(new SelectionListener() {
+		find_icon_tool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
@@ -312,7 +340,7 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
-					visual_search_tool.setEnabled(false);
+					find_icon_tool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
@@ -387,12 +415,13 @@ public class SimpleToolBarEx {
 						shell.setBounds(boundRect);
 					}
 					shell.pack();
-					visual_search_tool.setEnabled(true);
+					find_icon_tool.setEnabled(true);
+					save_tool.setEnabled(true);
 				}
 			}
 		});
 
-		demo_app_tool.addSelectionListener(new SelectionListener() {
+		demo_tool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
@@ -400,7 +429,7 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
-					demo_app_tool.setEnabled(false);
+					demo_tool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
@@ -439,9 +468,8 @@ public class SimpleToolBarEx {
 					String name = readVisualSearchResult(payload, Optional.of(data));
 
 					closeVisualSearch();
-
+					flushVisualSearchResult();
 					Button button = new Button(shell, SWT.PUSH);
-
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					button.setData("origin", data);
@@ -473,8 +501,7 @@ public class SimpleToolBarEx {
 						shell.setBounds(boundRect);
 					}
 					shell.pack();
-
-					demo_app_tool.setEnabled(true);
+					demo_tool.setEnabled(true);
 				}
 			}
 		});
@@ -493,14 +520,16 @@ public class SimpleToolBarEx {
 					// taskkill
 					// when run from Powershell
 				}
-
 				shutdown_tool.setEnabled(true);
 			}
 			shell.getDisplay().dispose();
 			System.exit(0);
 		});
 
-		shell.setText("Selenium WebDriver Page Recorder");
+		status.setText("Ready");
+		status.pack();
+		shell.pack();
+		shell.setText("Selenium WebDriver Eclipse Toolkit");
 		// shell.setSize(500, 250);
 		shell.open();
 
@@ -658,9 +687,13 @@ public class SimpleToolBarEx {
 
 	@Override
 	public void finalize() {
-		create_browser.dispose();
-		visual_search.dispose();
+		launch_icon.dispose();
+		find_icon.dispose();
 		shutdown_icon.dispose();
+		preferences_icon.dispose();
+		page_icon.dispose();
+		demo_icon.dispose();
+		flowchart_icon.dispose();
 	}
 
 	public static void main(String[] args) {
@@ -762,9 +795,10 @@ class ChildShell {
 		}
 		shell.setSize(20, 20);
 		shell.open();
-//		shell.setText(String.format("Step %s details", commandId));
+		// shell.setText(String.format("Step %s details", commandId));
 		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
-		titleData.setText(String.format("Step %s details", data.get("ElementCodeName")));
+		titleData
+				.setText(String.format("Step %s details", data.get("ElementCodeName")));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 4;
 		shell.setLayout(gl);
