@@ -8,18 +8,19 @@ Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt
 ![Ubuntu Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
 ### Goals
 
-Eventually the main functionality of SWD is to be achieved.
+Eventually the full functionality of SWD is to be achieved.
 
 UI is a work in progress: adding more form elements and the code generator is a work in progress.
 
-A number of basic examples from the
-Standard Widget Toolkit study project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
-(which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com))
-is currently checked in but will eventually disappear, and the code generator support will be added.
+A number of very basic examples from the Standard Widget Toolkit study project
+[lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
+(which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com)) is currently checked in but will eventually disappear.
 
-Also, the standalone SWT application jar may be converted to an Eclipse plugin.
+Also, the standalone SWT application jar might be converted to an Eclipse plugin.
 
-The application can be run on a 32 or 64 bit Windows or Linux machine, or in Vagrantbox. It is expected to eventually run on OSX, but not yet.
+The application can be run on a 32 or 64 bit Windows, Mac or Linux, or in Virtual Box.
+For Mac testing the [Sierra Final 10.12 Virtual Box image vdi by TechReviews](https://techsviewer.com/install-macos-sierra-virtualbox-windows/)
+have been used.
 
 ### Usage
 
@@ -31,10 +32,36 @@ or
 ```bash
 ./run.sh
 ```
-This script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven 
+This script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven
 and runs it it from the `target` directory.
 
-Currently `swt.jar` dependency is declared in the the `pom.xml` in a platform-specific fashion:
+### Toolbar buttons
+
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/launch.png)
+launches the browser
+
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/inject.png)
+injects the [SWD Element Searcher script](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/ElementSearch.js) into the page then
+loops polling the page until the user selects some element via right click
+![SWD Table](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/swd_table.png)
+and fills and submits the form.
+
+The Java reads back the result once it available and adds a breadcrump button:
+![breadcumps](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/breadcumps.png)
+
+The breadcrump button opens the form dialog with the details of the element:
+![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
+
+There is also a demo button that does these actions automatically:
+![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/demo.png)
+
+Currently project is hardcoded to use Chrome browser on Windows, and Firefox on the rest of platforms.
+The configuration will be added shotly - it will use a yaml, json or java properties file.
+
+### Platform-specific information
+
+The project is written in java, but its
+main `swt.jar` dependency is currently declared in the the `pom.xml` in a platform-specific fashion:
 
 ```xml
   <properties>
@@ -62,7 +89,8 @@ Due to some problem with JVM loader, these platform-dependent jars cannot be inc
 ### Compinent Versions
 As usual with Selenium, Application only runnable with the matching combination of versions of Selenium jar, browser driver and browsers is used.
 
-Few supported combination of old versions are listed below:
+Few supported combination of old versions are listed below (you can download virtually every old build of Firefox from
+https://ftp.mozilla.org/pub/firefox/releases, for other browser location vary):
 
 |                      |              |
 |----------------------|--------------|
