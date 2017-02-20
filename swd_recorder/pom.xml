@@ -42,6 +42,11 @@
     <opal.version>1.0.4</opal.version>
   </properties>
   <dependencies>
+  <dependency>
+    <groupId>org.yaml</groupId>
+    <artifactId>snakeyaml</artifactId>
+    <version>1.17</version>
+</dependency>
     <dependency>
       <groupId>org.eclipse.swt</groupId>
       <artifactId>${eclipse.swt.artifactId}</artifactId>

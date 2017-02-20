@@ -1,0 +1,36 @@
+version: '1.0'
+created: '2017-02-19'
+selenium_version: '2.53.1'
+
+# Browser parameters
+browser:
+  name: firefox
+  platform: linux
+  version: '45.0.1'
+
+# Browser parameters
+browser:
+  name: chrome
+  platform: windows
+  version: '54.0.2840.71'
+  driver_version: '2.24'
+  driver_path: 'c:/java/selenium/chromedriver.exe'
+
+# Selenium Browsers
+browsers:
+  - chrome
+  - firefox
+
+# Elements
+elements:
+  1:
+    ElementCodeName: logo
+    ElementCssSelector: 'img#hplogo'
+    CommandId: 9882f662-5593-4b8a-a21d-8e5a6d1bcc6a
+    ElementXPath: id("hplogo")
+  2:
+    CommandId: f26d01af-117a-40fa-8345-e111927061d4
+    ElementCodeName: 'element name'
+    ElementId: ''
+    ElementCssSelector: 'article#home > section.homepage-content-container > div.homepage-parsys-container > div.farefinderwidget.parbase.section.specialofferswidget > div > farefinder-compact > div.section-wrapper > div.home-info.full-width > div > h3 > span.highlight'
+    ElementXPath: "id(\"home\")/section[1]/div[2]/div[1]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"

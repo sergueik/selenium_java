@@ -142,8 +142,3 @@ This is why it may be worthwhile setting up Virtual Box to compile and run an in
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
 
-
-JAVA_VERSION=1.8.0.112
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_45.jdk/Contents/Home
-export M2=$HOME/Downloads/apache-maven-$MAVEN_VERSION
-export PATH=/opt/apache-maven-3.3.9/bin:$PATH

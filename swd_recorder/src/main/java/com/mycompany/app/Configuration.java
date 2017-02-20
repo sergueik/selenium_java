@@ -1,0 +1,93 @@
+package com.mycompany.app;
+
+import static java.lang.String.format;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+final class Configuration {
+	public Date created;
+	public Date updated;
+	public String version;
+	public String selenium_version;
+	public Browser browser;
+	public List<String> browsers;
+	public Map<String, Map<String, String>> elements;
+	public Map<String, String> plugins;
+
+	public Date getCreated() {
+		return created;
+	}
+
+	public void setCreated(Date data) {
+		this.created = data;
+	}
+
+	public Date getUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(Date data) {
+		this.updated = data;
+	}
+
+	public String getVersion() {
+		return version;
+	}
+
+	public void setVersion(String data) {
+		this.version = data;
+	}
+
+	public String getSeleniumVersion() {
+		return selenium_version;
+	}
+
+	public void setSeleniumVersion(String data) {
+		this.selenium_version = data;
+	}
+
+	public Browser getBrowser() {
+		return browser;
+	}
+
+	public void setBrowser(Browser data) {
+		this.browser = data;
+	}
+
+	public List<String> getbrowsers() {
+		return browsers;
+	}
+
+	public void setbrowsers(List<String> browsers) {
+		this.browsers = browsers;
+	}
+
+	public Map<String, String> getPlugins() {
+		return plugins;
+	}
+
+	public void setPlugins(Map<String, String> data) {
+		this.plugins = data;
+	}
+
+	public Map<String, Map<String, String>> getelements() {
+		return elements;
+	}
+
+	public void setelements(Map<String, Map<String, String>> elements) {
+		this.elements = elements;
+	}
+
+	@Override
+	public String toString() {
+		return new StringBuilder().append(format("Version: %s\n", version))
+				.append(format("created: %s\n", created))
+				.append(format("Selenium version: %s\n", selenium_version))
+				.append(format("Supported browsers: %s\n", browsers))
+				.append(format("Using: %s\n", browser))
+				.append(format("Plugins: %s\n", plugins))
+				.append(format("elements: %s\n", elements)).toString();
+	}
+}
