@@ -6,8 +6,8 @@ import static java.lang.String.format;
 public final class Browser {
 	public String name;
 	public String platform;
-	public String driver_path;
-	public String driver_version;
+	public String driverPath;
+	public String driverVersion;
 	public String version;
 
 	public String getName() {
@@ -19,11 +19,11 @@ public final class Browser {
 	}
 
 	public String getDriverVersion() {
-		return driver_version;
+		return driverVersion;
 	}
 
 	public void setDriverVersion(String data) {
-		this.driver_version = data;
+		this.driverVersion = data;
 	}
 
 	public String getVersion() {
@@ -43,11 +43,11 @@ public final class Browser {
 	}
 
 	public String getDriverPath() {
-		return driver_path;
+		return driverPath;
 	}
 
 	public void setDriverPath(String data) {
-		this.driver_path = data;
+		this.driverPath = data;
 	}
 
 	@Override

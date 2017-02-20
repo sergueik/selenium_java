@@ -10,7 +10,7 @@ final class Configuration {
 	public Date created;
 	public Date updated;
 	public String version;
-	public String selenium_version;
+	public String seleniumVersion;
 	public Browser browser;
 	public List<String> browsers;
 	public Map<String, Map<String, String>> elements;
@@ -41,11 +41,11 @@ final class Configuration {
 	}
 
 	public String getSeleniumVersion() {
-		return selenium_version;
+		return seleniumVersion;
 	}
 
 	public void setSeleniumVersion(String data) {
-		this.selenium_version = data;
+		this.seleniumVersion = data;
 	}
 
 	public Browser getBrowser() {
@@ -84,7 +84,7 @@ final class Configuration {
 	public String toString() {
 		return new StringBuilder().append(format("Version: %s\n", version))
 				.append(format("created: %s\n", created))
-				.append(format("Selenium version: %s\n", selenium_version))
+				.append(format("Selenium version: %s\n", seleniumVersion))
 				.append(format("Supported browsers: %s\n", browsers))
 				.append(format("Using: %s\n", browser))
 				.append(format("Plugins: %s\n", plugins))

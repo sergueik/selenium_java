@@ -138,6 +138,7 @@ This is why it may be worthwhile setting up Virtual Box to compile and run an in
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
   * [mono/xwt](https://github.com/mono/xwt)
   * [json2](https://github.com/douglascrockford/JSON-js)
+  * [snakeYaml](https://bitbucket.org/asomov/snakeyaml)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

@@ -1,6 +1,6 @@
 version: '1.0'
 created: '2017-02-19'
-selenium_version: '2.53.1'
+seleniumVersion: '2.53.1'
 
 # Browser parameters
 browser:
@@ -13,8 +13,8 @@ browser:
   name: chrome
   platform: windows
   version: '54.0.2840.71'
-  driver_version: '2.24'
-  driver_path: 'c:/java/selenium/chromedriver.exe'
+  driverVersion: '2.24'
+  driverPath: 'c:/java/selenium/chromedriver.exe'
 
 # Selenium Browsers
 browsers:
