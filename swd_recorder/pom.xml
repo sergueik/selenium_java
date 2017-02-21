@@ -163,7 +163,9 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>utf-8</encoding>
-          <compilerArgument>-verbose</compilerArgument>
+          <!--
+          <compilerArgument>-verbose</compilerArgument> 
+          -->
         </configuration>
       </plugin>
       <plugin>
