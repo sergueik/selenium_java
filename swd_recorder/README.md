@@ -1,6 +1,7 @@
 ### Info
-Selenium WebDriver Eclipse Toolkit is a OS-independent successor to the
-[Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
+
+Selenium WebDriver Eclipse Toolkit (SWET) is a OS-independent successor to the
+[Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt/), and [SWT new widgets library Opal Project by Laurent Caron](https://github.com/lcaron/opal)
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
@@ -107,6 +108,50 @@ http://www.slimjetbrowser.com/chrome/, for other browsers locations vary.
 
 This is why it may be worthwhile setting up Virtual Box to compile and run an instance in.
 
+
+### Configuration, saving and loading
+
+The element locators collected by SWET may be saved in YAML format.
+Example
+```yaml
+version: '1.0'
+created: '2017-02-21'
+seleniumVersion: '2.53.1'
+
+# Browser parameters
+browser:
+  name: firefox
+  platform: linux
+  version: '45.0.1'
+
+# Browser parameters
+browser:
+  name: chrome
+  platform: windows
+  version: '54.0.2840.71'
+  driverVersion: '2.24'
+  driverPath: 'c:/java/selenium/chromedriver.exe'
+
+# Selenium Browsers
+browsers:
+  - chrome
+  - firefox
+
+# Elements
+elements:
+  1:
+    ElementCodeName: logo
+    ElementCssSelector: 'img#hplogo'
+    CommandId: 9882f662-5593-4b8a-a21d-8e5a6d1bcc6a
+    ElementXPath: id("hplogo")
+  2:
+    CommandId: f26d01af-1
+    ElementCodeName: 'element name'
+    ElementId: ''
+    ElementCssSelector: 'article#home > section.homepage-content-container > div.homepage-parsys-container > div.farefinderwidget.parbase.section.specialofferswidget > div > farefinder-compact > div.section-wrapper > div.home-info.full-width > div > h3 > span.highlight'
+    ElementXPath: "id(\"home\")/section[1]/div[2]/div[1]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
+```
+Processing the saved configuration is a work in progress.
 ### Links
 
 #### SWT
