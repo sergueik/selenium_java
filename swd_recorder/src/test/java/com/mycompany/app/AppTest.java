@@ -7,6 +7,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.text.DateFormat;
+
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -17,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.Enumeration;
 import java.util.function.Function;
@@ -101,6 +107,7 @@ public class AppTest {
 	private static String baseURL = "about:blank";
 	private static final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private static HashMap<String, String> data = new HashMap<String, String>();
+	private static String osName;
 
 	@BeforeClass
 	public static void beforeSuiteMethod() throws Exception {
@@ -163,7 +170,7 @@ public class AppTest {
 		browser.version = "54.0";
 		browser.driverVersion = "2.27";
 		browser.driverPath = "c:/java/selenium/chromedriver.exe";
-
+		browser.platform = getOsName();
 		config.created = new Date();
 		config.browser = browser;
 		config.updated = new Date();
@@ -172,6 +179,17 @@ public class AppTest {
 		config.elements = testData;
 
 		YamlHelper.saveConfiguration(config);
+	}
+
+	public static String getOsName() {
+
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+			if (osName.startsWith("Windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
 	}
 
 	String readVisualSearchResult(String payload) {
@@ -300,6 +318,8 @@ public class AppTest {
 
 		private static DumperOptions options = new DumperOptions();
 		private static Yaml yaml = null;
+		private static Date dateString;
+		private static Calendar calendar;
 
 		private static Configuration loadConfiguration(String fileName) {
 			if (yaml == null) {
@@ -329,14 +349,18 @@ public class AppTest {
 				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 				yaml = new Yaml(options);
 			}
-			String pattern = "yyyy-MM-dd";
-			SimpleDateFormat format = new SimpleDateFormat(pattern);
-			Date date = new Date();
+			calendar = new GregorianCalendar();
+			SimpleDateFormat dateFormat = new SimpleDateFormat(
+					((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT,
+							Locale.US)).toPattern().replaceAll("\\byy\\b", "yyyy"));
+			System.err.println("Testing date format: " + dateFormat.toPattern());
+
 			try {
-				config.updated = format.parse(String.format("%4d-%2d-%2d",
-						date.getYear(), date.getMonth(), date.getDay()));
+				config.updated = dateFormat
+						.parse(dateFormat.format(calendar.getTime()));
 			} catch (java.text.ParseException e) {
-				config.updated = date;
+				System.err.println("Ignoring date parse exception: " + e.toString());
+				config.updated = new Date();
 			}
 			if (fileName != null) {
 				try {
