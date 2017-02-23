@@ -306,7 +306,8 @@ public class SimpleToolBarEx {
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 					.setScriptTimeout(30, TimeUnit.SECONDS);
 			driver.get(baseURL);
-			launch_tool.setEnabled(true);
+      // prevent the customer from launching multiple instances
+			// launch_tool.setEnabled(true);
 			find_icon_tool.setEnabled(true);
 			demo_tool.setEnabled(true);
 			flowchart_tool.setEnabled(true);
