@@ -315,7 +315,7 @@ public class SimpleToolBarEx {
 
 		flowchart_tool.addListener(SWT.Selection, event -> {
 			shell.setData("Nothing here\n yet...");
-			ScrolledTextChildShellEx test = new ScrolledTextChildShellEx(
+			ScrolledTextEx test = new ScrolledTextEx(
 					Display.getCurrent(), shell);
 		});
 
@@ -840,62 +840,5 @@ public class SimpleToolBarEx {
 				System.err.println(yaml.dump(config));
 			}
 		}
-	}
-}
-
-class ScrolledTextChildShellEx {
-
-	protected Shell shell;
-	private Text text;
-	private String payload;
-
-	ScrolledTextChildShellEx(Display display, Shell parent) {
-
-		shell = new Shell(display);
-		payload = (String) parent.getData();
-		shell.setSize(20, 20);
-		shell.open();
-
-		createContents();
-		shell.setSize(450, 300);
-		shell.setText("Configuration");
-		shell.addListener(SWT.Close, new Listener() {
-
-			@Override
-			public void handleEvent(Event event) {
-				shell.dispose();
-			}
-		});
-
-		try {
-			while (!shell.isDisposed()) {
-				if (!display.readAndDispatch()) {
-					display.sleep();
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	protected void createContents() {
-		shell.setText("Generated QA source");
-		shell.setLayout(new GridLayout(2, false));
-
-		Label lblDomain = new Label(shell, SWT.NONE);
-		lblDomain.setLayoutData(GridDataFactory.fillDefaults().create());
-		lblDomain.setText("Name of the script");
-
-		text = new Text(shell, SWT.BORDER);
-		text.setLayoutData(
-				GridDataFactory.fillDefaults().grab(true, false).create());
-
-		final StyledText styledText = new StyledText(shell,
-				SWT.BORDER | SWT.V_SCROLL | SWT.MULTI | SWT.WRAP);
-		styledText.setLayoutData(
-				GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
-		styledText.setText(payload);
-		Button btnWhois = new Button(shell, SWT.NONE);
-		btnWhois.setText("Save");
 	}
 }
