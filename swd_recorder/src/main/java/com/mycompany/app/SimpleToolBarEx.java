@@ -159,7 +159,7 @@ public class SimpleToolBarEx {
 	private Image save_icon;
 
 	private Configuration config = null;
-  private static String configFilePath; 
+	private static String configFilePath;
 	private WebDriver driver;
 	private WebDriverWait wait;
 	private Actions actions;
@@ -326,9 +326,9 @@ public class SimpleToolBarEx {
 			dialog.setFilterNames(filterNames);
 			dialog.setFilterExtensions(filterExtensions);
 			configFilePath = dialog.open();
-      System.err.println("Loading " + configFilePath );
+			System.err.println("Loading " + configFilePath);
 			config = YamlHelper.loadConfiguration(configFilePath);
-			// TODO:  better method names
+			// TODO: better method names
 			YamlHelper.saveConfiguration(config);
 		});
 
@@ -415,7 +415,7 @@ public class SimpleToolBarEx {
 							System.out.println(
 									String.format("Clicked %s / %s", item.getText(), commandId));
 							shell.setData("CurrentCommandId", commandId);
-							ChildShell cs = new ChildShell(Display.getCurrent(), shell);
+							ComplexFormEx cs = new ComplexFormEx(Display.getCurrent(), shell);
 							for (String key : elementData.keySet()) {
 								// System.err.println(key + ": " + elementData.get(key));
 								cs.setData(key, elementData.get(key));
@@ -841,146 +841,6 @@ public class SimpleToolBarEx {
 			}
 		}
 	}
-}
-
-// https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111
-class ChildShell {
-
-	private Shell shell;
-	private String commandId;
-	private Display display;
-	private HashMap<String, String> data = new HashMap<String, String>(); // empty
-
-	ChildShell(Display parentDisplay, Shell parent) {
-		commandId = parent.getData("CurrentCommandId").toString();
-		display = parentDisplay;
-		shell = new Shell(display);
-	}
-
-	public void setData(String key, String value) {
-		data.put(key, value);
-	}
-
-	public void render() {
-		for (String key : data.keySet()) {
-			System.err.println(key + ": " + data.get(key));
-		}
-		shell.setSize(20, 20);
-		shell.open();
-		// shell.setText(String.format("Step %s details", commandId));
-		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
-		titleData
-				.setText(String.format("Step %s details", data.get("ElementCodeName")));
-		GridLayout gl = new GridLayout();
-		gl.numColumns = 4;
-		shell.setLayout(gl);
-		shell.setLayout(gl);
-
-		GridComposite gc = new GridComposite(shell);
-		gc.renderData(data);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 4;
-		gc.setLayoutData(gd);
-		gd = new GridData();
-
-		RowComposite rc = new RowComposite(shell);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		rc.setLayoutData(gd);
-		shell.addListener(SWT.Close, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				shell.dispose();
-			}
-		});
-
-		shell.setSize(350, 280);
-
-		while (!shell.isDisposed()) {
-			if (!display.readAndDispatch())
-				display.sleep();
-		}
-
-	}
-}
-
-class RowComposite extends Composite {
-
-	final Button buttonOK;
-	final Button buttonCancel;
-
-	public RowComposite(Composite composite) {
-
-		super(composite, SWT.NO_FOCUS);
-		RowLayout rl = new RowLayout();
-		rl.wrap = false;
-		rl.pack = false;
-		this.setLayout(rl);
-		buttonOK = new Button(this, SWT.BORDER | SWT.PUSH);
-		buttonOK.setText("OK");
-		buttonOK.setSize(30, 20);
-		buttonCancel = new Button(this, SWT.PUSH);
-		buttonCancel.setText("Cancel");
-		buttonCancel.setSize(30, 20);
-		buttonCancel.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-				// System.out.println("Cancel was clicked");
-				composite.dispose();
-			}
-		});
-		buttonOK.addListener(SWT.Selection, new Listener() {
-			@Override
-			public void handleEvent(Event e) {
-				composite.dispose();
-			}
-		});
-
-	}
-}
-
-class GridComposite extends Composite {
-
-	public GridComposite(Composite c) {
-		super(c, SWT.BORDER);
-		GridLayout gl = new GridLayout();
-		gl.numColumns = 2;
-		this.setLayout(gl);
-	}
-
-	public void renderData(HashMap<String, String> data) {
-		final Button cssSelectorRadio = new Button(this, SWT.RADIO);
-		cssSelectorRadio.setSelection(true);
-		cssSelectorRadio.setText("Css Selector");
-		cssSelectorRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
-		cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		cssSelectorData.setText(data.get("ElementCssSelector"));
-
-		final Button xPathRadio = new Button(this, SWT.RADIO);
-		xPathRadio.setSelection(false);
-		xPathRadio.setText("XPath");
-		xPathRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
-		xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		xPathData.setText(data.get("ElementXPath"));
-
-		final Button idRadio = new Button(this, SWT.RADIO);
-		idRadio.setSelection(false);
-		idRadio.setText("ID");
-		idRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
-		idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		idData.setText(data.get("ElementId"));
-
-		final Button textRadio = new Button(this, SWT.RADIO);
-		textRadio.setSelection(false);
-		textRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		textRadio.setText("Text");
-
-		final Text textData = new Text(this, SWT.SINGLE | SWT.BORDER);
-		textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		textData.setText("Text...");
-	}
-
 }
 
 class ScrolledTextChildShellEx {
