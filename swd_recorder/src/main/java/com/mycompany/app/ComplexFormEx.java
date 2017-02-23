@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -135,8 +136,9 @@ public class ComplexFormEx {
 		public void renderData(HashMap<String, String> data) {
 			final Button cssSelectorRadio = new Button(this, SWT.RADIO);
 			cssSelectorRadio.setSelection(true);
-			cssSelectorRadio.setText("Css Selector");
-			cssSelectorRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			cssSelectorRadio.setText("Css");
+			cssSelectorRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
+
 			final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementCssSelector")) {
@@ -146,7 +148,7 @@ public class ComplexFormEx {
 			final Button xPathRadio = new Button(this, SWT.RADIO);
 			xPathRadio.setSelection(false);
 			xPathRadio.setText("XPath");
-			xPathRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			xPathRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
 			final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementXPath")) {
@@ -155,7 +157,7 @@ public class ComplexFormEx {
 			final Button idRadio = new Button(this, SWT.RADIO);
 			idRadio.setSelection(false);
 			idRadio.setText("ID");
-			idRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			idRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
@@ -163,7 +165,7 @@ public class ComplexFormEx {
 			}
 			final Button textRadio = new Button(this, SWT.RADIO);
 			textRadio.setSelection(false);
-			textRadio.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			textRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
 			textRadio.setText("Text");
 
 			final Text textData = new Text(this, SWT.SINGLE | SWT.BORDER);
