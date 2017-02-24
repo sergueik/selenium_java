@@ -1,10 +1,13 @@
 package com.mycompany.app;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.json.*;
+import org.json.JSONException;
+// import org.json.*;
+import org.json.JSONObject;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -38,11 +41,16 @@ public class ComplexFormEx {
 	private int width = 350;
 	private int height = 280;
 	private static Shell parentShell = null;
+	private static Boolean updated = false;
+	private static String result = null;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		if (parent != null) {
+			System.err.println("Detected parent shell " + parent.toString());
 			parentShell = parent;
 			commandId = parent.getData(dataKey).toString();
+		} else {
+			System.err.println("No parent shell");
 		}
 		// readData(Optional.<HashMap<String, String>> empty());
 		readData(Optional.of(elementData));
@@ -83,9 +91,14 @@ public class ComplexFormEx {
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				// save the elementData json with parentShell.setData
-				if (parentShell != null) {
-					parentShell.setData("answer", "42");
+				if (updated) {
+					if (parentShell != null) {
+						// save the elementData json by callng setData on parentShell
+						// NOTE: not currently reached
+						System.err.println("[1]Updating the parent with: " + result);
+						parentShell.setData("result", result);
+						parentShell.setData("updated", true);
+					}
 				}
 				shell.dispose();
 			}
@@ -123,16 +136,31 @@ public class ComplexFormEx {
 			buttonCancel.setText("Cancel");
 			buttonCancel.setSize(30, 20);
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent e) {
+				public void widgetSelected(SelectionEvent event) {
 					System.out.println("Cancel was clicked");
 					composite.dispose();
 				}
 			});
 			buttonOK.addListener(SWT.Selection, new Listener() {
 				@Override
-				public void handleEvent(Event e) {
-					for (String key : elementData.keySet()) {
-						System.err.println(key + ": " + elementData.get(key));
+				public void handleEvent(Event event) {
+					JSONObject json = new JSONObject();
+					try {
+						for (String key : elementData.keySet()) {
+							json.put(key, elementData.get(key));
+						}
+						StringWriter wr = new StringWriter();
+						json.write(wr);
+						result = wr.toString();
+						// System.err.println("created json:" + result);
+						updated = true;
+						if (parentShell != null) {
+							System.err.println("[2]Updating the parent with: " + result);
+							System.err.println("Updating the parent");
+							parentShell.setData("result", result);
+							parentShell.setData("updated", true);
+						}
+					} catch (JSONException ex) {
 					}
 					composite.dispose();
 				}
@@ -144,7 +172,7 @@ public class ComplexFormEx {
 	static void doSelection(Button button) {
 		if (button.getSelection()) {
 			// System.out.println("process selection " + button);
-      System.out.println(button.getText() + " selected");
+			System.out.println(button.getText() + " selected");
 		} else {
 			System.out.println("do work for deselection " + button);
 		}
@@ -172,7 +200,7 @@ public class ComplexFormEx {
 			cssSelectorRadio.setSelection(true);
 			cssSelectorRadio.setText("Css");
 			cssSelectorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-      cssSelectorRadio.addListener(SWT.Selection, listener);
+			cssSelectorRadio.addListener(SWT.Selection, listener);
 
 			final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -192,8 +220,8 @@ public class ComplexFormEx {
 			xPathRadio.setSelection(false);
 			xPathRadio.setText("XPath");
 			xPathRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-      xPathRadio.addListener(SWT.Selection, listener);
-      
+			xPathRadio.addListener(SWT.Selection, listener);
+
 			final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementXPath")) {
@@ -212,7 +240,7 @@ public class ComplexFormEx {
 			idRadio.setSelection(false);
 			idRadio.setText("ID");
 			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-      idRadio.addListener(SWT.Selection, listener);
+			idRadio.addListener(SWT.Selection, listener);
 
 			idRadio.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
@@ -226,7 +254,7 @@ public class ComplexFormEx {
 					}
 				}
 			});
-      
+
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
@@ -241,12 +269,12 @@ public class ComplexFormEx {
 					data.replace((String) text.getData("key"), text.getText());
 				}
 			});
-      
+
 			final Button textRadio = new Button(this, SWT.RADIO);
 			textRadio.setSelection(false);
 			textRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			textRadio.setText("Text");
-      textRadio.addListener(SWT.Selection, listener);
+			textRadio.addListener(SWT.Selection, listener);
 
 			final Text textData;
 			textData = new Text(this, SWT.SINGLE | SWT.BORDER);

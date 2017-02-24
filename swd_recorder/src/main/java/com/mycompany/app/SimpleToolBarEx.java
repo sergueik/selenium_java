@@ -148,6 +148,8 @@ import org.yaml.snakeyaml.Yaml;
 
 public class SimpleToolBarEx {
 
+	private Shell shell;
+
 	private Image launch_icon;
 	private Image find_icon;
 	private Image shutdown_icon;
@@ -200,7 +202,7 @@ public class SimpleToolBarEx {
 
 		testData = new HashMap<String, HashMap<String, String>>();
 		getOsName();
-		Shell shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
+		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
 		Device dev = shell.getDisplay();
@@ -306,7 +308,7 @@ public class SimpleToolBarEx {
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 					.setScriptTimeout(30, TimeUnit.SECONDS);
 			driver.get(baseURL);
-      // prevent the customer from launching multiple instances
+			// prevent the customer from launching multiple instances
 			// launch_tool.setEnabled(true);
 			find_icon_tool.setEnabled(true);
 			demo_tool.setEnabled(true);
@@ -316,8 +318,7 @@ public class SimpleToolBarEx {
 
 		flowchart_tool.addListener(SWT.Selection, event -> {
 			shell.setData("Nothing here\n yet...");
-			ScrolledTextEx test = new ScrolledTextEx(
-					Display.getCurrent(), shell);
+			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
 		});
 
 		open_tool.addListener(SWT.Selection, event -> {
@@ -413,15 +414,25 @@ public class SimpleToolBarEx {
 							assertThat(stepKeys, hasItem(commandId));
 							assertTrue(testData.containsKey(commandId));
 							HashMap<String, String> elementData = testData.get(commandId);
-							System.out.println(
+							System.err.println(
 									String.format("Clicked %s / %s", item.getText(), commandId));
 							shell.setData("CurrentCommandId", commandId);
+							shell.setData("updated", false);
 							ComplexFormEx cs = new ComplexFormEx(Display.getCurrent(), shell);
 							for (String key : elementData.keySet()) {
 								// System.err.println(key + ": " + elementData.get(key));
 								cs.setData(key, elementData.get(key));
 							}
 							cs.render();
+							if ((Boolean) shell.getData("updated")) {
+
+								System.err.println("After editing " + shell.getData("result"));
+								HashMap<String, String> data = new HashMap<String, String>();
+								String name = readVisualSearchResult(
+										(String) shell.getData("result"), Optional.of(data));
+								testData.replace(commandId, data);
+
+							}
 						}
 					});
 					step_index++;
