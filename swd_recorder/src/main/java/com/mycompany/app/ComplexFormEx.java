@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.json.*;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -32,16 +34,18 @@ public class ComplexFormEx {
 	private String commandId;
 	private Display display;
 	private String dataKey = "CurrentCommandId";
-	private HashMap<String, String> elementData = new HashMap<String, String>(); // empty
+	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 	private int width = 350;
 	private int height = 280;
+	private static Shell parentShell = null;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		if (parent != null) {
+			parentShell = parent;
 			commandId = parent.getData(dataKey).toString();
 		}
-    // readData(Optional.<HashMap<String, String>> empty());
-    readData(Optional.of(elementData));
+		// readData(Optional.<HashMap<String, String>> empty());
+		readData(Optional.of(elementData));
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 	}
@@ -58,8 +62,8 @@ public class ComplexFormEx {
 		shell.open();
 		// shell.setText(String.format("Step %s details", commandId));
 		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
-		titleData.setText(
-				String.format("Step %s details", (elementData.containsKey("ElementCodeName"))
+		titleData.setText(String.format("Step %s details",
+				(elementData.containsKey("ElementCodeName"))
 						? elementData.get("ElementCodeName") : ""));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 4;
@@ -79,6 +83,10 @@ public class ComplexFormEx {
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				// save the elementData json with parentShell.setData
+				if (parentShell != null) {
+					parentShell.setData("answer", "42");
+				}
 				shell.dispose();
 			}
 		});
@@ -116,17 +124,29 @@ public class ComplexFormEx {
 			buttonCancel.setSize(30, 20);
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent e) {
-					// System.out.println("Cancel was clicked");
+					System.out.println("Cancel was clicked");
 					composite.dispose();
 				}
 			});
 			buttonOK.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event e) {
+					for (String key : elementData.keySet()) {
+						System.err.println(key + ": " + elementData.get(key));
+					}
 					composite.dispose();
 				}
 			});
 
+		}
+	}
+
+	static void doSelection(Button button) {
+		if (button.getSelection()) {
+			// System.out.println("process selection " + button);
+      System.out.println(button.getText() + " selected");
+		} else {
+			System.out.println("do work for deselection " + button);
 		}
 	}
 
@@ -142,66 +162,125 @@ public class ComplexFormEx {
 		}
 
 		public void renderData(HashMap<String, String> data) {
+			Listener listener = new Listener() {
+				public void handleEvent(Event event) {
+					doSelection(((Button) event.widget));
+				}
+			};
+
 			final Button cssSelectorRadio = new Button(this, SWT.RADIO);
 			cssSelectorRadio.setSelection(true);
 			cssSelectorRadio.setText("Css");
 			cssSelectorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+      cssSelectorRadio.addListener(SWT.Selection, listener);
 
 			final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementCssSelector")) {
 				cssSelectorData.setText(data.get("ElementCssSelector"));
 			}
+			cssSelectorData.setData("key", "ElementCssSelector");
+			cssSelectorData.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent event) {
+					Text text = (Text) event.widget;
+					data.replace((String) text.getData("key"), text.getText());
+				}
+			});
 
 			final Button xPathRadio = new Button(this, SWT.RADIO);
 			xPathRadio.setSelection(false);
 			xPathRadio.setText("XPath");
 			xPathRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+      xPathRadio.addListener(SWT.Selection, listener);
+      
 			final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementXPath")) {
 				xPathData.setText(data.get("ElementXPath"));
 			}
+			xPathData.setData("key", "ElementXPath");
+			xPathData.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent event) {
+					Text text = (Text) event.widget;
+					data.replace((String) text.getData("key"), text.getText());
+				}
+			});
+
 			final Button idRadio = new Button(this, SWT.RADIO);
 			idRadio.setSelection(false);
 			idRadio.setText("ID");
 			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+      idRadio.addListener(SWT.Selection, listener);
+
+			idRadio.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(Event event) {
+					switch (event.type) {
+					case SWT.Selection:
+						Button button = ((Button) event.widget);
+						if (button.getSelection()) {
+							System.out.println(button.getText() + " selected");
+						}
+						break;
+					}
+				}
+			});
+      
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
 				idData.setText(data.get("ElementId"));
 			}
+			idData.setData("key", "ElementId");
+
+			idData.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent event) {
+					Text text = (Text) event.widget;
+					data.replace((String) text.getData("key"), text.getText());
+				}
+			});
+      
 			final Button textRadio = new Button(this, SWT.RADIO);
 			textRadio.setSelection(false);
 			textRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			textRadio.setText("Text");
+      textRadio.addListener(SWT.Selection, listener);
 
-			final Text textData = new Text(this, SWT.SINGLE | SWT.BORDER);
+			final Text textData;
+			textData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			textData.setText("Text...");
+			textData.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent event) {
+					Text text = (Text) event.widget;
+					// System.err.println(text.getText());
+				}
+			});
 		}
 	}
 
 	public String readData(Optional<HashMap<String, String>> parameters) {
 
-		// Boolean collectResults = true;
-    Boolean collectResults = parameters.isPresent();
-    HashMap<String, String> collector = (collectResults) ? parameters.get()
-        : new HashMap<String, String>();
+		Boolean collectResults = parameters.isPresent();
+		HashMap<String, String> collector = (collectResults) ? parameters.get()
+				: new HashMap<String, String>();
 		String data = "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"id\", \"ElementXPath\": \"/html//img[1]\" }";
 		try {
 			JSONObject elementObj = new JSONObject(data);
-      @SuppressWarnings("unchecked")
-      Iterator<String> propIterator = elementObj.keys();
-      while (propIterator.hasNext()) {
-        String propertyKey = propIterator.next();
+			@SuppressWarnings("unchecked")
+			Iterator<String> propIterator = elementObj.keys();
+			while (propIterator.hasNext()) {
+				String propertyKey = propIterator.next();
 
-        String propertyVal = elementObj.getString(propertyKey);
-        System.err.println(propertyKey + ": " + propertyVal);
-        collector.put(propertyKey, propertyVal);
-      }
+				String propertyVal = elementObj.getString(propertyKey);
+				System.err.println(propertyKey + ": " + propertyVal);
+				collector.put(propertyKey, propertyVal);
+			}
 		} catch (JSONException e) {
-      System.err.println("Ignored exception: " + e.toString());
+			System.err.println("Ignored exception: " + e.toString());
 			return null;
 		}
 		return collector.get("ElementCodeName");
