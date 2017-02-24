@@ -1,6 +1,9 @@
 package com.mycompany.app;
 
 import java.util.HashMap;
+import java.util.Iterator;
+
+import org.json.*;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -126,6 +129,8 @@ public class ComplexFormEx {
 
 	private static class GridComposite extends Composite {
 
+		private int labelWidth = 70;
+
 		public GridComposite(Composite c) {
 			super(c, SWT.BORDER);
 			GridLayout gl = new GridLayout();
@@ -137,7 +142,7 @@ public class ComplexFormEx {
 			final Button cssSelectorRadio = new Button(this, SWT.RADIO);
 			cssSelectorRadio.setSelection(true);
 			cssSelectorRadio.setText("Css");
-			cssSelectorRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
+			cssSelectorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 
 			final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -148,7 +153,7 @@ public class ComplexFormEx {
 			final Button xPathRadio = new Button(this, SWT.RADIO);
 			xPathRadio.setSelection(false);
 			xPathRadio.setText("XPath");
-			xPathRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
+			xPathRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementXPath")) {
@@ -157,7 +162,7 @@ public class ComplexFormEx {
 			final Button idRadio = new Button(this, SWT.RADIO);
 			idRadio.setSelection(false);
 			idRadio.setText("ID");
-			idRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
+			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
@@ -165,12 +170,36 @@ public class ComplexFormEx {
 			}
 			final Button textRadio = new Button(this, SWT.RADIO);
 			textRadio.setSelection(false);
-			textRadio.setLayoutData(new GridData(70 , SWT.DEFAULT ));
+			textRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			textRadio.setText("Text");
 
 			final Text textData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			textData.setText("Text...");
 		}
+	}
+
+	public void findHashes() {
+    
+    String data = "{
+    "Url": "GetXPathFromElement",
+    "ElementCodeName": "element",
+    "CommandId": "d5be4ea9-c51f-4e61-aefc-e5c83ba00be8",
+    "CssSelector": "html div.home-logo_custom > img",
+    "ElementId": "id",
+    "XPathValue": "/html//img[1]"
+}";
+
+	JSONObject resultObj = new JSONObject(data);
+	@SuppressWarnings("unchecked")
+	Iterator<String> masterServerIterator = resultObj.keys();
+	while(masterServerIterator.hasNext())
+	{
+		String masterServer = masterServerIterator.next();
+		JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
+		for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
+			System.err.println(masterServer + " " + resultDataArray.get(cnt));
+		}
+
 	}
 }
