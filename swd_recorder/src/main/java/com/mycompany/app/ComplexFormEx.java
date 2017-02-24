@@ -2,6 +2,7 @@ package com.mycompany.app;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.json.*;
 
@@ -31,7 +32,7 @@ public class ComplexFormEx {
 	private String commandId;
 	private Display display;
 	private String dataKey = "CurrentCommandId";
-	private HashMap<String, String> data = new HashMap<String, String>(); // empty
+	private HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 	private int width = 350;
 	private int height = 280;
 
@@ -39,32 +40,34 @@ public class ComplexFormEx {
 		if (parent != null) {
 			commandId = parent.getData(dataKey).toString();
 		}
+    // readData(Optional.<HashMap<String, String>> empty());
+    readData(Optional.of(elementData));
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 	}
 
 	public void setData(String key, String value) {
-		data.put(key, value);
+		elementData.put(key, value);
 	}
 
 	public void render() {
-		for (String key : data.keySet()) {
-			System.err.println(key + ": " + data.get(key));
+		for (String key : elementData.keySet()) {
+			System.err.println(key + ": " + elementData.get(key));
 		}
 		shell.setSize(20, 20);
 		shell.open();
 		// shell.setText(String.format("Step %s details", commandId));
 		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
 		titleData.setText(
-				String.format("Step %s details", (data.containsKey("ElementCodeName"))
-						? data.get("ElementCodeName") : ""));
+				String.format("Step %s details", (elementData.containsKey("ElementCodeName"))
+						? elementData.get("ElementCodeName") : ""));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 4;
 		shell.setLayout(gl);
 		// shell.setLayout(gl);
 
 		GridComposite gc = new GridComposite(shell);
-		gc.renderData(data);
+		gc.renderData(elementData);
 		GridData gd = new GridData(GridData.FILL_BOTH);
 		gd.horizontalSpan = 4;
 		gc.setLayoutData(gd);
@@ -179,27 +182,28 @@ public class ComplexFormEx {
 		}
 	}
 
-	public void findHashes() {
-    
-    String data = "{
-    "Url": "GetXPathFromElement",
-    "ElementCodeName": "element",
-    "CommandId": "d5be4ea9-c51f-4e61-aefc-e5c83ba00be8",
-    "CssSelector": "html div.home-logo_custom > img",
-    "ElementId": "id",
-    "XPathValue": "/html//img[1]"
-}";
+	public String readData(Optional<HashMap<String, String>> parameters) {
 
-	JSONObject resultObj = new JSONObject(data);
-	@SuppressWarnings("unchecked")
-	Iterator<String> masterServerIterator = resultObj.keys();
-	while(masterServerIterator.hasNext())
-	{
-		String masterServer = masterServerIterator.next();
-		JSONArray resultDataArray = resultObj.getJSONArray(masterServer);
-		for (int cnt = 0; cnt < resultDataArray.length(); cnt++) {
-			System.err.println(masterServer + " " + resultDataArray.get(cnt));
+		// Boolean collectResults = true;
+    Boolean collectResults = parameters.isPresent();
+    HashMap<String, String> collector = (collectResults) ? parameters.get()
+        : new HashMap<String, String>();
+		String data = "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"id\", \"ElementXPath\": \"/html//img[1]\" }";
+		try {
+			JSONObject elementObj = new JSONObject(data);
+      @SuppressWarnings("unchecked")
+      Iterator<String> propIterator = elementObj.keys();
+      while (propIterator.hasNext()) {
+        String propertyKey = propIterator.next();
+
+        String propertyVal = elementObj.getString(propertyKey);
+        System.err.println(propertyKey + ": " + propertyVal);
+        collector.put(propertyKey, propertyVal);
+      }
+		} catch (JSONException e) {
+      System.err.println("Ignored exception: " + e.toString());
+			return null;
 		}
-
+		return collector.get("ElementCodeName");
 	}
 }
