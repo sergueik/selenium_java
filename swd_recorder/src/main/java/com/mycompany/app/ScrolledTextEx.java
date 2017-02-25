@@ -1,5 +1,8 @@
 package com.mycompany.app;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
@@ -19,6 +22,9 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.ScrolledComposite;
 
+import org.jtwig.JtwigModel;
+import org.jtwig.JtwigTemplate;
+
 // based on: 
 // http://stackoverflow.com/questions/10145547/enabling-scroll-bars-in-a-java-swt-window
 class ScrolledTextEx {
@@ -36,6 +42,8 @@ class ScrolledTextEx {
 		if (parent != null) {
 			// commandId = parent.getData(dataKey).toString();
 			payload = (String) parent.getData();
+		} else {
+			payload = render();
 		}
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 
@@ -89,5 +97,33 @@ class ScrolledTextEx {
 	public static void main(String[] arg) {
 		ScrolledTextEx o = new ScrolledTextEx(null, null);
 		// o.render();
+	}
+
+	private static final Map<String, String> elementData = createSampleElement();
+
+	private static Map<String, String> createSampleElement() {
+		Map<String, String> elementData = new HashMap<String, String>();
+		elementData.put("ElementId", "id");
+		elementData.put("ElementCodeName", "gmail link");
+		elementData.put("ElementXPath", "/html//img[1]");
+		elementData.put("ElementCssSelector", "div#gbw > a.highlight");
+		elementData.put("useCss", "true");
+		elementData.put("useXPath", "false");
+		elementData.put("useId", "false");
+		elementData.put("useText", "false");
+		return elementData;
+	}
+
+	// http://jtwig.org/documentation/reference/
+	private String render() {
+		JtwigTemplate template = JtwigTemplate
+				.classpathTemplate("templates/example.twig");
+		JtwigModel model = JtwigModel.newModel();
+		for (String key : elementData.keySet()) {
+			model.with(key, elementData.get(key));
+		}
+		String output = template.render(model);
+		System.err.println("Rendered: " + output);
+		return output;
 	}
 }

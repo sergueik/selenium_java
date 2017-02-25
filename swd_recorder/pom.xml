@@ -28,6 +28,8 @@
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>2.53.0</selenium.version>
     <selenium.firefox-driver.version>2.53.0</selenium.firefox-driver.version>
+    <snakeyaml.version>1.17</snakeyaml.version>
+    <jtwig-core.version>5.85.0.RELEASE</jtwig-core.version>
     <eclipse.swt.version>4.3</eclipse.swt.version>
     <!--
     <eclipse.swt.version>[3.6,4.5.0)</eclipse.swt.version>
@@ -42,11 +44,16 @@
     <opal.version>1.0.4</opal.version>
   </properties>
   <dependencies>
-  <dependency>
-    <groupId>org.yaml</groupId>
-    <artifactId>snakeyaml</artifactId>
-    <version>1.17</version>
-</dependency>
+    <dependency>
+      <groupId>org.jtwig</groupId>
+      <artifactId>jtwig-core</artifactId>
+      <version>${jtwig-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.eclipse.swt</groupId>
       <artifactId>${eclipse.swt.artifactId}</artifactId>
@@ -199,6 +206,10 @@
       <id>seasar</id>
       <name>seasar repo</name>
       <url>https://www.seasar.org/maven/maven2</url>
+    </repository>
+    <repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
     </repository>
   </repositories>
 </project>
