@@ -56,11 +56,18 @@ The Java reads back the result once it available and adds a breadcrump button:
 The breadcrump button opens the form dialog with the details of the element:
 ![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
 
-There is also a demo button that does these actions automatically:
+The flowchart button 
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/flowchart.png)
+
+starts codegeneration using [Jtwig](http://jtwig.org/) tempate and `elementData` hash and opens result in a separate dialog:
+![codegen](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/codegen.png)
+
+There is also a demo button that executes these actions automatically (for one element):
 ![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/demo.png)
 
-Currently project is hardcoded to use Chrome browser on Windows, and Firefox on the rest of platforms.
-The configuration will be added shotly - it will use a yaml, json or java properties file.
+Currently project is hardcoded to use Chrome browser on Windows os, and Firefox on the rest of platforms.
+The YAML configuration will be fuly integrated shotly.
+Eventually other common formats: YAML, JSON, POI or Java properties file - will be supported.
 
 ### Platform-specific information
 
@@ -111,8 +118,8 @@ This is why it may be worthwhile setting up Virtual Box to compile and run an in
 
 ### Configuration, saving and loading
 
-The element locators collected by SWET may be saved in YAML format.
-Example
+The element locators collected by SWET may be saved in YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml).
+Example:
 ```yaml
 version: '1.0'
 created: '2017-02-21'
@@ -139,19 +146,19 @@ browsers:
 
 # Elements
 elements:
-  1:
+  '9882f662-5593-4b8a-a21d-8e5a6d1bcc6a':
     ElementCodeName: logo
     ElementCssSelector: 'img#hplogo'
-    CommandId: 9882f662-5593-4b8a-a21d-8e5a6d1bcc6a
     ElementXPath: id("hplogo")
-  2:
-    CommandId: f26d01af-1
+    Url: http://www.google.com
+  'f26d01af-1':
     ElementCodeName: 'element name'
     ElementId: ''
     ElementCssSelector: 'article#home > section.homepage-content-container > div.homepage-parsys-container > div.farefinderwidget.parbase.section.specialofferswidget > div > farefinder-compact > div.section-wrapper > div.home-info.full-width > div > h3 > span.highlight'
     ElementXPath: "id(\"home\")/section[1]/div[2]/div[1]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
 ```
-Processing the saved configuration is a work in progress.
+Integration with the main flow of processing the saved configuration is a work in progress.
+
 ### Links
 
 #### SWT
@@ -173,6 +180,9 @@ Processing the saved configuration is a work in progress.
   * [Jtwig](http://jtwig.org/)
   * [Thymeleaf](http://www.thymeleaf.org/)
   * [StringTemplate](http://www.stringtemplate.org/)
+
+### YAML
+  *  [snakeyaml](https://bitbucket.org/asomov/snakeyaml)
 
 ### Javascript injection
   * [Keymaster](https://github.com/madrobby/keymaster)
