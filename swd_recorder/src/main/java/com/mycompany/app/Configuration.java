@@ -13,7 +13,7 @@ final class Configuration {
 	public Date updated;
 	public String version;
 	public String seleniumVersion;
-	public Browser browser;
+	public BrowserConfiguration browserConfiguration;
 	public List<String> browsers;
 	public HashMap<String, HashMap<String, String>> elements;
 	public Map<String, String> plugins;
@@ -50,20 +50,20 @@ final class Configuration {
 		this.seleniumVersion = data;
 	}
 
-	public Browser getBrowser() {
-		return browser;
+	public BrowserConfiguration getBrowserConfiguration() {
+		return browserConfiguration;
 	}
 
-	public void setBrowser(Browser data) {
-		this.browser = data;
+	public void setBrowserConfiguration(BrowserConfiguration data) {
+		this.browserConfiguration = data;
 	}
 
-	public List<String> getbrowsers() {
+	public List<String> getBrowsers() {
 		return browsers;
 	}
 
-	public void setbrowsers(List<String> browsers) {
-		this.browsers = browsers;
+	public void setBrowsers(List<String> data) {
+		this.browsers = data;
 	}
 
 	public Map<String, String> getPlugins() {
@@ -78,8 +78,8 @@ final class Configuration {
 		return elements;
 	}
 
-	public void setelements(HashMap<String, HashMap<String, String>> elements) {
-		this.elements = elements;
+	public void setelements(HashMap<String, HashMap<String, String>> data) {
+		this.elements = data;
 	}
 
 	@Override
@@ -88,7 +88,7 @@ final class Configuration {
 				.append(format("created: %s\n", created))
 				.append(format("Selenium version: %s\n", seleniumVersion))
 				.append(format("Supported browsers: %s\n", browsers))
-				.append(format("Using: %s\n", browser))
+				.append(format("Using: %s\n", browserConfiguration))
 				.append(format("Plugins: %s\n", plugins))
 				.append(format("elements: %s\n", elements)).toString();
 	}

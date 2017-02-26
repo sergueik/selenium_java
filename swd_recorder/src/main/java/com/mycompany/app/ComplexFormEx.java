@@ -70,13 +70,13 @@ public class ComplexFormEx {
 		shell.open();
 		// shell.setText(String.format("Step %s details", commandId));
 		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
+		titleData.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		titleData.setText(String.format("Step %s details",
 				(elementData.containsKey("ElementCodeName"))
 						? elementData.get("ElementCodeName") : ""));
 		GridLayout gl = new GridLayout();
 		gl.numColumns = 4;
 		shell.setLayout(gl);
-		// shell.setLayout(gl);
 
 		GridComposite gc = new GridComposite(shell);
 		gc.renderData(elementData);

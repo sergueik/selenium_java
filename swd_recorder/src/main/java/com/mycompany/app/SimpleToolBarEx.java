@@ -83,6 +83,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.internal.Coordinates;
@@ -90,6 +91,12 @@ import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -300,6 +307,24 @@ public class SimpleToolBarEx {
 				System.setProperty("webdriver.chrome.driver",
 						"c:/java/selenium/chromedriver.exe");
 				driver = new ChromeDriver();
+				/*
+				File file = new File("c:/java/Selenium/IEDriverServer.exe");
+				System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
+
+				DesiredCapabilities capabilities = DesiredCapabilities
+						.internetExplorer();
+
+				capabilities.setCapability(
+						InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
+						true);
+				// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
+				capabilities.setCapability("ignoreZoomSetting", true);
+				capabilities.setCapability("ignoreProtectedModeSettings", true);
+				capabilities.setBrowserName(
+						DesiredCapabilities.internetExplorer().getBrowserName());
+
+				driver = new InternetExplorerDriver(capabilities);
+				*/
 			} else {
 				driver = new FirefoxDriver();
 			}
@@ -662,6 +687,7 @@ public class SimpleToolBarEx {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
+			// org.openqa.selenium.NoSuchWindowException
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");

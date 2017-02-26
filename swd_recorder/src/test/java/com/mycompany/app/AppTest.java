@@ -165,14 +165,14 @@ public class AppTest {
 		String elementName = readVisualSearchResult(payload,
 				Optional.of(elementData));
 		Configuration config = new Configuration();
-		Browser browser = new Browser();
-		browser.name = "chrome";
-		browser.version = "54.0";
-		browser.driverVersion = "2.27";
-		browser.driverPath = "c:/java/selenium/chromedriver.exe";
-		browser.platform = getOsName();
+		BrowserConfiguration browserConfiguration = new BrowserConfiguration();
+		browserConfiguration.name = "chrome";
+		browserConfiguration.version = "54.0";
+		browserConfiguration.driverVersion = "2.27";
+		browserConfiguration.driverPath = "c:/java/selenium/chromedriver.exe";
+		browserConfiguration.platform = getOsName();
 		config.created = new Date();
-		config.browser = browser;
+		config.browserConfiguration = browserConfiguration;
 		config.updated = new Date();
 		HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
 		testData.put(elementName, elementData);

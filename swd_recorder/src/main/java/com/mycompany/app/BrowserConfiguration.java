@@ -2,8 +2,7 @@ package com.mycompany.app;
 
 import static java.lang.String.format;
 
-
-public final class Browser {
+public final class BrowserConfiguration {
 	public String name;
 	public String platform;
 	public String driverPath;
