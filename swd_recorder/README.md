@@ -1,27 +1,29 @@
 ### Info
 
-Selenium WebDriver Eclipse Toolkit (SWET) is a OS-independent successor to the
+Selenium WebDriver Eclipse Extension Toolkit (SWEET) is a OS-independent successor to the
 [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
-Dmytro Zharii based on [The Standard Widget Toolkit](https://www.eclipse.org/swt/), and [SWT new widgets library Opal Project by Laurent Caron](https://github.com/lcaron/opal)
+Dmytro Zharii. While the latter is .Net Windows Forms/ Razor application,
+SWEET is based on the [Standard Widget Toolkit](https://www.eclipse.org/swt/) with some third party widgets (currently, [Opal](https://github.com/lcaron/opal)
+therefore it can be run on Windows, Mac or Linux, 32 or 64 bit platforms. Eventually SWET might become an Eclipse plugin.
+
+The application is developed in Ecipse mars with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
+on Ubuntu 16.04 and Windows.
+The [Jtwig](http://jtwig.org/) is the code generatsor used.
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
 ![Ubuntu Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
+
+![Windows Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture3.png)
+
+
 ### Goals
 
 Eventually the full functionality of SWD is to be achieved.
+Currently
 
-UI is a work in progress: adding more form elements and the code generator is a work in progress.
-
-A number of very basic examples from the Standard Widget Toolkit study project
-[lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt)
-(which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com)) is currently checked in but will eventually disappear.
-
-Also, the standalone SWT application jar might be converted to an Eclipse plugin.
-
-The application can be run on a 32 or 64 bit Windows, Mac or Linux, or in Virtual Box.
-For Mac testing the [Sierra Final 10.12 Virtual Box image vdi by TechReviews](https://techsviewer.com/install-macos-sierra-virtualbox-windows/)
-have been used.
+For Mac testing a Virtual Box [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/)
+vdi by TechReviews is being used.
 
 ### Usage
 
@@ -37,8 +39,14 @@ on Windows or
 ```bash
 ./run.sh
 ```
-on Linuxor Mac. The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository, compiles and packages the project in maven
-and runs it it from the `target` directory.
+on Linux or a Mac.
+The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository, 
+compiles and packages the project using maven
+and runs the application jar from the `target` directory.
+The runner script can be used to launch individual basic examples from the Standard Widget Toolkit study
+project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt),
+which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com)
+a number os such examples is still checked in in the project directory but will eventually disappear.
 
 ### Toolbar Buttons
 
@@ -56,7 +64,7 @@ The Java reads back the result once it available and adds a breadcrump button:
 The breadcrump button opens the form dialog with the details of the element:
 ![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
 
-The flowchart button 
+The flowchart button
 ![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/flowchart.png)
 
 starts codegeneration using [Jtwig](http://jtwig.org/) tempate and `elementData` hash and opens result in a separate dialog:
@@ -111,10 +119,10 @@ Currently supported combination of versions is
 
 One can download virtually every old build of Firefox from
 https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from
-http://www.slimjetbrowser.com/chrome/, for other browsers locations vary.
+http://www.slimjetbrowser.com/chrome/, for other browsers the download locations vary.
 
-This is why it may be worthwhile setting up Virtual Box to compile and run an instance in.
-
+This is why it may be worthwhile setting up Virtual Box e.g.
+[selenium-fluxbox](https://github.com/sergueik/selenium-fluxbox) to run the appliation with fixed downlevel browser versions.
 
 ### Configuration, saving and loading
 
@@ -157,7 +165,12 @@ elements:
     ElementCssSelector: 'article#home > section.homepage-content-container > div.homepage-parsys-container > div.farefinderwidget.parbase.section.specialofferswidget > div > farefinder-compact > div.section-wrapper > div.home-info.full-width > div > h3 > span.highlight'
     ElementXPath: "id(\"home\")/section[1]/div[2]/div[1]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
 ```
-Integration with the main flow of processing the saved configuration is a work in progress.
+
+### Work in Progress
+* UI improvements adding more form elements
+* Testing with Safari and variety of IE / Edge browsers
+* Adding the code generator templates
+* Codebase cleanup
 
 ### Links
 
@@ -182,7 +195,7 @@ Integration with the main flow of processing the saved configuration is a work i
   * [StringTemplate](http://www.stringtemplate.org/)
 
 ### YAML
-  *  [snakeyaml](https://bitbucket.org/asomov/snakeyaml)
+  * [snakeyaml](https://bitbucket.org/asomov/snakeyaml)
 
 ### Javascript injection
   * [Keymaster](https://github.com/madrobby/keymaster)
@@ -193,7 +206,6 @@ Integration with the main flow of processing the saved configuration is a work i
   * [eclipse xwt](https://wiki.eclipse.org/XWT_Documentation)
   * [mono/xwt](https://github.com/mono/xwt)
   * [json2](https://github.com/douglascrockford/JSON-js)
-  * [snakeYaml](https://bitbucket.org/asomov/snakeyaml)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
