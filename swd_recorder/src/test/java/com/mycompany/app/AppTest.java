@@ -73,6 +73,7 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -111,11 +112,58 @@ public class AppTest {
 
 	@BeforeClass
 	public static void beforeSuiteMethod() throws Exception {
-		// NOTE: CTRL-right click via actions does not work well with Firefox
-		// driver = new FirefoxDriver();
-		System.setProperty("webdriver.chrome.driver",
-				"c:/java/selenium/chromedriver.exe");
-		driver = new ChromeDriver();
+
+		getOsName();
+		if (osName.toLowerCase().startsWith("windows")) {
+			System.setProperty("webdriver.chrome.driver",
+					"c:/java/selenium/chromedriver.exe");
+			driver = new ChromeDriver();
+			/*
+			// IE 10 works, IE 11 does not
+			File file = new File("c:/java/Selenium/IEDriverServer.exe");
+			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
+			
+			DesiredCapabilities capabilities = DesiredCapabilities
+					.internetExplorer();
+			
+			capabilities.setCapability(
+					InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
+					true);
+			// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
+			capabilities.setCapability("ignoreZoomSetting", true);
+			capabilities.setCapability("ignoreProtectedModeSettings", true);
+			capabilities.setBrowserName(
+					DesiredCapabilities.internetExplorer().getBrowserName());
+			
+			driver = new InternetExplorerDriver(capabilities);
+			*/
+		} else if (osName.startsWith("Mac")) {
+			driver = new SafariDriver();
+			/*
+			INFO: Launching Safari
+			org.openqa.selenium.safari.SafariDriverCommandExecutor start
+			INFO: Waiting for SafariDriver to connect
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Shutting down
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Stopping Safari
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Stopping server
+			org.openqa.selenium.safari.SafariDriverServer stop
+			INFO: Stopping server
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Shutdown complete
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Shutting down
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Stopping server
+			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
+			INFO: Shutdown complete
+			Ignored exception: java.lang.NullPointerException
+			*/
+		} else {
+			driver = new FirefoxDriver();
+		}
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -133,6 +181,7 @@ public class AppTest {
 	}
 
 	@Before
+
 	public void loadBaseURL() {
 		driver.get(baseURL);
 	}
@@ -144,7 +193,10 @@ public class AppTest {
 
 	@Test
 	public void testStatic() {
-		driver.get(getPageContent("ElementSearch.html"));
+		// driver.get(getPageContent("ElementSearch.html"));
+    // Unsupported URL protocol: file:/Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
+    driver.get("file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html");
+    // Unsupported URL protocol: file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		highlight(element);

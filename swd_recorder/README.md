@@ -112,18 +112,24 @@ Currently supported combination of versions is
 
 |                      |              |
 |----------------------|--------------|
-| SELENIUM_VERSION     | 2.53.1       |
-| FIREFOX_VERSION      | 45.0.1       |
-| CHROME_VERSION       | 54.0.2840.71 |
-| CHROMEDRIVER_VERSION | 2.24         |
+| SELENIUM_VERSION     | __2.53.1__       |
+| FIREFOX_VERSION      | __45.0.1__       |
+| CHROME_VERSION       | __54.0.X__ |
+| CHROMEDRIVER_VERSION | __2.24__         |
+
 
 One can download virtually every old build of Firefox from
 https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from
 http://www.slimjetbrowser.com/chrome/, for other browsers the download locations vary.
 
-This is why it may be worthwhile setting up Virtual Box e.g.
-[selenium-fluxbox](https://github.com/sergueik/selenium-fluxbox) to run the appliation with fixed downlevel browser versions.
+This is why it may be worthwhile setting up Virtual Box e.g. [selenium-fluxbox](https://github.com/sergueik/selenium-fluxbox) to run the appliation with fixed downlevel browser versions.
 
+### Safari Testing
+If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver would be installed automatically, 
+but it does not seems to work with Selenium __2.53__.
+For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__ 
+then follow the http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser
+      
 ### Configuration, saving and loading
 
 The element locators collected by SWET may be saved in YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml).

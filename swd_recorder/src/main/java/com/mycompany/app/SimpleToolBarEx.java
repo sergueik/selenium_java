@@ -90,6 +90,7 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -308,31 +309,34 @@ public class SimpleToolBarEx {
 			status.setText("Launching browser");
 			status.pack();
 			shell.pack();
-			if (osName.startsWith("Windows")) {
-				System.setProperty("webdriver.chrome.driver",
-						"c:/java/selenium/chromedriver.exe");
-				driver = new ChromeDriver();
-				/*
-				File file = new File("c:/java/Selenium/IEDriverServer.exe");
-				System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-				
-				DesiredCapabilities capabilities = DesiredCapabilities
-						.internetExplorer();
-				
-				capabilities.setCapability(
-						InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
-						true);
-				// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
-				capabilities.setCapability("ignoreZoomSetting", true);
-				capabilities.setCapability("ignoreProtectedModeSettings", true);
-				capabilities.setBrowserName(
-						DesiredCapabilities.internetExplorer().getBrowserName());
-				
-				driver = new InternetExplorerDriver(capabilities);
-				*/
-			} else {
-				driver = new FirefoxDriver();
-			}
+		if (osName.toLowerCase().startsWith("windows")) {
+			System.setProperty("webdriver.chrome.driver",
+					"c:/java/selenium/chromedriver.exe");
+			driver = new ChromeDriver();
+			/*
+			// IE 10 works, IE 11 does not
+			File file = new File("c:/java/Selenium/IEDriverServer.exe");
+			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
+			
+			DesiredCapabilities capabilities = DesiredCapabilities
+					.internetExplorer();
+			
+			capabilities.setCapability(
+					InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
+					true);
+			// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
+			capabilities.setCapability("ignoreZoomSetting", true);
+			capabilities.setCapability("ignoreProtectedModeSettings", true);
+			capabilities.setBrowserName(
+					DesiredCapabilities.internetExplorer().getBrowserName());
+			
+			driver = new InternetExplorerDriver(capabilities);
+			*/
+		} else if (osName.startsWith("Mac")) {
+			driver = new SafariDriver();
+		} else {
+			driver = new FirefoxDriver();
+		}
 
 			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
