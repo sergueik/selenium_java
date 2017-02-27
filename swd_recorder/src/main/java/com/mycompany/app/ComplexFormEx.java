@@ -43,59 +43,53 @@ public class ComplexFormEx {
 	private static Shell parentShell = null;
 	private static Boolean updated = false;
 	private static String result = null;
+	private int step_num = 1;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		if (parent != null) {
-			System.err.println("Detected parent shell " + parent.toString());
+			// System.err.println("Detected parent shell " + parent.toString());
 			parentShell = parent;
 			commandId = parent.getData(dataKey).toString();
 		} else {
-			System.err.println("No parent shell");
+			// System.err.println("No parent shell");
 		}
-		// readData(Optional.<HashMap<String, String>> empty());
 		readData(Optional.of(elementData));
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 	}
 
-	public void setData(String key, String value) {
-		elementData.put(key, value);
-	}
-
 	public void render() {
-		for (String key : elementData.keySet()) {
-			System.err.println(key + ": " + elementData.get(key));
-		}
-		shell.setSize(20, 20);
 		shell.open();
-		// shell.setText(String.format("Step %s details", commandId));
-		final Label titleData = new Label(shell, SWT.SINGLE | SWT.BORDER);
-		titleData.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
-		titleData.setText(String.format("Step %s details",
-				(elementData.containsKey("ElementCodeName"))
-						? elementData.get("ElementCodeName") : ""));
+		shell.setText(String.format("Element Locators", commandId));
 		GridLayout gl = new GridLayout();
-		gl.numColumns = 4;
+		gl.numColumns = 1;
 		shell.setLayout(gl);
+		final Label titleData = new Label(shell, SWT.SINGLE | SWT.NONE);
+		titleData
+				.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
+		titleData.setText((elementData.containsKey("ElementCodeName"))
+				? elementData.get("ElementCodeName")
+				: String.format("Step %s details", step_num));
 
 		GridComposite gc = new GridComposite(shell);
 		gc.renderData(elementData);
 		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 4;
 		gc.setLayoutData(gd);
-		gd = new GridData();
+		gc.pack();
 
 		RowComposite rc = new RowComposite(shell);
 		gd = new GridData(GridData.FILL_HORIZONTAL);
 		rc.setLayoutData(gd);
+		rc.pack();
+		shell.pack();
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
 				if (updated) {
 					if (parentShell != null) {
-						// save the elementData json by callng setData on parentShell
 						// NOTE: not currently reached
-						System.err.println("[1]Updating the parent with: " + result);
+						System.err
+								.println("Handle Close: updating the parent shell: " + result);
 						parentShell.setData("result", result);
 						parentShell.setData("updated", true);
 					}
@@ -110,11 +104,6 @@ public class ComplexFormEx {
 			if (!display.readAndDispatch())
 				display.sleep();
 		}
-	}
-
-	public static void main(String[] arg) {
-		ComplexFormEx o = new ComplexFormEx(null, null);
-		o.render();
 	}
 
 	private static class RowComposite extends Composite {
@@ -137,7 +126,6 @@ public class ComplexFormEx {
 			buttonCancel.setSize(30, 20);
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
-					System.out.println("Cancel was clicked");
 					composite.dispose();
 				}
 			});
@@ -152,7 +140,6 @@ public class ComplexFormEx {
 						StringWriter wr = new StringWriter();
 						json.write(wr);
 						result = wr.toString();
-						// System.err.println("created json:" + result);
 						updated = true;
 						if (parentShell != null) {
 							System.err.println("[2]Updating the parent with: " + result);
@@ -169,15 +156,6 @@ public class ComplexFormEx {
 		}
 	}
 
-	static void doSelection(Button button) {
-		if (button.getSelection()) {
-			// System.out.println("process selection " + button);
-			System.out.println(button.getText() + " selected");
-		} else {
-			System.out.println("do work for deselection " + button);
-		}
-	}
-
 	private static class GridComposite extends Composite {
 
 		private int labelWidth = 70;
@@ -187,6 +165,15 @@ public class ComplexFormEx {
 			GridLayout gl = new GridLayout();
 			gl.numColumns = 2;
 			this.setLayout(gl);
+		}
+
+		private static void doSelection(Button button) {
+			if (button.getSelection()) {
+				// System.out.println("process selection " + button);
+				System.out.println(button.getText() + " selected");
+				// } else {
+				// System.out.println("do work for deselection " + button);
+			}
 		}
 
 		public void renderData(HashMap<String, String> data) {
@@ -242,19 +229,20 @@ public class ComplexFormEx {
 			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			idRadio.addListener(SWT.Selection, listener);
 
-			idRadio.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event event) {
-					switch (event.type) {
-					case SWT.Selection:
-						Button button = ((Button) event.widget);
-						if (button.getSelection()) {
-							System.out.println(button.getText() + " selected");
-						}
-						break;
-					}
-				}
-			});
-
+			/*
+						idRadio.addListener(SWT.Selection, new Listener() {
+							public void handleEvent(Event event) {
+								switch (event.type) {
+								case SWT.Selection:
+									Button button = ((Button) event.widget);
+									if (button.getSelection()) {
+										System.out.println(button.getText() + " selected (*)");
+									}
+									break;
+								}
+							}
+						});
+			*/
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
@@ -313,4 +301,14 @@ public class ComplexFormEx {
 		}
 		return collector.get("ElementCodeName");
 	}
+
+	public void setData(String key, String value) {
+		elementData.put(key, value);
+	}
+
+	public static void main(String[] arg) {
+		ComplexFormEx o = new ComplexFormEx(null, null);
+		o.render();
+	}
+
 }

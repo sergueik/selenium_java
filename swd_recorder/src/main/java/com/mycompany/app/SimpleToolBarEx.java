@@ -147,6 +147,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import org.mihalis.opal.breadcrumb.*;
 
@@ -179,11 +180,7 @@ public class SimpleToolBarEx {
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private ArrayList<String> stepKeys = new ArrayList<String>();
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
-
-	private RowLayout layout;
-	private Composite composite;
-	private static String[] Labels = { "Open application",
-			"Navigate to login page", "Something else" };
+	private Label status;
 
 	private static int width = 900;
 	private static int height = 800;
@@ -191,7 +188,6 @@ public class SimpleToolBarEx {
 	private static String osName = null;
 
 	private Breadcrumb bc;
-	private ToolBar toolBar;
 
 	public SimpleToolBarEx(Display display) {
 		initUI(display);
@@ -212,6 +208,8 @@ public class SimpleToolBarEx {
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
+		shell.setImage(
+				SWTResourceManager.getImage(this.getClass(), "/magnifier.ico"));
 		Device dev = shell.getDisplay();
 
 		try {
@@ -232,12 +230,12 @@ public class SimpleToolBarEx {
 			System.exit(1);
 		}
 
-		bc = new Breadcrumb(shell, SWT.BORDER);
-		// GridData cannot be cast to RowData
-		// bc.setLayoutData(
-		// new GridData(GridData.BEGINNING, GridData.CENTER, false, false));
+		shell.setText(String.format("Selenium Webdriver Elementor Toolkit"));
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 1;
+		shell.setLayout(gl);
 
-		toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
+		ToolBar toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
 		ToolItem launch_tool = new ToolItem(toolBar, SWT.PUSH);
 		launch_tool.setImage(launch_icon);
@@ -277,32 +275,39 @@ public class SimpleToolBarEx {
 		shutdown_tool.setImage(shutdown_icon);
 		shutdown_tool.setToolTipText("Quits the app");
 
-		toolBar.pack();
-
 		// preferences_tool.setEnabled(false);
 		find_icon_tool.setEnabled(false);
 		flowchart_tool.setEnabled(false);
 		demo_tool.setEnabled(false);
 		save_tool.setEnabled(false);
-		layout = new RowLayout();
 
-		layout.wrap = true;
-		layout.marginLeft = 5;
-		layout.marginTop = 5;
-		layout.marginRight = 5;
-		layout.marginBottom = 5;
+		toolBar.pack();
 
-		shell.setLayout(layout);
+		Composite composite = new Composite(shell, SWT.BORDER);
 
-		Label status = new Label(shell, SWT.BORDER);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.marginLeft = 5;
+		gridLayout.marginTop = 5;
+		gridLayout.marginRight = 5;
+		gridLayout.marginBottom = 5;
+		gridLayout.numColumns = 1;
+		gridLayout.makeColumnsEqualWidth = false;
+		composite.setLayout(gridLayout);
+
+		Breadcrumb bc1 = new Breadcrumb(composite, SWT.BORDER);
+		bc = bc1;
+		composite.pack();
+
+		status = new Label(shell, SWT.BORDER);
+		status.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		status.setText("Loading");
 		status.pack();
 		shell.pack();
 		launch_tool.addListener(SWT.Selection, event -> {
 			launch_tool.setEnabled(false);
-			// Currently testing with Firefox on Linux and OSX and with Chrome on
-			// Windows
-			// System.err.println("OS: " + getOsName());
+			status.setText("Launching browser");
+			status.pack();
+			shell.pack();
 			if (osName.startsWith("Windows")) {
 				System.setProperty("webdriver.chrome.driver",
 						"c:/java/selenium/chromedriver.exe");
@@ -310,10 +315,10 @@ public class SimpleToolBarEx {
 				/*
 				File file = new File("c:/java/Selenium/IEDriverServer.exe");
 				System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-
+				
 				DesiredCapabilities capabilities = DesiredCapabilities
 						.internetExplorer();
-
+				
 				capabilities.setCapability(
 						InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
 						true);
@@ -322,7 +327,7 @@ public class SimpleToolBarEx {
 				capabilities.setCapability("ignoreProtectedModeSettings", true);
 				capabilities.setBrowserName(
 						DesiredCapabilities.internetExplorer().getBrowserName());
-
+				
 				driver = new InternetExplorerDriver(capabilities);
 				*/
 			} else {
@@ -339,6 +344,8 @@ public class SimpleToolBarEx {
 			demo_tool.setEnabled(true);
 			flowchart_tool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
+			status.setText("Ready");
+			status.pack();
 		});
 
 		flowchart_tool.addListener(SWT.Selection, event -> {
@@ -384,6 +391,8 @@ public class SimpleToolBarEx {
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
 					find_icon_tool.setEnabled(false);
+					status.setText("Injecting the script");
+					status.pack();
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
@@ -391,6 +400,7 @@ public class SimpleToolBarEx {
 					String name = "";
 					HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 					Boolean waitingForData = true;
+					status.setText("Waiting for data");
 					while (waitingForData) {
 						String payload = executeScript(getCommand).toString();
 						if (!payload.isEmpty()) {
@@ -421,6 +431,12 @@ public class SimpleToolBarEx {
 					// clear results on the page
 					flushVisualSearchResult();
 					closeVisualSearch();
+					Rectangle rect = bc.getBounds();
+					// System.err.println("Bound rect width: " + rect.width);
+					if (rect.width > 765) {
+						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
+						bc = bc2;
+					}
 					final BreadcrumbItem item = new BreadcrumbItem(bc,
 							SWT.CENTER | SWT.TOGGLE);
 					String commandId = elementData.get("CommandId");
@@ -469,6 +485,8 @@ public class SimpleToolBarEx {
 					}
 					shell.pack();
 					find_icon_tool.setEnabled(true);
+					status.setText("Ready");
+					status.pack();
 					save_tool.setEnabled(true);
 				}
 			}
@@ -482,6 +500,8 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
+					status.setText("Running the demo");
+					status.pack();
 					demo_tool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -522,7 +542,7 @@ public class SimpleToolBarEx {
 
 					closeVisualSearch();
 					flushVisualSearchResult();
-					Button button = new Button(shell, SWT.PUSH);
+					Button button = new Button(composite, SWT.PUSH|SWT.BORDER);
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					button.setData("origin", data);
@@ -553,6 +573,7 @@ public class SimpleToolBarEx {
 					if (newSize.x > 500) {
 						shell.setBounds(boundRect);
 					}
+					status.setText("Ready");
 					shell.pack();
 					demo_tool.setEnabled(true);
 				}
@@ -564,7 +585,7 @@ public class SimpleToolBarEx {
 				shutdown_tool.setEnabled(false);
 				try {
 					driver.close();
-					// driver.quit();
+					driver.quit();
 				} catch (Exception e) {
 					System.err.println("Ignored exception: " + e.toString());
 					// WARNING: Process refused to die after 10 seconds,
@@ -583,7 +604,6 @@ public class SimpleToolBarEx {
 		status.pack();
 		shell.pack();
 		shell.setText("Selenium WebDriver Eclipse Toolkit");
-		// shell.setSize(500, 250);
 		shell.open();
 
 		while (!shell.isDisposed()) {

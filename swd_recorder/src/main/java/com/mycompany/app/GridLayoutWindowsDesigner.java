@@ -51,6 +51,7 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.wb.swt.SWTResourceManager;
 
 import org.mihalis.opal.breadcrumb.*;
 
@@ -79,10 +80,10 @@ public class GridLayoutWindowsDesigner {
 	public Image save_icon;
 	private static int width = 900;
 	private static int height = 800;
-
+	private Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 	private Composite composite;
 	private static String[] Labels = { "Open application",
-			"Navigate to login page", "Next step", "Something else"  };
+			"Navigate to login page", "Next step", "Something else" };
 
 	GridLayoutWindowsDesigner(Display display) {
 
@@ -92,7 +93,9 @@ public class GridLayoutWindowsDesigner {
 	private void initUI(Display display) {
 
 		Shell shell = new Shell(display, SWT.SHELL_TRIM | SWT.CENTER);
-		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
+		shell.setImage(
+				SWTResourceManager.getImage(this.getClass(), "/magnifier.ico"));
+
 		shell.setBounds(boundRect);
 		Device dev = shell.getDisplay();
 
@@ -115,6 +118,10 @@ public class GridLayoutWindowsDesigner {
 			System.exit(1);
 		}
 
+		GridLayout gl = new GridLayout();
+		gl.numColumns = 1;
+		shell.setLayout(gl);
+
 		ToolBar toolBar = new ToolBar(shell, SWT.FLAT | SWT.HORIZONTAL | SWT.RIGHT);
 
 		ToolItem tltmNewItem1 = new ToolItem(toolBar, SWT.PUSH);
@@ -132,40 +139,18 @@ public class GridLayoutWindowsDesigner {
 		toolBar.pack();
 
 		Composite composite = new Composite(shell, SWT.BORDER);
-		composite.setBounds(0, 50, 400, 200);
-		// composite.setLayoutData(
-		// GridDataFactory.fillDefaults().grab(true, false).create());
 
-		/*
-    
-		RowLayout layout = new RowLayout();
-		layout.wrap = true;
-		composite.setLayout(layout);
-		*/
 		GridLayout gridLayout = new GridLayout();
 		gridLayout.marginLeft = 5;
 		gridLayout.marginTop = 5;
 		gridLayout.marginRight = 5;
 		gridLayout.marginBottom = 5;
-		gridLayout.numColumns = 2;
+		gridLayout.numColumns = 1;
 		gridLayout.makeColumnsEqualWidth = false;
 		composite.setLayout(gridLayout);
 
-		bc = new Breadcrumb(composite, SWT.BORDER);
-
-    /*
-		final BreadcrumbItem item1 = new BreadcrumbItem(bc,
-				SWT.CENTER | SWT.TOGGLE);
-		item1.setText(String.format("Step: %d", (int) (step_index + 1)));
-		item1.setImage(page_icon);
-		item1.setSelectionImage(page_icon);
-		final BreadcrumbItem item2 = new BreadcrumbItem(bc,
-				SWT.CENTER | SWT.TOGGLE);
-		item2.setText(String.format("Step: %d", (int) (step_index + 1)));
-		item2.setImage(page_icon);
-		item2.setSelectionImage(page_icon);
-		bc.pack();
-    */
+		Breadcrumb bc1 = new Breadcrumb(composite, SWT.BORDER);
+		bc = bc1;
 		composite.pack();
 
 		tltmNewItem1.addSelectionListener(new SelectionListener() {
@@ -175,13 +160,26 @@ public class GridLayoutWindowsDesigner {
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
+
+				Rectangle rect = bc.getBounds();
+				System.err.println("Bound rect width: " + rect.width);
+				if (rect.width > 300) {
+					Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
+					bc = bc2;
+
+				}
 				final BreadcrumbItem item = new BreadcrumbItem(bc,
 						SWT.CENTER | SWT.PUSH);
-				item.setText(String.format("Step: %d", (int) (step_index + 1)));
+				if (step_index < Labels.length) {
+					item.setText(String.format("Step %d: %s", (int) (step_index + 1),
+							Labels[step_index]));
+				} else {
+					item.setText(String.format("Step %d", (int) (step_index + 1)));
+				}
 				item.setImage(page_icon);
 				item.setSelectionImage(page_icon);
 				step_index++;
-				// bc.pack();
+				bc.pack();
 				composite.pack();
 				shell.pack();
 				tltmNewItem2.setEnabled(true);

@@ -2,14 +2,14 @@ version: '1.0'
 created: '2017-02-19'
 seleniumVersion: '2.53.1'
 
-# Browser parameters
-browser:
+# Browser configuration
+browserConfiguration:
   name: firefox
   platform: linux
   version: '45.0.1'
 
-# Browser parameters
-browser:
+# Browser configuration
+browserConfiguration:
   name: chrome
   platform: windows
   version: '54.0.2840.71'
