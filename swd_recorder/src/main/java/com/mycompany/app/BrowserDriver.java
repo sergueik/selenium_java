@@ -1,110 +1,111 @@
 package com.mycompany.app;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import java.util.concurrent.TimeUnit;
-
 // import org.apache.logging.log4j.LogManager;
 // import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.OutputType;
+
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.Platform;
-
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariOptions;
 
 // import com.jprotractor.NgBy;
 // import com.jprotractor.NgWebDriver;
 // import com.jprotractor.NgWebElement;
 
-public class BroswerDriver {
+public class BrowserDriver {
 
 	public static WebDriver driver;
-	private static WebDriverWait wait;
-	private static int implicitWait = 10;
-	private static int flexibleWait = 5;
-	private static long pollingInterval = 500;
-	private static Actions actions;
-	private static int highlightInterval = 100;
-	private static String browser;
-	private static String location;
-	private static String chromePath;
+	private static String location = "";
+	private static String chromeDriverPath = "c:/java/selenium/chromedriver.exe";
+	private static String iEDriverPath = "c:/java/selenium/IEDriverServer.exe";
+	// private static String geckoDriverDriverPath;
 
-	public void initialize() throws MalformedURLException {
+	public static WebDriver initialize(String browser)
+			throws MalformedURLException {
 		DesiredCapabilities capabilities = null;
-
-		if (browser.toLowerCase().equals("firefox")) {
+		browser = browser.toLowerCase();
+		if (browser.equals("firefox")) {
 			capabilities = capabilitiesFirefox();
-		} else if (browser.toLowerCase().equals("phantomjs")) {
+		} else if (browser.equals("phantomjs")) {
 			capabilities = capabilitiesPhantomJS();
-		} else if (browser.toLowerCase().equals("chrome")) {
+		} else if (browser.equals("chrome")) {
 			capabilities = capabilitiesChrome();
-		} else if (browser.toLowerCase().equals("iexplore")) {
-			capabilities = capabilitiesExplorer();
-		} else if (browser.toLowerCase().equals("android")) {
+		} else if (browser.equals("ie")) {
+			capabilities = capabilitiesInternetExplorer();
+		} else if (browser.equals("android")) {
 			capabilities = capabilitiesAndroid();
-		} else if (browser.toLowerCase().equals("iphone")) {
+		} else if (browser.equals("safari")) {
+			capabilities = capabilitiesSafari();
+		} else if (browser.equals("iphone")) {
 			capabilities = capabilitiesiPhone();
-		} else if (browser.toLowerCase().equals("ipad")) {
+		} else if (browser.equals("ipad")) {
 			capabilities = capabilitiesiPad();
 		}
 
-		if (!location.toLowerCase().contains("local")) {
+		if (location.toLowerCase().contains("http:")) {
 			// log.info("Running on Selenium Grid: " + location);
 			driver = new RemoteWebDriver(new URL(location), capabilities);
-		} else if (browser.toLowerCase().equals("firefox")) {
+		} else if (browser.equals("firefox")) {
 			driver = new FirefoxDriver(capabilities);
-		} else if (browser.toLowerCase().equals("phantomjs")) {
+		} else if (browser.equals("phantomjs")) {
 			driver = new PhantomJSDriver(capabilities);
-		} else if (browser.toLowerCase().equals("chrome")) {
+		} else if (browser.equals("safari")) {
+			SafariOptions options = new SafariOptions();
+			driver = new SafariDriver(options);
+		} else if (browser.equals("chrome")) {
 			driver = new ChromeDriver(capabilities);
-		} else if (browser.toLowerCase().equals("iexplore")) {
+		} else if (browser.equals("iexplore")) {
+			File file = new File(iEDriverPath);
+			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
 			driver = new InternetExplorerDriver(capabilities);
-		} else if (browser.toLowerCase().equals("android")) {
+		} else if (browser.equals("android")) {
 			driver = new ChromeDriver(capabilities);
-		} else if (browser.toLowerCase().equals("iphone")) {
+		} else if (browser.equals("iphone")) {
 			driver = new ChromeDriver(capabilities);
-		} else if (browser.toLowerCase().equals("ipad")) {
+		} else if (browser.equals("ipad")) {
 			driver = new ChromeDriver(capabilities);
 		}
 		// ngDriver = new NgWebDriver(driver);
-		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		actions = new Actions(driver);
+		return driver;
 	}
 
-	public DesiredCapabilities capabilitiesPhantomJS() {
+	private static DesiredCapabilities capabilitiesSafari() {
+		DesiredCapabilities capabilities = DesiredCapabilities.safari();
+		SafariOptions options = new SafariOptions();
+		options.setUseCleanSession(true);
+		capabilities.setCapability(SafariOptions.CAPABILITY, options);
+		return capabilities;
+	}
 
-		DesiredCapabilities c = new DesiredCapabilities("phantomjs", "",
+	private static DesiredCapabilities capabilitiesPhantomJS() {
+
+		DesiredCapabilities capabilities = new DesiredCapabilities("phantomjs", "",
 				Platform.ANY);
-		c.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
+		capabilities.setCapability(PhantomJSDriverService.PHANTOMJS_CLI_ARGS,
 				new String[] { "--web-security=false", "--ssl-protocol=any",
 						"--ignore-ssl-errors=true", "--local-to-remote-url-access=true",
 						"--webdriver-loglevel=INFO" });
-		return c;
+		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesAndroid() {
+	private static DesiredCapabilities capabilitiesAndroid() {
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		Map<String, String> mobileEmulation = new HashMap<String, String>();
@@ -117,7 +118,7 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesiPhone() {
+	private static DesiredCapabilities capabilitiesiPhone() {
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		Map<String, String> mobileEmulation = new HashMap<String, String>();
@@ -130,7 +131,7 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesiPad() {
+	private static DesiredCapabilities capabilitiesiPad() {
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		Map<String, String> mobileEmulation = new HashMap<String, String>();
@@ -143,7 +144,7 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesFirefox() {
+	private static DesiredCapabilities capabilitiesFirefox() {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 
 		FirefoxProfile profile = new FirefoxProfile();
@@ -159,7 +160,7 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesChrome() {
+	private static DesiredCapabilities capabilitiesChrome() {
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		String downloadFilepath = System.getProperty("user.dir")
@@ -181,7 +182,8 @@ public class BroswerDriver {
 		option.addArguments("--browser.download.dir=" + downloadFilepath);
 		option.addArguments("allow-running-insecure-content");
 
-		System.setProperty("webdriver.chrome.driver", chromePath);
+		File file = new File(chromeDriverPath);
+		System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
 
 		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 		capabilities.setCapability(ChromeOptions.CAPABILITY, option);
@@ -189,7 +191,7 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public DesiredCapabilities capabilitiesExplorer() {
+	private static DesiredCapabilities capabilitiesInternetExplorer() {
 		DesiredCapabilities capabilities = DesiredCapabilities.internetExplorer();
 
 		capabilities.setCapability(
@@ -202,7 +204,8 @@ public class BroswerDriver {
 		return capabilities;
 	}
 
-	public void close() {
+	public static void close() {
+		driver.close();
 		if (driver != null) {
 			driver.quit();
 		}

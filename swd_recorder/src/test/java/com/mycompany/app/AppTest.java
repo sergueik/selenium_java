@@ -95,6 +95,7 @@ import org.json.JSONObject;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import com.mycompany.app.BrowserDriver;
 
 public class AppTest {
 
@@ -115,30 +116,13 @@ public class AppTest {
 
 		getOsName();
 		if (osName.toLowerCase().startsWith("windows")) {
-			System.setProperty("webdriver.chrome.driver",
-					"c:/java/selenium/chromedriver.exe");
-			driver = new ChromeDriver();
+			driver = BrowserDriver.initialize("chrome");
 			/*
-			// IE 10 works, IE 11 does not
-			File file = new File("c:/java/Selenium/IEDriverServer.exe");
-			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-			
-			DesiredCapabilities capabilities = DesiredCapabilities
-					.internetExplorer();
-			
-			capabilities.setCapability(
-					InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
-					true);
-			// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
-			capabilities.setCapability("ignoreZoomSetting", true);
-			capabilities.setCapability("ignoreProtectedModeSettings", true);
-			capabilities.setBrowserName(
-					DesiredCapabilities.internetExplorer().getBrowserName());
-			
+			// IE 10 works, IE 11 does not			
 			driver = new InternetExplorerDriver(capabilities);
 			*/
 		} else if (osName.startsWith("Mac")) {
-			driver = new SafariDriver();
+			driver = BrowserDriver.initialize("safari");
 			/*
 			INFO: Launching Safari
 			org.openqa.selenium.safari.SafariDriverCommandExecutor start
@@ -162,7 +146,7 @@ public class AppTest {
 			Ignored exception: java.lang.NullPointerException
 			*/
 		} else {
-			driver = new FirefoxDriver();
+			driver = BrowserDriver.initialize("firefox");
 		}
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
@@ -173,15 +157,13 @@ public class AppTest {
 	@AfterClass
 	public static void afterSuiteMethod() {
 		try {
-			driver.close();
-			// driver.quit();
+			BrowserDriver.close();
 		} catch (Exception e) {
 			System.err.println("Ignored exception: " + e.toString());
 		}
 	}
 
 	@Before
-
 	public void loadBaseURL() {
 		driver.get(baseURL);
 	}
@@ -191,6 +173,32 @@ public class AppTest {
 		driver.get("about:blank");
 	}
 
+	@Test
+	public void testWebPageElementSearch() {
+		driver.get("https://www.ryanair.com/ie/en/");
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		highlight(element);
+		// Assert
+		actions.keyDown(Keys.CONTROL).build().perform();
+		actions.moveToElement(element).contextClick().build().perform();
+		actions.keyUp(Keys.CONTROL).build().perform();
+		// Assert
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		completeVisualSearch("element name");
+
+		// Assert
+		String payload = (String) executeScript(getCommand);
+		assertFalse(payload.isEmpty());
+		String result = readVisualSearchResult(payload);
+	}
+
+	@Ignore
 	@Test
 	public void testStatic() {
 		driver.get(getPageContent("ElementSearch.html"));
