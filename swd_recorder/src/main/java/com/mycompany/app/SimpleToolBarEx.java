@@ -592,11 +592,6 @@ public class SimpleToolBarEx {
 					driver.quit();
 				} catch (Exception e) {
 					System.err.println("Ignored exception: " + e.toString());
-					// WARNING: Process refused to die after 10 seconds,
-					// and couldn't taskkill it
-					// java.lang.NullPointerException: Unable to find executable for:
-					// taskkill
-					// when run from Powershell
 				}
 				shutdown_tool.setEnabled(true);
 			}
@@ -711,7 +706,7 @@ public class SimpleToolBarEx {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
-			// org.openqa.selenium.NoSuchWindowException
+			// IE: org.openqa.selenium.NoSuchWindowException
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
@@ -745,7 +740,7 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	// getResourceURI does not work with standalone app.
+	// getResourceURI does not work well with standalone app.
 	private String getResourceURI(String resourceFileName) {
 		try {
 			URI uri = this.getClass().getClassLoader().getResource(resourceFileName)
@@ -772,6 +767,8 @@ public class SimpleToolBarEx {
 		page_icon.dispose();
 		demo_icon.dispose();
 		flowchart_icon.dispose();
+		open_icon.dispose();
+		save_icon.dispose();
 	}
 
 	public static void main(String[] args) {
@@ -780,127 +777,5 @@ public class SimpleToolBarEx {
 		SimpleToolBarEx ex = new SimpleToolBarEx(display);
 		ex.finalize();
 		display.dispose();
-	}
-
-	private static class TestConfigurationParser {
-
-		private static Scanner loadTestData(final String fileName) {
-			Scanner scanner = null;
-			System.err
-					.println(String.format("Reading configuration file: '%s'", fileName));
-			try {
-				scanner = new Scanner(new File(fileName));
-			} catch (FileNotFoundException e) {
-				// fail(String.format("File '%s' was not found.", fileName));
-				System.err.println(
-						String.format("Configuration file was not found: '%s'", fileName));
-				e.printStackTrace();
-			}
-			return scanner;
-		}
-
-		public static List<String[]> getConfiguration(final String fileName) {
-			ArrayList<String[]> listOfData = new ArrayList<>();
-			Scanner scanner = loadTestData(fileName);
-			String separator = "|";
-			while (scanner.hasNext()) {
-				String line = scanner.next();
-				String[] data = line.split(Pattern.compile("(\\||\\|/)")
-						.matcher(separator).replaceAll("\\\\$1"));
-				for (String entry : data) {
-					System.err.println("data entry: " + entry);
-				}
-				listOfData.add(data);
-			}
-			scanner.close();
-			return listOfData;
-		}
-	}
-
-	private static class PropertiesParser {
-		public static HashMap<String, String> getProperties(final String fileName) {
-			Properties p = new Properties();
-			HashMap<String, String> propertiesMap = new HashMap<String, String>();
-			System.err
-					.println(String.format("Reading properties file: '%s'", fileName));
-			try {
-				p.load(new FileInputStream(fileName));
-				Enumeration<String> e = (Enumeration<String>) p.propertyNames();
-				for (; e.hasMoreElements();) {
-					String key = e.nextElement();
-					String val = p.get(key).toString();
-					System.out.println(String.format("Reading: '%s' = '%s'", key, val));
-					propertiesMap.put(key, val);
-				}
-
-			} catch (FileNotFoundException e) {
-				System.err.println(
-						String.format("Properties file was not found: '%s'", fileName));
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.err.println(
-						String.format("Properties file is not readable: '%s'", fileName));
-				e.printStackTrace();
-			}
-			return (propertiesMap);
-
-		}
-	}
-
-	private static class YamlHelper {
-
-		private static DumperOptions options = new DumperOptions();
-		private static Yaml yaml = null;
-
-		private static Configuration loadConfiguration(String fileName) {
-			if (yaml == null) {
-				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-				yaml = new Yaml(options);
-			}
-			Configuration config = null;
-			try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
-				config = yaml.loadAs(in, Configuration.class);
-				// TODO: better method naming
-				YamlHelper.saveConfiguration(config);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return config;
-		}
-
-		private static void saveConfiguration(Configuration config) {
-			saveConfiguration(config, null);
-		}
-
-		@SuppressWarnings("deprecation")
-		private static void saveConfiguration(Configuration config,
-				String fileName) {
-			if (yaml == null) {
-				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-				yaml = new Yaml(options);
-			}
-			String pattern = "yyyy-MM-dd";
-			SimpleDateFormat format = new SimpleDateFormat(pattern);
-			Date date = new Date();
-			try {
-				config.updated = format.parse(String.format("%4d-%2d-%2d",
-						date.getYear(), date.getMonth(), date.getDay()));
-			} catch (java.text.ParseException e) {
-				config.updated = date;
-			}
-			if (fileName != null) {
-				try {
-					Writer out = new OutputStreamWriter(new FileOutputStream(fileName),
-							"UTF8");
-					yaml.dump(config, out);
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.err.println(yaml.dump(config));
-			}
-		}
 	}
 }

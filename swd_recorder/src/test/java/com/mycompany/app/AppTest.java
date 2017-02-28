@@ -193,10 +193,9 @@ public class AppTest {
 
 	@Test
 	public void testStatic() {
-		// driver.get(getPageContent("ElementSearch.html"));
-    // Unsupported URL protocol: file:/Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
-    driver.get("file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html");
-    // Unsupported URL protocol: file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
+		driver.get(getPageContent("ElementSearch.html"));
+		// Unsupported URL protocol:
+		// file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		highlight(element);

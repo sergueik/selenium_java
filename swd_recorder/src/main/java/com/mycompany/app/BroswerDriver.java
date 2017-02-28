@@ -41,9 +41,9 @@ public class BroswerDriver {
 
 	public static WebDriver driver;
 	private static WebDriverWait wait;
-	static int implicitWait = 10;
-	static int flexibleWait = 5;
-	static long pollingInterval = 500;
+	private static int implicitWait = 10;
+	private static int flexibleWait = 5;
+	private static long pollingInterval = 500;
 	private static Actions actions;
 	private static int highlightInterval = 100;
 	private static String browser;
