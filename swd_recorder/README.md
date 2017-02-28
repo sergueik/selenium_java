@@ -129,7 +129,7 @@ If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver 
 but it does not seems to work with Selenium __2.53__.
 For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__ 
 then follow the http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser
-      
+Overall working with Safari browser is quite flaky.       
 ### Configuration, saving and loading
 
 The element locators collected by SWET may be saved in YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml).

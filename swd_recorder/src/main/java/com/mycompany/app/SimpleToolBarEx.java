@@ -280,6 +280,7 @@ public class SimpleToolBarEx {
 		find_icon_tool.setEnabled(false);
 		flowchart_tool.setEnabled(false);
 		demo_tool.setEnabled(false);
+		// demo_tool.setGrayed(true);
 		save_tool.setEnabled(false);
 
 		toolBar.pack();
@@ -309,34 +310,17 @@ public class SimpleToolBarEx {
 			status.setText("Launching browser");
 			status.pack();
 			shell.pack();
-		if (osName.toLowerCase().startsWith("windows")) {
-			System.setProperty("webdriver.chrome.driver",
-					"c:/java/selenium/chromedriver.exe");
-			driver = new ChromeDriver();
-			/*
-			// IE 10 works, IE 11 does not
-			File file = new File("c:/java/Selenium/IEDriverServer.exe");
-			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
-			
-			DesiredCapabilities capabilities = DesiredCapabilities
-					.internetExplorer();
-			
-			capabilities.setCapability(
-					InternetExplorerDriver.INTRODUCE_FLAKINESS_BY_IGNORING_SECURITY_DOMAINS,
-					true);
-			// https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/6511
-			capabilities.setCapability("ignoreZoomSetting", true);
-			capabilities.setCapability("ignoreProtectedModeSettings", true);
-			capabilities.setBrowserName(
-					DesiredCapabilities.internetExplorer().getBrowserName());
-			
-			driver = new InternetExplorerDriver(capabilities);
-			*/
-		} else if (osName.startsWith("Mac")) {
-			driver = new SafariDriver();
-		} else {
-			driver = new FirefoxDriver();
-		}
+			if (osName.toLowerCase().startsWith("windows")) {
+				driver = BrowserDriver.initialize("chrome");
+				/*
+				// IE 10 works, IE 11 does not			
+				driver = new InternetExplorerDriver(capabilities);
+				*/
+			} else if (osName.startsWith("Mac")) {
+				driver = BrowserDriver.initialize("safari");
+			} else {
+				driver = BrowserDriver.initialize("firefox");
+			}
 
 			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
@@ -345,7 +329,9 @@ public class SimpleToolBarEx {
 			// prevent the customer from launching multiple instances
 			// launch_tool.setEnabled(true);
 			find_icon_tool.setEnabled(true);
-			demo_tool.setEnabled(true);
+			if (!osName.startsWith("Mac")) {
+				demo_tool.setEnabled(true);
+			}
 			flowchart_tool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
 			status.setText("Ready");
@@ -518,7 +504,7 @@ public class SimpleToolBarEx {
 							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
 					injectElementSearch(Optional.<String> empty());
-					// NOTE: with FF the CONTROL modifier appears to not be sent
+					// NOTE: with FF the CONTROL mouse pointer appears to be misplaced
 					try {
 						Thread.sleep(500);
 					} catch (InterruptedException exception) {
@@ -528,9 +514,24 @@ public class SimpleToolBarEx {
 									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
 					highlight(element);
 					executeScript(String.format("scroll(0, %d);", -100));
-					actions.keyDown(Keys.CONTROL).build().perform();
-					actions.moveToElement(element).contextClick().build().perform();
-					actions.keyUp(Keys.CONTROL).build().perform();
+
+					if (osName.startsWith("Mac")) {
+						// "Demo" functionality appears to be currently broken on Mac with
+						// Keys.COMMAND
+						try {
+							actions.keyDown(Keys.COMMAND).build().perform();
+							actions.moveToElement(element).contextClick().build().perform();
+							actions.keyUp(Keys.COMMAND).build().perform();
+						} catch (WebDriverException e) {
+							// TODO: print a message box
+							System.err.println("Ignoring exception: " + e.toString());
+						}
+					} else {
+						actions.keyDown(Keys.CONTROL).build().perform();
+						actions.moveToElement(element).contextClick().build().perform();
+						actions.keyUp(Keys.CONTROL).build().perform();
+					}
+
 					try {
 						Thread.sleep(100);
 					} catch (InterruptedException e) {
@@ -546,7 +547,7 @@ public class SimpleToolBarEx {
 
 					closeVisualSearch();
 					flushVisualSearchResult();
-					Button button = new Button(composite, SWT.PUSH|SWT.BORDER);
+					Button button = new Button(composite, SWT.PUSH | SWT.BORDER);
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					button.setData("origin", data);
@@ -588,8 +589,7 @@ public class SimpleToolBarEx {
 			if (driver != null) {
 				shutdown_tool.setEnabled(false);
 				try {
-					driver.close();
-					driver.quit();
+					BrowserDriver.close();
 				} catch (Exception e) {
 					System.err.println("Ignored exception: " + e.toString());
 				}

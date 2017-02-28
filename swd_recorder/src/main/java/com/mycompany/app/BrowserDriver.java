@@ -37,8 +37,8 @@ public class BrowserDriver {
 	private static String iEDriverPath = "c:/java/selenium/IEDriverServer.exe";
 	// private static String geckoDriverDriverPath;
 
-	public static WebDriver initialize(String browser)
-			throws MalformedURLException {
+	public static WebDriver initialize(String browser) {
+
 		DesiredCapabilities capabilities = null;
 		browser = browser.toLowerCase();
 		if (browser.equals("firefox")) {
@@ -60,8 +60,13 @@ public class BrowserDriver {
 		}
 
 		if (location.toLowerCase().contains("http:")) {
-			// log.info("Running on Selenium Grid: " + location);
-			driver = new RemoteWebDriver(new URL(location), capabilities);
+			try {
+				// log.info("Running on Selenium Grid: " + location);
+				driver = new RemoteWebDriver(new URL(location), capabilities);
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+				throw new RuntimeException();
+			}
 		} else if (browser.equals("firefox")) {
 			driver = new FirefoxDriver(capabilities);
 		} else if (browser.equals("phantomjs")) {
@@ -174,7 +179,7 @@ public class BrowserDriver {
 
 		ChromeOptions option = new ChromeOptions();
 		option.addArguments("test-type");
-		option.addArguments("--start-maximized");
+		// option.addArguments("--start-maximized");
 		option.setExperimentalOption("prefs", chromePrefs);
 		option.addArguments("--browser.download.folderList=2");
 		option.addArguments(

@@ -182,9 +182,15 @@ public class AppTest {
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
 		highlight(element);
 		// Assert
-		actions.keyDown(Keys.CONTROL).build().perform();
-		actions.moveToElement(element).contextClick().build().perform();
-		actions.keyUp(Keys.CONTROL).build().perform();
+		if (osName.startsWith("Mac")) {
+			actions.keyDown(Keys.COMMAND).build().perform();
+			actions.moveToElement(element).contextClick().build().perform();
+			actions.keyUp(Keys.COMMAND).build().perform();
+		} else {
+			actions.keyDown(Keys.CONTROL).build().perform();
+			actions.moveToElement(element).contextClick().build().perform();
+			actions.keyUp(Keys.CONTROL).build().perform();
+		}
 		// Assert
 		try {
 			Thread.sleep(100);
