@@ -20,10 +20,7 @@ The [Jtwig](http://jtwig.org/) is the code generatsor used.
 ### Goals
 
 Eventually the full functionality of SWD is to be achieved.
-Currently
-
-For Mac testing a Virtual Box [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/)
-vdi by TechReviews is being used.
+SWEET isn't yet ready for users, but you can help! Continue reading for info on how to get the dev environment setup.
 
 ### Usage
 
@@ -40,7 +37,7 @@ on Windows or
 ./run.sh
 ```
 on Linux or a Mac.
-The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository, 
+The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository,
 compiles and packages the project using maven
 and runs the application jar from the `target` directory.
 The runner script can be used to launch individual basic examples from the Standard Widget Toolkit study
@@ -125,11 +122,13 @@ http://www.slimjetbrowser.com/chrome/, for other browsers the download locations
 This is why it may be worthwhile setting up Virtual Box e.g. [selenium-fluxbox](https://github.com/sergueik/selenium-fluxbox) to run the appliation with fixed downlevel browser versions.
 
 ### Safari Testing
-If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver would be installed automatically, 
+If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver would be installed automatically,
 but it does not seems to work with Selenium __2.53__.
-For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__ 
-then follow the http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser
-Overall working with Safari browser is quite flaky.       
+For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__
+then follow the [Running Selenium Tests in Safari Browser](http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser).
+For Mac testing, [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
+Overall,s working with Safari browser is somewhat flaky.
+
 ### Configuration, saving and loading
 
 The element locators collected by SWET may be saved in YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml).
@@ -191,9 +190,18 @@ elements:
   * [danlucraft/swt](https://github.com/danlucraft/swt)
   * [fab1an/appkit toolkit for swt app design](https://github.com/fab1an/appkit)
   * [SWT dependency repositories](http://stackoverflow.com/questions/5096299/maven-project-swt-3-5-dependency-any-official-public-repo)
+  * [SWT jar ANT helper](http://mchr3k.github.io/swtjar/)
   * [Examples](http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/CatalogSWT-JFace-Eclipse.htm)
   * [Examples](https://github.com/ReadyTalk/avian-swt-examples)
-
+  * [swt-bling](https://github.com/ReadyTalk/swt-bling)
+  * [Multiplatform SWT](https://github.com/jendap/multiplatform-swt)
+  * [SWT custom preference dialog](https://github.com/prasser/swtpreferences)
+  * [SWT/JFace Utilities](https://github.com/Albertus82/JFaceUtils)
+  * [SWT/WMI](https://github.com/ctron/wmisample)
+  * [SWT Tools](https://github.com/bp-FLN/SWT-Tools)
+  * [SWT choice dialog customization](https://github.com/prasser/swtchoices)
+  * [SWT Browser component based recorder](https://github.com/itspanzi/swt-browser-recorder-spike)
+  
 #### Code Generation
 
   * [Jtwig](http://jtwig.org/)
