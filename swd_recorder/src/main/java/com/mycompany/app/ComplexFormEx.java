@@ -6,10 +6,10 @@ import java.util.Iterator;
 import java.util.Optional;
 
 import org.json.JSONException;
-// import org.json.*;
 import org.json.JSONObject;
 
 import org.eclipse.swt.SWT;
+
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-// based on: 
-// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ComplexShellExample.htm 
+// based on:
+// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ComplexShellExample.htm
 // https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111
 public class ComplexFormEx {
 
@@ -53,7 +53,8 @@ public class ComplexFormEx {
 		} else {
 			// System.err.println("No parent shell");
 		}
-		readData(Optional.of(elementData));
+		readData(Optional.of(elementData));    
+    elementData.put("ElementSelected", null);
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 	}
@@ -169,11 +170,34 @@ public class ComplexFormEx {
 
 		private static void doSelection(Button button) {
 			if (button.getSelection()) {
-				// System.out.println("process selection " + button);
 				System.out.println(button.getText() + " selected");
+				String selectedKey = (String) button.getData("key");
+				if (selectedKey != null && selectedKey != ""
+						&& elementData.containsKey(selectedKey)) {
+					System.out.println("process selection of key " + selectedKey);
+          elementData.replace("ElementSelected", selectedKey);
+				} else {
+					System.out.println(
+							String.format("Error processing of key '%s'", selectedKey));
+				}
 				// } else {
 				// System.out.println("do work for deselection " + button);
 			}
+			/*
+        // Java 6 style 
+        idRadio.addListener(SWT.Selection, new Listener() {
+          public void handleEvent(Event event) {
+            switch (event.type) {
+            case SWT.Selection:
+              Button button = ((Button) event.widget);
+              if (button.getSelection()) {
+                System.out.println(button.getText() + " selected (*)");
+              }
+              break;
+            }
+          }
+        });
+			*/
 		}
 
 		public void renderData(HashMap<String, String> data) {
@@ -186,6 +210,8 @@ public class ComplexFormEx {
 			final Button cssSelectorRadio = new Button(this, SWT.RADIO);
 			cssSelectorRadio.setSelection(true);
 			cssSelectorRadio.setText("Css");
+			cssSelectorRadio.setData("key", "ElementCssSelector");
+
 			cssSelectorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			cssSelectorRadio.addListener(SWT.Selection, listener);
 
@@ -206,6 +232,7 @@ public class ComplexFormEx {
 			final Button xPathRadio = new Button(this, SWT.RADIO);
 			xPathRadio.setSelection(false);
 			xPathRadio.setText("XPath");
+			xPathRadio.setData("key", "ElementXPath");
 			xPathRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			xPathRadio.addListener(SWT.Selection, listener);
 
@@ -226,23 +253,10 @@ public class ComplexFormEx {
 			final Button idRadio = new Button(this, SWT.RADIO);
 			idRadio.setSelection(false);
 			idRadio.setText("ID");
+			idRadio.setData("key", "ElementId");
 			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			idRadio.addListener(SWT.Selection, listener);
 
-			/*
-						idRadio.addListener(SWT.Selection, new Listener() {
-							public void handleEvent(Event event) {
-								switch (event.type) {
-								case SWT.Selection:
-									Button button = ((Button) event.widget);
-									if (button.getSelection()) {
-										System.out.println(button.getText() + " selected (*)");
-									}
-									break;
-								}
-							}
-						});
-			*/
 			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			if (data.containsKey("ElementId")) {
@@ -262,12 +276,14 @@ public class ComplexFormEx {
 			textRadio.setSelection(false);
 			textRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
 			textRadio.setText("Text");
+			textRadio.setData("key", "ElementText");
 			textRadio.addListener(SWT.Selection, listener);
 
 			final Text textData;
 			textData = new Text(this, SWT.SINGLE | SWT.BORDER);
 			textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 			textData.setText("Text...");
+			textData.setData("key", "ElementText");
 			textData.addModifyListener(new ModifyListener() {
 				@Override
 				public void modifyText(ModifyEvent event) {
