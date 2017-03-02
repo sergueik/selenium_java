@@ -116,35 +116,14 @@ public class AppTest {
 
 		getOsName();
 		if (osName.toLowerCase().startsWith("windows")) {
-			driver = BrowserDriver.initialize("chrome");
+			driver = BrowserDriver.initialize("firefox");
+			// driver = BrowserDriver.initialize("chrome");
 			/*
 			// IE 10 works, IE 11 does not			
 			driver = new InternetExplorerDriver(capabilities);
 			*/
 		} else if (osName.startsWith("Mac")) {
 			driver = BrowserDriver.initialize("safari");
-			/*
-			INFO: Launching Safari
-			org.openqa.selenium.safari.SafariDriverCommandExecutor start
-			INFO: Waiting for SafariDriver to connect
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Shutting down
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Stopping Safari
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Stopping server
-			org.openqa.selenium.safari.SafariDriverServer stop
-			INFO: Stopping server
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Shutdown complete
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Shutting down
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Stopping server
-			org.openqa.selenium.safari.SafariDriverCommandExecutor stop
-			INFO: Shutdown complete
-			Ignored exception: java.lang.NullPointerException
-			*/
 		} else {
 			driver = BrowserDriver.initialize("firefox");
 		}
@@ -173,6 +152,7 @@ public class AppTest {
 		driver.get("about:blank");
 	}
 
+	// @Ignore
 	@Test
 	public void testWebPageElementSearch() {
 		driver.get("https://www.ryanair.com/ie/en/");
@@ -187,9 +167,15 @@ public class AppTest {
 			actions.moveToElement(element).contextClick().build().perform();
 			actions.keyUp(Keys.COMMAND).build().perform();
 		} else {
+			/*
 			actions.keyDown(Keys.CONTROL).build().perform();
 			actions.moveToElement(element).contextClick().build().perform();
 			actions.keyUp(Keys.CONTROL).build().perform();
+			*/
+			//
+			actions.moveToElement(element).build().perform();
+			actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
+					.perform();
 		}
 		// Assert
 		try {
@@ -213,9 +199,14 @@ public class AppTest {
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		highlight(element);
+
+		/*
 		actions.keyDown(Keys.CONTROL).build().perform();
 		actions.moveToElement(element).contextClick().build().perform();
 		actions.keyUp(Keys.CONTROL).build().perform();
+		*/
+		actions.moveToElement(element).keyDown(Keys.CONTROL).contextClick()
+				.keyUp(Keys.CONTROL).build().perform();
 		// Assert
 		try {
 			Thread.sleep(100);

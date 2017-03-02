@@ -59,7 +59,6 @@
       <groupId>org.eclipse.swt</groupId>
       <artifactId>${eclipse.swt.artifactId}</artifactId>
       <version>${eclipse.swt.version}</version>
-      <!-- <version>[3.6,4.5.0)</version> -->
     </dependency>
     <dependency>
       <groupId>org.eclipse</groupId>
@@ -210,6 +209,10 @@
     <repository>
       <id>jcenter</id>
       <url>https://jcenter.bintray.com/</url>
+    </repository>
+    <repository>
+      <id>swt-repo</id>
+      <url>https://swt-repo.googlecode.com/svn/repo/</url>
     </repository>
   </repositories>
 </project>

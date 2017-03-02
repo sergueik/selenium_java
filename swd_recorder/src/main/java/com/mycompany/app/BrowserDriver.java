@@ -47,7 +47,7 @@ public class BrowserDriver {
 			capabilities = capabilitiesPhantomJS();
 		} else if (browser.equals("chrome")) {
 			capabilities = capabilitiesChrome();
-		} else if (browser.equals("ie")) {
+		} else if (browser.equals("iexplore")) {
 			capabilities = capabilitiesInternetExplorer();
 		} else if (browser.equals("android")) {
 			capabilities = capabilitiesAndroid();
@@ -151,7 +151,6 @@ public class BrowserDriver {
 
 	private static DesiredCapabilities capabilitiesFirefox() {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-
 		FirefoxProfile profile = new FirefoxProfile();
 		// java.lang.IllegalArgumentException: Preference
 		// network.http.phishy-userpass-length may not be overridden: frozen
@@ -159,8 +158,8 @@ public class BrowserDriver {
 		// profile.setPreference("network.http.phishy-userpass-length", 255);
 		profile.setEnableNativeEvents(true);
 		profile.setAcceptUntrustedCertificates(true);
-
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+		capabilities.setCapability("elementScrollBehavior", 1);
 		capabilities.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
 		return capabilities;
 	}
@@ -204,6 +203,7 @@ public class BrowserDriver {
 				true);
 		capabilities.setCapability("ignoreZoomSetting", true);
 		capabilities.setCapability("ignoreProtectedModeSettings", true);
+		capabilities.setCapability("requireWindowFocus", true);
 		capabilities.setBrowserName(
 				DesiredCapabilities.internetExplorer().getBrowserName());
 		return capabilities;

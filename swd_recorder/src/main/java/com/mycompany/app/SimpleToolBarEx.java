@@ -330,6 +330,8 @@ public class SimpleToolBarEx {
 			// launch_tool.setEnabled(true);
 			find_icon_tool.setEnabled(true);
 			if (!osName.startsWith("Mac")) {
+				// TODO: add a sorry dialog for Mac / Safari, any OS / Firefox
+				// combinations
 				demo_tool.setEnabled(true);
 			}
 			flowchart_tool.setEnabled(true);
