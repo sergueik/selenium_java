@@ -1,8 +1,10 @@
 package com.mycompany.app;
 
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 
 import org.json.JSONException;
@@ -44,6 +46,7 @@ public class ComplexFormEx {
 	private static Boolean updated = false;
 	private static String result = null;
 	private int step_num = 1;
+	private static String selectedKey = null;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		if (parent != null) {
@@ -53,10 +56,10 @@ public class ComplexFormEx {
 		} else {
 			// System.err.println("No parent shell");
 		}
-		readData(Optional.of(elementData));    
-    if (!elementData.containsKey("ElementSelectBy")) {
-      elementData.put("ElementSelectBy", "xxx");
-    }
+		readData(Optional.of(elementData));
+		if (!elementData.containsKey("ElementSelectedBy")) {
+			elementData.put("ElementSelectedBy", "none");
+		}
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 	}
@@ -144,9 +147,9 @@ public class ComplexFormEx {
 						json.write(wr);
 						result = wr.toString();
 						updated = true;
+						System.err
+								.println("Handle OK: updating the parent shell: " + result);
 						if (parentShell != null) {
-							System.err.println("[2]Updating the parent with: " + result);
-							System.err.println("Updating the parent");
 							parentShell.setData("result", result);
 							parentShell.setData("updated", true);
 						}
@@ -176,134 +179,101 @@ public class ComplexFormEx {
 				if (selectedKey != null && selectedKey != ""
 						&& elementData.containsKey(selectedKey)) {
 					System.out.println("Process selection of key " + selectedKey);
-          elementData.replace("ElementSelectBy", selectedKey);
+					elementData.replace("ElementSelectedBy", selectedKey);
 				} else {
 					System.out.println(
-							String.format("Error processing of key '%s'", selectedKey));
+							String.format("Skip processing of key '%s'", selectedKey));
 				}
 				// } else {
 				// System.out.println("do work for deselection " + button);
 			}
 			/*
-        // Java 6 style 
-        idRadio.addListener(SWT.Selection, new Listener() {
-          public void handleEvent(Event event) {
-            switch (event.type) {
-            case SWT.Selection:
-              Button button = ((Button) event.widget);
-              if (button.getSelection()) {
-                System.out.println(button.getText() + " selected (*)");
-              }
-              break;
-            }
-          }
-        });
+			  // Java 6 style 
+			  idRadio.addListener(SWT.Selection, new Listener() {
+			    public void handleEvent(Event event) {
+			      switch (event.type) {
+			      case SWT.Selection:
+			        Button button = ((Button) event.widget);
+			        if (button.getSelection()) {
+			          System.out.println(button.getText() + " selected (*)");
+			        }
+			        break;
+			      }
+			    }
+			  });
 			*/
 		}
 
-    private String selectedKey = null;
 		public void renderData(HashMap<String, String> data) {
+
+			List<String> locators = Arrays.asList("ElementCssSelector",
+					"ElementXPath", "ElementId", "ElementText");
 			Listener listener = new Listener() {
 				public void handleEvent(Event event) {
 					doSelection(((Button) event.widget));
 				}
 			};
+			for (String locatorKey : locators) {
+				if (data.containsKey(locatorKey)) {
+					// label the radio
+					String locatorKeyLabel = locatorKey.replace("Element", "");
+					final Button locatorRadio = new Button(this, SWT.RADIO);
+					locatorRadio.setSelection(true);
+					locatorRadio.setText(locatorKeyLabel);
+					locatorRadio.setData("key", locatorKey);
+					locatorRadio.setSelection(
+							locatorKey.contains((String) data.get("ElementSelectedBy")));
 
-			final Button cssSelectorRadio = new Button(this, SWT.RADIO);
-			cssSelectorRadio.setSelection(true);
-			cssSelectorRadio.setText("Css");
-      selectedKey = "ElementCssSelector";      
-			cssSelectorRadio.setData("key", selectedKey);
-      cssSelectorRadio.setSelection(selectedKey.contains((String) data.get("ElementSelectBy")));
+					locatorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+					locatorRadio.addListener(SWT.Selection, listener);
 
-			cssSelectorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-			cssSelectorRadio.addListener(SWT.Selection, listener);
+					final Text locatorValue = new Text(this, SWT.SINGLE | SWT.BORDER);
+					locatorValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					String value = data.get(locatorKey);
+					if (value.length() > 0) {
+						locatorValue.setText(data.get(locatorKey));
+					} else {
+						locatorValue.setEnabled(false);
+						locatorRadio.setEnabled(false);
+					}
 
-			final Text cssSelectorData = new Text(this, SWT.SINGLE | SWT.BORDER);
-			cssSelectorData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			if (data.containsKey(selectedKey)) {
-				cssSelectorData.setText(data.get(selectedKey));
+					locatorValue.setData("key", locatorKey);
+					locatorValue.addModifyListener(new ModifyListener() {
+						@Override
+						public void modifyText(ModifyEvent event) {
+							Text text = (Text) event.widget;
+							data.replace((String) text.getData("key"), text.getText());
+						}
+					});
+				} else {
+
+					final Button locatorRadio = new Button(this, SWT.RADIO);
+					locatorKey = "ElementText";
+					String locatorKeyLabel = locatorKey.replace("Element", "");
+					locatorRadio.setSelection(false);
+					locatorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+					locatorRadio.setText(locatorKeyLabel);
+					locatorRadio.setData("key", locatorKey);
+					locatorRadio.setSelection(
+							locatorKey.contains((String) data.get("ElementSelectedBy")));
+					locatorRadio.addListener(SWT.Selection, listener);
+
+					final Text locatorValue;
+					locatorValue = new Text(this, SWT.SINGLE | SWT.BORDER);
+					locatorValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					locatorValue.setText(String.format("%s...", locatorKeyLabel));
+					locatorValue.setData("key", locatorKey);
+					locatorValue.addModifyListener(new ModifyListener() {
+						@Override
+						public void modifyText(ModifyEvent event) {
+							Text text = (Text) event.widget;
+							// System.err.println(text.getText());
+						}
+					});
+
+				}
 			}
 
-			cssSelectorData.setData("key", selectedKey);
-			cssSelectorData.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent event) {
-					Text text = (Text) event.widget;
-					data.replace((String) text.getData("key"), text.getText());
-				}
-			});
-
-			final Button xPathRadio = new Button(this, SWT.RADIO);
-			xPathRadio.setSelection(false);
-			xPathRadio.setText("XPath");
-      selectedKey = "ElementXPath";      
-			xPathRadio.setData("key", selectedKey);
-      xPathRadio.setSelection(selectedKey.contains((String) data.get("ElementSelectBy")));
-
-			xPathRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-			xPathRadio.addListener(SWT.Selection, listener);
-
-			final Text xPathData = new Text(this, SWT.SINGLE | SWT.BORDER);
-			xPathData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			if (data.containsKey("ElementXPath")) {
-				xPathData.setText(data.get("ElementXPath"));
-			}
-			xPathData.setData("key", "ElementXPath");
-			xPathData.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent event) {
-					Text text = (Text) event.widget;
-					data.replace((String) text.getData("key"), text.getText());
-				}
-			});
-
-			final Button idRadio = new Button(this, SWT.RADIO);
-			idRadio.setSelection(false);
-			idRadio.setText("ID");
-      selectedKey = "ElementId";      
-			idRadio.setData("key", selectedKey);
-      idRadio.setSelection(selectedKey.contains((String) data.get("ElementSelectBy")));
-
-			idRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-			idRadio.addListener(SWT.Selection, listener);
-
-			final Text idData = new Text(this, SWT.SINGLE | SWT.BORDER);
-			idData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			if (data.containsKey(selectedKey)) {
-				idData.setText(data.get(selectedKey));
-			}
-			idData.setData("key", selectedKey);
-
-			idData.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent event) {
-					Text text = (Text) event.widget;
-					data.replace((String) text.getData("key"), text.getText());
-				}
-			});
-
-			final Button textRadio = new Button(this, SWT.RADIO);
-      selectedKey = "ElementText";      
-			textRadio.setSelection(false);
-			textRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
-			textRadio.setText("Text");
-			textRadio.setData("key", selectedKey);
-      textRadio.setSelection(selectedKey.contains((String) data.get("ElementSelectBy")));
-			textRadio.addListener(SWT.Selection, listener);
-
-			final Text textData;
-			textData = new Text(this, SWT.SINGLE | SWT.BORDER);
-			textData.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-			textData.setText("Text...");
-			textData.setData("key", selectedKey);
-			textData.addModifyListener(new ModifyListener() {
-				@Override
-				public void modifyText(ModifyEvent event) {
-					Text text = (Text) event.widget;
-					// System.err.println(text.getText());
-				}
-			});
 		}
 	}
 
@@ -312,7 +282,7 @@ public class ComplexFormEx {
 		Boolean collectResults = parameters.isPresent();
 		HashMap<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
-		String data = "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"id\", \"ElementXPath\": \"/html//img[1]\" }";
+		String data = "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"\", \"ElementXPath\": \"/html//img[1]\" }";
 		try {
 			JSONObject elementObj = new JSONObject(data);
 			@SuppressWarnings("unchecked")
