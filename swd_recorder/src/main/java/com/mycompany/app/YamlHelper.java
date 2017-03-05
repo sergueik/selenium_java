@@ -13,13 +13,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import java.lang.RuntimeException;
 import static java.lang.String.format;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.text.SimpleDateFormat;
+import java.text.DateFormat;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
@@ -28,6 +34,8 @@ public class YamlHelper {
 
 	private static DumperOptions options = new DumperOptions();
 	private static Yaml yaml = null;
+	private static Date dateString;
+	private static Calendar calendar;
 
 	public static Configuration loadConfiguration(String fileName) {
 		if (yaml == null) {
@@ -46,6 +54,10 @@ public class YamlHelper {
 		return config;
 	}
 
+	public static void printConfiguration(Configuration config) {
+		saveConfiguration(config);
+	}
+
 	public static void saveConfiguration(Configuration config) {
 		saveConfiguration(config, null);
 	}
@@ -56,6 +68,7 @@ public class YamlHelper {
 			options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 			yaml = new Yaml(options);
 		}
+		/*
 		String pattern = "yyyy-MM-dd";
 		SimpleDateFormat format = new SimpleDateFormat(pattern);
 		Date date = new Date();
@@ -65,6 +78,20 @@ public class YamlHelper {
 		} catch (java.text.ParseException e) {
 			config.updated = date;
 		}
+		*/
+		calendar = new GregorianCalendar();
+		SimpleDateFormat dateFormat = new SimpleDateFormat(
+				((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT,
+						Locale.US)).toPattern().replaceAll("\\byy\\b", "yyyy"));
+		System.err.println("Testing date format: " + dateFormat.toPattern());
+
+		try {
+			config.updated = dateFormat.parse(dateFormat.format(calendar.getTime()));
+		} catch (java.text.ParseException e) {
+			System.err.println("Ignoring date parse exception: " + e.toString());
+			config.updated = new Date();
+		}
+
 		if (fileName != null) {
 			try {
 				Writer out = new OutputStreamWriter(new FileOutputStream(fileName),

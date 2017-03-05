@@ -354,8 +354,7 @@ public class SimpleToolBarEx {
 			configFilePath = dialog.open();
 			System.err.println("Loading " + configFilePath);
 			config = YamlHelper.loadConfiguration(configFilePath);
-			// TODO: better method names
-			YamlHelper.saveConfiguration(config);
+			YamlHelper.printConfiguration(config);
 		});
 
 		save_tool.addListener(SWT.Selection, event -> {

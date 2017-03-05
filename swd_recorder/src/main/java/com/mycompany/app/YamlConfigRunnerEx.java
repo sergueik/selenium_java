@@ -29,6 +29,6 @@ public class YamlConfigRunnerEx {
 				System.getProperty("user.dir"), "sample.yaml") : args[0];
 
 		Configuration config = YamlHelper.loadConfiguration(yamlFile);
-		YamlHelper.saveConfiguration(config);
+		YamlHelper.printConfiguration(config);
 	}
 }

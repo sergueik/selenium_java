@@ -7,12 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
 
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
 
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -116,8 +111,7 @@ public class AppTest {
 
 		getOsName();
 		if (osName.toLowerCase().startsWith("windows")) {
-			driver = BrowserDriver.initialize("firefox");
-			// driver = BrowserDriver.initialize("chrome");
+			driver = BrowserDriver.initialize("chrome");
 			/*
 			// IE 10 works, IE 11 does not			
 			driver = new InternetExplorerDriver(capabilities);
@@ -396,69 +390,6 @@ public class AppTest {
 			return uri.toString();
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
-		}
-	}
-
-	private static class YamlHelper {
-
-		private static DumperOptions options = new DumperOptions();
-		private static Yaml yaml = null;
-		private static Date dateString;
-		private static Calendar calendar;
-
-		private static Configuration loadConfiguration(String fileName) {
-			if (yaml == null) {
-				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-				yaml = new Yaml(options);
-			}
-			Configuration config = null;
-			try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
-				config = yaml.loadAs(in, Configuration.class);
-				// TODO: better method naming
-				YamlHelper.saveConfiguration(config);
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return config;
-		}
-
-		private static void saveConfiguration(Configuration config) {
-			saveConfiguration(config, null);
-		}
-
-		@SuppressWarnings("deprecation")
-		private static void saveConfiguration(Configuration config,
-				String fileName) {
-			if (yaml == null) {
-				options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
-				yaml = new Yaml(options);
-			}
-			calendar = new GregorianCalendar();
-			SimpleDateFormat dateFormat = new SimpleDateFormat(
-					((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT,
-							Locale.US)).toPattern().replaceAll("\\byy\\b", "yyyy"));
-			System.err.println("Testing date format: " + dateFormat.toPattern());
-
-			try {
-				config.updated = dateFormat
-						.parse(dateFormat.format(calendar.getTime()));
-			} catch (java.text.ParseException e) {
-				System.err.println("Ignoring date parse exception: " + e.toString());
-				config.updated = new Date();
-			}
-			if (fileName != null) {
-				try {
-					Writer out = new OutputStreamWriter(new FileOutputStream(fileName),
-							"UTF8");
-					yaml.dump(config, out);
-					out.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				System.err.println(yaml.dump(config));
-			}
 		}
 	}
 }

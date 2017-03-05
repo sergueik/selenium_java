@@ -188,7 +188,7 @@ public class ComplexFormEx {
 				// System.out.println("do work for deselection " + button);
 			}
 			/*
-			  // Java 6 style 
+			  // Java 6 style
 			  idRadio.addListener(SWT.Selection, new Listener() {
 			    public void handleEvent(Event event) {
 			      switch (event.type) {
@@ -248,7 +248,6 @@ public class ComplexFormEx {
 				} else {
 
 					final Button locatorRadio = new Button(this, SWT.RADIO);
-					locatorKey = "ElementText";
 					String locatorKeyLabel = locatorKey.replace("Element", "");
 					locatorRadio.setSelection(false);
 					locatorRadio.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
