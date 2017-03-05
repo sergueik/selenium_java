@@ -348,6 +348,35 @@ public class AppTest {
 		}
 	}
 
+	private String getElementText(WebElement element) {
+
+		// http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
+		/*
+		function getTextFromNode(node, addSpaces) {
+		var i, result, text, child;
+		result = '';
+		for (i = 0; i < node.childNodes.length; i++) {
+		    child = node.childNodes[i];
+		    text = null;
+		    if (child.nodeType === 1) {
+		        text = getTextFromNode(child, addSpaces);
+		    } else if (child.nodeType === 3) {
+		        text = child.nodeValue;
+		    }
+		    if (text) {
+		        if (addSpaces && /\S$/.test(result) && /^\S/.test(text)) text = ' ' + text;
+		        result += text;
+		    }
+		}
+		return result;
+		}
+		*/
+
+		String script = "var element = arguments[0];var text = element.innerText || element.textContent || '';return text;";
+
+		return (String) executeScript(script, element);
+	}
+
 	protected static String getScriptContent(String scriptName) {
 		try {
 			final InputStream stream = AppTest.class.getClassLoader()
