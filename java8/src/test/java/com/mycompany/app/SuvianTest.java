@@ -746,7 +746,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test12_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
@@ -1427,6 +1427,8 @@ public class SuvianTest {
 
 	}
 
+	// Few failing attempts
+	// Attempt #1
 	@Test(enabled = false)
 	public void test20_1() {
 		// Arrange
@@ -1445,8 +1447,6 @@ public class SuvianTest {
 		assertThat(dropElement.getText(), containsString("Drop Here"));
 
 		// Act
-		// Few failing attempts
-		// Attempt #1
 		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
 				.build().perform();
 		try {
@@ -1454,14 +1454,58 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 
-		// Attempt #2
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+	}
+
+	// Attempt #2
+	@Test(enabled = false)
+	public void test20_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h5#drag1 strong"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
 		actions.dragAndDrop(draggableElement, dropElement).build().perform();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
 
-		// Attempt #3
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+	}
+
+	// Attempt #3
+	@Test(enabled = false)
+	public void test20_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h5#drag1 strong"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
 		Point source_location = draggableElement.getLocation();
 		highlight(draggableElement);
 		Point target_location = dropElement.getLocation();
@@ -1470,7 +1514,34 @@ public class SuvianTest {
 		actions.release().build();
 		actions.perform();
 
-		// Attempt #4
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
+
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+	}
+
+	// Attempt #4
+	@Test(enabled = false)
+	public void test20_4() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h5#drag1 strong"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
 		Mouse mouse = ((HasInputDevices) driver).getMouse();
 		Coordinates source_coords = ((Locatable) draggableElement).getCoordinates();
 		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
@@ -1478,12 +1549,46 @@ public class SuvianTest {
 				source_coords.inViewPort().x, source_coords.inViewPort().y));
 		mouse.mouseDown(source_coords);
 
-		mouse.mouseMove(source_coords, 0, target_location.y - source_location.y);
+		mouse.mouseMove(source_coords, 0, target_coords.inViewPort().y - source_coords.inViewPort().y);
 		System.err.println(String.format("Mouse up at: (%-4d, %-4d)",
 				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
 		mouse.mouseUp(target_coords);
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+		}
 
-		// Wait page to update
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+	}
+
+	// Attempt #5
+	@Test(enabled = true)
+	public void test20_5() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector(".container .row .intro-message h5#drag1 strong"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
+		Coordinates source_coords = ((Locatable) draggableElement).getCoordinates();
+		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
+    String simulateDragDropScript = getScriptContent("simulateDragDrop.js");
+		System.err.println(String.format("Simulate drage an drop by: (%-4d, %-4d)",
+				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
+
+    executeScript(simulateDragDropScript, draggableElement, target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10);
+
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
