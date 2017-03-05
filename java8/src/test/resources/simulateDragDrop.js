@@ -1,14 +1,11 @@
 /**
- * simulate mouse event on the element
+ * simulate  Drag and Drop of the page element with the mouse
  *
  * arguments[0] {Element} The event target.
- * arguments[1] {String} The name of the event (e.g. 'contextmenu').
+ * arguments[1] {long} The destination x coordinate.
+ * arguments[2] {long} The destination y coordinate.
  */
-
-// http://stackoverflow.com/questions/6157929/how-to-simulate-a-mouse-click-using-javascript/6158050
-// http://www.spookandpuff.com/examples/clickSimulation.html
-// http://mouseevents.nerdyjs.com/search/MouseEvents
-// https://raw.githubusercontent.com/sergeych/jsnippets/master/simulate_event.js
+// https://ynot408.wordpress.com/2011/09/22/drag-and-drop-using-selenium-webdriver/
 // http://stackoverflow.com/questions/35834671/similating-a-javascript-click-event-on-a-specific-page
 simulate = function(element, eventName) {
 	var options = extend(defaultOptions, arguments[2] || {});
@@ -49,10 +46,10 @@ function extend(destination, source) {
 		destination[property] = source[property];
 	return destination;
 }
-// contextmenu  is handled by simulateRightMouseButtonClick.js
+// contextmenu
 var eventMatchers = {
 	'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
-	'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
+	'MouseEvents': /^(?:click|contextmenu|dblclick|mouse(?:down|up|over|move|out))$/
 }
 var defaultOptions = {
 	pointerX: 0,
@@ -66,7 +63,10 @@ var defaultOptions = {
 	cancelable: true
 }
 
-var element = arguments[0] || document.defaultView;
-var eventName = arguments[1] || 'click';
+var elementFrom = arguments[0] || document.defaultView;
+var destX = arguments[1] || 0;
+var destY = arguments[2] || 0;
 
-simulate(element, eventName);
+simulate(elementFrom, 'mousedown', 0, 0);
+simulate(elementFrom, 'mousemove', destX, destY);
+simulate(elementFrom, 'mouseup', destX, destY);
