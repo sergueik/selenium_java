@@ -152,10 +152,6 @@ public class BrowserDriver {
 	private static DesiredCapabilities capabilitiesFirefox() {
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		FirefoxProfile profile = new FirefoxProfile();
-		// java.lang.IllegalArgumentException: Preference
-		// network.http.phishy-userpass-length may not be overridden: frozen
-		// value=255, requested value=255
-		// profile.setPreference("network.http.phishy-userpass-length", 255);
 		profile.setEnableNativeEvents(true);
 		profile.setAcceptUntrustedCertificates(true);
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
@@ -164,33 +160,33 @@ public class BrowserDriver {
 		return capabilities;
 	}
 
+	// https://sites.google.com/a/chromium.org/chromedriver/capabilities
+  // http://peter.sh/experiments/chromium-command-line-switches/
 	private static DesiredCapabilities capabilitiesChrome() {
+		System.setProperty("webdriver.chrome.driver",
+				(new File(chromeDriverPath)).getAbsolutePath());
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-
-		String downloadFilepath = System.getProperty("user.dir")
-				+ System.getProperty("file.separator") + "target"
-				+ System.getProperty("file.separator");
+		ChromeOptions options = new ChromeOptions();
 
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
+		String downloadFilepath = System.getProperty("user.dir")
+				+ System.getProperty("file.separator") + "target"
+				+ System.getProperty("file.separator");
 		chromePrefs.put("download.default_directory", downloadFilepath);
 		chromePrefs.put("enableNetwork", "true");
-
-		ChromeOptions option = new ChromeOptions();
-		option.addArguments("test-type");
-		// option.addArguments("--start-maximized");
-		option.setExperimentalOption("prefs", chromePrefs);
-		option.addArguments("--browser.download.folderList=2");
-		option.addArguments(
+		options.setExperimentalOption("prefs", chromePrefs);
+		options.addArguments("allow-running-insecure-content");
+		options.addArguments("allow-insecure-localhost");
+		options.addArguments("enable-local-file-accesses");
+		options.addArguments("start-maximized");
+		options.addArguments("browser.download.folderList=2");
+		options.addArguments(
 				"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
-		option.addArguments("--browser.download.dir=" + downloadFilepath);
-		option.addArguments("allow-running-insecure-content");
-
-		File file = new File(chromeDriverPath);
-		System.setProperty("webdriver.chrome.driver", file.getAbsolutePath());
-
+		options.addArguments("browser.download.dir=" + downloadFilepath);
+		// options.addArguments("user-data-dir=/path/to/your/custom/profile");
 		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-		capabilities.setCapability(ChromeOptions.CAPABILITY, option);
+		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		return capabilities;
 	}
