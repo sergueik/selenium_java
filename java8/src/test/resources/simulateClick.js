@@ -22,7 +22,7 @@ simulate = function(element, eventName) {
 	}
 
 	if (!eventType)
-		throw new SyntaxError('Only HTMLEvents and MouseEvents interfaces are supported');
+		throw new SyntaxError('Unsupported event: ' + eventName);
 
 	if (document.createEvent) {
 		oEvent = document.createEvent(eventType);
@@ -49,7 +49,7 @@ function extend(destination, source) {
 		destination[property] = source[property];
 	return destination;
 }
-// contextmenu  is handled by simulateRightMouseButtonClick.js
+// contextmenu is supposedly handled by simulateRightMouseButtonClick.js
 var eventMatchers = {
 	'HTMLEvents': /^(?:load|unload|abort|error|select|change|submit|reset|focus|blur|resize|scroll)$/,
 	'MouseEvents': /^(?:click|dblclick|mouse(?:down|up|over|move|out))$/
@@ -57,8 +57,11 @@ var eventMatchers = {
 var defaultOptions = {
 	pointerX: 0,
 	pointerY: 0,
+  // 0 for left button
+  // 1  in Chrome has effect of 'Ctrl click' - link is opened in a new tab
 	button: 0,
-	ctrlKey: false,
+	ctrlKey: true,
+  // modifiers have no effect in FF
 	altKey: false,
 	shiftKey: false,
 	metaKey: false,
@@ -66,7 +69,37 @@ var defaultOptions = {
 	cancelable: true
 }
 
-var element = arguments[0] || document.defaultView;
-var eventName = arguments[1] || 'click';
+// http://stackoverflow.com/questions/10596417/is-there-a-way-to-get-element-by-xpath-using-javascript-in-selenium-webdriver
+var getElementByXpath = function getElementByXpath(xpath) {
+  return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+}
 
-simulate(element, eventName);
+var getElementsByXpath = function getElementByXpath(xpath) {
+  var result = [];
+  var nodesSnapshot = document.evaluate(xpath, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
+  for (var i = 0; i < nodesSnapshot.snapshotLength; i++) {
+    result.push(nodesSnapshot.snapshotItem(i));
+  }
+  return result;
+}
+var element = null;
+var eventName = null;
+if (typeof(arguments) == 'undefined') {
+  // localor valid for a link in http://suvian.in/selenium/1.1link.html
+  element = getElementByXpath('//div[1]/div/div/div/div/h3[2]/a');
+  eventName = 'click';
+} else {
+  element = arguments[0] || document.defaultView;
+  eventName = arguments[1] || 'click';
+}
+
+/*
+// simplified:
+var _event = new MouseEvent(eventName, {
+  view: window,
+  bubbles: true,
+  cancelable: true,
+  clientX: 20,
+});
+element.dispatchEvent(_event);
+*/

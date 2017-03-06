@@ -35,6 +35,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.internal.Coordinates;
@@ -45,6 +46,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -92,10 +94,21 @@ public class SuvianTest {
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
-		// driver = new FirefoxDriver();
+
+
+    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		FirefoxProfile profile = new FirefoxProfile();
+		profile.setEnableNativeEvents(true);
+		profile.setAcceptUntrustedCertificates(true);
+		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+		capabilities.setCapability("elementScrollBehavior", 1);
+
+		driver = new FirefoxDriver(capabilities);
+    /*
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
 		driver = new ChromeDriver();
+    */
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -286,6 +299,48 @@ public class SuvianTest {
 		highlight(element);
 		assertTrue(element.getText().equalsIgnoreCase("Link Successfully clicked"),
 				element.getText());
+	}
+
+	@Test(enabled = true)
+	public void test0_5() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.1link.html");
+
+		wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//div[1]/div/div/div/div/h3[2]/a"));
+		assertTrue(elements.size() > 0);
+
+		// Act
+		WebElement element = elements.get(0);
+		highlight(element);
+		assertTrue(element.getText().equalsIgnoreCase("Click Here"),
+				element.getText());
+		String simulateRightMouseButtonClick = getScriptContent(
+				"simulateRightMouseButtonClick.js");
+		System.err.println("Simulate (1) right mouse click on element");
+		executeScript(simulateRightMouseButtonClick, element);
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
+		String simulateClick = getScriptContent(
+				"simulateClick.js");
+		System.err.println("Simulate (2) right mouse click on element");
+		executeScript(simulateClick, element, "contextmenu");
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
+		System.err.println("Simulate (3) right mouse click on element");
+    actions.moveToElement(element).build().perform();
+    actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
+        .perform();
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	@Test(enabled = false)
@@ -1549,7 +1604,8 @@ public class SuvianTest {
 				source_coords.inViewPort().x, source_coords.inViewPort().y));
 		mouse.mouseDown(source_coords);
 
-		mouse.mouseMove(source_coords, 0, target_coords.inViewPort().y - source_coords.inViewPort().y);
+		mouse.mouseMove(source_coords, 0,
+				target_coords.inViewPort().y - source_coords.inViewPort().y);
 		System.err.println(String.format("Mouse up at: (%-4d, %-4d)",
 				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
 		mouse.mouseUp(target_coords);
@@ -1583,11 +1639,12 @@ public class SuvianTest {
 		// Act
 		Coordinates source_coords = ((Locatable) draggableElement).getCoordinates();
 		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
-    String simulateDragDropScript = getScriptContent("simulateDragDrop.js");
-		System.err.println(String.format("Simulate drage an drop by: (%-4d, %-4d)",
+		String simulateDragDropScript = getScriptContent("simulateDragDrop.js");
+		System.err.println(String.format("Simulate drag an drop by: (%-4d, %-4d)",
 				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
 
-    executeScript(simulateDragDropScript, draggableElement, target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10);
+		executeScript(simulateDragDropScript, draggableElement,
+				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10);
 
 		try {
 			Thread.sleep(1000);
