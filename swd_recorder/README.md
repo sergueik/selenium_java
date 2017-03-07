@@ -1,12 +1,12 @@
 ### Info
 
-Selenium WebDriver Eclipse Extension Toolkit (SWEET) is a OS-independent successor to the
+Selenium WebDriver Extension Toolkit (SWET) is a OS-independent successor to the
 [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii. While the latter is .Net Windows Forms/ Razor application,
 SWEET is based on the [Standard Widget Toolkit](https://www.eclipse.org/swt/) with some third party widgets (currently, [Opal](https://github.com/lcaron/opal)
 therefore it can be run on Windows, Mac or Linux, 32 or 64 bit platforms. Eventually SWET might become an Eclipse plugin.
 
-The application is developed in Ecipse mars with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
+The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
 The [Jtwig](http://jtwig.org/) is the code generatsor used.
 
@@ -15,7 +15,6 @@ The [Jtwig](http://jtwig.org/) is the code generatsor used.
 ![Ubuntu Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
 
 ![Windows Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture3.png)
-
 
 ### Goals
 
@@ -73,6 +72,28 @@ There is also a demo button that executes these actions automatically (for one e
 Currently project is hardcoded to use Chrome browser on Windows os, and Firefox on the rest of platforms.
 The YAML configuration will be fuly integrated shotly.
 Eventually other common formats: YAML, JSON, POI or Java properties file - will be supported.
+
+
+### Operation
+SWET and SWD inject certain Javascript code `ElementSearch.js` into the page, and waits polling for the speficic
+`document.swdpr_command` object to appear on that page. This object is created  by the `ElementSearch.js`
+when user selects the specific element on the page he is interested to access in the test script,
+and confirms the selection by entering the name of the element and clicking.
+The `document.swdpr_command` object contains certain properties of the selected element:
+
+* Absolute XPath, e.g. `/*[@id = "www-wikipedia-org"]/div[1]/div[1]/img[1]`
+* Element ID (when available)
+* Firebug-style cssSelector, e.g. `body[id = "www-wikipedia-org"] > div.central-featured > div.central-featured-logo-wrapper > img.central-featured-logo`
+* Element text (WIP)
+* Angular Protractor-specific locators `repeater`, `binding`, `model`, `repeaterRow` etc. (WIP)
+
+Auto-generated locators often become unnecessarily long, e.g. for the facebook logo one gets:
+```css
+div#blueBarDOMInspector > div._53jh > div.loggedout_menubar_container >
+div.clearfix.loggedout_menubar > div.lfloat._ohe >
+h1 > a > i.fb_logo.img.sp_Mlxwn39jCAE.sx_896ebb
+```
+but SWET does not have a way of shortening them automatically yet. Adding smart locator generators is a work in progress.
 
 ### Platform-specific information
 
@@ -201,12 +222,17 @@ elements:
   * [SWT Tools](https://github.com/bp-FLN/SWT-Tools)
   * [SWT choice dialog customization](https://github.com/prasser/swtchoices)
   * [SWT Browser component based recorder](https://github.com/itspanzi/swt-browser-recorder-spike)
-  
+
 #### Code Generation
 
   * [Jtwig](http://jtwig.org/)
   * [Thymeleaf](http://www.thymeleaf.org/)
   * [StringTemplate](http://www.stringtemplate.org/)
+
+### Selenium Locator Strategies
+
+  * [Choosing Effective XPaths](http://toolsqa.com/selenium-webdriver/choosing-effective-xpath/)
+  * [Use XPath locators efficiently](http://bitbar.com/appium-tip-18-how-to-use-xpath-locators-efficiently/)
 
 ### YAML
   * [snakeyaml](https://bitbucket.org/asomov/snakeyaml)

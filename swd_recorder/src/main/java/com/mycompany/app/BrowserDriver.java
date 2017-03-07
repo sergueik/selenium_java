@@ -179,7 +179,7 @@ public class BrowserDriver {
 		options.addArguments("allow-running-insecure-content");
 		options.addArguments("allow-insecure-localhost");
 		options.addArguments("enable-local-file-accesses");
-		options.addArguments("start-maximized");
+		// options.addArguments("start-maximized");
 		options.addArguments("browser.download.folderList=2");
 		options.addArguments(
 				"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");

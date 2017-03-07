@@ -64,7 +64,7 @@ class JavaLineStyler implements LineStyleListener {
 	public static final int STRING = 5;
 	public static final int OTHER = 6;
 	public static final int NUMBER = 7;
-	public static final int MAXIMUM_TOKEN = 8;
+	public static final int MAXIMUM_TOKEN = 8; // number of colors
 
 	public JavaLineStyler() {
 		initializeColors();
