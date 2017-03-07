@@ -58,7 +58,36 @@
     bye("getInputElementsByTypeAndValue");
     return result;
   };
-getElementId = function(element) {
+  
+    // http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
+		getText = function(element, addSpaces) {
+      var i, result, text, child;
+      hello('getText');
+      if (element.childNodes && element.childNodes > 1 ) {
+        result = '';
+        for (i = 0; i < element.childNodes.length; i++) {
+            child = element.childNodes[i];
+            text = null;
+            // NOTE we only collapsing child node values when there is more than one child
+            if (child.elementType === 1) {
+                text = getText(child, addSpaces);
+            } else if (child.elementType === 3) {
+                text = child.elementValue;
+            }
+            if (text) {
+                if (addSpaces && /\S$/.test(result) && /^\S/.test(text)) text = ' ' + text;
+                result += text;
+            }
+        }        
+      } else {
+        result = element.innerText || element.textContent || '';
+      }
+      result = result.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ' ).replace(/^\s+/, '' ).replace(/\s+$/, '' )
+      bye('getText result: ' + result);
+      return result;
+		}
+
+    getElementId = function(element) {
          var selector = '';
          hello('getElementId');
  
@@ -146,21 +175,21 @@ getElementId = function(element) {
       y += element.offsetTop;
       element = element.offsetParent;
     }
-    bye("getPageXY");
+    bye('getPageXY');
     return [x, y];
   };
 
   createCommand = function(jsonData) {
     var myJSONText;
-    hello("createCommand");
+    hello('createCommand');
     myJSONText = JSON.stringify(jsonData, null, 2);
     document.swdpr_command = myJSONText;
-    return bye("createCommand " + myJSONText);
+    return bye('createCommand ' + myJSONText);
   };
 
   addStyle = function(css) {
     var head, style;
-    hello("addStyle");
+    hello('addStyle');
     head = document.getElementsByTagName('head')[0];
     style = document.createElement('style');
     style.type = 'text/css';
@@ -170,7 +199,7 @@ getElementId = function(element) {
       style.appendChild(document.createTextNode(css));
     }
     head.appendChild(style);
-    return bye("addStyle");
+    return bye('addStyle');
   };
 
   preventEvent = function(event) {
@@ -212,7 +241,7 @@ getElementId = function(element) {
   };
 
   rightClickHandler = function(event) {
-    var JsonData, body, eventPreventingResult, mxy, path, root, target, txy, xpath, css_selector, id;
+    var jsonData, body, eventPreventingResult, mxy, root, target, txy, xpath, css_selector, id, textContent;
     hello("rightClickHandler");
     if (document.SWD_Page_Recorder == null) {
       return;
@@ -224,24 +253,25 @@ getElementId = function(element) {
       target = 'target' in event ? event.target : event.srcElement;
       root = document.compatMode === 'CSS1Compat' ? document.documentElement : document.body;
       mxy = [event.clientX + root.scrollLeft, event.clientY + root.scrollTop];
-      path = getPathTo(target);
+      xpath = getPathTo(target);
       txy = getPageXY(target);
       css_selector = getCssSelectorOF(target);
       id = getElementId(target);
+      textContent = getText(target, true);
       body = document.getElementsByTagName('body')[0];
-      xpath = path;
-      JsonData = {
-        "Command": "GetXPathFromElement",
-        "Caller": "EventListener : mousedown",
-        "CommandId": pseudoGuid(),
-        "CssSelector": css_selector,
-        "ElementId": id,
-        "XPathValue": xpath
+      jsonData = {
+        'Command': 'GetXPathFromElement',
+        'Caller': 'EventListener : mousedown',
+        'CommandId': pseudoGuid(),
+        'CssSelector': css_selector,
+        'ElementId': id,
+        'XPathValue': xpath,
+        'TextContent': textContent,
       };
-      createCommand(JsonData);
-      document.SWD_Page_Recorder.showPos(event, xpath, css_selector, id);
+      createCommand(jsonData);
+      document.SWD_Page_Recorder.showPos(event, xpath, css_selector, id,textContent);
       eventPreventingResult = preventEvent(event);
-      bye("rightClickHandler");
+      bye('rightClickHandler');
       return eventPreventingResult;
     }
   };
@@ -268,7 +298,7 @@ getElementId = function(element) {
       return bye("displaySwdForm");
     };
 
-    SWD_Page_Recorder.prototype.showPos = function(event, xpath, css_selector, id) {
+    SWD_Page_Recorder.prototype.showPos = function(event, xpath, css_selector, id, textContent) {
       var x, y;
       hello("showPos");
       if (window.event) {
@@ -285,10 +315,11 @@ getElementId = function(element) {
       document.getElementById("SwdPR_PopUp_XPathLocator").innerHTML = xpath;
       document.getElementById("SwdPR_PopUp_CssSelector").innerHTML = css_selector;
       document.getElementById("SwdPR_PopUp_ElementId").innerHTML = id;
-      document.getElementById("SwdPR_PopUp_ElementText").innerHTML = pseudoGuid();
+      document.getElementById("SwdPR_PopUp_ElementGUID").innerHTML = pseudoGuid();
       document.getElementById("SwdPR_PopUp_CodeIDText").value = '';
+      document.getElementById("SwdPR_PopUp_ElementTextContent").innerHTML = textContent;
       say(x + ";" + y);
-      return bye("showPos");
+      return bye('showPos');
     };
 
     SWD_Page_Recorder.prototype.closeForm = function() {
@@ -329,8 +360,8 @@ getElementId = function(element) {
               <td><span id="SwdPR_PopUp_ElementId">Element</span></td>\
             </tr>\
             <tr>\
-              <td>Text:</td>\
-              <td><span id="SwdPR_PopUp_ElementText">Element</span></td>\
+              <td>GUID:</td>\
+              <td><span id="SwdPR_PopUp_ElementGUID">Element</span></td>\
             </tr>\
             <tr>\
               <td>XPath:</td>\
@@ -340,6 +371,10 @@ getElementId = function(element) {
               <td>Css:</td>\
               <td><span id="SwdPR_PopUp_CssSelector">Element</span></td>\
             </tr>\
+            <tr>\
+              <td>Text:</td>\
+              <td><span id="SwdPR_PopUp_ElementTextContent">Element</span></td>\
+            </tr>\
             </table>\
         <input type="button" value="Add element" onclick="document.SWD_Page_Recorder.addElement()">\
         ';
@@ -347,12 +382,13 @@ getElementId = function(element) {
     };
 
     SWD_Page_Recorder.prototype.addElement = function() {
-      var JsonData, XPathLocatorElement, codeIDTextElement, htmlIdElement;
+      var JsonData, XPathLocatorElement, codeIDTextElement, htmlIdElement,textContentElement;
       codeIDTextElement = document.getElementById("SwdPR_PopUp_CodeIDText");
       hello("addElement " + codeIDTextElement.value );
       htmlIdElement = document.getElementById("SwdPR_PopUp_ElementId");
       CssSelectorElement = document.getElementById("SwdPR_PopUp_CssSelector");
       XPathLocatorElement = document.getElementById("SwdPR_PopUp_XPathLocator");
+      textContentElement = document.getElementById("SwdPR_PopUp_TextContent");
       JsonData = {
         "Command": "AddElement",
         "Caller": "addElement",
@@ -360,7 +396,8 @@ getElementId = function(element) {
         "ElementCodeName": codeIDTextElement.value,
         "ElementId": (htmlIdElement.hasChildNodes())?htmlIdElement.firstChild.nodeValue:"",
         "ElementCssSelector": CssSelectorElement.firstChild.nodeValue,
-        "ElementXPath": XPathLocatorElement.firstChild.nodeValue
+        "ElementXPath": XPathLocatorElement.firstChild.nodeValue,
+        'TextContent': textContentElement.firstChild.nodeValue,
       };
       createCommand(JsonData);
       return bye('addElement ' + codeIDTextElement.value + '>');

@@ -184,7 +184,7 @@ public class AppTest {
 		String result = readVisualSearchResult(payload);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testStatic() {
 		driver.get(getPageContent("ElementSearch.html"));
@@ -228,7 +228,7 @@ public class AppTest {
 		testData.put(elementName, elementData);
 		config.elements = testData;
 
-		YamlHelper.saveConfiguration(config);
+		YamlHelper.printConfiguration(config);
 	}
 
 	public static String getOsName() {
@@ -249,7 +249,7 @@ public class AppTest {
 
 	private String readVisualSearchResult(final String payload,
 			Optional<HashMap<String, String>> parameters) {
-		// System.err.println("Processing payload: " + payload);
+		System.err.println("Processing payload: " + payload);
 		Boolean collectResults = parameters.isPresent();
 		HashMap<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
@@ -343,31 +343,8 @@ public class AppTest {
 	}
 
 	private String getElementText(WebElement element) {
-
 		// http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
-		/*
-		function getTextFromNode(node, addSpaces) {
-		var i, result, text, child;
-		result = '';
-		for (i = 0; i < node.childNodes.length; i++) {
-		    child = node.childNodes[i];
-		    text = null;
-		    if (child.nodeType === 1) {
-		        text = getTextFromNode(child, addSpaces);
-		    } else if (child.nodeType === 3) {
-		        text = child.nodeValue;
-		    }
-		    if (text) {
-		        if (addSpaces && /\S$/.test(result) && /^\S/.test(text)) text = ' ' + text;
-		        result += text;
-		    }
-		}
-		return result;
-		}
-		*/
-
-		String script = "var element = arguments[0];var text = element.innerText || element.textContent || '';return text;";
-
+		String script = "var element = arguments[0];var text = element.innerText || element.textContent || ''; return text;";
 		return (String) executeScript(script, element);
 	}
 
