@@ -134,7 +134,8 @@
 
     getPathTo = function(element) {
         var element_sibling, siblingTagName, siblings, cnt, sibling_count;
-
+        var specialAttribute1 = 'href'
+        var specialAttribute2 = 'src'
         hello("getPathTo");
         var elementTagName = element.tagName.toLowerCase();
         if (element.id != '') {
@@ -143,6 +144,10 @@
             // return '*[@id="' + element.id + '"]';
         } else if (element.name && document.getElementsByName(element.name).length === 1) {
             return '//' + elementTagName + '[@name="' + element.name + '"]';
+        } else if (element.hasAttribute(specialAttribute1)) {
+            return getPathTo(element.parentNode) + '/' +  elementTagName + '[@' + specialAttribute1 + '="' + element.getAttribute(specialAttribute1) + '"]';
+        } else if (element.hasAttribute(specialAttribute2)) {
+            return getPathTo(element.parentNode) + '/' +  elementTagName + '[@' + specialAttribute2 + '="' + element.getAttribute(specialAttribute2) + '"]';
         }
         if (element === document.body) {
             return '/html/' + elementTagName;
