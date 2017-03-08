@@ -149,10 +149,10 @@ public class AppTest {
 	// @Ignore
 	@Test
 	public void testWebPageElementSearch() {
-		driver.get("https://www.ryanair.com/ie/en/");
+		driver.get("https://www.codeproject.com/");
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"#home div.specialofferswidget h3 > span:nth-child(1)"))));
+						"img[src *= 'post_an_article.png']"))));
 		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
 		highlight(element);
 		// Assert
@@ -327,6 +327,7 @@ public class AppTest {
 		highlight(element, 100);
 	}
 
+  // http://stackoverflow.com/questions/11010569/highlight-a-dom-element-on-mouse-over-like-inspect-does
 	private void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -334,7 +335,7 @@ public class AppTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'", element);
+			executeScript("arguments[0].style.border='3nnpx solid yellow'", element);
 			Thread.sleep(highlight_interval);
 			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {

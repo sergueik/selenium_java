@@ -132,10 +132,16 @@
          return path.join(' > ');
      };
 
+    probeAttribute = function(element,attributeName){
+      if (element.hasAttribute(attributeName)) {
+        return '[@' + attributeName + '="' + element.getAttribute(attributeName) + '"]';
+      } else {            
+        return null;
+      }
+    }
     getPathTo = function(element) {
         var element_sibling, siblingTagName, siblings, cnt, sibling_count;
-        var specialAttribute1 = 'href'
-        var specialAttribute2 = 'src'
+        var specialAttributesArray = ['href','src','title','alt'];
         hello("getPathTo");
         var elementTagName = element.tagName.toLowerCase();
         if (element.id != '') {
@@ -144,10 +150,15 @@
             // return '*[@id="' + element.id + '"]';
         } else if (element.name && document.getElementsByName(element.name).length === 1) {
             return '//' + elementTagName + '[@name="' + element.name + '"]';
-        } else if (element.hasAttribute(specialAttribute1)) {
-            return getPathTo(element.parentNode) + '/' +  elementTagName + '[@' + specialAttribute1 + '="' + element.getAttribute(specialAttribute1) + '"]';
-        } else if (element.hasAttribute(specialAttribute2)) {
-            return getPathTo(element.parentNode) + '/' +  elementTagName + '[@' + specialAttribute2 + '="' + element.getAttribute(specialAttribute2) + '"]';
+        } 
+        
+        var arrayLength = specialAttributesArray.length;
+        for (var i = 0; i < arrayLength; i++) {
+          specialAttribute = specialAttributesArray[i];
+          var postfix = probeAttribute(element,specialAttribute);
+          if (postfix) {
+            return getPathTo(element.parentNode) + '/' +  elementTagName + postfix; 
+          }
         }
         if (element === document.body) {
             return '/html/' + elementTagName;
