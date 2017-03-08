@@ -7,7 +7,6 @@
 // http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
 getText = function(element, addSpaces) {
 	var i, result, text, child;
-	hello('getText');
 	if (element.childNodes && element.childNodes > 1) {
 		result = '';
 		for (i = 0; i < element.childNodes.length; i++) {
@@ -28,6 +27,5 @@ getText = function(element, addSpaces) {
 		result = element.innerText || element.textContent || '';
 	}
 	result = result.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '')
-	bye('getText result: ' + result);
 	return result;
 }
