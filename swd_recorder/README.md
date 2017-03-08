@@ -81,19 +81,19 @@ when user selects the specific element on the page he is interested to access in
 and confirms the selection by entering the name of the element and clicking.
 The `document.swdpr_command` object contains certain properties of the selected element:
 
-* Absolute XPath, e.g. `/*[@id = "www-wikipedia-org"]/div[1]/div[1]/img[1]`
+* Absolute XPath, that looks like `/html/body/*[@id = "www-wikipedia-org"]/div[1]/div[1]/img[1]`
+* Attribute-extended XPath that looks like `//a[@href="/script/answers"]/img[@src="question.png"]`
+* Firebug-style cssSelector (all classes attached to all parent nodes), that look like `ul.nav-links li.nav-links__item div.central.featured.logo-wrapper > img.central.featured-logo`
+* Element text (transalted under the hood into XPath `[contains()]` expression).
+* Input for Angular Protractor-specific locators `repeater`, `binding`, `model`, `repeaterRow` etc. (WIP)
 * Element ID (when available)
-* Firebug-style cssSelector, e.g. `body[id = "www-wikipedia-org"] > div.central-featured > div.central-featured-logo-wrapper > img.central-featured-logo`
-* Element text (WIP)
-* Angular Protractor-specific locators `repeater`, `binding`, `model`, `repeaterRow` etc. (WIP)
-
-Auto-generated locators often become unnecessarily long, e.g. for the facebook logo one gets:
+Auto-generated locators often become unnecessarily long, e.g. for the facebook logo one may get:
 ```css
 div#blueBarDOMInspector > div._53jh > div.loggedout_menubar_container >
 div.clearfix.loggedout_menubar > div.lfloat._ohe >
 h1 > a > i.fb_logo.img.sp_Mlxwn39jCAE.sx_896ebb
 ```
-but SWET does not have a way of shortening them automatically yet. Adding smart locator generators is a work in progress.
+Currently SWET does not know a way of shortening them automatically. Adding smart locator generators is a work in progress.
 
 ### Platform-specific information
 
