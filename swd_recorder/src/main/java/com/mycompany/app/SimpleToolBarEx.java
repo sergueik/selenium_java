@@ -381,6 +381,16 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
+
+					// Experimental - timing out on UI thread
+					long startTime = System.currentTimeMillis();
+
+					long retryInterval = 1000;
+					long maxRetry = 300;
+					long checkRetryDelay = 0;
+					Boolean waitingForData = true;
+					HashMap<String, String> elementData = new HashMap<String, String>();
+					String name = "";
 					find_icon_tool.setEnabled(false);
 					status.setText("Injecting the script");
 					status.pack();
@@ -388,9 +398,73 @@ public class SimpleToolBarEx {
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
 					injectElementSearch(Optional.<String> empty());
-					String name = "";
-					HashMap<String, String> elementData = new HashMap<String, String>(); // empty
-					Boolean waitingForData = true;
+					if (true) {
+
+						while (waitingForData) {
+
+							String payload = executeScript(getCommand).toString();
+							if (!payload.isEmpty()) {
+								// objects cannot suicide
+								elementData = new HashMap<String, String>();
+								name = readVisualSearchResult(payload,
+										Optional.of(elementData));
+								if (name == null || name.isEmpty()) {
+									System.err.println("Rejected visual search");
+
+								} else {
+									System.err.println(String
+											.format("Received element data of the step: '%s'", name));
+									waitingForData = false;
+									break;
+								}
+							}
+
+							if (waitingForData) {
+								// check if waited long enough already
+								checkRetryDelay = System.currentTimeMillis() - startTime;
+								if (Math.ceil(checkRetryDelay / retryInterval) > maxRetry + 1) {
+									System.err.format("Result not present after %d second\n",
+											checkRetryDelay);
+									throw new RuntimeException();
+								}
+								try {
+									System.err.print(String.format("Sleep %4.2f sec ...",
+											Math.ceil(retryInterval / 1000)));
+									Thread.sleep(retryInterval);
+								} catch (InterruptedException e) {
+									System.err.println("Unexpected Interrupted Exception: "
+                  + e.getStackTrace().toString());
+                  // TODO:  gracefully enable
+                  find_icon_tool.setEnabled(true);
+									throw new RuntimeException(e.toString());
+								}
+							}
+						}
+
+						long delaySecond = (checkRetryDelay / 1000) % 60;
+						long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
+						long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
+						String delayTime = String.format("%02d:%02d:%02d", delayHour,
+								delayMinute, delaySecond);
+						System.err.format("Data was receiveed at %s\n", delayTime);
+            find_icon_tool.setEnabled(true);
+					}
+
+					// ====
+					find_icon_tool.setEnabled(false);
+					status.setText("Injecting the script");
+					status.pack();
+					wait = new WebDriverWait(driver, flexibleWait);
+					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+					actions = new Actions(driver);
+					injectElementSearch(Optional.<String> empty());
+					// String name = "";
+					name = "";
+					// HashMap<String, String> elementData = new HashMap<String,
+					// String>(); // empty
+					// Boolean waitingForData = true;
+					elementData = new HashMap<String, String>(); // empty
+					waitingForData = true;
 					status.setText("Waiting for data");
 					while (waitingForData) {
 						String payload = executeScript(getCommand).toString();
