@@ -11,7 +11,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.eclipse.swt.SWT;
-
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -135,6 +136,16 @@ public class ComplexFormEx {
 					composite.dispose();
 				}
 			});
+
+			// context menu
+			buttonCancel.addMenuDetectListener(new MenuDetectListener() {
+				@Override
+				public void menuDetected(MenuDetectEvent event) {
+					System.err.println("Context menu ");
+				}
+
+			});
+
 			buttonOK.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {

@@ -114,6 +114,8 @@ import org.eclipse.jface.layout.GridDataFactory;
 
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.events.MenuDetectEvent;
+import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -244,6 +246,7 @@ public class SimpleToolBarEx {
 
 		ToolItem find_icon_tool = new ToolItem(toolBar, SWT.PUSH);
 		find_icon_tool.setImage(find_icon);
+		// setDisabledImage
 		find_icon_tool.setToolTipText("Injects the script");
 
 		ToolItem flowchart_tool = new ToolItem(toolBar, SWT.PUSH);
@@ -341,10 +344,33 @@ public class SimpleToolBarEx {
 		});
 
 		flowchart_tool.addListener(SWT.Selection, event -> {
+			// TODO: context menu
+			// System.err.println("Button: " + event.button);
+			// if (event.button )
 			shell.setData("Nothing here\n yet...");
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
 		});
 
+		// TODO: SWT.MouseDown not reached
+		flowchart_tool.addListener(SWT.MouseDown, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				System.err.println("Button: " + event.button);
+				if (event.button == 3) {
+				}
+			}
+
+		});
+		// NOTE: ToolItem has no addMenuDetectListener
+    /*
+		flowchart_tool.addMenuDetectListener(new MenuDetectListener() {
+			@Override
+			public void menuDetected(MenuDetectEvent event) {				
+				System.err.println("Context menu ");
+			}
+
+		});
+    */
 		open_tool.addListener(SWT.Selection, event -> {
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 			String[] filterNames = new String[] { "YAML sources", "All Files (*)" };
@@ -376,6 +402,7 @@ public class SimpleToolBarEx {
 		find_icon_tool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
+
 			}
 
 			@Override
@@ -433,9 +460,9 @@ public class SimpleToolBarEx {
 									Thread.sleep(retryInterval);
 								} catch (InterruptedException e) {
 									System.err.println("Unexpected Interrupted Exception: "
-                  + e.getStackTrace().toString());
-                  // TODO:  gracefully enable
-                  find_icon_tool.setEnabled(true);
+											+ e.getStackTrace().toString());
+									// TODO: gracefully enable
+									find_icon_tool.setEnabled(true);
 									throw new RuntimeException(e.toString());
 								}
 							}
@@ -447,7 +474,7 @@ public class SimpleToolBarEx {
 						String delayTime = String.format("%02d:%02d:%02d", delayHour,
 								delayMinute, delaySecond);
 						System.err.format("Data was receiveed at %s\n", delayTime);
-            find_icon_tool.setEnabled(true);
+						find_icon_tool.setEnabled(true);
 					}
 
 					// ====
@@ -512,7 +539,17 @@ public class SimpleToolBarEx {
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					item.setImage(page_icon);
 					item.setSelectionImage(page_icon);
-					item.addSelectionListener(new SelectionAdapter() {
+          // NOTE: cannot cast from Breadcrump to Control
+          /*
+					((Control) item).addMenuDetectListener(new MenuDetectListener() {
+						@Override
+						public void menuDetected(MenuDetectEvent event) {				
+							System.err.println("Context menu ");
+						}
+
+					});
+          */
+          item.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent e) {
 							String commandId = e.item.getData("CommandId").toString();
