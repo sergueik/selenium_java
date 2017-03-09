@@ -206,7 +206,7 @@ public class AppTest {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-		completeVisualSearch("element name");
+		completeVisualSearch("this element name");
 
 		// Assert
 		String payload = (String) executeScript(getCommand);
@@ -225,7 +225,8 @@ public class AppTest {
 		config.browserConfiguration = browserConfiguration;
 		config.updated = new Date();
 		HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
-		testData.put(elementName, elementData);
+    String commandId = elementData.get("CommandId");
+		testData.put(commandId, elementData);
 		config.elements = testData;
 
 		YamlHelper.printConfiguration(config);
@@ -265,8 +266,8 @@ public class AppTest {
 		} catch (JSONException e) {
 
 		}
-		assertTrue(collector.containsKey("ElementId"));
-		// NOTE: elementCodeName will not be set if
+		assertTrue(collector.containsKey("CommandId"));
+		// NOTE: elementCodeName will not be set when
 		// user clicked the SWD Table Close Button
 		// ElementId is always set
 		return collector.get("ElementCodeName");

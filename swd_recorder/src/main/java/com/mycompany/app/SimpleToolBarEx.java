@@ -431,7 +431,6 @@ public class SimpleToolBarEx {
 					final BreadcrumbItem item = new BreadcrumbItem(bc,
 							SWT.CENTER | SWT.TOGGLE);
 					String commandId = elementData.get("CommandId");
-					System.err.println("Sending : " + commandId);
 					testData.put(commandId, elementData);
 					stepKeys.add(commandId);
 					item.setData("CommandId", commandId);

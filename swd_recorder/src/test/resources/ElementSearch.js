@@ -257,7 +257,7 @@
   };
 
   rightClickHandler = function(event) {
-    var jsonData, body, eventPreventingResult, mxy, root, target, txy, xpath, css_selector, id, textContent;
+    var jsonData, body, eventPreventingResult, mxy, root, target, txy, xpath, css_selector, id, elementText;
     hello("rightClickHandler");
     if (document.SWD_Page_Recorder == null) {
       return;
@@ -273,7 +273,7 @@
       txy = getPageXY(target);
       css_selector = getCssSelectorOF(target);
       id = getElementId(target);
-      textContent = getText(target, true);
+      elementText = getText(target, true);
       body = document.getElementsByTagName('body')[0];
       jsonData = {
         'Command': 'GetXPathFromElement',
@@ -282,10 +282,10 @@
         'CssSelector': css_selector,
         'ElementId': id,
         'XPathValue': xpath,
-        'TextContent': textContent,
+        'ElementText': elementText,
       };
       createCommand(jsonData);
-      document.SWD_Page_Recorder.showPos(event, xpath, css_selector, id,textContent);
+      document.SWD_Page_Recorder.showPos(event, xpath, css_selector, id,elementText);
       eventPreventingResult = preventEvent(event);
       bye('rightClickHandler');
       return eventPreventingResult;
@@ -314,7 +314,7 @@
       return bye("displaySwdForm");
     };
 
-    SWD_Page_Recorder.prototype.showPos = function(event, xpath, css_selector, id, textContent) {
+    SWD_Page_Recorder.prototype.showPos = function(event, xpath, css_selector, id, elementText) {
       var x, y;
       hello("showPos");
       if (window.event) {
@@ -333,7 +333,7 @@
       document.getElementById("SwdPR_PopUp_ElementId").innerHTML = id;
       document.getElementById("SwdPR_PopUp_ElementGUID").innerHTML = pseudoGuid();
       document.getElementById("SwdPR_PopUp_CodeIDText").value = '';
-      document.getElementById("SwdPR_PopUp_TextContent").innerHTML = textContent;
+      document.getElementById("SwdPR_PopUp_ElementText").innerHTML = elementText;
       say(x + ";" + y);
       return bye('showPos');
     };
@@ -368,10 +368,6 @@
               </td>\
             </tr>\
             <tr>\
-              <td>Element</td>\
-              <td><span id="SwdPR_PopUp_ElementName">Element Name</span></td>\
-            </tr>\
-            <tr>\
               <td>Id:</td>\
               <td><span id="SwdPR_PopUp_ElementId">Element Id</span></td>\
             </tr>\
@@ -389,7 +385,7 @@
             </tr>\
             <tr>\
               <td>Text:</td>\
-              <td><span id="SwdPR_PopUp_TextContent">Element Text</span></td>\
+              <td><span id="SwdPR_PopUp_ElementText">Element Text</span></td>\
             </tr>\
             </table>\
         <input type="button" value="Add element" onclick="document.SWD_Page_Recorder.addElement()">\
@@ -398,22 +394,22 @@
     };
 
     SWD_Page_Recorder.prototype.addElement = function() {
-      var JsonData, XPathLocatorElement, codeIDTextElement, htmlIdElement,textContentElement;
-      codeIDTextElement = document.getElementById("SwdPR_PopUp_CodeIDText");
-      hello("addElement " + codeIDTextElement.value );
-      htmlIdElement = document.getElementById("SwdPR_PopUp_ElementId");
-      CssSelectorElement = document.getElementById("SwdPR_PopUp_CssSelector");
-      XPathLocatorElement = document.getElementById("SwdPR_PopUp_XPathLocator");
-      textContentElement = document.getElementById("SwdPR_PopUp_TextContent");
-      JsonData = {
-        "Command": "AddElement",
-        "Caller": "addElement",
-        "CommandId": pseudoGuid(),
-        "ElementCodeName": codeIDTextElement.value,
-        "ElementId": (htmlIdElement.hasChildNodes())?htmlIdElement.firstChild.nodeValue:"",
-        "ElementCssSelector": CssSelectorElement.firstChild.nodeValue,
-        "ElementXPath": XPathLocatorElement.firstChild.nodeValue,
-        'TextContent': textContentElement.firstChild.nodeValue,
+
+    var codeIDTextElement = document.getElementById('SwdPR_PopUp_CodeIDText');
+      hello('addElement ' + codeIDTextElement.value );
+      var htmlIdElement = document.getElementById('SwdPR_PopUp_ElementId');
+      var cssSelectorElement = document.getElementById('SwdPR_PopUp_CssSelector');
+      var xPathLocatorElement = document.getElementById('SwdPR_PopUp_XPathLocator');
+      var elementTextElement = document.getElementById('SwdPR_PopUp_ElementText');
+      var JsonData = {
+        'Command': 'AddElement',
+        'Caller': 'addElement',
+        'CommandId': pseudoGuid(),
+        'ElementCodeName': codeIDTextElement.value,
+        'ElementId': (htmlIdElement.hasChildNodes())?htmlIdElement.firstChild.nodeValue:'',
+        'ElementCssSelector': cssSelectorElement.firstChild.nodeValue,
+        'ElementXPath': xPathLocatorElement.firstChild.nodeValue,
+        'ElementText': elementTextElement.firstChild.nodeValue,
       };
       createCommand(JsonData);
       return bye('addElement ' + codeIDTextElement.value + '>');
