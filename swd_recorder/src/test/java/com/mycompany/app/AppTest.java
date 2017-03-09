@@ -146,7 +146,7 @@ public class AppTest {
 		driver.get("about:blank");
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testWebPageElementSearch() {
 		driver.get("https://www.codeproject.com/");
@@ -274,9 +274,11 @@ public class AppTest {
 
 	private void completeVisualSearch(String elementCodeName) {
 		WebElement swdControl = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SwdPR_PopUp"))));
 		assertThat(swdControl, notNullValue());
 
+		// System.err.println("Swd Control:" +
+		// swdControl.getAttribute("innerHTML"));
 		WebElement swdCodeID = wait.until(ExpectedConditions
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
@@ -285,9 +287,18 @@ public class AppTest {
 				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
 						By.xpath("//input[@type='button'][@value='Add element']"))));
 		assertThat(swdAddElementButton, notNullValue());
+    
+    // html body div#SwdPR_PopUp input
 		highlight(swdAddElementButton);
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+    
+		// Act
 		swdAddElementButton.click();
 	}
+
 
 	private void closeVisualSearch() {
 		WebElement swdControl = wait.until(

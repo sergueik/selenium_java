@@ -333,7 +333,7 @@
       document.getElementById("SwdPR_PopUp_ElementId").innerHTML = id;
       document.getElementById("SwdPR_PopUp_ElementGUID").innerHTML = pseudoGuid();
       document.getElementById("SwdPR_PopUp_CodeIDText").value = '';
-      document.getElementById("SwdPR_PopUp_ElementTextContent").innerHTML = textContent;
+      document.getElementById("SwdPR_PopUp_TextContent").innerHTML = textContent;
       say(x + ";" + y);
       return bye('showPos');
     };
@@ -369,27 +369,27 @@
             </tr>\
             <tr>\
               <td>Element</td>\
-              <td><span id="SwdPR_PopUp_ElementName">Element</span></td>\
+              <td><span id="SwdPR_PopUp_ElementName">Element Name</span></td>\
             </tr>\
             <tr>\
               <td>Id:</td>\
-              <td><span id="SwdPR_PopUp_ElementId">Element</span></td>\
+              <td><span id="SwdPR_PopUp_ElementId">Element Id</span></td>\
             </tr>\
             <tr>\
               <td>GUID:</td>\
-              <td><span id="SwdPR_PopUp_ElementGUID">Element</span></td>\
+              <td><span id="SwdPR_PopUp_ElementGUID">Element GUID</span></td>\
             </tr>\
             <tr>\
               <td>XPath:</td>\
-              <td><span id="SwdPR_PopUp_XPathLocator">Element</span></td>\
+              <td><span id="SwdPR_PopUp_XPathLocator">Element XPath</span></td>\
             </tr>\
             <tr>\
               <td>Css:</td>\
-              <td><span id="SwdPR_PopUp_CssSelector">Element</span></td>\
+              <td><span id="SwdPR_PopUp_CssSelector">Element Css</span></td>\
             </tr>\
             <tr>\
               <td>Text:</td>\
-              <td><span id="SwdPR_PopUp_ElementTextContent">Element</span></td>\
+              <td><span id="SwdPR_PopUp_TextContent">Element Text</span></td>\
             </tr>\
             </table>\
         <input type="button" value="Add element" onclick="document.SWD_Page_Recorder.addElement()">\
