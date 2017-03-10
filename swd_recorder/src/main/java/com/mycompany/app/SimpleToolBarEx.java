@@ -510,34 +510,6 @@ public class SimpleToolBarEx {
 							"https://www.ryanair.com/ie/en/", By.cssSelector(
 									"#home div.specialofferswidget h3 > span:nth-child(1)"));
 					String name = elementData.get("ElementCodeName");
-
-					/*
-					Button button = new Button(composite, SWT.PUSH | SWT.BORDER);
-					button.setText(
-							String.format("Step %d: %s", (int) (step_index + 1), name));
-					button.setData("origin", elementData);
-					button.setData("text",
-							String.format("Step %d: %s", (int) (step_index + 1), name));
-					
-					button.addListener(SWT.Selection, new Listener() {
-						@Override
-						public void handleEvent(Event event) {
-							Object into = event.widget.getData("origin");
-							String text = (String) event.widget.getData("text");
-							boolean answer = MessageDialog.openConfirm(shell,
-									button.getText(), String.format("Details of %s...", text));
-						}
-					});
-					
-					step_index++;
-					Control[] children = shell.getChildren();
-					if (children.length == 0) {
-						button.setParent(shell);
-					} else {
-						button.moveBelow(children[children.length - 1]);
-					}
-					shell.layout(new Control[] { button });
-					*/
 					addButton(name, elementData, composite);
 					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
 							true);
