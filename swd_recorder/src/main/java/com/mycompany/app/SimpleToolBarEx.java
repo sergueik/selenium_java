@@ -421,43 +421,6 @@ public class SimpleToolBarEx {
 					HashMap<String, String> elementData = addElement();
 					String name = elementData.get("ElementCodeName");
 
-					/*
-					String name = "";
-					HashMap<String, String> elementData = new HashMap<String, String>(); // empty
-					Boolean waitingForData = true;
-					status.setText("Waiting for data ...");
-					status.pack();
-					
-					while (waitingForData) {
-						String payload = executeScript(getCommand).toString();
-						if (!payload.isEmpty()) {
-							// objects cannot suicide
-							elementData = new HashMap<String, String>();
-							name = readVisualSearchResult(payload, Optional.of(elementData));
-							if (name == null || name.isEmpty()) {
-								System.err.println("Rejected visual search");
-							} else {
-								System.err.println(String
-										.format("Received element data of the step: '%s'", name));
-								waitingForData = false;
-								break;
-							}
-						}
-						if (waitingForData) {
-							try {
-								// TODO: add the code to
-								// check if waited long enough already
-								// test17
-								System.err.println("Waiting: ");
-								Thread.sleep(1000);
-							} catch (InterruptedException exception) {
-							}
-						}
-					}
-					// clear results on the page
-					flushVisualSearchResult();
-					closeVisualSearch();
-					*/
 					// 'paginate' the Breadcrump
 					Rectangle rect = bc.getBounds();
 					// System.err.println("Bound rect width: " + rect.width);
@@ -542,58 +505,15 @@ public class SimpleToolBarEx {
 					driver.manage().window()
 							.setPosition(new org.openqa.selenium.Point(600, 0));
 					driver.manage().window().setSize(new Dimension(width, height));
-					driver.get("https://www.ryanair.com/ie/en/");
-					wait.until(
-							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
-					injectElementSearch(Optional.<String> empty());
-					// NOTE: with FF the CONTROL mouse pointer appears to be misplaced
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException exception) {
-					}
-					WebElement element = wait.until(
-							ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-									"#home div.specialofferswidget h3 > span:nth-child(1)"))));
-					highlight(element);
-					executeScript(String.format("scroll(0, %d);", -100));
-
-					if (osName.startsWith("Mac")) {
-						// "Demo" functionality appears to be currently broken on Mac with
-						// not passing the Keys.COMMAND
-						try {
-							actions.keyDown(Keys.COMMAND).build().perform();
-							actions.moveToElement(element).contextClick().build().perform();
-							actions.keyUp(Keys.COMMAND).build().perform();
-						} catch (WebDriverException e) {
-							// TODO: print a message box
-							System.err.println("Ignoring exception: " + e.toString());
-						}
-					} else {
-						actions.keyDown(Keys.CONTROL).build().perform();
-						actions.moveToElement(element).contextClick().build().perform();
-						actions.keyUp(Keys.CONTROL).build().perform();
-					}
-
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-					}
-
-					completeVisualSearch("element name");
-					String payload = executeScript(getCommand).toString();
-					assertFalse(payload.isEmpty());
-					// String name = readVisualSearchResult(payload);
-
-					HashMap<String, String> data = new HashMap<String, String>();
-					String name = readVisualSearchResult(payload, Optional.of(data));
-
-					closeVisualSearch();
-					flushVisualSearchResult();
+					// TODO: debug timeoutException in closeVisualSearch
+					HashMap<String, String> elementData = demoAddElement(
+							"https://www.ryanair.com/ie/en/", By.cssSelector(
+									"#home div.specialofferswidget h3 > span:nth-child(1)"));
+					String name = elementData.get("ElementCodeName");
 					Button button = new Button(composite, SWT.PUSH | SWT.BORDER);
 					button.setText(
 							String.format("Step %d: %s", (int) (step_index + 1), name));
-					button.setData("origin", data);
+					button.setData("origin", elementData);
 					button.setData("text",
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 
@@ -731,6 +651,51 @@ public class SimpleToolBarEx {
 		flushVisualSearchResult();
 		closeVisualSearch();
 		return elementData;
+	}
+
+	private HashMap<String, String> demoAddElement(String URL, By by) {
+		driver.get(URL);
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
+		injectElementSearch(Optional.<String> empty());
+		// NOTE: with FF the CONTROL mouse pointer appears to be misplaced
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException exception) {
+		}
+		WebElement element = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
+		highlight(element);
+		if (osName.startsWith("Mac")) {
+			// "Demo" functionality appears to be currently broken on Mac with
+			// not passing the Keys.COMMAND
+			try {
+				actions.keyDown(Keys.COMMAND).build().perform();
+				actions.moveToElement(element).contextClick().build().perform();
+				actions.keyUp(Keys.COMMAND).build().perform();
+			} catch (WebDriverException e) {
+				// TODO: print a message box
+				System.err.println("Ignoring exception: " + e.toString());
+			}
+		} else {
+			actions.keyDown(Keys.CONTROL).build().perform();
+			actions.moveToElement(element).contextClick().build().perform();
+			actions.keyUp(Keys.CONTROL).build().perform();
+		}
+
+		executeScript(String.format("scroll(0, %d);", -400));
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+
+		completeVisualSearch("element name");
+		String payload = executeScript(getCommand).toString();
+		assertFalse(payload.isEmpty());
+		HashMap<String, String> data = new HashMap<String, String>();
+		String name = readVisualSearchResult(payload, Optional.of(data));
+		closeVisualSearch();
+		flushVisualSearchResult();
+		return data;
 	}
 
 	private void highlight(WebElement element) {
