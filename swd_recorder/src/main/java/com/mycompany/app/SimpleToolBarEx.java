@@ -140,6 +140,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.ExpandBar;
 import org.eclipse.swt.widgets.ExpandItem;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
@@ -305,12 +306,12 @@ public class SimpleToolBarEx {
 
 		status = new Label(shell, SWT.BORDER);
 		status.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		status.setText("Loading");
+		status.setText("Loading ...");
 		status.pack();
 		shell.pack();
 		launch_tool.addListener(SWT.Selection, event -> {
 			launch_tool.setEnabled(false);
-			status.setText("Launching browser");
+			status.setText("Launching the browser ...");
 			status.pack();
 			shell.pack();
 			if (osName.toLowerCase().startsWith("windows")) {
@@ -339,7 +340,7 @@ public class SimpleToolBarEx {
 			}
 			flowchart_tool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
-			status.setText("Ready");
+			status.setText("Ready ...");
 			status.pack();
 		});
 
@@ -362,15 +363,15 @@ public class SimpleToolBarEx {
 
 		});
 		// NOTE: ToolItem has no addMenuDetectListener
-    /*
+		/*
 		flowchart_tool.addMenuDetectListener(new MenuDetectListener() {
 			@Override
 			public void menuDetected(MenuDetectEvent event) {				
 				System.err.println("Context menu ");
 			}
-
+		
 		});
-    */
+		*/
 		open_tool.addListener(SWT.Selection, event -> {
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 			String[] filterNames = new String[] { "YAML sources", "All Files (*)" };
@@ -402,97 +403,31 @@ public class SimpleToolBarEx {
 		find_icon_tool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
-
 			}
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
+					find_icon_tool.setEnabled(false);
+					status.setText("Injecting the script ...");
+					status.pack();
+					wait = new WebDriverWait(driver, flexibleWait);
+					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+					actions = new Actions(driver);
+					injectElementSearch(Optional.<String> empty());
 
-					// Experimental - timing out on UI thread
-					long startTime = System.currentTimeMillis();
+					status.setText("Waiting for data ...");
+					status.pack();
+					HashMap<String, String> elementData = addElement();
+					String name = elementData.get("ElementCodeName");
 
-					long retryInterval = 1000;
-					long maxRetry = 300;
-					long checkRetryDelay = 0;
-					Boolean waitingForData = true;
-					HashMap<String, String> elementData = new HashMap<String, String>();
+					/*
 					String name = "";
-					find_icon_tool.setEnabled(false);
-					status.setText("Injecting the script");
+					HashMap<String, String> elementData = new HashMap<String, String>(); // empty
+					Boolean waitingForData = true;
+					status.setText("Waiting for data ...");
 					status.pack();
-					wait = new WebDriverWait(driver, flexibleWait);
-					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-					actions = new Actions(driver);
-					injectElementSearch(Optional.<String> empty());
-					if (true) {
-
-						while (waitingForData) {
-
-							String payload = executeScript(getCommand).toString();
-							if (!payload.isEmpty()) {
-								// objects cannot suicide
-								elementData = new HashMap<String, String>();
-								name = readVisualSearchResult(payload,
-										Optional.of(elementData));
-								if (name == null || name.isEmpty()) {
-									System.err.println("Rejected visual search");
-
-								} else {
-									System.err.println(String
-											.format("Received element data of the step: '%s'", name));
-									waitingForData = false;
-									break;
-								}
-							}
-
-							if (waitingForData) {
-								// check if waited long enough already
-								checkRetryDelay = System.currentTimeMillis() - startTime;
-								if (Math.ceil(checkRetryDelay / retryInterval) > maxRetry + 1) {
-									System.err.format("Result not present after %d second\n",
-											checkRetryDelay);
-									throw new RuntimeException();
-								}
-								try {
-									System.err.print(String.format("Sleep %4.2f sec ...",
-											Math.ceil(retryInterval / 1000)));
-									Thread.sleep(retryInterval);
-								} catch (InterruptedException e) {
-									System.err.println("Unexpected Interrupted Exception: "
-											+ e.getStackTrace().toString());
-									// TODO: gracefully enable
-									find_icon_tool.setEnabled(true);
-									throw new RuntimeException(e.toString());
-								}
-							}
-						}
-
-						long delaySecond = (checkRetryDelay / 1000) % 60;
-						long delayMinute = (checkRetryDelay / (1000 * 60)) % 60;
-						long delayHour = (checkRetryDelay / (1000 * 60 * 60)) % 24;
-						String delayTime = String.format("%02d:%02d:%02d", delayHour,
-								delayMinute, delaySecond);
-						System.err.format("Data was receiveed at %s\n", delayTime);
-						find_icon_tool.setEnabled(true);
-					}
-
-					// ====
-					find_icon_tool.setEnabled(false);
-					status.setText("Injecting the script");
-					status.pack();
-					wait = new WebDriverWait(driver, flexibleWait);
-					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-					actions = new Actions(driver);
-					injectElementSearch(Optional.<String> empty());
-					// String name = "";
-					name = "";
-					// HashMap<String, String> elementData = new HashMap<String,
-					// String>(); // empty
-					// Boolean waitingForData = true;
-					elementData = new HashMap<String, String>(); // empty
-					waitingForData = true;
-					status.setText("Waiting for data");
+					
 					while (waitingForData) {
 						String payload = executeScript(getCommand).toString();
 						if (!payload.isEmpty()) {
@@ -501,7 +436,6 @@ public class SimpleToolBarEx {
 							name = readVisualSearchResult(payload, Optional.of(elementData));
 							if (name == null || name.isEmpty()) {
 								System.err.println("Rejected visual search");
-
 							} else {
 								System.err.println(String
 										.format("Received element data of the step: '%s'", name));
@@ -523,6 +457,8 @@ public class SimpleToolBarEx {
 					// clear results on the page
 					flushVisualSearchResult();
 					closeVisualSearch();
+					*/
+					// 'paginate' the Breadcrump
 					Rectangle rect = bc.getBounds();
 					// System.err.println("Bound rect width: " + rect.width);
 					if (rect.width > 765) {
@@ -539,17 +475,17 @@ public class SimpleToolBarEx {
 							String.format("Step %d: %s", (int) (step_index + 1), name));
 					item.setImage(page_icon);
 					item.setSelectionImage(page_icon);
-          // NOTE: cannot cast from Breadcrump to Control
-          /*
-					((Control) item).addMenuDetectListener(new MenuDetectListener() {
+					item.addListener(SWT.MouseDown, new Listener() {
 						@Override
-						public void menuDetected(MenuDetectEvent event) {				
-							System.err.println("Context menu ");
+						public void handleEvent(Event event) {
+							System.err.println("MouseDown Button: " + event.button);
+							if (event.button == 3) {
+							}
 						}
 
 					});
-          */
-          item.addSelectionListener(new SelectionAdapter() {
+
+					item.addSelectionListener(new SelectionAdapter() {
 						@Override
 						public void widgetSelected(final SelectionEvent e) {
 							String commandId = e.item.getData("CommandId").toString();
@@ -579,14 +515,10 @@ public class SimpleToolBarEx {
 					});
 					step_index++;
 					shell.layout(true, true);
-					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
-							true);
-					if (newSize.x > 500) {
-						shell.setBounds(boundRect);
-					}
+
 					shell.pack();
 					find_icon_tool.setEnabled(true);
-					status.setText("Ready");
+					status.setText("Ready ...");
 					status.pack();
 					save_tool.setEnabled(true);
 				}
@@ -601,7 +533,7 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
-					status.setText("Running the demo");
+					status.setText("Running the demo ...");
 					status.pack();
 					demo_tool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
@@ -628,7 +560,7 @@ public class SimpleToolBarEx {
 
 					if (osName.startsWith("Mac")) {
 						// "Demo" functionality appears to be currently broken on Mac with
-						// Keys.COMMAND
+						// not passing the Keys.COMMAND
 						try {
 							actions.keyDown(Keys.COMMAND).build().perform();
 							actions.moveToElement(element).contextClick().build().perform();
@@ -689,7 +621,8 @@ public class SimpleToolBarEx {
 					if (newSize.x > 500) {
 						shell.setBounds(boundRect);
 					}
-					status.setText("Ready");
+					status.setText("Ready ...");
+					status.pack();
 					shell.pack();
 					demo_tool.setEnabled(true);
 				}
@@ -697,6 +630,8 @@ public class SimpleToolBarEx {
 		});
 
 		shutdown_tool.addListener(SWT.Selection, event -> {
+			status.setText("Shutting down ...");
+			status.pack();
 			if (driver != null) {
 				shutdown_tool.setEnabled(false);
 				try {
@@ -710,7 +645,7 @@ public class SimpleToolBarEx {
 			System.exit(0);
 		});
 
-		status.setText("Ready");
+		status.setText("Ready ...");
 		status.pack();
 		shell.pack();
 		shell.setText("Selenium WebDriver Eclipse Toolkit");
@@ -762,7 +697,44 @@ public class SimpleToolBarEx {
 		return collector.get("ElementCodeName");
 	}
 
+	private HashMap<String, String> addElement() {
+		HashMap<String, String> elementData = new HashMap<String, String>(); // empty
+		Boolean waitingForData = true;
+		String name = null;
+		while (waitingForData) {
+			String payload = executeScript(getCommand).toString();
+			if (!payload.isEmpty()) {
+				// objects cannot suicide
+				elementData = new HashMap<String, String>();
+				name = readVisualSearchResult(payload, Optional.of(elementData));
+				if (name == null || name.isEmpty()) {
+					System.err.println("Rejected unfinished visual search");
+				} else {
+					System.err.println(String
+							.format("Received element data of the element: '%s'", name));
+					waitingForData = false;
+					break;
+				}
+			}
+			if (waitingForData) {
+				try {
+					// TODO: add the code to
+					// check if waited long enough already
+					// test17
+					System.err.println("Waiting: ");
+					Thread.sleep(1000);
+				} catch (InterruptedException exception) {
+				}
+			}
+		}
+		// clear results on the page
+		flushVisualSearchResult();
+		closeVisualSearch();
+		return elementData;
+	}
+
 	private void highlight(WebElement element) {
+
 		highlight(element, 100);
 	}
 
