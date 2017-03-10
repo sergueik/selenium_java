@@ -419,66 +419,20 @@ public class SimpleToolBarEx {
 					status.setText("Waiting for data ...");
 					status.pack();
 					HashMap<String, String> elementData = addElement();
-					String name = elementData.get("ElementCodeName");
 
-					// 'paginate' the Breadcrump
+					// 'paginate' the breadcrump
 					Rectangle rect = bc.getBounds();
-					// System.err.println("Bound rect width: " + rect.width);
 					if (rect.width > 765) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
 					}
-					final BreadcrumbItem item = new BreadcrumbItem(bc,
-							SWT.CENTER | SWT.TOGGLE);
 					String commandId = elementData.get("CommandId");
+
 					testData.put(commandId, elementData);
 					stepKeys.add(commandId);
-					item.setData("CommandId", commandId);
-					item.setText(
-							String.format("Step %d: %s", (int) (step_index + 1), name));
-					item.setImage(page_icon);
-					item.setSelectionImage(page_icon);
-					item.addListener(SWT.MouseDown, new Listener() {
-						@Override
-						public void handleEvent(Event event) {
-							System.err.println("MouseDown Button: " + event.button);
-							if (event.button == 3) {
-							}
-						}
-
-					});
-
-					item.addSelectionListener(new SelectionAdapter() {
-						@Override
-						public void widgetSelected(final SelectionEvent e) {
-							String commandId = e.item.getData("CommandId").toString();
-							assertThat(stepKeys, hasItem(commandId));
-							assertTrue(testData.containsKey(commandId));
-							HashMap<String, String> elementData = testData.get(commandId);
-							System.err.println(
-									String.format("Clicked %s / %s", item.getText(), commandId));
-							shell.setData("CurrentCommandId", commandId);
-							shell.setData("updated", false);
-							ComplexFormEx cs = new ComplexFormEx(Display.getCurrent(), shell);
-							for (String key : elementData.keySet()) {
-								// System.err.println(key + ": " + elementData.get(key));
-								cs.setData(key, elementData.get(key));
-							}
-							cs.render();
-							if ((Boolean) shell.getData("updated")) {
-
-								System.err.println("After editing " + shell.getData("result"));
-								HashMap<String, String> data = new HashMap<String, String>();
-								String name = readVisualSearchResult(
-										(String) shell.getData("result"), Optional.of(data));
-								testData.replace(commandId, data);
-
-							}
-						}
-					});
-					step_index++;
+					addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
+							elementData, bc);
 					shell.layout(true, true);
-
 					shell.pack();
 					find_icon_tool.setEnabled(true);
 					status.setText("Ready ...");
@@ -674,7 +628,6 @@ public class SimpleToolBarEx {
 	}
 
 	private void highlight(WebElement element) {
-
 		highlight(element, 100);
 	}
 
@@ -781,6 +734,62 @@ public class SimpleToolBarEx {
 				System.getProperty("user.dir"), resourceFileName);
 	}
 
+	// adds a bredCrump item to BreadCrump canvas with attached Shell / Form for
+	// editing
+	private void addBreadCrumpItem(String name, String commandId,
+			HashMap<String, String> data, Breadcrumb bc) {
+		Rectangle rect = bc.getBounds();
+		// System.err.println("Bound rect width: " + rect.width);
+		final BreadcrumbItem item = new BreadcrumbItem(bc, SWT.CENTER | SWT.TOGGLE);
+		item.setData("CommandId", commandId);
+		item.setText(String.format("Step %d: %s", (int) (step_index + 1), name));
+		item.setImage(page_icon);
+		item.setSelectionImage(page_icon);
+
+		// NOTE: MouseDown event is not received
+		item.addListener(SWT.MouseDown, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				System.err.println("MouseDown Button: " + event.button);
+				if (event.button == 3) {
+				}
+			}
+
+		});
+
+		item.addSelectionListener(new SelectionAdapter() {
+			@Override
+			public void widgetSelected(final SelectionEvent e) {
+				String commandId = e.item.getData("CommandId").toString();
+				assertThat(stepKeys, hasItem(commandId));
+				assertTrue(testData.containsKey(commandId));
+				HashMap<String, String> elementData = testData.get(commandId);
+				System.err.println(
+						String.format("Clicked %s / %s", item.getText(), commandId));
+				shell.setData("CurrentCommandId", commandId);
+				shell.setData("updated", false);
+				// spawn a separate shell for editing the element attributes
+				ComplexFormEx cs = new ComplexFormEx(Display.getCurrent(), shell);
+				for (String key : elementData.keySet()) {
+					// System.err.println(key + ": " + elementData.get(key));
+					cs.setData(key, elementData.get(key));
+				}
+				cs.render();
+				if ((Boolean) shell.getData("updated")) {
+
+					System.err.println("After editing " + shell.getData("result"));
+					HashMap<String, String> data = new HashMap<String, String>();
+					String name = readVisualSearchResult((String) shell.getData("result"),
+							Optional.of(data));
+					testData.replace(commandId, data);
+
+				}
+			}
+		});
+		step_index++;
+	}
+
+	// Adds a button with attached dialog
 	private void addButton(String name, HashMap<String, String> data,
 			Composite composite) {
 
