@@ -7,9 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
 import org.eclipse.swt.events.MenuDetectListener;
@@ -30,6 +27,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 // based on:
 // http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ComplexShellExample.htm
@@ -57,7 +57,7 @@ public class ComplexFormEx {
 		} else {
 			// System.err.println("No parent shell");
 		}
-		readData(Optional.of(elementData));
+		new Utils().readData(Optional.of(elementData));
 		if (!elementData.containsKey("ElementSelectedBy")) {
 			elementData.put("ElementSelectedBy", "none");
 		}
@@ -115,7 +115,7 @@ public class ComplexFormEx {
 
 	private static class RowComposite extends Composite {
 
-		final Button buttonOK;
+		final Button buttonSave;
 		final Button buttonCancel;
 
 		public RowComposite(Composite composite) {
@@ -125,30 +125,13 @@ public class ComplexFormEx {
 			rl.wrap = false;
 			rl.pack = false;
 			this.setLayout(rl);
-			buttonOK = new Button(this, SWT.BORDER | SWT.PUSH);
-			buttonOK.setText("OK");
-			buttonOK.setSize(30, 20);
-			buttonCancel = new Button(this, SWT.PUSH);
-			buttonCancel.setText("Cancel");
-			buttonCancel.setSize(30, 20);
-			buttonCancel.addSelectionListener(new SelectionAdapter() {
-				public void widgetSelected(SelectionEvent event) {
-					composite.dispose();
-				}
-			});
-
-			// context menu
-			buttonCancel.addMenuDetectListener(new MenuDetectListener() {
-				@Override
-				public void menuDetected(MenuDetectEvent event) {
-					System.err.println("Context menu ");
-				}
-
-			});
-
-			buttonOK.addListener(SWT.Selection, new Listener() {
+			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
+			buttonSave.setText("Save");
+			buttonSave.setSize(30, 20);
+			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
+					// TODO: move to Utils
 					JSONObject json = new JSONObject();
 					try {
 						for (String key : elementData.keySet()) {
@@ -169,7 +152,24 @@ public class ComplexFormEx {
 					composite.dispose();
 				}
 			});
+			buttonCancel = new Button(this, SWT.PUSH);
+			buttonCancel.setText("Cancel");
+			buttonCancel.setSize(30, 20);
 
+			buttonCancel.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					composite.dispose();
+				}
+			});
+
+			// context menu
+			buttonCancel.addMenuDetectListener(new MenuDetectListener() {
+				@Override
+				public void menuDetected(MenuDetectEvent event) {
+					System.err.println("Context menu ");
+				}
+
+			});
 		}
 	}
 
@@ -285,30 +285,6 @@ public class ComplexFormEx {
 			}
 
 		}
-	}
-
-	public String readData(Optional<HashMap<String, String>> parameters) {
-
-		Boolean collectResults = parameters.isPresent();
-		HashMap<String, String> collector = (collectResults) ? parameters.get()
-				: new HashMap<String, String>();
-		String data = "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"\", \"ElementXPath\": \"/html//img[1]\" }";
-		try {
-			JSONObject elementObj = new JSONObject(data);
-			@SuppressWarnings("unchecked")
-			Iterator<String> propIterator = elementObj.keys();
-			while (propIterator.hasNext()) {
-				String propertyKey = propIterator.next();
-
-				String propertyVal = elementObj.getString(propertyKey);
-				System.err.println(propertyKey + ": " + propertyVal);
-				collector.put(propertyKey, propertyVal);
-			}
-		} catch (JSONException e) {
-			System.err.println("Ignored exception: " + e.toString());
-			return null;
-		}
-		return collector.get("ElementCodeName");
 	}
 
 	public void setData(String key, String value) {

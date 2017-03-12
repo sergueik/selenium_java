@@ -685,6 +685,7 @@ public class SimpleToolBarEx {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
 			// IE: org.openqa.selenium.NoSuchWindowException
+      // Chrome: Exception in thread "main" org.openqa.selenium.WebDriverException: disconnected: not connected to DevTools
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
@@ -748,9 +749,11 @@ public class SimpleToolBarEx {
 				cs.render();
 				if ((Boolean) shell.getData("updated")) {
 
-					System.err.println("After editing " + shell.getData("result"));
+					// System.err.println("After editing " + shell.getData("result"));
 					HashMap<String, String> data = new HashMap<String, String>();
-					String name = readVisualSearchResult((String) shell.getData("result"),
+					// result - JSON of modified element attributes
+					// or an empty JSON when element is deleted,
+					String name = new Utils().readData((String) shell.getData("result"),
 							Optional.of(data));
 					testData.replace(commandId, data);
 
