@@ -158,6 +158,8 @@ import org.mihalis.opal.breadcrumb.*;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+import com.mycompany.app.Utils;
+
 public class SimpleToolBarEx {
 
 	private Shell shell;
@@ -218,15 +220,15 @@ public class SimpleToolBarEx {
 
 		try {
 
-			launch_icon = new Image(dev, getResourcePath("launch.png"));
-			find_icon = new Image(dev, getResourcePath("find.png"));
-			preferences_icon = new Image(dev, getResourcePath("preferences.png"));
-			shutdown_icon = new Image(dev, getResourcePath("quit.png"));
-			demo_icon = new Image(dev, getResourcePath("demo.png"));
-			page_icon = new Image(dev, getResourcePath("page.png"));
-			flowchart_icon = new Image(dev, getResourcePath("flowchart.png"));
-			open_icon = new Image(dev, getResourcePath("open.png"));
-			save_icon = new Image(dev, getResourcePath("save.png"));
+			launch_icon = new Image(dev, new Utils().getResourcePath("launch.png"));
+			find_icon = new Image(dev, new Utils().getResourcePath("find.png"));
+			preferences_icon = new Image(dev, new Utils().getResourcePath("preferences.png"));
+			shutdown_icon = new Image(dev, new Utils().getResourcePath("quit.png"));
+			demo_icon = new Image(dev, new Utils().getResourcePath("demo.png"));
+			page_icon = new Image(dev, new Utils().getResourcePath("page.png"));
+			flowchart_icon = new Image(dev, new Utils().getResourcePath("flowchart.png"));
+			open_icon = new Image(dev, new Utils().getResourcePath("open.png"));
+			save_icon = new Image(dev, new Utils().getResourcePath("save.png"));
 
 		} catch (Exception e) {
 
@@ -691,7 +693,7 @@ public class SimpleToolBarEx {
 
 	private void injectElementSearch(Optional<String> script) {
 		ArrayList<String> scripts = new ArrayList<String>(
-				Arrays.asList(getScriptContent("ElementSearch.js")));
+				Arrays.asList(new Utils().getScriptContent("ElementSearch.js")));
 		if (script.isPresent()) {
 			scripts.add(script.get());
 		}
@@ -701,37 +703,6 @@ public class SimpleToolBarEx {
 						String.format("Adding the script: %s...", s.substring(0, 100)));
 			executeScript(s);
 		}
-	}
-
-	private String getScriptContent(String scriptName) {
-		System.err.println("Getting script content: " + scriptName);
-		try {
-			final InputStream stream = this.getClass().getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
-	}
-
-	// getResourceURI does not work well with standalone app.
-	private String getResourceURI(String resourceFileName) {
-		try {
-			URI uri = this.getClass().getClassLoader().getResource(resourceFileName)
-					.toURI();
-			System.err.println(String.format("Getting URI to %s : %s",
-					resourceFileName, uri.toString()));
-			return uri.toString();
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private String getResourcePath(String resourceFileName) {
-		return String.format("%s/src/main/resources/%s",
-				System.getProperty("user.dir"), resourceFileName);
 	}
 
 	// adds a bredCrump item to BreadCrump canvas with attached Shell / Form for

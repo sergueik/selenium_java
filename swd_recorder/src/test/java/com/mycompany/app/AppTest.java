@@ -90,7 +90,9 @@ import org.json.JSONObject;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+
 import com.mycompany.app.BrowserDriver;
+import com.mycompany.app.Utils;
 
 public class AppTest {
 
@@ -150,10 +152,9 @@ public class AppTest {
 	@Test
 	public void testWebPageElementSearch() {
 		driver.get("https://www.codeproject.com/");
-		WebElement element = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"img[src *= 'post_an_article.png']"))));
-		injectKeyMaster(Optional.of(getScriptContent("ElementSearch.js")));
+		WebElement element = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector("img[src *= 'post_an_article.png']"))));
+		injectKeyMaster(Optional.<String> empty());
 		highlight(element);
 		// Assert
 		if (osName.startsWith("Mac")) {
@@ -187,7 +188,8 @@ public class AppTest {
 	// @Ignore
 	@Test
 	public void testStatic() {
-		driver.get(getPageContent("ElementSearch.html"));
+		driver.get(new Utils().getPageContent("ElementSearch.html"));
+		injectKeyMaster(Optional.<String> empty());
 		// Unsupported URL protocol:
 		// file:///Users/sergueik/dev/selenium_java/swd_recorder/target/test-classes/ElementSearch.html
 		WebElement element = wait.until(
@@ -225,7 +227,7 @@ public class AppTest {
 		config.browserConfiguration = browserConfiguration;
 		config.updated = new Date();
 		HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
-    String commandId = elementData.get("CommandId");
+		String commandId = elementData.get("CommandId");
 		testData.put(commandId, elementData);
 		config.elements = testData;
 
@@ -274,8 +276,8 @@ public class AppTest {
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
-		WebElement swdControl = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.id("SwdPR_PopUp"))));
+		WebElement swdControl = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("SwdPR_PopUp"))));
 		assertThat(swdControl, notNullValue());
 
 		// System.err.println("Swd Control:" +
@@ -288,18 +290,16 @@ public class AppTest {
 				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
 						By.xpath("//input[@type='button'][@value='Add element']"))));
 		assertThat(swdAddElementButton, notNullValue());
-    
-    // html body div#SwdPR_PopUp input
+
+		// html body div#SwdPR_PopUp input
 		highlight(swdAddElementButton);
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
 		}
-    
 		// Act
 		swdAddElementButton.click();
 	}
-
 
 	private void closeVisualSearch() {
 		WebElement swdControl = wait.until(
@@ -325,7 +325,7 @@ public class AppTest {
 
 	private void injectKeyMaster(Optional<String> script) {
 		ArrayList<String> scripts = new ArrayList<String>(
-				Arrays.asList(getScriptContent("ElementSearch.js")));
+				Arrays.asList(new Utils().getScriptContent("ElementSearch.js")));
 		if (script.isPresent()) {
 			scripts.add(script.get());
 		}
@@ -339,7 +339,7 @@ public class AppTest {
 		highlight(element, 100);
 	}
 
-  // http://stackoverflow.com/questions/11010569/highlight-a-dom-element-on-mouse-over-like-inspect-does
+	// http://stackoverflow.com/questions/11010569/highlight-a-dom-element-on-mouse-over-like-inspect-does
 	private void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -359,27 +359,5 @@ public class AppTest {
 		// http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
 		String script = "var element = arguments[0];var text = element.innerText || element.textContent || ''; return text;";
 		return (String) executeScript(script, element);
-	}
-
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = AppTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
-	}
-
-	protected static String getPageContent(String pagename) {
-		try {
-			URI uri = AppTest.class.getClassLoader().getResource(pagename).toURI();
-			System.err.println("Testing: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
-		}
 	}
 }
