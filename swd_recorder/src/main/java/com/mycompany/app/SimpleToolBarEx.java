@@ -222,11 +222,13 @@ public class SimpleToolBarEx {
 
 			launch_icon = new Image(dev, new Utils().getResourcePath("launch.png"));
 			find_icon = new Image(dev, new Utils().getResourcePath("find.png"));
-			preferences_icon = new Image(dev, new Utils().getResourcePath("preferences.png"));
+			preferences_icon = new Image(dev,
+					new Utils().getResourcePath("preferences.png"));
 			shutdown_icon = new Image(dev, new Utils().getResourcePath("quit.png"));
 			demo_icon = new Image(dev, new Utils().getResourcePath("demo.png"));
 			page_icon = new Image(dev, new Utils().getResourcePath("page.png"));
-			flowchart_icon = new Image(dev, new Utils().getResourcePath("flowchart.png"));
+			flowchart_icon = new Image(dev,
+					new Utils().getResourcePath("flowchart.png"));
 			open_icon = new Image(dev, new Utils().getResourcePath("open.png"));
 			save_icon = new Image(dev, new Utils().getResourcePath("save.png"));
 
@@ -685,7 +687,9 @@ public class SimpleToolBarEx {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
 			// IE: org.openqa.selenium.NoSuchWindowException
-      // Chrome: Exception in thread "main" org.openqa.selenium.WebDriverException: disconnected: not connected to DevTools
+			// Chrome: Exception in thread "main"
+			// org.openqa.selenium.WebDriverException: disconnected: not connected to
+			// DevTools
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
@@ -751,12 +755,18 @@ public class SimpleToolBarEx {
 
 					// System.err.println("After editing " + shell.getData("result"));
 					HashMap<String, String> data = new HashMap<String, String>();
-					// result - JSON of modified element attributes
-					// or an empty JSON when element is deleted,
+					// JSON of modified element attributes
 					String name = new Utils().readData((String) shell.getData("result"),
 							Optional.of(data));
-					testData.replace(commandId, data);
-
+					if (name != null) {
+						testData.replace(commandId, data);
+					// or an empty JSON when element is deleted,
+					} else {
+            // Clear test data
+						testData.remove(commandId);
+						// Remove item
+						bc.removeItem(item);
+					}
 				}
 			}
 		});

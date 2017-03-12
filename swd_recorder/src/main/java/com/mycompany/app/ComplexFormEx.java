@@ -116,6 +116,7 @@ public class ComplexFormEx {
 	private static class RowComposite extends Composite {
 
 		final Button buttonSave;
+		final Button buttonDelete;
 		final Button buttonCancel;
 
 		public RowComposite(Composite composite) {
@@ -127,7 +128,20 @@ public class ComplexFormEx {
 			this.setLayout(rl);
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
-			buttonSave.setSize(30, 20);
+			buttonSave.setSize(36, 24);
+			buttonDelete = new Button(this, SWT.PUSH);
+			buttonDelete.setText("Delete");
+			buttonDelete.setSize(36, 24);
+			buttonDelete.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					if (parentShell != null) {
+						parentShell.setData("result", "{}");
+						parentShell.setData("updated", true);
+					}
+					composite.dispose();
+				}
+			});
+
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
@@ -152,9 +166,10 @@ public class ComplexFormEx {
 					composite.dispose();
 				}
 			});
+
 			buttonCancel = new Button(this, SWT.PUSH);
 			buttonCancel.setText("Cancel");
-			buttonCancel.setSize(30, 20);
+			buttonCancel.setSize(36, 24);
 
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
@@ -170,6 +185,7 @@ public class ComplexFormEx {
 				}
 
 			});
+
 		}
 	}
 
@@ -295,5 +311,4 @@ public class ComplexFormEx {
 		ComplexFormEx o = new ComplexFormEx(null, null);
 		o.render();
 	}
-
 }
