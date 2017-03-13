@@ -737,7 +737,7 @@ public class SimpleToolBarEx {
 				cs.render();
 				if ((Boolean) shell.getData("updated")) {
 					HashMap<String, String> data = new HashMap<String, String>();
-					// JSON of modified element attributes
+					// form sets result to the modified element attributes JSON
 					String name = new Utils().readData((String) shell.getData("result"),
 							Optional.of(data));
 					if (name != null) {
@@ -746,8 +746,8 @@ public class SimpleToolBarEx {
 					} else {
 						// Clear test data
 						testData.remove(commandId);
-						// Remove item
-						bc.removeItem(item);
+						// Remove the current item
+						item.getParent().removeItem(item);
 					}
 				}
 			}
