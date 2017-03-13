@@ -526,28 +526,12 @@ public class SimpleToolBarEx {
 		Boolean collectResults = parameters.isPresent();
 		HashMap<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
-		try {
-			JSONObject payloadObj = new JSONObject(payload);
-			Iterator<String> payloadKeyIterator = payloadObj.keys();
-			while (payloadKeyIterator.hasNext()) {
-
-				String itemKey = payloadKeyIterator.next();
-				String itemVal = payloadObj.getString(itemKey);
-				collector.put(itemKey, itemVal);
-				/*
-				 * JSONArray dataArray = resultObj.getJSONArray(key); for (int cnt = 0;
-				 * cnt < dataArray.length(); cnt++) { System.err.println(key + " " +
-				 * dataArray.get(cnt)); }
-				 */
-			}
-		} catch (JSONException e) {
-
-		}
+		String result = new Utils().readData(payload, Optional.of(collector));
 		assertTrue(collector.containsKey("ElementId"));
 		// NOTE: elementCodeName will not be set if
 		// user clicked the SWD Table Close Button
 		// ElementId is always set
-		return collector.get("ElementCodeName");
+		return result;
 	}
 
 	private HashMap<String, String> addElement() {
@@ -752,17 +736,15 @@ public class SimpleToolBarEx {
 				}
 				cs.render();
 				if ((Boolean) shell.getData("updated")) {
-
-					// System.err.println("After editing " + shell.getData("result"));
 					HashMap<String, String> data = new HashMap<String, String>();
 					// JSON of modified element attributes
 					String name = new Utils().readData((String) shell.getData("result"),
 							Optional.of(data));
 					if (name != null) {
 						testData.replace(commandId, data);
-					// or an empty JSON when element is deleted,
+						// or an empty JSON when element is deleted,
 					} else {
-            // Clear test data
+						// Clear test data
 						testData.remove(commandId);
 						// Remove item
 						bc.removeItem(item);
