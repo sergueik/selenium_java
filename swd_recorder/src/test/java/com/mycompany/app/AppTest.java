@@ -256,23 +256,12 @@ public class AppTest {
 		Boolean collectResults = parameters.isPresent();
 		HashMap<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
-		try {
-			JSONObject payloadObj = new JSONObject(payload);
-			Iterator<String> payloadKeyIterator = payloadObj.keys();
-			while (payloadKeyIterator.hasNext()) {
-
-				String itemKey = payloadKeyIterator.next();
-				String itemVal = payloadObj.getString(itemKey);
-				collector.put(itemKey, itemVal);
-			}
-		} catch (JSONException e) {
-
-		}
-		assertTrue(collector.containsKey("CommandId"));
-		// NOTE: elementCodeName will not be set when
+		String result = new Utils().readData(payload, Optional.of(collector));
+		assertTrue(collector.containsKey("ElementId"));
+		// NOTE: elementCodeName will not be set if
 		// user clicked the SWD Table Close Button
 		// ElementId is always set
-		return collector.get("ElementCodeName");
+		return result;
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
