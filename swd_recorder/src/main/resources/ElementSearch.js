@@ -406,10 +406,10 @@
         'Caller': 'addElement',
         'CommandId': pseudoGuid(),
         'ElementCodeName': codeIDTextElement.value,
-        'ElementId': (htmlIdElement.hasChildNodes())?htmlIdElement.firstChild.nodeValue:'',
-        'ElementCssSelector': cssSelectorElement.firstChild.nodeValue,
-        'ElementXPath': xPathLocatorElement.firstChild.nodeValue,
-        'ElementText': elementTextElement.firstChild.nodeValue,
+        'ElementId': (htmlIdElement.hasChildNodes()) ? htmlIdElement.firstChild.nodeValue:'',
+        'ElementCssSelector': (cssSelectorElement.hasChildNodes())?cssSelectorElement.firstChild.nodeValue : '',
+        'ElementXPath': (xPathLocatorElement.hasChildNodes())? xPathLocatorElement.firstChild.nodeValue : '',
+        'ElementText': (elementTextElement.hasChildNodes())? elementTextElement.firstChild.nodeValue: '',
       };
       createCommand(JsonData);
       return bye('addElement ' + codeIDTextElement.value + '>');
