@@ -356,26 +356,6 @@ public class SimpleToolBarEx {
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
 		});
 
-		// TODO: SWT.MouseDown not reached
-		flowchart_tool.addListener(SWT.MouseDown, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				System.err.println("Button: " + event.button);
-				if (event.button == 3) {
-				}
-			}
-
-		});
-		// NOTE: ToolItem has no addMenuDetectListener
-		/*
-		flowchart_tool.addMenuDetectListener(new MenuDetectListener() {
-			@Override
-			public void menuDetected(MenuDetectEvent event) {				
-				System.err.println("Context menu ");
-			}
-		
-		});
-		*/
 		open_tool.addListener(SWT.Selection, event -> {
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 			String[] filterNames = new String[] { "YAML sources", "All Files (*)" };
@@ -397,6 +377,10 @@ public class SimpleToolBarEx {
 			dialog.setFileName(configFilePath);
 			String path = dialog.open();
 			System.out.println("Save to: " + path);
+      if (config == null) {
+        config = new Configuration();
+      }
+      config.setelements(testData);
 			YamlHelper.saveConfiguration(config, path);
 		});
 
@@ -425,8 +409,7 @@ public class SimpleToolBarEx {
 					HashMap<String, String> elementData = addElement();
 
 					// 'paginate' the breadcrump
-					Rectangle rect = bc.getBounds();
-					if (rect.width > 765) {
+					if (bc.getBounds().width > 765) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
 					}
@@ -516,10 +499,6 @@ public class SimpleToolBarEx {
 				Optional.<HashMap<String, String>> empty());
 	}
 
-	private void flushVisualSearchResult() {
-		executeScript("document.swdpr_command = undefined;");
-	}
-
 	private String readVisualSearchResult(final String payload,
 			Optional<HashMap<String, String>> parameters) {
 		System.err.println("Processing payload: " + payload);
@@ -534,7 +513,16 @@ public class SimpleToolBarEx {
 		return result;
 	}
 
+	private void flushVisualSearchResult() {
+		executeScript("document.swdpr_command = undefined;");
+	}
+
+	private String getCurrentUrl() {
+		return driver.getCurrentUrl();
+	}
+
 	private HashMap<String, String> addElement() {
+
 		HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 		Boolean waitingForData = true;
 		String name = null;
@@ -549,6 +537,7 @@ public class SimpleToolBarEx {
 				} else {
 					System.err.println(String
 							.format("Received element data of the element: '%s'", name));
+					elementData.put("ElementPageURL", getCurrentUrl());
 					waitingForData = false;
 					break;
 				}

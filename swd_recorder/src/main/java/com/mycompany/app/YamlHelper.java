@@ -82,7 +82,7 @@ public class YamlHelper {
 		calendar = new GregorianCalendar();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				((SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT,
-						Locale.US)).toPattern().replaceAll("\\byy\\b", "yyyy"));
+						Locale.US)).toPattern().replaceAll("\\byy\\b", "yyyy").replaceAll("\\bM\\b", "MM").replaceAll("\\bd\\b", "dd"));
 		System.err.println("Testing date format: " + dateFormat.toPattern());
 
 		try {
