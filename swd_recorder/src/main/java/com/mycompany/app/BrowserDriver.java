@@ -161,7 +161,9 @@ public class BrowserDriver {
 	}
 
 	// https://sites.google.com/a/chromium.org/chromedriver/capabilities
-  // http://peter.sh/experiments/chromium-command-line-switches/
+	// http://peter.sh/experiments/chromium-command-line-switches/
+	// https://developer.chrome.com/extensions/contentSettings
+	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.chrome.ChromeOptions
 	private static DesiredCapabilities capabilitiesChrome() {
 		System.setProperty("webdriver.chrome.driver",
 				(new File(chromeDriverPath)).getAbsolutePath());
@@ -179,6 +181,7 @@ public class BrowserDriver {
 		options.addArguments("allow-running-insecure-content");
 		options.addArguments("allow-insecure-localhost");
 		options.addArguments("enable-local-file-accesses");
+		options.addArguments("disable-notifications");
 		// options.addArguments("start-maximized");
 		options.addArguments("browser.download.folderList=2");
 		options.addArguments(

@@ -365,7 +365,33 @@ public class SimpleToolBarEx {
 			configFilePath = dialog.open();
 			System.err.println("Loading " + configFilePath);
 			config = YamlHelper.loadConfiguration(configFilePath);
+			testData = config.getElements();
+			Iterator<String> testDataKeys = testData.keySet().iterator();
+			String stepId;
+			while (testDataKeys.hasNext()) {
+				stepId = testDataKeys.next();
+				HashMap<String, String> elementData = testData.get(stepId);
+				// 'paginate' the breadcrump
+				if (bc.getBounds().width > 765) {
+					Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
+					bc = bc2;
+				}
+				String commandId = elementData.get("CommandId");
+
+				stepKeys.add(commandId);
+				addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
+						elementData, bc);
+				shell.layout(true, true);
+				shell.pack();
+
+			}
 			YamlHelper.printConfiguration(config);
+			shell.layout(true, true);
+			shell.pack();
+			open_tool.setEnabled(true);
+			status.setText("Ready ...");
+			status.pack();
+			save_tool.setEnabled(true);
 		});
 
 		save_tool.addListener(SWT.Selection, event -> {
@@ -377,10 +403,10 @@ public class SimpleToolBarEx {
 			dialog.setFileName(configFilePath);
 			String path = dialog.open();
 			System.out.println("Save to: " + path);
-      if (config == null) {
-        config = new Configuration();
-      }
-      config.setelements(testData);
+			if (config == null) {
+				config = new Configuration();
+			}
+			config.setElements(testData);
 			YamlHelper.saveConfiguration(config, path);
 		});
 

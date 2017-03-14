@@ -73,11 +73,11 @@ final class Configuration {
 		this.plugins = data;
 	}
 
-	public HashMap<String, HashMap<String, String>> getelements() {
+	public HashMap<String, HashMap<String, String>> getElements() {
 		return elements;
 	}
 
-	public void setelements(HashMap<String, HashMap<String, String>> data) {
+	public void setElements(HashMap<String, HashMap<String, String>> data) {
 		this.elements = data;
 	}
 
