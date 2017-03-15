@@ -368,10 +368,15 @@ public class SimpleToolBarEx {
 				System.err.println("Loading " + configFilePath);
 				config = YamlHelper.loadConfiguration(configFilePath);
 				testData = config.getElements();
-				Iterator<String> testDataKeys = testData.keySet().iterator();
-				String stepId;
-				while (testDataKeys.hasNext()) {
-					stepId = testDataKeys.next();
+
+				Map<String, Integer> elementSteps = testData.keySet().stream()
+						.collect(Collectors.toMap(o -> o, o -> Integer
+								.parseInt(testData.get(o).get("ElementStepNumber"))));
+				LinkedHashMap<String, Integer> sortedElementSteps = sortByValue(
+						elementSteps);
+				for (String stepId : sortedElementSteps.keySet()) {
+					System.out.println(String.format("Drawing step %d (%s)",
+							sortedElementSteps.get(stepId), stepId));
 					HashMap<String, String> elementData = testData.get(stepId);
 					// 'paginate' the breadcrump
 					if (bc.getBounds().width > 765) {
@@ -379,15 +384,13 @@ public class SimpleToolBarEx {
 						bc = bc2;
 					}
 					String commandId = elementData.get("CommandId");
-
 					stepKeys.add(commandId);
 					addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
 							elementData, bc);
 					shell.layout(true, true);
 					shell.pack();
-
 				}
-				YamlHelper.printConfiguration(config);
+				// YamlHelper.printConfiguration(config);
 				shell.layout(true, true);
 				shell.pack();
 				save_tool.setEnabled(true);
@@ -412,24 +415,15 @@ public class SimpleToolBarEx {
 					config = new Configuration();
 				}
 				config.setElements(testData);
-				// Will save unsorted, sort when generating script, drawing buttons etc.
-				Map<String, Integer> elementSteps = testData.keySet().stream()
-						.collect(Collectors.toMap(o -> o, o -> Integer
-								.parseInt(testData.get(o).get("ElementStepNumber"))));
-				LinkedHashMap<String, Integer> sortedElementSteps = sortByValue(
-						elementSteps);
-				for (String key : sortedElementSteps.keySet()) {
-					System.out.println(key + ":\t" + sortedElementSteps.get(key));
-				}
-
+				// Save unordered, order by step index when generating script, drawing
+				// buttons etc.
 				YamlHelper.saveConfiguration(config, path);
 			} else {
 				configFilePath = new String(path);
 			}
 		});
-
 		preferences_tool.addListener(SWT.Selection, event -> {
-
+			// TODO
 		});
 
 		find_icon_tool.addSelectionListener(new SelectionListener() {
@@ -572,7 +566,7 @@ public class SimpleToolBarEx {
 	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortByValue(
 			Map<K, V> map) {
 		return map.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.sorted(Map.Entry.comparingByValue())
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
 	}
