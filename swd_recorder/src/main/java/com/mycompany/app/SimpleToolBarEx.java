@@ -363,35 +363,38 @@ public class SimpleToolBarEx {
 			dialog.setFilterNames(filterNames);
 			dialog.setFilterExtensions(filterExtensions);
 			configFilePath = dialog.open();
-			System.err.println("Loading " + configFilePath);
-			config = YamlHelper.loadConfiguration(configFilePath);
-			testData = config.getElements();
-			Iterator<String> testDataKeys = testData.keySet().iterator();
-			String stepId;
-			while (testDataKeys.hasNext()) {
-				stepId = testDataKeys.next();
-				HashMap<String, String> elementData = testData.get(stepId);
-				// 'paginate' the breadcrump
-				if (bc.getBounds().width > 765) {
-					Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
-					bc = bc2;
-				}
-				String commandId = elementData.get("CommandId");
+			if (configFilePath != null) {
 
-				stepKeys.add(commandId);
-				addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
-						elementData, bc);
+				System.err.println("Loading " + configFilePath);
+				config = YamlHelper.loadConfiguration(configFilePath);
+				testData = config.getElements();
+				Iterator<String> testDataKeys = testData.keySet().iterator();
+				String stepId;
+				while (testDataKeys.hasNext()) {
+					stepId = testDataKeys.next();
+					HashMap<String, String> elementData = testData.get(stepId);
+					// 'paginate' the breadcrump
+					if (bc.getBounds().width > 765) {
+						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
+						bc = bc2;
+					}
+					String commandId = elementData.get("CommandId");
+
+					stepKeys.add(commandId);
+					addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
+							elementData, bc);
+					shell.layout(true, true);
+					shell.pack();
+
+				}
+				YamlHelper.printConfiguration(config);
 				shell.layout(true, true);
 				shell.pack();
-
+				save_tool.setEnabled(true);
 			}
-			YamlHelper.printConfiguration(config);
-			shell.layout(true, true);
-			shell.pack();
 			open_tool.setEnabled(true);
 			status.setText("Ready ...");
 			status.pack();
-			save_tool.setEnabled(true);
 		});
 
 		save_tool.addListener(SWT.Selection, event -> {
@@ -401,13 +404,28 @@ public class SimpleToolBarEx {
 			String homeDir = System.getProperty("user.home");
 			dialog.setFilterPath(homeDir); // Windows path
 			dialog.setFileName(configFilePath);
-			String path = dialog.open();
-			System.out.println("Save to: " + path);
-			if (config == null) {
-				config = new Configuration();
+			String path = new String(configFilePath);
+			configFilePath = dialog.open();
+			if (configFilePath != null) {
+				System.out.println("Save to: " + configFilePath);
+				if (config == null) {
+					config = new Configuration();
+				}
+				config.setElements(testData);
+				// Will save unsorted, sort when generating script, drawing buttons etc.
+				Map<String, Integer> elementSteps = testData.keySet().stream()
+						.collect(Collectors.toMap(o -> o, o -> Integer
+								.parseInt(testData.get(o).get("ElementStepNumber"))));
+				LinkedHashMap<String, Integer> sortedElementSteps = sortByValue(
+						elementSteps);
+				for (String key : sortedElementSteps.keySet()) {
+					System.out.println(key + ":\t" + sortedElementSteps.get(key));
+				}
+
+				YamlHelper.saveConfiguration(config, path);
+			} else {
+				configFilePath = new String(path);
 			}
-			config.setElements(testData);
-			YamlHelper.saveConfiguration(config, path);
 		});
 
 		preferences_tool.addListener(SWT.Selection, event -> {
@@ -440,6 +458,7 @@ public class SimpleToolBarEx {
 						bc = bc2;
 					}
 					String commandId = elementData.get("CommandId");
+					elementData.put("ElementStepNumber", String.format("%d", step_index));
 
 					testData.put(commandId, elementData);
 					stepKeys.add(commandId);
@@ -477,6 +496,7 @@ public class SimpleToolBarEx {
 							"https://www.ryanair.com/ie/en/", By.cssSelector(
 									"#home div.specialofferswidget h3 > span:nth-child(1)"));
 					String name = elementData.get("ElementCodeName");
+					elementData.put("ElementStepNumber", String.format("%d", step_index));
 					addButton(name, elementData, composite);
 					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
 							true);
@@ -545,6 +565,16 @@ public class SimpleToolBarEx {
 
 	private String getCurrentUrl() {
 		return driver.getCurrentUrl();
+	}
+
+	// sorting example from
+	// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortByValue(
+			Map<K, V> map) {
+		return map.entrySet().stream()
+				.sorted(Map.Entry.comparingByValue(Collections.reverseOrder()))
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1, e2) -> e1, LinkedHashMap::new));
 	}
 
 	private HashMap<String, String> addElement() {
