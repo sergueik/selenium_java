@@ -60,6 +60,12 @@ The Java reads back the result once it available and adds a breadcrump button:
 The breadcrump button opens the form dialog with the details of the element:
 ![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
 
+The save and load buttons
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/save.png)
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/open.png)
+save  and restore the test session in YAML format.
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/open_sesssion.png)
+
 The flowchart button
 ![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/flowchart.png)
 
@@ -180,16 +186,17 @@ browsers:
 
 # Elements
 elements:
-  '9882f662-5593-4b8a-a21d-8e5a6d1bcc6a':
-    ElementCodeName: logo
-    ElementCssSelector: 'img#hplogo'
-    ElementXPath: id("hplogo")
-    Url: http://www.google.com
-  'f26d01af-1':
-    ElementCodeName: 'element name'
+  ce094429-d4bd-4eb0-83ab-6d10c563f456:
+    ElementCssSelector: div[id = "page-body"] > div.main-container > section.main-content > div.main-content-right > div.row.highlight > section.card.titled > section.project-info > header > h3 > a
+    ElementCodeName: 'sourceforge project link'
+    Command: AddElement
+    Caller: addElement
+    ElementPageURL: https://sourceforge.net/
+    CommandId: ce094429-d4bd-4eb0-83ab-6d10c563f456
+    ElementStepNumber: '0'
+    ElementText: Staff Choice Outlook CalDav Synchronizer
     ElementId: ''
-    ElementCssSelector: 'article#home > section.homepage-content-container > div.homepage-parsys-container > div.farefinderwidget.parbase.section.specialofferswidget > div > farefinder-compact > div.section-wrapper > div.home-info.full-width > div > h3 > span.highlight'
-    ElementXPath: "id(\"home\")/section[1]/div[2]/div[1]/div[1]/farefinder-compact[1]/div[1]/div[1]/div[1]/h3[1]/span[1]"
+    ElementXPath: id("page-body")/div[1]/section[1]/div[2]/div[2]/section[1]/section[2]/header[1]/h3[1]/a[@href="/projects/outlookcaldavsynchronizer/?source=frontpage&position=1"]
 ```
 
 ### Work in Progress
