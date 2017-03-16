@@ -36,31 +36,21 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
+import com.mycompany.app.Utils;
+
 // http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/JavaSourcecodeViewer.htm
 
 public class JavaSourcecodeViewerEx {
+
 	Shell shell;
-
 	StyledText text;
-
 	JavaLineStyler lineStyler = new JavaLineStyler();
-
 	FileDialog fileDialog;
 
 	Menu createFileMenu() {
 		Menu bar = shell.getMenuBar();
 		Menu menu = new Menu(bar);
 		MenuItem item;
-
-		// Open
-		item = new MenuItem(menu, SWT.CASCADE);
-		item.setText("Open");
-		item.setAccelerator(SWT.MOD1 + 'O');
-		item.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent event) {
-				openFile();
-			}
-		});
 
 		// Exit
 		item = new MenuItem(menu, SWT.PUSH);
@@ -101,8 +91,8 @@ public class JavaSourcecodeViewerEx {
 		text = new StyledText(shell,
 				SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL);
 		GridData spec = new GridData();
-    Font font = new Font(shell.getDisplay(), "Courier New", 12, SWT.NORMAL);
-    text.setFont(font);
+		Font font = new Font(shell.getDisplay(), "Courier New", 12, SWT.NORMAL);
+		text.setFont(font);
 		spec.horizontalAlignment = GridData.FILL;
 		spec.grabExcessHorizontalSpace = true;
 		spec.verticalAlignment = GridData.FILL;
@@ -112,6 +102,21 @@ public class JavaSourcecodeViewerEx {
 		text.setEditable(false);
 		Color bg = Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
 		text.setBackground(bg);
+
+		String textString = new Utils().getScriptContent("ElementSearch.js");
+		// Guard against superfluous mouse move events -- defer action until
+		// later
+		Display display = text.getDisplay();
+		display.asyncExec(new Runnable() {
+			public void run() {
+				text.setText(textString);
+			}
+		});
+
+		// parse the block comments up front since block comments can go across
+		// lines - inefficient way of doing this
+		lineStyler.parseBlockComments(textString);
+
 	}
 
 	void displayError(String msg) {
@@ -137,67 +142,6 @@ public class JavaSourcecodeViewerEx {
 		shell.setSize(500, 400);
 		shell.open();
 		return shell;
-	}
-
-	void openFile() {
-		if (fileDialog == null) {
-			fileDialog = new FileDialog(shell, SWT.OPEN);
-		}
-
-		fileDialog.setFilterExtensions(new String[] { "*.java", "*.*" });
-		String name = fileDialog.open();
-
-		open(name);
-	}
-
-	void open(String name) {
-		final String textString;
-
-		if ((name == null) || (name.length() == 0))
-			return;
-
-		File file = new File(name);
-		if (!file.exists()) {
-			String message = "Err file no exist";
-			displayError(message);
-			return;
-		}
-
-		try {
-			FileInputStream stream = new FileInputStream(file.getPath());
-			try {
-				Reader in = new BufferedReader(new InputStreamReader(stream));
-				char[] readBuffer = new char[2048];
-				StringBuffer buffer = new StringBuffer((int) file.length());
-				int n;
-				while ((n = in.read(readBuffer)) > 0) {
-					buffer.append(readBuffer, 0, n);
-				}
-				textString = buffer.toString();
-				stream.close();
-			} catch (IOException e) {
-				// Err_file_io
-				String message = "Err_file_io";
-				displayError(message);
-				return;
-			}
-		} catch (FileNotFoundException e) {
-			String message = "Err_not_found";
-			displayError(message);
-			return;
-		}
-		// Guard against superfluous mouse move events -- defer action until
-		// later
-		Display display = text.getDisplay();
-		display.asyncExec(new Runnable() {
-			public void run() {
-				text.setText(textString);
-			}
-		});
-
-		// parse the block comments up front since block comments can go across
-		// lines - inefficient way of doing this
-		lineStyler.parseBlockComments(textString);
 	}
 
 	void menuFileExit() {

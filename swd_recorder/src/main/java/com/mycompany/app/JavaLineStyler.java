@@ -101,13 +101,13 @@ class JavaLineStyler implements LineStyleListener {
 				new Color(display, new RGB(0, 0, 128)) // blue
 		};
 		tokenColors = new int[MAXIMUM_TOKEN];
-		tokenColors[WORD] = 0;
-		tokenColors[WHITE] = 0;
-		tokenColors[KEY] = 3;
-		tokenColors[COMMENT] = 1;
-		tokenColors[STRING] = 2;
 		tokenColors[OTHER] = 0;
 		tokenColors[NUMBER] = 0;
+		tokenColors[WORD] = 0;
+		tokenColors[WHITE] = 0;
+		tokenColors[COMMENT] = 1;
+		tokenColors[STRING] = 2;
+		tokenColors[KEY] = 3;
 	}
 
 	void disposeColors() {
