@@ -379,6 +379,8 @@ public class SimpleToolBarEx {
 							sortedElementSteps.get(stepId), stepId));
 					HashMap<String, String> elementData = testData.get(stepId);
 					// 'paginate' the breadcrump
+					Rectangle rect = bc.getBounds();
+					// System.err.println("Bound rect width: " + rect.width);
 					if (bc.getBounds().width > 765) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
@@ -447,6 +449,8 @@ public class SimpleToolBarEx {
 					HashMap<String, String> elementData = addElement();
 
 					// 'paginate' the breadcrump
+					Rectangle rect = bc.getBounds();
+					// System.err.println("Bound rect width: " + rect.width);
 					if (bc.getBounds().width > 765) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
@@ -565,8 +569,7 @@ public class SimpleToolBarEx {
 	// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
 	public static <K, V extends Comparable<? super V>> LinkedHashMap<K, V> sortByValue(
 			Map<K, V> map) {
-		return map.entrySet().stream()
-				.sorted(Map.Entry.comparingByValue())
+		return map.entrySet().stream().sorted(Map.Entry.comparingByValue())
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
 	}
@@ -737,11 +740,11 @@ public class SimpleToolBarEx {
 	// editing
 	private void addBreadCrumpItem(String name, String commandId,
 			HashMap<String, String> data, Breadcrumb bc) {
-		Rectangle rect = bc.getBounds();
-		// System.err.println("Bound rect width: " + rect.width);
 		final BreadcrumbItem item = new BreadcrumbItem(bc, SWT.CENTER | SWT.TOGGLE);
 		item.setData("CommandId", commandId);
-		item.setText(String.format("Step %d: %s", (int) (step_index + 1), name));
+		int step_number = (data.containsKey("ElementStepNumber"))
+				? Integer.parseInt(data.get("ElementStepNumber")) : step_index;
+		item.setText(String.format("Step %d: %s", (int) (step_number + 1), name));
 		item.setImage(page_icon);
 		item.setSelectionImage(page_icon);
 
