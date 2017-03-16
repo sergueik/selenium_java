@@ -8,7 +8,8 @@ therefore it can be run on Windows, Mac or Linux, 32 or 64 bit platforms. Eventu
 
 The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
-The [Jtwig](http://jtwig.org/) is the code generatsor used.
+The [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow) 
+is the code generator we intend to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
@@ -232,7 +233,7 @@ elements:
 
 #### Code Generation
 
-  * [Jtwig](http://jtwig.org/)
+  * [Jtwig](https://github.com/jtwig/jtwig)
   * [Thymeleaf](http://www.thymeleaf.org/)
   * [StringTemplate](http://www.stringtemplate.org/)
 
