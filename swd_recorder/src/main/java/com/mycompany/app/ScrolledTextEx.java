@@ -52,7 +52,7 @@ import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 
 import com.mycompany.app.Utils;
-
+import com.mycompany.app.RenderTemplate;
 /**
  * Generated source display form for Selenium Webdriver Eclipse Tool
  * 
@@ -81,7 +81,7 @@ class ScrolledTextEx {
 		if (parent != null) {
 			payload = (String) parent.getData();
 		} else {
-			payload = sampleRender();
+			payload = new RenderTemplate().sampleRender();
 		}
 		// NOTE: org.eclipse.swt.SWTException: Invalid thread access
 		display = (parentDisplay != null) ? parentDisplay : new Display();
@@ -126,7 +126,7 @@ class ScrolledTextEx {
 		GridData spec = new GridData();
 		// TODO: lookup best font
 		styledText
-				.setFont(new Font(shell.getDisplay(), "Lucida Console", 10, SWT.NORMAL));
+				.setFont(new Font(shell.getDisplay(), "Source Code Pro Light", 10, SWT.NORMAL));
 		spec.horizontalAlignment = GridData.FILL;
 		spec.grabExcessHorizontalSpace = true;
 		spec.verticalAlignment = GridData.FILL;
@@ -141,32 +141,5 @@ class ScrolledTextEx {
 
 	public static void main(String[] arg) {
 		ScrolledTextEx o = new ScrolledTextEx(new Display(), null);
-	}
-
-	private static final Map<String, String> elementData = createSampleElement();
-
-	private static Map<String, String> createSampleElement() {
-		Map<String, String> elementData = new HashMap<String, String>();
-		elementData.put("ElementId", "id");
-		elementData.put("ElementCodeName", "gmail link");
-		elementData.put("ElementXPath", "/html//img[1]");
-		elementData.put("ElementCssSelector", "div#gbw > a.highlight");
-		elementData.put("useCss", "true");
-		elementData.put("useXPath", "false");
-		elementData.put("useId", "false");
-		elementData.put("useText", "false");
-		return elementData;
-	}
-
-	private String sampleRender() {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/example.twig");
-		JtwigModel model = JtwigModel.newModel();
-		for (String key : elementData.keySet()) {
-			model.with(key, elementData.get(key));
-		}
-		String output = template.render(model);
-		System.err.println("Rendered: " + output);
-		return output;
 	}
 }
