@@ -30,6 +30,12 @@ import java.text.DateFormat;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+/**
+ * Common YAML configuration file utilities for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class YamlHelper {
 
 	private static DumperOptions options = new DumperOptions();

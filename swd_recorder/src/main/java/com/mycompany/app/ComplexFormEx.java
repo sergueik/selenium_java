@@ -31,6 +31,11 @@ import org.eclipse.swt.widgets.Text;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Element attribute editor form for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 // based on:
 // http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ComplexShellExample.htm
 // https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111

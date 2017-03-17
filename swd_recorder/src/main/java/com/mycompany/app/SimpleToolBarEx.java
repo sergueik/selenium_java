@@ -160,6 +160,12 @@ import org.yaml.snakeyaml.Yaml;
 
 import com.mycompany.app.Utils;
 
+/**
+ * Main form for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class SimpleToolBarEx {
 
 	private Shell shell;

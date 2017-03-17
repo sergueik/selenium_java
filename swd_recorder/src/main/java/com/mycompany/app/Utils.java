@@ -18,6 +18,12 @@ import java.util.Optional;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Common utilities class for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class Utils {
 
 	public String getScriptContent(String resourceFileName) {
@@ -92,5 +98,4 @@ public class Utils {
 		}
 		return collector.get("ElementCodeName");
 	}
-
 }

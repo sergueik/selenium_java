@@ -53,7 +53,13 @@ import org.jtwig.JtwigTemplate;
 
 import com.mycompany.app.Utils;
 
-// based on: 
+/**
+ * Generated source display form for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
+// based on:
 // http://stackoverflow.com/questions/10145547/enabling-scroll-bars-in-a-java-swt-window
 // http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/JavaSourcecodeViewer.htm
 
@@ -120,7 +126,7 @@ class ScrolledTextEx {
 		GridData spec = new GridData();
 		// TODO: lookup best font
 		styledText
-				.setFont(new Font(shell.getDisplay(), "Courier New", 10, SWT.NORMAL));
+				.setFont(new Font(shell.getDisplay(), "Lucida Console", 10, SWT.NORMAL));
 		spec.horizontalAlignment = GridData.FILL;
 		spec.grabExcessHorizontalSpace = true;
 		spec.verticalAlignment = GridData.FILL;

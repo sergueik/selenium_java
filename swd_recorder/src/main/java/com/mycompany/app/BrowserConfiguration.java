@@ -2,6 +2,13 @@ package com.mycompany.app;
 
 import static java.lang.String.format;
 
+/**
+ * Browsercon figuration serializer class for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
+
 public final class BrowserConfiguration {
 	public String name;
 	public String platform;

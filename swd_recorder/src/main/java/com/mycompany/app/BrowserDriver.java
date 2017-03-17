@@ -29,6 +29,12 @@ import org.openqa.selenium.safari.SafariOptions;
 // import com.jprotractor.NgWebDriver;
 // import com.jprotractor.NgWebElement;
 
+/**
+ * Browser Driver wrapper class for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class BrowserDriver {
 
 	public static WebDriver driver;

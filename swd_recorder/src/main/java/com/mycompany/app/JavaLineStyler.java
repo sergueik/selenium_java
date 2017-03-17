@@ -46,6 +46,12 @@ import org.eclipse.swt.widgets.Shell;
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
 
+/**
+ * Token color/style processor for Selenium Webdriver Eclipse Tool
+ * 
+ */
+
+
 class JavaLineStyler implements LineStyleListener {
 	JavaScanner scanner = new JavaScanner();
 

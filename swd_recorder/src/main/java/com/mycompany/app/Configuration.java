@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+/**
+ * Test configuration serializer class for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 final class Configuration {
 	public Date created;
 	public Date updated;

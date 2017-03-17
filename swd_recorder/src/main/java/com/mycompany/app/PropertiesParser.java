@@ -18,6 +18,12 @@ import java.util.Map;
 import java.util.Properties;
 import java.lang.RuntimeException;
 
+/**
+ * Common configuration / properties file parsers for Selenium Webdriver Eclipse Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class PropertiesParser {
 
 	public static HashMap<String, String> getProperties(final String fileName) {
