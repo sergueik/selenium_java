@@ -80,9 +80,11 @@ class ScrolledTextEx {
 	ScrolledTextEx(Display parentDisplay, Shell parent) {
 
 		if (parent != null) {
-			payload = (String) parent.getData();
+			payload = (String) parent.getData("payload");
 		} else {
-			payload = new RenderTemplate().sampleRenderTest();
+			RenderTemplate template = new RenderTemplate();
+			template.setTemplateName("templates/example2.twig");
+			payload = template.renderTest();
 		}
 		// NOTE: org.eclipse.swt.SWTException: Invalid thread access
 		display = (parentDisplay != null) ? parentDisplay : new Display();
@@ -125,8 +127,8 @@ class ScrolledTextEx {
 		styledText = new StyledText(shell,
 				SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL); // SWT.WRAP
 		GridData spec = new GridData();
-		styledText
-				.setFont(new Font(shell.getDisplay(), "Source Code Pro Light", 10, SWT.NORMAL));
+		styledText.setFont(
+				new Font(shell.getDisplay(), "Source Code Pro Light", 10, SWT.NORMAL));
 		spec.horizontalAlignment = GridData.FILL;
 		spec.grabExcessHorizontalSpace = true;
 		spec.verticalAlignment = GridData.FILL;

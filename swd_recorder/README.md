@@ -8,7 +8,7 @@ therefore it can be run on Windows, Mac or Linux, 32 or 64 bit platforms. Eventu
 
 The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
-The [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow) 
+The [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
 is the code generator we intend to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
@@ -156,6 +156,21 @@ For earlier releases, you have to downgrade the Selenium version in the `pom.xml
 then follow the [Running Selenium Tests in Safari Browser](http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser).
 For Mac testing, [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
 Overall,s working with Safari browser is somewhat flaky.
+
+
+### Code Templates
+
+The code is generated using SWIG templates which look like
+```
+{% if (ElementSelectedBy == 'ElementCssSelector') -%}
+  driver.findElement(By.cssSelector("{{ ElementCssSelector }}");
+{% elseif (ElementSelectedBy == 'ElementXPath') -%}
+  driver.findElement(By.Xpath("{{ ElementXPath }}");
+{% elseif (ElementSelectedBy == 'ElementId') -%}
+  driver.findElement(By.Id("{{ ElementId }}");
+{% else -%}
+{% endif -%}
+```
 
 ### Configuration, saving and loading
 

@@ -358,7 +358,10 @@ public class SimpleToolBarEx {
 			// TODO: context menu
 			// System.err.println("Button: " + event.button);
 			// if (event.button )
-			shell.setData("Nothing here\n yet...");
+			RenderTemplate template = new RenderTemplate();
+			template.setTemplateName("templates/example2.twig");
+			String payload = template.renderTest(testData);
+			shell.setData("payload", payload);
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
 		});
 
@@ -404,6 +407,7 @@ public class SimpleToolBarEx {
 				save_tool.setEnabled(true);
 			}
 			open_tool.setEnabled(true);
+			flowchart_tool.setEnabled(true);
 			status.setText("Ready ...");
 			status.pack();
 		});

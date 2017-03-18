@@ -33,17 +33,23 @@ class RenderTemplate {
 
 	private static final HashMap<String, String> elementData = createSampleElementData();
 	private static HashMap<String, HashMap<String, String>> testData;
+	private String templateName = "templates/example2.twig";
+
+	public void setTemplateName(String templateName) {
+		this.templateName = templateName;
+	}
+
+	public String getTemplateName() {
+		return templateName;
+	}
 
 	private static HashMap<String, String> createSampleElementData() {
 		HashMap<String, String> elementData = new HashMap<String, String>();
 		elementData.put("ElementId", "id");
-		elementData.put("ElementCodeName", "gmail link");
+		elementData.put("ElementCodeTemplateName", "gmail link");
 		elementData.put("ElementXPath", "/html//img[1]");
 		elementData.put("ElementCssSelector", "div#gbw > a.highlight");
-		elementData.put("useCss", "true");
-		elementData.put("useXPath", "false");
-		elementData.put("useId", "false");
-		elementData.put("useText", "false");
+		elementData.put("ElementSelectedBy", "ElementCssSelector");
 		return elementData;
 	}
 
@@ -53,12 +59,12 @@ class RenderTemplate {
 		return testData;
 	}
 
-	public String sampleRenderTest() {
+	public String renderTest() {
 		testData = createSampleTestData();
-		return sampleRenderTest(testData);
+		return renderTest(testData);
 	}
 
-	public String sampleRenderTest(
+	public String renderTest(
 			HashMap<String, HashMap<String, String>> testData) {
 		Iterator<String> testDataKeys = testData.keySet().iterator();
 		String stepId;
@@ -66,7 +72,7 @@ class RenderTemplate {
 		while (testDataKeys.hasNext()) {
 			stepId = testDataKeys.next();
 			HashMap<String, String> elementData = testData.get(stepId);
-			scripts.add(sampleRenderElement(elementData));
+			scripts.add(renderElement(elementData));
 		}
 		StringBuilder result = new StringBuilder();
 		for (String line : scripts) {
@@ -76,19 +82,18 @@ class RenderTemplate {
 		return result.toString();
 	}
 
-	private String sampleRenderElement(Map<String, String> data) {
-		JtwigTemplate template = JtwigTemplate
-				.classpathTemplate("templates/example.twig");
+	private String renderElement(Map<String, String> data) {
+		JtwigTemplate template = JtwigTemplate.classpathTemplate(this.templateName);
 		JtwigModel model = JtwigModel.newModel();
 		for (String key : data.keySet()) {
-			model.with(key, data.get(key));
+			model.with(key, data.get(key).replace("\"","\\\""));
 		}
 		String output = template.render(model);
 		return output;
 	}
 
 	public static void main(String[] args) {
-		String output = new RenderTemplate().sampleRenderTest();
+		String output = new RenderTemplate().renderTest();
 		System.err.println("Rendered: " + output);
 	}
 }
