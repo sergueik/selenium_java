@@ -55,6 +55,8 @@ public class ComplexFormEx {
 	private static String selectedKey = null;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
+		display = (parentDisplay != null) ? parentDisplay : new Display();
+		shell = new Shell(display);
 		if (parent != null) {
 			// System.err.println("Detected parent shell " + parent.toString());
 			parentShell = parent;
@@ -66,8 +68,6 @@ public class ComplexFormEx {
 		if (!elementData.containsKey("ElementSelectedBy")) {
 			elementData.put("ElementSelectedBy", "none");
 		}
-		display = (parentDisplay != null) ? parentDisplay : new Display();
-		shell = new Shell(display);
 	}
 
 	public void render() {
