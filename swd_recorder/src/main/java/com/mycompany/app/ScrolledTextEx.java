@@ -53,6 +53,7 @@ import org.jtwig.JtwigTemplate;
 
 import com.mycompany.app.Utils;
 import com.mycompany.app.RenderTemplate;
+
 /**
  * Generated source display form for Selenium Webdriver Eclipse Tool
  * 
@@ -81,7 +82,7 @@ class ScrolledTextEx {
 		if (parent != null) {
 			payload = (String) parent.getData();
 		} else {
-			payload = new RenderTemplate().sampleRender();
+			payload = new RenderTemplate().sampleRenderTest();
 		}
 		// NOTE: org.eclipse.swt.SWTException: Invalid thread access
 		display = (parentDisplay != null) ? parentDisplay : new Display();
@@ -124,7 +125,6 @@ class ScrolledTextEx {
 		styledText = new StyledText(shell,
 				SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL); // SWT.WRAP
 		GridData spec = new GridData();
-		// TODO: lookup best font
 		styledText
 				.setFont(new Font(shell.getDisplay(), "Source Code Pro Light", 10, SWT.NORMAL));
 		spec.horizontalAlignment = GridData.FILL;
