@@ -8,8 +8,11 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
+
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import com.mycompany.app.Utils;
 
 // based on http://www.vogella.com/tutorials/EclipseDialogs/article.html
 // http://www.programcreek.com/java-api-examples/org.eclipse.jface.dialogs.ErrorDialog
@@ -38,12 +41,14 @@ public class ExceptionDialogEx {
 		ErrorDialog.openError(shell, "Error", "Exception thrown", status);
 
 		// TODO: next does not show the dialog
-		ErrorDialog dialog = new ErrorDialog(shell, "Error", "Exception thrown",
-				status, 0);
-		// dialog.setDefaultImages();
-		dialog.create();
-		dialog.open();
-
+		/*
+		  import org.eclipse.jdt.internal.ui.dialogs.ProblemDialog;
+		  ProblemDialog dialog = new ProblemDialog(shell, "Error", "Exception thrown", new Image(dev, new Utils().getResourcePath("launch.png"));
+		      status, 0);
+		  // dialog.setDefaultImages();
+		  dialog.create();
+		  dialog.open();
+		*/
 	}
 
 	public ExceptionDialogEx(Display parentDisplay, Shell parentShell,

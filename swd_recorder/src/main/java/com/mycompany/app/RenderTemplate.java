@@ -64,8 +64,7 @@ class RenderTemplate {
 		return renderTest(testData);
 	}
 
-	public String renderTest(
-			HashMap<String, HashMap<String, String>> testData) {
+	public String renderTest(HashMap<String, HashMap<String, String>> testData) {
 		Iterator<String> testDataKeys = testData.keySet().iterator();
 		String stepId;
 		List<String> scripts = new ArrayList<String>();
@@ -86,7 +85,7 @@ class RenderTemplate {
 		JtwigTemplate template = JtwigTemplate.classpathTemplate(this.templateName);
 		JtwigModel model = JtwigModel.newModel();
 		for (String key : data.keySet()) {
-			model.with(key, data.get(key).replace("\"","\\\""));
+			model.with(key, data.get(key).replace("\"", "\\\""));
 		}
 		String output = template.render(model);
 		return output;

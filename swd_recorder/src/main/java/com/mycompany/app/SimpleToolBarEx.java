@@ -75,6 +75,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
+// incompatible types: org.eclipse.swt.graphics.Point cannot be converted to org.openqa.selenium.Point
 // import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -198,6 +199,7 @@ public class SimpleToolBarEx {
 	private static int height = 800;
 	private static int step_index = 0;
 	private static String osName = null;
+	private String generatedScript = null;
 
 	private Breadcrumb bc;
 
@@ -355,13 +357,17 @@ public class SimpleToolBarEx {
 		});
 
 		flowchart_tool.addListener(SWT.Selection, event -> {
-			// TODO: context menu
-			// System.err.println("Button: " + event.button);
-			// if (event.button )
 			RenderTemplate template = new RenderTemplate();
 			template.setTemplateName("templates/example2.twig");
-			String payload = template.renderTest(testData);
-			shell.setData("payload", payload);
+			generatedScript = "";
+			try {
+				generatedScript = template.renderTest(testData);
+			} catch (Exception e) {
+				ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
+				// show the error dialog with exception trace
+				o.execute();
+			}
+			shell.setData("payload", generatedScript);
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
 		});
 
@@ -384,13 +390,16 @@ public class SimpleToolBarEx {
 				LinkedHashMap<String, Integer> sortedElementSteps = sortByValue(
 						elementSteps);
 				for (String stepId : sortedElementSteps.keySet()) {
-					System.out.println(String.format("Drawing step %d (%s)",
-							sortedElementSteps.get(stepId), stepId));
+					// System.out.println(String.format("Drawing step %d (%s)",
+					// sortedElementSteps.get(stepId), stepId));
 					HashMap<String, String> elementData = testData.get(stepId);
 					// 'paginate' the breadcrump
 					Rectangle rect = bc.getBounds();
-					// System.err.println("Bound rect width: " + rect.width);
-					if (bc.getBounds().width > 765) {
+					System.err.println("Screen width: " + java.awt.Toolkit.getDefaultToolkit()
+									.getScreenSize().width);
+					if (bc.getBounds().width > shell.getBounds().width - 5
+							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
+									.getScreenSize().width - 100) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
 					}

@@ -8,9 +8,14 @@ import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -56,7 +61,7 @@ import com.mycompany.app.RenderTemplate;
 
 /**
  * Generated source display form for Selenium Webdriver Eclipse Tool
- * 
+ *
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -79,13 +84,6 @@ class ScrolledTextEx {
 
 	ScrolledTextEx(Display parentDisplay, Shell parent) {
 
-		if (parent != null) {
-			payload = (String) parent.getData("payload");
-		} else {
-			RenderTemplate template = new RenderTemplate();
-			template.setTemplateName("templates/example2.twig");
-			payload = template.renderTest();
-		}
 		// NOTE: org.eclipse.swt.SWTException: Invalid thread access
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 
@@ -93,6 +91,19 @@ class ScrolledTextEx {
 		shell.setSize(20, 20);
 		shell.open();
 
+		if (parent != null) {
+			payload = (String) parent.getData("payload");
+		} else {
+			RenderTemplate template = new RenderTemplate();
+			template.setTemplateName("templates/example2.twig");
+			try {
+				payload = template.renderTest();
+			} catch (Exception e) {
+				ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
+				// show the error dialog with exception trace
+				o.execute();
+			}
+		}
 		shell.setText("Generated QA source");
 		shell.setLayout(new GridLayout(2, false));
 		styledText = createStyledText();
@@ -112,6 +123,32 @@ class ScrolledTextEx {
 			}
 		});
 
+		buttonSave.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				FileDialog dialog = new FileDialog(shell, SWT.SAVE);
+				dialog.setFilterNames(new String[] { "TEXT Files", "All Files (*.*)" });
+				dialog.setFilterExtensions(new String[] { "*.txt", "*.*" });
+				String homeDir = System.getProperty("user.home");
+				dialog.setFilterPath(homeDir); // Windows path
+				// TODO: remember the path
+				String filePath = dialog.open();
+				if (filePath != null) {
+					System.out.println("Save to: " + filePath);
+					try {
+						Files.write(Paths.get(filePath),
+								(List<String>) Arrays.asList(payload.split("\n")),
+								Charset.forName("UTF-8"));
+					} catch (IOException e) {
+						ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
+						// show the error dialog with exception trace
+						o.execute();
+					}
+					styledText.dispose();
+					shell.dispose();
+				}
+			}
+		});
 		try {
 			while (!shell.isDisposed()) {
 				if (!display.readAndDispatch()) {

@@ -46,23 +46,22 @@ public class ComplexFormEx {
 	private Display display;
 	private String dataKey = "CurrentCommandId";
 	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
-	private int width = 350;
-	private int height = 280;
+	private int formWidth = 450;
+	private int formHeight = 280;
+	private final static int buttonWidth = 36;
+	private final static int buttonHeight = 24;
 	private static Shell parentShell = null;
 	private static Boolean updated = false;
 	private static String result = null;
-	private int step_num = 1;
 	private static String selectedKey = null;
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 		if (parent != null) {
-			// System.err.println("Detected parent shell " + parent.toString());
 			parentShell = parent;
 			commandId = parent.getData(dataKey).toString();
-		} else {
-			// System.err.println("No parent shell");
+			// parent sets the elementData explicitly
 		}
 		new Utils().readData(Optional.of(elementData));
 		if (!elementData.containsKey("ElementSelectedBy")) {
@@ -80,8 +79,7 @@ public class ComplexFormEx {
 		titleData
 				.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false, 1, 1));
 		titleData.setText((elementData.containsKey("ElementCodeName"))
-				? elementData.get("ElementCodeName")
-				: String.format("Step %s details", step_num));
+				? elementData.get("ElementCodeName") : "Element selector details");
 
 		GridComposite gc = new GridComposite(shell);
 		gc.renderData(elementData);
@@ -110,7 +108,7 @@ public class ComplexFormEx {
 			}
 		});
 
-		shell.setSize(width, height);
+		shell.setSize(formHeight, formHeight);
 
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
@@ -133,13 +131,14 @@ public class ComplexFormEx {
 			this.setLayout(rl);
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
-			buttonSave.setSize(36, 24);
+			buttonSave.setSize(buttonWidth, buttonHeight);
 			buttonDelete = new Button(this, SWT.PUSH);
 			buttonDelete.setText("Delete");
-			buttonDelete.setSize(36, 24);
+			buttonDelete.setSize(buttonWidth, buttonHeight);
 			buttonDelete.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					if (parentShell != null) {
+						// deleting the element
 						parentShell.setData("result", "{}");
 						parentShell.setData("updated", true);
 					}
@@ -174,7 +173,7 @@ public class ComplexFormEx {
 
 			buttonCancel = new Button(this, SWT.PUSH);
 			buttonCancel.setText("Cancel");
-			buttonCancel.setSize(36, 24);
+			buttonCancel.setSize(buttonWidth, buttonHeight);
 
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {

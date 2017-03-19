@@ -51,7 +51,6 @@ import org.eclipse.swt.widgets.Shell;
  * 
  */
 
-
 class JavaLineStyler implements LineStyleListener {
 	JavaScanner scanner = new JavaScanner();
 

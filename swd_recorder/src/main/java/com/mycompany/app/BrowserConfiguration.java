@@ -8,7 +8,6 @@ import static java.lang.String.format;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-
 public final class BrowserConfiguration {
 	public String name;
 	public String platform;
