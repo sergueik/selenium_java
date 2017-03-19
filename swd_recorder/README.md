@@ -1,13 +1,17 @@
-### Info
+### Info, goals
 
-Selenium WebDriver Extension Toolkit (SWET) is a OS-independent successor to the
-[Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
-Dmytro Zharii. While the latter is .Net Windows Forms/ Razor application,
-SWEET is based on the [Standard Widget Toolkit](https://www.eclipse.org/swt/) with some third party widgets (currently, [Opal](https://github.com/lcaron/opal)
-therefore it can be run on Windows, Mac or Linux, 32 or 64 bit platforms. Eventually SWET might become an Eclipse plugin.
+Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
+Dmytro Zharii (and author). SWET is using [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets 
+(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms forthe user interface and JTwig template engine instead 
+of Razor for code generation therefore it runs on Windows, Mac or Linux, 32 or 64 bit platforms. 
+Eventually the full functionality of SWD is to be achieved, also SWET might become an Eclipse plugin.
+SWET is currently alpha quality, it may not be very useful yet, but you can help! Continue reading for info on how to get the dev environment setup.
 
 The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
+For Mac testing, the [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
+Currently, working with Safari browser is somewhat flaky.
+
 The [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
 is the code generator we intend to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
 
@@ -16,11 +20,6 @@ is the code generator we intend to use - it supports the original [PHP Twig](htt
 ![Ubuntu Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture2.png)
 
 ![Windows Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture3.png)
-
-### Goals
-
-Eventually the full functionality of SWD is to be achieved.
-SWEET isn't yet ready for users, but you can help! Continue reading for info on how to get the dev environment setup.
 
 ### Usage
 
@@ -40,11 +39,14 @@ on Linux or a Mac.
 The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository,
 compiles and packages the project using maven
 and runs the application jar from the `target` directory.
-The runner script can be used to launch individual basic examples from the Standard Widget Toolkit study
+The runner script can also be used to launch individual forms that have been largely based on 
+examples from the Standard Widget Toolkit study
 project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt),
-which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com)
-a number os such examples is still checked in in the project directory but will eventually disappear.
+which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com) as: 
 
+```shell
+./run.sh [ConfigFormEx|ScrolledTextEx|ComplexFormEx] 
+```
 ### Toolbar Buttons
 
 ![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/launch.png)
@@ -72,6 +74,12 @@ The flowchart button
 
 starts codegeneration using [Jtwig](http://jtwig.org/) tempate and `elementData` hash and opens result in a separate dialog:
 ![codegen](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/codegen.png)
+
+The preferences.png button
+![preferences](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/preferences.png)
+opens the configuration dialog
+![config](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/config.png)
+Currently the browser and template selection are configurable, one also can set the base URL.
 
 There is also a demo button that executes these actions automatically (for one element):
 ![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/demo.png)
@@ -154,8 +162,6 @@ If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver 
 but it does not seems to work with Selenium __2.53__.
 For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__
 then follow the [Running Selenium Tests in Safari Browser](http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser).
-For Mac testing, [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
-Overall,s working with Safari browser is somewhat flaky.
 
 
 ### Code Templates
@@ -209,7 +215,8 @@ elements:
     Caller: addElement
     ElementPageURL: https://sourceforge.net/
     CommandId: ce094429-d4bd-4eb0-83ab-6d10c563f456
-    ElementStepNumber: '0'
+    ElementStepNumber: 1
+    ElementSelectedBy: ElementXPath
     ElementText: Staff Choice Outlook CalDav Synchronizer
     ElementId: ''
     ElementXPath: id("page-body")/div[1]/section[1]/div[2]/div[2]/section[1]/section[2]/header[1]/h3[1]/a[@href="/projects/outlookcaldavsynchronizer/?source=frontpage&position=1"]
@@ -220,6 +227,7 @@ elements:
 * Testing with Safari and variety of IE / Edge browsers
 * Adding the code generator templates
 * Codebase cleanup
+* Adding Threads to Element Finder button 
 
 ### Links
 
