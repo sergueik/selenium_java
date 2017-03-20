@@ -30,7 +30,7 @@ import org.openqa.selenium.safari.SafariOptions;
 // import com.jprotractor.NgWebElement;
 
 /**
- * Browser Driver wrapper class for Selenium Webdriver Eclipse Tool
+ * Browser Driver wrapper class for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

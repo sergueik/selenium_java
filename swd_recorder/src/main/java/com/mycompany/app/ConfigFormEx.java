@@ -33,7 +33,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Session configuration editor form for Selenium Webdriver Eclipse Tool
+ * Session configuration editor form for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
@@ -158,6 +158,7 @@ public class ConfigFormEx {
 		public void renderData(HashMap<String, String> data) {
 
 			List<String> configs = Arrays.asList("Browser", "Base URL", "Template");
+      // TODO: template directory
 			for (String configKey : configs) {
 				if (configOptions.containsKey(configKey)) {
 					final Label configLabel = new Label(this, SWT.NONE);

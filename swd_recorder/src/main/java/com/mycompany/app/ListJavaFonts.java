@@ -14,6 +14,13 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.image.BufferedImage;
 
+
+/**
+ * Utilities for Selenium Webdriver Elementor Tool
+ *
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 // based on: http://stackoverflow.com/questions/922052/testing-whether-a-font-is-monospaced-in-java
 public class ListJavaFonts {
 

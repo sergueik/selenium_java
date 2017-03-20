@@ -29,6 +29,12 @@ import java.text.SimpleDateFormat;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
+/**
+ * Text table configuration file helper for Selenium Webdriver Elementor Tool
+ *
+ *  @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class TestConfigurationParser {
 
 	public static Scanner loadTestData(final String fileName) {

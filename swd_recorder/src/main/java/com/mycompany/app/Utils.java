@@ -19,7 +19,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Common utilities class for Selenium Webdriver Eclipse Tool
+ * Common utilities class for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

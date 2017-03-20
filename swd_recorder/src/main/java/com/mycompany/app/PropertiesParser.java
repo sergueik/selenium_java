@@ -19,7 +19,7 @@ import java.util.Properties;
 import java.lang.RuntimeException;
 
 /**
- * Common configuration / properties file parsers for Selenium Webdriver Eclipse Tool
+ * Common configuration / properties file parsers for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

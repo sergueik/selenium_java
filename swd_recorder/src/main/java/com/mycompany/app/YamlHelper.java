@@ -31,7 +31,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * Common YAML configuration file utilities for Selenium Webdriver Eclipse Tool
+ * Common YAML configuration file utilities for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

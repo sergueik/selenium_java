@@ -32,7 +32,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Element attribute editor form for Selenium Webdriver Eclipse Tool
+ * Element attribute editor form for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

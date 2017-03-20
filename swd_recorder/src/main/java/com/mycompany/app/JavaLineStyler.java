@@ -47,7 +47,7 @@ import org.eclipse.swt.widgets.Shell;
  ******************************************************************************/
 
 /**
- * Token color/style processor for Selenium Webdriver Eclipse Tool
+ * Token color/style processor for Selenium Webdriver Elementor Tool
  * 
  */
 

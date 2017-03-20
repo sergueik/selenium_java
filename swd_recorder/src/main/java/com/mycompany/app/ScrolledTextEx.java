@@ -60,7 +60,7 @@ import com.mycompany.app.Utils;
 import com.mycompany.app.RenderTemplate;
 
 /**
- * Generated source display form for Selenium Webdriver Eclipse Tool
+ * Generated source display form for Selenium Webdriver Elementor Tool
  *
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

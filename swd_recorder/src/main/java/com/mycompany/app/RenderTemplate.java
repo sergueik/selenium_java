@@ -24,7 +24,7 @@ import org.jtwig.JtwigTemplate;
 import com.mycompany.app.Utils;
 
 /**
- * Generate source code from testData and twig template for Selenium Webdriver Eclipse Tool
+ * Generate source code from testData and twig template for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */

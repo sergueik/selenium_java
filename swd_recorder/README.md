@@ -1,6 +1,6 @@
 ### Info, goals
 
-Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
+![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png) Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii (and author). SWET is using [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets 
 (currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms forthe user interface and JTwig template engine instead 
 of Razor for code generation therefore it runs on Windows, Mac or Linux, 32 or 64 bit platforms. 
@@ -253,7 +253,7 @@ elements:
   * [SWT Tools](https://github.com/bp-FLN/SWT-Tools)
   * [SWT choice dialog customization](https://github.com/prasser/swtchoices)
   * [SWT Browser component based recorder](https://github.com/itspanzi/swt-browser-recorder-spike)
-
+  * [Joptions Pane examples](http://alvinalexander.com/java/java-joptionpane-examples-tutorials-dialogs)
 #### Code Generation
 
   * [Jtwig](https://github.com/jtwig/jtwig)

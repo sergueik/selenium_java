@@ -20,6 +20,12 @@ import java.util.Map;
 import java.lang.RuntimeException;
 import static java.lang.String.format;
 
+/**
+ * Configuration test for Selenium Webdriver Elementor Tool
+ *  
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class YamlConfigRunnerEx {
 	private static String yamlFile = null;
 
