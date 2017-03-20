@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.lang.RuntimeException;
@@ -160,9 +161,13 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 import com.mycompany.app.Utils;
+import com.mycompany.app.ConfigFormEx;
+import com.mycompany.app.ComplexFormEx;
+import com.mycompany.app.ScrolledTextEx;
+import com.mycompany.app.BrowserDriver;
 
 /**
- * Main form for Selenium Webdriver Eclipse Tool
+ * Main form for Selenium Webdriver Elementor Tool
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
@@ -171,15 +176,15 @@ public class SimpleToolBarEx {
 
 	private Shell shell;
 
-	private Image launch_icon;
-	private Image find_icon;
-	private Image shutdown_icon;
-	private Image preferences_icon;
-	private Image demo_icon;
-	private Image page_icon;
-	private Image flowchart_icon;
-	private Image open_icon;
-	private Image save_icon;
+	private Image launchIcon;
+	private Image findIcon;
+	private Image shutdownIcon;
+	private Image preferencesIcon;
+	private Image demoIcon;
+	private Image pageIcon;
+	private Image flowchartIcon;
+	private Image openIcon;
+	private Image saveIcon;
 
 	private Configuration config = null;
 	private static String configFilePath;
@@ -193,6 +198,7 @@ public class SimpleToolBarEx {
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private ArrayList<String> stepKeys = new ArrayList<String>();
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
+	private HashMap<String, String> configData = new HashMap<String, String>();
 	private Label status;
 
 	private static int width = 900;
@@ -222,23 +228,24 @@ public class SimpleToolBarEx {
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
 		shell.setBounds(boundRect);
-		shell.setImage(
-				SWTResourceManager.getImage(this.getClass(), "/magnifier.ico"));
+		shell.setImage(SWTResourceManager.getImage(this.getClass(),
+				"/document_wrench_color.ico"));
 		Device dev = shell.getDisplay();
 
 		try {
 
-			launch_icon = new Image(dev, new Utils().getResourcePath("launch.png"));
-			find_icon = new Image(dev, new Utils().getResourcePath("find.png"));
-			preferences_icon = new Image(dev,
+			launchIcon = new Image(dev, new Utils().getResourcePath("launch.png"));
+			findIcon = new Image(dev, new Utils().getResourcePath("find.png"));
+			preferencesIcon = new Image(dev,
 					new Utils().getResourcePath("preferences.png"));
-			shutdown_icon = new Image(dev, new Utils().getResourcePath("quit.png"));
-			demo_icon = new Image(dev, new Utils().getResourcePath("demo.png"));
-			page_icon = new Image(dev, new Utils().getResourcePath("page.png"));
-			flowchart_icon = new Image(dev,
+			shutdownIcon = new Image(dev, new Utils().getResourcePath("quit.png"));
+			demoIcon = new Image(dev, new Utils().getResourcePath("demo.png"));
+			pageIcon = new Image(dev,
+					new Utils().getResourcePath("document_wrench_bw.png"));
+			flowchartIcon = new Image(dev,
 					new Utils().getResourcePath("flowchart.png"));
-			open_icon = new Image(dev, new Utils().getResourcePath("open.png"));
-			save_icon = new Image(dev, new Utils().getResourcePath("save.png"));
+			openIcon = new Image(dev, new Utils().getResourcePath("open.png"));
+			saveIcon = new Image(dev, new Utils().getResourcePath("save.png"));
 
 		} catch (Exception e) {
 
@@ -253,51 +260,50 @@ public class SimpleToolBarEx {
 
 		ToolBar toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
-		ToolItem launch_tool = new ToolItem(toolBar, SWT.PUSH);
-		launch_tool.setImage(launch_icon);
-		launch_tool.setToolTipText("Launches the browser");
+		ToolItem launchTool = new ToolItem(toolBar, SWT.PUSH);
+		launchTool.setImage(launchIcon);
+		launchTool.setToolTipText("Launches the browser");
 
-		ToolItem find_icon_tool = new ToolItem(toolBar, SWT.PUSH);
-		find_icon_tool.setImage(find_icon);
+		ToolItem findTool = new ToolItem(toolBar, SWT.PUSH);
+		findTool.setImage(findIcon);
 		// setDisabledImage
-		find_icon_tool.setToolTipText("Injects the script");
+		findTool.setToolTipText("Injects the script");
 
-		ToolItem flowchart_tool = new ToolItem(toolBar, SWT.PUSH);
-		flowchart_tool.setImage(flowchart_icon);
-		flowchart_tool.setToolTipText("Generates the script");
-
-		new ToolItem(toolBar, SWT.SEPARATOR);
-
-		ToolItem open_tool = new ToolItem(toolBar, SWT.PUSH);
-		open_tool.setImage(open_icon);
-		open_tool.setToolTipText("Reads the saved session");
-
-		ToolItem save_tool = new ToolItem(toolBar, SWT.PUSH);
-		save_tool.setImage(save_icon);
-		save_tool.setToolTipText("Saves the session");
+		ToolItem flowchartTool = new ToolItem(toolBar, SWT.PUSH);
+		flowchartTool.setImage(flowchartIcon);
+		flowchartTool.setToolTipText("Generates the script");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
-		ToolItem demo_tool = new ToolItem(toolBar, SWT.PUSH);
-		demo_tool.setImage(demo_icon);
-		demo_tool.setToolTipText("Demonstrates the app");
+		ToolItem openTool = new ToolItem(toolBar, SWT.PUSH);
+		openTool.setImage(openIcon);
+		openTool.setToolTipText("Reads the saved session");
+
+		ToolItem saveTool = new ToolItem(toolBar, SWT.PUSH);
+		saveTool.setImage(saveIcon);
+		saveTool.setToolTipText("Saves the session");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
-		ToolItem preferences_tool = new ToolItem(toolBar, SWT.PUSH);
-		preferences_tool.setImage(preferences_icon);
-		preferences_tool.setToolTipText("Configures the app (disabled)");
+		ToolItem demoTool = new ToolItem(toolBar, SWT.PUSH);
+		demoTool.setImage(demoIcon);
+		demoTool.setToolTipText("Demonstrates the app");
 
-		ToolItem shutdown_tool = new ToolItem(toolBar, SWT.PUSH);
-		shutdown_tool.setImage(shutdown_icon);
-		shutdown_tool.setToolTipText("Quits the app");
+		new ToolItem(toolBar, SWT.SEPARATOR);
 
-		// preferences_tool.setEnabled(false);
-		find_icon_tool.setEnabled(false);
-		flowchart_tool.setEnabled(false);
-		demo_tool.setEnabled(false);
-		// demo_tool.setGrayed(true);
-		save_tool.setEnabled(false);
+		ToolItem preferencesTool = new ToolItem(toolBar, SWT.PUSH);
+		preferencesTool.setImage(preferencesIcon);
+		preferencesTool.setToolTipText("Configures the app");
+
+		ToolItem shutdownTool = new ToolItem(toolBar, SWT.PUSH);
+		shutdownTool.setImage(shutdownIcon);
+		shutdownTool.setToolTipText("Quits the app");
+
+		findTool.setEnabled(false);
+		flowchartTool.setEnabled(false);
+		demoTool.setEnabled(false);
+		// demoTool.setGrayed(true);
+		saveTool.setEnabled(false);
 
 		toolBar.pack();
 
@@ -321,8 +327,8 @@ public class SimpleToolBarEx {
 		status.setText("Loading ...");
 		status.pack();
 		shell.pack();
-		launch_tool.addListener(SWT.Selection, event -> {
-			launch_tool.setEnabled(false);
+		launchTool.addListener(SWT.Selection, event -> {
+			launchTool.setEnabled(false);
 			status.setText("Launching the browser ...");
 			status.pack();
 			shell.pack();
@@ -335,7 +341,14 @@ public class SimpleToolBarEx {
 			} else if (osName.startsWith("Mac")) {
 				driver = BrowserDriver.initialize("safari");
 			} else {
-				driver = BrowserDriver.initialize("firefox");
+				// Linux
+				try {
+					driver = BrowserDriver.initialize("firefox");
+				} catch (Exception e) {
+					ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
+					// show the error dialog with exception trace
+					o.execute();
+				}
 			}
 
 			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
@@ -343,20 +356,21 @@ public class SimpleToolBarEx {
 					.setScriptTimeout(30, TimeUnit.SECONDS);
 			driver.get(baseURL);
 			// prevent the customer from launching multiple instances
-			// launch_tool.setEnabled(true);
-			find_icon_tool.setEnabled(true);
+			// launchTool.setEnabled(true);
+			findTool.setEnabled(true);
 			if (!osName.startsWith("Mac")) {
 				// TODO: add a sorry dialog for Mac / Safari, any OS / Firefox
 				// combinations
-				demo_tool.setEnabled(true);
+				demoTool.setEnabled(true);
 			}
-			flowchart_tool.setEnabled(true);
+			flowchartTool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
 			status.setText("Ready ...");
 			status.pack();
 		});
 
-		flowchart_tool.addListener(SWT.Selection, event -> {
+		flowchartTool.addListener(SWT.Selection, event -> {
+			flowchartTool.setEnabled(false);
 			RenderTemplate template = new RenderTemplate();
 			template.setTemplateName("templates/example2.twig");
 			generatedScript = "";
@@ -369,9 +383,11 @@ public class SimpleToolBarEx {
 			}
 			shell.setData("payload", generatedScript);
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
+			flowchartTool.setEnabled(true);
 		});
 
-		open_tool.addListener(SWT.Selection, event -> {
+		openTool.addListener(SWT.Selection, event -> {
+			openTool.setEnabled(false);
 			FileDialog dialog = new FileDialog(shell, SWT.OPEN);
 			String[] filterNames = new String[] { "YAML sources", "All Files (*)" };
 			String[] filterExtensions = new String[] { "*.yaml", "*" };
@@ -395,8 +411,6 @@ public class SimpleToolBarEx {
 					HashMap<String, String> elementData = testData.get(stepId);
 					// 'paginate' the breadcrump
 					Rectangle rect = bc.getBounds();
-					System.err.println("Screen width: " + java.awt.Toolkit.getDefaultToolkit()
-									.getScreenSize().width);
 					if (bc.getBounds().width > shell.getBounds().width - 5
 							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
 									.getScreenSize().width - 100) {
@@ -413,15 +427,16 @@ public class SimpleToolBarEx {
 				// YamlHelper.printConfiguration(config);
 				shell.layout(true, true);
 				shell.pack();
-				save_tool.setEnabled(true);
+				saveTool.setEnabled(true);
 			}
-			open_tool.setEnabled(true);
-			flowchart_tool.setEnabled(true);
+			openTool.setEnabled(true);
+			flowchartTool.setEnabled(true);
 			status.setText("Ready ...");
 			status.pack();
 		});
 
-		save_tool.addListener(SWT.Selection, event -> {
+		saveTool.addListener(SWT.Selection, event -> {
+			saveTool.setEnabled(false);
 			FileDialog dialog = new FileDialog(shell, SWT.SAVE);
 			dialog.setFilterNames(new String[] { "YAML Files", "All Files (*.*)" });
 			dialog.setFilterExtensions(new String[] { "*.yaml", "*.*" });
@@ -442,12 +457,40 @@ public class SimpleToolBarEx {
 			} else {
 				configFilePath = new String(path);
 			}
-		});
-		preferences_tool.addListener(SWT.Selection, event -> {
-			// TODO
+			saveTool.setEnabled(true);
 		});
 
-		find_icon_tool.addSelectionListener(new SelectionListener() {
+		preferencesTool.addListener(SWT.Selection, event -> {
+			preferencesTool.setEnabled(true);
+			shell.setData("updated", false);
+			configData = new HashMap<String, String>();
+			configData.put("Browser", "Chrome");
+			configData.put("Template", "Basic Java");
+			JSONObject json = new JSONObject();
+			try {
+				for (String key : configData.keySet()) {
+					json.put(key, configData.get(key));
+				}
+				StringWriter wr = new StringWriter();
+				json.write(wr);
+				String result = wr.toString();
+				System.err.println("Updating the subshell: " + result);
+				shell.setData("CurrentConfig", result);
+			} catch (JSONException ex) {
+				shell.setData("CurrentConfig",
+						"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java\", }");
+			}
+
+			ConfigFormEx o = new ConfigFormEx(Display.getCurrent(), shell);
+			o.render();
+			if ((Boolean) shell.getData("updated")) {
+				new Utils().readData((String) shell.getData("CurrentConfig"),
+						Optional.of(configData));
+			}
+			preferencesTool.setEnabled(true);
+		});
+
+		findTool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
@@ -455,7 +498,7 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
-					find_icon_tool.setEnabled(false);
+					findTool.setEnabled(false);
 					status.setText("Injecting the script ...");
 					status.pack();
 					wait = new WebDriverWait(driver, flexibleWait);
@@ -483,15 +526,15 @@ public class SimpleToolBarEx {
 							elementData, bc);
 					shell.layout(true, true);
 					shell.pack();
-					find_icon_tool.setEnabled(true);
+					findTool.setEnabled(true);
 					status.setText("Ready ...");
 					status.pack();
-					save_tool.setEnabled(true);
+					saveTool.setEnabled(true);
 				}
 			}
 		});
 
-		demo_tool.addSelectionListener(new SelectionListener() {
+		demoTool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
@@ -501,7 +544,7 @@ public class SimpleToolBarEx {
 				if (driver != null) {
 					status.setText("Running the demo ...");
 					status.pack();
-					demo_tool.setEnabled(false);
+					demoTool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
@@ -523,22 +566,22 @@ public class SimpleToolBarEx {
 					status.setText("Ready ...");
 					status.pack();
 					shell.pack();
-					demo_tool.setEnabled(true);
+					demoTool.setEnabled(true);
 				}
 			}
 		});
 
-		shutdown_tool.addListener(SWT.Selection, event -> {
+		shutdownTool.addListener(SWT.Selection, event -> {
 			status.setText("Shutting down ...");
 			status.pack();
 			if (driver != null) {
-				shutdown_tool.setEnabled(false);
+				shutdownTool.setEnabled(false);
 				try {
 					BrowserDriver.close();
 				} catch (Exception e) {
 					System.err.println("Ignored exception: " + e.toString());
 				}
-				shutdown_tool.setEnabled(true);
+				shutdownTool.setEnabled(true);
 			}
 			shell.getDisplay().dispose();
 			System.exit(0);
@@ -764,8 +807,8 @@ public class SimpleToolBarEx {
 		int step_number = (data.containsKey("ElementStepNumber"))
 				? Integer.parseInt(data.get("ElementStepNumber")) : step_index;
 		item.setText(String.format("Step %d: %s", (int) (step_number + 1), name));
-		item.setImage(page_icon);
-		item.setSelectionImage(page_icon);
+		item.setImage(pageIcon);
+		item.setSelectionImage(pageIcon);
 
 		// NOTE: MouseDown event is not received
 		item.addListener(SWT.MouseDown, new Listener() {
@@ -848,15 +891,15 @@ public class SimpleToolBarEx {
 
 	@Override
 	public void finalize() {
-		launch_icon.dispose();
-		find_icon.dispose();
-		shutdown_icon.dispose();
-		preferences_icon.dispose();
-		page_icon.dispose();
-		demo_icon.dispose();
-		flowchart_icon.dispose();
-		open_icon.dispose();
-		save_icon.dispose();
+		launchIcon.dispose();
+		findIcon.dispose();
+		shutdownIcon.dispose();
+		preferencesIcon.dispose();
+		pageIcon.dispose();
+		demoIcon.dispose();
+		flowchartIcon.dispose();
+		openIcon.dispose();
+		saveIcon.dispose();
 	}
 
 	public static void main(String[] args) {

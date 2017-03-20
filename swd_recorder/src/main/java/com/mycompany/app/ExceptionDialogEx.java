@@ -14,6 +14,11 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.mycompany.app.Utils;
 
+/**
+ * Exception dialog for Selenium Webdriver Elementor Tool
+ * 
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 // based on http://www.vogella.com/tutorials/EclipseDialogs/article.html
 // http://www.programcreek.com/java-api-examples/org.eclipse.jface.dialogs.ErrorDialog
 // http://stackoverflow.com/questions/2826959/jface-errordialog-how-do-i-show-something-in-the-details-portion
@@ -71,13 +76,15 @@ public class ExceptionDialogEx {
 
 		for (StackTraceElement stackTrace : Thread.currentThread()
 				.getStackTrace()) {
-			Status status = new Status(IStatus.ERROR, "com.example.e4.rcp.todo",
+			Status status = new Status(IStatus.ERROR, "com.mycompany.app",
 					stackTrace.toString());
 			childStatuses.add(status);
 		}
-
-		MultiStatus status = new MultiStatus("com.example.e4.rcp.todo",
-				IStatus.ERROR, childStatuses.toArray(new Status[] {}), t.toString(), t);
+		String summary = (description != null) ? description : t.toString();
+		MultiStatus status = new MultiStatus("com.mycompany.app",
+				IStatus.ERROR, childStatuses.toArray(new Status[] {}),
+				(summary.length() > 120) ? summary.substring(0, 120) : summary,
+				t);
 		return status;
 	}
 }
