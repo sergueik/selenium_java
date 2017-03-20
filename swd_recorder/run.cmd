@@ -8,12 +8,11 @@ if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.3.9
 set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
 set M2=%M2_HOME%\bin
 set MAVEN_OPTS=-Xms256m -Xmx512m
-
+set PACKAGE_NAME=swet
 PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 
-
 set TARGET=%CD%\target
-set PACKAGE_VERSION=0.0.3-SNAPSHOT
+set PACKAGE_VERSION=0.0.4-SNAPSHOT
 
 set MAIN_APP_PACKAGE=com.mycompany.app
 
@@ -22,7 +21,7 @@ if "%MAIN_APP_CLASS%"=="" set MAIN_APP_CLASS=SimpleToolBarEx
 
 call mvn package install
 
-java -cp %TARGET%\myswt-%PACKAGE_VERSION%.jar;%TARGET%\lib\* ^
+java -cp %TARGET%\%PACKAGE_NAME%-%PACKAGE_VERSION%.jar;%TARGET%\lib\* ^
 %MAIN_APP_PACKAGE%.%MAIN_APP_CLASS%
 
 goto :EOF

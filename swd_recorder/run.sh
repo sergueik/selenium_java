@@ -1,7 +1,8 @@
 #!/bin/bash
 # set -x
 
-PROJECT_VERSION='0.0.3-SNAPSHOT'
+PACKAGE_NAME='swet'
+PACKAGE_VERSION='0.0.4-SNAPSHOT'
 MAIN_APP_PACKAGE='com.mycompany.app'
 MAIN_APP_CLASS=${1:-SimpleToolBarEx}
 
@@ -29,4 +30,4 @@ then
   LAUNCH_OPTS='-XstartOnFirstThread'
 fi
 mvn package install
-java $LAUNCH_OPTS -cp target/myswt-$PROJECT_VERSION.jar:target/lib/* "$MAIN_APP_PACKAGE.$MAIN_APP_CLASS"
+java $LAUNCH_OPTS -cp target/$PACKAGE_NAME-$PACKAGE_VERSION.jar:target/lib/* $MAIN_APP_PACKAGE.$MAIN_APP_CLASS

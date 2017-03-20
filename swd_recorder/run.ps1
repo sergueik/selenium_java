@@ -13,7 +13,8 @@ $env:M2 = "${env:M2_HOME}\bin"
 $env:PATH = "${env:JAVA_HOME}\bin;${env:M2};${env:PATH}"
 $env:JAVA_OPTS = $env:MAVEN_OPTS = @('-Xms256m','-Xmx512m')
 
-$PROJECT_VERSION = '0.0.3-SNAPSHOT'
+$PACKAGE_NAME = 'swet'
+$PACKAGE_VERSION = '0.0.4-SNAPSHOT'
 $MAIN_APP_PACKAGE = 'com.mycompany.app'
 
 
@@ -44,5 +45,5 @@ $DEPENDENCIES.Keys | ForEach-Object {
 
 # Run
 & 'java.exe' `
-   '-cp' "target\myswt-${PROJECT_VERSION}.jar;target\lib\*" `
+   '-cp' "target\${PACKAGE_NAME}-${PACKAGE_VERSION}.jar;target\lib\*" `
    "${MAIN_APP_PACKAGE}.${MAIN_APP_CLASS}"
