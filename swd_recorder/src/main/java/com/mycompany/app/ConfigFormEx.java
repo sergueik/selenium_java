@@ -1,11 +1,16 @@
 package com.mycompany.app;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.MenuDetectEvent;
@@ -48,7 +53,7 @@ public class ConfigFormEx {
 	private static HashMap<String, String> configData = new HashMap<String, String>(); // empty
 	private static HashMap<String, String[]> configOptions = new HashMap<String, String[]>();
 	private int formWidth = 516;
-	private int formHeight = 210;
+	private int formHeight = 238;
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
 	private static Shell parentShell = null;
@@ -57,12 +62,16 @@ public class ConfigFormEx {
 
 	ConfigFormEx(Display parentDisplay, Shell parent) {
 
+		final String dirPath = String.format("%s/src/main/resources/templates",
+				System.getProperty("user.dir"));
+		listFilesForFolder(new File(dirPath));
+
 		configOptions.put("Browser", new String[] { "Chrome", "Firefox",
 				"Internet Explorer", "Edge", "Safari" });
-		// TODO: scan the template directory. Keep one config template inline and
-		// merge
-		configOptions.put("Template",
-				new String[] { "Basic C#", "Basic Java", "Page Objects/C#", "Page Objects/Java", "Selenide" });
+    // TODO: Keep few config template inline and
+		// rest up to customer
+		configOptions.put("Template", new String[] { "Basic C#", "Basic Java",
+				"Page Objects/C#", "Page Objects/Java", "Selenide" });
 
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
@@ -107,6 +116,7 @@ public class ConfigFormEx {
 	private static class RowComposite extends Composite {
 
 		final Button buttonSave;
+
 		public RowComposite(Composite composite) {
 
 			super(composite, SWT.NO_FOCUS);
@@ -130,8 +140,7 @@ public class ConfigFormEx {
 						json.write(wr);
 						result = wr.toString();
 						updated = true;
-						System.err
-								.println("Updating the parent shell: " + result);
+						System.err.println("Updating the parent shell: " + result);
 						if (parentShell != null) {
 							parentShell.setData("CurrentConfig", result);
 							parentShell.setData("updated", true);
@@ -157,8 +166,9 @@ public class ConfigFormEx {
 
 		public void renderData(HashMap<String, String> data) {
 
-			List<String> configs = Arrays.asList("Browser", "Base URL", "Template");
-      // TODO: template directory
+			List<String> configs = Arrays.asList("Browser", "Base URL", "Template",
+					"Template Directory");
+			// TODO: template directory
 			for (String configKey : configs) {
 				if (configOptions.containsKey(configKey)) {
 					final Label configLabel = new Label(this, SWT.NONE);
@@ -166,8 +176,9 @@ public class ConfigFormEx {
 
 					final Combo configValue = new Combo(this, SWT.READ_ONLY);
 					String items[] = configOptions.get(configKey);
-          configValue.setItems(items);
-					configValue.select(Arrays.asList(items).indexOf(configData.get(configKey)));
+					configValue.setItems(items);
+					configValue
+							.select(Arrays.asList(items).indexOf(configData.get(configKey)));
 					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 					/*
 					String value = data.get(configKey);
@@ -213,6 +224,7 @@ public class ConfigFormEx {
 					configValue.setText(String.format("%s...", configKey));
 					configValue.setData("key", configKey);
 					configValue.addModifyListener(new ModifyListener() {
+
 						@Override
 						public void modifyText(ModifyEvent event) {
 							Text text = (Text) event.widget;
@@ -223,6 +235,55 @@ public class ConfigFormEx {
 				}
 			}
 
+		}
+	}
+
+	public void listFilesForFolder(final File dir) {
+		FileReader fileReader = null;
+		String contents = null;
+		for (final File fileEntry : dir.listFiles()) {
+			contents = null;
+			if (fileEntry.isFile()) {
+				try {
+					fileReader = new FileReader(fileEntry);
+					char[] template = new char[(int) fileEntry.length()];
+					fileReader.read(template);
+					contents = new String(template);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					if (fileReader != null) {
+						try {
+							fileReader.close();
+						} catch (IOException e) {
+						}
+					}
+				}
+			}
+			if (contents != null) {
+				String twigCommentMatcher = "\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}";
+				String templateMatcher = "template: (.*)$";
+				Pattern patternTwigComment = Pattern.compile(twigCommentMatcher,
+						Pattern.MULTILINE);
+				Matcher matcherTwigComment = patternTwigComment.matcher(contents);
+				if (matcherTwigComment.find()) {
+					String comment = matcherTwigComment.group(1);
+					String templateName = null;
+					Pattern patternTemplate = Pattern.compile(templateMatcher,
+							Pattern.MULTILINE);
+					Matcher matcherTemplate = patternTemplate.matcher(comment);
+					if (matcherTemplate.find()) {
+            // TODO: scan the template directory and merge configOptions. 
+            templateName = matcherTemplate.group(1);
+						System.out.println(String.format("got a tag for %s: '%s'",
+								fileEntry.getName(), templateName));
+					} else {
+						System.out.println(String.format("no tag: %s", fileEntry.getName()));
+					}
+				} else {
+					System.out.println(String.format("no tag: %s", fileEntry.getName()));
+				}
+			}
 		}
 	}
 
