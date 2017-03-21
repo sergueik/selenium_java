@@ -1,9 +1,11 @@
-### Info, goals
+![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png)
 
-![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png) Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
-Dmytro Zharii (and author). SWET is using [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets 
-(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms forthe user interface and JTwig template engine instead 
-of Razor for code generation therefore it runs on Windows, Mac or Linux, 32 or 64 bit platforms. 
+### Info
+
+Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
+Dmytro Zharii (and author). SWET is using [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets
+(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms forthe user interface and JTwig template engine instead
+of Razor for code generation therefore it runs on Windows, Mac or Linux, 32 or 64 bit platforms.
 Eventually the full functionality of SWD is to be achieved, also SWET might become an Eclipse plugin.
 SWET is currently alpha quality, it may not be very useful yet, but you can help! Continue reading for info on how to get the dev environment setup.
 
@@ -39,13 +41,13 @@ on Linux or a Mac.
 The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository,
 compiles and packages the project using maven
 and runs the application jar from the `target` directory.
-The runner script can also be used to launch individual forms that have been largely based on 
+The runner script can also be used to launch individual forms that have been largely based on
 examples from the Standard Widget Toolkit study
 project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt),
-which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com) as: 
+which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com) as:
 
 ```shell
-./run.sh [ConfigFormEx|ScrolledTextEx|ComplexFormEx] 
+./run.sh [ConfigFormEx|ScrolledTextEx|ComplexFormEx]
 ```
 ### Toolbar Buttons
 
@@ -168,15 +170,31 @@ then follow the [Running Selenium Tests in Safari Browser](http://toolsqa.com/se
 
 The code is generated using SWIG templates which look like
 ```
-{% if (ElementSelectedBy == 'ElementCssSelector') -%}
-  driver.findElement(By.cssSelector("{{ ElementCssSelector }}");
+{#
+template: Basic Page Objects (Java)
+#}
+class TestPage (Page) {
+  // {{ ElementText }}
+  {% if (ElementSelectedBy == 'ElementCssSelector') -%}
+  @FindBy( how = How.CSS, using = "{{ ElementCssSelector }}" )
 {% elseif (ElementSelectedBy == 'ElementXPath') -%}
-  driver.findElement(By.Xpath("{{ ElementXPath }}");
+  @FindBy( how = How.XPATH, using = "{{ ElementXPath }}" )
 {% elseif (ElementSelectedBy == 'ElementId') -%}
-  driver.findElement(By.Id("{{ ElementId }}");
+  @FindBy( how = How.ID, using =  "{{ ElementId }}" )
+{% endif -%}
+{% if (ElementVariable != '') -%}
+  private WebElement {{ ElementVariable }};
 {% else -%}
+  private WebElement element;
 {% endif -%}
 ```
+Any language/framework can be supported. The comment
+```
+{#
+template: Basic Page Objects (Java)
+#}
+```
+is reserved for future use, when tester is allowed to provide the path to template during session configuration.
 
 ### Configuration, saving and loading
 
@@ -219,6 +237,7 @@ elements:
     ElementSelectedBy: ElementXPath
     ElementText: Staff Choice Outlook CalDav Synchronizer
     ElementId: ''
+    ElementVariable: userSelectedVariableName
     ElementXPath: id("page-body")/div[1]/section[1]/div[2]/div[2]/section[1]/section[2]/header[1]/h3[1]/a[@href="/projects/outlookcaldavsynchronizer/?source=frontpage&position=1"]
 ```
 
@@ -227,7 +246,7 @@ elements:
 * Testing with Safari and variety of IE / Edge browsers
 * Adding the code generator templates
 * Codebase cleanup
-* Adding Threads to Element Finder button 
+* Adding Threads to Element Finder button
 
 ### Links
 

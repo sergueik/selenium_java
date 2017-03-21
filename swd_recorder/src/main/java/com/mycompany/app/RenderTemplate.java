@@ -46,8 +46,10 @@ class RenderTemplate {
 	private static HashMap<String, String> createSampleElementData() {
 		HashMap<String, String> elementData = new HashMap<String, String>();
 		elementData.put("ElementId", "id");
-		elementData.put("ElementCodeTemplateName", "gmail link");
+		elementData.put("ElementCodeName", "name of the element, supplied during recoring");
+		elementData.put("ElementText", "text of the element, when available");
 		elementData.put("ElementXPath", "/html//img[1]");
+		elementData.put("ElementVariable", "elementVariable");
 		elementData.put("ElementCssSelector", "div#gbw > a.highlight");
 		elementData.put("ElementSelectedBy", "ElementCssSelector");
 		return elementData;

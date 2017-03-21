@@ -2,7 +2,7 @@
 {% if (ElementText != '') -%}
 // {{ ElementText }}
 {% endif -%}
-WebElement element = driver.findElement( 
+WebElement element = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
 {% if (ElementSelectedBy == 'ElementCssSelector') -%}
   By.cssSelector("{{ ElementCssSelector }}")
 {% elseif (ElementSelectedBy == 'ElementXPath') -%}
@@ -10,4 +10,4 @@ WebElement element = driver.findElement(
 {% elseif (ElementSelectedBy == 'ElementId') -%}
   By.Id("{{ ElementId }}")
 {% endif -%}
-)
+ )));

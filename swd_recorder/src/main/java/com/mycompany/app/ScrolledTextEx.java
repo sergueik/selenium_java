@@ -95,7 +95,7 @@ class ScrolledTextEx {
 			payload = (String) parent.getData("payload");
 		} else {
 			RenderTemplate template = new RenderTemplate();
-			template.setTemplateName("templates/example2.twig");
+			template.setTemplateName("templates/example3.twig");
 			try {
 				payload = template.renderTest();
 			} catch (Exception e) {
