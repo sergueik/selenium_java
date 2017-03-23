@@ -336,23 +336,23 @@ public class SimpleToolBarEx {
 			status.setText("Launching the browser ...");
 			status.pack();
 			shell.pack();
-			if (osName.toLowerCase().startsWith("windows")) {
-				driver = BrowserDriver.initialize("chrome");
-				/*
-				// IE 10 works, IE 11 does not			
-				driver = new InternetExplorerDriver(capabilities);
-				*/
-			} else if (osName.startsWith("Mac")) {
-				driver = BrowserDriver.initialize("safari");
-			} else {
-				// Linux
-				try {
-					driver = BrowserDriver.initialize("firefox");
-				} catch (Exception e) {
-					ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
-					// show the error dialog with exception trace
-					o.execute();
+			String browser = configData.get("Browser");
+			if (browser == null || browser == "") {
+				if (osName.toLowerCase().startsWith("windows")) {
+					browser = "chrome";
+				} else if (osName.startsWith("Mac")) {
+					browser = "safari";
+				} else {
+					// Linux
+					browser = "firefox";
 				}
+			}
+			try {
+				driver = BrowserDriver.initialize(browser);
+			} catch (Exception e) {
+				ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
+				// show the error dialog with exception trace
+				o.execute();
 			}
 
 			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
@@ -467,7 +467,6 @@ public class SimpleToolBarEx {
 		preferencesTool.addListener(SWT.Selection, event -> {
 			preferencesTool.setEnabled(true);
 			shell.setData("updated", false);
-
 			shell.setData("CurrentConfig", new Utils().writeDataJSON(configData,
 					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java\", }"));
 			ConfigFormEx o = new ConfigFormEx(Display.getCurrent(), shell);
