@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.json.JSONException;
@@ -62,20 +63,36 @@ public class Utils {
 		}
 	}
 
+	public String writeDataJSON(Map<String, String> data, String defaultData) {
+		String result = defaultData;
+		JSONObject json = new JSONObject();
+		try {
+			for (String key : data.keySet()) {
+				json.put(key, data.get(key));
+			}
+			StringWriter wr = new StringWriter();
+			json.write(wr);
+			result = wr.toString();
+		} catch (JSONException e) {
+			System.err.println("Excpetion (ignored): " + e);
+		}
+		return result;
+	}
+
 	public String getResourcePath(String resourceFileName) {
 		return String.format("%s/src/main/resources/%s",
 				System.getProperty("user.dir"), resourceFileName);
 	}
 
-	public String readData(Optional<HashMap<String, String>> parameters) {
+	public String readData(Optional<Map<String, String>> parameters) {
 		return readData(null, parameters);
 	}
 
 	public String readData(String payload,
-			Optional<HashMap<String, String>> parameters) {
+			Optional<Map<String, String>> parameters) {
 
 		Boolean collectResults = parameters.isPresent();
-		HashMap<String, String> collector = (collectResults) ? parameters.get()
+		Map<String, String> collector = (collectResults) ? parameters.get()
 				: new HashMap<String, String>();
 
 		String data = (payload == null)

@@ -198,7 +198,11 @@ public class SimpleToolBarEx {
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private ArrayList<String> stepKeys = new ArrayList<String>();
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
-	private HashMap<String, String> configData = new HashMap<String, String>();
+	private static Map<String, String> configData = new HashMap<String, String>();
+	static {
+		configData.put("Browser", "Chrome");
+		configData.put("Template", "Basic Java");
+	}
 	private Label status;
 
 	private static int width = 900;
@@ -463,24 +467,9 @@ public class SimpleToolBarEx {
 		preferencesTool.addListener(SWT.Selection, event -> {
 			preferencesTool.setEnabled(true);
 			shell.setData("updated", false);
-			configData = new HashMap<String, String>();
-			configData.put("Browser", "Chrome");
-			configData.put("Template", "Basic Java");
-			JSONObject json = new JSONObject();
-			try {
-				for (String key : configData.keySet()) {
-					json.put(key, configData.get(key));
-				}
-				StringWriter wr = new StringWriter();
-				json.write(wr);
-				String result = wr.toString();
-				System.err.println("Updating the subshell: " + result);
-				shell.setData("CurrentConfig", result);
-			} catch (JSONException ex) {
-				shell.setData("CurrentConfig",
-						"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java\", }");
-			}
 
+			shell.setData("CurrentConfig", new Utils().writeDataJSON(configData,
+					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java\", }"));
 			ConfigFormEx o = new ConfigFormEx(Display.getCurrent(), shell);
 			o.render();
 			if ((Boolean) shell.getData("updated")) {

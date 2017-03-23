@@ -66,13 +66,13 @@ public class ConfigFormEx {
 		configOptions.put("Browser",
 				new ArrayList<String>(Arrays.asList(new String[] { "Chrome", "Firefox",
 						"Internet Explorer", "Edge", "Safari" })));
-		// TODO: Keep few config template inline and
-		// rest up to customer
+		// TODO: Keep few twig templates embedded in the application jar and
+		// make rest up to customer
 		configOptions.put("Template",
 				new ArrayList<String>(
-						Arrays.asList(new String[] { "Basic C# (embedded)", "Basic Java (embedded)",
-								"Page Objects/C# (embedded)", "Page Objects/Java (embedded)", "Selenide (embedded)" })));
-
+						Arrays.asList(new String[] { "Basic C# (embedded)",
+								"Basic Java (embedded)", "Page Objects/C# (embedded)",
+								"Page Objects/Java (embedded)", "Selenide (embedded)" })));
 		final String dirPath = String.format("%s/src/main/resources/templates",
 				System.getProperty("user.dir"));
 		listFilesForFolder(new File(dirPath));
@@ -108,7 +108,6 @@ public class ConfigFormEx {
 		rc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		rc.pack();
 		shell.pack();
-
 		shell.setSize(formWidth, formHeight);
 
 		while (!shell.isDisposed()) {
@@ -122,7 +121,6 @@ public class ConfigFormEx {
 		final Button buttonSave;
 
 		public RowComposite(Composite composite) {
-
 			super(composite, SWT.NO_FOCUS);
 			RowLayout rl = new RowLayout();
 			rl.wrap = false;
@@ -135,23 +133,14 @@ public class ConfigFormEx {
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					JSONObject json = new JSONObject();
-					try {
-						for (String key : configData.keySet()) {
-							json.put(key, configData.get(key));
-						}
-						StringWriter wr = new StringWriter();
-						json.write(wr);
-						result = wr.toString();
-						updated = true;
-						System.err.println("Updating the parent shell: " + result);
-						if (parentShell != null) {
-							parentShell.setData("CurrentConfig", result);
-							parentShell.setData("updated", true);
-						}
-					} catch (JSONException ex) {
+					result = new Utils().writeDataJSON(configData, "{}");
+
+					System.err.println("Updating the parent shell: " + result);
+					if (parentShell != null) {
+						parentShell.setData("CurrentConfig", result);
+						parentShell.setData("updated", true);
+						composite.dispose();
 					}
-					composite.dispose();
 				}
 			});
 		}
@@ -170,10 +159,10 @@ public class ConfigFormEx {
 
 		public void renderData(HashMap<String, String> data) {
 
-			List<String> configs = Arrays.asList("Browser", "Base URL", "Template",
-					"Template Directory");
+			// List<String> configs = ;
 			// TODO: template directory
-			for (String configKey : configs) {
+			for (String configKey : Arrays.asList("Browser", "Base URL", "Template",
+					"Template Directory")) {
 				if (configOptions.containsKey(configKey)) {
 					final Label configLabel = new Label(this, SWT.NONE);
 					configLabel.setText(configKey);
@@ -201,7 +190,7 @@ public class ConfigFormEx {
 						public void widgetSelected(SelectionEvent event) {
 							Combo o = (Combo) event.widget;
 							data.replace((String) o.getData("key"), o.getText());
-							// TODO: assoc.
+							// TODO: validation process
 							if (configValue.getText().equals("Safari")) {
 							} else {
 								/*
@@ -228,24 +217,31 @@ public class ConfigFormEx {
 					final Text configValue;
 					configValue = new Text(this, SWT.SINGLE | SWT.BORDER);
 					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					configValue.setText(String.format("%s...", configKey));
+					if (data.containsKey(configKey)) {
+						configValue.setText(data.get(configKey));
+					} else {
+						// configValue.setText(String.format("%s...", configKey));
+					}
 					configValue.setData("key", configKey);
 					configValue.addModifyListener(new ModifyListener() {
-
 						@Override
 						public void modifyText(ModifyEvent event) {
 							Text text = (Text) event.widget;
-							// System.err.println(text.getText());
+							System.err.println(String.format("%s = %s",
+									(String) text.getData("key"), text.getText()));
+							if (data.containsKey((String) text.getData("key"))) {
+								data.replace((String) text.getData("key"), text.getText());
+							} else {
+								data.put((String) text.getData("key"), text.getText());
+							}
 						}
 					});
-
 				}
 			}
-
 		}
 	}
-	
-	//scan the template directory and merge configOptions.
+
+	// scan the template directory and merge configOptions.
 	public void listFilesForFolder(final File dir) {
 		FileReader fileReader = null;
 		String contents = null;
@@ -281,7 +277,7 @@ public class ConfigFormEx {
 							Pattern.MULTILINE);
 					Matcher matcherTemplate = patternTemplate.matcher(comment);
 					if (matcherTemplate.find()) {
-						
+
 						templateName = matcherTemplate.group(1);
 						System.out.println(String.format("got a tag for %s: '%s'",
 								fileEntry.getName(), templateName));

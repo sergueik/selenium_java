@@ -46,7 +46,7 @@ public class ComplexFormEx {
 	private Display display;
 	private String dataKey = "CurrentCommandId";
 	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
-	private int formWidth = 450;
+	private int formWidth = 750;
 	private int formHeight = 280;
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
@@ -92,6 +92,8 @@ public class ComplexFormEx {
 		rc.setLayoutData(gd);
 		rc.pack();
 		shell.pack();
+		shell.setSize(formWidth, formHeight);
+
 		shell.addListener(SWT.Close, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
@@ -107,8 +109,6 @@ public class ComplexFormEx {
 				shell.dispose();
 			}
 		});
-
-		shell.setSize(formHeight, formHeight);
 
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
@@ -149,23 +149,17 @@ public class ComplexFormEx {
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					// TODO: move to Utils
-					JSONObject json = new JSONObject();
-					try {
-						for (String key : elementData.keySet()) {
-							json.put(key, elementData.get(key));
-						}
-						StringWriter wr = new StringWriter();
-						json.write(wr);
-						result = wr.toString();
-						updated = true;
-						System.err
-								.println("Handle OK: updating the parent shell: " + result);
-						if (parentShell != null) {
+
+					result = new Utils().writeDataJSON(elementData, "{}");
+
+					updated = true;
+					System.err.println("Handle OK: updating the parent shell: " + result);
+					if (parentShell != null) {
+						if (result != "{}") {
+
 							parentShell.setData("result", result);
 							parentShell.setData("updated", true);
 						}
-					} catch (JSONException ex) {
 					}
 					composite.dispose();
 				}
