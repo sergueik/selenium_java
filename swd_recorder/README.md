@@ -297,6 +297,10 @@ elements:
   * [mono/xwt](https://github.com/mono/xwt)
   * [json2](https://github.com/douglascrockford/JSON-js)
 
+### Note
+
+[Swet](http://www.urbandictionary.com/define.php?term=swet&defid=6820405) - *a word that describes something that's hot. Or something that would typically take a lot of skill and practice to do, therefore causing the person to sweat*.
+
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
 
