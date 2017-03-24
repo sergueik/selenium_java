@@ -35,9 +35,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Session configuration editor form for Selenium Webdriver Elementor Tool
  *
@@ -50,16 +47,14 @@ import org.json.JSONObject;
 public class ConfigFormEx {
 
 	private Shell shell;
+	private static Shell parentShell = null;
 	private Display display;
-	private static HashMap<String, String> configData = new HashMap<String, String>(); // empty
-	private static HashMap<String, List<String>> configOptions = new HashMap<String, List<String>>();
-	private int formWidth = 516;
-	private int formHeight = 238;
+	private final static int formWidth = 516;
+	private final static int formHeight = 238;
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
-	private static Shell parentShell = null;
-	private static Boolean updated = false;
-	private static String result = null;
+	private static HashMap<String, String> configData = new HashMap<String, String>(); // empty
+	private static HashMap<String, List<String>> configOptions = new HashMap<String, List<String>>();
 
 	ConfigFormEx(Display parentDisplay, Shell parent) {
 
@@ -73,10 +68,6 @@ public class ConfigFormEx {
 						Arrays.asList(new String[] { "Basic C# (embedded)",
 								"Basic Java (embedded)", "Page Objects/C# (embedded)",
 								"Page Objects/Java (embedded)", "Selenide (embedded)" })));
-		final String dirPath = String.format("%s/src/main/resources/templates",
-				System.getProperty("user.dir"));
-		listFilesForFolder(new File(dirPath));
-
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 		if (parent != null) {
@@ -90,23 +81,31 @@ public class ConfigFormEx {
 					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java (embedded)\", }",
 					Optional.of(configData));
 		}
+		String dirPath = String.format("%s/src/main/resources/templates",
+				System.getProperty("user.dir"));
+		if (configData.containsKey("Template Directory")) {
+			dirPath = configData.get("Template Directory");
+			if (dirPath != "") {
+				listFilesForFolder(new File(dirPath), configOptions);
+			}
+		}
 	}
 
 	public void render() {
 		shell.open();
 		shell.setText("Session Configuration");
-		GridLayout gl = new GridLayout();
-		gl.numColumns = 1;
-		shell.setLayout(gl);
+		GridLayout gridLayout = new GridLayout();
+		gridLayout.numColumns = 1;
+		shell.setLayout(gridLayout);
 
-		GridComposite gc = new GridComposite(shell);
-		gc.renderData(configData);
-		gc.setLayoutData(new GridData(GridData.FILL_BOTH));
-		gc.pack();
+		GridComposite gridComposite = new GridComposite(shell);
+		gridComposite.renderData(configData);
+		gridComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gridComposite.pack();
 
-		RowComposite rc = new RowComposite(shell);
-		rc.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		rc.pack();
+		RowComposite rowComposite = new RowComposite(shell);
+		rowComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		rowComposite.pack();
 		shell.pack();
 		shell.setSize(formWidth, formHeight);
 
@@ -122,10 +121,10 @@ public class ConfigFormEx {
 
 		public RowComposite(Composite composite) {
 			super(composite, SWT.NO_FOCUS);
-			RowLayout rl = new RowLayout();
-			rl.wrap = false;
-			rl.pack = false;
-			this.setLayout(rl);
+			RowLayout rowLayout = new RowLayout();
+			rowLayout.wrap = false;
+			rowLayout.pack = false;
+			this.setLayout(rowLayout);
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
 			buttonSave.setSize(buttonWidth, buttonHeight);
@@ -133,14 +132,15 @@ public class ConfigFormEx {
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-					result = new Utils().writeDataJSON(configData, "{}");
+					String result = new Utils().writeDataJSON(configData, "{}");
 
-					System.err.println("Updating the parent shell: " + result);
 					if (parentShell != null) {
 						parentShell.setData("CurrentConfig", result);
 						parentShell.setData("updated", true);
 						composite.dispose();
-					}
+					} else {
+            System.err.println("Updating the parent shell: " + result);
+          }
 				}
 			});
 		}
@@ -148,19 +148,14 @@ public class ConfigFormEx {
 
 	private static class GridComposite extends Composite {
 
-		private int labelWidth = 70;
-
-		public GridComposite(Composite c) {
-			super(c, SWT.BORDER);
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			this.setLayout(gl);
+		public GridComposite(Composite composite) {
+			super(composite, SWT.BORDER);
+			GridLayout gridLayout = new GridLayout();
+			gridLayout.numColumns = 2;
+			this.setLayout(gridLayout);
 		}
 
 		public void renderData(HashMap<String, String> data) {
-
-			// List<String> configs = ;
-			// TODO: template directory
 			for (String configKey : Arrays.asList("Browser", "Base URL", "Template",
 					"Template Directory")) {
 				if (configOptions.containsKey(configKey)) {
@@ -176,14 +171,6 @@ public class ConfigFormEx {
 					configValue
 							.select(Arrays.asList(items).indexOf(configData.get(configKey)));
 					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					/*
-					String value = data.get(configKey);
-					if (value.length() > 0) {
-						configValue.setText(data.get(configKey));
-					} else {
-						configValue.setEnabled(false);
-					}
-					*/
 					configValue.setData("key", configKey);
 
 					configValue.addSelectionListener(new SelectionAdapter() {
@@ -241,8 +228,9 @@ public class ConfigFormEx {
 		}
 	}
 
-	// scan the template directory and merge configOptions.
-	public void listFilesForFolder(final File dir) {
+	// scan the template directory and merge options.
+	public void listFilesForFolder(final File dir,
+			HashMap<String, List<String>> options) {
 		FileReader fileReader = null;
 		String contents = null;
 		for (final File fileEntry : dir.listFiles()) {
@@ -265,6 +253,7 @@ public class ConfigFormEx {
 				}
 			}
 			if (contents != null) {
+				// find comment containing the template name
 				String twigCommentMatcher = "\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}";
 				String templateMatcher = "template: (.*)$";
 				Pattern patternTwigComment = Pattern.compile(twigCommentMatcher,
@@ -279,11 +268,13 @@ public class ConfigFormEx {
 					if (matcherTemplate.find()) {
 
 						templateName = matcherTemplate.group(1);
+						/*
 						System.out.println(String.format("got a tag for %s: '%s'",
 								fileEntry.getName(), templateName));
-						List<String> items = configOptions.get("Template");
+						    */
+						List<String> items = options.get("Template");
 						items.add(String.format("%s (user defined)", templateName));
-						configOptions.put("Template", items);
+						options.put("Template", items);
 					} else {
 						System.out
 								.println(String.format("no tag: %s", fileEntry.getName()));

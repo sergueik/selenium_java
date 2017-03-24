@@ -28,9 +28,6 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 /**
  * Element attribute editor form for Selenium Webdriver Elementor Tool
  * 
@@ -44,16 +41,15 @@ public class ComplexFormEx {
 	private Shell shell;
 	private String commandId;
 	private Display display;
+	private static Shell parentShell = null;
 	private String dataKey = "CurrentCommandId";
-	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
-	private int formWidth = 750;
-	private int formHeight = 280;
+	private final static int formWidth = 750;
+	private final static int formHeight = 280;
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
-	private static Shell parentShell = null;
 	private static Boolean updated = false;
 	private static String result = null;
-	private static String selectedKey = null;
+	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 
 	ComplexFormEx(Display parentDisplay, Shell parent) {
 		display = (parentDisplay != null) ? parentDisplay : new Display();
@@ -81,16 +77,14 @@ public class ComplexFormEx {
 		titleData.setText((elementData.containsKey("ElementCodeName"))
 				? elementData.get("ElementCodeName") : "Element selector details");
 
-		GridComposite gc = new GridComposite(shell);
-		gc.renderData(elementData);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gc.setLayoutData(gd);
-		gc.pack();
+		GridComposite gridComposite = new GridComposite(shell);
+		gridComposite.renderData(elementData);
+		gridComposite.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gridComposite.pack();
 
-		RowComposite rc = new RowComposite(shell);
-		gd = new GridData(GridData.FILL_HORIZONTAL);
-		rc.setLayoutData(gd);
-		rc.pack();
+		RowComposite rowComposite = new RowComposite(shell);
+		rowComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		rowComposite.pack();
 		shell.pack();
 		shell.setSize(formWidth, formHeight);
 
@@ -100,10 +94,11 @@ public class ComplexFormEx {
 				if (updated) {
 					if (parentShell != null) {
 						// NOTE: not currently reached
-						System.err
-								.println("Handle Close: updating the parent shell: " + result);
 						parentShell.setData("result", result);
 						parentShell.setData("updated", true);
+					} else {
+						System.err
+								.println("Handle Close: updating the parent shell: " + result);
 					}
 				}
 				shell.dispose();
@@ -118,17 +113,17 @@ public class ComplexFormEx {
 
 	private static class RowComposite extends Composite {
 
-		final Button buttonSave;
-		final Button buttonDelete;
-		final Button buttonCancel;
+		private final Button buttonSave;
+		private final Button buttonDelete;
+		private final Button buttonCancel;
 
 		public RowComposite(Composite composite) {
 
 			super(composite, SWT.NO_FOCUS);
-			RowLayout rl = new RowLayout();
-			rl.wrap = false;
-			rl.pack = false;
-			this.setLayout(rl);
+			RowLayout rowLayout = new RowLayout();
+			rowLayout.wrap = false;
+			rowLayout.pack = false;
+			this.setLayout(rowLayout);
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
 			buttonSave.setSize(buttonWidth, buttonHeight);
@@ -149,14 +144,12 @@ public class ComplexFormEx {
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
-
 					result = new Utils().writeDataJSON(elementData, "{}");
-
 					updated = true;
-					System.err.println("Handle OK: updating the parent shell: " + result);
 					if (parentShell != null) {
 						if (result != "{}") {
-
+							// System.err.println("Handle OK: updating the parent shell: " +
+							// result);
 							parentShell.setData("result", result);
 							parentShell.setData("updated", true);
 						}
@@ -179,23 +172,21 @@ public class ComplexFormEx {
 			buttonCancel.addMenuDetectListener(new MenuDetectListener() {
 				@Override
 				public void menuDetected(MenuDetectEvent event) {
-					System.err.println("Context menu ");
+					// System.err.println("Context menu ");
 				}
-
 			});
-
 		}
 	}
 
 	private static class GridComposite extends Composite {
 
-		private int labelWidth = 70;
+		private final static int labelWidth = 70;
 
-		public GridComposite(Composite c) {
-			super(c, SWT.BORDER);
-			GridLayout gl = new GridLayout();
-			gl.numColumns = 2;
-			this.setLayout(gl);
+		public GridComposite(Composite composite) {
+			super(composite, SWT.BORDER);
+			GridLayout gridLayout = new GridLayout();
+			gridLayout.numColumns = 2;
+			this.setLayout(gridLayout);
 		}
 
 		private static void doSelection(Button button) {
@@ -203,11 +194,11 @@ public class ComplexFormEx {
 				String selectedKey = (String) button.getData("key");
 				if (selectedKey != null && selectedKey != ""
 						&& elementData.containsKey(selectedKey)) {
-					System.out.println("Process selection of key " + selectedKey);
+					// System.out.println("Process selection of key " + selectedKey);
 					elementData.replace("ElementSelectedBy", selectedKey);
 				} else {
-					System.out.println(
-							String.format("Skip processing of key '%s'", selectedKey));
+					// System.out.println(
+					// 		String.format("Skip processing of key '%s'", selectedKey));
 				}
 				// } else {
 				// System.out.println("do work for deselection " + button);
@@ -294,10 +285,8 @@ public class ComplexFormEx {
 							// System.err.println(text.getText());
 						}
 					});
-
 				}
 			}
-
 		}
 	}
 

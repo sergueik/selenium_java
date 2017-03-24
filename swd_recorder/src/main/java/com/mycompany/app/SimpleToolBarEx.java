@@ -104,10 +104,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import org.eclipse.swt.SWT;
 
 import org.eclipse.jface.dialogs.InputDialog;
@@ -157,9 +153,6 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import org.mihalis.opal.breadcrumb.*;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
 import com.mycompany.app.Utils;
 import com.mycompany.app.ConfigFormEx;
 import com.mycompany.app.ComplexFormEx;
@@ -186,8 +179,6 @@ public class SimpleToolBarEx {
 	private Image openIcon;
 	private Image saveIcon;
 
-	private Configuration config = null;
-	private static String configFilePath;
 	private WebDriver driver;
 	private WebDriverWait wait;
 	private Actions actions;
@@ -198,18 +189,22 @@ public class SimpleToolBarEx {
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private ArrayList<String> stepKeys = new ArrayList<String>();
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
+	private Configuration config = null;
+	private static String configFilePath;
 	private static Map<String, String> configData = new HashMap<String, String>();
 	static {
 		configData.put("Browser", "Chrome");
-		configData.put("Template", "Basic Java");
+		configData.put("Template", "Basic Java (embedded)");
 	}
-	private Label status;
 
-	private static int width = 900;
-	private static int height = 800;
+	private static final int shellWidth = 768;
+	private static final int shellHeight = 324;
+	private static final int browserDemoWidth = 900;
+	private static final int browserDemoHeight = 800;
 	private static int step_index = 0;
 	private static String osName = null;
 	private String generatedScript = null;
+	private Label status;
 
 	private Breadcrumb bc;
 
@@ -230,7 +225,7 @@ public class SimpleToolBarEx {
 		testData = new HashMap<String, HashMap<String, String>>();
 		getOsName();
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
-		Rectangle boundRect = new Rectangle(0, 0, 768, 324);
+		Rectangle boundRect = new Rectangle(0, 0, shellWidth, shellHeight);
 		shell.setBounds(boundRect);
 		shell.setImage(SWTResourceManager.getImage(this.getClass(),
 				"/document_wrench_color.ico"));
@@ -500,8 +495,9 @@ public class SimpleToolBarEx {
 
 					// 'paginate' the breadcrump
 					Rectangle rect = bc.getBounds();
-					// System.err.println("Bound rect width: " + rect.width);
-					if (bc.getBounds().width > 765) {
+					if (bc.getBounds().width > shell.getBounds().width - 5
+							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
+									.getScreenSize().width - 100) {
 						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
 						bc = bc2;
 					}
@@ -538,7 +534,8 @@ public class SimpleToolBarEx {
 					actions = new Actions(driver);
 					driver.manage().window()
 							.setPosition(new org.openqa.selenium.Point(600, 0));
-					driver.manage().window().setSize(new Dimension(width, height));
+					driver.manage().window()
+							.setSize(new Dimension(browserDemoWidth, browserDemoHeight));
 					// TODO: debug timeoutException in closeVisualSearch
 					HashMap<String, String> elementData = demoAddElement(
 							"https://www.ryanair.com/ie/en/", By.cssSelector(
