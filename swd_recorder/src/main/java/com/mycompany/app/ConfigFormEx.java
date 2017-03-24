@@ -46,9 +46,9 @@ import org.eclipse.swt.widgets.Text;
 // https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111
 public class ConfigFormEx {
 
-	private Shell shell;
+	private static Shell shell;
 	private static Shell parentShell = null;
-	private Display display;
+	private static Display display;
 	private final static int formWidth = 516;
 	private final static int formHeight = 238;
 	private final static int buttonWidth = 36;
@@ -65,9 +65,10 @@ public class ConfigFormEx {
 		// make rest up to customer
 		configOptions.put("Template",
 				new ArrayList<String>(
-						Arrays.asList(new String[] { "Basic C# (embedded)",
-								"Basic Java (embedded)", "Page Objects/C# (embedded)",
-								"Page Objects/Java (embedded)", "Selenide (embedded)" })));
+						Arrays.asList(new String[] {  })));
+		String dirPath = String.format("%s/src/main/resources/templates",
+				System.getProperty("user.dir"));
+		listFilesForFolder(new File(dirPath), "embedded", configOptions);
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 		if (parent != null) {
@@ -78,15 +79,13 @@ public class ConfigFormEx {
 					Optional.of(configData));
 		} else {
 			new Utils().readData(
-					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java (embedded)\", }",
+					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java (embedded)\", \"Template Directory\": \"c:\\\\Users\\\\Serguei\\\\desktop\\\\templates\"}",
 					Optional.of(configData));
 		}
-		String dirPath = String.format("%s/src/main/resources/templates",
-				System.getProperty("user.dir"));
 		if (configData.containsKey("Template Directory")) {
 			dirPath = configData.get("Template Directory");
 			if (dirPath != "") {
-				listFilesForFolder(new File(dirPath), configOptions);
+				listFilesForFolder(new File(dirPath), "user defined", configOptions);
 			}
 		}
 	}
@@ -137,10 +136,10 @@ public class ConfigFormEx {
 					if (parentShell != null) {
 						parentShell.setData("CurrentConfig", result);
 						parentShell.setData("updated", true);
-						composite.dispose();
 					} else {
-            System.err.println("Updating the parent shell: " + result);
-          }
+						System.err.println("Updating the parent shell: " + result);
+					}
+          composite.dispose();
 				}
 			});
 		}
@@ -229,58 +228,63 @@ public class ConfigFormEx {
 	}
 
 	// scan the template directory and merge options.
-	public void listFilesForFolder(final File dir,
+	public void listFilesForFolder(final File dir, String note,
 			HashMap<String, List<String>> options) {
 		FileReader fileReader = null;
 		String contents = null;
+		if (dir.listFiles().length == 0) {
+			return;
+		}
 		for (final File fileEntry : dir.listFiles()) {
 			contents = null;
-			if (fileEntry.isFile()) {
-				try {
-					fileReader = new FileReader(fileEntry);
-					char[] template = new char[(int) fileEntry.length()];
-					fileReader.read(template);
-					contents = new String(template);
-				} catch (Exception e) {
-					e.printStackTrace();
-				} finally {
-					if (fileReader != null) {
-						try {
-							fileReader.close();
-						} catch (IOException e) {
+			if (fileEntry.getName().endsWith(".twig")) {
+				if (fileEntry.isFile()) {
+					try {
+						fileReader = new FileReader(fileEntry);
+						char[] template = new char[(int) fileEntry.length()];
+						fileReader.read(template);
+						contents = new String(template);
+					} catch (Exception e) {
+						e.printStackTrace();
+					} finally {
+						if (fileReader != null) {
+							try {
+								fileReader.close();
+							} catch (IOException e) {
+							}
 						}
 					}
 				}
-			}
-			if (contents != null) {
-				// find comment containing the template name
-				String twigCommentMatcher = "\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}";
-				String templateMatcher = "template: (.*)$";
-				Pattern patternTwigComment = Pattern.compile(twigCommentMatcher,
-						Pattern.MULTILINE);
-				Matcher matcherTwigComment = patternTwigComment.matcher(contents);
-				if (matcherTwigComment.find()) {
-					String comment = matcherTwigComment.group(1);
-					String templateName = null;
-					Pattern patternTemplate = Pattern.compile(templateMatcher,
+				if (contents != null) {
+					// find comment containing the template name
+					String twigCommentMatcher = "\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}";
+					String templateMatcher = "template: (.*)$";
+					Pattern patternTwigComment = Pattern.compile(twigCommentMatcher,
 							Pattern.MULTILINE);
-					Matcher matcherTemplate = patternTemplate.matcher(comment);
-					if (matcherTemplate.find()) {
+					Matcher matcherTwigComment = patternTwigComment.matcher(contents);
+					if (matcherTwigComment.find()) {
+						String comment = matcherTwigComment.group(1);
+						String templateName = null;
+						Pattern patternTemplate = Pattern.compile(templateMatcher,
+								Pattern.MULTILINE);
+						Matcher matcherTemplate = patternTemplate.matcher(comment);
+						if (matcherTemplate.find()) {
 
-						templateName = matcherTemplate.group(1);
-						/*
-						System.out.println(String.format("got a tag for %s: '%s'",
-								fileEntry.getName(), templateName));
-						    */
-						List<String> items = options.get("Template");
-						items.add(String.format("%s (user defined)", templateName));
-						options.put("Template", items);
+							templateName = matcherTemplate.group(1);
+							System.out.println(String.format("got a tag for %s: '%s'",
+									fileEntry.getName(), templateName));
+							List<String> items = options.get("Template");
+							items.add(String.format("%s (%s)", templateName,
+									(note == null) ? "unknown" : note));
+							options.put("Template", items);
+						} else {
+							System.out
+									.println(String.format("no tag: %s", fileEntry.getName()));
+						}
 					} else {
 						System.out
 								.println(String.format("no tag: %s", fileEntry.getName()));
 					}
-				} else {
-					System.out.println(String.format("no tag: %s", fileEntry.getName()));
 				}
 			}
 		}

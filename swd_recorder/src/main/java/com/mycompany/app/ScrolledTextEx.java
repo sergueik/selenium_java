@@ -53,9 +53,6 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import org.jtwig.JtwigModel;
-import org.jtwig.JtwigTemplate;
-
 import com.mycompany.app.Utils;
 import com.mycompany.app.RenderTemplate;
 
@@ -72,13 +69,10 @@ import com.mycompany.app.RenderTemplate;
 class ScrolledTextEx {
 
 	protected Shell shell;
-	private String commandId;
 	private Display display;
-	private String dataKey = "CurrentCommandId";
 	private String payload = "Nothing here\nyet...";
-	private int width = 700;
-	private int height = 400;
-	private Text text;
+	private final static int width = 700;
+	private final static int height = 400;
 	private StyledText styledText;
 	public JavaLineStyler lineStyler = new JavaLineStyler();
 
@@ -130,7 +124,7 @@ class ScrolledTextEx {
 				dialog.setFilterNames(new String[] { "TEXT Files", "All Files (*.*)" });
 				dialog.setFilterExtensions(new String[] { "*.txt", "*.*" });
 				String homeDir = System.getProperty("user.home");
-				dialog.setFilterPath(homeDir); // Windows path
+				dialog.setFilterPath(homeDir);
 				// TODO: remember the path
 				String filePath = dialog.open();
 				if (filePath != null) {
@@ -140,9 +134,7 @@ class ScrolledTextEx {
 								(List<String>) Arrays.asList(payload.split("\n")),
 								Charset.forName("UTF-8"));
 					} catch (IOException e) {
-						ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
-						// show the error dialog with exception trace
-						o.execute();
+						new ExceptionDialogEx(display, shell, e).execute();
 					}
 					styledText.dispose();
 					shell.dispose();
@@ -163,14 +155,14 @@ class ScrolledTextEx {
 	private StyledText createStyledText() {
 		styledText = new StyledText(shell,
 				SWT.BORDER | SWT.MULTI | SWT.V_SCROLL | SWT.H_SCROLL); // SWT.WRAP
-		GridData spec = new GridData();
+		GridData gridData = new GridData();
 		styledText.setFont(
 				new Font(shell.getDisplay(), "Source Code Pro Light", 10, SWT.NORMAL));
-		spec.horizontalAlignment = GridData.FILL;
-		spec.grabExcessHorizontalSpace = true;
-		spec.verticalAlignment = GridData.FILL;
-		spec.grabExcessVerticalSpace = true;
-		styledText.setLayoutData(spec);
+		gridData.horizontalAlignment = GridData.FILL;
+		gridData.grabExcessHorizontalSpace = true;
+		gridData.verticalAlignment = GridData.FILL;
+		gridData.grabExcessVerticalSpace = true;
+		styledText.setLayoutData(gridData);
 		styledText.addLineStyleListener(lineStyler);
 		styledText.setEditable(false);
 		styledText
