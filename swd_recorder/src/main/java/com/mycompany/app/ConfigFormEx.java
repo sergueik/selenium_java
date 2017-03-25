@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,18 +55,27 @@ public class ConfigFormEx {
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
 	private static HashMap<String, String> configData = new HashMap<String, String>(); // empty
-	private static HashMap<String, List<String>> configOptions = new HashMap<String, List<String>>();
+	// NOTE: to simplify code, use the same DOM - do not need values for "Browser"
+	private static HashMap<String, HashMap<String, String>> configOptions = new HashMap<String, HashMap<String, String>>();
 
 	ConfigFormEx(Display parentDisplay, Shell parent) {
+		HashMap<String, String> browserOptions = new HashMap<String, String>();
 
-		configOptions.put("Browser",
-				new ArrayList<String>(Arrays.asList(new String[] { "Chrome", "Firefox",
-						"Internet Explorer", "Edge", "Safari" })));
+		for (
+
+		String browser : new ArrayList<String>(Arrays.asList(new String[] {
+				"Chrome", "Firefox", "Internet Explorer", "Edge", "Safari" }))) {
+
+			browserOptions.put(browser, "unused");
+
+		}
+		configOptions.put("Browser", browserOptions);
+
+		configData.put("Template", "Core Selenium Java (embedded)");
+
 		// TODO: Keep few twig templates embedded in the application jar and
 		// make rest up to customer
-		configOptions.put("Template",
-				new ArrayList<String>(
-						Arrays.asList(new String[] {  })));
+		configOptions.put("Template", new HashMap<String, String>());
 		String dirPath = String.format("%s/src/main/resources/templates",
 				System.getProperty("user.dir"));
 		listFilesForFolder(new File(dirPath), "embedded", configOptions);
@@ -79,7 +89,7 @@ public class ConfigFormEx {
 					Optional.of(configData));
 		} else {
 			new Utils().readData(
-					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java (embedded)\", \"Template Directory\": \"c:\\\\Users\\\\Serguei\\\\desktop\\\\templates\"}",
+					"{ \"Browser\": \"Chrome\", \"Template\": \"Core Selenium Java (embedded)\", \"Template Directory\": \"c:\\\\Users\\\\Serguei\\\\desktop\\\\templates\", \"Template Path\": \"\"}",
 					Optional.of(configData));
 		}
 		if (configData.containsKey("Template Directory")) {
@@ -131,15 +141,27 @@ public class ConfigFormEx {
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override
 				public void handleEvent(Event event) {
+					String templateLabel = configData.get("Template");
+					if (templateLabel != "") {
+						String fileName = configOptions.get("Template").get(templateLabel);
+						String configKey = "Template Path";
+						if (configData.containsKey(configKey)) {
+							configData.replace(configKey, fileName);
+						} else {
+							configData.put(configKey, fileName);
+						}
+						System.err.println(String.format(
+								"Saving the path to the selected template \"%s\": \"%s\" \"%s\"",
+								templateLabel, fileName, configData.get(configKey)));
+					}
 					String result = new Utils().writeDataJSON(configData, "{}");
-
 					if (parentShell != null) {
 						parentShell.setData("CurrentConfig", result);
 						parentShell.setData("updated", true);
 					} else {
 						System.err.println("Updating the parent shell: " + result);
 					}
-          composite.dispose();
+					composite.dispose();
 				}
 			});
 		}
@@ -162,11 +184,14 @@ public class ConfigFormEx {
 					configLabel.setText(configKey);
 
 					final Combo configValue = new Combo(this, SWT.READ_ONLY);
-					List<String> itemsList = configOptions.get(configKey);
-
-					String[] items = new String[itemsList.size()];
-					itemsList.toArray(items);
+					// Set<String> itemsSet = configOptions.get(configKey).keySet();
+					// String[] items = (String[])itemsSet.toArray();
+					String[] items = (String[]) configOptions.get(configKey).keySet()
+							.toArray(new String[0]);
 					configValue.setItems(items);
+					System.err.println(String.format("Setting index of %s to %d",
+							configData.get(configKey),
+							Arrays.asList(items).indexOf(configData.get(configKey))));
 					configValue
 							.select(Arrays.asList(items).indexOf(configData.get(configKey)));
 					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -229,7 +254,7 @@ public class ConfigFormEx {
 
 	// scan the template directory and merge options.
 	public void listFilesForFolder(final File dir, String note,
-			HashMap<String, List<String>> options) {
+			HashMap<String, HashMap<String, String>> options) {
 		FileReader fileReader = null;
 		String contents = null;
 		if (dir.listFiles().length == 0) {
@@ -269,14 +294,21 @@ public class ConfigFormEx {
 								Pattern.MULTILINE);
 						Matcher matcherTemplate = patternTemplate.matcher(comment);
 						if (matcherTemplate.find()) {
-
+							String fileName = fileEntry.getName();
 							templateName = matcherTemplate.group(1);
-							System.out.println(String.format("got a tag for %s: '%s'",
-									fileEntry.getName(), templateName));
-							List<String> items = options.get("Template");
-							items.add(String.format("%s (%s)", templateName,
-									(note == null) ? "unknown" : note));
-							options.put("Template", items);
+							String templateLabel = String.format("%s (%s)", templateName,
+									(note == null) ? "unknown" : note);
+							System.out.println(String.format("Make option for \"%s\": \"%s\"",
+									fileName, templateLabel));
+							HashMap<String, String> templates = options.get("Template");
+							if (templates.containsKey(templateLabel)) {
+								templates.replace(templateLabel, fileName);
+							} else {
+								templates.put(templateLabel, fileName);
+							}
+							options.put("Template", templates);
+							System.out.println(String.format("Data for option \"%s\": \"%s\"",
+									templateLabel, options.get("Template").get(templateLabel)));
 						} else {
 							System.out
 									.println(String.format("no tag: %s", fileEntry.getName()));
