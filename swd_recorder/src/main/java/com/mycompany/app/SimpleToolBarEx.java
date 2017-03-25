@@ -194,7 +194,7 @@ public class SimpleToolBarEx {
 	private static Map<String, String> configData = new HashMap<String, String>();
 	static {
 		configData.put("Browser", "Chrome");
-		configData.put("Template", "Basic Java (embedded)");
+		configData.put("Template", "Core Selenium Java (embedded)");
 	}
 
 	private static final int shellWidth = 768;
@@ -208,10 +208,6 @@ public class SimpleToolBarEx {
 
 	private Breadcrumb bc;
 
-	public SimpleToolBarEx(Display display) {
-		initUI(display);
-	}
-
 	public static String getOsName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name");
@@ -220,7 +216,7 @@ public class SimpleToolBarEx {
 	}
 
 	@SuppressWarnings("unused")
-	public void initUI(Display display) {
+	public SimpleToolBarEx(Display display) {
 
 		testData = new HashMap<String, HashMap<String, String>>();
 		getOsName();
@@ -268,9 +264,9 @@ public class SimpleToolBarEx {
 		// setDisabledImage
 		findTool.setToolTipText("Injects the script");
 
-		ToolItem flowchartTool = new ToolItem(toolBar, SWT.PUSH);
-		flowchartTool.setImage(flowchartIcon);
-		flowchartTool.setToolTipText("Generates the script");
+		ToolItem flowChartTool = new ToolItem(toolBar, SWT.PUSH);
+		flowChartTool.setImage(flowchartIcon);
+		flowChartTool.setToolTipText("Generates the script");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
@@ -299,7 +295,7 @@ public class SimpleToolBarEx {
 		shutdownTool.setToolTipText("Quits the app");
 
 		findTool.setEnabled(false);
-		flowchartTool.setEnabled(false);
+		flowChartTool.setEnabled(false);
 		demoTool.setEnabled(false);
 		// demoTool.setGrayed(true);
 		saveTool.setEnabled(false);
@@ -362,27 +358,33 @@ public class SimpleToolBarEx {
 				// combinations
 				demoTool.setEnabled(true);
 			}
-			flowchartTool.setEnabled(true);
+			flowChartTool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
 			status.setText("Ready ...");
 			status.pack();
 		});
 
-		flowchartTool.addListener(SWT.Selection, event -> {
-			flowchartTool.setEnabled(false);
-			RenderTemplate template = new RenderTemplate();
-			template.setTemplateName("templates/example2.twig");
+		flowChartTool.addListener(SWT.Selection, event -> {
+			flowChartTool.setEnabled(false);
+			RenderTemplate renderTemplate = new RenderTemplate();
+			status.setText(
+					String.format("Reading template %s ...", configData.get("Template")));
+			// renderTemplate.setTemplateName( "templates/example2.twig" );
+			// TODO: 
+			// relative path => setTemplateName
+			// absolute path => setTemplateAbsolutePath
+			renderTemplate.setTemplateAbsolutePath(configData.get("Template Path")
+					.replace("\\\\", "\\").replace("\\", "/"));
+
 			generatedScript = "";
 			try {
-				generatedScript = template.renderTest(testData);
+				generatedScript = renderTemplate.renderTest(testData);
 			} catch (Exception e) {
-				ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
-				// show the error dialog with exception trace
-				o.execute();
+				new ExceptionDialogEx(display, shell, e).execute();
 			}
 			shell.setData("payload", generatedScript);
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
-			flowchartTool.setEnabled(true);
+			flowChartTool.setEnabled(true);
 		});
 
 		openTool.addListener(SWT.Selection, event -> {
@@ -429,7 +431,7 @@ public class SimpleToolBarEx {
 				saveTool.setEnabled(true);
 			}
 			openTool.setEnabled(true);
-			flowchartTool.setEnabled(true);
+			flowChartTool.setEnabled(true);
 			status.setText("Ready ...");
 			status.pack();
 		});

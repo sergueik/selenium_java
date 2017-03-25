@@ -50,7 +50,7 @@ public class ConfigFormEx {
 	private static Shell shell;
 	private static Shell parentShell = null;
 	private static Display display;
-	private final static int formWidth = 516;
+	private final static int formWidth = 656;
 	private final static int formHeight = 238;
 	private final static int buttonWidth = 36;
 	private final static int buttonHeight = 24;
@@ -88,8 +88,9 @@ public class ConfigFormEx {
 			new Utils().readData(parentShell.getData("CurrentConfig").toString(),
 					Optional.of(configData));
 		} else {
-			new Utils().readData(
-					"{ \"Browser\": \"Chrome\", \"Template\": \"Core Selenium Java (embedded)\", \"Template Directory\": \"c:\\\\Users\\\\Serguei\\\\desktop\\\\templates\", \"Template Path\": \"\"}",
+			new Utils().readData(String.format(
+					"{ \"Browser\": \"Chrome\", \"Template\": \"Core Selenium Java (embedded)\", \"Template Directory\": \"%s\", \"Template Path\": \"\"}",
+					dirPath.replace("\\", "\\\\")),
 					Optional.of(configData));
 		}
 		if (configData.containsKey("Template Directory")) {
@@ -143,16 +144,18 @@ public class ConfigFormEx {
 				public void handleEvent(Event event) {
 					String templateLabel = configData.get("Template");
 					if (templateLabel != "") {
-						String fileName = configOptions.get("Template").get(templateLabel);
+						String templateAbsolutePath = configOptions.get("Template")
+								.get(templateLabel);
 						String configKey = "Template Path";
 						if (configData.containsKey(configKey)) {
-							configData.replace(configKey, fileName);
+							configData.replace(configKey, templateAbsolutePath);
 						} else {
-							configData.put(configKey, fileName);
+							configData.put(configKey, templateAbsolutePath);
 						}
 						System.err.println(String.format(
 								"Saving the path to the selected template \"%s\": \"%s\" \"%s\"",
-								templateLabel, fileName, configData.get(configKey)));
+								templateLabel, templateAbsolutePath,
+								configData.get(configKey)));
 					}
 					String result = new Utils().writeDataJSON(configData, "{}");
 					if (parentShell != null) {
@@ -294,17 +297,17 @@ public class ConfigFormEx {
 								Pattern.MULTILINE);
 						Matcher matcherTemplate = patternTemplate.matcher(comment);
 						if (matcherTemplate.find()) {
-							String fileName = fileEntry.getName();
+							String templateAbsolutePath = fileEntry.getAbsolutePath();
 							templateName = matcherTemplate.group(1);
 							String templateLabel = String.format("%s (%s)", templateName,
 									(note == null) ? "unknown" : note);
 							System.out.println(String.format("Make option for \"%s\": \"%s\"",
-									fileName, templateLabel));
+									templateAbsolutePath, templateLabel));
 							HashMap<String, String> templates = options.get("Template");
 							if (templates.containsKey(templateLabel)) {
-								templates.replace(templateLabel, fileName);
+								templates.replace(templateLabel, templateAbsolutePath);
 							} else {
-								templates.put(templateLabel, fileName);
+								templates.put(templateLabel, templateAbsolutePath);
 							}
 							options.put("Template", templates);
 							System.out.println(String.format("Data for option \"%s\": \"%s\"",

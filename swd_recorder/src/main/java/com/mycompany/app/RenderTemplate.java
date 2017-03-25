@@ -29,24 +29,34 @@ import com.mycompany.app.Utils;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-class RenderTemplate {
+public class RenderTemplate {
 
 	private static final HashMap<String, String> elementData = createSampleElementData();
 	private static HashMap<String, HashMap<String, String>> testData;
 	private String templateName = "templates/example2.twig";
+	private String templateAbsolutePath = "";
 
-	public void setTemplateName(String templateName) {
-		this.templateName = templateName;
+	public void setTemplateName(String data) {
+		this.templateName = data;
 	}
 
 	public String getTemplateName() {
 		return templateName;
 	}
 
+	public void setTemplateAbsolutePath(String data) {
+		this.templateAbsolutePath = data;
+	}
+
+	public String getTemplateAbsolutePath() {
+		return templateAbsolutePath;
+	}
+
 	private static HashMap<String, String> createSampleElementData() {
 		HashMap<String, String> elementData = new HashMap<String, String>();
 		elementData.put("ElementId", "id");
-		elementData.put("ElementCodeName", "name of the element, supplied during recoring");
+		elementData.put("ElementCodeName",
+				"name of the element, supplied during recoring");
 		elementData.put("ElementText", "text of the element, when available");
 		elementData.put("ElementXPath", "/html//img[1]");
 		elementData.put("ElementVariable", "elementVariable");
@@ -84,7 +94,12 @@ class RenderTemplate {
 	}
 
 	private String renderElement(Map<String, String> data) {
-		JtwigTemplate template = JtwigTemplate.classpathTemplate(this.templateName);
+		JtwigTemplate template = null;
+		if (this.templateAbsolutePath != "") {
+			template = JtwigTemplate.fileTemplate(this.templateAbsolutePath);
+		} else {
+			template = JtwigTemplate.classpathTemplate(this.templateName);
+		}
 		JtwigModel model = JtwigModel.newModel();
 		for (String key : data.keySet()) {
 			model.with(key, data.get(key).replace("\"", "\\\""));
@@ -94,7 +109,15 @@ class RenderTemplate {
 	}
 
 	public static void main(String[] args) {
-		String output = new RenderTemplate().renderTest();
+		// TODO:
+		// C:\developer\sergueik\selenium_java\swd_recorder\src\main\resources\templates\example3.twig
+		String templatePath = "C:\\developer\\sergueik\\selenium_java\\swd_recorder\\src\\main\\resources\\templates\\example3.twig";
+		RenderTemplate renderTemplate = new RenderTemplate();
+		System.err
+				.println(String.format("Reading template from %s ...", templatePath));
+		renderTemplate
+				.setTemplateAbsolutePath(templatePath.replace("\\\\", "\\").replace("\\", "/"));
+		String output = renderTemplate.renderTest();
 		System.err.println("Rendered: " + output);
 	}
 }
