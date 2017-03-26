@@ -32,7 +32,7 @@ import org.mihalis.opal.utils.SWTGraphicUtil;
 public class TipDayEx {
 
 	private final static int buttonWidth = 120;
-	private final static int buttonHeight = 24;
+	private final static int buttonHeight = 28;
 	private static int index = -1;
 
 	public int getIndex() {
@@ -212,9 +212,12 @@ public class TipDayEx {
 
 		final Button buttonPrevious = new Button(composite, SWT.PUSH);
 		buttonPrevious.setText(ResourceManager.getLabel(ResourceManager.PREVIOUS_TIP));
-		buttonPrevious.setLayoutData(new GridData(GridData.END, GridData.CENTER,
-				this.showOnStartup ? false : true, false));
-		buttonPrevious.setSize(buttonWidth, buttonHeight);
+    GridData gridDataPrevious = new GridData(GridData.END, GridData.CENTER,
+				this.showOnStartup ? false : true, false);
+		gridDataPrevious.widthHint = buttonWidth;
+    gridDataPrevious.heightHint = buttonHeight;
+
+		buttonPrevious.setLayoutData(gridDataPrevious);
 		buttonPrevious.addSelectionListener(new SelectionAdapter() {
 			@Override
 			public void widgetSelected(final SelectionEvent e) {
@@ -229,9 +232,11 @@ public class TipDayEx {
 
 		final Button buttonNext = new Button(composite, SWT.PUSH);
 		buttonNext.setText(ResourceManager.getLabel(ResourceManager.NEXT_TIP));
-		buttonNext.setSize(buttonWidth, buttonHeight);
-		buttonNext.setLayoutData(
-				new GridData(GridData.FILL, GridData.CENTER, false, false));
+    GridData gridDataNext = new GridData(GridData.FILL, GridData.CENTER, false, false);
+		gridDataNext.widthHint = buttonWidth;
+    gridDataNext.heightHint = buttonHeight;
+
+		buttonNext.setLayoutData(gridDataNext);
 		buttonNext.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -249,10 +254,10 @@ public class TipDayEx {
 		buttonClose.setText(ResourceManager.getLabel(ResourceManager.CLOSE));
 		final GridData gridClose = new GridData(GridData.FILL, GridData.CENTER,
 				false, false);
-		// gridClose.widthHint = 120;
-		buttonClose.setSize(buttonWidth, buttonHeight);
-		buttonClose.setLayoutData(
-				new GridData(GridData.FILL, GridData.CENTER, false, false));
+    GridData gridDataClose = new GridData(GridData.FILL, GridData.CENTER, false, false);
+		gridDataClose.widthHint = buttonWidth;
+    gridDataClose.heightHint = buttonHeight;
+		buttonClose.setLayoutData( gridDataClose);
 		buttonClose.addSelectionListener(new SelectionAdapter() {
 
 			@Override

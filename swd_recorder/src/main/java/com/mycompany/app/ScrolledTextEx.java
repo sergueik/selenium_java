@@ -74,6 +74,9 @@ class ScrolledTextEx {
 	private final static int width = 700;
 	private final static int height = 400;
 	private StyledText styledText;
+  private final static int buttonWidth = 120;
+	private final static int buttonHeight = 28;
+
 	public JavaLineStyler lineStyler = new JavaLineStyler();
 
 	ScrolledTextEx(Display parentDisplay, Shell parent) {
@@ -104,7 +107,15 @@ class ScrolledTextEx {
 		styledText.setLayoutData(
 				GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
 		styledText.setText(payload);
-		Button buttonSave = new Button(shell, SWT.NONE);
+		Button buttonSave = new Button(shell, SWT.BORDER | SWT.PUSH);
+    
+    			GridData gridDataSave = new GridData(GridData.FILL, GridData.CENTER,
+					false, false);
+			gridDataSave.widthHint = buttonWidth;
+			gridDataSave.heightHint = buttonHeight;
+
+			buttonSave.setLayoutData(gridDataSave);
+
 		buttonSave.setText("Save");
 
 		shell.setSize(width, height);

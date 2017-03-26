@@ -52,9 +52,9 @@ public class ConfigFormEx {
 	private static Display display;
 	private final static int formWidth = 656;
 	private final static int formHeight = 238;
-	private final static int buttonWidth = 36;
-	private final static int buttonHeight = 24;
-	private static HashMap<String, String> configData = new HashMap<String, String>(); // empty
+	private final static int buttonWidth = 120;
+	private final static int buttonHeight = 28;
+	private static HashMap<String, String> configData = new HashMap<String, String>();
 	// NOTE: to simplify code, use the same DOM - do not need values for "Browser"
 	private static HashMap<String, HashMap<String, String>> configOptions = new HashMap<String, HashMap<String, String>>();
 
@@ -90,8 +90,7 @@ public class ConfigFormEx {
 		} else {
 			new Utils().readData(String.format(
 					"{ \"Browser\": \"Chrome\", \"Template\": \"Core Selenium Java (embedded)\", \"Template Directory\": \"%s\", \"Template Path\": \"\"}",
-					dirPath.replace("\\", "\\\\")),
-					Optional.of(configData));
+					dirPath.replace("\\", "\\\\")), Optional.of(configData));
 		}
 		if (configData.containsKey("Template Directory")) {
 			dirPath = configData.get("Template Directory");
@@ -114,7 +113,7 @@ public class ConfigFormEx {
 		gridComposite.pack();
 
 		RowComposite rowComposite = new RowComposite(shell);
-		rowComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+		// rowComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		rowComposite.pack();
 		shell.pack();
 		shell.setSize(formWidth, formHeight);
@@ -131,13 +130,20 @@ public class ConfigFormEx {
 
 		public RowComposite(Composite composite) {
 			super(composite, SWT.NO_FOCUS);
-			RowLayout rowLayout = new RowLayout();
-			rowLayout.wrap = false;
-			rowLayout.pack = false;
-			this.setLayout(rowLayout);
+
+			this.setLayoutData(
+					new GridData(GridData.FILL, GridData.BEGINNING, false, false, 2, 1));
+			final GridLayout gridLayout = new GridLayout();
+			gridLayout.marginWidth = 2;
+			this.setLayout(new GridLayout(1, false));
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
-			buttonSave.setSize(buttonWidth, buttonHeight);
+			GridData gridDataSave = new GridData(GridData.FILL, GridData.CENTER,
+					false, false);
+			gridDataSave.widthHint = buttonWidth;
+			gridDataSave.heightHint = buttonHeight;
+
+			buttonSave.setLayoutData(gridDataSave);
 
 			buttonSave.addListener(SWT.Selection, new Listener() {
 				@Override

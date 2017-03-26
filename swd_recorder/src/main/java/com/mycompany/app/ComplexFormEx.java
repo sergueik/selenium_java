@@ -45,8 +45,8 @@ public class ComplexFormEx {
 	private String dataKey = "CurrentCommandId";
 	private final static int formWidth = 750;
 	private final static int formHeight = 280;
-	private final static int buttonWidth = 36;
-	private final static int buttonHeight = 24;
+	private final static int buttonWidth = 120;
+	private final static int buttonHeight = 28  ;
 	private static Boolean updated = false;
 	private static String result = null;
 	private static HashMap<String, String> elementData = new HashMap<String, String>(); // empty
@@ -83,7 +83,6 @@ public class ComplexFormEx {
 		gridComposite.pack();
 
 		RowComposite rowComposite = new RowComposite(shell);
-		rowComposite.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 		rowComposite.pack();
 		shell.pack();
 		shell.setSize(formWidth, formHeight);
@@ -120,16 +119,32 @@ public class ComplexFormEx {
 		public RowComposite(Composite composite) {
 
 			super(composite, SWT.NO_FOCUS);
+			this.setLayoutData(
+					new GridData(GridData.FILL, GridData.BEGINNING, false, false, 2, 1));
+			final GridLayout gridLayout = new GridLayout();
+			gridLayout.marginWidth = 2;
+			this.setLayout(new GridLayout(3, false));
+      /*
 			RowLayout rowLayout = new RowLayout();
 			rowLayout.wrap = false;
 			rowLayout.pack = false;
 			this.setLayout(rowLayout);
+      */
 			buttonSave = new Button(this, SWT.BORDER | SWT.PUSH);
 			buttonSave.setText("Save");
-			buttonSave.setSize(buttonWidth, buttonHeight);
+      GridData gridDataSave = new GridData(GridData.FILL, GridData.CENTER,
+					false, false);
+			gridDataSave.widthHint = buttonWidth;
+			gridDataSave.heightHint = buttonHeight;
+			buttonSave.setLayoutData(gridDataSave);
+
 			buttonDelete = new Button(this, SWT.PUSH);
 			buttonDelete.setText("Delete");
-			buttonDelete.setSize(buttonWidth, buttonHeight);
+      GridData gridDataDelete = new GridData(GridData.FILL, GridData.CENTER,
+					false, false);
+			gridDataDelete.widthHint = buttonWidth;
+			gridDataDelete.heightHint = buttonHeight;
+			buttonDelete.setLayoutData(gridDataDelete);
 			buttonDelete.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
 					if (parentShell != null) {
@@ -160,7 +175,11 @@ public class ComplexFormEx {
 
 			buttonCancel = new Button(this, SWT.PUSH);
 			buttonCancel.setText("Cancel");
-			buttonCancel.setSize(buttonWidth, buttonHeight);
+      GridData gridDataCancel = new GridData(GridData.FILL, GridData.CENTER,
+					false, false);
+			gridDataCancel.widthHint = buttonWidth;
+			gridDataCancel.heightHint = buttonHeight;
+			buttonCancel.setLayoutData(gridDataCancel);
 
 			buttonCancel.addSelectionListener(new SelectionAdapter() {
 				public void widgetSelected(SelectionEvent event) {
