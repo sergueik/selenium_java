@@ -186,8 +186,8 @@ public class ConfigFormEx {
 		}
 
 		public void renderData(HashMap<String, String> data) {
-			for (String configKey : Arrays.asList("Browser", "Base URL", "Template",
-					"Template Directory")) {
+			for (String configKey : Arrays.asList("Browser", "Base URL", "Template Directory", "Template"
+					)) {
 				if (configOptions.containsKey(configKey)) {
 					final Label configLabel = new Label(this, SWT.NONE);
 					configLabel.setText(configKey);

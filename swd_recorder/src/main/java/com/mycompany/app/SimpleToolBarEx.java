@@ -120,6 +120,7 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Device;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -208,6 +209,20 @@ public class SimpleToolBarEx {
 
 	private Breadcrumb bc;
 
+	// http://aniszczyk.org/2007/08/09/resizing-images-using-swt/
+
+	private Image resize(Image image, int width, int height) {
+		Image scaled = new Image(Display.getDefault(), width, height);
+		GC gc = new GC(scaled);
+		gc.setAntialias(SWT.ON);
+		gc.setInterpolation(SWT.HIGH);
+		gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height,
+				0, 0, width, height);
+		gc.dispose();
+		image.dispose(); // don't forget about me!
+		return scaled;
+	}
+
 	public static String getOsName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name");
@@ -229,18 +244,19 @@ public class SimpleToolBarEx {
 
 		try {
 
-			launchIcon = new Image(dev, new Utils().getResourcePath("launch.png"));
-			findIcon = new Image(dev, new Utils().getResourcePath("find.png"));
+			launchIcon = resize(
+					new Image(dev, new Utils().getResourcePath("launch_36.png")), 36, 36);
+			findIcon = new Image(dev, new Utils().getResourcePath("find_36.png"));
 			preferencesIcon = new Image(dev,
-					new Utils().getResourcePath("preferences.png"));
+					new Utils().getResourcePath("gear_36.png"));
 			shutdownIcon = new Image(dev, new Utils().getResourcePath("quit.png"));
-			demoIcon = new Image(dev, new Utils().getResourcePath("demo.png"));
+			demoIcon = new Image(dev, new Utils().getResourcePath("demo_36.png"));
 			pageIcon = new Image(dev,
 					new Utils().getResourcePath("document_wrench_bw.png"));
 			flowchartIcon = new Image(dev,
-					new Utils().getResourcePath("flowchart.png"));
-			openIcon = new Image(dev, new Utils().getResourcePath("open.png"));
-			saveIcon = new Image(dev, new Utils().getResourcePath("save.png"));
+					new Utils().getResourcePath("codegen_36.png"));
+			openIcon = new Image(dev, new Utils().getResourcePath("open_36.png"));
+			saveIcon = new Image(dev, new Utils().getResourcePath("save_36.png"));
 
 		} catch (Exception e) {
 
@@ -257,6 +273,14 @@ public class SimpleToolBarEx {
 
 		ToolItem launchTool = new ToolItem(toolBar, SWT.PUSH);
 		launchTool.setImage(launchIcon);
+		// It is not possible to resize ToolItems manually.
+		/*
+		final GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
+		gd.widthHint = 16;
+		gd.heightHint = 16;
+		launchTool.setLayoutData(gd);
+		*/
+
 		launchTool.setToolTipText("Launches the browser");
 
 		ToolItem findTool = new ToolItem(toolBar, SWT.PUSH);
@@ -370,7 +394,7 @@ public class SimpleToolBarEx {
 			status.setText(
 					String.format("Reading template %s ...", configData.get("Template")));
 			// renderTemplate.setTemplateName( "templates/example2.twig" );
-			// TODO: 
+			// TODO:
 			// relative path => setTemplateName
 			// absolute path => setTemplateAbsolutePath
 			renderTemplate.setTemplateAbsolutePath(configData.get("Template Path")
