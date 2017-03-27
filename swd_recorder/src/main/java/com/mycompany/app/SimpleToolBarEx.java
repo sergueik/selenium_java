@@ -205,12 +205,110 @@ public class SimpleToolBarEx {
 	private static int step_index = 0;
 	private static String osName = null;
 	private String generatedScript = null;
-	private Label status;
+	private Label statusMessage;
 
 	private Breadcrumb bc;
+	private String launchImage = "launch_36.png";
+
+	public void setLaunchImage(final String data) {
+		this.launchImage = data;
+	}
+
+	public String getlaunchImage() {
+		return this.launchImage;
+	}
+
+	private String findImage = "find_36.png";
+
+	public void setFindImage(final String data) {
+		this.findImage = data;
+	}
+
+	public String getFindImage() {
+		return this.findImage;
+	}
+
+	private String gearImage = "gear_36.png";
+
+	public void setGearImage(final String data) {
+		this.gearImage = data;
+	}
+
+	public String getGearImage() {
+		return this.gearImage;
+	}
+
+	private String flowchartImage = "flowchart_36.png";
+
+	public void setFlowChartImage(final String data) {
+		this.flowchartImage = data;
+	}
+
+	public String getFlowChartImage() {
+		return this.flowchartImage;
+	}
+
+	private String pageImage = "page_36.png";
+
+	public void setPageImage(final String data) {
+		this.pageImage = data;
+	}
+
+	public String getPageImage() {
+		return this.pageImage;
+	}
+
+	private String demoImage = "demo_36.png";
+
+	public void setDemoImage(final String data) {
+		this.demoImage = data;
+	}
+
+	public String getDemoImage() {
+		return this.demoImage;
+	}
+
+	private String openImage = "open_36.png";
+
+	public void setOpenImage(final String data) {
+		this.openImage = data;
+	}
+
+	public String getOpenImage() {
+		return this.openImage;
+	}
+
+	private String saveImage = "save_36.png";
+
+	public void setSaveImage(final String data) {
+		this.saveImage = data;
+	}
+
+	public String getSaveImage() {
+		return this.saveImage;
+	}
+
+	private String quitImage = "quit.png";
+
+	public void setQuitImage(final String data) {
+		this.quitImage = data;
+	}
+
+	public String getQuitImage() {
+		return this.quitImage;
+	}
+
+	private String codeGenImage = "codegen_36.png";
+
+	public void setCodeGenImage(final String data) {
+		this.codeGenImage = data;
+	}
+
+	public String getCodeGenImage() {
+		return this.codeGenImage;
+	}
 
 	// http://aniszczyk.org/2007/08/09/resizing-images-using-swt/
-
 	private Image resize(Image image, int width, int height) {
 		Image scaled = new Image(Display.getDefault(), width, height);
 		GC gc = new GC(scaled);
@@ -231,8 +329,11 @@ public class SimpleToolBarEx {
 	}
 
 	@SuppressWarnings("unused")
-	public SimpleToolBarEx(Display display) {
+	public SimpleToolBarEx() {
 
+	}
+
+	public void open(Display display) {
 		testData = new HashMap<String, HashMap<String, String>>();
 		getOsName();
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
@@ -245,18 +346,16 @@ public class SimpleToolBarEx {
 		try {
 
 			launchIcon = resize(
-					new Image(dev, new Utils().getResourcePath("launch_36.png")), 36, 36);
-			findIcon = new Image(dev, new Utils().getResourcePath("find_36.png"));
-			preferencesIcon = new Image(dev,
-					new Utils().getResourcePath("gear_36.png"));
-			shutdownIcon = new Image(dev, new Utils().getResourcePath("quit.png"));
-			demoIcon = new Image(dev, new Utils().getResourcePath("demo_36.png"));
+					new Image(dev, new Utils().getResourcePath(launchImage)), 36, 36);
+			findIcon = new Image(dev, new Utils().getResourcePath(findImage));
+			preferencesIcon = new Image(dev, new Utils().getResourcePath(gearImage));
+			shutdownIcon = new Image(dev, new Utils().getResourcePath(quitImage));
+			demoIcon = new Image(dev, new Utils().getResourcePath(demoImage));
 			pageIcon = new Image(dev,
 					new Utils().getResourcePath("document_wrench_bw.png"));
-			flowchartIcon = new Image(dev,
-					new Utils().getResourcePath("codegen_36.png"));
-			openIcon = new Image(dev, new Utils().getResourcePath("open_36.png"));
-			saveIcon = new Image(dev, new Utils().getResourcePath("save_36.png"));
+			flowchartIcon = new Image(dev, new Utils().getResourcePath(codeGenImage));
+			openIcon = new Image(dev, new Utils().getResourcePath(openImage));
+			saveIcon = new Image(dev, new Utils().getResourcePath(saveImage));
 
 		} catch (Exception e) {
 
@@ -340,17 +439,19 @@ public class SimpleToolBarEx {
 		Breadcrumb bc1 = new Breadcrumb(composite, SWT.BORDER);
 		bc = bc1;
 		composite.pack();
-
-		status = new Label(shell, SWT.BORDER);
-		status.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-		status.setText("Loading ...");
-		status.pack();
-		shell.pack();
+  
+		this.statusMessage = new Label(shell, SWT.NONE);
+		statusMessage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    /*
+    final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		gd.widthHint = statusMessage.getParent().getBounds().width;
+		gd.heightHint = 28; 
+		statusMessage.setLayoutData(gd);
+    */
+		updateStatus("Loading");
 		launchTool.addListener(SWT.Selection, event -> {
 			launchTool.setEnabled(false);
-			status.setText("Launching the browser ...");
-			status.pack();
-			shell.pack();
+      updateStatus("Launching the browser");
 			String browser = configData.get("Browser");
 			if (browser == null || browser == "") {
 				if (osName.toLowerCase().startsWith("windows")) {
@@ -384,15 +485,14 @@ public class SimpleToolBarEx {
 			}
 			flowChartTool.setEnabled(true);
 			// driver.get(getResourceURI("blankpage.html"));
-			status.setText("Ready ...");
-			status.pack();
+			updateStatus("Ready");
 		});
 
 		flowChartTool.addListener(SWT.Selection, event -> {
 			flowChartTool.setEnabled(false);
 			RenderTemplate renderTemplate = new RenderTemplate();
-			status.setText(
-					String.format("Reading template %s ...", configData.get("Template")));
+			updateStatus(
+					String.format("Reading template %s \u2026", configData.get("Template")));
 			// renderTemplate.setTemplateName( "templates/example2.twig" );
 			// TODO:
 			// relative path => setTemplateName
@@ -456,8 +556,7 @@ public class SimpleToolBarEx {
 			}
 			openTool.setEnabled(true);
 			flowChartTool.setEnabled(true);
-			status.setText("Ready ...");
-			status.pack();
+			updateStatus("Ready");
 		});
 
 		saveTool.addListener(SWT.Selection, event -> {
@@ -508,15 +607,13 @@ public class SimpleToolBarEx {
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
 					findTool.setEnabled(false);
-					status.setText("Injecting the script ...");
-					status.pack();
+          updateStatus("Injecting the script");
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
 					injectElementSearch(Optional.<String> empty());
 
-					status.setText("Waiting for data ...");
-					status.pack();
+					updateStatus("Waiting for data");
 					HashMap<String, String> elementData = addElement();
 
 					// 'paginate' the breadcrump
@@ -537,8 +634,7 @@ public class SimpleToolBarEx {
 					shell.layout(true, true);
 					shell.pack();
 					findTool.setEnabled(true);
-					status.setText("Ready ...");
-					status.pack();
+					updateStatus("Ready");
 					saveTool.setEnabled(true);
 				}
 			}
@@ -552,8 +648,7 @@ public class SimpleToolBarEx {
 			@Override
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
-					status.setText("Running the demo ...");
-					status.pack();
+					updateStatus("Running the demo");
 					demoTool.setEnabled(false);
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -574,17 +669,15 @@ public class SimpleToolBarEx {
 					if (newSize.x > 500) {
 						shell.setBounds(boundRect);
 					}
-					status.setText("Ready ...");
-					status.pack();
-					shell.pack();
+					updateStatus("Ready");
+					statusMessage.pack();
 					demoTool.setEnabled(true);
 				}
 			}
 		});
 
 		shutdownTool.addListener(SWT.Selection, event -> {
-			status.setText("Shutting down ...");
-			status.pack();
+			updateStatus("Shutting down");
 			if (driver != null) {
 				shutdownTool.setEnabled(false);
 				try {
@@ -598,10 +691,8 @@ public class SimpleToolBarEx {
 			System.exit(0);
 		});
 
-		status.setText("Ready ...");
-		status.pack();
-		shell.pack();
-		shell.setText("Selenium WebDriver Eclipse Toolkit");
+		updateStatus("Ready");
+		shell.setText("Selenium WebDriver Elementor Toolkit");
 		shell.open();
 
 		while (!shell.isDisposed()) {
@@ -804,7 +895,7 @@ public class SimpleToolBarEx {
 		for (String s : scripts) {
 			if (s != null)
 				System.err.println(
-						String.format("Adding the script: %s...", s.substring(0, 100)));
+						String.format("Adding the script: %s\u2026", s.substring(0, 100)));
 			executeScript(s);
 		}
 	}
@@ -886,7 +977,7 @@ public class SimpleToolBarEx {
 				Object into = event.widget.getData("origin");
 				String text = (String) event.widget.getData("text");
 				boolean answer = MessageDialog.openConfirm(shell, button.getText(),
-						String.format("Details of %s...", text));
+						String.format("Details of %s\u2026", text));
 			}
 		});
 
@@ -913,11 +1004,19 @@ public class SimpleToolBarEx {
 		saveIcon.dispose();
 	}
 
+  private void updateStatus(String newStatus){
+    this.statusMessage.setText(String.format("%s \u2026", newStatus));
+    this.statusMessage.pack();        
+    this.shell.pack();
+  }
 	public static void main(String[] args) {
 
 		Display display = new Display();
-		SimpleToolBarEx ex = new SimpleToolBarEx(display);
-		ex.finalize();
+		SimpleToolBarEx simpleToolBarEx = new SimpleToolBarEx();
+		simpleToolBarEx.setCodeGenImage("codegen_36.png");
+
+		simpleToolBarEx.open(display);
+		simpleToolBarEx.finalize();
 		display.dispose();
 	}
 }
