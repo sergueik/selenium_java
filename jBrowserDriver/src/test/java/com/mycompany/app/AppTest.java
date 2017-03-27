@@ -137,7 +137,10 @@ public class AppTest {
 	public static void tearDown() throws Exception {
 		Thread.sleep(afterTest_interval);
 		if (driver instanceof JBrowserDriver) {
-			// jbrowserDriver does not support close() / quit() ?
+			// jbrowserDriver does not support quit() yet
+			// https://github.com/MachinePublishers/jBrowserDriver/issues/213
+			// driver.close();
+			driver.quit();
 		} else {
 			driver.close();
 			driver.quit();
@@ -151,8 +154,10 @@ public class AppTest {
 	// https://github.com/MachinePublishers/jBrowserDriver/issues/110
 	// the file upload plugin issue:
 	// https://github.com/MachinePublishers/jBrowserDriver/issues/143
+  @Ignore
 	@Test
 	public void test1SendKeys() {
+    System.err.println("test1SendKeys");
 		driver.get("http://blueimp.github.io/jQuery-File-Upload/basic.html");
 		element = driver.findElement(By.id("fileupload"));
 		assertThat(element, notNullValue());
@@ -162,7 +167,7 @@ public class AppTest {
 		executeScript("$('#fileupload').removeAttr('multiple');");
 		element.sendKeys(testFilePath);
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 
 		}
@@ -173,8 +178,10 @@ public class AppTest {
 		assertThat(element.getText(), containsString(testFileName));
 	}
 
+  @Ignore
 	@Test
 	public void test2SendKeys() {
+    System.err.println("test2SendKeys");
 		driver.get("http://siptv.eu/converter/");
 		element = driver
 				.findElement(By.cssSelector("div#container form#file_form input#file"));
@@ -183,7 +190,7 @@ public class AppTest {
 
 		element.sendKeys(testFilePath);
 		try {
-			Thread.sleep(2000);
+			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 
 		}
@@ -194,10 +201,11 @@ public class AppTest {
 		element.click();
 	}
 
+  @Ignore
 	@Test
 	public void testExecutePhantomJS() {
 		if (driver instanceof PhantomJSDriver) {
-
+      System.err.println("testExecutePhantomJS");
 			driver.get("http://siptv.eu/converter/");
 			element = driver.findElement(
 					By.cssSelector("div#container form#file_form input#file"));
@@ -207,7 +215,7 @@ public class AppTest {
 					"var page = this; page.uploadFile('input[id=file]', '%s' );",
 					testFilePath));
 			try {
-				Thread.sleep(2000);
+				Thread.sleep(1000);
 			} catch (InterruptedException e) {
 
 			}
@@ -215,57 +223,80 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+  // @Ignore
 	@Test
 	public void verifyTextTest() throws Exception {
 		try {
 			assertEquals("Hotels", findElement("link_text", "Hotels").getText());
-
 		} catch (Error e) {
 			verificationErrors.append(e.toString());
 		}
 
 	}
 
-	@Ignore
+  @Ignore
 	@Test
 	public void xpathOfElementTest() throws Exception {
-		try {
-			element = findElement("link_text", "Hotels");
-			highlight(element);
-			selector = xpathOfElement(element);
-			assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-		try {
-			element = findElement("xpath", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-			verificationErrors.append(e.toString());
-		}
-
+    element = findElement("link_text", "Hotels");
+		assertThat(element, notNullValue());
+    highlight(element);
+    selector = xpathOfElement(element);
+		// Assert
+		assertThat(selector, notNullValue());
+    assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
+    element = findElement("xpath", selector);
+		assertThat(element, notNullValue());
+    highlight(element);
 	}
 
-	@Ignore
+  // NOTE: this test is hanging the jbrowserdriver
+  // after the test is run orphaned java processess require a taskkill
+  @Ignore
+	@Test
+	public void test13_1() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.3frame.html");
+
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
+				By.cssSelector(".container .row .intro-message iframe")));
+
+		// Act
+		WebElement buttonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
+
+		assertThat(buttonElement, notNullValue());
+		buttonElement.click();
+		// Assert
+		try {
+			// confirm alert
+			Alert alert = driver.switchTo().alert();
+			String alert_text = alert.getText();
+			assertThat(alert_text, containsString("You clicked on Green"));
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
+	}
+
+	// @Ignore
 	@Test
 	public void cssSelectorOfElementWithIdInParentTest() throws Exception {
-		try {
-			element = findElement("link_text", "Hotels");
-			highlight(element);
-			selector = cssSelectorOfElement(element);
-			assertEquals("div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
+    element = findElement("link_text", "Hotels");
+		assertThat(element, notNullValue());
+    highlight(element);
+    selector = cssSelectorOfElement(element);
+    assertEquals(
+    "div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
+    // NOTE: old script was 
+    //"div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
 					selector);
-		} catch (Error e) {
-			verificationErrors.append(e.toString());
-		}
-		try {
-			element = findElement("css_selector", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-
-			verificationErrors.append(e.toString());
-		}
+		assertThat(selector, notNullValue());
+    element = findElement("css_selector", selector);
+		assertThat(element, notNullValue());
+    highlight(element);
 	}
 
 	@Ignore
@@ -294,7 +325,7 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testcssSelectorOfElementAlternative() throws Exception {
 
@@ -302,7 +333,7 @@ public class AppTest {
 			element = findElement("id", "searchbox");
 			highlight(element);
 			selector = cssSelectorOfElementAlternative(element);
-			// System.err.println("css_selector: " + selector );
+			System.err.println("css_selector: " + selector );
 			assertEquals(
 					"form[name=\"PTPT_HAC_FORM\"] > div > label > input[name=\"q\"]",
 					selector);
