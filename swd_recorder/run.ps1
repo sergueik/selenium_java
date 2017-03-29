@@ -4,11 +4,27 @@ Param (
   [string]$MAIN_APP_CLASS = 'SimpleToolBarEx'
 )
 
-$MAVEN_VERSION = '3.3.9'
-$JAVA_VERSION = '1.8.0_101'
-$env:JAVA_HOME = "c:\java\jdk${JAVA_VERSION}"
-$env:M2_HOME = "c:\java\apache-maven-${MAVEN_VERSION}"
-$env:M2 = "${env:M2_HOME}\bin"
+if ($env:MAVEN_VERSION -ne $null) {
+  $MAVEN_VERSION = $env:MAVEN_VERSION
+} else {
+  $MAVEN_VERSION = '3.3.9'
+}
+if ($env:JAVA_VERSION -ne $null) {
+  $JAVA_VERSION = $env:JAVA_VERSION
+} else {
+  $JAVA_VERSION = '1.8.0_101'
+}
+if ($env:JAVA_HOME -eq $null) {
+  $env:JAVA_HOME = "c:\java\jdk${JAVA_VERSION}"
+}
+
+if ($env:M2_HOME -eq $null) {
+  $env:M2_HOME = "c:\java\apache-maven-${MAVEN_VERSION}"
+}
+if ($env:M2 -eq $null) {
+  $env:M2 = "${env:M2_HOME}\bin"
+}
+
 
 $env:PATH = "${env:JAVA_HOME}\bin;${env:M2};${env:PATH}"
 $env:JAVA_OPTS = $env:MAVEN_OPTS = @('-Xms256m','-Xmx512m')

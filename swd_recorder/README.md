@@ -24,23 +24,92 @@ is the code generator we intend to use - it supports the original [PHP Twig](htt
 ![Windows Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture3.png)
 
 ### Usage
+In order to use the application one will have to compile it - it is not difficult.
 
-To start the application run
+### Prerequisites
+Project needs JDK 1.8 or later and Maven to be installed and in the `PATH`. This means the following environment variables are to 
+either be defined globally:
+
+```bash
+JAVA_VERSION
+JAVA_HOME
+M2_HOME
+MAVEN_VERSION
+M2
+```
+or updated in the project runner scripts as explained below.
+
+The Eclipse is not required. With the exception of one jar, the project dependencies are pulled by Maven. On a Mac, the
+JDK is expected to be installed to
+`/Library/Java/JavaVirtualMachines/jdk$JAVA_VERSION.jdk/Contents/Home` which is the default location.
+On Windows Java and Maven were conveniently installed to `c:\java\`. 
+#### Updating the platform-specific information in the `pom.xml`
+
+The project `pom.xml` currently is declaring the main `swt.jar` dependency in a platform-specific fashion:
+
+```xml
+  <properties>
+    <eclipse.swt.version>4.3</eclipse.swt.version>
+    <eclipse.swt.artifactId>org.eclipse.swt.win32.win32.x86_64</eclipse.swt.artifactId>
+    <!--
+    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</eclipse.swt.artifactId>
+    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86</eclipse.swt.artifactId>
+    <eclipse.swt.artifactId>org.eclipse.swt.cocoa.macosx</eclipse.swt.artifactId>
+    <eclipse.swt.artifactId>org.eclipse.swt.cocoa.macosx.x86_64</eclipse.swt.artifactId>
+    -->
+  </properties>
+  <dependencies>
+    <dependency>
+			<groupId>org.eclipse.swt</groupId>
+			<artifactId>${eclipse.swt.artifactId}</artifactId>
+      <version>${eclipse.swt.version}</version>
+		</dependency>
+    ...
+```
+One willl have to uncomment the relevant `artifactId` property definition and comment the rest.
+Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously.
+After the `pom.xml` is modified, it is recommended to use the runner scripts exlained below rather than direct `mvn` commands.
+
+#### Runner Scripts
+After the project is cloned or downloaded from from github, one will find the following `run.*` scripts helpful to compile and start the application:
+On Windows, use either Powershell script
 ```powershell
 . .\run.ps1
 ```
-or
+or a batch file
 ```cmd
 run.cmd
 ```
-on Windows or
+On Umix /Mac, run Bash script
 ```bash
 ./run.sh
 ```
-on Linux or a Mac.
-The runner script downloads those dependency jar(s), that are not hosted on Maven Central repository,
+
+The script downloads those dependency jar(s), that are not hosted on Maven Central repository,
 compiles and packages the project using maven
 and runs the application jar from the `target` directory.
+
+The script configuration needs to be updated with the actual paths to Java and Maven:
+```powershell
+$MAVEN_VERSION = '3.3.9'
+$JAVA_VERSION = '1.8.0_101'
+$env:JAVA_HOME = "c:\java\jdk${JAVA_VERSION}"
+$env:M2_HOME = "c:\java\apache-maven-${MAVEN_VERSION}"
+$env:M2 = "${env:M2_HOME}\bin"
+```
+
+```cmd
+if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
+set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
+if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.3.9
+set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
+
+```
+```bash
+JAVA_VERSION='1.8.0_121'
+MAVEN_VERSION='3.3.9'
+
+```
 The runner script can also be used to launch individual forms that have been largely based on
 examples from the Standard Widget Toolkit study
 project [lshamsutdinov/study_swt](https://github.com/lshamsutdinov/study_swt),
@@ -111,34 +180,6 @@ div.clearfix.loggedout_menubar > div.lfloat._ohe >
 h1 > a > i.fb_logo.img.sp_Mlxwn39jCAE.sx_896ebb
 ```
 Currently SWET does not know a way of shortening them automatically. Adding smart locator generators is a work in progress.
-
-### Platform-specific information
-
-The project is written in java, but its
-main `swt.jar` dependency is currently declared in the the `pom.xml` in a platform-specific fashion:
-
-```xml
-  <properties>
-    <eclipse.swt.version>4.3</eclipse.swt.version>
-    <!--
-    <eclipse.swt.version>[3.6,4.5.0)</eclipse.swt.version>
-    -->
-    <eclipse.swt.artifactId>org.eclipse.swt.win32.win32.x86_64</eclipse.swt.artifactId>
-    <!--
-    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</eclipse.swt.artifactId>
-    <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86</eclipse.swt.artifactId>
-    -->
-  </properties>
-  <dependencies>
-    <dependency>
-			<groupId>org.eclipse.swt</groupId>
-			<artifactId>${eclipse.swt.artifactId}</artifactId>
-      <version>${eclipse.swt.version}</version>
-			<!-- <version>[3.6,4.5.0)</version> -->
-		</dependency>
-    ...
-```
-Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously - one has to uncomment the OS-specific `artifactId` an comment the rest.
 
 ### Compinent Versions
 As usual with Selenium, Application only runnable with the matching combination of versions of Selenium jar, browser driver and browsers is used.
