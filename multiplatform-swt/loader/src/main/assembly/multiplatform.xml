@@ -1,0 +1,40 @@
+<assembly
+	xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.0 http://maven.apache.org/xsd/assembly-1.1.0.xsd">
+	<id>multiplatform</id>
+
+	<formats>
+		<format>jar</format>
+	</formats>
+
+	<includeBaseDirectory>false</includeBaseDirectory>
+
+	<dependencySets>
+		<!-- place all the (but myself) dependencies into ${lib.directory} -->
+		<dependencySet>
+			<scope>runtime</scope>
+			<outputDirectory>${lib.directory}</outputDirectory>
+			<excludes>
+				<exclude>${artifact.groupId}:${artifact.artifactId}</exclude>
+			</excludes>
+		</dependencySet>
+
+		<!-- put myself into root of the package -->
+		<dependencySet>
+			<scope>runtime</scope>
+			<unpack>true</unpack>
+			<includes>
+				<include>${artifact.groupId}:${artifact.artifactId}</include>
+			</includes>
+		</dependencySet>
+	</dependencySets>
+
+	<fileSets>
+		<!-- this fileSet actually copy the swt jars into ${lib.directory} -->
+		<fileSet>
+			<directory>${project.build.directory}/${lib.directory}</directory>
+			<outputDirectory>${lib.directory}</outputDirectory>
+		</fileSet>
+	</fileSets>
+</assembly>
