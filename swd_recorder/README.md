@@ -1,21 +1,25 @@
-![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png)
 
 ### Info
 
-Selenium WebDriver Elementor Toolkit (SWET) is a OS-independent successor to the [Selenium WebDriver Page Recorder (SWD)](https://github.com/dzharii/swd-recorder) of
-Dmytro Zharii (and author). SWET is using [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets
-(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms forthe user interface and JTwig template engine instead
-of Razor for code generation therefore it runs on Windows, Mac or Linux, 32 or 64 bit platforms.
-Eventually the full functionality of SWD is to be achieved, also SWET might become an Eclipse plugin.
-SWET is currently alpha quality, it may not be very useful yet, but you can help! Continue reading for info on how to get the dev environment setup.
+![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png)
+
+__Selenium WebDriver Elementor Toolkit__ (__SWET__) is a OS-independent successor to the [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
+Dmytro Zharii (and author) - a.k.a. __SWD__. __SWET__ is using the
+[Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets
+(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms for user interface and
+[Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
+ template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation.
+Therefore __SWET__ runs on Windows, Mac or Linux, 32 or 64 bit platforms.
+Eventually the full functionality of __SWD__ is to be achieved, also __SWET__ might become an [Eclipse plugin](http://www.vogella.com/tutorials/EclipsePlugin/article.html).
+__SWET__ is currently alpha quality, it may not be very useful yet, but you can help!
+Continue reading for info on how to get the dev environment setup.
 
 The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
-For Mac testing, the [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
+For Mac / Safari testing, the [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
 Currently, working with Safari browser is somewhat flaky.
 
-The [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
-is the code generator we intend to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
+we chose to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
@@ -27,7 +31,7 @@ is the code generator we intend to use - it supports the original [PHP Twig](htt
 In order to use the application one will have to compile it - it is not difficult.
 
 ### Prerequisites
-Project needs JDK 1.8 or later and Maven to be installed and in the `PATH`. This means the following environment variables are to 
+Project needs JDK 1.8 or later and Maven to be installed and in the `PATH`. This means the following environment variables are to
 either be defined globally:
 
 ```bash
@@ -42,7 +46,7 @@ or updated in the project runner scripts as explained below.
 The Eclipse is not required. With the exception of one jar, the project dependencies are pulled by Maven. On a Mac, the
 JDK is expected to be installed to
 `/Library/Java/JavaVirtualMachines/jdk$JAVA_VERSION.jdk/Contents/Home` which is the default location.
-On Windows Java and Maven were conveniently installed to `c:\java\`. 
+On Windows Java and Maven were conveniently installed to `c:\java\`.
 #### Updating the platform-specific information in the `pom.xml`
 
 The project `pom.xml` currently is declaring the main `swt.jar` dependency in a platform-specific fashion:
@@ -161,11 +165,12 @@ Eventually other common formats: YAML, JSON, POI or Java properties file - will 
 
 
 ### Operation
-SWET and SWD inject certain Javascript code `ElementSearch.js` into the page, and waits polling for the speficic
-`document.swdpr_command` object to appear on that page. This object is created  by the `ElementSearch.js`
+Both __SWD__ and __SWET__ inject certain Javascript code `ElementSearch.js` into the page, that the user can interct with with the mouse right-click.
+After injecting the script the IDE waits polling for the speficic
+`document.swdpr_command` object to be present on that page. This object is created  by the `ElementSearch.js`
 when user selects the specific element on the page he is interested to access in the test script,
-and confirms the selection by entering the name of the element and clicking.
-The `document.swdpr_command` object contains certain properties of the selected element:
+and confirms the selection by entering the name of the element and clicking the 'Add Element' button.
+The `document.swdpr_command` object will contain certain properties of the selected element:
 
 * Absolute XPath, that looks like `/html/body/*[@id = "www-wikipedia-org"]/div[1]/div[1]/img[1]`
 * Attribute-extended XPath that looks like `//a[@href="/script/answers"]/img[@src="question.png"]`
@@ -173,18 +178,22 @@ The `document.swdpr_command` object contains certain properties of the selected 
 * Element text (transalted under the hood into XPath `[contains()]` expression).
 * Input for Angular Protractor-specific locators `repeater`, `binding`, `model`, `repeaterRow` etc. (WIP)
 * Element ID (when available)
+
+#### Automation of Locator Shortening
 Auto-generated locators often become unnecessarily long, e.g. for the facebook logo one may get:
 ```css
 div#blueBarDOMInspector > div._53jh > div.loggedout_menubar_container >
 div.clearfix.loggedout_menubar > div.lfloat._ohe >
 h1 > a > i.fb_logo.img.sp_Mlxwn39jCAE.sx_896ebb
 ```
-Currently SWET does not know a way of shortening them automatically. Adding smart locator generators is a work in progress.
+Currently __SWET__ does not have an algorythm for shortening these locators.
+Adding smart locator generators is a work in progress.
 
-### Compinent Versions
-As usual with Selenium, Application only runnable with the matching combination of versions of Selenium jar, browser driver and browsers is used.
+### Component Versions
+As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar, 
+browser driver and browser itself is used - making __SWET__ work with the most recent releases of Selenium and browser drivers is not currently a priority.
 
-Currently supported combination of versions is
+Example of supported version combination is
 
 |                      |              |
 |----------------------|--------------|
@@ -239,8 +248,7 @@ is reserved for future use, when tester is allowed to provide the path to templa
 
 ### Configuration, saving and loading
 
-The element locators collected by SWET may be saved in YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml).
-Example:
+__SWET__ may be saved the element locators in the YAML format, using [snakeyaml](https://bitbucket.org/asomov/snakeyaml). Example:
 ```yaml
 version: '1.0'
 created: '2017-02-21'
@@ -314,21 +322,25 @@ elements:
   * [SWT choice dialog customization](https://github.com/prasser/swtchoices)
   * [SWT Browser component based recorder](https://github.com/itspanzi/swt-browser-recorder-spike)
   * [Joptions Pane examples](http://alvinalexander.com/java/java-joptionpane-examples-tutorials-dialogs)
+
+#### EClise Plugind
+  * [java2s](http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/Eclipse-Plugin.htm)
+
 #### Code Generation
 
   * [Jtwig](https://github.com/jtwig/jtwig)
   * [Thymeleaf](http://www.thymeleaf.org/)
   * [StringTemplate](http://www.stringtemplate.org/)
 
-### Selenium Locator Strategies
+#### Selenium Locator Strategies
 
   * [Choosing Effective XPaths](http://toolsqa.com/selenium-webdriver/choosing-effective-xpath/)
   * [Use XPath locators efficiently](http://bitbar.com/appium-tip-18-how-to-use-xpath-locators-efficiently/)
 
-### YAML
+#### YAML
   * [snakeyaml](https://bitbucket.org/asomov/snakeyaml)
 
-### Javascript injection
+#### Javascript injection
   * [Keymaster](https://github.com/madrobby/keymaster)
 
 #### Misc.
