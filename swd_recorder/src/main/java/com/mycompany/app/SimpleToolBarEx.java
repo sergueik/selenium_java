@@ -170,16 +170,6 @@ public class SimpleToolBarEx {
 
 	private Shell shell;
 
-	private Image launchIcon;
-	private Image findIcon;
-	private Image shutdownIcon;
-	private Image preferencesIcon;
-	private Image demoIcon;
-	private Image pageIcon;
-	private Image flowchartIcon;
-	private Image openIcon;
-	private Image saveIcon;
-
 	private WebDriver driver;
 	private WebDriverWait wait;
 	private Actions actions;
@@ -190,6 +180,7 @@ public class SimpleToolBarEx {
 	private final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private ArrayList<String> stepKeys = new ArrayList<String>();
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
+	private HashMap<String, Image> iconData = new HashMap<String, Image>();
 	private Configuration config = null;
 	private static String configFilePath;
 	private static Map<String, String> configData = new HashMap<String, String>();
@@ -345,17 +336,25 @@ public class SimpleToolBarEx {
 
 		try {
 
-			launchIcon = resize(
-					new Image(dev, new Utils().getResourcePath(launchImage)), 36, 36);
-			findIcon = new Image(dev, new Utils().getResourcePath(findImage));
-			preferencesIcon = new Image(dev, new Utils().getResourcePath(gearImage));
-			shutdownIcon = new Image(dev, new Utils().getResourcePath(quitImage));
-			demoIcon = new Image(dev, new Utils().getResourcePath(demoImage));
-			pageIcon = new Image(dev,
-					new Utils().getResourcePath("document_wrench_bw.png"));
-			flowchartIcon = new Image(dev, new Utils().getResourcePath(codeGenImage));
-			openIcon = new Image(dev, new Utils().getResourcePath(openImage));
-			saveIcon = new Image(dev, new Utils().getResourcePath(saveImage));
+			iconData.put("launch icon", resize(new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(launchImage)),
+					36, 36));
+			iconData.put("find icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(findImage)));
+			iconData.put("prefs icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(gearImage)));
+			iconData.put("shutdown icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(quitImage)));
+			iconData.put("demo icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(demoImage)));
+			iconData.put("step icon", new Image(display, this.getClass()
+					.getClassLoader().getResourceAsStream("document_wrench_bw.png")));
+			iconData.put("codeGen icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(codeGenImage)));
+			iconData.put("open icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(openImage)));
+			iconData.put("save icon", new Image(display,
+					this.getClass().getClassLoader().getResourceAsStream(saveImage)));
 
 		} catch (Exception e) {
 
@@ -371,56 +370,48 @@ public class SimpleToolBarEx {
 		ToolBar toolBar = new ToolBar(shell, SWT.BORDER | SWT.HORIZONTAL);
 
 		ToolItem launchTool = new ToolItem(toolBar, SWT.PUSH);
-		launchTool.setImage(launchIcon);
-		// It is not possible to resize ToolItems manually.
-		/*
-		final GridData gd = new GridData(GridData.FILL, GridData.FILL, true, true);
-		gd.widthHint = 16;
-		gd.heightHint = 16;
-		launchTool.setLayoutData(gd);
-		*/
-
+		launchTool.setImage(iconData.get("launch icon"));
 		launchTool.setToolTipText("Launches the browser");
 
 		ToolItem findTool = new ToolItem(toolBar, SWT.PUSH);
-		findTool.setImage(findIcon);
-		// setDisabledImage
+		findTool.setImage(iconData.get("find icon"));
+		// TODO: setDisabledImage
 		findTool.setToolTipText("Injects the script");
 
 		ToolItem flowChartTool = new ToolItem(toolBar, SWT.PUSH);
-		flowChartTool.setImage(flowchartIcon);
+		flowChartTool.setImage(iconData.get("codeGen icon"));
 		flowChartTool.setToolTipText("Generates the script");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem openTool = new ToolItem(toolBar, SWT.PUSH);
-		openTool.setImage(openIcon);
+		openTool.setImage(iconData.get("open icon"));
 		openTool.setToolTipText("Reads the saved session");
 
 		ToolItem saveTool = new ToolItem(toolBar, SWT.PUSH);
-		saveTool.setImage(saveIcon);
+		saveTool.setImage(iconData.get("save icon"));
 		saveTool.setToolTipText("Saves the session");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem demoTool = new ToolItem(toolBar, SWT.PUSH);
-		demoTool.setImage(demoIcon);
+		demoTool.setImage(iconData.get("demo icon"));
 		demoTool.setToolTipText("Demonstrates the app");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem preferencesTool = new ToolItem(toolBar, SWT.PUSH);
-		preferencesTool.setImage(preferencesIcon);
+		preferencesTool.setImage(iconData.get("prefs icon"));
+
 		preferencesTool.setToolTipText("Configures the app");
 
 		ToolItem shutdownTool = new ToolItem(toolBar, SWT.PUSH);
-		shutdownTool.setImage(shutdownIcon);
+		shutdownTool.setImage(iconData.get("shutdown icon"));
 		shutdownTool.setToolTipText("Quits the app");
 
 		findTool.setEnabled(false);
 		flowChartTool.setEnabled(false);
 		demoTool.setEnabled(false);
-		// demoTool.setGrayed(true);
 		saveTool.setEnabled(false);
 
 		toolBar.pack();
@@ -439,19 +430,19 @@ public class SimpleToolBarEx {
 		Breadcrumb bc1 = new Breadcrumb(composite, SWT.BORDER);
 		bc = bc1;
 		composite.pack();
-  
+
 		this.statusMessage = new Label(shell, SWT.NONE);
 		statusMessage.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    /*
-    final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
+		/*
+		final GridData gd = new GridData(SWT.FILL, SWT.CENTER, true, false);
 		gd.widthHint = statusMessage.getParent().getBounds().width;
 		gd.heightHint = 28; 
 		statusMessage.setLayoutData(gd);
-    */
+		*/
 		updateStatus("Loading");
 		launchTool.addListener(SWT.Selection, event -> {
 			launchTool.setEnabled(false);
-      updateStatus("Launching the browser");
+			updateStatus("Launching the browser");
 			String browser = configData.get("Browser");
 			if (browser == null || browser == "") {
 				if (osName.toLowerCase().startsWith("windows")) {
@@ -491,8 +482,8 @@ public class SimpleToolBarEx {
 		flowChartTool.addListener(SWT.Selection, event -> {
 			flowChartTool.setEnabled(false);
 			RenderTemplate renderTemplate = new RenderTemplate();
-			updateStatus(
-					String.format("Reading template %s \u2026", configData.get("Template")));
+			updateStatus(String.format("Reading template %s \u2026",
+					configData.get("Template")));
 			// renderTemplate.setTemplateName( "templates/example2.twig" );
 			// TODO:
 			// relative path => setTemplateName
@@ -534,7 +525,7 @@ public class SimpleToolBarEx {
 					// System.out.println(String.format("Drawing step %d (%s)",
 					// sortedElementSteps.get(stepId), stepId));
 					HashMap<String, String> elementData = testData.get(stepId);
-					// 'paginate' the breadcrump
+					// 'paginate' the breadcrumps
 					Rectangle rect = bc.getBounds();
 					if (bc.getBounds().width > shell.getBounds().width - 5
 							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
@@ -607,7 +598,7 @@ public class SimpleToolBarEx {
 			public void widgetSelected(SelectionEvent event) {
 				if (driver != null) {
 					findTool.setEnabled(false);
-          updateStatus("Injecting the script");
+					updateStatus("Injecting the script");
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					actions = new Actions(driver);
@@ -909,8 +900,8 @@ public class SimpleToolBarEx {
 		int step_number = (data.containsKey("ElementStepNumber"))
 				? Integer.parseInt(data.get("ElementStepNumber")) : step_index;
 		item.setText(String.format("Step %d: %s", (int) (step_number + 1), name));
-		item.setImage(pageIcon);
-		item.setSelectionImage(pageIcon);
+		item.setImage(iconData.get("step icon"));
+		item.setSelectionImage(iconData.get("step icon"));
 
 		// NOTE: MouseDown event is not received
 		item.addListener(SWT.MouseDown, new Listener() {
@@ -993,22 +984,21 @@ public class SimpleToolBarEx {
 
 	@Override
 	public void finalize() {
-		launchIcon.dispose();
-		findIcon.dispose();
-		shutdownIcon.dispose();
-		preferencesIcon.dispose();
-		pageIcon.dispose();
-		demoIcon.dispose();
-		flowchartIcon.dispose();
-		openIcon.dispose();
-		saveIcon.dispose();
+
+		Iterator<Image> iconIterator = iconData.values().iterator();
+
+		while (iconIterator.hasNext()) {
+			Image icon = (Image) iconIterator.next();
+			icon.dispose();
+		}
 	}
 
-  private void updateStatus(String newStatus){
-    this.statusMessage.setText(String.format("%s \u2026", newStatus));
-    this.statusMessage.pack();        
-    this.shell.pack();
-  }
+	private void updateStatus(String newStatus) {
+		this.statusMessage.setText(String.format("%s \u2026", newStatus));
+		this.statusMessage.pack();
+		this.shell.pack();
+	}
+
 	public static void main(String[] args) {
 
 		Display display = new Display();
