@@ -2,11 +2,13 @@ Info
 ----
 This directory contains  a clone of
 [Multiplatform SWT](https://github.com/jendap/multiplatform-swt) maven project
-to test with [SWET](https://github.com/sergueik/selenium_java/tree/master/swd_recorder).
+to combine with [SWET](https://github.com/sergueik/selenium_java/tree/master/swd_recorder).
 
 ``` bash
+rm -rf src/main
+cp -R ../swd-recorder/src/main src
 mvn package
-java -jar example/target/multiplatform-swt-example-*.jar
+java -jar example/target/swet-0.0.5-SNAPSHOT.jar
 ```
 
 Usage
@@ -26,4 +28,4 @@ mvn install
   - `profiles` section
 sections with their configurations
 
-* Change your main.class property.
+* Change your main.class property
