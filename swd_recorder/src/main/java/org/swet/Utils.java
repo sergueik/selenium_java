@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.io.IOException;
 import java.io.InputStream;

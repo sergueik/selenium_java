@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import static java.lang.String.format;
 

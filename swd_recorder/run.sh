@@ -1,9 +1,13 @@
 #!/bin/bash
 # set -x
 
+JAVA_VERSION='1.8.0_121'
+MAVEN_VERSION='3.3.9'
+
 PACKAGE_NAME='swet'
-PACKAGE_VERSION='0.0.4-SNAPSHOT'
-MAIN_APP_PACKAGE='com.mycompany.app'
+PACKAGE_VERSION='0.0.5-SNAPSHOT'
+
+MAIN_APP_PACKAGE='org.swet'
 MAIN_APP_CLASS=${1:-SimpleToolBarEx}
 
 ALIAS='opal'
@@ -17,8 +21,6 @@ then
   popd
   # https://ftp.mozilla.org/pub/firefox/releases/40.0.3/mac/en-US/
 fi
-JAVA_VERSION='1.8.0_121'
-MAVEN_VERSION='3.3.9'
 if $(uname -s | grep -qi Darwin)
 then
   export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk$JAVA_VERSION.jdk/Contents/Home

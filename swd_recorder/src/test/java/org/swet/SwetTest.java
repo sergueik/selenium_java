@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
@@ -84,17 +84,10 @@ import org.junit.runner.RunWith;
 import org.junit.Test;
 import org.junit.Ignore;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
+import org.swet.BrowserDriver;
+import org.swet.Utils;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
-import com.mycompany.app.BrowserDriver;
-import com.mycompany.app.Utils;
-
-public class AppTest {
+public class SwetTest {
 
 	private static WebDriver driver;
 	private static WebDriverWait wait;

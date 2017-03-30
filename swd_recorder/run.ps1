@@ -30,8 +30,8 @@ $env:PATH = "${env:JAVA_HOME}\bin;${env:M2};${env:PATH}"
 $env:JAVA_OPTS = $env:MAVEN_OPTS = @('-Xms256m','-Xmx512m')
 
 $PACKAGE_NAME = 'swet'
-$PACKAGE_VERSION = '0.0.4-SNAPSHOT'
-$MAIN_APP_PACKAGE = 'com.mycompany.app'
+$PACKAGE_VERSION = '0.0.5-SNAPSHOT'
+$MAIN_APP_PACKAGE = 'org.swet'
 
 
 # external dependencies

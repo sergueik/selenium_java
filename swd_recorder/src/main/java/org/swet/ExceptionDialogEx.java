@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +12,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import com.mycompany.app.Utils;
+import org.swet.Utils;
 
 /**
  * Exception dialog for Selenium Webdriver Elementor Tool
@@ -76,12 +76,12 @@ public class ExceptionDialogEx {
 
 		for (StackTraceElement stackTrace : Thread.currentThread()
 				.getStackTrace()) {
-			Status status = new Status(IStatus.ERROR, "com.mycompany.app",
+			Status status = new Status(IStatus.ERROR, "org.swet",
 					stackTrace.toString());
 			childStatuses.add(status);
 		}
 		String summary = (description != null) ? description : t.toString();
-		MultiStatus status = new MultiStatus("com.mycompany.app",
+		MultiStatus status = new MultiStatus("org.swet",
 				IStatus.ERROR, childStatuses.toArray(new Status[] {}),
 				(summary.length() > 120) ? summary.substring(0, 120) : summary,
 				t);

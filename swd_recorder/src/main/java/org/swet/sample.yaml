@@ -1,4 +1,4 @@
-!!com.mycompany.app.Configuration
+!!org.swet.Configuration
 browserConfiguration: null
 browsers: null
 created: null

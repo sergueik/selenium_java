@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,7 +21,7 @@ import java.util.Vector;
 import org.jtwig.JtwigModel;
 import org.jtwig.JtwigTemplate;
 
-import com.mycompany.app.Utils;
+import org.swet.Utils;
 
 /**
  * Generate source code from testData and twig template for Selenium Webdriver Elementor Tool

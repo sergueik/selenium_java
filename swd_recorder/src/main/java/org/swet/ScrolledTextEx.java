@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -53,8 +53,8 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.mycompany.app.Utils;
-import com.mycompany.app.RenderTemplate;
+import org.swet.Utils;
+import org.swet.RenderTemplate;
 
 /**
  * Generated source display form for Selenium Webdriver Elementor Tool

@@ -318,6 +318,7 @@ elements:
   * [Examples](https://github.com/ReadyTalk/avian-swt-examples)
   * [swt-bling](https://github.com/ReadyTalk/swt-bling)
   * [Multiplatform SWT](https://github.com/jendap/multiplatform-swt)
+  * [SWT Single Jar Packager](https://github.com/mchr3k/swtjar)
   * [SWT custom preference dialog](https://github.com/prasser/swtpreferences)
   * [SWT/JFace Utilities](https://github.com/Albertus82/JFaceUtils)
   * [SWT/WMI](https://github.com/ctron/wmisample)

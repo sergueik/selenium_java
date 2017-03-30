@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.swet;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -154,11 +154,11 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import org.mihalis.opal.breadcrumb.*;
 
-import com.mycompany.app.Utils;
-import com.mycompany.app.ConfigFormEx;
-import com.mycompany.app.ComplexFormEx;
-import com.mycompany.app.ScrolledTextEx;
-import com.mycompany.app.BrowserDriver;
+import org.swet.Utils;
+import org.swet.ConfigFormEx;
+import org.swet.ComplexFormEx;
+import org.swet.ScrolledTextEx;
+import org.swet.BrowserDriver;
 
 /**
  * Main form for Selenium Webdriver Elementor Tool
