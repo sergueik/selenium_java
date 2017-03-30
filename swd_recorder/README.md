@@ -8,18 +8,15 @@ Dmytro Zharii (and author) - a.k.a. __SWD__. __SWET__ is using the
 [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets
 (currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms for user interface and
 [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
- template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation.
+ template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation (that is just one of the available template exngines - note, __jtwig__ supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax)..
 Therefore __SWET__ runs on Windows, Mac or Linux, 32 or 64 bit platforms.
 Eventually the full functionality of __SWD__ is to be achieved, also __SWET__ might become an [Eclipse plugin](http://www.vogella.com/tutorials/EclipsePlugin/article.html).
-__SWET__ is currently alpha quality, it may not be very useful yet, but you can help!
-Continue reading for info on how to get the dev environment setup.
 
 The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
 For Mac / Safari testing, the [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
 Currently, working with Safari browser is somewhat flaky.
 
-we chose to use - it supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax.
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
@@ -28,7 +25,10 @@ we chose to use - it supports the original [PHP Twig](http://twig.sensiolabs.org
 ![Windows Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture3.png)
 
 ### Usage
-In order to use the application one will have to compile it - it is not difficult.
+
+__SWET__ is currently beta quality, it may not be very useful: one can create a session Page Element recording in Java or C#,
+In order to use one will have to compile the application - it is not difficult.
+Continue reading for info on how to get the dev environment setup.
 
 ### Prerequisites
 Project needs JDK 1.8 or later and Maven to be installed and in the `PATH`. This means the following environment variables are to
@@ -72,7 +72,10 @@ The project `pom.xml` currently is declaring the main `swt.jar` dependency in a 
 ```
 One willl have to uncomment the relevant `artifactId` property definition and comment the rest.
 Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously.
-After the `pom.xml` is modified, it is recommended to use the runner scripts exlained below rather than direct `mvn` commands.
+The alternative is to package the spring-boot jar file as explained in
+[Multiplatform SWT](https://github.com/jendap/multiplatform-swt) project.
+Unfortulately the resulting bare-bones `multiplatform-swt-loader.jar` file is almost 10 Mb and __SWET__ jar is over 30 Mb.
+Therefore,  we recommend to modify the `pom.xml` and use runner scripts explained below.
 
 #### Runner Scripts
 After the project is cloned or downloaded from from github, one will find the following `run.*` scripts helpful to compile and start the application:
@@ -190,7 +193,7 @@ Currently __SWET__ does not have an algorythm for shortening these locators.
 Adding smart locator generators is a work in progress.
 
 ### Component Versions
-As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar, 
+As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar,
 browser driver and browser itself is used - making __SWET__ work with the most recent releases of Selenium and browser drivers is not currently a priority.
 
 Example of supported version combination is
