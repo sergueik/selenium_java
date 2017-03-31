@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.github.greengerong</groupId>
+  <artifactId>maven-ng-protractor-demo</artifactId>
+  <packaging>jar</packaging>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>maven-ng-protractor-demo</name>
+  <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>com.github.greengerong</groupId>
+        <artifactId>maven-ng-protractor</artifactId>
+        <version>0.0.3-SNAPSHOT</version>
+        <configuration>
+          <protractor>${project.basedir}/node_modules/protractor/bin/protractor</protractor>
+          <beforeRunning>${project.basedir}/kill-chrome.bat</beforeRunning>
+        </configuration>
+        <executions>
+          <execution>
+            <id>ng-protractor</id>
+            <phase>test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
