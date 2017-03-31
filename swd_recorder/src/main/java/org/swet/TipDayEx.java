@@ -27,6 +27,13 @@ import org.mihalis.opal.header.Header;
 import org.mihalis.opal.utils.ResourceManager;
 import org.mihalis.opal.utils.SWTGraphicUtil;
 
+
+/**
+ * Utilities for Selenium Webdriver Elementor Tool (SWET)
+ * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
+
 // based on Tip of the Day (c) Laurent CARON
 
 public class TipDayEx {

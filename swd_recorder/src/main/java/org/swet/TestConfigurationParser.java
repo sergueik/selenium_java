@@ -1,37 +1,14 @@
 package org.swet;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import java.util.Scanner;
 import java.util.regex.Pattern;
-import java.lang.RuntimeException;
-import static java.lang.String.format;
-import java.text.SimpleDateFormat;
-
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
 
 /**
- * Text table configuration file helper for Selenium Webdriver Elementor Tool
- *
+ * Text table configuration file helper for Selenium Webdriver Elementor Tool (SWET)
  *  @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

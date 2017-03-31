@@ -6,13 +6,10 @@ import java.lang.RuntimeException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Formatter;
 
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -20,8 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * Common utilities class for Selenium Webdriver Elementor Tool
- * 
+ * Common utilities class for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

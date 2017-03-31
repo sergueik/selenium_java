@@ -161,8 +161,7 @@ import org.swet.ScrolledTextEx;
 import org.swet.BrowserDriver;
 
 /**
- * Main form for Selenium Webdriver Elementor Tool
- * 
+ * Main form for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

@@ -24,8 +24,7 @@ import org.jtwig.JtwigTemplate;
 import org.swet.Utils;
 
 /**
- * Generate source code from testData and twig template for Selenium Webdriver Elementor Tool
- * 
+ * Generate source code from testData and twig template for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -115,8 +114,8 @@ public class RenderTemplate {
 		RenderTemplate renderTemplate = new RenderTemplate();
 		System.err
 				.println(String.format("Reading template from %s ...", templatePath));
-		renderTemplate
-				.setTemplateAbsolutePath(templatePath.replace("\\\\", "\\").replace("\\", "/"));
+		renderTemplate.setTemplateAbsolutePath(
+				templatePath.replace("\\\\", "\\").replace("\\", "/"));
 		String output = renderTemplate.renderTest();
 		System.err.println("Rendered: " + output);
 	}

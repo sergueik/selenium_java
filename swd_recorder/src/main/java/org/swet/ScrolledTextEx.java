@@ -1,39 +1,19 @@
 package org.swet;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStreamReader;
 import java.io.IOException;
-import java.io.Reader;
-import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Vector;
 
 import org.eclipse.swt.SWT;
 
 import org.eclipse.jface.layout.GridDataFactory;
-import org.eclipse.swt.custom.LineStyleEvent;
-import org.eclipse.swt.custom.LineStyleListener;
-import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.RGB;
@@ -57,14 +37,9 @@ import org.swet.Utils;
 import org.swet.RenderTemplate;
 
 /**
- * Generated source display form for Selenium Webdriver Elementor Tool
- *
+ * Generated source display form for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-
-// based on:
-// http://stackoverflow.com/questions/10145547/enabling-scroll-bars-in-a-java-swt-window
-// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/JavaSourcecodeViewer.htm
 
 class ScrolledTextEx {
 
@@ -74,7 +49,7 @@ class ScrolledTextEx {
 	private final static int width = 700;
 	private final static int height = 400;
 	private StyledText styledText;
-  private final static int buttonWidth = 120;
+	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
 
 	public JavaLineStyler lineStyler = new JavaLineStyler();
@@ -108,13 +83,13 @@ class ScrolledTextEx {
 				GridDataFactory.fillDefaults().grab(true, true).span(2, 1).create());
 		styledText.setText(payload);
 		Button buttonSave = new Button(shell, SWT.BORDER | SWT.PUSH);
-    
-    			GridData gridDataSave = new GridData(GridData.FILL, GridData.CENTER,
-					false, false);
-			gridDataSave.widthHint = buttonWidth;
-			gridDataSave.heightHint = buttonHeight;
 
-			buttonSave.setLayoutData(gridDataSave);
+		GridData gridDataSave = new GridData(GridData.FILL, GridData.CENTER, false,
+				false);
+		gridDataSave.widthHint = buttonWidth;
+		gridDataSave.heightHint = buttonHeight;
+
+		buttonSave.setLayoutData(gridDataSave);
 
 		buttonSave.setText("Save");
 

@@ -25,13 +25,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
 import org.openqa.selenium.safari.SafariOptions;
 
-// import com.jprotractor.NgBy;
-// import com.jprotractor.NgWebDriver;
-// import com.jprotractor.NgWebElement;
-
 /**
- * Browser Driver wrapper class for Selenium Webdriver Elementor Tool
- * 
+ * Browser Driver wrapper class for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

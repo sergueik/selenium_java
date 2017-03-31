@@ -1,14 +1,7 @@
 package org.swet;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.StringReader;
-import java.text.MessageFormat;
 import java.util.Hashtable;
 import java.util.ResourceBundle;
 import java.util.Vector;
@@ -18,22 +11,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.LineStyleEvent;
 import org.eclipse.swt.custom.LineStyleListener;
 import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
+
+/**
+ * Token color/style processor for Selenium Webdriver Elementor Tool (SWET)
+ */
 
 // origin: http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/JavaSourcecodeViewer.htm
 
@@ -45,11 +30,6 @@ import org.eclipse.swt.widgets.Shell;
  * 
  * Contributors: IBM Corporation - initial API and implementation
  ******************************************************************************/
-
-/**
- * Token color/style processor for Selenium Webdriver Elementor Tool
- * 
- */
 
 class JavaLineStyler implements LineStyleListener {
 	JavaScanner scanner = new JavaScanner();

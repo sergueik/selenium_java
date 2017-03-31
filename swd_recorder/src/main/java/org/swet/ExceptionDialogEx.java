@@ -16,12 +16,8 @@ import org.swet.Utils;
 
 /**
  * Exception dialog for Selenium Webdriver Elementor Tool
- * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-// based on http://www.vogella.com/tutorials/EclipseDialogs/article.html
-// http://www.programcreek.com/java-api-examples/org.eclipse.jface.dialogs.ErrorDialog
-// http://stackoverflow.com/questions/2826959/jface-errordialog-how-do-i-show-something-in-the-details-portion
 
 public class ExceptionDialogEx {
 
@@ -34,10 +30,7 @@ public class ExceptionDialogEx {
 			String s = null;
 			System.out.println(s.length());
 		} catch (NullPointerException e) {
-			// create exception on purpose to demonstrate ErrorDialog
-			ExceptionDialogEx o = new ExceptionDialogEx(null, null, e);
-			// show the error dialog with exception trace
-			o.execute();
+			(new ExceptionDialogEx(null, null, e)).execute();
 		}
 	}
 
@@ -67,7 +60,7 @@ public class ExceptionDialogEx {
 			shell = Display.getCurrent().getActiveShell();
 		}
 		// Collect the exception stack trace
-		status = createMultiStatus(e.getLocalizedMessage(), e);
+		status = createMultiStatus(e.getLocalizedMessage(), e /* TODO: e.getCause() */);
 	}
 
 	private static MultiStatus createMultiStatus(String description,
@@ -81,10 +74,9 @@ public class ExceptionDialogEx {
 			childStatuses.add(status);
 		}
 		String summary = (description != null) ? description : t.toString();
-		MultiStatus status = new MultiStatus("org.swet",
-				IStatus.ERROR, childStatuses.toArray(new Status[] {}),
-				(summary.length() > 120) ? summary.substring(0, 120) : summary,
-				t);
+		MultiStatus status = new MultiStatus("org.swet", IStatus.ERROR,
+				childStatuses.toArray(new Status[] {}),
+				(summary.length() > 120) ? summary.substring(0, 120) : summary, t);
 		return status;
 	}
 }

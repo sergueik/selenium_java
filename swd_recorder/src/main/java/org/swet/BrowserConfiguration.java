@@ -3,8 +3,7 @@ package org.swet;
 import static java.lang.String.format;
 
 /**
- * Browsercon figuration serializer class for Selenium Webdriver Elementor Tool
- * 
+ * Browser Configuration Serializer class for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

@@ -3,24 +3,12 @@ package org.swet;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
-import java.lang.RuntimeException;
 
 /**
- * Common configuration / properties file parsers for Selenium Webdriver Elementor Tool
- * 
+ * Common configuration / properties file parsers for Selenium Webdriver Elementor Tool  (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

@@ -9,7 +9,6 @@ import java.util.HashMap;
 
 /**
  * Test configuration serializer class for Selenium Webdriver Elementor Tool
- * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 

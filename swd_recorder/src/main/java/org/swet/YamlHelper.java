@@ -1,24 +1,13 @@
 package org.swet;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-
-import java.lang.RuntimeException;
-import static java.lang.String.format;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -31,8 +20,7 @@ import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * Common YAML configuration file utilities for Selenium Webdriver Elementor Tool
- * 
+ * Common YAML configuration file utilities for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -40,7 +28,6 @@ public class YamlHelper {
 
 	private static DumperOptions options = new DumperOptions();
 	private static Yaml yaml = null;
-	private static Date dateString;
 	private static Calendar calendar;
 
 	public static Configuration loadConfiguration(String fileName) {
