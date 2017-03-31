@@ -5,8 +5,9 @@
   <artifactId>swet</artifactId>
   <version>0.0.5-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>swet</name>
-  <url>http://maven.apache.org</url>
+  <name>${project.groupId}:${project.artifactId}</name>
+  <description>SWET is a SWT port of SWD - browser based Page Element recorder</description>
+  <url>https://github.com/sergueik/swet</url>
   <developers>
     <developer>
       <name>Serguei Kouzmine</name>
@@ -32,9 +33,6 @@
     <snakeyaml.version>1.17</snakeyaml.version>
     <jtwig-core.version>5.85.0.RELEASE</jtwig-core.version>
     <eclipse.swt.version>4.3</eclipse.swt.version>
-    <!--
-    <eclipse.swt.version>[3.6,4.5.0)</eclipse.swt.version>
-    -->
     <eclipse.swt.artifactId>org.eclipse.swt.win32.win32.x86_64</eclipse.swt.artifactId>
     <!--
     <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86_64</eclipse.swt.artifactId>
