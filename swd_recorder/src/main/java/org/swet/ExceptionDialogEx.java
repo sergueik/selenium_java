@@ -24,20 +24,37 @@ public class ExceptionDialogEx {
 	private MultiStatus status;
 	private Shell shell = null;
 	private Display display;
+	private static boolean debug = false;
 
 	public static void main(String[] arg) {
+		debug = true;
 		try {
-			String s = null;
-			System.out.println(s.length());
-		} catch (NullPointerException e) {
+			testFunction();
+		} catch (Exception e) {
+			if (debug) {
+				System.err.println("Processing exception:");
+				e.printStackTrace();
+			}
+
+			if (debug) {
+				System.err.println("Create the Exception dialog");
+			}
 			(new ExceptionDialogEx(null, null, e)).execute();
 		}
 	}
 
+	private static void testFunction() throws Exception {
+		throw new Exception("This is a test exception");
+	}
+
 	public void execute() {
-
+		if (debug) {
+			System.err.println("Show the dialog");
+		}
 		ErrorDialog.openError(shell, "Error", "Exception thrown", status);
-
+		if (debug) {
+			System.err.println("Shown the dialog");
+		}
 		// TODO: next does not show the dialog
 		/*
 		  import org.eclipse.jdt.internal.ui.dialogs.ProblemDialog;
@@ -60,19 +77,44 @@ public class ExceptionDialogEx {
 			shell = Display.getCurrent().getActiveShell();
 		}
 		// Collect the exception stack trace
-		status = createMultiStatus(e.getLocalizedMessage(), e /* TODO: e.getCause() */);
+		if (debug) {
+			System.err.println("Begin Collecting the exception stack trace");
+		}
+		Exception eCause = (Exception) e.getCause();
+		if (eCause != null) {
+			if (debug) {
+				System.err.println("Cause: " + eCause.toString());
+			}
+			status = createMultiStatus(e.getLocalizedMessage(), eCause);
+		} else {
+			status = createMultiStatus(e.getLocalizedMessage(), e);
+		}
 	}
 
 	private static MultiStatus createMultiStatus(String description,
 			Throwable t) {
 		List<Status> childStatuses = new ArrayList<>();
 
-		for (StackTraceElement stackTrace : Thread.currentThread()
-				.getStackTrace()) {
+		for (StackTraceElement stackTrace : t.getStackTrace()) {
+			if (debug) {
+				System.err.println(
+						String.format("Adding stack trace: %s", stackTrace.toString()));
+			}
 			Status status = new Status(IStatus.ERROR, "org.swet",
 					stackTrace.toString());
 			childStatuses.add(status);
 		}
+		for (StackTraceElement stackTrace : Thread.currentThread()
+				.getStackTrace()) {
+			if (debug) {
+				System.err.println(
+						String.format("Adding stack trace: %s", stackTrace.toString()));
+			}
+			Status status = new Status(IStatus.ERROR, "org.swet",
+					stackTrace.toString());
+			childStatuses.add(status);
+		}
+
 		String summary = (description != null) ? description : t.toString();
 		MultiStatus status = new MultiStatus("org.swet", IStatus.ERROR,
 				childStatuses.toArray(new Status[] {}),
