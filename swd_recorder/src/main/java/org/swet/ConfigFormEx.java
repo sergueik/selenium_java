@@ -1,31 +1,18 @@
 package org.swet;
 
 import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MenuDetectEvent;
-import org.eclipse.swt.events.MenuDetectListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
@@ -35,6 +22,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+
+import org.swet.RenderTemplate;
+import org.swet.OSUtils;
 
 /**
  * Session configuration editor form for Selenium Webdriver Elementor Tool (SWET)
@@ -50,14 +40,16 @@ public class ConfigFormEx {
 	private final static int formHeight = 238;
 	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
+	private static String osName = OSUtils.getOsName();
 	private static HashMap<String, String> configData = new HashMap<String, String>();
-	// NOTE: use the same DOM for Browser config options to simplify code - the hash values for "Browser" are not used
+	// NOTE: use the same DOM for Browser config options to simplify code
+	// the values for "Browser" hash are not used
 	private static HashMap<String, HashMap<String, String>> configOptions = new HashMap<String, HashMap<String, String>>();
+	private static HashMap<String, String> templates = new HashMap<String, String>();
 
 	ConfigFormEx(Display parentDisplay, Shell parent) {
 		HashMap<String, String> browserOptions = new HashMap<String, String>();
-		for (
-		String browser : new ArrayList<String>(Arrays.asList(new String[] {
+		for (String browser : new ArrayList<String>(Arrays.asList(new String[] {
 				"Chrome", "Firefox", "Internet Explorer", "Edge", "Safari" }))) {
 			browserOptions.put(browser, "unused");
 		}
@@ -69,24 +61,40 @@ public class ConfigFormEx {
 		configOptions.put("Template", new HashMap<String, String>());
 		String dirPath = String.format("%s/src/main/resources/templates",
 				System.getProperty("user.dir"));
-		listFilesForFolder(new File(dirPath), "embedded", configOptions);
+		templates = configOptions.get("Template");
+		(new RenderTemplate()).listFilesForFolder(new File(dirPath), "embedded",
+				templates);
+		configOptions.replace("Template", templates);
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		shell = new Shell(display);
 		if (parent != null) {
 			parentShell = parent;
 		}
-		if (parent != null) {
-			new Utils().readData(parentShell.getData("CurrentConfig").toString(),
-					Optional.of(configData));
+		// http://stackoverflow.com/questions/585534/what-is-the-best-way-to-find-the-users-home-directory-in-java
+		if (osName.toLowerCase().startsWith("windows")) {
+			try {
+				dirPath = OSUtils.getDesktopPath();
+			} catch (Exception e) {
+				dirPath = System.getProperty("user.home");
+			}
 		} else {
-			new Utils().readData(String.format(
-					"{ \"Browser\": \"Chrome\", \"Template\": \"Core Selenium Java (embedded)\", \"Template Directory\": \"%s\", \"Template Path\": \"\"}",
-					dirPath.replace("\\", "\\\\")), Optional.of(configData));
+			dirPath = System.getProperty("user.home");
 		}
+		new Utils().readData(
+				parent != null ? parentShell.getData("CurrentConfig").toString()
+						: "{ \"Browser\": \"Chrome\", "
+								+ "\"Template\": \"Core Selenium Java (embedded)\", "
+								+ String.format("\"Template Directory\": \"%s\", ",
+										dirPath.replace("/", "\\").replace("\\", "\\\\"))
+								+ "\"Template Path\": \"\"}",
+				Optional.of(configData));
 		if (configData.containsKey("Template Directory")) {
 			dirPath = configData.get("Template Directory");
 			if (dirPath != "") {
-				listFilesForFolder(new File(dirPath), "user defined", configOptions);
+				templates = configOptions.get("Template");
+				(new RenderTemplate()).listFilesForFolder(new File(dirPath),
+						"user defined", templates);
+				configOptions.replace("Template", templates);
 			}
 		}
 	}
@@ -247,75 +255,6 @@ public class ConfigFormEx {
 							}
 						}
 					});
-				}
-			}
-		}
-	}
-
-	// Scan the template directory and build the hash of template name / path options.
-	public void listFilesForFolder(final File dir, String note,
-			HashMap<String, HashMap<String, String>> options) {
-		FileReader fileReader = null;
-		String contents = null;
-		if (dir.listFiles().length == 0) {
-			return;
-		}
-		for (final File fileEntry : dir.listFiles()) {
-			contents = null;
-			if (fileEntry.getName().endsWith(".twig")) {
-				if (fileEntry.isFile()) {
-					try {
-						fileReader = new FileReader(fileEntry);
-						char[] template = new char[(int) fileEntry.length()];
-						fileReader.read(template);
-						contents = new String(template);
-					} catch (Exception e) {
-						e.printStackTrace();
-					} finally {
-						if (fileReader != null) {
-							try {
-								fileReader.close();
-							} catch (IOException e) {
-							}
-						}
-					}
-				}
-				if (contents != null) {
-					// find comment in the template
-					Matcher matcherTwigComment = Pattern
-							.compile("\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}",
-									Pattern.MULTILINE)
-							.matcher(contents);
-					if (matcherTwigComment.find()) {
-						String comment = matcherTwigComment.group(1);
-						String templateName = null;
-						// find template name in the comment
-						Matcher matcherTemplate = Pattern
-								.compile("template: (.*)$", Pattern.MULTILINE).matcher(comment);
-						if (matcherTemplate.find()) {
-							String templateAbsolutePath = fileEntry.getAbsolutePath();
-							templateName = matcherTemplate.group(1);
-							String templateLabel = String.format("%s (%s)", templateName,
-									(note == null) ? "unknown" : note);
-							System.out.println(String.format("Make option for \"%s\": \"%s\"",
-									templateAbsolutePath, templateLabel));
-							HashMap<String, String> templates = options.get("Template");
-							if (templates.containsKey(templateLabel)) {
-								templates.replace(templateLabel, templateAbsolutePath);
-							} else {
-								templates.put(templateLabel, templateAbsolutePath);
-							}
-							options.put("Template", templates);
-							System.out.println(String.format("Data for option \"%s\": \"%s\"",
-									templateLabel, options.get("Template").get(templateLabel)));
-						} else {
-							System.out
-									.println(String.format("no tag: %s", fileEntry.getName()));
-						}
-					} else {
-						System.out
-								.println(String.format("no tag: %s", fileEntry.getName()));
-					}
 				}
 			}
 		}

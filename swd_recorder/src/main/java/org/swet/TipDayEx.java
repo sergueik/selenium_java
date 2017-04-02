@@ -41,9 +41,13 @@ public class TipDayEx {
 	private Button buttonClose;
 	private Browser tipArea;
 	private static String fontName = null;
-
 	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
+
+	@SuppressWarnings("unused")
+	public TipDayEx() {
+	}
+
 	private static int index = -1;
 
 	public int getIndex() {
@@ -75,9 +79,6 @@ public class TipDayEx {
 
 	public Image getImage() {
 		return this.image;
-	}
-
-	public TipDayEx() {
 	}
 
 	public void open(final Shell parent, Display... parentDisplay) {

@@ -159,6 +159,7 @@ import org.swet.ConfigFormEx;
 import org.swet.ComplexFormEx;
 import org.swet.ScrolledTextEx;
 import org.swet.BrowserDriver;
+import org.swet.OSUtils;
 
 /**
  * Main form for Selenium Webdriver Elementor Tool (SWET)
@@ -193,7 +194,7 @@ public class SimpleToolBarEx {
 	private static final int browserDemoWidth = 900;
 	private static final int browserDemoHeight = 800;
 	private static int step_index = 0;
-	private static String osName = null;
+	private static String osName = OSUtils.getOsName();
 	private String generatedScript = null;
 	private Label statusMessage;
 
@@ -311,13 +312,6 @@ public class SimpleToolBarEx {
 		return scaled;
 	}
 
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name");
-		}
-		return osName;
-	}
-
 	@SuppressWarnings("unused")
 	public SimpleToolBarEx() {
 
@@ -325,7 +319,7 @@ public class SimpleToolBarEx {
 
 	public void open(Display display) {
 		testData = new HashMap<String, HashMap<String, String>>();
-		getOsName();
+		
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, shellWidth, shellHeight);
 		shell.setBounds(boundRect);
