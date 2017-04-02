@@ -37,14 +37,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * Session configuration editor form for Selenium Webdriver Elementor Tool
- *
+ * Session configuration editor form for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-// based on:
-// http://www.java2s.com/Code/Java/SWT-JFace-Eclipse/ComplexShellExample.htm
-// https://www.chrisnewland.com/swt-best-practice-single-display-multiple-shells-111
 public class ConfigFormEx {
 
 	private static Shell shell;
@@ -55,22 +51,17 @@ public class ConfigFormEx {
 	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
 	private static HashMap<String, String> configData = new HashMap<String, String>();
-	// NOTE: to simplify code, use the same DOM - do not need values for "Browser"
+	// NOTE: use the same DOM for Browser config options to simplify code - the hash values for "Browser" are not used
 	private static HashMap<String, HashMap<String, String>> configOptions = new HashMap<String, HashMap<String, String>>();
 
 	ConfigFormEx(Display parentDisplay, Shell parent) {
 		HashMap<String, String> browserOptions = new HashMap<String, String>();
-
 		for (
-
 		String browser : new ArrayList<String>(Arrays.asList(new String[] {
 				"Chrome", "Firefox", "Internet Explorer", "Edge", "Safari" }))) {
-
 			browserOptions.put(browser, "unused");
-
 		}
 		configOptions.put("Browser", browserOptions);
-
 		configData.put("Template", "Core Selenium Java (embedded)");
 
 		// TODO: Keep few twig templates embedded in the application jar and
@@ -186,8 +177,8 @@ public class ConfigFormEx {
 		}
 
 		public void renderData(HashMap<String, String> data) {
-			for (String configKey : Arrays.asList("Browser", "Base URL", "Template Directory", "Template"
-					)) {
+			for (String configKey : Arrays.asList("Browser", "Base URL",
+					"Template Directory", "Template")) {
 				if (configOptions.containsKey(configKey)) {
 					final Label configLabel = new Label(this, SWT.NONE);
 					configLabel.setText(configKey);
@@ -261,7 +252,7 @@ public class ConfigFormEx {
 		}
 	}
 
-	// scan the template directory and merge options.
+	// Scan the template directory and build the hash of template name / path options.
 	public void listFilesForFolder(final File dir, String note,
 			HashMap<String, HashMap<String, String>> options) {
 		FileReader fileReader = null;
@@ -290,18 +281,17 @@ public class ConfigFormEx {
 					}
 				}
 				if (contents != null) {
-					// find comment containing the template name
-					String twigCommentMatcher = "\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}";
-					String templateMatcher = "template: (.*)$";
-					Pattern patternTwigComment = Pattern.compile(twigCommentMatcher,
-							Pattern.MULTILINE);
-					Matcher matcherTwigComment = patternTwigComment.matcher(contents);
+					// find comment in the template
+					Matcher matcherTwigComment = Pattern
+							.compile("\\{#(?:\\r?\\n)?(.*)(?:\\r?\\n)?#\\}",
+									Pattern.MULTILINE)
+							.matcher(contents);
 					if (matcherTwigComment.find()) {
 						String comment = matcherTwigComment.group(1);
 						String templateName = null;
-						Pattern patternTemplate = Pattern.compile(templateMatcher,
-								Pattern.MULTILINE);
-						Matcher matcherTemplate = patternTemplate.matcher(comment);
+						// find template name in the comment
+						Matcher matcherTemplate = Pattern
+								.compile("template: (.*)$", Pattern.MULTILINE).matcher(comment);
 						if (matcherTemplate.find()) {
 							String templateAbsolutePath = fileEntry.getAbsolutePath();
 							templateName = matcherTemplate.group(1);

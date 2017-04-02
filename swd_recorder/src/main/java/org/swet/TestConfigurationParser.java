@@ -8,7 +8,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 /**
- * Text table configuration file helper for Selenium Webdriver Elementor Tool (SWET)
+ * Configuration table helper for Selenium Webdriver Elementor Tool (SWET)
  *  @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
