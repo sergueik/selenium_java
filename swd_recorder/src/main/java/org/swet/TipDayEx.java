@@ -86,8 +86,7 @@ public class TipDayEx {
 		}
 		this.shell = new Shell(parent,
 				SWT.SYSTEM_MODAL | SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.RESIZE);
-		this.shell
-				.setText("Tip of the day");
+		this.shell.setText("Tip of the day");
 		this.shell.setLayout(new GridLayout(2, false));
 
 		this.shell.addListener(SWT.Traverse, new Listener() {
@@ -132,33 +131,10 @@ public class TipDayEx {
 		}
 	}
 
-	private void buildShell(final Shell parent) {
-		this.shell = new Shell(parent,
-				SWT.SYSTEM_MODAL | SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.RESIZE);
-		this.shell.setText("Tip of the day");
-		this.shell.setLayout(new GridLayout(2, false));
-
-		this.shell.addListener(SWT.Traverse, new Listener() {
-			@Override
-			public void handleEvent(final Event event) {
-				switch (event.detail) {
-				case SWT.TRAVERSE_ESCAPE:
-					TipDayEx.this.shell.dispose();
-					event.detail = SWT.TRAVERSE_NONE;
-					event.doit = false;
-					break;
-				}
-			}
-		});
-	}
-
 	private void buildLeftColumn() {
 		final Composite composite = new Composite(this.shell, SWT.NONE);
-		int numberOfRows = 1;
-		numberOfRows = 5;
-
 		final GridData gd = new GridData(GridData.FILL, GridData.BEGINNING, false,
-				true, 1, numberOfRows);
+				true, 1, 1);
 		composite.setLayoutData(gd);
 		final FillLayout compositeLayout = new FillLayout();
 		compositeLayout.marginWidth = 2;
@@ -176,7 +152,6 @@ public class TipDayEx {
 
 		}
 		label.setImage(this.image);
-
 	}
 
 	private void buildTip() {
@@ -224,8 +199,7 @@ public class TipDayEx {
 		final Button checkBox = new Button(composite, SWT.CHECK);
 		checkBox.setLayoutData(
 				new GridData(GridData.BEGINNING, GridData.CENTER, true, false));
-		checkBox
-				.setText("Show at startup");
+		checkBox.setText("Show at startup");
 		checkBox.setSelection(this.showOnStartup);
 		checkBox.addListener(SWT.Selection, new Listener() {
 
@@ -236,8 +210,7 @@ public class TipDayEx {
 		});
 
 		final Button buttonPrevious = new Button(composite, SWT.PUSH);
-		buttonPrevious
-				.setText("Previous Tip");
+		buttonPrevious.setText("Previous Tip");
 		final GridData gridDataPrevious = new GridData(GridData.END,
 				GridData.CENTER, this.showOnStartup ? false : true, false);
 		gridDataPrevious.widthHint = buttonWidth;
