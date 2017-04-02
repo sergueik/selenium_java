@@ -24,19 +24,23 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.mihalis.opal.header.Header;
-import org.mihalis.opal.utils.ResourceManager;
-import org.mihalis.opal.utils.SWTGraphicUtil;
-
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Monitor;
 
 /**
  * Utilities for Selenium Webdriver Elementor Tool (SWET)
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-
-// based on Tip of the Day (c) Laurent CARON
+// based on Tip of the Day (c) Laurent Caron
 
 public class TipDayEx {
+
+	private Display display;
+	private Shell shell;
+	private Button buttonClose;
+	private Browser tipArea;
+	private static String fontName = null;
 
 	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
@@ -63,11 +67,6 @@ public class TipDayEx {
 		return this.showOnStartup;
 	}
 
-	private Shell shell;
-	private Button buttonClose;
-	private Browser tipArea;
-	private static String fontName = null;
-
 	private Image image;
 
 	public void setImage(final Image image) {
@@ -81,14 +80,14 @@ public class TipDayEx {
 	public TipDayEx() {
 	}
 
-	public void open(final Shell parent) {
+	public void open(final Shell parent, Display... parentDisplay) {
 		if (TipDayEx.index == -1) {
 			TipDayEx.index = new Random().nextInt(this.tips.size());
 		}
 		this.shell = new Shell(parent,
 				SWT.SYSTEM_MODAL | SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.RESIZE);
 		this.shell
-				.setText(ResourceManager.getLabel(ResourceManager.TIP_OF_THE_DAY));
+				.setText("Tip of the day");
 		this.shell.setLayout(new GridLayout(2, false));
 
 		this.shell.addListener(SWT.Traverse, new Listener() {
@@ -110,11 +109,25 @@ public class TipDayEx {
 		this.shell.setDefaultButton(this.buttonClose);
 		this.shell.pack();
 		this.shell.open();
-		SWTGraphicUtil.centerShell(this.shell);
+
+		if (parentDisplay != null) {
+			display = parentDisplay[0];
+		} else {
+
+			display = this.shell.getDisplay();
+		}
+		Monitor primary = display.getPrimaryMonitor();
+		Rectangle bounds = primary.getBounds();
+		Rectangle rect = shell.getBounds();
+
+		int x = bounds.x + (bounds.width - rect.width) / 2;
+		int y = bounds.y + (bounds.height - rect.height) / 2;
+
+		shell.setLocation(x, y);
 
 		while (!this.shell.isDisposed()) {
-			if (!this.shell.getDisplay().readAndDispatch()) {
-				this.shell.getDisplay().sleep();
+			if (!display.readAndDispatch()) {
+				display.sleep();
 			}
 		}
 	}
@@ -122,8 +135,7 @@ public class TipDayEx {
 	private void buildShell(final Shell parent) {
 		this.shell = new Shell(parent,
 				SWT.SYSTEM_MODAL | SWT.TITLE | SWT.BORDER | SWT.CLOSE | SWT.RESIZE);
-		this.shell
-				.setText(ResourceManager.getLabel(ResourceManager.TIP_OF_THE_DAY));
+		this.shell.setText("Tip of the day");
 		this.shell.setLayout(new GridLayout(2, false));
 
 		this.shell.addListener(SWT.Traverse, new Listener() {
@@ -153,12 +165,18 @@ public class TipDayEx {
 		composite.setLayout(compositeLayout);
 		final Label label = new Label(composite, SWT.NONE);
 		if (this.image == null) {
-			final Image img = SWTGraphicUtil.createImageFromFile("images/light1.png");
-			label.setImage(img);
-			SWTGraphicUtil.addDisposer(this.shell, img);
-		} else {
-			label.setImage(this.image);
+			this.image = new Image(display, this.getClass().getClassLoader()
+					.getResourceAsStream("images/light1.png"));
+			shell.addListener(SWT.Close, new Listener() {
+				@Override
+				public void handleEvent(Event event) {
+					image.dispose();
+				}
+			});
+
 		}
+		label.setImage(this.image);
+
 	}
 
 	private void buildTip() {
@@ -167,7 +185,7 @@ public class TipDayEx {
 		gd.widthHint = 300;
 		gd.heightHint = 120;
 		group.setLayoutData(gd);
-		group.setText(ResourceManager.getLabel(ResourceManager.DID_YOU_KNOW));
+		group.setText("Did you know");
 		final FillLayout fillLayout = new FillLayout();
 		fillLayout.marginWidth = 15;
 		group.setLayout(fillLayout);
@@ -207,7 +225,7 @@ public class TipDayEx {
 		checkBox.setLayoutData(
 				new GridData(GridData.BEGINNING, GridData.CENTER, true, false));
 		checkBox
-				.setText(ResourceManager.getLabel(ResourceManager.SHOW_TIP_AT_STARTUP));
+				.setText("Show at startup");
 		checkBox.setSelection(this.showOnStartup);
 		checkBox.addListener(SWT.Selection, new Listener() {
 
@@ -218,11 +236,12 @@ public class TipDayEx {
 		});
 
 		final Button buttonPrevious = new Button(composite, SWT.PUSH);
-		buttonPrevious.setText(ResourceManager.getLabel(ResourceManager.PREVIOUS_TIP));
-    GridData gridDataPrevious = new GridData(GridData.END, GridData.CENTER,
-				this.showOnStartup ? false : true, false);
+		buttonPrevious
+				.setText("Previous Tip");
+		final GridData gridDataPrevious = new GridData(GridData.END,
+				GridData.CENTER, this.showOnStartup ? false : true, false);
 		gridDataPrevious.widthHint = buttonWidth;
-    gridDataPrevious.heightHint = buttonHeight;
+		gridDataPrevious.heightHint = buttonHeight;
 
 		buttonPrevious.setLayoutData(gridDataPrevious);
 		buttonPrevious.addSelectionListener(new SelectionAdapter() {
@@ -238,10 +257,11 @@ public class TipDayEx {
 		});
 
 		final Button buttonNext = new Button(composite, SWT.PUSH);
-		buttonNext.setText(ResourceManager.getLabel(ResourceManager.NEXT_TIP));
-    GridData gridDataNext = new GridData(GridData.FILL, GridData.CENTER, false, false);
+		buttonNext.setText("Next Tip");
+		final GridData gridDataNext = new GridData(GridData.FILL, GridData.CENTER,
+				false, false);
 		gridDataNext.widthHint = buttonWidth;
-    gridDataNext.heightHint = buttonHeight;
+		gridDataNext.heightHint = buttonHeight;
 
 		buttonNext.setLayoutData(gridDataNext);
 		buttonNext.addSelectionListener(new SelectionAdapter() {
@@ -258,13 +278,12 @@ public class TipDayEx {
 		});
 
 		buttonClose = new Button(composite, SWT.BORDER | SWT.PUSH);
-		buttonClose.setText(ResourceManager.getLabel(ResourceManager.CLOSE));
-		final GridData gridClose = new GridData(GridData.FILL, GridData.CENTER,
+		buttonClose.setText("Close");
+		final GridData gridDataClose = new GridData(GridData.FILL, GridData.CENTER,
 				false, false);
-    GridData gridDataClose = new GridData(GridData.FILL, GridData.CENTER, false, false);
 		gridDataClose.widthHint = buttonWidth;
-    gridDataClose.heightHint = buttonHeight;
-		buttonClose.setLayoutData( gridDataClose);
+		gridDataClose.heightHint = buttonHeight;
+		buttonClose.setLayoutData(gridDataClose);
 		buttonClose.addSelectionListener(new SelectionAdapter() {
 
 			@Override
@@ -273,7 +292,7 @@ public class TipDayEx {
 			}
 
 		});
-    this.buttonClose = buttonClose;
+		this.buttonClose = buttonClose;
 	}
 
 	public void setIndex(final int index) {
@@ -302,14 +321,14 @@ public class TipDayEx {
 				"This is the second tip", "This is the third tip",
 				"This is the forth tip", "This is the fifth tip" }) {
 			tipDayEx.addTip(String.format(
-					"<h4>%s</h4>" + "<b>%s</b> " + "<u>%s</u> " + "<i>%s</i> "
-							+ "%s " + "%s<br/>" + "<p color=\"#A00000\">%s</p>",
+					"<h4>%s</h4>" + "<b>%s</b> " + "<u>%s</u> " + "<i>%s</i> " + "%s "
+							+ "%s<br/>" + "<p color=\"#A00000\">%s</p>",
 					tipMessage, tipMessage, tipMessage, tipMessage, tipMessage,
 					tipMessage, tipMessage));
 
 		}
 
-		tipDayEx.open(shell);
+		tipDayEx.open(shell, display);
 		display.dispose();
 	}
 
