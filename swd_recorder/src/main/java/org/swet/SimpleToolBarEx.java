@@ -336,24 +336,24 @@ public class SimpleToolBarEx {
 		try {
 
 			iconData.put("launch icon", resize(new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(launchImage)),
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", launchImage))),
 					36, 36));
 			iconData.put("find icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(findImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", findImage))));
 			iconData.put("prefs icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(gearImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", gearImage))));
 			iconData.put("shutdown icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(quitImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", quitImage))));
 			iconData.put("demo icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(demoImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", demoImage))));
 			iconData.put("step icon", new Image(display, this.getClass()
-					.getClassLoader().getResourceAsStream("document_wrench_bw.png")));
+					.getClassLoader().getResourceAsStream(String.format("images/%s", "document_wrench_bw.png"))));
 			iconData.put("codeGen icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(codeGenImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", codeGenImage))));
 			iconData.put("open icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(openImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", openImage))));
 			iconData.put("save icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(saveImage)));
+					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", saveImage))));
 
 		} catch (Exception e) {
 
