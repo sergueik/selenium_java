@@ -1,7 +1,7 @@
 
 ### Info
 
-![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/document_wrench_color.png)
+![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/document_wrench_color.png)
 
 __Selenium WebDriver Elementor Toolkit__ (__SWET__) is a OS-independent successor to the [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
 Dmytro Zharii (and author) - a.k.a. __SWD__. __SWET__ is using the
@@ -127,11 +127,11 @@ which in turn is based on SWT examples from Jan Bodnar's [website](zetcode.com) 
 ```
 ### Toolbar Buttons
 
-![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/launch.png)
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/launch.png)
 launches the browser
 
-![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/find.png)
-injects the [SWD Element Searcher script](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/ElementSearch.js) into the page then
+![launch](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/find.png)
+injects the [SWD Element Searcher script](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/ElementSearch.js) into the page then
 loops polling the page witing for user to select some element via right click and to fill and submit the form:
 ![SWD Table](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/swd_table.png)
 
@@ -142,25 +142,25 @@ The breadcrump button opens the form dialog with the details of the element:
 ![form](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/form.png)
 
 The save and load buttons
-![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/save.png)
-![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/open.png)
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/save.png)
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/open.png)
 save  and restore the test session in YAML format.
 ![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/open_sesssion.png)
 
 The flowchart button
-![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/flowchart.png)
+![flowchart](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/flowchart.png)
 
 starts codegeneration using [Jtwig](http://jtwig.org/) tempate and `elementData` hash and opens result in a separate dialog:
 ![codegen](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/codegen.png)
 
 The preferences.png button
-![preferences](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/preferences.png)
+![preferences](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/preferences.png)
 opens the configuration dialog
 ![config](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/config.png)
 Currently the browser and template selection are configurable, one also can set the base URL.
 
 There is also a demo button that executes these actions automatically (for one element):
-![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/demo.png)
+![demo](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/demo.png)
 
 Currently project is hardcoded to use Chrome browser on Windows os, and Firefox on the rest of platforms.
 The YAML configuration will be fuly integrated shotly.
