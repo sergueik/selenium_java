@@ -182,7 +182,7 @@ public class SimpleToolBarEx {
 	private HashMap<String, HashMap<String, String>> testData = new HashMap<String, HashMap<String, String>>();
 	private HashMap<String, Image> iconData = new HashMap<String, Image>();
 	private Configuration config = null;
-	private static String configFilePath;
+	private static String configFilePath; // TODO: rename
 	private static Map<String, String> configData = new HashMap<String, String>();
 	static {
 		configData.put("Browser", "Chrome");
@@ -319,7 +319,7 @@ public class SimpleToolBarEx {
 
 	public void open(Display display) {
 		testData = new HashMap<String, HashMap<String, String>>();
-		
+
 		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM); // (~SWT.RESIZE)));
 		Rectangle boundRect = new Rectangle(0, 0, shellWidth, shellHeight);
 		shell.setBounds(boundRect);
@@ -329,25 +329,35 @@ public class SimpleToolBarEx {
 
 		try {
 
-			iconData.put("launch icon", resize(new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", launchImage))),
-					36, 36));
-			iconData.put("find icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", findImage))));
-			iconData.put("prefs icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", gearImage))));
-			iconData.put("shutdown icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", quitImage))));
-			iconData.put("demo icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", demoImage))));
-			iconData.put("step icon", new Image(display, this.getClass()
-					.getClassLoader().getResourceAsStream(String.format("images/%s", "document_wrench_bw.png"))));
-			iconData.put("codeGen icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", codeGenImage))));
-			iconData.put("open icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", openImage))));
-			iconData.put("save icon", new Image(display,
-					this.getClass().getClassLoader().getResourceAsStream(String.format("images/%s", saveImage))));
+			iconData.put("launch icon",
+					resize(new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", launchImage))),
+							36, 36));
+			iconData.put("find icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", findImage))));
+			iconData.put("prefs icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", gearImage))));
+			iconData.put("shutdown icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", quitImage))));
+			iconData.put("demo icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", demoImage))));
+			iconData.put("step icon",
+					new Image(display,
+							this.getClass().getClassLoader().getResourceAsStream(
+									String.format("images/%s", "document_wrench_bw.png"))));
+			iconData.put("codeGen icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", codeGenImage))));
+			iconData.put("open icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", openImage))));
+			iconData.put("save icon",
+					new Image(display, this.getClass().getClassLoader()
+							.getResourceAsStream(String.format("images/%s", saveImage))));
 
 		} catch (Exception e) {
 
@@ -481,9 +491,12 @@ public class SimpleToolBarEx {
 			// TODO:
 			// relative path => setTemplateName
 			// absolute path => setTemplateAbsolutePath
-			renderTemplate.setTemplateAbsolutePath(configData.get("Template Path")
-					.replace("\\\\", "\\").replace("\\", "/"));
-
+			if (configData.containsValue("Template Path")) {
+				renderTemplate.setTemplateAbsolutePath(configData.get("Template Path")
+						.replace("\\\\", "\\").replace("\\", "/"));
+			} else {
+				renderTemplate.setTemplateName("templates/example2.twig");
+			}
 			generatedScript = "";
 			try {
 				generatedScript = renderTemplate.renderTest(testData);
@@ -518,14 +531,9 @@ public class SimpleToolBarEx {
 					// System.out.println(String.format("Drawing step %d (%s)",
 					// sortedElementSteps.get(stepId), stepId));
 					HashMap<String, String> elementData = testData.get(stepId);
-					// 'paginate' the breadcrumps
-					Rectangle rect = bc.getBounds();
-					if (bc.getBounds().width > shell.getBounds().width - 5
-							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
-									.getScreenSize().width - 100) {
-						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
-						bc = bc2;
-					}
+
+					// Append Breadcrump Button
+
 					String commandId = elementData.get("CommandId");
 					stepKeys.add(commandId);
 					addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
@@ -550,8 +558,11 @@ public class SimpleToolBarEx {
 			dialog.setFilterExtensions(new String[] { "*.yaml", "*.*" });
 			String homeDir = System.getProperty("user.home");
 			dialog.setFilterPath(homeDir); // Windows path
-			dialog.setFileName(configFilePath);
-			String path = new String(configFilePath);
+			String path = null;
+			if (configFilePath != null) {
+				dialog.setFileName(configFilePath);
+				path = new String(configFilePath);
+			} //
 			configFilePath = dialog.open();
 			if (configFilePath != null) {
 				System.out.println("Save to: " + configFilePath);
@@ -563,7 +574,9 @@ public class SimpleToolBarEx {
 				// buttons etc.
 				YamlHelper.saveConfiguration(config, path);
 			} else {
-				configFilePath = new String(path);
+				if (path != null) {
+					configFilePath = new String(path);
+				}
 			}
 			saveTool.setEnabled(true);
 		});
@@ -600,14 +613,14 @@ public class SimpleToolBarEx {
 					updateStatus("Waiting for data");
 					HashMap<String, String> elementData = addElement();
 
-					// 'paginate' the breadcrump
-					Rectangle rect = bc.getBounds();
-					if (bc.getBounds().width > shell.getBounds().width - 5
-							|| bc.getBounds().width > java.awt.Toolkit.getDefaultToolkit()
-									.getScreenSize().width - 100) {
-						Breadcrumb bc2 = new Breadcrumb(composite, SWT.BORDER);
-						bc = bc2;
+					// TODO: add radios to the ElementSearch Form
+					if (!elementData.containsKey("ElementSelectedBy")) {
+						elementData.put("ElementSelectedBy", "ElementCssSelector");
 					}
+					System.err.println(
+							"ElementSelectedBy : " + elementData.get("ElementSelectedBy"));
+
+					// Append Breadcrump Button
 					String commandId = elementData.get("CommandId");
 					elementData.put("ElementStepNumber", String.format("%d", step_index));
 
@@ -884,10 +897,23 @@ public class SimpleToolBarEx {
 		}
 	}
 
-	// adds a bredCrump item to BreadCrump canvas with attached Shell / Form for
-	// editing
+	// Paginates the BreadCrump
+	private void paginateBreadCrump() {
+		Rectangle rect = bc.getBounds();
+		if (rect.width > shell.getBounds().width - 5
+				|| rect.width > java.awt.Toolkit.getDefaultToolkit()
+						.getScreenSize().width - 100) {
+			Breadcrumb bc2 = new Breadcrumb((Composite) bc.getParent(), SWT.BORDER);
+			// NOTE: operates global
+			bc = bc2;
+		}
+	}
+
+	// Adds a bredCrump item to BreadCrump canvas
+	// attached Shell / Form for Element editing
 	private void addBreadCrumpItem(String name, String commandId,
 			HashMap<String, String> data, Breadcrumb bc) {
+		paginateBreadCrump();
 		final BreadcrumbItem item = new BreadcrumbItem(bc, SWT.CENTER | SWT.TOGGLE);
 		item.setData("CommandId", commandId);
 		int step_number = (data.containsKey("ElementStepNumber"))
@@ -996,7 +1022,7 @@ public class SimpleToolBarEx {
 
 		Display display = new Display();
 		SimpleToolBarEx simpleToolBarEx = new SimpleToolBarEx();
-		simpleToolBarEx.setCodeGenImage("codegen_36.png");
+		simpleToolBarEx.setCodeGenImage("code_128.png");
 
 		simpleToolBarEx.open(display);
 		simpleToolBarEx.finalize();
