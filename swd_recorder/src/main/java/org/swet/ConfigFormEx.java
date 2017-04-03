@@ -22,6 +22,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Listener;
 
 import org.swet.RenderTemplate;
 import org.swet.OSUtils;
@@ -37,9 +42,10 @@ public class ConfigFormEx {
 	private static Shell parentShell = null;
 	private static Display display;
 	private final static int formWidth = 656;
-	private final static int formHeight = 238;
+	private final static int formHeight = 248;
 	private final static int buttonWidth = 120;
 	private final static int buttonHeight = 28;
+	private final static int labelWidth = 150;
 	private static String osName = OSUtils.getOsName();
 	private static HashMap<String, String> configData = new HashMap<String, String>();
 	// NOTE: use the same DOM for Browser config options to simplify code
@@ -66,7 +72,8 @@ public class ConfigFormEx {
 				templates);
 		configOptions.replace("Template", templates);
 		display = (parentDisplay != null) ? parentDisplay : new Display();
-		shell = new Shell(display);
+		// shell = new Shell(display);
+		shell = new Shell(display, SWT.CENTER | SWT.SHELL_TRIM/* | ~SWT.RESIZE */);
 		if (parent != null) {
 			parentShell = parent;
 		}
@@ -120,6 +127,78 @@ public class ConfigFormEx {
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch())
 				display.sleep();
+		}
+	}
+
+	private static class DirBrowseComposite extends Composite {
+
+		public DirBrowseComposite(Composite composite) {
+			super(composite, SWT.NONE);
+			this.setSize(this.getParent().getBounds().width,
+					this.getParent().getBounds().height /* buttonHeight*/ );
+			this.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+			GridLayout gridLayout = new GridLayout(3, true);
+			gridLayout.makeColumnsEqualWidth = false;
+			this.setLayout(gridLayout);
+		}
+
+		public void renderData(HashMap<String, String> data, String configKey) {
+
+      Label valueLabel = new Label(this, SWT.NONE);
+			valueLabel.setLayoutData(new GridData(labelWidth, SWT.DEFAULT));
+			valueLabel.setText(configKey);
+
+			final Text valueText = new Text(this, SWT.SINGLE | SWT.BORDER);
+
+			GridData gridDatevalueText = new GridData(GridData.FILL,
+					GridData.CENTER, true, false);
+			gridDatevalueText.widthHint = this.getBounds().width - 70;
+			gridDatevalueText.heightHint = buttonHeight;
+			valueText.setLayoutData(gridDatevalueText);
+			valueText.setData("key", configKey);
+			if (data.containsKey(configKey)) {
+				valueText.setText(data.get(configKey));
+			}
+			valueText.addModifyListener(new ModifyListener() {
+				@Override
+				public void modifyText(ModifyEvent event) {
+					Text text = (Text) event.widget;
+					System.err.println(String.format("Updating %s = %s",
+							(String) text.getData("key"), text.getText()));
+					if (data.containsKey((String) text.getData("key"))) {
+						data.replace((String) text.getData("key"), text.getText());
+					} else {
+						data.put((String) text.getData("key"), text.getText());
+					}
+				}
+			});
+
+			final Button browse = new Button(this, SWT.PUSH);
+			GridData gridDataBrowse = new GridData(GridData.FILL,
+					GridData.CENTER, false, false);
+			gridDataBrowse.widthHint = 70;
+			gridDataBrowse.heightHint = buttonHeight;
+			browse.setLayoutData(gridDataBrowse);
+			browse.setText("Browse");
+			// ?? browse.setValue("Browse");
+
+			browse.addSelectionListener(new SelectionAdapter() {
+				public void widgetSelected(SelectionEvent event) {
+					DirectoryDialog dialog = new DirectoryDialog(shell);
+
+					dialog.setFilterPath(valueText.getText());
+					dialog.setText(String.format("%s Dialog", configKey));
+					dialog.setMessage("Select a directory");
+
+					String dir = dialog.open();
+					Text text = valueText;
+					if (dir != null) {
+						text.setText(dir);
+						System.err.println(String.format("Browser: %s = %s",
+								(String) text.getData("key"), text.getText()));
+					}
+				}
+			});
 		}
 	}
 
@@ -231,30 +310,44 @@ public class ConfigFormEx {
 					*/
 				} else {
 
-					final Label configLabel = new Label(this, SWT.NONE);
-					configLabel.setText(configKey);
-					final Text configValue;
-					configValue = new Text(this, SWT.SINGLE | SWT.BORDER);
-					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					if (data.containsKey(configKey)) {
-						configValue.setText(data.get(configKey));
+					if (configKey.indexOf("Directory") >= 0) {
+
+						DirBrowseComposite dirBrowseComposite3 = new DirBrowseComposite(
+								this);
+						GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
+								true);
+						gridData.horizontalSpan = 2;
+						dirBrowseComposite3.setLayoutData(gridData);
+						dirBrowseComposite3.renderData(data, configKey);
+						dirBrowseComposite3.pack();
 					} else {
-						// configValue.setText(String.format("%s...", configKey));
-					}
-					configValue.setData("key", configKey);
-					configValue.addModifyListener(new ModifyListener() {
-						@Override
-						public void modifyText(ModifyEvent event) {
-							Text text = (Text) event.widget;
-							System.err.println(String.format("%s = %s",
-									(String) text.getData("key"), text.getText()));
-							if (data.containsKey((String) text.getData("key"))) {
-								data.replace((String) text.getData("key"), text.getText());
-							} else {
-								data.put((String) text.getData("key"), text.getText());
-							}
+
+						final Label configLabel = new Label(this, SWT.NONE);
+						configLabel.setText(configKey);
+						final Text configValue;
+						configValue = new Text(this, SWT.SINGLE | SWT.BORDER);
+						configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+						if (data.containsKey(configKey)) {
+							configValue.setText(data.get(configKey));
+						} else {
+							// configValue.setText(String.format("%s...", configKey));
 						}
-					});
+						configValue.setData("key", configKey);
+						configValue.addModifyListener(new ModifyListener() {
+							@Override
+							public void modifyText(ModifyEvent event) {
+								Text text = (Text) event.widget;
+								System.err.println(String.format("%s = %s",
+										(String) text.getData("key"), text.getText()));
+								if (data.containsKey((String) text.getData("key"))) {
+									data.replace((String) text.getData("key"), text.getText());
+								} else {
+									data.put((String) text.getData("key"), text.getText());
+								}
+							}
+						});
+
+					}
 				}
 			}
 		}
