@@ -36,6 +36,7 @@ public class BrowserDriver {
 	private static String location = "";
 	private static String chromeDriverPath = "c:/java/selenium/chromedriver.exe";
 	private static String iEDriverPath = "c:/java/selenium/IEDriverServer.exe";
+	private static String geckoDriverPath = "c:/java/selenium/geckodriver.exe";
 	// private static String geckoDriverDriverPath;
 
 	public static WebDriver initialize(String browser) {
@@ -69,7 +70,18 @@ public class BrowserDriver {
 				throw new RuntimeException();
 			}
 		} else if (browser.equals("firefox")) {
+
 			driver = new FirefoxDriver(capabilities);
+			// http://navyuginfo.com/selenium-3-0-resolved-firefox-compatibility-issues/
+			// needs the gecko driver regardless
+			/*
+			  Exception in thread "main" java.lang.NoSuchMethodError:			 
+			 com.google.common.base.Preconditions.checkArgument(ZLjava/lang/String;I)V
+			 at org.openqa.selenium.remote.service.DriverService$Builder.usingPort(DriverService.java:241)
+			 at org.openqa.selenium.firefox.FirefoxDriver.toExecutor(FirefoxDriver.java:228)
+			 at org.openqa.selenium.firefox.FirefoxDriver.<init>(FirefoxDriver.java:125)
+			 at org.openqa.selenium.firefox.FirefoxDriver.<init>(FirefoxDriver.java:150)
+			*/
 		} else if (browser.equals("phantomjs")) {
 			driver = new PhantomJSDriver(capabilities);
 		} else if (browser.equals("safari")) {
@@ -77,6 +89,16 @@ public class BrowserDriver {
 			driver = new SafariDriver(options);
 		} else if (browser.equals("chrome")) {
 			driver = new ChromeDriver(capabilities);
+			/*
+			Exception in thread "main" java.lang.NoSuchMethodError: 
+			com.google.common.base.Preconditions.checkState(ZLjava/lang/String;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)V
+			  at org.openqa.selenium.remote.service.DriverService.findExecutable(DriverService.java:111)
+			  at org.openqa.selenium.chrome.ChromeDriverService.access$000(ChromeDriverService.java:32)
+			  at org.openqa.selenium.chrome.ChromeDriverService$Builder.findDefaultExecutable(ChromeDriverService.java:137)
+			  at org.openqa.selenium.remote.service.DriverService$Builder.build(DriverService.java:302)
+			  at org.openqa.selenium.chrome.ChromeDriverService.createDefaultService(ChromeDriverService.java:88)
+			  at org.openqa.selenium.chrome.ChromeDriver.<init>(ChromeDriver.java:146)
+			*/
 		} else if (browser.equals("iexplore")) {
 			File file = new File(iEDriverPath);
 			System.setProperty("webdriver.ie.driver", file.getAbsolutePath());
@@ -151,13 +173,22 @@ public class BrowserDriver {
 	}
 
 	private static DesiredCapabilities capabilitiesFirefox() {
+		System.setProperty("webdriver.gecko.driver", geckoDriverPath);
 		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		// http://toolsqa.com/selenium-webdriver/how-to-use-geckodriver/
+		// capabilities.setCapability("marionette", false);
+		capabilities.setCapability("marionette", true);
+		capabilities.setCapability("firefox_binary",
+				new File("C:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+						.getAbsolutePath());
+		/*
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(true);
 		profile.setAcceptUntrustedCertificates(true);
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 		capabilities.setCapability("elementScrollBehavior", 1);
 		capabilities.setBrowserName(DesiredCapabilities.firefox().getBrowserName());
+		*/
 		return capabilities;
 	}
 
