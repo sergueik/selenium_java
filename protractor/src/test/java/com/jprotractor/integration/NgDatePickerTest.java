@@ -274,7 +274,7 @@ public class NgDatePickerTest {
 
 	// @Ignore
 	@Test
-	// uses DateTime Picker dropdown with input box
+	// uses DateTime Picker drop down with input box
 	public void testDirectSelect() {
 
 		NgWebElement ng_datepicker;

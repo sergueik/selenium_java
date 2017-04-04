@@ -100,38 +100,39 @@ public class NgMultiSelectTest {
 		ngDriver.navigate().to(baseUrl);
 	}
 
+	// @Ignore
 	@Test
 	public void testSelectCarsOneByOne() {
 
-		// Given we are using multiselect directive to pick cars
+		// Given we are using multi select directive to pick cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
 		assertThat(ng_directive.getTagName(), equalTo("am-multiselect"));
-		WebElement toggleSelect = ng_directive.findElement(NgBy
-				.buttonText("Select Some Cars"));
+		WebElement toggleSelect = ng_directive
+				.findElement(NgBy.buttonText("Select Some Cars"));
 		assertThat(toggleSelect, notNullValue());
 		assertTrue(toggleSelect.isDisplayed());
 		toggleSelect.click();
 
 		// After selecting every car one car at a time
-		List<WebElement> cars = ng_directive.findElements(NgBy
-				.repeater("i in items"));
+		List<WebElement> cars = ng_directive
+				.findElements(NgBy.repeater("i in items"));
 		// NOTE: not "c.name for c in cars" that one finds in the am-multiselect tag
 		int selectedCarCount = 0;
 		for (int rowNum = 0; rowNum != cars.size(); rowNum++) {
-			NgWebElement ng_car = ngDriver.findElement(NgBy.repeaterElement(
-					"i in items", rowNum, "i.label"));
+			NgWebElement ng_car = ngDriver
+					.findElement(NgBy.repeaterElement("i in items", rowNum, "i.label"));
 			System.err.println("* " + ng_car.evaluate("i.label").toString());
 			CommonFunctions.highlight(ng_car);
 			ng_car.click();
-      selectedCarCount ++ ;
+			selectedCarCount++;
 		}
 		// Until all cars are selected
 		assertThat(ng_directive.findElements(NgBy.repeater("i in items")).size(),
 				equalTo(selectedCarCount));
 		// Then the button text shows the total number of cars selected
-		WebElement button = ngDriver.findElement(By
-				.cssSelector("am-multiselect > div > button"));
+		WebElement button = ngDriver
+				.findElement(By.cssSelector("am-multiselect > div > button"));
 		String buttonTextPattern = "There are (\\d+) car\\(s\\) selected";
 		String buttonText = button.getText();
 		assertTrue(buttonText.matches(buttonTextPattern));
@@ -145,41 +146,42 @@ public class NgMultiSelectTest {
 		assertThat(carCount, equalTo(selectedCarCount));
 	}
 
+	// @Ignore
 	@Test
 	public void testSelectAll() {
-    
+
 		// Given we are using multiselect directive for selecting cars
 		NgWebElement ng_directive = ngDriver.findElement(NgBy.model("selectedCar"));
 		assertThat(ng_directive, notNullValue());
 		assertTrue(ng_directive.getTagName().equals("am-multiselect"));
-		WebElement toggleSelect = ng_directive.findElement(By
-				.cssSelector("button[ng-click='toggleSelect()']"));
+		WebElement toggleSelect = ng_directive
+				.findElement(By.cssSelector("button[ng-click='toggleSelect()']"));
 		assertThat(toggleSelect, notNullValue());
 		assertTrue(toggleSelect.isDisplayed());
 		toggleSelect.click();
 		// When selected all cars via 'check all' link
-		wait.until(ExpectedConditions.visibilityOf(ng_directive.findElement(By
-				.cssSelector("button[ng-click='checkAll()']"))));
-		WebElement checkAll = ng_directive.findElement(By
-				.cssSelector("button[ng-click='checkAll()']"));
+		wait.until(ExpectedConditions.visibilityOf(ng_directive
+				.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
+		WebElement checkAll = ng_directive
+				.findElement(By.cssSelector("button[ng-click='checkAll()']"));
 		assertThat(checkAll, notNullValue());
 		assertTrue(checkAll.isDisplayed());
 		CommonFunctions.highlight(checkAll);
 		checkAll.click();
-		// Then every car is selected	
-		List<WebElement> cars = ng_directive.findElements(NgBy
-				.repeater("i in items"));
+		// Then every car is selected
+		List<WebElement> cars = ng_directive
+				.findElements(NgBy.repeater("i in items"));
 		int selectedCarCount = 0;
 		for (WebElement car : cars) {
-			assertTrue((boolean) (new NgWebElement(ngDriver, car)
-					.evaluate("i.checked")));
+			assertTrue(
+					(boolean) (new NgWebElement(ngDriver, car).evaluate("i.checked")));
 			System.err.println("* " + car.getText());
 			selectedCarCount++;
 		}
 		assertThat(cars.size(), equalTo(selectedCarCount));
 		// And the button text shows the total number of cars selected
-		WebElement button = ngDriver.findElement(By
-				.cssSelector("am-multiselect > div > button"));
+		WebElement button = ngDriver
+				.findElement(By.cssSelector("am-multiselect > div > button"));
 		String buttonTextPattern = "There are (\\d+) car\\(s\\) selected";
 		String buttonText = button.getText();
 		assertTrue(buttonText.matches(buttonTextPattern));
@@ -191,8 +193,7 @@ public class NgMultiSelectTest {
 			carCount = Integer.parseInt(matcher.group(1));
 		}
 		assertThat(carCount, equalTo(selectedCarCount));
-
-  }
+	}
 
 	@AfterClass
 	public static void teardown() {

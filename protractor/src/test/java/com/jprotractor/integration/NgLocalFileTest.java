@@ -259,7 +259,7 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testEvaluate() {
-		if (!isCIBuild) {
+S		if (!isCIBuild) {
 			return;
 		}
 		getPageContent("ng_service.htm");
@@ -865,7 +865,7 @@ public class NgLocalFileTest {
 		System.err.println(required.getText()); // required: false
 	}
 
-	// // @Ignore
+	// @Ignore
 	// @Test
 	// public void testFindRepeaterElement() {
 	// if (!isCIBuild) {
@@ -1315,7 +1315,7 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// // @Ignore
+	// @Ignore
 	@Test
 	public void testDragAndDrop() {
 		// TODO: investigate the failure under TRAVIS
@@ -1418,5 +1418,4 @@ public class NgLocalFileTest {
 		} catch (Exception e) {
 		}
 	}
-
 }

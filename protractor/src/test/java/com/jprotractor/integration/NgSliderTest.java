@@ -115,16 +115,16 @@ public class NgSliderTest {
 		ngDriver.waitForAngular();
 		// leads to org.openqa.selenium.WebDriverException: angular is not defined
 		// in the
-		List<WebElement> sliderElements = ngDriver.findElements(NgBy
-				.model("demoVals.sliderExample1"));
+		List<WebElement> sliderElements = ngDriver
+				.findElements(NgBy.model("demoVals.sliderExample1"));
 
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		highlight(sliderContainerElement);
 		CommonFunctions.setHighlightTimeout(10);
-		WebElement sliderElement = sliderContainerElement.findElement(By
-				.className("ui-slider-handle"));
-		for (int cnt: new IntRange(1, 10).toArray()) {
+		WebElement sliderElement = sliderContainerElement
+				.findElement(By.className("ui-slider-handle"));
+		for (int cnt : new IntRange(1, 10).toArray()) {
 			sliderElement.sendKeys(Keys.ARROW_RIGHT);
 			highlight(sliderElement);
 		}
@@ -147,16 +147,16 @@ public class NgSliderTest {
 			return;
 		}
 		ngDriver.waitForAngular();
-		List<WebElement> sliderElements = ngDriver.findElements(NgBy
-				.model("demoVals.sliderExample1"));
+		List<WebElement> sliderElements = ngDriver
+				.findElements(NgBy.model("demoVals.sliderExample1"));
 		WebElement sliderContainerElement = sliderElements.get(0);
 		assertThat(sliderContainerElement.getTagName(), equalTo("div"));
 		Dimension dimension = sliderContainerElement.getSize();
 		int width = dimension.width;
 		// System.err.println("width = " + width);
 		highlight(sliderContainerElement);
-		WebElement sliderElement = sliderContainerElement.findElement(By
-				.className("ui-slider-handle"));
+		WebElement sliderElement = sliderContainerElement
+				.findElement(By.className("ui-slider-handle"));
 		// actions.dragAndDropBy(sliderElement, 100, 0).build().perform();
 		// has no effect
 		for (int cnt = 0; cnt != 10; cnt++) {
@@ -164,9 +164,10 @@ public class NgSliderTest {
 			actions.moveByOffset(width / 20, 0);
 			actions.release();
 			actions.build().perform();
-      try{
-			Thread.sleep(100);
-      } catch (InterruptedException e) {}
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
 		}
 		WebElement sliderValueElement = sliderElements.get(1);
 		assertThat(sliderValueElement.getTagName(), equalTo("input"));

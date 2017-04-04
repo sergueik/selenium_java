@@ -178,7 +178,7 @@ public class NgWay2AutomationIntegrationTest {
 	 * "<AccountNumbers>" And I can not see any other accounts Examples: |
 	 * AccountNumbers | FirstName | LastName | | 1004,1005,1006 | Harry | Potter |
 	 */
-	@Ignore
+	// @Ignore
 	@Test
 	public void testCustomerLogin() {
 		if (isCIBuild) {
@@ -280,7 +280,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testEvaluateTransactionDetails() throws InterruptedException {
 		if (isCIBuild) {
@@ -342,7 +342,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testOpenAccount() throws InterruptedException {
 		if (isCIBuild) {
@@ -452,7 +452,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testSortCustomerAccounts() throws InterruptedException {
 		if (isCIBuild) {
@@ -485,7 +485,7 @@ public class NgWay2AutomationIntegrationTest {
 		assertThat(first_customer.getText(), containsString(last_customer_name));
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testListTransactions() {
 		if (isCIBuild) {
@@ -550,7 +550,7 @@ public class NgWay2AutomationIntegrationTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testAddCustomer() {
 		if (isCIBuild) {
@@ -670,7 +670,7 @@ public class NgWay2AutomationIntegrationTest {
 		// TODO: assert the customers.count change
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testInvitateNewCustomerToOpenAccount() {
 		if (isCIBuild) {
@@ -773,7 +773,7 @@ public class NgWay2AutomationIntegrationTest {
 
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testDepositAndWithdraw() {
 		if (isCIBuild) {

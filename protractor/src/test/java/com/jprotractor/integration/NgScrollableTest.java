@@ -103,6 +103,7 @@ public class NgScrollableTest {
 		ngDriver.navigate().to(baseUrl);
 	}
 
+	// @Ignore
 	@Test
 	public void testRowsVisibility() {
 
@@ -148,7 +149,7 @@ public class NgScrollableTest {
 		WebElement row = rows.get(size - 1);
 		System.err.println(row.getText());
 		highlight(row);
-		
+
 		for (int cnt = size - 1; cnt != rows.size(); cnt++) {
 			WebElement rowElement = rows.get(cnt);
 			System.err.println(rowElement.getText() + " " + rowElement.isDisplayed());
