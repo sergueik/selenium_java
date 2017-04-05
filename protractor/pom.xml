@@ -34,8 +34,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>2.53.0</selenium.version>
-    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
+    <selenium.version>3.2.0</selenium.version>
+    <selenium-firefox-driver.version>3.2.0</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -86,6 +86,20 @@
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
     </dependency>
+        <dependency>
+      <groupId>org.seleniumhq.selenium.fluent</groupId>
+      <artifactId>fluent-selenium</artifactId>
+      <version>1.16.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <!-- declare the exclusion here -->
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-java</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
   </dependencies>
   <build>
     <plugins>

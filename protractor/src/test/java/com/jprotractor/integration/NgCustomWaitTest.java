@@ -10,6 +10,11 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -70,7 +75,7 @@ public class NgCustomWaitTest {
 		try {
 			executeScript(
 					"waitForAngular = function() { window.angularFinished = false; angular.element(document.querySelector('body')).injector().get('$browser').notifyWhenNoOutstandingRequests(function() { window.angularFinished = true});};waitForAngular();");
-			wait.until(new ExpectedCondition<Boolean>() {
+			wait.until(new Function<WebDriver, Boolean>() {
 				@Override
 				public Boolean apply(WebDriver driver) {
 					// NullPointerException
@@ -85,8 +90,8 @@ public class NgCustomWaitTest {
 		} catch (WebDriverException e) {
 			System.out.println("Exception (ignored): " + e.toString());
 		} catch (Exception e) {
-			throw new RuntimeException(
-					String.format("Unexpected exception: " + ExceptionUtils.getFullStackTrace(e)));
+			throw new RuntimeException(String.format(
+					"Unexpected exception: " + ExceptionUtils.getFullStackTrace(e)));
 		}
 	}
 

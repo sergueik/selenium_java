@@ -8,6 +8,35 @@ import static org.junit.Assume.*;
 import java.io.IOException;
 import static java.lang.Boolean.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -259,7 +288,7 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testEvaluate() {
-S		if (!isCIBuild) {
+		if (!isCIBuild) {
 			return;
 		}
 		getPageContent("ng_service.htm");
@@ -353,8 +382,15 @@ S		if (!isCIBuild) {
 		// String script = "angular.element(this).scope().setFiles(this)";
 		// Object result = CommonFunctions.executeScript(script,ng_fileToUpload);
 		// assertThat(result, notNullValue());
-		wait.until(ExpectedConditions.visibilityOf(ngDriver.findElement(
-				By.cssSelector("input[ type='button' ][ value='Upload' ]"))));
+		wait.until(new Function<WebDriver, Boolean>() {
+			@Override
+			public Boolean apply(WebDriver d) {
+				WebElement e = d.findElement(
+						By.cssSelector("input[ type='button' ][ value='Upload' ]"));
+				return e.isDisplayed();
+			}
+		});
+
 		// Element is not currently visible and may not be manipulated
 		WebElement button = ngDriver.findElement(
 				By.cssSelector("input[ type='button' ][ value='Upload' ]"));
@@ -1219,7 +1255,7 @@ S		if (!isCIBuild) {
 		// Wait for the Angular 'hovering' property to get evaluated to true
 		WebDriverWait wait2 = new WebDriverWait(seleniumDriver, 120);
 		wait2.pollingEvery(50, TimeUnit.MILLISECONDS);
-		wait2.until(new ExpectedCondition<Boolean>() {
+		wait2.until(new Function<WebDriver, Boolean>() {
 			// NOTE: 'until' only prints "hovering: true" and never "hovering: false"
 			@Override
 			public Boolean apply(WebDriver d) {
@@ -1242,8 +1278,14 @@ S		if (!isCIBuild) {
 		}
 		actions.moveToElement(element).build().perform();
 		try {
-			wait.until(ExpectedConditions.visibilityOf(seleniumDriver
-					.findElement(By.cssSelector("div[ng-show='hovering']"))));
+			wait.until(new Function<WebDriver, Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					WebElement e = d.findElement(By.className("div[ng-show='hovering']"));
+					return e.isDisplayed();
+				}
+			});
+
 		} catch (NoSuchElementException e) {
 		}
 	}

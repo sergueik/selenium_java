@@ -34,6 +34,12 @@ import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 import org.junit.Test;
 
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -61,7 +67,7 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 
 /**
- * Tests of Javascript scrroll
+ * Tests of Javascript scroll
  * http://www.globalsqa.com/angularJs-protractor/Scrollable/ based on
  * https://github.com/PiotrWysocki/globalsqa.com/blob/master/src/main/java/
  * scrollablepages/ScrollablePage.java
@@ -108,11 +114,16 @@ public class NgScrollableTest {
 	public void testRowsVisibility() {
 
 		// Given we are using scrollable table
-
-		WebElement divTableContainer = wait.until( // Wait page to load
-				ExpectedConditions.visibilityOf(
-						ngDriver.findElement(By.className("table-container"))));
-
+		// Wait page to load
+		wait.until(new Function<WebDriver, WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				WebElement e = d.findElement(By.className("table-container"));
+				return e.isDisplayed() ? e : null;
+			}
+		});
+		WebElement divTableContainer = ngDriver
+				.findElement(By.className("table-container"));
 		List<WebElement> rows = ngDriver
 				.findElements(NgBy.repeater("row in rowCollection"));
 		assertThat(rows, notNullValue());
