@@ -8,6 +8,7 @@ The project practices Java 8 functional constructs with Selenium using the Selen
  * [stackoverflow](http://stackoverflow.com/questions/30174546/selenium-filter-with-predicate)
  * [seleniumcapsules](https://github.com/yujunliang/seleniumcapsules)
  * [ahussan/Java8LamdaExpressionAndStreamAPITest](https://github.com/ahussan/Java8LamdaExpressionAndStreamAPITest)
- 
+ * [sskorol/selenium-camp-17](https://github.com/sskorol/selenium-camp-17)
+
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

@@ -1,5 +1,10 @@
 package com.mycompany.app;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -32,22 +37,31 @@ import org.apache.commons.lang3.StringUtils;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.phantomjs.PhantomJSDriverService;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
+import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
@@ -91,24 +105,84 @@ public class SuvianTest {
 	private long pollingInterval = 500;
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
+	private static final String browser = "chrome";
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
 
+		if (browser.equals("chrome")) {
+			System.setProperty("webdriver.chrome.driver",
+					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			ChromeOptions options = new ChromeOptions();
 
-    DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+			chromePrefs.put("profile.default_content_settings.popups", 0);
+			String downloadFilepath = System.getProperty("user.dir")
+					+ System.getProperty("file.separator") + "target"
+					+ System.getProperty("file.separator");
+			chromePrefs.put("download.default_directory", downloadFilepath);
+			chromePrefs.put("enableNetwork", "true");
+			options.setExperimentalOption("prefs", chromePrefs);
+			options.addArguments("allow-running-insecure-content");
+			options.addArguments("allow-insecure-localhost");
+			options.addArguments("enable-local-file-accesses");
+			options.addArguments("disable-notifications");
+			// options.addArguments("start-maximized");
+			options.addArguments("browser.download.folderList=2");
+			options.addArguments(
+					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
+			options.addArguments("browser.download.dir=" + downloadFilepath);
+			// options.addArguments("user-data-dir=/path/to/your/custom/profile");
+			capabilities
+					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			driver = new ChromeDriver(capabilities);
+		} else if (browser.equals("firefox")) {
+			// alternatively one can add Geckodriver to system path
+			System.setProperty("webdriver.gecko.driver",
+					"c:/java/selenium/geckodriver.exe");
+			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+			// alternatively set "marionette" capability to false to use legacy
+			// FirefoxDriver
+			capabilities.setCapability("marionette", false);
+			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+			capabilities.setCapability("locationContextEnabled", false);
+			capabilities.setCapability("acceptSslCerts", true);
+			capabilities.setCapability("elementScrollBehavior", 1);
+			FirefoxProfile profile = new FirefoxProfile();
+			profile.setAcceptUntrustedCertificates(true);
+			profile.setAssumeUntrustedCertificateIssuer(true);
+			profile.setEnableNativeEvents(false);
+
+			System.out.println(System.getProperty("user.dir"));
+			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+			try {
+				driver = new FirefoxDriver(capabilities);
+			} catch (WebDriverException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot initialize Firefox driver");
+			}
+		}
+		actions = new Actions(driver);
+		/*
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		FirefoxProfile profile = new FirefoxProfile();
 		profile.setEnableNativeEvents(true);
 		profile.setAcceptUntrustedCertificates(true);
 		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+
 		capabilities.setCapability("elementScrollBehavior", 1);
 
 		driver = new FirefoxDriver(capabilities);
-    /*
+		*/
+		/*
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
 		driver = new ChromeDriver();
-    */
+		*/
 		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -325,8 +399,7 @@ public class SuvianTest {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
 		}
-		String simulateClick = getScriptContent(
-				"simulateClick.js");
+		String simulateClick = getScriptContent("simulateClick.js");
 		System.err.println("Simulate (2) right mouse click on element");
 		executeScript(simulateClick, element, "contextmenu");
 		try {
@@ -334,9 +407,9 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 		System.err.println("Simulate (3) right mouse click on element");
-    actions.moveToElement(element).build().perform();
-    actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
-        .perform();
+		actions.moveToElement(element).build().perform();
+		actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
+				.perform();
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e) {
@@ -965,6 +1038,7 @@ public class SuvianTest {
 		List<WebElement> tooltips = driver
 				.findElements(By.xpath("//div[contains(@id, '_tooltip')]"));
 		assertThat(tooltips.size(), is(1));
+		// TODO: visibility check
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
@@ -1881,6 +1955,9 @@ public class SuvianTest {
 				.getText().trim().length() > 0);
 	}
 
+	// This test was developed with Selenium Driver 2.53 and needs update to work
+	// with Selenium 3.x.x
+	/*
 	@Test(enabled = false)
 	public void test25_2() {
 		// Arrange
@@ -1943,8 +2020,12 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 	}
+	*/
 
-	@Test(enabled = false)
+	// This test was developed with Selenium Driver 2.53 and needs update to work
+	// with Selenium 3.x.x
+	/*
+	@Test(enabled = true)
 	public void test25_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -1973,7 +2054,11 @@ public class SuvianTest {
 						o -> Integer.parseInt(o.findElement(By.xpath("td[2]")).getText())));
 		// Assert
 		LinkedHashMap<String, Integer> playerScoresList = sortByValue(playerScores);
+
 		// TODO : finish
+		for (String key : playerScoresList.keySet()) {
+			System.out.println(key + ":\t" + playerScoresList.get(key));
+		}
 	}
 
 	// sorting example from
@@ -1985,6 +2070,7 @@ public class SuvianTest {
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
 						(e1, e2) -> e1, LinkedHashMap::new));
 	}
+	*/
 
 	@Test(enabled = false)
 	public void test26() {
