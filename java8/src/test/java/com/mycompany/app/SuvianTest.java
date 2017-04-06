@@ -105,7 +105,7 @@ public class SuvianTest {
 	private long pollingInterval = 500;
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static final String browser = "chrome";
+	private static final String browser = "firefox";
 
 	@BeforeSuite
 	public void beforeSuite() throws Exception {
@@ -211,7 +211,7 @@ public class SuvianTest {
 	// Firebug console validation:
 	// $x("<xpath>")
 	// $$("<cssSelector>")
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test0() {
 
 		// Arrange
@@ -416,7 +416,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test1() {
 
 		// Arrange
@@ -464,7 +464,7 @@ public class SuvianTest {
 		elements.forEach(System.out::println); // output : ??
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.4gender_dropdown.html");
@@ -487,7 +487,7 @@ public class SuvianTest {
 		assertTrue(element.getText().equals(optionString), element.getText());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test5_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -528,7 +528,7 @@ public class SuvianTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test5_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -570,7 +570,7 @@ public class SuvianTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test6_1() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -642,7 +642,7 @@ public class SuvianTest {
 	// be appropriate
 	// - see the test6_3 for the solution
 	// however preceding-sibling always finds the check box #1
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test6_2() {
 		// Arrange
 		ArrayList<String> hobbies = new ArrayList<String>(
@@ -689,7 +689,7 @@ public class SuvianTest {
 	}
 
 	// reverse usage of following-sibling to locate check box by its label
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test6_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
@@ -745,7 +745,7 @@ public class SuvianTest {
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test10() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
@@ -819,7 +819,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test12_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
@@ -874,7 +874,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test12_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.2browserPopUp.html");
@@ -921,7 +921,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test13_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
@@ -948,7 +948,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test13_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
@@ -977,7 +977,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test14_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.4mouseHover.html");
@@ -1000,7 +1000,7 @@ public class SuvianTest {
 	}
 
 	// http://sqa.stackexchange.com/questions/14247/how-can-i-get-the-value-of-the-tooltip
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test14_2() {
 		// Arrange
 		driver.get("http://yuilibrary.com/yui/docs/charts/charts-pie.html");
@@ -1042,7 +1042,7 @@ public class SuvianTest {
 		assertThat(tooltips.get(0).getText(), containsString("day: Monday"));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test15_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
@@ -1081,7 +1081,7 @@ public class SuvianTest {
 				"Text area new height: " + textAreaElement.getSize().getHeight());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test15_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
@@ -1124,7 +1124,7 @@ public class SuvianTest {
 	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.interactions.Mouse
 	// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.interactions.internal.Coordinates
 	// http://grepcode.com/file/repo1.maven.org/maven2/org.seleniumhq.selenium/selenium-api/2.40.0/org/openqa/selenium/interactions/Mouse.java#Mouse.mouseMove%28org.openqa.selenium.interactions.internal.Coordinates%2Clong%2Clong%29
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test15_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.5resize.html");
@@ -1166,7 +1166,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test16_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -1206,7 +1206,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test16_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -1230,7 +1230,7 @@ public class SuvianTest {
 		resultElement.sendKeys(String.format("%d", elements.size()));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test16_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.6liCount.html");
@@ -1254,7 +1254,7 @@ public class SuvianTest {
 				});
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test17() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.7waitUntil.html");
@@ -1307,7 +1307,7 @@ public class SuvianTest {
 		System.err.format("Alert was confirmed at %s\n", delayTime);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test18_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
@@ -1347,7 +1347,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test18_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
@@ -1413,7 +1413,7 @@ public class SuvianTest {
 				"Button2 attribute check (2) : " + button2.getAttribute("outerHTML"));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test18_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.8progressBar.html");
@@ -1461,7 +1461,7 @@ public class SuvianTest {
 				"Button2 attribute check (3) : " + button2.getAttribute("outerHTML"));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test19_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1494,7 +1494,7 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test19_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.9greenColorBlock.html");
@@ -1556,7 +1556,7 @@ public class SuvianTest {
 
 	}
 
-	// Few failing attempts
+	// Few failing attempts. Warning: Timing out with Firefox 
 	// Attempt #1
 	@Test(enabled = false)
 	public void test20_1() {
@@ -1693,7 +1693,7 @@ public class SuvianTest {
 	}
 
 	// Attempt #5
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_5() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -1729,7 +1729,8 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	// NOTE: this test is failing 
+	@Test(enabled = true)
 	public void test21() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.1fileupload.html");
@@ -1747,6 +1748,7 @@ public class SuvianTest {
 		// Assert
 	}
 
+	// Few failing attempts. Warning: Timing out with Firefox 
 	@Test(enabled = false)
 	public void test22() {
 		// Arrange
@@ -1804,7 +1806,7 @@ public class SuvianTest {
 	}
 
 	// only loads first 25 lines of code
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test23_1() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1830,7 +1832,7 @@ public class SuvianTest {
 	}
 
 	// loads all code
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test23_2() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1867,7 +1869,7 @@ public class SuvianTest {
 	}
 
 	// only loads first 35 lines of code
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test23_3() {
 		// Arrange
 		driver.get("https://codemirror.net/demo/simplemode.html");
@@ -1896,7 +1898,7 @@ public class SuvianTest {
 		// Assert
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test25_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -1958,7 +1960,7 @@ public class SuvianTest {
 	// This test was developed with Selenium Driver 2.53 and needs update to work
 	// with Selenium 3.x.x
 	/*
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test25_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
@@ -2072,7 +2074,7 @@ public class SuvianTest {
 	}
 	*/
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test26() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.6copyTextFromTextField.html");
@@ -2111,7 +2113,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test27_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -2140,7 +2142,7 @@ public class SuvianTest {
 		System.err.println("Result : " + itemElement.getText());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test27_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -2171,7 +2173,7 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test30() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
