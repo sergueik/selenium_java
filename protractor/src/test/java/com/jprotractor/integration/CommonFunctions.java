@@ -2,8 +2,8 @@ package com.jprotractor.integration;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
 
+
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.IOException;
 
@@ -12,10 +12,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-import java.util.HashMap;
+
 import java.util.concurrent.TimeUnit;
 
 import java.util.function.Function;
@@ -24,6 +21,10 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.openqa.selenium.By;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.Dimension;
@@ -40,14 +41,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 /**
- * Common functions for Protractor Integration testing
- * 
+ * Common functions for Protractor Testing
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -222,7 +221,7 @@ public class CommonFunctions {
 		final By _locator = locator;
 		new WebDriverWait(seleniumDriver, flexibleWait)
 				.pollingEvery(pollingInterval, TimeUnit.SECONDS)
-				.until(new Function<WebDriver, Boolean>() {
+				.until(new ExpectedCondition<Boolean>() {
 					@Override
 					public Boolean apply(WebDriver o) {
 						System.err.println("Size: " + o.findElements(_locator).size());
@@ -231,4 +230,5 @@ public class CommonFunctions {
 				});
 
 	}
+  
 }

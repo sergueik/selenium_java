@@ -284,7 +284,8 @@ PhantomJs allows loading Angular samples from `file://` context:
 Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
 ### Test setup
-The project work on Linux with Java 1.7, Selenium 2.47, Firefox 40 (download desired version of firefox from
+The project tested to work on Linux and Windows with Java 1.8, Selenium 2.53, Selenium 3.0.1, Firefox 45 or Chrome 56. 
+Download desired version of Firefox from
 [ubuntuzilla](https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/) or [ftp.mozilla.org](https://ftp.mozilla.org/pub/firefox/)) and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
 
 ```bash
@@ -311,7 +312,11 @@ java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_
   - [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory)
   - [PiotrWysocki/globalsqa.com](https://github.com/PiotrWysocki/globalsqa.com) (NOTE: currently using regular Selenium locators with Angular pages)
   - [http://www.globalsqa.com/angularjs-protractor-practice-site](http://www.globalsqa.com/angularjs-protractor-practice-site/)
-  
+
+### Work in progress
+
+Converting the integration tests to Selenium 3.3.x `ExpectedCondition` [deprecation](https://selenium2.ru/blog/187-predicates-in-explicit-waits.html) -  [forum (russian)](http://software-testing.ru/forum/index.php?/topic/34732-selenium-331-java-perestal-rabotat-predikat-kto-pobedil/)
+
 ### Authors
 [Carlos Alexandro Becker](caarlos0@gmail.com)
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

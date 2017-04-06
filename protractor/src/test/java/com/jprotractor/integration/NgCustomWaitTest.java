@@ -10,11 +10,6 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -26,8 +21,8 @@ import org.openqa.selenium.WebDriverException;
 import com.jprotractor.NgWebDriver;
 
 /**
- * Alternative waitForAngular tests based on example from https://github.com/ansiona/ProtractorDemoTest/blob/master/src/main/java/protractordemotest/pages/BasePage.java
- * 
+ * Alternative waitForAngular Test 
+ * based on: https://github.com/ansiona/ProtractorDemoTest/blob/master/src/main/java/protractordemotest/pages/BasePage.java
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -75,7 +70,7 @@ public class NgCustomWaitTest {
 		try {
 			executeScript(
 					"waitForAngular = function() { window.angularFinished = false; angular.element(document.querySelector('body')).injector().get('$browser').notifyWhenNoOutstandingRequests(function() { window.angularFinished = true});};waitForAngular();");
-			wait.until(new Function<WebDriver, Boolean>() {
+			wait.until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver driver) {
 					// NullPointerException

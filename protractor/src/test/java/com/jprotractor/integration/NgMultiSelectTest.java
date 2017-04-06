@@ -14,17 +14,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.Formatter; 
+import java.util.Formatter;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import java.util.concurrent.TimeUnit;
 
@@ -166,16 +160,8 @@ public class NgMultiSelectTest {
 		assertTrue(toggleSelect.isDisplayed());
 		toggleSelect.click();
 		// When selected all cars via 'check all' link
-    wait.until(new Function<WebDriver, Boolean>() {
-			@Override
-			public Boolean apply(WebDriver _driver) {
-        NgWebDriver _ngDriver = new NgWebDriver(_driver);
-        NgWebElement _ng_directive = _ngDriver.findElement(NgBy.model("selectedCar"));
-				NgWebElement _ngWebElement =  _ng_directive.findElement(By.cssSelector("button[ng-click='checkAll()']"));
-				return _ngWebElement.isDisplayed();
-			}
-		});
-
+		wait.until(ExpectedConditions.visibilityOf(ng_directive
+				.findElement(By.cssSelector("button[ng-click='checkAll()']"))));
 		WebElement checkAll = ng_directive
 				.findElement(By.cssSelector("button[ng-click='checkAll()']"));
 		assertThat(checkAll, notNullValue());

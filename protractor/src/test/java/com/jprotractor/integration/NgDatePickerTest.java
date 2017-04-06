@@ -27,12 +27,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -58,8 +52,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.WebDriver;
@@ -72,7 +66,6 @@ import com.jprotractor.NgWebElement;
 
 /**
  * Datetime Picker tests
- * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -123,7 +116,7 @@ public class NgDatePickerTest {
 		// Arrange
 		final String searchText = "Embedded calendar";
 		try {
-			(new WebDriverWait(driver, 5)).until(new Function<WebDriver, Boolean>() {
+			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
 					Iterator<WebElement> elements = d
@@ -190,47 +183,25 @@ public class NgDatePickerTest {
 		final String searchText = "Drop-down Datetime with input box";
 		WebElement contaiter = null;
 		try {
-			/*
 			contaiter = wait.until(
 					ExpectedConditions.visibilityOf(driver.findElement(By.xpath(String
 							.format("//div[@class='col-sm-6']//*[contains(text(),'%s')]",
 									searchText)))));
-			            */
-			contaiter = wait.until(new Function<WebDriver, WebElement>() {
-				@Override
-				public WebElement apply(WebDriver d) {
-					WebElement e = d.findElement(By.xpath(String.format(
-							"//div[@class='col-sm-6']//*[contains(text(),'%s')]",
-							searchText)));
-					return e.isDisplayed() ? e : null;
-				}
-			});
 			highlight(contaiter);
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
 		try {
-			/*
 			contaiter = wait
 					.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
 							String.format("//*[text()[contains(.,'%s')]]", searchText)))));
-			  */
-			contaiter = wait.until(new Function<WebDriver, WebElement>() {
-				@Override
-				public WebElement apply(WebDriver d) {
-					WebElement e = d.findElement(By.xpath(
-							String.format("//*[text()[contains(.,'%s')]]", searchText)));
-					return e.isDisplayed() ? e : null;
-				}
-			});
-
 			highlight(contaiter);
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
 
 		try {
-			(new WebDriverWait(driver, 5)).until(new Function<WebDriver, Boolean>() {
+			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
 					Iterator<WebElement> elements = d
@@ -309,7 +280,7 @@ public class NgDatePickerTest {
 		// Arrange
 		final String searchText = "Drop-down Datetime with input box";
 		try {
-			(new WebDriverWait(driver, 5)).until(new Function<WebDriver, Boolean>() {
+			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
 					Iterator<WebElement> elements = d
