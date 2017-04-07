@@ -206,6 +206,13 @@ Example of supported version combination is
 | CHROMEDRIVER_VERSION | __2.24__         |
 
 
+|                      |              |
+|----------------------|--------------|
+| SELENIUM_VERSION     | __3.0.1__       |
+| FIREFOX_VERSION      | *TBD*       |
+| CHROME_VERSION       | __56.0.X__ |
+| CHROMEDRIVER_VERSION | __2.29__         |
+
 One can download virtually every old build of Firefox from
 https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from
 http://www.slimjetbrowser.com/chrome/, for other browsers the download locations vary.
