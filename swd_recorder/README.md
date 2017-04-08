@@ -8,7 +8,7 @@ Dmytro Zharii and author. __SWET__ is using the
 [Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) (currently, with third party [Opal](https://github.com/lcaron/opal) widget library) instead of Microsoft .Net Windows Forms for user interface and [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow) template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation (that is just one of the available template exngines - note, __jtwig__ supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax).
 
 Therefore __SWET__ runs on Windows, Mac or Linux, 32 or 64 bit platforms.
-__SWET__ is currently beta quality: one can create a session and collect Page Element information and convert it to a 
+__SWET__ is currently beta quality: one can create a session and collect Page Element information and convert it to a
 fragment of the code in the Java or C# language; eventually the full functionality of __SWD__ is to be achieved, also __SWET__ might become an [Eclipse plugin](http://www.vogella.com/tutorials/EclipsePlugin/article.html).
 
 The application is being developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
@@ -40,14 +40,14 @@ M2
 ```
 or updated in the project runner scripts as explained below.
 
-The Eclipse is not required. 
+The Eclipse is not required.
 
-With the exception of one jar, the project dependencies are pulled by Maven. 
+With the exception of one jar, the project dependencies are pulled by Maven.
 
 On the Mac, the
 JDK is expected to be installed to
 `/Library/Java/JavaVirtualMachines/jdk$JAVA_VERSION.jdk/Contents/Home` which is the default location.
-In the checked-in runner scripts, the Java and Maven were conveniently installed to `c:\java\` for Windows . 
+In the checked-in runner scripts, the Java and Maven were conveniently installed to `c:\java\` for Windows .
 
 #### Updating the platform-specific information in the `pom.xml`
 
@@ -76,7 +76,7 @@ One willl have to uncomment the relevant `artifactId` property definition and co
 Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously.
 The alternative is to package the spring-boot jar file as explained in
 [Multiplatform SWT](https://github.com/jendap/multiplatform-swt) project.
-Unfortulately the resulting bare-bones `multiplatform-swt-loader.jar` file is almost 10 Mb and with all dependencies the 
+Unfortulately the resulting bare-bones `multiplatform-swt-loader.jar` file is almost 10 Mb and with all dependencies the
 __SWET__ jar is over 30 Mb which is not very practical.
 Therefore,  we recommend to modify the `pom.xml` and use runner scripts to compile it as explained below.
 
@@ -197,29 +197,34 @@ Adding smart locator generators is a work in progress.
 
 ### Dependencies Versions
 
-As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar, browser driver and browser itself is used. Examples of supported version combinations are listed below.
+As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar, browser driver and browser itself is used.
+The __SWET__ application master branch is being developed with
 
 |                      |              |
 |----------------------|--------------|
-| SELENIUM_VERSION     | __2.53.1__       |
-| FIREFOX_VERSION      | __45.0.1__       |
-| CHROME_VERSION       | __54.0.X__ |
-| CHROMEDRIVER_VERSION | __2.24__         |
+| SELENIUM_VERSION     | __2.53.1__   |
+| FIREFOX_VERSION      | __45.0.1__   |
+| CHROME_VERSION       | __56.0.X__   |
+| CHROMEDRIVER_VERSION | __2.29__     |
 
-
-|                      |              |
-|----------------------|--------------|
-| SELENIUM_VERSION     | __3.0.1__       |
-| FIREFOX_VERSION      | *TBD*       |
-| CHROME_VERSION       | __56.0.X__ |
-| CHROMEDRIVER_VERSION | __2.29__         |
+Examples of partially supported version combinations are listed below (exceptions may be observed when launching browser). 
+Branches selenium_301 and selenium_3x created until this code is stable.
 
 |                      |              |
 |----------------------|--------------|
-| SELENIUM_VERSION     | __3.3.1__       |
-| FIREFOX_VERSION      | *TBD*       |
-| CHROME_VERSION       | __56.0.X__ |
-| CHROMEDRIVER_VERSION | __2.29__         |
+| SELENIUM_VERSION     | __3.0.1__    |
+| FIREFOX_VERSION      | __52.0__     |
+| GECKODRIVER_VERSION  | __0.14__     |
+| CHROME_VERSION       | __56.0.X__   |
+| CHROMEDRIVER_VERSION | __2.29__     |
+
+|                      |              |
+|----------------------|--------------|
+| SELENIUM_VERSION     | __3.3.1__    |
+| FIREFOX_VERSION      | __52.0__     |
+| GECKODRIVER_VERSION  | __0.14__     |
+| CHROME_VERSION       | __56.0.X__   |
+| CHROMEDRIVER_VERSION | __2.29__     |
 
 One can download virtually every old build of Firefox from
 https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from

@@ -106,7 +106,6 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.support.ui.FluentWait;
 
 import org.eclipse.swt.SWT;
 
@@ -174,7 +173,6 @@ public class SimpleToolBarEx {
 
 	private Shell shell;
 	private WebDriver driver;
-	// private FluentWait<WebDriver> wait;
 	private WebDriverWait wait;
 	private Actions actions;
 	private int flexibleWait = 5;
@@ -312,7 +310,7 @@ public class SimpleToolBarEx {
 		gc.drawImage(image, 0, 0, image.getBounds().width, image.getBounds().height,
 				0, 0, width, height);
 		gc.dispose();
-		image.dispose(); // don't forget about me!
+		image.dispose();
 		return scaled;
 	}
 
@@ -461,26 +459,24 @@ public class SimpleToolBarEx {
 			}
 			try {
 				driver = BrowserDriver.initialize(browser);
+				driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+						.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+						.setScriptTimeout(30, TimeUnit.SECONDS);
+				driver.get(baseURL);
+				// prevent the customer from launching multiple instances
+				// launchTool.setEnabled(true);
+				findTool.setEnabled(true);
+				if (!osName.startsWith("Mac")) {
+					// TODO: add a sorry dialog for Mac / Safari, any OS / Firefox
+					// combinations
+					demoTool.setEnabled(true);
+				}
+				flowChartTool.setEnabled(true);
+				// driver.get(getResourceURI("blankpage.html"));
 			} catch (Exception e) {
-				ExceptionDialogEx o = new ExceptionDialogEx(display, shell, e);
 				// show the error dialog with exception trace
-				o.execute();
+				(new ExceptionDialogEx(display, shell, e)).execute();
 			}
-
-			driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
-					.implicitlyWait(implicitWait, TimeUnit.SECONDS)
-					.setScriptTimeout(30, TimeUnit.SECONDS);
-			driver.get(baseURL);
-			// prevent the customer from launching multiple instances
-			// launchTool.setEnabled(true);
-			findTool.setEnabled(true);
-			if (!osName.startsWith("Mac")) {
-				// TODO: add a sorry dialog for Mac / Safari, any OS / Firefox
-				// combinations
-				demoTool.setEnabled(true);
-			}
-			flowChartTool.setEnabled(true);
-			// driver.get(getResourceURI("blankpage.html"));
 			updateStatus("Ready");
 		});
 
@@ -610,11 +606,11 @@ public class SimpleToolBarEx {
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					/*
-										wait = new FluentWait<>(driver)
-												.withTimeout(flexibleWait, TimeUnit.SECONDS)
-												.pollingEvery(pollingInterval, TimeUnit.SECONDS)
-												.ignoring(NoSuchElementException.class);
-												*/
+					wait = new FluentWait<>(driver)
+						.withTimeout(flexibleWait, TimeUnit.SECONDS)
+						.pollingEvery(pollingInterval, TimeUnit.SECONDS)
+						.ignoring(NoSuchElementException.class);
+					*/
 					actions = new Actions(driver);
 					injectElementSearch(Optional.<String> empty());
 
@@ -783,6 +779,7 @@ public class SimpleToolBarEx {
 
 	private HashMap<String, String> demoAddElement(String URL, By by) {
 		driver.get(URL);
+		/*
 		wait.until(new Function<WebDriver, Boolean>() {
 			@Override
 			public Boolean apply(WebDriver d) {
@@ -790,7 +787,8 @@ public class SimpleToolBarEx {
 				return e.isDisplayed();
 			}
 		});
-
+		*/
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
 		injectElementSearch(Optional.<String> empty());
 
 		// NOTE: with FF the CONTROL mouse pointer appears to be misplaced
@@ -798,6 +796,7 @@ public class SimpleToolBarEx {
 			Thread.sleep(500);
 		} catch (InterruptedException exception) {
 		}
+		/*
 		WebElement element = wait.until(new Function<WebDriver, WebElement>() {
 			@Override
 			public WebElement apply(WebDriver d) {
@@ -805,7 +804,11 @@ public class SimpleToolBarEx {
 				return e.isDisplayed() ? e : null;
 			}
 		});
+		*/
+		WebElement element = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
 		highlight(element);
+		Keys cntlKey = osName.startsWith("Mac") ? Keys.COMMAND : Keys.CONTROL;
 		if (osName.startsWith("Mac")) {
 			// "Demo" functionality appears to be currently broken on Mac with
 			// not passing the Keys.COMMAND
@@ -845,6 +848,7 @@ public class SimpleToolBarEx {
 
 	private void highlight(WebElement element, long highlight_interval) {
 		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
 			executeScript("arguments[0].style.border='3px solid yellow'", element);
 			Thread.sleep(highlight_interval);
 			executeScript("arguments[0].style.border=''", element);
@@ -854,6 +858,7 @@ public class SimpleToolBarEx {
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
+		/*
 		WebElement swdControl = wait.until(new Function<WebDriver, WebElement>() {
 			@Override
 			public WebElement apply(WebDriver d) {
@@ -861,8 +866,11 @@ public class SimpleToolBarEx {
 				return e.isDisplayed() ? e : null;
 			}
 		});
+		*/
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
-
+		/*
 		WebElement swdCodeID = wait.until(new Function<WebDriver, WebElement>() {
 			@Override
 			public WebElement apply(WebDriver d) {
@@ -870,20 +878,59 @@ public class SimpleToolBarEx {
 				return e.isDisplayed() ? e : null;
 			}
 		});
+		*/
+		WebElement swdCodeID = wait.until(ExpectedConditions
+				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
 		swdCodeID.sendKeys(elementCodeName);
-
+		/*
 		WebElement swdAddElementButton = wait
-				.until(new Function<WebDriver, WebElement>() {
-					@Override
-					public WebElement apply(WebDriver d) {
-						WebElement e = d.findElement(By.cssSelector(
-								"div#SwdPR_PopUp > input[type='button'][value='Add element']"));
-						System.err.println(
-								"in apply iterator (1): Text = " + e.getAttribute("value"));
-						return e.isDisplayed() ? e : null;
+		.until(new Function<WebDriver, WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				WebElement e = d.findElement(By.cssSelector(
+						"div#SwdPR_PopUp > input[type='button'][value='Add element']"));
+				System.err.println(
+						"in apply iterator (1): Text = " + e.getAttribute("value"));
+				return e.isDisplayed() ? e : null;
+			}
+		});
+		*/
+    /*
+		WebElement swdAddElementButton = wait.until(
+				ExpectedConditions.visibilityOf(swdControl.findElement(By.cssSelector(
+						"div#SwdPR_PopUp > input[type='button'][value='Add element']"))));
+    */
+		WebElement swdAddElementButton = null;
+		try {
+			swdAddElementButton = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					Iterator<WebElement> i = d
+							.findElements(By.cssSelector(
+						"div#SwdPR_PopUp > input[type='button']")).iterator();
+					WebElement result = null;
+					Pattern pattern = Pattern.compile(Pattern.quote("Add element"),
+							Pattern.CASE_INSENSITIVE);
+					while (i.hasNext()) {
+						WebElement e = (WebElement) i.next();
+						String t = e.getAttribute("value");
+						// System.err.println("in apply iterator (2): buttton value = " + t);
+						Matcher matcher = pattern.matcher(t);
+						if (matcher.find()) {
+							result = e;
+							break;
+						}
 					}
-				});
+					return result;
+				}
+			});
+		} catch (Exception e) {
+			// TODO: dialog
+			(new ExceptionDialogEx(Display.getCurrent(), shell, e)).execute();
+			System.err.println("Exception: " + e.toString());
+		}
+                
 		assertThat(swdAddElementButton, notNullValue());
 		highlight(swdAddElementButton);
 		// Act
@@ -893,6 +940,10 @@ public class SimpleToolBarEx {
 	// http://stackoverflow.com/questions/34176392/fluentwait-throwing-the-method-unti-in-the-type-waitwebdriver-is-not-applicab
 	private void closeVisualSearch() {
 
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
+		assertThat(swdControl, notNullValue());
+		/*
 		WebElement swdCloseButton = null;
 		try {
 			swdCloseButton = wait.until(new Function<WebDriver, WebElement>() {
@@ -920,11 +971,18 @@ public class SimpleToolBarEx {
 			assertThat(swdCloseButton, notNullValue());
 			highlight(swdCloseButton);
 			swdCloseButton.click();
-
+		
 		} catch (Exception e) {
 			// TODO: dialog
 			System.err.println("Exception: " + e.toString());
 		}
+		*/
+
+		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
+				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
+		assertThat(swdCloseButton, notNullValue());
+		highlight(swdCloseButton);
+		swdCloseButton.click();
 	}
 
 	private Object executeScript(String script, Object... arguments) {
