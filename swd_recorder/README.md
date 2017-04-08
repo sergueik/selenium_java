@@ -3,20 +3,18 @@
 
 ![icon](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/src/main/resources/images/document_wrench_color.png)
 
-__Selenium WebDriver Elementor Toolkit__ (__SWET__) is a OS-independent successor to the [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) of
-Dmytro Zharii (and author) - a.k.a. __SWD__. __SWET__ is using the
-[Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) with third party widgets
-(currently, [Opal](https://github.com/lcaron/opal) instead of .Net Windows Forms for user interface and
-[Jtwig](http://jtwig.org/documentation/reference/tags/control-flow)
- template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation (that is just one of the available template exngines - note, __jtwig__ supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax)..
-Therefore __SWET__ runs on Windows, Mac or Linux, 32 or 64 bit platforms.
-Eventually the full functionality of __SWD__ is to be achieved, also __SWET__ might become an [Eclipse plugin](http://www.vogella.com/tutorials/EclipsePlugin/article.html).
+__Selenium WebDriver Elementor Toolkit__  ( __SWET__  = light , in Russian) is a OS-independent successor to the [Selenium WebDriver Page Recorder](https://github.com/dzharii/swd-recorder) (__SWD__)of
+Dmytro Zharii and author. __SWET__ is using the
+[Eclipse Standard Widget Toolkit](https://www.eclipse.org/swt/) (currently, with third party [Opal](https://github.com/lcaron/opal) widget library) instead of Microsoft .Net Windows Forms for user interface and [Jtwig](http://jtwig.org/documentation/reference/tags/control-flow) template engine instead of [ASP.Net Razor](https://en.wikipedia.org/wiki/ASP.NET_Razor) for code generation (that is just one of the available template exngines - note, __jtwig__ supports the original [PHP Twig](http://twig.sensiolabs.org/doc/2.x/) syntax).
 
-The application is developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
+Therefore __SWET__ runs on Windows, Mac or Linux, 32 or 64 bit platforms.
+__SWET__ is currently beta quality: one can create a session and collect Page Element information and convert it to a 
+fragment of the code in the Java or C# language; eventually the full functionality of __SWD__ is to be achieved, also __SWET__ might become an [Eclipse plugin](http://www.vogella.com/tutorials/EclipsePlugin/article.html).
+
+The application is being developed in Ecipse with [SWT Designer/Window Builder](http://www.vogella.com/tutorials/EclipseWindowBuilder/article.html),
 on Ubuntu 16.04 and Windows.
 For Mac / Safari testing, the [Sierra Final 10.12](https://techsviewer.com/install-macos-sierra-virtualbox-windows/) Virtual Box by TechReviews is being used.
 Currently, working with Safari browser is somewhat flaky.
-
 
 ![OSX Example](https://github.com/sergueik/selenium_java/blob/master/swd_recorder/screenshots/capture1.png)
 
@@ -26,8 +24,7 @@ Currently, working with Safari browser is somewhat flaky.
 
 ### Usage
 
-__SWET__ is currently beta quality, it may not be very useful: one can create a session Page Element recording in Java or C#,
-In order to use one will have to compile the application - it is not difficult.
+In order to use __SWET__ one will need to compile the application jar from the source - it is not difficult.
 Continue reading for info on how to get the dev environment setup.
 
 ### Prerequisites
@@ -43,10 +40,15 @@ M2
 ```
 or updated in the project runner scripts as explained below.
 
-The Eclipse is not required. With the exception of one jar, the project dependencies are pulled by Maven. On a Mac, the
+The Eclipse is not required. 
+
+With the exception of one jar, the project dependencies are pulled by Maven. 
+
+On the Mac, the
 JDK is expected to be installed to
 `/Library/Java/JavaVirtualMachines/jdk$JAVA_VERSION.jdk/Contents/Home` which is the default location.
-On Windows Java and Maven were conveniently installed to `c:\java\`.
+In the checked-in runner scripts, the Java and Maven were conveniently installed to `c:\java\` for Windows . 
+
 #### Updating the platform-specific information in the `pom.xml`
 
 The project `pom.xml` currently is declaring the main `swt.jar` dependency in a platform-specific fashion:
@@ -74,8 +76,9 @@ One willl have to uncomment the relevant `artifactId` property definition and co
 Due to some problem with JVM loader, these platform-dependent jars cannot be included simultaneously.
 The alternative is to package the spring-boot jar file as explained in
 [Multiplatform SWT](https://github.com/jendap/multiplatform-swt) project.
-Unfortulately the resulting bare-bones `multiplatform-swt-loader.jar` file is almost 10 Mb and __SWET__ jar is over 30 Mb.
-Therefore,  we recommend to modify the `pom.xml` and use runner scripts explained below.
+Unfortulately the resulting bare-bones `multiplatform-swt-loader.jar` file is almost 10 Mb and with all dependencies the 
+__SWET__ jar is over 30 Mb which is not very practical.
+Therefore,  we recommend to modify the `pom.xml` and use runner scripts to compile it as explained below.
 
 #### Runner Scripts
 After the project is cloned or downloaded from from github, one will find the following `run.*` scripts helpful to compile and start the application:
@@ -192,11 +195,9 @@ h1 > a > i.fb_logo.img.sp_Mlxwn39jCAE.sx_896ebb
 Currently __SWET__ does not have an algorythm for shortening these locators.
 Adding smart locator generators is a work in progress.
 
-### Component Versions
-As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar,
-browser driver and browser itself is used - making __SWET__ work with the most recent releases of Selenium and browser drivers is not currently a priority.
+### Dependencies Versions
 
-Example of supported version combination is
+As typical with Selenium, the __SWET__ application only runnable with the matching combination of versions of Selenium jar, browser driver and browser itself is used. Examples of supported version combinations are listed below.
 
 |                      |              |
 |----------------------|--------------|
@@ -213,6 +214,13 @@ Example of supported version combination is
 | CHROME_VERSION       | __56.0.X__ |
 | CHROMEDRIVER_VERSION | __2.29__         |
 
+|                      |              |
+|----------------------|--------------|
+| SELENIUM_VERSION     | __3.3.1__       |
+| FIREFOX_VERSION      | *TBD*       |
+| CHROME_VERSION       | __56.0.X__ |
+| CHROMEDRIVER_VERSION | __2.29__         |
+
 One can download virtually every old build of Firefox from
 https://ftp.mozilla.org/pub/firefox/releases, and selected old builds of Chrome from
 http://www.slimjetbrowser.com/chrome/, for other browsers the download locations vary.
@@ -224,7 +232,6 @@ If you have Mac OSX 10.12.X Sierra / Safari 10.X , then the Apple Safari driver 
 but it does not seems to work with Selenium __2.53__.
 For earlier releases, you have to downgrade the Selenium version in the `pom.xml` to __2.48__
 then follow the [Running Selenium Tests in Safari Browser](http://toolsqa.com/selenium-webdriver/running-tests-in-safari-browser).
-
 
 ### Code Templates
 
