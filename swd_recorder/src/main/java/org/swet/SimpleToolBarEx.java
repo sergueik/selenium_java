@@ -79,6 +79,7 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.TimeoutException;
 // incompatible types: org.eclipse.swt.graphics.Point cannot be converted to org.openqa.selenium.Point
 // import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
@@ -788,7 +789,14 @@ public class SimpleToolBarEx {
 			}
 		});
 		*/
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
+		WebElement element = null;
+		try {
+			element = wait
+					.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
+			highlight(element);
+		} catch (TimeoutException e) {
+			(new ExceptionDialogEx(Display.getCurrent(), shell, e)).execute();
+		}
 		injectElementSearch(Optional.<String> empty());
 
 		// NOTE: with FF the CONTROL mouse pointer appears to be misplaced
@@ -805,28 +813,18 @@ public class SimpleToolBarEx {
 			}
 		});
 		*/
-		WebElement element = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(by)));
-		highlight(element);
+		// "Demo" functionality appears to be currently broken on Mac with
+		// not passing the Keys.COMMAND
 		Keys cntlKey = osName.startsWith("Mac") ? Keys.COMMAND : Keys.CONTROL;
-		if (osName.startsWith("Mac")) {
-			// "Demo" functionality appears to be currently broken on Mac with
-			// not passing the Keys.COMMAND
-			try {
-				actions.keyDown(Keys.COMMAND).build().perform();
-				actions.moveToElement(element).contextClick().build().perform();
-				actions.keyUp(Keys.COMMAND).build().perform();
-			} catch (WebDriverException e) {
-				// TODO: print a message box
-				System.err.println("Ignoring exception: " + e.toString());
-			}
-		} else {
-			actions.keyDown(Keys.CONTROL).build().perform();
+		try {
+			actions.keyDown(cntlKey).build().perform();
 			actions.moveToElement(element).contextClick().build().perform();
-			actions.keyUp(Keys.CONTROL).build().perform();
+			actions.keyUp(cntlKey).build().perform();
+		} catch (WebDriverException e) {
+			// TODO: print a message box
+			System.err.println("Ignoring exception: " + e.toString());
 		}
-
-		executeScript(String.format("scroll(0, %d);", -400));
+		executeScript(String.format("scroll(0, %d);", -600));
 		try {
 			Thread.sleep(100);
 		} catch (InterruptedException e) {
@@ -858,67 +856,31 @@ public class SimpleToolBarEx {
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
-		/*
-		WebElement swdControl = wait.until(new Function<WebDriver, WebElement>() {
-			@Override
-			public WebElement apply(WebDriver d) {
-				WebElement e = d.findElement(By.id("SWDTable"));
-				return e.isDisplayed() ? e : null;
-			}
-		});
-		*/
-		WebElement swdControl = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
-		assertThat(swdControl, notNullValue());
-		/*
-		WebElement swdCodeID = wait.until(new Function<WebDriver, WebElement>() {
-			@Override
-			public WebElement apply(WebDriver d) {
-				WebElement e = d.findElement(By.id("SwdPR_PopUp_CodeIDText"));
-				return e.isDisplayed() ? e : null;
-			}
-		});
-		*/
-		WebElement swdCodeID = wait.until(ExpectedConditions
-				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
-		assertThat(swdCodeID, notNullValue());
-		swdCodeID.sendKeys(elementCodeName);
-		/*
-		WebElement swdAddElementButton = wait
-		.until(new Function<WebDriver, WebElement>() {
-			@Override
-			public WebElement apply(WebDriver d) {
-				WebElement e = d.findElement(By.cssSelector(
-						"div#SwdPR_PopUp > input[type='button'][value='Add element']"));
-				System.err.println(
-						"in apply iterator (1): Text = " + e.getAttribute("value"));
-				return e.isDisplayed() ? e : null;
-			}
-		});
-		*/
-    /*
-		WebElement swdAddElementButton = wait.until(
-				ExpectedConditions.visibilityOf(swdControl.findElement(By.cssSelector(
-						"div#SwdPR_PopUp > input[type='button'][value='Add element']"))));
-    */
 		WebElement swdAddElementButton = null;
 		try {
+			WebElement swdControl = wait.until(ExpectedConditions
+					.visibilityOf(driver.findElement(By.id("SWDTable"))));
+			assertThat(swdControl, notNullValue());
+			WebElement swdCodeID = wait.until(ExpectedConditions.visibilityOf(
+					swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
+			assertThat(swdCodeID, notNullValue());
+			// Act
+			swdCodeID.sendKeys(elementCodeName);
 			swdAddElementButton = wait.until(new ExpectedCondition<WebElement>() {
 				@Override
-				public WebElement apply(WebDriver d) {
-					Iterator<WebElement> i = d
-							.findElements(By.cssSelector(
-						"div#SwdPR_PopUp > input[type='button']")).iterator();
+				public WebElement apply(WebDriver _driver) {
+					Iterator<WebElement> _elements = _driver
+							.findElements(
+									By.cssSelector("div#SwdPR_PopUp > input[type='button']"))
+							.iterator();
 					WebElement result = null;
 					Pattern pattern = Pattern.compile(Pattern.quote("Add element"),
 							Pattern.CASE_INSENSITIVE);
-					while (i.hasNext()) {
-						WebElement e = (WebElement) i.next();
-						String t = e.getAttribute("value");
-						// System.err.println("in apply iterator (2): buttton value = " + t);
-						Matcher matcher = pattern.matcher(t);
+					while (_elements.hasNext()) {
+						WebElement _element = (WebElement) _elements.next();
+						Matcher matcher = pattern.matcher(_element.getAttribute("value"));
 						if (matcher.find()) {
-							result = e;
+							result = _element;
 							break;
 						}
 					}
@@ -926,57 +888,27 @@ public class SimpleToolBarEx {
 				}
 			});
 		} catch (Exception e) {
-			// TODO: dialog
 			(new ExceptionDialogEx(Display.getCurrent(), shell, e)).execute();
 			System.err.println("Exception: " + e.toString());
+			if (driver != null) {
+				try {
+					BrowserDriver.close();
+				} catch (Exception ex) {
+					System.err.println("Ignored exception: " + ex.toString());
+				}
+			}
 		}
-                
+
 		assertThat(swdAddElementButton, notNullValue());
 		highlight(swdAddElementButton);
 		// Act
 		swdAddElementButton.click();
 	}
 
-	// http://stackoverflow.com/questions/34176392/fluentwait-throwing-the-method-unti-in-the-type-waitwebdriver-is-not-applicab
 	private void closeVisualSearch() {
-
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
-		/*
-		WebElement swdCloseButton = null;
-		try {
-			swdCloseButton = wait.until(new Function<WebDriver, WebElement>() {
-				@Override
-				public WebElement apply(WebDriver d) {
-					Iterator<WebElement> i = d
-							.findElements(By.id("SwdPR_PopUp_CloseButton")).iterator();
-					WebElement result = null;
-					// "(?:" + "Navigate Back" + ")"
-					Pattern pattern = Pattern.compile(Pattern.quote("X"),
-							Pattern.CASE_INSENSITIVE);
-					while (i.hasNext()) {
-						WebElement e = (WebElement) i.next();
-						String t = e.getText();
-						// System.err.println("in apply iterator (2): Text = " + t);
-						Matcher matcher = pattern.matcher(t);
-						if (matcher.find()) {
-							result = e;
-							break;
-						}
-					}
-					return result;
-				}
-			});
-			assertThat(swdCloseButton, notNullValue());
-			highlight(swdCloseButton);
-			swdCloseButton.click();
-		
-		} catch (Exception e) {
-			// TODO: dialog
-			System.err.println("Exception: " + e.toString());
-		}
-		*/
 
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));

@@ -258,35 +258,125 @@ public class SwetTest {
 	}
 
 	private void completeVisualSearch(String elementCodeName) {
-		WebElement swdControl = wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.id("SwdPR_PopUp"))));
+		/*
+		WebElement swdControl = wait.until(new Function<WebDriver, WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				WebElement e = d.findElement(By.id("SWDTable"));
+				return e.isDisplayed() ? e : null;
+			}
+		});
+		*/
+		WebElement swdControl = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
-
-		// System.err.println("Swd Control:" +
-		// swdControl.getAttribute("innerHTML"));
+		/*
+		WebElement swdCodeID = wait.until(new Function<WebDriver, WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				WebElement e = d.findElement(By.id("SwdPR_PopUp_CodeIDText"));
+				return e.isDisplayed() ? e : null;
+			}
+		});
+		*/
 		WebElement swdCodeID = wait.until(ExpectedConditions
 				.visibilityOf(swdControl.findElement(By.id("SwdPR_PopUp_CodeIDText"))));
 		assertThat(swdCodeID, notNullValue());
 		swdCodeID.sendKeys(elementCodeName);
+		/*
+		WebElement swdAddElementButton = wait
+		.until(new Function<WebDriver, WebElement>() {
+			@Override
+			public WebElement apply(WebDriver d) {
+				WebElement e = d.findElement(By.cssSelector(
+						"div#SwdPR_PopUp > input[type='button'][value='Add element']"));
+				System.err.println(
+						"in apply iterator (1): Text = " + e.getAttribute("value"));
+				return e.isDisplayed() ? e : null;
+			}
+		});
+		*/
+		/*
 		WebElement swdAddElementButton = wait
 				.until(ExpectedConditions.visibilityOf(swdControl.findElement(
 						By.xpath("//input[@type='button'][@value='Add element']"))));
 		assertThat(swdAddElementButton, notNullValue());
-
-		// html body div#SwdPR_PopUp input
-		highlight(swdAddElementButton);
+		*/
+		WebElement swdAddElementButton = null;
 		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
+			swdAddElementButton = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver _driver) {
+					Iterator<WebElement> _elements = _driver
+							.findElements(
+									By.cssSelector("div#SwdPR_PopUp > input[type='button']"))
+							.iterator();
+					WebElement result = null;
+					Pattern pattern = Pattern.compile(Pattern.quote("Add element"),
+							Pattern.CASE_INSENSITIVE);
+					while (_elements.hasNext()) {
+						WebElement _element = (WebElement) _elements.next();
+						Matcher matcher = pattern.matcher(_element.getAttribute("value"));
+						if (matcher.find()) {
+							result = _element;
+							break;
+						}
+					}
+					return result;
+				}
+			});
+		} catch (Exception e) {
+			// TODO: dialog
+			// (new ExceptionDialogEx(Display.getCurrent(), shell, e)).execute();
+			System.err.println("Exception: " + e.toString());
 		}
+
+		assertThat(swdAddElementButton, notNullValue());
+		highlight(swdAddElementButton);
 		// Act
 		swdAddElementButton.click();
 	}
 
+	// http://stackoverflow.com/questions/34176392/fluentwait-throwing-the-method-unti-in-the-type-waitwebdriver-is-not-applicab
 	private void closeVisualSearch() {
+
 		WebElement swdControl = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.id("SWDTable"))));
 		assertThat(swdControl, notNullValue());
+		/*
+		WebElement swdCloseButton = null;
+		try {
+			swdCloseButton = wait.until(new Function<WebDriver, WebElement>() {
+				@Override
+				public WebElement apply(WebDriver d) {
+					Iterator<WebElement> i = d
+							.findElements(By.id("SwdPR_PopUp_CloseButton")).iterator();
+					WebElement result = null;
+					// "(?:" + "Navigate Back" + ")"
+					Pattern pattern = Pattern.compile(Pattern.quote("X"),
+							Pattern.CASE_INSENSITIVE);
+					while (i.hasNext()) {
+						WebElement e = (WebElement) i.next();
+						String t = e.getText();
+						// System.err.println("in apply iterator (2): Text = " + t);
+						Matcher matcher = pattern.matcher(t);
+						if (matcher.find()) {
+							result = e;
+							break;
+						}
+					}
+					return result;
+				}
+			});
+			assertThat(swdCloseButton, notNullValue());
+			highlight(swdCloseButton);
+			swdCloseButton.click();
+		
+		} catch (Exception e) {
+			// TODO: dialog
+			System.err.println("Exception: " + e.toString());
+		}
+		*/
 
 		WebElement swdCloseButton = wait.until(ExpectedConditions.visibilityOf(
 				swdControl.findElement(By.id("SwdPR_PopUp_CloseButton"))));
