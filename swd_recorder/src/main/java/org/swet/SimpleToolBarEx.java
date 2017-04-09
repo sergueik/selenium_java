@@ -490,10 +490,15 @@ public class SimpleToolBarEx {
 			// TODO:
 			// relative path => setTemplateName
 			// absolute path => setTemplateAbsolutePath
-			if (configData.containsValue("Template Path")) {
+			if (configData.containsKey("Template Path")) {
+				/*
+				System.err.println(
+						"Using specific template path: " + configData.get("Template Path"));
+				*/
 				renderTemplate.setTemplateAbsolutePath(configData.get("Template Path")
 						.replace("\\\\", "\\").replace("\\", "/"));
 			} else {
+				// System.err.println("Using default template");
 				renderTemplate.setTemplateName("templates/example2.twig");
 			}
 			generatedScript = "";
@@ -625,7 +630,7 @@ public class SimpleToolBarEx {
 					System.err.println(
 							"ElementSelectedBy : " + elementData.get("ElementSelectedBy"));
 
-					// Append Breadcrump Button
+					// Append a Breadcrumb Item Button
 					String commandId = elementData.get("CommandId");
 					elementData.put("ElementStepNumber", String.format("%d", step_index));
 
@@ -659,18 +664,20 @@ public class SimpleToolBarEx {
 							.setPosition(new org.openqa.selenium.Point(600, 0));
 					driver.manage().window()
 							.setSize(new Dimension(browserDemoWidth, browserDemoHeight));
-					// TODO: debug timeoutException in closeVisualSearch
-					HashMap<String, String> elementData = demoAddElement(
-							"https://www.ryanair.com/ie/en/", By.cssSelector(
-									"#home div.specialofferswidget h3 > span:nth-child(1)"));
+					final String demoURL = "https://www.ryanair.com/ie/en/";
+					final String demoSelector = "#home div.specialofferswidget h3 > span:nth-child(1)";
+					HashMap<String, String> elementData = demoAddElement(demoURL,
+							By.cssSelector(demoSelector));
 					String name = elementData.get("ElementCodeName");
 					elementData.put("ElementStepNumber", String.format("%d", step_index));
 					addButton(name, elementData, composite);
-					final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
-							true);
-					if (newSize.x > 500) {
-						shell.setBounds(boundRect);
-					}
+					/*
+						final Point newSize = shell.computeSize(SWT.DEFAULT, SWT.DEFAULT,
+								true);
+						if (newSize.x > 500) {
+							shell.setBounds(boundRect);
+						}
+					*/
 					updateStatus("Ready");
 					statusMessage.pack();
 					demoTool.setEnabled(true);
@@ -815,11 +822,11 @@ public class SimpleToolBarEx {
 		*/
 		// "Demo" functionality appears to be currently broken on Mac with
 		// not passing the Keys.COMMAND
-		Keys cntlKey = osName.startsWith("Mac") ? Keys.COMMAND : Keys.CONTROL;
+		Keys keyCTRL = osName.startsWith("Mac") ? Keys.COMMAND : Keys.CONTROL;
 		try {
-			actions.keyDown(cntlKey).build().perform();
+			actions.keyDown(keyCTRL).build().perform();
 			actions.moveToElement(element).contextClick().build().perform();
-			actions.keyUp(cntlKey).build().perform();
+			actions.keyUp(keyCTRL).build().perform();
 		} catch (WebDriverException e) {
 			// TODO: print a message box
 			System.err.println("Ignoring exception: " + e.toString());
@@ -834,7 +841,7 @@ public class SimpleToolBarEx {
 		String payload = executeScript(getCommand).toString();
 		assertFalse(payload.isEmpty());
 		HashMap<String, String> data = new HashMap<String, String>();
-		String name = readVisualSearchResult(payload, Optional.of(data));
+		readVisualSearchResult(payload, Optional.of(data));
 		closeVisualSearch();
 		flushVisualSearchResult();
 		return data;

@@ -76,8 +76,6 @@ public class BrowserDriver {
 			SafariOptions options = new SafariOptions();
 			driver = new SafariDriver(options);
 		} else if (browser.equals("chrome")) {
-			System.err.println("webdriver.chrome.driver = "
-					+ System.getProperty("webdriver.chrome.driver"));
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("iexplore")) {
 			File file = new File(iEDriverPath);
