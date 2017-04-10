@@ -51,6 +51,15 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.junit.Ignore;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -74,16 +83,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.experimental.categories.Category;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-import org.junit.Test;
-import org.junit.Ignore;
-
 import org.swet.BrowserDriver;
 import org.swet.Utils;
 
@@ -93,18 +92,18 @@ public class SwetTest {
 	private static WebDriverWait wait;
 	private static Actions actions;
 	private static Alert alert;
+	private static Keys keyCTRL;
 	private static int flexibleWait = 5;
 	private static int implicitWait = 1;
 	private static long pollingInterval = 500;
 	private static String baseURL = "about:blank";
 	private static final String getCommand = "return document.swdpr_command === undefined ? '' : document.swdpr_command;";
 	private static HashMap<String, String> data = new HashMap<String, String>();
-	private static String osName;
+	private static String osName = OSUtils.getOsName();
 
 	@BeforeClass
 	public static void beforeSuiteMethod() throws Exception {
 
-		getOsName();
 		if (osName.toLowerCase().startsWith("windows")) {
 			driver = BrowserDriver.initialize("chrome");
 			/*
@@ -120,6 +119,7 @@ public class SwetTest {
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
+		keyCTRL = osName.startsWith("Mac") ? Keys.COMMAND : Keys.CONTROL;
 	}
 
 	@AfterClass
@@ -149,21 +149,15 @@ public class SwetTest {
 				.findElement(By.cssSelector("img[src *= 'post_an_article.png']"))));
 		injectKeyMaster(Optional.<String> empty());
 		highlight(element);
-		// Assert
+		// Act
+
 		if (osName.startsWith("Mac")) {
-			actions.keyDown(Keys.COMMAND).build().perform();
+			actions.keyDown(keyCTRL).build().perform();
 			actions.moveToElement(element).contextClick().build().perform();
-			actions.keyUp(Keys.COMMAND).build().perform();
+			actions.keyUp(keyCTRL).build().perform();
 		} else {
-			/*
-			actions.keyDown(Keys.CONTROL).build().perform();
-			actions.moveToElement(element).contextClick().build().perform();
-			actions.keyUp(Keys.CONTROL).build().perform();
-			*/
-			//
 			actions.moveToElement(element).build().perform();
-			actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
-					.perform();
+			actions.keyDown(keyCTRL).contextClick().keyUp(keyCTRL).build().perform();
 		}
 		// Assert
 		try {
@@ -188,14 +182,9 @@ public class SwetTest {
 		WebElement element = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.tagName("h1"))));
 		highlight(element);
-
-		/*
-		actions.keyDown(Keys.CONTROL).build().perform();
-		actions.moveToElement(element).contextClick().build().perform();
-		actions.keyUp(Keys.CONTROL).build().perform();
-		*/
-		actions.moveToElement(element).keyDown(Keys.CONTROL).contextClick()
-				.keyUp(Keys.CONTROL).build().perform();
+		// Act
+		actions.moveToElement(element).keyDown(keyCTRL).contextClick()
+				.keyUp(keyCTRL).build().perform();
 		// Assert
 		try {
 			Thread.sleep(100);
