@@ -14,6 +14,6 @@ WebElement element = driver.findElement(
 {% elseif (ElementSelectedBy == 'ElementId') -%}
   By.Id("{{ ElementId }}")
 {% elseif (ElementSelectedBy == 'ElementText') -%}
-  By.Xpath("//*[contains(., '{{ ElementText }}')]")
+  By.Xpath("//{{ ElementTagName }}[contains(normalize-space(text()), '{{ ElementText }}')]")
 {% endif -%}
 )

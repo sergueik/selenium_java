@@ -12,10 +12,10 @@ wait.until( new ExpectedCondition<Webelement>(){
   public WebElement apply(WebDriver _driver) {
     Iterator<WebElement> _elements = _driver
       .findElements(
-        By.XPath("//*[contains(., '{{ ElementText }}')]"))
+        By.XPath("//{{ ElementTagName }}[contains(normalize-space(text()), '{{ ElementText }}')]"))
       .iterator();
     WebElement result = null;
-    Pattern pattern = Pattern.compile(Pattern.quote("{{ ElementText }}"),
+    Pattern pattern = Pattern.compile("^ *" + Pattern.quote("{{ ElementText }}"),
       Pattern.CASE_INSENSITIVE);
     while (_elements.hasNext()) {
       WebElement _element = (WebElement) _elements.next();

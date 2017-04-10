@@ -10,7 +10,7 @@ class TestPage (Page) {
 {% elseif (ElementSelectedBy == 'ElementId') -%}
   @FindBy( how = How.ID, using = "{{ ElementId }}" )
 {% elseif (ElementSelectedBy == 'ElementText') -%}
-  @FindBy( how = How.XPATH, using = "//*[contains(., '{{ ElementText }}')]" )
+@FindBy( how = How.XPATH, using = "//{{ ElementTagName }}[contains(normalize-space(text()), '{{ ElementText }}')]" ) #}
 {% endif -%}
 {% if (ElementVariable != '') -%}
   private WebElement {{ ElementVariable }};
