@@ -187,7 +187,7 @@ public class SimpleToolBarEx {
 	private Configuration config = null;
 	private static String configFilePath; // TODO: rename
 	private static Map<String, String> configData = new HashMap<String, String>();
-	private static HashMap<String, Boolean> data = new HashMap<String, Boolean>();
+	private static HashMap<String, Boolean> browserStatus = new HashMap<String, Boolean>();
 	static {
 		configData.put("Browser", "Chrome");
 		configData.put("Template", "Core Selenium Java (embedded)");
@@ -602,9 +602,8 @@ public class SimpleToolBarEx {
 
 				if (driver != null) {
 
-					data.put("runaway", false);
-					shell.setData("runaway", false);
-					getTask2(pageExploreTool, shell, driver, data).start();
+					browserStatus.put("runaway", false);
+					getTask2(driver, browserStatus).start();
 					pageExploreTool.setEnabled(false);
 					updateStatus("Inject script");
 					wait = new WebDriverWait(driver, flexibleWait);
@@ -643,6 +642,7 @@ public class SimpleToolBarEx {
 					}
 					pageExploreTool.setEnabled(true);
 					updateStatus("Ready");
+					browserStatus.put("runaway", false);
 					saveTool.setEnabled(true);
 				}
 			}
@@ -752,6 +752,7 @@ public class SimpleToolBarEx {
 
 		HashMap<String, String> elementData = new HashMap<String, String>(); // empty
 		Boolean waitingForData = true;
+		Boolean browserRunaway = false;
 		String name = null;
 		while (waitingForData) {
 			String payload = executeScript(getCommand).toString();
@@ -769,8 +770,9 @@ public class SimpleToolBarEx {
 					break;
 				}
 			}
-			if ((Boolean) data.get("runaway")) {
+			if ((Boolean) browserStatus.get("runaway")) {
 				System.err.println("Detected URL change");
+				browserRunaway = true;
 				waitingForData = false;
 			}
 			if (waitingForData) {
@@ -785,7 +787,7 @@ public class SimpleToolBarEx {
 		}
 		// clear results on the page
 		flushVisualSearchResult();
-		if (!(Boolean) data.get("runaway")) {
+		if (!browserRunaway) {
 			closeVisualSearch();
 		}
 		return elementData;
@@ -1090,10 +1092,14 @@ public class SimpleToolBarEx {
 		display.dispose();
 	}
 
-	public static Thread getTask2(ToolItem launcher, Shell shell,
-			WebDriver driver, HashMap<String, Boolean> data) {
-		final ToolItem theLauncher = launcher;
-		final Shell theShell = shell;
+	// NOTE: currently contains the inverse of the
+	// http://www.vogella.com/tutorials/EclipseJobs/article.html#using-syncexec-and-asyncexec
+	// run Selenium url change detection in a separat thread then update the UI
+	// thread through shared data,
+	// but not using execAsync
+
+	public static Thread getTask2(WebDriver driver,
+			HashMap<String, Boolean> browserStatus) {
 		final String URL = driver.getCurrentUrl();
 
 		return new Thread() {
@@ -1101,39 +1107,19 @@ public class SimpleToolBarEx {
 
 				while (true) {
 					try {
-						System.out.println("Thread: wait 5 sec");
-						Thread.sleep(5000);
+						// System.out.println("Thread: wait .5 sec");
+						Thread.sleep(500);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					System.out
-							.println("Thread: inspecting URL " + driver.getCurrentUrl());
+					// System.out
+					// .println("Thread: inspecting URL " + driver.getCurrentUrl());
 					if (driver.getCurrentUrl().indexOf(URL) != 0) {
 						System.err.println("Signaling URL change ");
-						data.replace("runaway", true);
+						browserStatus.replace("runaway", true);
 						break;
 					}
 				}
-
-				// Does not work
-				/*
-				Runnable r = new Runnable() {
-					public void run() {
-						System.err.println(
-								"Set URL change: " + (Boolean) theShell.getData("runaway"));
-						theShell.setData("runaway", true);
-						theLauncher.setEnabled(true);
-						// TODO: status update
-						theLauncher.setText("Browser is gone");
-					}
-				};
-				
-				if (Display.getCurrent() != null) {
-					r.run();
-				} else {
-					Display.getDefault().syncExec(r);
-				}
-				*/
 			}
 		};
 	}
