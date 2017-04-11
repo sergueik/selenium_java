@@ -187,6 +187,7 @@ public class SimpleToolBarEx {
 	private Configuration config = null;
 	private static String configFilePath; // TODO: rename
 	private static Map<String, String> configData = new HashMap<String, String>();
+  private static HashMap<String, Boolean> data = new HashMap<String, Boolean> ();
 	static {
 		configData.put("Browser", "Chrome");
 		configData.put("Template", "Core Selenium Java (embedded)");
@@ -198,6 +199,7 @@ public class SimpleToolBarEx {
 	private static final int browserDemoHeight = 800;
 	private static int step_index = 0;
 	private static String osName = OSUtils.getOsName();
+	private static Display display;
 	private String generatedScript = null;
 	private Label statusMessage;
 
@@ -230,16 +232,6 @@ public class SimpleToolBarEx {
 
 	public String getGearImage() {
 		return this.gearImage;
-	}
-
-	private String flowchartImage = "flowchart_36.png";
-
-	public void setFlowChartImage(final String data) {
-		this.flowchartImage = data;
-	}
-
-	public String getFlowChartImage() {
-		return this.flowchartImage;
 	}
 
 	private String pageImage = "page_36.png";
@@ -304,7 +296,7 @@ public class SimpleToolBarEx {
 
 	// http://aniszczyk.org/2007/08/09/resizing-images-using-swt/
 	private Image resize(Image image, int width, int height) {
-		Image scaled = new Image(Display.getDefault(), width, height);
+		Image scaled = new Image(display, width, height);
 		GC gc = new GC(scaled);
 		gc.setAntialias(SWT.ON);
 		gc.setInterpolation(SWT.HIGH);
@@ -375,46 +367,46 @@ public class SimpleToolBarEx {
 
 		ToolItem launchTool = new ToolItem(toolBar, SWT.PUSH);
 		launchTool.setImage(iconData.get("launch icon"));
-		launchTool.setToolTipText("Launches the browser");
+		launchTool.setToolTipText("Launch browser");
 
-		ToolItem findTool = new ToolItem(toolBar, SWT.PUSH);
-		findTool.setImage(iconData.get("find icon"));
+		ToolItem pageExploreTool = new ToolItem(toolBar, SWT.PUSH);
+		pageExploreTool.setImage(iconData.get("find icon"));
 		// TODO: setDisabledImage
-		findTool.setToolTipText("Injects the script");
+		pageExploreTool.setToolTipText("Explore page");
 
-		ToolItem flowChartTool = new ToolItem(toolBar, SWT.PUSH);
-		flowChartTool.setImage(iconData.get("codeGen icon"));
-		flowChartTool.setToolTipText("Generates the script");
+		ToolItem codeGenTool = new ToolItem(toolBar, SWT.PUSH);
+		codeGenTool.setImage(iconData.get("codeGen icon"));
+		codeGenTool.setToolTipText("Generate program");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem openTool = new ToolItem(toolBar, SWT.PUSH);
 		openTool.setImage(iconData.get("open icon"));
-		openTool.setToolTipText("Reads the saved session");
+		openTool.setToolTipText("Load session");
 
 		ToolItem saveTool = new ToolItem(toolBar, SWT.PUSH);
 		saveTool.setImage(iconData.get("save icon"));
-		saveTool.setToolTipText("Saves the session");
+		saveTool.setToolTipText("Save session");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem demoTool = new ToolItem(toolBar, SWT.PUSH);
 		demoTool.setImage(iconData.get("demo icon"));
-		demoTool.setToolTipText("Demonstrates the app");
+		demoTool.setToolTipText("Demo app");
 
 		new ToolItem(toolBar, SWT.SEPARATOR);
 
 		ToolItem preferencesTool = new ToolItem(toolBar, SWT.PUSH);
 		preferencesTool.setImage(iconData.get("prefs icon"));
 
-		preferencesTool.setToolTipText("Configures the app");
+		preferencesTool.setToolTipText("Configure");
 
 		ToolItem shutdownTool = new ToolItem(toolBar, SWT.PUSH);
 		shutdownTool.setImage(iconData.get("shutdown icon"));
-		shutdownTool.setToolTipText("Quits the app");
+		shutdownTool.setToolTipText("Quit");
 
-		findTool.setEnabled(false);
-		flowChartTool.setEnabled(false);
+		pageExploreTool.setEnabled(false);
+		codeGenTool.setEnabled(false);
 		demoTool.setEnabled(false);
 		saveTool.setEnabled(false);
 
@@ -466,13 +458,13 @@ public class SimpleToolBarEx {
 				driver.get(baseURL);
 				// prevent the customer from launching multiple instances
 				// launchTool.setEnabled(true);
-				findTool.setEnabled(true);
+				pageExploreTool.setEnabled(true);
 				if (!osName.startsWith("Mac")) {
 					// TODO: add a sorry dialog for Mac / Safari, any OS / Firefox
 					// combinations
 					demoTool.setEnabled(true);
 				}
-				flowChartTool.setEnabled(true);
+				codeGenTool.setEnabled(true);
 				// driver.get(getResourceURI("blankpage.html"));
 			} catch (Exception e) {
 				// show the error dialog with exception trace
@@ -481,8 +473,8 @@ public class SimpleToolBarEx {
 			updateStatus("Ready");
 		});
 
-		flowChartTool.addListener(SWT.Selection, event -> {
-			flowChartTool.setEnabled(false);
+		codeGenTool.addListener(SWT.Selection, event -> {
+			codeGenTool.setEnabled(false);
 			RenderTemplate renderTemplate = new RenderTemplate();
 			updateStatus(String.format("Reading template %s \u2026",
 					configData.get("Template")));
@@ -509,7 +501,7 @@ public class SimpleToolBarEx {
 			}
 			shell.setData("payload", generatedScript);
 			ScrolledTextEx test = new ScrolledTextEx(Display.getCurrent(), shell);
-			flowChartTool.setEnabled(true);
+			codeGenTool.setEnabled(true);
 		});
 
 		openTool.addListener(SWT.Selection, event -> {
@@ -551,7 +543,7 @@ public class SimpleToolBarEx {
 				saveTool.setEnabled(true);
 			}
 			openTool.setEnabled(true);
-			flowChartTool.setEnabled(true);
+			codeGenTool.setEnabled(true);
 			updateStatus("Ready");
 		});
 
@@ -588,6 +580,7 @@ public class SimpleToolBarEx {
 		preferencesTool.addListener(SWT.Selection, event -> {
 			preferencesTool.setEnabled(true);
 			shell.setData("updated", false);
+
 			shell.setData("CurrentConfig", new Utils().writeDataJSON(configData,
 					"{ \"Browser\": \"Chrome\", \"Template\": \"Basic Java\", }"));
 			ConfigFormEx o = new ConfigFormEx(Display.getCurrent(), shell);
@@ -599,16 +592,21 @@ public class SimpleToolBarEx {
 			preferencesTool.setEnabled(true);
 		});
 
-		findTool.addSelectionListener(new SelectionListener() {
+		pageExploreTool.addSelectionListener(new SelectionListener() {
 			@Override
 			public void widgetDefaultSelected(SelectionEvent event) {
 			}
 
 			@Override
 			public void widgetSelected(SelectionEvent event) {
+
 				if (driver != null) {
-					findTool.setEnabled(false);
-					updateStatus("Injecting the script");
+          
+          data.put("runaway", false);
+					shell.setData("runaway", false);
+					getTask2(pageExploreTool, shell, driver, data).start();
+					pageExploreTool.setEnabled(false);
+					updateStatus("Inject script");
 					wait = new WebDriverWait(driver, flexibleWait);
 					wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 					/*
@@ -640,7 +638,7 @@ public class SimpleToolBarEx {
 							elementData, bc);
 					shell.layout(true, true);
 					shell.pack();
-					findTool.setEnabled(true);
+					pageExploreTool.setEnabled(true);
 					updateStatus("Ready");
 					saveTool.setEnabled(true);
 				}
@@ -768,11 +766,23 @@ public class SimpleToolBarEx {
 					break;
 				}
 			}
+
+			System.err.println("Checking URL change");
+
+			if ((Boolean) data.get("runaway")) {
+				System.err.println("Detected URL change");
+				waitingForData = false;
+			} else {
+				System.err
+						.println("No URL change: " + (Boolean) shell.getData("runaway"));
+
+			}
 			if (waitingForData) {
 				try {
 					// TODO: add the code to
 					// check if waited long enough already
 					// test17
+
 					System.err.println("Waiting: ");
 					Thread.sleep(1000);
 				} catch (InterruptedException exception) {
@@ -1075,12 +1085,58 @@ public class SimpleToolBarEx {
 
 	public static void main(String[] args) {
 
-		Display display = new Display();
+		display = new Display();
 		SimpleToolBarEx simpleToolBarEx = new SimpleToolBarEx();
 		simpleToolBarEx.setCodeGenImage("code_128.png");
 
 		simpleToolBarEx.open(display);
 		simpleToolBarEx.finalize();
 		display.dispose();
+	}
+
+	public static Thread getTask2(ToolItem launcher, Shell shell,
+			WebDriver driver, HashMap<String, Boolean> data) {
+		final ToolItem theLauncher = launcher;
+		final Shell theShell = shell;
+		final String URL = driver.getCurrentUrl();
+
+		return new Thread() {
+			public void run() {
+
+				while (true) {
+					try {
+						System.out.println("Thread: wait 5 sec");
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out
+							.println("Thread: inspecting URL " + driver.getCurrentUrl());
+					if (driver.getCurrentUrl().indexOf(URL) != 0) {
+						System.err.println("Signaling URL change ");
+            data.replace("runaway", true);
+						break;
+					}
+				}
+
+				Runnable r = new Runnable() {
+					public void run() {
+            // Does not work
+						System.err.println(
+								"Set URL change: " + (Boolean) theShell.getData("runaway"));
+						theShell.setData("runaway", true);
+						theLauncher.setEnabled(true);
+						// TODO: status update
+						theLauncher.setText("Browser is gone");
+            
+					}
+				};
+				if (Display.getCurrent() != null) {
+					r.run();
+				} else {
+					Display.getDefault().syncExec(r);
+				}
+			}
+		};
 	}
 }
