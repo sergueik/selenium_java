@@ -187,7 +187,7 @@ public class SimpleToolBarEx {
 	private Configuration config = null;
 	private static String configFilePath; // TODO: rename
 	private static Map<String, String> configData = new HashMap<String, String>();
-  private static HashMap<String, Boolean> data = new HashMap<String, Boolean> ();
+	private static HashMap<String, Boolean> data = new HashMap<String, Boolean>();
 	static {
 		configData.put("Browser", "Chrome");
 		configData.put("Template", "Core Selenium Java (embedded)");
@@ -601,8 +601,8 @@ public class SimpleToolBarEx {
 			public void widgetSelected(SelectionEvent event) {
 
 				if (driver != null) {
-          
-          data.put("runaway", false);
+
+					data.put("runaway", false);
 					shell.setData("runaway", false);
 					getTask2(pageExploreTool, shell, driver, data).start();
 					pageExploreTool.setEnabled(false);
@@ -620,24 +620,27 @@ public class SimpleToolBarEx {
 
 					updateStatus("Waiting for data");
 					HashMap<String, String> elementData = addElement();
+					if (!elementData.containsKey("CommandId")) {
+						// TODO: better handle invalid elementData
+					} else {
+						// TODO: add radios to the ElementSearch Form
+						if (!elementData.containsKey("ElementSelectedBy")) {
+							elementData.put("ElementSelectedBy", "ElementCssSelector");
+						}
+						// System.err.println(
+						// "ElementSelectedBy : " + elementData.get("ElementSelectedBy"));
+						// Append a Breadcrumb Item Button
+						String commandId = elementData.get("CommandId");
+						elementData.put("ElementStepNumber",
+								String.format("%d", step_index));
 
-					// TODO: add radios to the ElementSearch Form
-					if (!elementData.containsKey("ElementSelectedBy")) {
-						elementData.put("ElementSelectedBy", "ElementCssSelector");
+						testData.put(commandId, elementData);
+						stepKeys.add(commandId);
+						addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
+								elementData, bc);
+						shell.layout(true, true);
+						shell.pack();
 					}
-					System.err.println(
-							"ElementSelectedBy : " + elementData.get("ElementSelectedBy"));
-
-					// Append a Breadcrumb Item Button
-					String commandId = elementData.get("CommandId");
-					elementData.put("ElementStepNumber", String.format("%d", step_index));
-
-					testData.put(commandId, elementData);
-					stepKeys.add(commandId);
-					addBreadCrumpItem(elementData.get("ElementCodeName"), commandId,
-							elementData, bc);
-					shell.layout(true, true);
-					shell.pack();
 					pageExploreTool.setEnabled(true);
 					updateStatus("Ready");
 					saveTool.setEnabled(true);
@@ -766,23 +769,14 @@ public class SimpleToolBarEx {
 					break;
 				}
 			}
-
-			System.err.println("Checking URL change");
-
 			if ((Boolean) data.get("runaway")) {
 				System.err.println("Detected URL change");
 				waitingForData = false;
-			} else {
-				System.err
-						.println("No URL change: " + (Boolean) shell.getData("runaway"));
-
 			}
 			if (waitingForData) {
 				try {
-					// TODO: add the code to
-					// check if waited long enough already
-					// test17
-
+					// TODO: add the alternative code to
+					// bail if waited long enough already
 					System.err.println("Waiting: ");
 					Thread.sleep(1000);
 				} catch (InterruptedException exception) {
@@ -791,7 +785,9 @@ public class SimpleToolBarEx {
 		}
 		// clear results on the page
 		flushVisualSearchResult();
-		closeVisualSearch();
+		if (!(Boolean) data.get("runaway")) {
+			closeVisualSearch();
+		}
 		return elementData;
 	}
 
@@ -1114,28 +1110,30 @@ public class SimpleToolBarEx {
 							.println("Thread: inspecting URL " + driver.getCurrentUrl());
 					if (driver.getCurrentUrl().indexOf(URL) != 0) {
 						System.err.println("Signaling URL change ");
-            data.replace("runaway", true);
+						data.replace("runaway", true);
 						break;
 					}
 				}
 
+				// Does not work
+				/*
 				Runnable r = new Runnable() {
 					public void run() {
-            // Does not work
 						System.err.println(
 								"Set URL change: " + (Boolean) theShell.getData("runaway"));
 						theShell.setData("runaway", true);
 						theLauncher.setEnabled(true);
 						// TODO: status update
 						theLauncher.setText("Browser is gone");
-            
 					}
 				};
+				
 				if (Display.getCurrent() != null) {
 					r.run();
 				} else {
 					Display.getDefault().syncExec(r);
 				}
+				*/
 			}
 		};
 	}
