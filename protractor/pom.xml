@@ -28,14 +28,14 @@
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <commons-collections4.version>4.0</commons-collections4.version>
-    <java.version>1.8</java.version>
+    <java.version>1.7</java.version>
     <junit.version>4.12</junit.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>3.0.1</selenium.version>
-    <selenium-firefox-driver.version>3.0.1</selenium-firefox-driver.version>
+    <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
+    <selenium.version>2.53.0</selenium.version>
+    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -65,12 +65,6 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.codeborne</groupId>
-      <artifactId>phantomjsdriver</artifactId>
-      <version>${phantomjsdriver.version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
@@ -86,20 +80,6 @@
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
     </dependency>
-        <dependency>
-      <groupId>org.seleniumhq.selenium.fluent</groupId>
-      <artifactId>fluent-selenium</artifactId>
-      <version>1.16.1</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- declare the exclusion here -->
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-java</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
   </dependencies>
   <build>
     <plugins>

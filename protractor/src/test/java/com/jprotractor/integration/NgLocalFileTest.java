@@ -45,7 +45,6 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -81,7 +80,6 @@ public class NgLocalFileTest {
 	static int width = 600;
 	static int height = 400;
 	// set to true for Desktop, false for headless browser testing
-	static boolean isCIBuild = false;
 	public static String localFile;
 	static StringBuilder sb;
 	static Formatter formatter;
@@ -91,7 +89,6 @@ public class NgLocalFileTest {
 	public static void setup() throws IOException {
 		sb = new StringBuilder();
 		formatter = new Formatter(sb, Locale.US);
-		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
@@ -164,13 +161,6 @@ public class NgLocalFileTest {
 			assertThat(ng_element, notNullValue());
 			highlight(ng_element);
 		} catch (StaleElementReferenceException e) {
-			// org.openqa.selenium.StaleElementReferenceException in Phantom JS
-			// works fine with desktop browsers
-			if (isCIBuild) {
-				System.err.println("Ignoring StaleElementReferenceException");
-			} else {
-				throw (e);
-			}
 		}
 		WebElement ng_minute;
 		try {
@@ -182,11 +172,6 @@ public class NgLocalFileTest {
 			System.err.println("Time of the day: " + ng_minute.getText());
 			ng_minute.click();
 		} catch (StaleElementReferenceException e) {
-			if (isCIBuild) {
-				System.err.println("Ignoring StaleElementReferenceException");
-			} else {
-				throw (e);
-			}
 		}
 		try {
 			ng_result = ngDriver.findElement(NgBy.model("data.inputOnTimeSet"));
@@ -197,11 +182,6 @@ public class NgLocalFileTest {
 			assertTrue(ng_result.getAttribute("value").matches(
 					"\\w{3} \\w{3} \\d{1,2} \\d{4} 18:35:00 GMT[+-]\\d{4} \\(.+\\)"));
 		} catch (StaleElementReferenceException e) {
-			if (isCIBuild) {
-				System.err.println("Ignoring StaleElementReferenceException");
-			} else {
-				throw (e);
-			}
 		}
 	}
 
@@ -258,9 +238,7 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testEvaluate() {
-		if (!isCIBuild) {
-			return;
-		}
+		
 		getPageContent("ng_service.htm");
 		Enumeration<WebElement> elements = Collections
 				.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
@@ -286,9 +264,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testUpload1() {
-		if (!isCIBuild) {
-			return;
-		}
 		// This example interacts with custom 'fileModel' directive
 		getPageContent("ng_upload1.htm");
 		WebElement file = ngDriver.findElement(
@@ -333,9 +308,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testUpload3() {
-		if (isCIBuild) {
-			return;
-		}
 		// TODO: abort the test on timeout
 		// http://stackoverflow.com/questions/2275443/how-to-timeout-a-thread
 		getPageContent("ng_upload3.htm");
@@ -364,9 +336,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testEvaluateEvenOdd() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_table_even_odd.htm");
 		Enumeration<WebElement> rows = Collections
 				.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
@@ -393,9 +362,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindRepeaterElement() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_table2.htm");
 		int length = 0;
 		Pattern pattern = Pattern.compile("(\\d+)");
@@ -422,9 +388,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindElementByRepeaterColumn() {
-		if (!isCIBuild) {
-			return;
-		}
 		seleniumDriver.navigate()
 				.to("http://www.w3schools.com/angular/customers.php");
 		System.err.println("Customers:" + seleniumDriver.getPageSource());
@@ -460,12 +423,8 @@ public class NgLocalFileTest {
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
+			
+			
 		}
 
 		WebElement element = elements.get(0);
@@ -490,23 +449,6 @@ public class NgLocalFileTest {
 			if (option.getText().equalsIgnoreCase("two")) {
 				System.err.println("Selecting option: " + option.getText());
 				option.click();
-				if (!isCIBuild) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-					}
-				}
-				if (!isCIBuild) {
-					try {
-						alert = seleniumDriver.switchTo().alert();
-						String alert_text = alert.getText();
-						System.err.println("Accepted alert: " + alert_text);
-						alert.accept();
-					} catch (NoAlertPresentException ex) {
-						System.err.println(ex.getStackTrace());
-						return;
-					}
-				}
 			}
 		}
 		ngDriver.waitForAngular();
@@ -514,12 +456,6 @@ public class NgLocalFileTest {
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
 		}
 
 		element = elements.get(0);
@@ -536,32 +472,17 @@ public class NgLocalFileTest {
 						.evaluate("countSelected").toString());
 		System.err.println("countSelected = " + valueOfCountSelected);
 		assertThat(valueOfCountSelected, equalTo(2));
-		if (!isCIBuild) {
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-			}
-		}
 	}
 
 	// @Ignore
 	@Test
 	public void testFindSelectedtOption() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_select_array.htm");
 		List<WebElement> elements = ngDriver
 				.findElements(NgBy.selectedOption("myChoice"));
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
 		}
 		WebElement element = elements.get(0);
 		ngDriver.waitForAngular();
@@ -575,9 +496,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testChangeSelectedtOption() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_select_array.htm");
 		Iterator<WebElement> options = ngDriver
 				.findElements(NgBy.repeater("option in options")).iterator();
@@ -598,12 +516,6 @@ public class NgLocalFileTest {
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
 		}
 		WebElement element = elements.get(0);
 		assertThat(element, notNullValue());
@@ -614,9 +526,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testChangeSelectedRepeaterOption() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_repeat_selected.htm");
 		Iterator<WebElement> options = ngDriver
 				.findElements(NgBy.repeater("fruit in Fruits")).iterator();
@@ -639,12 +548,6 @@ public class NgLocalFileTest {
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
 		}
 		WebElement element = elements.get(0);
 		assertThat(element, notNullValue());
@@ -666,12 +569,6 @@ public class NgLocalFileTest {
 		try {
 			assertThat(elements.size(), equalTo(1));
 		} catch (AssertionError e) {
-			if (isCIBuild) {
-				System.err.println("Skipped processing exception " + e.toString());
-				return;
-			} else {
-				throw e;
-			}
 		}
 
 		NgWebElement ngElement = ngElements.get(0);
@@ -805,9 +702,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindElementByRepeaterWithBeginEnd() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_repeat_start_end.htm");
 		List<WebElement> elements = ngDriver
 				.findElements(NgBy.repeater("definition in definitions"));
@@ -819,9 +713,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindElementByOptions() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_options_with_object.htm");
 		List<WebElement> elements = ngDriver
 				.findElements(NgBy.options("c.name for c in colors"));
@@ -883,9 +774,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testElementTextIsGenerated() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_load_json_data.htm");
 		WebElement name = ngDriver.findElement(NgBy.model("name"));
 		highlight(name);
@@ -989,20 +877,11 @@ public class NgLocalFileTest {
 					+ option.getAttribute("value"));
 		}
 
-		if (!isCIBuild) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
-		}
 	}
 
 	// @Ignore
 	@Test
 	public void testFindRepeaterRows() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_todo.htm");
 		String todos_repeater = "todo in todoList.todos";
 		List<WebElement> todos = ngDriver
@@ -1185,9 +1064,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testFindAllBindings() {
-		if (!isCIBuild) {
-			return;
-		}
 		getPageContent("ng_directive_binding.htm");
 
 		WebElement container = ngDriver.getWrappedDriver()
@@ -1250,9 +1126,6 @@ public class NgLocalFileTest {
 	// @Ignore
 	@Test
 	public void testDropDown() {
-		if (!isCIBuild) {
-			return;
-		}
 		// TODO: works with Angular 1.2.13, fails with Angular 1.4.9
 		getPageContent("ng_dropdown.htm");
 		try {
@@ -1314,11 +1187,10 @@ public class NgLocalFileTest {
 		}
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testDragAndDrop() {
 		// TODO: investigate the failure under TRAVIS
-		assumeFalse(isCIBuild);
 		getPageContent("ng_drag_and_drop1.htm");
 
 		Enumeration<WebElement> ng_cars = Collections.enumeration(
