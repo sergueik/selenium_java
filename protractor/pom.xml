@@ -33,9 +33,10 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
     <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
-    <selenium.version>2.53.0</selenium.version>
-    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
+    <selenium.version>3.2.0</selenium.version>
+    <selenium-firefox-driver.version>3.2.0</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -79,6 +80,17 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>${phantomjsdriver.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+          </exclusion>
+        </exclusions>
     </dependency>
   </dependencies>
   <build>

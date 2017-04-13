@@ -38,18 +38,6 @@ public class NgWebElement implements WebElement, WrapsElement {
 		this.element = elm;
   }
 
-  // http://stackoverflow.com/questions/39310090/selenium-upgrade-error
-	@Override
-	public Rectangle getRect() {
-		return this.element.getRect();
-	}
-
-	@Override
-	public <T> T getScreenshotAs(OutputType<T> target) {
-		return this.element.getScreenshotAs(target);
-
-	}
-
 	@Override
 	public WebElement getWrappedElement() {
 		return this.element;
@@ -156,5 +144,17 @@ public class NgWebElement implements WebElement, WrapsElement {
 	public void submit() {
 		this.driver.waitForAngular();
 		this.element.submit();
+	}
+
+  // http://stackoverflow.com/questions/39310090/selenium-upgrade-error
+	@Override
+	public Rectangle getRect() {
+		return this.element.getRect();
+	}
+
+	@Override
+	public <T> T getScreenshotAs(OutputType<T> target) {
+		return this.element.getScreenshotAs(target);
+
 	}
 }
