@@ -1,6 +1,6 @@
 package com.mycompany.app;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import static java.lang.Boolean.*;
 
 import java.awt.Toolkit;
@@ -14,6 +14,20 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -63,6 +77,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
@@ -96,19 +111,69 @@ public class AppTest {
 	private static int height = 1200;
 	private static WebDriverWait wait;
 	private static Actions actions;
+	private static final String browser = "chrome"; 
+  // NOTE: Trouble with FF / geckoDriver versions 
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
 	@BeforeSuite
 	public static void setUp() throws Exception {
-		final FirefoxProfile profile = new FirefoxProfile();
-		profile.setEnableNativeEvents(false);
-		seleniumDriver = new FirefoxDriver(profile);
-    // NOTE: can be unstable if test run on desktop and chrome browser allowed to do updates
-		// System.setProperty("webdriver.chrome.driver",
-		//		"c:/java/selenium/chromedriver.exe");
-		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		// seleniumDriver = new ChromeDriver(capabilities);
+		if (browser.equals("chrome")) {
+			System.setProperty("webdriver.chrome.driver",
+					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			ChromeOptions options = new ChromeOptions();
+
+			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+			chromePrefs.put("profile.default_content_settings.popups", 0);
+			String downloadFilepath = System.getProperty("user.dir")
+					+ System.getProperty("file.separator") + "target"
+					+ System.getProperty("file.separator");
+			chromePrefs.put("download.default_directory", downloadFilepath);
+			chromePrefs.put("enableNetwork", "true");
+			options.setExperimentalOption("prefs", chromePrefs);
+			options.addArguments("allow-running-insecure-content");
+			options.addArguments("allow-insecure-localhost");
+			options.addArguments("enable-local-file-accesses");
+			options.addArguments("disable-notifications");
+			// options.addArguments("start-maximized");
+			options.addArguments("browser.download.folderList=2");
+			options.addArguments(
+					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
+			options.addArguments("browser.download.dir=" + downloadFilepath);
+			// options.addArguments("user-data-dir=/path/to/your/custom/profile");
+			capabilities
+					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			seleniumDriver = new ChromeDriver(capabilities);
+		} else if (browser.equals("firefox")) {
+			// alternatively one can add Geckodriver to system path
+			System.setProperty("webdriver.gecko.driver",
+					"c:/java/selenium/geckodriver.exe");
+			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+			// use legacy FirefoxDriver
+			capabilities.setCapability("marionette", false);
+			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+			capabilities.setCapability("locationContextEnabled", false);
+			capabilities.setCapability("acceptSslCerts", true);
+			capabilities.setCapability("elementScrollBehavior", 1);
+			FirefoxProfile profile = new FirefoxProfile();
+			profile.setAcceptUntrustedCertificates(true);
+			profile.setAssumeUntrustedCertificateIssuer(true);
+			profile.setEnableNativeEvents(false);
+
+			System.out.println(System.getProperty("user.dir"));
+			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+			try {
+        // java.lang.ClassCastException: org.openqa.selenium.remote.service.DriverCommandExecutor cannot be cast to org.openqa.selenium.firefox.FirefoxDriver$LazyCommandExecutor
+				seleniumDriver = new FirefoxDriver(capabilities);
+			} catch (WebDriverException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot initialize Firefox driver");
+			}
+		}
 
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
