@@ -102,11 +102,19 @@ public class SuvianTest {
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final String browser = "firefox";
+	private static String osName;
 
-	@SuppressWarnings("deprecation")
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
+
 	@BeforeSuite
+	@SuppressWarnings("deprecation")
 	public void beforeSuite() throws Exception {
-
+		getOsName();
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -137,10 +145,15 @@ public class SuvianTest {
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
-			// alternatively one can add Geckodriver to system path
 			System.setProperty("webdriver.gecko.driver",
-					"c:/java/selenium/geckodriver.exe");
-			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+					osName.toLowerCase().startsWith("windows")
+							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+							: "/tmp/geckodriver");
+			System.setProperty("webdriver.firefox.bin",
+					osName.toLowerCase().startsWith("windows")
+							? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+									.getAbsolutePath()
+							: "/usr/bin/firefox");
 			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 			// use legacy FirefoxDriver
 			capabilities.setCapability("marionette", false);

@@ -8,14 +8,15 @@ The project practices Java 8 functional constructs with Selenium using the Selen
 ### Selenium 3 Testing
 
 This project is used to debug the issue with launching tests in Firefox 52 / Geckodriver 0.15
-under Windows x86 or x64 under Selenium 3.2 / Maven / TestNg.
+under Windows x86 or x64 under Selenium 3.2 / Maven / TestNg. No problem observed on Linux.
 
 The following standalone class invocation works fine, browser launched and navigated succesfully: 
 ```cmd
 rd /s/q src\test\java
-mvn clean package
-java -cp target\app-1.2-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-3.3.1.jar com.mycompany.app.fireFoxBrowseStart
+mvn clean install
+java -cp target\app-1.2-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-3.3.1.jar;target\lib\* com.mycompany.app.fireFoxBrowseStart
 ````
+but fails without explicitly using the `selenium-server-standalone-3.3.1.jar`
 - it is just a fragment of the with methods and fields converted to `static`.
 
 However the same code fails when run by maven / testng:

@@ -106,9 +106,18 @@ public class JqueryBarRatingTest {
 	private long pollingInterval = 500;
 	private String baseUrl = "http://antenna.io/demo/jquery-bar-rating/examples/";
 	private static final String browser = "firefox";
+	private static String osName;
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
 
 	@BeforeSuite
 	public void beforeSuiteMethod() throws Exception {
+		getOsName();
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -139,9 +148,17 @@ public class JqueryBarRatingTest {
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
-			// alternatively one can add Geckodriver to system path
+			
 			System.setProperty("webdriver.gecko.driver",
-					"c:/java/selenium/geckodriver.exe");
+					osName.toLowerCase().startsWith("windows")
+							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+							: "/tmp/geckodriver");
+			System
+					.setProperty("webdriver.firefox.bin",
+							osName.toLowerCase().startsWith("windows") ? new File(
+									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+											.getAbsolutePath()
+									: "/usr/bin/firefox");
 			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 			// alternatively set "marionette" capability to false to use legacy

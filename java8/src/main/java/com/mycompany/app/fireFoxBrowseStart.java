@@ -98,17 +98,33 @@ public class fireFoxBrowseStart {
 	private static int implicitWait = 1;
 	private static long pollingInterval = 500;
 	private static String baseUrl = "http://antenna.io/demo/jquery-bar-rating/examples/";
+	private static String osName;
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
 
 	public static void main(String[] args) throws Exception {
+		getOsName();
 		System.setProperty("webdriver.gecko.driver",
-				"C:\\java\\selenium\\geckodriver.exe");
+				osName.toLowerCase().startsWith("windows")
+						? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+						: "/tmp/geckodriver");
 		System.setProperty("webdriver.firefox.bin",
-				"C:\\Program Files\\Mozilla Firefox\\firefox.exe");
+				osName.toLowerCase().startsWith("windows")
+						? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+								.getAbsolutePath()
+						: "/usr/bin/firefox");
 		driver = new FirefoxDriver();
-		driver.get("https://www.google.com");
+		wait = new WebDriverWait(driver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(driver);
 		resetBrowser();
 		loadPage();
-		test1();
+		test();
 		afterSuiteMethod();
 	}
 
@@ -124,16 +140,15 @@ public class fireFoxBrowseStart {
 		driver.get("about:blank");
 	}
 
-	public static void test1() {
+	public static void test() {
 		// Arrange
+		// Act
 		WebElement bar = driver.findElement(By.cssSelector(
 				"section.section-examples div.examples div.box-example-square div.box-body div.br-theme-bars-square"));
-		// Act
-		// NOTE: relative xpath selector
-		assertTrue(bar.findElements(By.xpath("//a[@data-rating-value]")).size() > 7,
-				bar.findElements(By.xpath("//a[@data-rating-value]")).size());
+		assertTrue(
+				bar.findElements(By.xpath("//a[@data-rating-value]")).size() > 7);
 		List<WebElement> ratingElements = bar
-				.findElements(By.xpath(".//a[@data-rating-value]"));
+				.findElements(By.xpath(".//a[@data-rating-value]")); // NOTE: relative xpath selector
 		assertTrue(ratingElements.size() > 0);
 		// TODO: test that result set elements are unique ?
 		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
