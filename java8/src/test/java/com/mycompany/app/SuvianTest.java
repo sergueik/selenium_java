@@ -54,6 +54,7 @@ import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.phantomjs.PhantomJSDriverService;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Point;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.UnreachableBrowserException;
@@ -101,6 +102,7 @@ public class SuvianTest {
 	private long pollingInterval = 500;
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
+	private static String defaultScript = null;
 	private static final String browser = "firefox";
 	private static String osName;
 
@@ -149,11 +151,12 @@ public class SuvianTest {
 					osName.toLowerCase().startsWith("windows")
 							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
 							: "/tmp/geckodriver");
-			System.setProperty("webdriver.firefox.bin",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-									.getAbsolutePath()
-							: "/usr/bin/firefox");
+			System
+					.setProperty("webdriver.firefox.bin",
+							osName.toLowerCase().startsWith("windows") ? new File(
+									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+											.getAbsolutePath()
+									: "/usr/bin/firefox");
 			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 			// use legacy FirefoxDriver
 			capabilities.setCapability("marionette", false);
@@ -209,7 +212,7 @@ public class SuvianTest {
 	// Firebug console validation:
 	// $x("<xpath>")
 	// $$("<cssSelector>")
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test0_1() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
@@ -309,7 +312,7 @@ public class SuvianTest {
 				element.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test0_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
@@ -320,7 +323,7 @@ public class SuvianTest {
 		assertTrue(element.getText().equalsIgnoreCase("Click Here"),
 				element.getText());
 		highlight(element);
-    element.click();
+		element.click();
 		try {
 			wait.until(ExpectedConditions.urlContains("1.1link_validate.html"));
 		} catch (UnreachableBrowserException e) {
@@ -356,9 +359,9 @@ public class SuvianTest {
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
-  }
+	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test0_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
@@ -493,6 +496,7 @@ public class SuvianTest {
 
 		// Act
 		highlight(element);
+		highlightNew(element, 1000);
 		assertTrue(element.getText().equalsIgnoreCase(elementText),
 				element.getText());
 	}
@@ -2298,6 +2302,32 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 		// Assert
+	}
+
+	private void highlightNew(WebElement element, long highlight_interval) {
+		Rectangle elementRect = element.getRect();
+		String highlightScript = getScriptContent("highlight.js");
+		// append calling
+
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						String.format(
+								"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
+								highlightScript),
+						elementRect.y, elementRect.x, elementRect.width,
+						elementRect.height);
+			}
+			Thread.sleep(highlight_interval);
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						String.format("%s\nhighlight_remove();", highlightScript));
+			}
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+
 	}
 
 	private void highlight(WebElement element) {
