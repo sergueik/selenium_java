@@ -1,3 +1,2 @@
 #### Info 
-This project contains a replica of the repository
-[AnarSultanov/InstalledBrowsers](https://github.com/AnarSultanov/InstalledBrowsers)
+This project is based on [InstalledBrowsers](https://github.com/AnarSultanov/InstalledBrowsers) registry lookup for installed browsers and finding our their versions by Anar Sultanov

@@ -3,6 +3,7 @@ package org.utils;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStreamReader;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -12,14 +13,12 @@ import java.util.Set;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
+import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.VerRsrc.VS_FIXEDFILEINFO;
+import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-/**
- * based on class for registry lookup for installed browsers 
- * and finding our their versions by Anar Sultanov
- */
 public final class InstalledBrowsers {
 
 	private static boolean is64bit;
@@ -55,7 +54,7 @@ public final class InstalledBrowsers {
 	}
 
 	public static String getVersion(String browserName) {
-		if (isInstalled(browserName) == false)
+		if (!isInstalled(browserName))
 			return null;
 		int[] version = getVersionInfo(installedBrowsers.get(browserName));
 		return String.valueOf(version[0]) + "." + String.valueOf(version[1]) + "."
@@ -154,27 +153,55 @@ public final class InstalledBrowsers {
 		return browsers;
 	}
 
+	// http://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.Advapi32Util
 	private static List<String> findBrowsersInRegistry() {
+		// String regPath = "SOFTWARE\\Clients\\StartMenuInternet\\";
 		String regPath = is64bit
-				? "HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\Clients\\StartMenuInternet\\"
-				: "HKEY_LOCAL_MACHINE\\SOFTWARE\\Clients\\StartMenuInternet\\";
+				? "SOFTWARE\\Wow6432Node\\Clients\\StartMenuInternet\\"
+				: "SOFTWARE\\Clients\\StartMenuInternet\\";
 
 		List<String> browsers = new ArrayList<>();
-		// find browsers keys
+		String path = null;
 		try {
-			List<String> values = new ArrayList<>();
-			// TODO: replace execs
+			for (String browserName : Advapi32Util
+					.registryGetKeys(WinReg.HKEY_LOCAL_MACHINE, regPath)) {
+				path = Advapi32Util
+						.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+								regPath + "\\" + browserName + "\\shell\\open\\command", "")
+						.replace("\"", "");
+				if (path != null && new File(path).exists()) {
+					browsers.add(path);
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return browsers;
+	}
+
+	// http://stackoverflow.com/questions/62289/read-write-to-windows-registry-using-java
+	private static List<String> findBrowsersInRegistryWithExec() {
+
+		String regPath = is64bit
+				? "SOFTWARE\\Wow6432Node\\Clients\\StartMenuInternet\\"
+				: "SOFTWARE\\Clients\\StartMenuInternet\\";
+
+		List<String> browsers = new ArrayList<>();
+		List<String> values = new ArrayList<>();
+		try {
 			Process findBrowsers = Runtime.getRuntime()
-					.exec("reg.exe query \"" + regPath + " \"");
+					.exec("reg.exe query \"" + "HKEY_LOCAL_MACHINE\\" + regPath + " \"");
 			BufferedReader in = new BufferedReader(
 					new InputStreamReader(findBrowsers.getInputStream()));
 			String inputLine;
+
+			// read browser names
 			while ((inputLine = in.readLine()) != null) {
 				if (inputLine.contains(regPath))
 					values.add(inputLine);
 			}
 			in.close();
-			// read browser path
+			// read browser paths (through `defaulticon`)
 			for (String value : values) {
 				Process findPath = Runtime.getRuntime()
 						.exec("reg.exe query \"" + value + "\\DefaultIcon\"");
@@ -201,4 +228,5 @@ public final class InstalledBrowsers {
 		}
 		return browsers;
 	}
+
 }
