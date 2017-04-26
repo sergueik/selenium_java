@@ -19,70 +19,96 @@ import static org.mockito.Mockito.*;
  */
 public class ReplayBrowserTest {
 
-    @Test
-    public void replayInvokesExecutionExecuteMethod() throws InterruptedException, IOException, URISyntaxException {
-        ApplicationActionFactory applicationActionFactory = Mockito.mock(ApplicationActionFactory.class);
-        TestScenario testScenario = Mockito.mock(TestScenario.class);
-        WebDriverActionExecution webDriverActionExecution = Mockito.mock(WebDriverActionExecution.class);
-        LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
-        Mockito.when(webDriverActionExecution.getLoadingTimes()).thenReturn(loadingTimes);
+	@Test
+	public void replayInvokesExecutionExecuteMethod()
+			throws InterruptedException, IOException, URISyntaxException {
+		ApplicationActionFactory applicationActionFactory = Mockito
+				.mock(ApplicationActionFactory.class);
+		TestScenario testScenario = Mockito.mock(TestScenario.class);
+		WebDriverActionExecution webDriverActionExecution = Mockito
+				.mock(WebDriverActionExecution.class);
+		LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
+		Mockito.when(webDriverActionExecution.getLoadingTimes())
+				.thenReturn(loadingTimes);
 
-        ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory);
-        replayBrowser.replay(testScenario, webDriverActionExecution);
+		ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory);
+		replayBrowser.replay(testScenario, webDriverActionExecution);
 
-        Mockito.verify(webDriverActionExecution).execute(testScenario);
-    }
+		Mockito.verify(webDriverActionExecution).execute(testScenario);
+	}
 
-    @Test
-    public void replayInvokesExecutionExecuteMethodOnScreen() throws InterruptedException, IOException, URISyntaxException {
-        ApplicationActionFactory applicationActionFactory = Mockito.mock(ApplicationActionFactory.class);
-        TestScenario testScenario = Mockito.mock(TestScenario.class);
-        WebDriverActionExecution webDriverActionExecution = Mockito.mock(WebDriverActionExecution.class);
-        LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
-        Mockito.when(webDriverActionExecution.getLoadingTimes()).thenReturn(loadingTimes);
+	@Test
+	public void replayInvokesExecutionExecuteMethodOnScreen()
+			throws InterruptedException, IOException, URISyntaxException {
+		ApplicationActionFactory applicationActionFactory = Mockito
+				.mock(ApplicationActionFactory.class);
+		TestScenario testScenario = Mockito.mock(TestScenario.class);
+		WebDriverActionExecution webDriverActionExecution = Mockito
+				.mock(WebDriverActionExecution.class);
+		LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
+		Mockito.when(webDriverActionExecution.getLoadingTimes())
+				.thenReturn(loadingTimes);
 
-        String screen = ":1";
+		String screen = ":1";
 
-        ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory);
-        replayBrowser.replayOnScreen(testScenario, webDriverActionExecution, screen);
+		ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory);
+		replayBrowser.replayOnScreen(testScenario, webDriverActionExecution,
+				screen);
 
-        Mockito.verify(webDriverActionExecution).executeOnScreen(testScenario, screen);
-    }
+		Mockito.verify(webDriverActionExecution).executeOnScreen(testScenario,
+				screen);
+	}
 
-    @Test
-    public void replayFromFileInvokesExecutionExecuteMethod() throws InterruptedException, IOException, URISyntaxException {
-        ApplicationActionFactory applicationActionFactory = Mockito.mock(ApplicationActionFactory.class);
-        TestScenario testScenario = Mockito.mock(TestScenario.class);
-        WebDriverActionExecution webDriverActionExecution = Mockito.mock(WebDriverActionExecution.class);
-        LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
-        Mockito.when(webDriverActionExecution.getLoadingTimes()).thenReturn(loadingTimes);
-        TestScenarioFactory testScenarioFactory = Mockito.mock(TestScenarioFactory.class);
-        String pathToSerializedTest = "testcase.json";
+	@Test
+	public void replayFromFileInvokesExecutionExecuteMethod()
+			throws InterruptedException, IOException, URISyntaxException {
+		ApplicationActionFactory applicationActionFactory = Mockito
+				.mock(ApplicationActionFactory.class);
+		TestScenario testScenario = Mockito.mock(TestScenario.class);
+		WebDriverActionExecution webDriverActionExecution = Mockito
+				.mock(WebDriverActionExecution.class);
+		LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
+		Mockito.when(webDriverActionExecution.getLoadingTimes())
+				.thenReturn(loadingTimes);
+		TestScenarioFactory testScenarioFactory = Mockito
+				.mock(TestScenarioFactory.class);
+		String pathToSerializedTest = "testcase.json";
 
-        Mockito.when(testScenarioFactory.createFromFile(applicationActionFactory, pathToSerializedTest)).thenReturn(testScenario);
+		Mockito.when(testScenarioFactory.createFromFile(applicationActionFactory,
+				pathToSerializedTest)).thenReturn(testScenario);
 
-        ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory, testScenarioFactory);
-        replayBrowser.replay(pathToSerializedTest, webDriverActionExecution);
+		ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory,
+				testScenarioFactory);
+		replayBrowser.replay(pathToSerializedTest, webDriverActionExecution);
 
-        Mockito.verify(webDriverActionExecution).execute(testScenario);
-    }
+		Mockito.verify(webDriverActionExecution).execute(testScenario);
+	}
 
-    @Test
-    public void replayFromFileOnScreenInvokesExecutionExecuteMethod() throws InterruptedException, IOException, URISyntaxException {
-        ApplicationActionFactory applicationActionFactory = Mockito.mock(ApplicationActionFactory.class);
-        TestScenario testScenario = Mockito.mock(TestScenario.class);
-        WebDriverActionExecution webDriverActionExecution = Mockito.mock(WebDriverActionExecution.class);
-        LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
-        Mockito.when(webDriverActionExecution.getLoadingTimes()).thenReturn(loadingTimes);
-        TestScenarioFactory testScenarioFactory = Mockito.mock(TestScenarioFactory.class);
-        String pathToSerializedTest = "testcase.json";
-        String screen = ":1";
+	@Test
+	public void replayFromFileOnScreenInvokesExecutionExecuteMethod()
+			throws InterruptedException, IOException, URISyntaxException {
+		ApplicationActionFactory applicationActionFactory = Mockito
+				.mock(ApplicationActionFactory.class);
+		TestScenario testScenario = Mockito.mock(TestScenario.class);
+		WebDriverActionExecution webDriverActionExecution = Mockito
+				.mock(WebDriverActionExecution.class);
+		LoadingTimes loadingTimes = Mockito.mock(LoadingTimes.class);
+		Mockito.when(webDriverActionExecution.getLoadingTimes())
+				.thenReturn(loadingTimes);
+		TestScenarioFactory testScenarioFactory = Mockito
+				.mock(TestScenarioFactory.class);
+		String pathToSerializedTest = "testcase.json";
+		String screen = ":1";
 
-        Mockito.when(testScenarioFactory.createFromFile(applicationActionFactory, pathToSerializedTest)).thenReturn(testScenario);
+		Mockito.when(testScenarioFactory.createFromFile(applicationActionFactory,
+				pathToSerializedTest)).thenReturn(testScenario);
 
-        ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory, testScenarioFactory);
-        replayBrowser.replayOnScreen(pathToSerializedTest, webDriverActionExecution, screen);
+		ReplayBrowser replayBrowser = new ReplayBrowser(applicationActionFactory,
+				testScenarioFactory);
+		replayBrowser.replayOnScreen(pathToSerializedTest, webDriverActionExecution,
+				screen);
 
-        Mockito.verify(webDriverActionExecution).executeOnScreen(testScenario, screen);
-    }
+		Mockito.verify(webDriverActionExecution).executeOnScreen(testScenario,
+				screen);
+	}
 }

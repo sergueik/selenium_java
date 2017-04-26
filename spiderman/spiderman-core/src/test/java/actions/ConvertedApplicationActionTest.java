@@ -15,23 +15,24 @@ import static org.mockito.Mockito.mock;
  */
 public class ConvertedApplicationActionTest {
 
-    @Test
-    public void convertedApplicationActionReturnsCorrectWebDriverActions() {
-        WebDriverAction preCondition = mock(WebDriverAction.class);
-        WebDriverAction webDriverAction = mock(WebDriverAction.class);
-        WebDriverAction postCondition = mock(WebDriverAction.class);
+	@Test
+	public void convertedApplicationActionReturnsCorrectWebDriverActions() {
+		WebDriverAction preCondition = mock(WebDriverAction.class);
+		WebDriverAction webDriverAction = mock(WebDriverAction.class);
+		WebDriverAction postCondition = mock(WebDriverAction.class);
 
-        Optional<WebDriverAction> preConditionOptional = Optional.of(preCondition);
-        Optional<WebDriverAction> webDriverActionOptional = Optional.of(webDriverAction);
-        Optional<WebDriverAction> postConditionOptional = Optional.of(postCondition);
+		Optional<WebDriverAction> preConditionOptional = Optional.of(preCondition);
+		Optional<WebDriverAction> webDriverActionOptional = Optional
+				.of(webDriverAction);
+		Optional<WebDriverAction> postConditionOptional = Optional
+				.of(postCondition);
 
-        ApplicationAction applicationAction = new ConvertedApplicationAction(
-                preConditionOptional,
-                webDriverActionOptional,
-                postConditionOptional);
+		ApplicationAction applicationAction = new ConvertedApplicationAction(
+				preConditionOptional, webDriverActionOptional, postConditionOptional);
 
-        assertEquals(preConditionOptional, applicationAction.getPrecondition());
-        assertEquals(webDriverActionOptional, applicationAction.getWebdriverAction());
-        assertEquals(postConditionOptional, applicationAction.getPostcondition());
-    }
+		assertEquals(preConditionOptional, applicationAction.getPrecondition());
+		assertEquals(webDriverActionOptional,
+				applicationAction.getWebdriverAction());
+		assertEquals(postConditionOptional, applicationAction.getPostcondition());
+	}
 }

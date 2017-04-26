@@ -17,40 +17,41 @@ import static org.mockito.Mockito.when;
  */
 public class TestScenarioTest {
 
-    @Test
-    public void testScenarioMainsListOfActions() {
-        String actionName = "actionName";
-        WebDriverAction webDriverAction = mock(WebDriverAction.class);
-        when(webDriverAction.getName()).thenReturn(actionName);
-        when(webDriverAction.expectsHttpRequest()).thenReturn(true);
+	@Test
+	public void testScenarioMainsListOfActions() {
+		String actionName = "actionName";
+		WebDriverAction webDriverAction = mock(WebDriverAction.class);
+		when(webDriverAction.getName()).thenReturn(actionName);
+		when(webDriverAction.expectsHttpRequest()).thenReturn(true);
 
-        String anotherActionName = "anotherActionName";
-        WebDriverAction anotherWebDriverAction = mock(WebDriverAction.class);
-        when(anotherWebDriverAction.getName()).thenReturn(anotherActionName);
-        when(anotherWebDriverAction.expectsHttpRequest()).thenReturn(false);
+		String anotherActionName = "anotherActionName";
+		WebDriverAction anotherWebDriverAction = mock(WebDriverAction.class);
+		when(anotherWebDriverAction.getName()).thenReturn(anotherActionName);
+		when(anotherWebDriverAction.expectsHttpRequest()).thenReturn(false);
 
-        Optional<WebDriverAction> anotherActionOptional = Optional.of(anotherWebDriverAction);
+		Optional<WebDriverAction> anotherActionOptional = Optional
+				.of(anotherWebDriverAction);
 
-        TestScenario testScenario = new TestScenario();
-        testScenario.addWebDriverAction(webDriverAction);
-        testScenario.addWebDriverAction(anotherActionOptional);
+		TestScenario testScenario = new TestScenario();
+		testScenario.addWebDriverAction(webDriverAction);
+		testScenario.addWebDriverAction(anotherActionOptional);
 
-        assertTrue(testScenario.hasMoreSteps());
-        assertTrue(testScenario.nextActionExpectsHttpRequest());
-        assertEquals(actionName, testScenario.nextActionName());
+		assertTrue(testScenario.hasMoreSteps());
+		assertTrue(testScenario.nextActionExpectsHttpRequest());
+		assertEquals(actionName, testScenario.nextActionName());
 
-        List<String> expectedActionList = new ArrayList<>();
-        expectedActionList.add(actionName);
-        expectedActionList.add(anotherActionName);
+		List<String> expectedActionList = new ArrayList<>();
+		expectedActionList.add(actionName);
+		expectedActionList.add(anotherActionName);
 
-        assertEquals(expectedActionList, testScenario.getActions());
+		assertEquals(expectedActionList, testScenario.getActions());
 
-        WebDriverAction actionOnTop = testScenario.pollWebdriverAction();
-        assertEquals(webDriverAction, actionOnTop);
+		WebDriverAction actionOnTop = testScenario.pollWebdriverAction();
+		assertEquals(webDriverAction, actionOnTop);
 
-        WebDriverAction lastActionInQueue = testScenario.pollWebdriverAction();
-        assertEquals(anotherWebDriverAction, lastActionInQueue);
+		WebDriverAction lastActionInQueue = testScenario.pollWebdriverAction();
+		assertEquals(anotherWebDriverAction, lastActionInQueue);
 
-        assertFalse(testScenario.hasMoreSteps());
-    }
+		assertFalse(testScenario.hasMoreSteps());
+	}
 }

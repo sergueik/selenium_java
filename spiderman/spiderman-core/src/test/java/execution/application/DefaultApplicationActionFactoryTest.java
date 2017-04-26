@@ -24,51 +24,62 @@ import static org.mockito.Mockito.when;
  */
 public class DefaultApplicationActionFactoryTest {
 
-    @Test
-    public void canCreatePageLoadingAndOtherActions() {
-        String url = "http://tenniskafe.com";
-        String actionName = "actionName";
-        ApplicationActionConfiguration applicationActionConfiguration = mock(ApplicationActionConfiguration.class);
-        when(applicationActionConfiguration.getName()).thenReturn(actionName);
+	@Test
+	public void canCreatePageLoadingAndOtherActions() {
+		String url = "http://tenniskafe.com";
+		String actionName = "actionName";
+		ApplicationActionConfiguration applicationActionConfiguration = mock(
+				ApplicationActionConfiguration.class);
+		when(applicationActionConfiguration.getName()).thenReturn(actionName);
 
-        List<ApplicationActionConfiguration> applicationActionConfigurationList = new ArrayList<>();
-        applicationActionConfigurationList.add(applicationActionConfiguration);
+		List<ApplicationActionConfiguration> applicationActionConfigurationList = new ArrayList<>();
+		applicationActionConfigurationList.add(applicationActionConfiguration);
 
-        ApplicationConfiguration applicationConfiguration = mock(ApplicationConfiguration.class);
-        when(applicationConfiguration.getApplicationActionConfigurationList()).thenReturn(applicationActionConfigurationList);
+		ApplicationConfiguration applicationConfiguration = mock(
+				ApplicationConfiguration.class);
+		when(applicationConfiguration.getApplicationActionConfigurationList())
+				.thenReturn(applicationActionConfigurationList);
 
-        TestCaseToApplicationActionConverter testCaseToApplicationActionConverter =
-                mock(TestCaseToApplicationActionConverter.class);
+		TestCaseToApplicationActionConverter testCaseToApplicationActionConverter = mock(
+				TestCaseToApplicationActionConverter.class);
 
-        ApplicationAction applicationAction = mock(ApplicationAction.class);
+		ApplicationAction applicationAction = mock(ApplicationAction.class);
 
-        Map<String, String> testCaseStep = new HashMap<>();
-        testCaseStep.put("event", actionName);
+		Map<String, String> testCaseStep = new HashMap<>();
+		testCaseStep.put("event", actionName);
 
-        when(testCaseToApplicationActionConverter.convert(applicationActionConfiguration, testCaseStep))
-                .thenReturn(applicationAction);
+		when(testCaseToApplicationActionConverter
+				.convert(applicationActionConfiguration, testCaseStep))
+						.thenReturn(applicationAction);
 
-        ApplicationActionFactory applicationActionFactory =
-                new DefaultApplicationActionFactory(url, applicationConfiguration, testCaseToApplicationActionConverter);
+		ApplicationActionFactory applicationActionFactory = new DefaultApplicationActionFactory(
+				url, applicationConfiguration, testCaseToApplicationActionConverter);
 
-        ApplicationAction initialPageLoading = applicationActionFactory.getInitialPageLoading();
+		ApplicationAction initialPageLoading = applicationActionFactory
+				.getInitialPageLoading();
 
-        assertFalse(initialPageLoading.getPrecondition().isPresent());
-        assertEquals(applicationAction, applicationActionFactory.create(testCaseStep));
-    }
+		assertFalse(initialPageLoading.getPrecondition().isPresent());
+		assertEquals(applicationAction,
+				applicationActionFactory.create(testCaseStep));
+	}
 
-    @Test
-    public void canCreatePageLoading() {
-        String url = "http://tenniskafe.com";
-        String applicationName = "tenniskafe";
-        ApplicationConfiguration applicationConfiguration = mock(ApplicationConfiguration.class);
-        when(applicationConfiguration.getApplicationName()).thenReturn(applicationName);
-        WebDriverActionFactory webDriverActionFactory = mock(WebDriverActionFactory.class);
+	@Test
+	public void canCreatePageLoading() {
+		String url = "http://tenniskafe.com";
+		String applicationName = "tenniskafe";
+		ApplicationConfiguration applicationConfiguration = mock(
+				ApplicationConfiguration.class);
+		when(applicationConfiguration.getApplicationName())
+				.thenReturn(applicationName);
+		WebDriverActionFactory webDriverActionFactory = mock(
+				WebDriverActionFactory.class);
 
-        ApplicationActionFactory applicationActionFactory =
-                new DefaultApplicationActionFactory(url, applicationConfiguration, webDriverActionFactory);
+		ApplicationActionFactory applicationActionFactory = new DefaultApplicationActionFactory(
+				url, applicationConfiguration, webDriverActionFactory);
 
-        assertFalse(applicationActionFactory.getInitialPageLoading().getPrecondition().isPresent());
-        assertFalse(applicationActionFactory.getInitialPageLoading().getPostcondition().isPresent());
-    }
+		assertFalse(applicationActionFactory.getInitialPageLoading()
+				.getPrecondition().isPresent());
+		assertFalse(applicationActionFactory.getInitialPageLoading()
+				.getPostcondition().isPresent());
+	}
 }

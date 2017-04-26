@@ -15,18 +15,22 @@ import static org.mockito.Mockito.mock;
  */
 public class WebDriverActionConfigurationTest {
 
-    @Test
-    public void webDriverActionConfigurationTest() {
-        String webDriverActionType = "CLICK_CLASS_BY_TEXT";
-        ParameterConfiguration parameterConfiguration = mock(ParameterConfiguration.class);
-        Map<String, ParameterConfiguration> parametersConfiguration = new HashMap<>();
-        parametersConfiguration.put("text", parameterConfiguration);
+	@Test
+	public void webDriverActionConfigurationTest() {
+		String webDriverActionType = "CLICK_CLASS_BY_TEXT";
+		ParameterConfiguration parameterConfiguration = mock(
+				ParameterConfiguration.class);
+		Map<String, ParameterConfiguration> parametersConfiguration = new HashMap<>();
+		parametersConfiguration.put("text", parameterConfiguration);
 
-        WebDriverActionConfiguration webDriverActionConfiguration = new WebDriverActionConfiguration();
-        webDriverActionConfiguration.setWebDriverActionType(webDriverActionType);
-        webDriverActionConfiguration.setParametersConfiguration(parametersConfiguration);
+		WebDriverActionConfiguration webDriverActionConfiguration = new WebDriverActionConfiguration();
+		webDriverActionConfiguration.setWebDriverActionType(webDriverActionType);
+		webDriverActionConfiguration
+				.setParametersConfiguration(parametersConfiguration);
 
-        assertEquals(webDriverActionType, webDriverActionConfiguration.getWebDriverActionType());
-        assertEquals(parametersConfiguration, webDriverActionConfiguration.getParametersConfiguration());
-    }
+		assertEquals(webDriverActionType,
+				webDriverActionConfiguration.getWebDriverActionType());
+		assertEquals(parametersConfiguration,
+				webDriverActionConfiguration.getParametersConfiguration());
+	}
 }

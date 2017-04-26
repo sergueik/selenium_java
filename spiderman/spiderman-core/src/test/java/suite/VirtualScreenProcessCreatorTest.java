@@ -12,13 +12,13 @@ import static org.junit.Assert.assertTrue;
  */
 public class VirtualScreenProcessCreatorTest {
 
-    @Test
-    public void xvfbIsInstalledAndProcessIsCreated() throws IOException {
-        UbuntuVirtualScreenProcessCreator virtualScreenProcessCreator = new UbuntuVirtualScreenProcessCreator();
-        Process process = virtualScreenProcessCreator.createXvfbProcess(0);
+	@Test
+	public void xvfbIsInstalledAndProcessIsCreated() throws IOException {
+		UbuntuVirtualScreenProcessCreator virtualScreenProcessCreator = new UbuntuVirtualScreenProcessCreator();
+		Process process = virtualScreenProcessCreator.createXvfbProcess(0);
 
-        assertTrue(process.isAlive());
-        process.destroy();
-    }
+		assertTrue(process.isAlive());
+		process.destroy();
+	}
 
 }

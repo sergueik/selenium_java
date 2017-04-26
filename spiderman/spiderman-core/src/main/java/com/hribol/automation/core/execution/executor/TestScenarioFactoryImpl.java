@@ -15,28 +15,35 @@ import java.util.Optional;
  */
 public class TestScenarioFactoryImpl implements TestScenarioFactory {
 
-    @Override
-    public TestScenario createFromFile(ApplicationActionFactory applicationActionFactory, String pathToSerializedTest) throws IOException {
-        List<Map<String, String>> testCaseSteps = ConfigurationUtils.readSteps(pathToSerializedTest);
-        return createFromTestCaseSteps(applicationActionFactory, testCaseSteps);
-    }
+	@Override
+	public TestScenario createFromFile(
+			ApplicationActionFactory applicationActionFactory,
+			String pathToSerializedTest) throws IOException {
+		List<Map<String, String>> testCaseSteps = ConfigurationUtils
+				.readSteps(pathToSerializedTest);
+		return createFromTestCaseSteps(applicationActionFactory, testCaseSteps);
+	}
 
-    @Override
-    public TestScenario createFromTestCaseSteps(ApplicationActionFactory applicationActionFactory, List<Map<String, String>> testCaseSteps) {
-        TestScenario testScenario = new TestScenario();
+	@Override
+	public TestScenario createFromTestCaseSteps(
+			ApplicationActionFactory applicationActionFactory,
+			List<Map<String, String>> testCaseSteps) {
+		TestScenario testScenario = new TestScenario();
 
-        Optional<WebDriverAction> initialPageLoading = applicationActionFactory.getInitialPageLoading().getWebdriverAction();
-        testScenario.addWebDriverAction(initialPageLoading);
+		Optional<WebDriverAction> initialPageLoading = applicationActionFactory
+				.getInitialPageLoading().getWebdriverAction();
+		testScenario.addWebDriverAction(initialPageLoading);
 
-        for (Map<String, String> testCaseStep: testCaseSteps) {
-            ApplicationAction domainSpecificAction =
-                    applicationActionFactory.create(testCaseStep);
+		for (Map<String, String> testCaseStep : testCaseSteps) {
+			ApplicationAction domainSpecificAction = applicationActionFactory
+					.create(testCaseStep);
 
-            testScenario.addWebDriverAction(domainSpecificAction.getPrecondition());
-            testScenario.addWebDriverAction(domainSpecificAction.getWebdriverAction());
-            testScenario.addWebDriverAction(domainSpecificAction.getPostcondition());
-        }
+			testScenario.addWebDriverAction(domainSpecificAction.getPrecondition());
+			testScenario
+					.addWebDriverAction(domainSpecificAction.getWebdriverAction());
+			testScenario.addWebDriverAction(domainSpecificAction.getPostcondition());
+		}
 
-        return testScenario;
-    }
+		return testScenario;
+	}
 }

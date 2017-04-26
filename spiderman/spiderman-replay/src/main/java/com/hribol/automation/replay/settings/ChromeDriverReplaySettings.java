@@ -13,23 +13,22 @@ import java.io.IOException;
 /**
  * Created by hvrigazov on 21.03.17.
  */
-public class ChromeDriverReplaySettings extends ReplaySettingsBase<ChromeDriverService> {
+public class ChromeDriverReplaySettings
+		extends ReplaySettingsBase<ChromeDriverService> {
 
-    public ChromeDriverReplaySettings(String baseURI, RequestFilter requestFilter, ResponseFilter responseFilter) {
-        super(baseURI,
-                requestFilter,
-                responseFilter,
-                new InvisibleChromeDriverSupplier(),
-                new VisibleChromeDriverSupplier());
-    }
+	public ChromeDriverReplaySettings(String baseURI, RequestFilter requestFilter,
+			ResponseFilter responseFilter) {
+		super(baseURI, requestFilter, responseFilter,
+				new InvisibleChromeDriverSupplier(), new VisibleChromeDriverSupplier());
+	}
 
-    @Override
-    public ChromeDriverService getDriverService(String pathToDriverExecutable, String screenToUse) throws IOException {
-        return new ChromeDriverService.Builder()
-                .usingDriverExecutable(new File(pathToDriverExecutable))
-                .usingAnyFreePort()
-                .withEnvironment(ImmutableMap.of("DISPLAY", screenToUse))
-                .build();
-    }
+	@Override
+	public ChromeDriverService getDriverService(String pathToDriverExecutable,
+			String screenToUse) throws IOException {
+		return new ChromeDriverService.Builder()
+				.usingDriverExecutable(new File(pathToDriverExecutable))
+				.usingAnyFreePort()
+				.withEnvironment(ImmutableMap.of("DISPLAY", screenToUse)).build();
+	}
 
 }

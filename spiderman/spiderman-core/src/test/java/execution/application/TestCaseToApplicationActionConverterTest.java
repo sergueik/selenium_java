@@ -24,69 +24,87 @@ import static org.mockito.Mockito.when;
  */
 public class TestCaseToApplicationActionConverterTest {
 
-    @Test
-    public void canCreateCorrectAction() {
-        String actionType = "CLICK_CLASS_BY_TEXT";
-        String text = "text";
-        String ATP = "ATP";
-        String clickMegaMenu = "clickMegaMenu";
-        String megaMenuLink = "mega-menu-link";
-        String initialCollectorClass = "initialCollectorClass";
+	@Test
+	public void canCreateCorrectAction() {
+		String actionType = "CLICK_CLASS_BY_TEXT";
+		String text = "text";
+		String ATP = "ATP";
+		String clickMegaMenu = "clickMegaMenu";
+		String megaMenuLink = "mega-menu-link";
+		String initialCollectorClass = "initialCollectorClass";
 
-        Map<String, String> testCaseStep = new HashMap<>();
-        testCaseStep.put(text, ATP);
-        testCaseStep.put(EVENT, clickMegaMenu);
+		Map<String, String> testCaseStep = new HashMap<>();
+		testCaseStep.put(text, ATP);
+		testCaseStep.put(EVENT, clickMegaMenu);
 
-        Map<String, Object> tempMap = new HashMap<>();
-        tempMap.put(EVENT, clickMegaMenu);
-        tempMap.put(initialCollectorClass, megaMenuLink);
-        tempMap.put(EXPECTS_HTTP, false);
-        tempMap.put(text, ATP);
+		Map<String, Object> tempMap = new HashMap<>();
+		tempMap.put(EVENT, clickMegaMenu);
+		tempMap.put(initialCollectorClass, megaMenuLink);
+		tempMap.put(EXPECTS_HTTP, false);
+		tempMap.put(text, ATP);
 
-        ParameterConfiguration initialCollectorClassParameterConfiguration = mock(ParameterConfiguration.class);
-        when(initialCollectorClassParameterConfiguration.getParameterName()).thenReturn(initialCollectorClass);
-        when(initialCollectorClassParameterConfiguration.isExposed()).thenReturn(false);
-        when(initialCollectorClassParameterConfiguration.getValue()).thenReturn(megaMenuLink);
+		ParameterConfiguration initialCollectorClassParameterConfiguration = mock(
+				ParameterConfiguration.class);
+		when(initialCollectorClassParameterConfiguration.getParameterName())
+				.thenReturn(initialCollectorClass);
+		when(initialCollectorClassParameterConfiguration.isExposed())
+				.thenReturn(false);
+		when(initialCollectorClassParameterConfiguration.getValue())
+				.thenReturn(megaMenuLink);
 
-        ParameterConfiguration textParameterConfiguration = mock(ParameterConfiguration.class);
-        when(textParameterConfiguration.getParameterName()).thenReturn(text);
-        when(textParameterConfiguration.isExposed()).thenReturn(true);
-        when(textParameterConfiguration.getAlias()).thenReturn(text);
+		ParameterConfiguration textParameterConfiguration = mock(
+				ParameterConfiguration.class);
+		when(textParameterConfiguration.getParameterName()).thenReturn(text);
+		when(textParameterConfiguration.isExposed()).thenReturn(true);
+		when(textParameterConfiguration.getAlias()).thenReturn(text);
 
+		WebDriverAction webDriverAction = mock(WebDriverAction.class);
+		WebDriverActionFactory webDriverActionFactory = mock(
+				WebDriverActionFactory.class);
 
-        WebDriverAction webDriverAction = mock(WebDriverAction.class);
-        WebDriverActionFactory webDriverActionFactory = mock(WebDriverActionFactory.class);
+		when(webDriverActionFactory.create(actionType, tempMap))
+				.thenReturn(webDriverAction);
 
-        when(webDriverActionFactory.create(actionType, tempMap)).thenReturn(webDriverAction);
+		WebDriverActionConfiguration preconditionActionConfiguration = mock(
+				WebDriverActionConfiguration.class);
+		when(preconditionActionConfiguration.getWebDriverActionType())
+				.thenReturn(NOTHING);
 
-        WebDriverActionConfiguration preconditionActionConfiguration = mock(WebDriverActionConfiguration.class);
-        when(preconditionActionConfiguration.getWebDriverActionType()).thenReturn(NOTHING);
+		WebDriverActionConfiguration webDriverActionConfiguration = mock(
+				WebDriverActionConfiguration.class);
+		when(webDriverActionConfiguration.getWebDriverActionType())
+				.thenReturn(actionType);
+		Map<String, ParameterConfiguration> parameterConfigurationMap = new HashMap<>();
+		parameterConfigurationMap.put(initialCollectorClass,
+				initialCollectorClassParameterConfiguration);
+		parameterConfigurationMap.put(text, textParameterConfiguration);
+		when(webDriverActionConfiguration.getParametersConfiguration())
+				.thenReturn(parameterConfigurationMap);
 
-        WebDriverActionConfiguration webDriverActionConfiguration = mock(WebDriverActionConfiguration.class);
-        when(webDriverActionConfiguration.getWebDriverActionType()).thenReturn(actionType);
-        Map<String, ParameterConfiguration> parameterConfigurationMap = new HashMap<>();
-        parameterConfigurationMap.put(initialCollectorClass, initialCollectorClassParameterConfiguration);
-        parameterConfigurationMap.put(text, textParameterConfiguration);
-        when(webDriverActionConfiguration.getParametersConfiguration()).thenReturn(parameterConfigurationMap);
+		WebDriverActionConfiguration postconditionActionConfiguration = mock(
+				WebDriverActionConfiguration.class);
+		when(postconditionActionConfiguration.getWebDriverActionType())
+				.thenReturn(NOTHING);
 
-        WebDriverActionConfiguration postconditionActionConfiguration = mock(WebDriverActionConfiguration.class);
-        when(postconditionActionConfiguration.getWebDriverActionType()).thenReturn(NOTHING);
+		ApplicationActionConfiguration applicationActionConfiguration = mock(
+				ApplicationActionConfiguration.class);
+		when(applicationActionConfiguration.getConditionBeforeExecution())
+				.thenReturn(preconditionActionConfiguration);
+		when(applicationActionConfiguration.getWebDriverAction())
+				.thenReturn(webDriverActionConfiguration);
+		when(applicationActionConfiguration.getConditionAfterExecution())
+				.thenReturn(postconditionActionConfiguration);
+		when(applicationActionConfiguration.getName()).thenReturn(clickMegaMenu);
 
-        ApplicationActionConfiguration applicationActionConfiguration = mock(ApplicationActionConfiguration.class);
-        when(applicationActionConfiguration.getConditionBeforeExecution()).thenReturn(preconditionActionConfiguration);
-        when(applicationActionConfiguration.getWebDriverAction()).thenReturn(webDriverActionConfiguration);
-        when(applicationActionConfiguration.getConditionAfterExecution()).thenReturn(postconditionActionConfiguration);
-        when(applicationActionConfiguration.getName()).thenReturn(clickMegaMenu);
+		TestCaseToApplicationActionConverter testCaseToApplicationActionConverter = new TestCaseToApplicationActionConverter(
+				webDriverActionFactory);
 
-        TestCaseToApplicationActionConverter testCaseToApplicationActionConverter =
-                new TestCaseToApplicationActionConverter(webDriverActionFactory);
+		ApplicationAction applicationAction = testCaseToApplicationActionConverter
+				.convert(applicationActionConfiguration, testCaseStep);
 
-        ApplicationAction applicationAction =
-                testCaseToApplicationActionConverter.convert(applicationActionConfiguration, testCaseStep);
-
-        assertFalse(applicationAction.getPrecondition().isPresent());
-        assertFalse(applicationAction.getPostcondition().isPresent());
-        assertTrue(applicationAction.getWebdriverAction().isPresent());
-        assertEquals(webDriverAction, applicationAction.getWebdriverAction().get());
-    }
+		assertFalse(applicationAction.getPrecondition().isPresent());
+		assertFalse(applicationAction.getPostcondition().isPresent());
+		assertTrue(applicationAction.getWebdriverAction().isPresent());
+		assertEquals(webDriverAction, applicationAction.getWebdriverAction().get());
+	}
 }

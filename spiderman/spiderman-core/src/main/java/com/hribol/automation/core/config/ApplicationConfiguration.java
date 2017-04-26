@@ -7,35 +7,36 @@ import java.util.List;
  * Created by hvrigazov on 15.03.17.
  */
 public class ApplicationConfiguration {
-    private String applicationName;
-    private String version;
-    private List<ApplicationActionConfiguration> applicationActionConfigurationList;
+	private String applicationName;
+	private String version;
+	private List<ApplicationActionConfiguration> applicationActionConfigurationList;
 
-    public ApplicationConfiguration() {
-        this.applicationActionConfigurationList = new ArrayList<>();
-    }
+	public ApplicationConfiguration() {
+		this.applicationActionConfigurationList = new ArrayList<>();
+	}
 
-    public String getApplicationName() {
-        return applicationName;
-    }
+	public String getApplicationName() {
+		return applicationName;
+	}
 
-    public void setApplicationName(String applicationName) {
-        this.applicationName = applicationName;
-    }
+	public void setApplicationName(String applicationName) {
+		this.applicationName = applicationName;
+	}
 
-    public String getVersion() {
-        return version;
-    }
+	public String getVersion() {
+		return version;
+	}
 
-    public void setVersion(String version) {
-        this.version = version;
-    }
+	public void setVersion(String version) {
+		this.version = version;
+	}
 
-    public List<ApplicationActionConfiguration> getApplicationActionConfigurationList() {
-        return applicationActionConfigurationList;
-    }
+	public List<ApplicationActionConfiguration> getApplicationActionConfigurationList() {
+		return applicationActionConfigurationList;
+	}
 
-    public void addApplicationActionConfiguration(ApplicationActionConfiguration applicationActionConfiguration) {
-        this.applicationActionConfigurationList.add(applicationActionConfiguration);
-    }
+	public void addApplicationActionConfiguration(
+			ApplicationActionConfiguration applicationActionConfiguration) {
+		this.applicationActionConfigurationList.add(applicationActionConfiguration);
+	}
 }

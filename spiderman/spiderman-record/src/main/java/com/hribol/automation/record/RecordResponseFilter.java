@@ -14,19 +14,21 @@ import static com.hribol.automation.core.utils.Utils.isUrlChangingRequest;
  */
 public class RecordResponseFilter implements ResponseFilter {
 
-    private URI baseURI;
-    private String injectionCode;
+	private URI baseURI;
+	private String injectionCode;
 
-    public RecordResponseFilter(URI baseURI, String injectionCode) {
-        this.baseURI = baseURI;
-        this.injectionCode = injectionCode;
-    }
+	public RecordResponseFilter(URI baseURI, String injectionCode) {
+		this.baseURI = baseURI;
+		this.injectionCode = injectionCode;
+	}
 
-    @Override
-    public void filterResponse(HttpResponse httpResponse, HttpMessageContents httpMessageContents, HttpMessageInfo httpMessageInfo) {
-        if (isUrlChangingRequest(baseURI, httpMessageInfo.getOriginalRequest())) {
-            injectionCode += httpMessageContents.getTextContents();
-            httpMessageContents.setTextContents(injectionCode);
-        }
-    }
+	@Override
+	public void filterResponse(HttpResponse httpResponse,
+			HttpMessageContents httpMessageContents,
+			HttpMessageInfo httpMessageInfo) {
+		if (isUrlChangingRequest(baseURI, httpMessageInfo.getOriginalRequest())) {
+			injectionCode += httpMessageContents.getTextContents();
+			httpMessageContents.setTextContents(injectionCode);
+		}
+	}
 }

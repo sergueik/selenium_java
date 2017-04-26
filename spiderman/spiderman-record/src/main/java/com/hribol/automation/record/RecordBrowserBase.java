@@ -18,46 +18,50 @@ import java.util.Map;
  */
 public abstract class RecordBrowserBase {
 
-    private RecordSettings recordSettings;
-    private String pathToDriverExecutable;
-    private String pathToJsInjectonFile;
-    private int timeout;
+	private RecordSettings recordSettings;
+	private String pathToDriverExecutable;
+	private String pathToJsInjectonFile;
+	private int timeout;
 
-    protected JavascriptInjector javascriptInjector;
-    protected List<Map<String, String>> domainSpecificActionList;
+	protected JavascriptInjector javascriptInjector;
+	protected List<Map<String, String>> domainSpecificActionList;
 
-    public RecordBrowserBase(String pathToDriverExecutable, String pathToJsInjectionFile) {
-        this.pathToDriverExecutable = pathToDriverExecutable;
-        this.pathToJsInjectonFile = pathToJsInjectionFile;
-        this.domainSpecificActionList = new ArrayList<>();
-    }
+	public RecordBrowserBase(String pathToDriverExecutable,
+			String pathToJsInjectionFile) {
+		this.pathToDriverExecutable = pathToDriverExecutable;
+		this.pathToJsInjectonFile = pathToJsInjectionFile;
+		this.domainSpecificActionList = new ArrayList<>();
+	}
 
-    protected abstract RecordSettings createRecordSettings(URI baseURI);
-    protected abstract String getSystemProperty();
+	protected abstract RecordSettings createRecordSettings(URI baseURI);
 
-    protected RecordResponseFilter recordResponseFilter;
-    protected RecordRequestFilter recordRequestFilter;
+	protected abstract String getSystemProperty();
 
-    public void record(String baseURI) throws IOException, InterruptedException, URISyntaxException {
-        URI uri = new URI(baseURI);
-        this.javascriptInjector = new JavascriptInjector(pathToJsInjectonFile);
-        this.timeout = 15;
-        recordResponseFilter = new RecordResponseFilter(uri, javascriptInjector.getInjectionCode());
-        recordRequestFilter = new RecordRequestFilter(domainSpecificActionList);
-        this.recordSettings = createRecordSettings(uri);
-        System.setProperty(getSystemProperty(), pathToDriverExecutable);
-        recordSettings.prepareRecord(timeout);
-        recordSettings.openBaseUrl();
-    }
+	protected RecordResponseFilter recordResponseFilter;
+	protected RecordRequestFilter recordRequestFilter;
 
-    public void dumpActions(String outputFile) throws IOException {
-        Writer writer = new FileWriter(outputFile);
-        Gson gson = new GsonBuilder().create();
-        gson.toJson(domainSpecificActionList, writer);
-        writer.close();
-    }
+	public void record(String baseURI)
+			throws IOException, InterruptedException, URISyntaxException {
+		URI uri = new URI(baseURI);
+		this.javascriptInjector = new JavascriptInjector(pathToJsInjectonFile);
+		this.timeout = 15;
+		recordResponseFilter = new RecordResponseFilter(uri,
+				javascriptInjector.getInjectionCode());
+		recordRequestFilter = new RecordRequestFilter(domainSpecificActionList);
+		this.recordSettings = createRecordSettings(uri);
+		System.setProperty(getSystemProperty(), pathToDriverExecutable);
+		recordSettings.prepareRecord(timeout);
+		recordSettings.openBaseUrl();
+	}
 
-    public void cleanUp() {
-        recordSettings.cleanUpRecord();
-    }
+	public void dumpActions(String outputFile) throws IOException {
+		Writer writer = new FileWriter(outputFile);
+		Gson gson = new GsonBuilder().create();
+		gson.toJson(domainSpecificActionList, writer);
+		writer.close();
+	}
+
+	public void cleanUp() {
+		recordSettings.cleanUpRecord();
+	}
 }

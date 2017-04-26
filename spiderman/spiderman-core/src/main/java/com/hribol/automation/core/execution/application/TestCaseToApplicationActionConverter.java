@@ -20,61 +20,69 @@ import static com.hribol.automation.core.utils.Constants.NOTHING;
  */
 public class TestCaseToApplicationActionConverter {
 
-    private WebDriverActionFactory webDriverActionFactory;
+	private WebDriverActionFactory webDriverActionFactory;
 
-    public TestCaseToApplicationActionConverter(WebDriverActionFactory webDriverActionFactory) {
-        this.webDriverActionFactory = webDriverActionFactory;
-    }
+	public TestCaseToApplicationActionConverter(
+			WebDriverActionFactory webDriverActionFactory) {
+		this.webDriverActionFactory = webDriverActionFactory;
+	}
 
-    public ApplicationAction convert(ApplicationActionConfiguration applicationActionConfiguration,
-                                     Map<String, String> testCaseStep) {
-        Optional<WebDriverAction> precondition =
-                convertAction(applicationActionConfiguration.getConditionBeforeExecution(), testCaseStep);
-        Optional<WebDriverAction> webdriverAction =
-                convertAction(applicationActionConfiguration.getWebDriverAction(),
-                        testCaseStep,
-                        applicationActionConfiguration.expectsHttpRequest());
-        Optional<WebDriverAction> postCondition =
-                convertAction(applicationActionConfiguration.getConditionAfterExecution(), testCaseStep);
-        return new ConvertedApplicationAction(precondition, webdriverAction, postCondition);
-    }
+	public ApplicationAction convert(
+			ApplicationActionConfiguration applicationActionConfiguration,
+			Map<String, String> testCaseStep) {
+		Optional<WebDriverAction> precondition = convertAction(
+				applicationActionConfiguration.getConditionBeforeExecution(),
+				testCaseStep);
+		Optional<WebDriverAction> webdriverAction = convertAction(
+				applicationActionConfiguration.getWebDriverAction(), testCaseStep,
+				applicationActionConfiguration.expectsHttpRequest());
+		Optional<WebDriverAction> postCondition = convertAction(
+				applicationActionConfiguration.getConditionAfterExecution(),
+				testCaseStep);
+		return new ConvertedApplicationAction(precondition, webdriverAction,
+				postCondition);
+	}
 
-    private Optional<WebDriverAction> convertAction(WebDriverActionConfiguration webDriverActionConfiguration,
-                                                    Map<String, String> testCaseStep) {
-        return convertAction(webDriverActionConfiguration, testCaseStep, false);
-    }
+	private Optional<WebDriverAction> convertAction(
+			WebDriverActionConfiguration webDriverActionConfiguration,
+			Map<String, String> testCaseStep) {
+		return convertAction(webDriverActionConfiguration, testCaseStep, false);
+	}
 
-    private Optional<WebDriverAction> convertAction(WebDriverActionConfiguration webDriverActionConfiguration,
-                                                    Map<String, String> testCaseStep,
-                                                    boolean expectHttpRequest) {
-        String webdriverActionType = webDriverActionConfiguration.getWebDriverActionType();
-        if (webdriverActionType.equals(NOTHING)) {
-            return Optional.empty();
-        }
+	private Optional<WebDriverAction> convertAction(
+			WebDriverActionConfiguration webDriverActionConfiguration,
+			Map<String, String> testCaseStep, boolean expectHttpRequest) {
+		String webdriverActionType = webDriverActionConfiguration
+				.getWebDriverActionType();
+		if (webdriverActionType.equals(NOTHING)) {
+			return Optional.empty();
+		}
 
-        Map<String, ParameterConfiguration> parametersConfigurations = webDriverActionConfiguration
-                .getParametersConfiguration();
-        Map<String, Object> parameters = new HashMap<>();
+		Map<String, ParameterConfiguration> parametersConfigurations = webDriverActionConfiguration
+				.getParametersConfiguration();
+		Map<String, Object> parameters = new HashMap<>();
 
-        parameters.put(EVENT, testCaseStep.get(EVENT));
-        parameters.put(EXPECTS_HTTP, expectHttpRequest);
+		parameters.put(EVENT, testCaseStep.get(EVENT));
+		parameters.put(EXPECTS_HTTP, expectHttpRequest);
 
-        for (String parameterName: parametersConfigurations.keySet()) {
-            ParameterConfiguration parameterConfiguration = parametersConfigurations.get(parameterName);
+		for (String parameterName : parametersConfigurations.keySet()) {
+			ParameterConfiguration parameterConfiguration = parametersConfigurations
+					.get(parameterName);
 
-            if (parameterConfiguration.isExposed()) {
-                String alias = parameterConfiguration.getAlias();
-                String value = testCaseStep.get(alias);
-                parameters.put(alias, value);
-            } else {
-                String name = parameterConfiguration.getParameterName();
-                String value = parameterConfiguration.getValue();
-                parameters.put(name, value);
-            }
-        }
+			if (parameterConfiguration.isExposed()) {
+				String alias = parameterConfiguration.getAlias();
+				String value = testCaseStep.get(alias);
+				parameters.put(alias, value);
+			} else {
+				String name = parameterConfiguration.getParameterName();
+				String value = parameterConfiguration.getValue();
+				parameters.put(name, value);
+			}
+		}
 
-        WebDriverAction webDriverAction = webDriverActionFactory.create(webdriverActionType, parameters);
-        return Optional.of(webDriverAction);
-    }
+		WebDriverAction webDriverAction = webDriverActionFactory
+				.create(webdriverActionType, parameters);
+		return Optional.of(webDriverAction);
+	}
 
 }

@@ -12,32 +12,32 @@ import java.util.Set;
  * Created by hvrigazov on 22.04.17.
  */
 public class ReplayBaseFilter {
-    protected List<String> whiteListHttp;
-    protected String baseURI;
-    protected Set<HttpRequest> httpRequestQueue;
+	protected List<String> whiteListHttp;
+	protected String baseURI;
+	protected Set<HttpRequest> httpRequestQueue;
 
-    public ReplayBaseFilter(String baseURI, Set<HttpRequest> httpRequestQueue) throws URISyntaxException {
-        this.baseURI = baseURI;
-        this.httpRequestQueue = httpRequestQueue;
-        this.whiteListHttp = buildWhitelist();
-    }
+	public ReplayBaseFilter(String baseURI, Set<HttpRequest> httpRequestQueue)
+			throws URISyntaxException {
+		this.baseURI = baseURI;
+		this.httpRequestQueue = httpRequestQueue;
+		this.whiteListHttp = buildWhitelist();
+	}
 
+	protected boolean inWhiteList(String url) {
+		for (String whiteListedString : whiteListHttp) {
+			if (url.contains(whiteListedString)) {
+				return true;
+			}
+		}
 
-    protected boolean inWhiteList(String url) {
-        for (String whiteListedString: whiteListHttp) {
-            if (url.contains(whiteListedString)) {
-                return true;
-            }
-        }
+		return false;
+	}
 
-        return false;
-    }
-
-    private List<String> buildWhitelist() throws URISyntaxException {
-        List<String> whiteListHttp = new ArrayList<>();
-        whiteListHttp.add("localhost");
-        URI uri = new URI(baseURI);
-        whiteListHttp.add(uri.getHost());
-        return whiteListHttp;
-    }
+	private List<String> buildWhitelist() throws URISyntaxException {
+		List<String> whiteListHttp = new ArrayList<>();
+		whiteListHttp.add("localhost");
+		URI uri = new URI(baseURI);
+		whiteListHttp.add(uri.getHost());
+		return whiteListHttp;
+	}
 }

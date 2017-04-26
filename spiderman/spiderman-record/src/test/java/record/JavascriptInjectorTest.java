@@ -12,14 +12,16 @@ import static org.junit.Assert.assertTrue;
  */
 public class JavascriptInjectorTest {
 
-    @Test
-    public void jsInjectorProducesValidScriptTag() throws IOException {
-        String pathToJSInjectionFile = getClass().getResource("/eventsRecorder.js").getFile();
-        JavascriptInjector javascriptInjector = new JavascriptInjector(pathToJSInjectionFile);
+	@Test
+	public void jsInjectorProducesValidScriptTag() throws IOException {
+		String pathToJSInjectionFile = getClass().getResource("/eventsRecorder.js")
+				.getFile();
+		JavascriptInjector javascriptInjector = new JavascriptInjector(
+				pathToJSInjectionFile);
 
-        String outputJS = javascriptInjector.getInjectionCode();
+		String outputJS = javascriptInjector.getInjectionCode();
 
-        assertTrue(outputJS.startsWith("<script>"));
-        assertTrue(outputJS.endsWith("</script>"));
-    }
+		assertTrue(outputJS.startsWith("<script>"));
+		assertTrue(outputJS.endsWith("</script>"));
+	}
 }

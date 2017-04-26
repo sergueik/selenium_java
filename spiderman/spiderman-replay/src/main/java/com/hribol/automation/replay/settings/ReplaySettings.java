@@ -10,14 +10,16 @@ import java.io.IOException;
  * Created by hvrigazov on 21.03.17.
  */
 public interface ReplaySettings<T extends DriverService> {
-    T getDriverService(String pathToDriverExecutable, String screenToUse) throws IOException;
+	T getDriverService(String pathToDriverExecutable, String screenToUse)
+			throws IOException;
 
-    void cleanUpReplay();
+	void cleanUpReplay();
 
-    WebDriver getWebDriver();
+	WebDriver getWebDriver();
 
-    Har getHar();
+	Har getHar();
 
-    void prepareReplay(String pathToChromeDriver, String screenToUse, int timeout) throws IOException;
+	void prepareReplay(String pathToChromeDriver, String screenToUse, int timeout)
+			throws IOException;
 
 }

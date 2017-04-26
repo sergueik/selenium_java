@@ -12,21 +12,25 @@ import java.util.Set;
 /**
  * Created by hvrigazov on 22.04.17.
  */
-public class ReplayResponseFilter extends ReplayBaseFilter implements ResponseFilter {
+public class ReplayResponseFilter extends ReplayBaseFilter
+		implements ResponseFilter {
 
-    public ReplayResponseFilter(String baseURI, Set<HttpRequest> httpRequestQueue) throws URISyntaxException {
-        super(baseURI, httpRequestQueue);
-    }
+	public ReplayResponseFilter(String baseURI, Set<HttpRequest> httpRequestQueue)
+			throws URISyntaxException {
+		super(baseURI, httpRequestQueue);
+	}
 
-    @Override
-    public void filterResponse(HttpResponse httpResponse, HttpMessageContents httpMessageContents, HttpMessageInfo httpMessageInfo) {
-        HttpRequest httpRequest = httpMessageInfo.getOriginalRequest();
+	@Override
+	public void filterResponse(HttpResponse httpResponse,
+			HttpMessageContents httpMessageContents,
+			HttpMessageInfo httpMessageInfo) {
+		HttpRequest httpRequest = httpMessageInfo.getOriginalRequest();
 
-        if (!inWhiteList(httpRequest.getUri())) {
-            return;
-        }
+		if (!inWhiteList(httpRequest.getUri())) {
+			return;
+		}
 
-        System.out.println("Remove request " + httpRequest.getUri());
-        this.httpRequestQueue.remove(httpMessageInfo.getOriginalRequest());
-    }
+		System.out.println("Remove request " + httpRequest.getUri());
+		this.httpRequestQueue.remove(httpMessageInfo.getOriginalRequest());
+	}
 }

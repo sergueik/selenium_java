@@ -12,27 +12,30 @@ import java.util.Set;
 /**
  * Created by hvrigazov on 22.04.17.
  */
-public class ReplayRequestFilter extends ReplayBaseFilter implements RequestFilter {
-    private LockManagement lockManagement;
+public class ReplayRequestFilter extends ReplayBaseFilter
+		implements RequestFilter {
+	private LockManagement lockManagement;
 
-    public ReplayRequestFilter(LockManagement lockManagement, String baseURI, Set<HttpRequest> httpRequestQueue) throws URISyntaxException {
-        super(baseURI, httpRequestQueue);
-        this.lockManagement = lockManagement;
-    }
+	public ReplayRequestFilter(LockManagement lockManagement, String baseURI,
+			Set<HttpRequest> httpRequestQueue) throws URISyntaxException {
+		super(baseURI, httpRequestQueue);
+		this.lockManagement = lockManagement;
+	}
 
+	@Override
+	public HttpResponse filterRequest(HttpRequest httpRequest,
+			HttpMessageContents httpMessageContents,
+			HttpMessageInfo httpMessageInfo) {
+		addHttpRequestToQueue(httpMessageInfo.getOriginalRequest());
+		lockManagement.setLock(false);
+		return null;
+	}
 
-    @Override
-    public HttpResponse filterRequest(HttpRequest httpRequest, HttpMessageContents httpMessageContents, HttpMessageInfo httpMessageInfo) {
-        addHttpRequestToQueue(httpMessageInfo.getOriginalRequest());
-        lockManagement.setLock(false);
-        return null;
-    }
-
-    private void addHttpRequestToQueue(HttpRequest httpRequest) {
-        if (!inWhiteList(httpRequest.getUri())) {
-            return;
-        }
-        System.out.println("Add request " + httpRequest.getUri());
-        this.httpRequestQueue.add(httpRequest);
-    }
+	private void addHttpRequestToQueue(HttpRequest httpRequest) {
+		if (!inWhiteList(httpRequest.getUri())) {
+			return;
+		}
+		System.out.println("Add request " + httpRequest.getUri());
+		this.httpRequestQueue.add(httpRequest);
+	}
 }

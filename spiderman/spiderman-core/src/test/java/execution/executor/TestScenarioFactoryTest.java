@@ -23,30 +23,37 @@ import static org.mockito.Mockito.when;
  */
 public class TestScenarioFactoryTest {
 
-    @Test
-    public void canCreateScenarioFromFile() throws IOException {
-        String pathToTestCase = getClass().getResource("/testCase.json").getFile();
+	@Test
+	public void canCreateScenarioFromFile() throws IOException {
+		String pathToTestCase = getClass().getResource("/testCase.json").getFile();
 
-        WebDriverAction pageLoadingWebDriverAction = mock(WebDriverAction.class);
-        ApplicationAction initialPageLoading = mock(ApplicationAction.class);
-        when(initialPageLoading.getWebdriverAction()).thenReturn(Optional.of(pageLoadingWebDriverAction));
-        ApplicationActionFactory applicationActionFactory = mock(ApplicationActionFactory.class);
-        when(applicationActionFactory.getInitialPageLoading()).thenReturn(initialPageLoading);
+		WebDriverAction pageLoadingWebDriverAction = mock(WebDriverAction.class);
+		ApplicationAction initialPageLoading = mock(ApplicationAction.class);
+		when(initialPageLoading.getWebdriverAction())
+				.thenReturn(Optional.of(pageLoadingWebDriverAction));
+		ApplicationActionFactory applicationActionFactory = mock(
+				ApplicationActionFactory.class);
+		when(applicationActionFactory.getInitialPageLoading())
+				.thenReturn(initialPageLoading);
 
-        List<Map<String, String>> testCaseSteps = ConfigurationUtils.readSteps(pathToTestCase);
+		List<Map<String, String>> testCaseSteps = ConfigurationUtils
+				.readSteps(pathToTestCase);
 
-        for (Map<String, String> testCaseStep: testCaseSteps) {
-            ApplicationAction domainSpecificAction = mock(ApplicationAction.class);
-            String something = "something";
-            WebDriverAction webDriverAction = mock(WebDriverAction.class);
-            when(webDriverAction.getName()).thenReturn(something);
-            when(domainSpecificAction.getWebdriverAction()).thenReturn(Optional.of(webDriverAction));
-            when(applicationActionFactory.create(testCaseStep)).thenReturn(domainSpecificAction);
-        }
+		for (Map<String, String> testCaseStep : testCaseSteps) {
+			ApplicationAction domainSpecificAction = mock(ApplicationAction.class);
+			String something = "something";
+			WebDriverAction webDriverAction = mock(WebDriverAction.class);
+			when(webDriverAction.getName()).thenReturn(something);
+			when(domainSpecificAction.getWebdriverAction())
+					.thenReturn(Optional.of(webDriverAction));
+			when(applicationActionFactory.create(testCaseStep))
+					.thenReturn(domainSpecificAction);
+		}
 
-        TestScenarioFactory testScenarioFactory = new TestScenarioFactoryImpl();
-        TestScenario testScenario = testScenarioFactory.createFromFile(applicationActionFactory, pathToTestCase);
+		TestScenarioFactory testScenarioFactory = new TestScenarioFactoryImpl();
+		TestScenario testScenario = testScenarioFactory
+				.createFromFile(applicationActionFactory, pathToTestCase);
 
-        assertEquals(testCaseSteps.size() + 1, testScenario.getActions().size());
-    }
+		assertEquals(testCaseSteps.size() + 1, testScenario.getActions().size());
+	}
 }

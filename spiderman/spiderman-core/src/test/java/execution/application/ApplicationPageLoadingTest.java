@@ -12,14 +12,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class ApplicationPageLoadingTest {
 
-    @Test
-    public void applicationPageLoadingHasNoPreconditionAndPostConditionButHasAction() {
-        String url = "http://tenniskafe.com";
-        String name = "eventName";
-        ApplicationAction applicationPageLoading = new ApplicationPageLoading(url, name);
+	@Test
+	public void applicationPageLoadingHasNoPreconditionAndPostConditionButHasAction() {
+		String url = "http://tenniskafe.com";
+		String name = "eventName";
+		ApplicationAction applicationPageLoading = new ApplicationPageLoading(url,
+				name);
 
-        assertFalse(applicationPageLoading.getPrecondition().isPresent());
-        assertTrue(applicationPageLoading.getWebdriverAction().isPresent());
-        assertFalse(applicationPageLoading.getPostcondition().isPresent());
-    }
+		assertFalse(applicationPageLoading.getPrecondition().isPresent());
+		assertTrue(applicationPageLoading.getWebdriverAction().isPresent());
+		assertFalse(applicationPageLoading.getPostcondition().isPresent());
+	}
 }

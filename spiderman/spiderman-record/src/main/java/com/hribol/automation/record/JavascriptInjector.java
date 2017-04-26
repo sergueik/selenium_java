@@ -11,21 +11,21 @@ import java.io.IOException;
  */
 public class JavascriptInjector {
 
-    private String injectionCode;
+	private String injectionCode;
 
-    public JavascriptInjector(String pathToJsInjectionFile) throws IOException {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("<script>");
-        stringBuilder.append("(function() {").append(System.lineSeparator());
-        stringBuilder.append(Files.toString(new File(pathToJsInjectionFile), Charsets.UTF_8));
-        stringBuilder
-                .append(System.lineSeparator()).append("})();")
-                .append("</script>");
+	public JavascriptInjector(String pathToJsInjectionFile) throws IOException {
+		StringBuilder stringBuilder = new StringBuilder();
+		stringBuilder.append("<script>");
+		stringBuilder.append("(function() {").append(System.lineSeparator());
+		stringBuilder.append(
+				Files.toString(new File(pathToJsInjectionFile), Charsets.UTF_8));
+		stringBuilder.append(System.lineSeparator()).append("})();")
+				.append("</script>");
 
-        this.injectionCode = stringBuilder.toString();
-    }
+		this.injectionCode = stringBuilder.toString();
+	}
 
-    public String getInjectionCode() {
-        return injectionCode;
-    }
+	public String getInjectionCode() {
+		return injectionCode;
+	}
 }

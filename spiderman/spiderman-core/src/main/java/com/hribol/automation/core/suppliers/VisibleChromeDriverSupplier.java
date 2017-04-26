@@ -9,8 +9,8 @@ import org.openqa.selenium.remote.DesiredCapabilities;
  */
 public class VisibleChromeDriverSupplier implements VisibleWebDriverSupplier {
 
-    @Override
-    public WebDriver get(DesiredCapabilities desiredCapabilities) {
-        return new ChromeDriver(desiredCapabilities);
-    }
+	@Override
+	public WebDriver get(DesiredCapabilities desiredCapabilities) {
+		return new ChromeDriver(desiredCapabilities);
+	}
 }

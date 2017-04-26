@@ -21,51 +21,54 @@ import static org.mockito.Mockito.when;
  */
 public class ClickClassByTextTest {
 
-    @Test
-    public void canClickIfThereIsSuitableElement() {
-        String initialCollectorClass = "mega-menu-click";
-        String text = "ATP";
-        String eventName = "clickMegaMenu";
-        boolean expectsHttp = true;
+	@Test
+	public void canClickIfThereIsSuitableElement() {
+		String initialCollectorClass = "mega-menu-click";
+		String text = "ATP";
+		String eventName = "clickMegaMenu";
+		boolean expectsHttp = true;
 
-        WebElement correctWebElement = mock(WebElement.class);
-        when(correctWebElement.getAttribute(INNER_HTML)).thenReturn("  ATP ");
-        when(correctWebElement.isDisplayed()).thenReturn(true);
+		WebElement correctWebElement = mock(WebElement.class);
+		when(correctWebElement.getAttribute(INNER_HTML)).thenReturn("  ATP ");
+		when(correctWebElement.isDisplayed()).thenReturn(true);
 
-        WebElement incorrectWebElement = mock(WebElement.class);
-        when(incorrectWebElement.getAttribute(INNER_HTML)).thenReturn("sometATPhing");
-        when(incorrectWebElement.isDisplayed()).thenReturn(true);
+		WebElement incorrectWebElement = mock(WebElement.class);
+		when(incorrectWebElement.getAttribute(INNER_HTML))
+				.thenReturn("sometATPhing");
+		when(incorrectWebElement.isDisplayed()).thenReturn(true);
 
-        List<WebElement> webElements = new ArrayList<>();
-        webElements.add(correctWebElement);
-        webElements.add(incorrectWebElement);
+		List<WebElement> webElements = new ArrayList<>();
+		webElements.add(correctWebElement);
+		webElements.add(incorrectWebElement);
 
-        By elementsLocator = By.className(initialCollectorClass);
-        WebDriver webDriver = mock(WebDriver.class);
-        when(webDriver.findElements(elementsLocator)).thenReturn(webElements);
+		By elementsLocator = By.className(initialCollectorClass);
+		WebDriver webDriver = mock(WebDriver.class);
+		when(webDriver.findElements(elementsLocator)).thenReturn(webElements);
 
-        ClickClassByText clickClassByText = new ClickClassByText(initialCollectorClass, text, eventName, expectsHttp);
-        clickClassByText.execute(webDriver);
-    }
+		ClickClassByText clickClassByText = new ClickClassByText(
+				initialCollectorClass, text, eventName, expectsHttp);
+		clickClassByText.execute(webDriver);
+	}
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void throwsExceptionIfNoElementsAreFound() {
-        String initialCollectorClass = "mega-menu-click";
-        String text = "ATP";
-        String eventName = "clickMegaMenu";
-        boolean expectsHttp = true;
+	@Test
+	public void throwsExceptionIfNoElementsAreFound() {
+		String initialCollectorClass = "mega-menu-click";
+		String text = "ATP";
+		String eventName = "clickMegaMenu";
+		boolean expectsHttp = true;
 
-        List<WebElement> webElements = new ArrayList<>();
+		List<WebElement> webElements = new ArrayList<>();
 
-        By elementsLocator = By.className(initialCollectorClass);
-        WebDriver webDriver = mock(WebDriver.class);
-        when(webDriver.findElements(elementsLocator)).thenReturn(webElements);
+		By elementsLocator = By.className(initialCollectorClass);
+		WebDriver webDriver = mock(WebDriver.class);
+		when(webDriver.findElements(elementsLocator)).thenReturn(webElements);
 
-        ClickClassByText clickClassByText = new ClickClassByText(initialCollectorClass, text, eventName, expectsHttp);
-        thrown.expect(ElementNotSelectableException.class);
-        clickClassByText.execute(webDriver);
-    }
+		ClickClassByText clickClassByText = new ClickClassByText(
+				initialCollectorClass, text, eventName, expectsHttp);
+		thrown.expect(ElementNotSelectableException.class);
+		clickClassByText.execute(webDriver);
+	}
 }

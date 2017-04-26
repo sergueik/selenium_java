@@ -16,30 +16,26 @@ import static org.junit.Assert.assertNotNull;
  */
 public class ReplayBrowserConfigurationTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-    @Test
-    public void canCreateConfigurationFromBuilder() throws IOException {
-        WebDriverActionFactory webDriverActionFactory = new PredefinedWebDriverActionFactory();
-        String url = "http://tenniskafe.com";
-        String filename = getClass().getResource("/tenniskafe.json").getFile();
+	@Test
+	public void canCreateConfigurationFromBuilder() throws IOException {
+		WebDriverActionFactory webDriverActionFactory = new PredefinedWebDriverActionFactory();
+		String url = "http://tenniskafe.com";
+		String filename = getClass().getResource("/tenniskafe.json").getFile();
 
-        ReplayBrowserConfiguration replayBrowserConfiguration = ReplayBrowserConfiguration
-                .builder()
-                .url(url)
-                .pathToApplicationConfiguration(filename)
-                .webdriverActionFactory(webDriverActionFactory)
-                .build();
+		ReplayBrowserConfiguration replayBrowserConfiguration = ReplayBrowserConfiguration
+				.builder().url(url).pathToApplicationConfiguration(filename)
+				.webdriverActionFactory(webDriverActionFactory).build();
 
-        assertNotNull(replayBrowserConfiguration.getReplayBrowser());
-    }
+		assertNotNull(replayBrowserConfiguration.getReplayBrowser());
+	}
 
-    @Test
-    public void throwsExceptionIfRequiredParameterIsMissing() throws IOException {
-        thrown.expect(NullPointerException.class);
-        ReplayBrowserConfiguration replayBrowserConfiguration = ReplayBrowserConfiguration
-                .builder()
-                .build();
-    }
+	@Test
+	public void throwsExceptionIfRequiredParameterIsMissing() throws IOException {
+		thrown.expect(NullPointerException.class);
+		ReplayBrowserConfiguration replayBrowserConfiguration = ReplayBrowserConfiguration
+				.builder().build();
+	}
 }
