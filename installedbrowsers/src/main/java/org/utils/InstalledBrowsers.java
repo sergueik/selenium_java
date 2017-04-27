@@ -96,6 +96,10 @@ public final class InstalledBrowsers {
 		}
 	}
 
+  // https://java-native-access.github.io/jna/4.2.0/com/sun/jna/platform/win32/package-summary.html
+  // https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/Version.java
+  // https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/VersionUtil.java
+  // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381058(v=vs.85).aspx
 	@SuppressWarnings("unused")
 	private static int[] getVersionInfo(String path) {
 		if (installedBrowsers == null) {
