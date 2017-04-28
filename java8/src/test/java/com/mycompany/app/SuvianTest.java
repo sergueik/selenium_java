@@ -123,7 +123,7 @@ public class SuvianTest {
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+			HashMap<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
@@ -131,18 +131,22 @@ public class SuvianTest {
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
 			options.setExperimentalOption("prefs", chromePrefs);
-			options.addArguments("allow-running-insecure-content");
-			options.addArguments("allow-insecure-localhost");
-			options.addArguments("enable-local-file-accesses");
-			options.addArguments("disable-notifications");
-			// options.addArguments("start-maximized");
-			options.addArguments("browser.download.folderList=2");
-			options.addArguments(
-					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
-			options.addArguments("browser.download.dir=" + downloadFilepath);
-			// options.addArguments("user-data-dir=/path/to/your/custom/profile");
+
+			for (String optionAgrument : (new String[] {
+					"allow-running-insecure-content", "allow-insecure-localhost",
+					"enable-local-file-accesses", "disable-notifications",
+					/* "start-maximized" , */
+					"browser.download.folderList=2",
+					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
+					String.format("browser.download.dir=%s", downloadFilepath)
+					/* "user-data-dir=/path/to/your/custom/profile"  , */
+			})) {
+				options.addArguments(optionAgrument);
+			}
+
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+
 			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			driver = new ChromeDriver(capabilities);
@@ -344,7 +348,7 @@ public class SuvianTest {
 					while (i.hasNext()) {
 						WebElement e = (WebElement) i.next();
 						String t = e.getText();
-						System.err.println("in apply iterator (2): Text = " + t);
+						// System.err.println("in apply iterator (2): Text = " + t);
 						Matcher matcher = pattern.matcher(t);
 						if (matcher.find()) {
 							result = e;
@@ -465,6 +469,7 @@ public class SuvianTest {
 			element = wait.until(new ExpectedCondition<WebElement>() {
 				@Override
 				public WebElement apply(WebDriver _driver) {
+					int cnt = 4;
 					String[] xpaths = new String[] { "//a[text() = '%s']",
 							"//a[normalize-space(.) = '%s']",
 							"//a[normalize-space(text()) = '%s']",
@@ -472,7 +477,7 @@ public class SuvianTest {
 							"//a[contains(normalize-space(.), '%s')]",
 							// NOTE: way too permissive for a selector
 							"//*[contains(normalize-space(.), '%s')]" };
-					String xpath = String.format(xpaths[4], elementText);
+					String xpath = String.format(xpaths[cnt], elementText);
 					System.err.println("Locator: xpath " + xpath);
 					Optional<WebElement> _element = _driver.findElements(By.xpath(xpath))
 							.stream().filter(o -> {
@@ -594,9 +599,9 @@ public class SuvianTest {
 		String checkboxValue = null;
 		if (matcher.find()) {
 			checkboxValue = matcher.group(1);
-			System.err.println("checkox value = " + checkboxValue);
+			System.err.println("checkbox value = " + checkboxValue);
 		} else {
-			System.err.println("checkox value not found");
+			System.err.println("checkbox value not found");
 		}
 		WebElement checkBoxElement = null;
 		if (checkboxValue != null) {
@@ -633,9 +638,9 @@ public class SuvianTest {
 		String checkboxValue = null;
 		if (matcher.find()) {
 			checkboxValue = matcher.group(1);
-			System.err.println("checkox value = " + checkboxValue);
+			System.err.println("checkbox value = " + checkboxValue);
 		} else {
-			System.err.println("checkox value not found");
+			System.err.println("checkbox value not found");
 		}
 		WebElement checkBoxElement = null;
 		if (checkboxValue != null) {
@@ -658,7 +663,7 @@ public class SuvianTest {
 	@Test(enabled = false)
 	public void test6_1() {
 		// Arrange
-		ArrayList<String> hobbies = new ArrayList<String>(
+		ArrayList<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		try {
@@ -688,9 +693,10 @@ public class SuvianTest {
 				.findElements(By.cssSelector("label[for]")).stream()
 				.filter(o -> hobbies.contains(o.getText()))
 				.collect(Collectors.toList());
-		Map<String, String> inputIds = inputElements.stream().collect(
+    // C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x => x.Text);
+		Map<String, String> dataMap = inputElements.stream().collect(
 				Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
-		ArrayList<WebElement> checkboxes = new ArrayList<WebElement>();
+		ArrayList<WebElement> checkboxes = new ArrayList<>();
 		for (String hobby : hobbies) {
 			try {
 				System.err.println("finding: " + inputIds.get(hobby));
@@ -703,7 +709,7 @@ public class SuvianTest {
 			try {
 				checkboxes.add(formElement.findElement(
 						// will not throw exception
-						By.xpath(String.format("input[@id='%s']", inputIds.get(hobby)))));
+						By.xpath(String.format("input[@id='%s']", dataMap.get(hobby)))));
 			} catch (Exception e) {
 				System.err.println("ignored: " + e.toString());
 			}
@@ -730,7 +736,7 @@ public class SuvianTest {
 	@Test(enabled = false)
 	public void test6_2() {
 		// Arrange
-		ArrayList<String> hobbies = new ArrayList<String>(
+		ArrayList<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
@@ -778,7 +784,7 @@ public class SuvianTest {
 	public void test6_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
-		ArrayList<String> hobbies = new ArrayList<String>(
+		ArrayList<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		WebElement checkElement = null;
 		try {
