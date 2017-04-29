@@ -1,4 +1,5 @@
 package com.mycompany.app;
+package com.mycompany.app;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -263,6 +264,7 @@ public class SuvianTest {
 		// http://www.nurkiewicz.com/2013/08/optional-in-java-8-cheat-sheet.html
 		try {
 			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+
 				@Override
 				public WebElement apply(WebDriver d) {
 					Optional<WebElement> e = d
@@ -278,7 +280,9 @@ public class SuvianTest {
 			});
 			System.err
 					.println("element check: " + checkElement.getAttribute("innerHTML"));
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
 
@@ -1013,7 +1017,8 @@ public class SuvianTest {
 		}
 	}
 
-  // This test appears to find the button even though it is inside iframe without frame switch
+	// This test appears to find the button even though it is inside iframe
+	// without frame switch
 	@Test(enabled = false)
 	public void test13_1() {
 		// Arrange
@@ -1025,7 +1030,6 @@ public class SuvianTest {
 		// Act
 		WebElement buttonElement = wait.until(ExpectedConditions
 				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
-
 
 		assertThat(buttonElement, notNullValue());
 		// Assert
@@ -1063,7 +1067,7 @@ public class SuvianTest {
 		}
 	}
 
-  // This test does switch frame fefore find the button in the iframed document
+	// This test does switch frame fefore find the button in the iframed document
 	@Test(enabled = false)
 	public void test13_2() {
 		// Arrange
@@ -1097,8 +1101,8 @@ public class SuvianTest {
 				? pageSource.substring(0, 80) + "..." : pageSource));
 
 		// Act
-		WebElement buttonElement = wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("h3 button[onclick = 'myFunction()']"))));
+		WebElement buttonElement = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector("h3 button[onclick = 'myFunction()']"))));
 
 		assertThat(buttonElement, notNullValue());
 		buttonElement.click();
@@ -1119,7 +1123,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test13_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.3frame.html");
@@ -1128,7 +1132,8 @@ public class SuvianTest {
 				By.cssSelector(".container .row .intro-message iframe")));
 
 		// Act
-		WebElement buttonElement = driver.findElement(By.xpath("//button[@onclick = 'myFunction()']"));
+		WebElement buttonElement = driver
+				.findElement(By.xpath("//button[@onclick = 'myFunction()']"));
 		assertThat(buttonElement, notNullValue());
 		// Assert
 
@@ -1171,8 +1176,8 @@ public class SuvianTest {
 
 	}
 
-  // https://docs.google.com/a/jazzteam.org/document/d/1PdfKMDfoqFIlF4tN1jKrOf1iZ1rqESy2xVMIj3uuV3g/pub#h.qkrwckq52qpd
-  
+	// https://docs.google.com/a/jazzteam.org/document/d/1PdfKMDfoqFIlF4tN1jKrOf1iZ1rqESy2xVMIj3uuV3g/pub#h.qkrwckq52qpd
+
 	// http://sqa.stackexchange.com/questions/14247/how-can-i-get-the-value-of-the-tooltip
 	@Test(enabled = false)
 	public void test14_2() {
@@ -1731,6 +1736,7 @@ public class SuvianTest {
 	}
 
 	// Few failing attempts. Warning: Timing out with Firefox
+
 	// Attempt #1
 	@Test(enabled = false)
 	public void test20_1() {
@@ -1901,6 +1907,95 @@ public class SuvianTest {
 
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
+	}
+
+	// https://github.com/tourdedave/elemental-selenium-tips
+	@Test(enabled = false)
+	public void test20_6() {
+		// Arrange
+		driver.get("http://the-internet.herokuapp.com/drag_and_drop");
+
+		WebElement draggableElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#column-a"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(), containsString("A"));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#column-b"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("B"));
+
+		// Act
+		String dragDropScript = String.format(
+				"%s\n$('#column-a').simulateDragDrop({ dropTarget: '#column-b'});",
+				getScriptContent("dnd.js"));
+		((JavascriptExecutor) driver).executeScript(dragDropScript);
+
+		// Assert
+		assertThat(dropElement.getText(),
+				containsString("B"));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+	}
+
+	@Test(enabled = true)
+	public void test20_7() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#div1"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
+		String dragDropScript = String.format(
+				"%s\n$('#drag1').simulateDragDrop({ dropTarget: '#div1'});",
+				getScriptContent("dnd.js"));
+		// System.err.println(dragDropScript);
+
+		((JavascriptExecutor) driver).executeScript(dragDropScript);
+
+		// Assert
+		assertThat(dropElement.getText(),
+				containsString("This is a draggable text."));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+	}
+
+	@Test(enabled = true)
+	public void test20_8() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#div1"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
+		String dragDropScript = String.format("%s\n%s", getScriptContent("dnd.js"),
+				"var dragElememt = $(arguments[0]); var dropTargetSelector = arguments[1]; dragElememt.simulateDragDrop({ dropTarget: dropTargetSelector});");
+		// System.err.println(dragDropScript);
+
+		((JavascriptExecutor) driver).executeScript(dragDropScript,
+				String.format("#%s", draggableElement.getAttribute("id")),
+				String.format("#%s", dropElement.getAttribute("id")));
+
+		// Assert
+		assertThat(dropElement.getText(),
+				containsString("This is a draggable text."));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
 	// NOTE: this test is failing
