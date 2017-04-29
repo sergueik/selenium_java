@@ -1,5 +1,4 @@
 package com.mycompany.app;
-package com.mycompany.app;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1932,8 +1931,7 @@ public class SuvianTest {
 		((JavascriptExecutor) driver).executeScript(dragDropScript);
 
 		// Assert
-		assertThat(dropElement.getText(),
-				containsString("B"));
+		assertThat(dropElement.getText(), containsString("B"));
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
@@ -2442,7 +2440,71 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = false)
+	// https://docs.google.com/a/jazzteam.org/document/d/1PdfKMDfoqFIlF4tN1jKrOf1iZ1rqESy2xVMIj3uuV3g/pub
+	@Test(enabled = true)
+	public void test27_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
+
+		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
+		assertThat(itemList, notNullValue());
+		// Act
+		WebElement inputElement = itemList
+				.findElements(By.xpath(
+						"li[contains(text(), 'India')]//input[@type='radio'][@name='country']"))
+				.stream()
+				.filter(o -> o.findElement(By.xpath("..")).getText()
+						.contains((CharSequence) "India"))
+				.findFirst().orElseThrow(RuntimeException::new);
+		inputElement.click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		Optional<WebElement> result = driver.findElements(By.tagName("input"))
+				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
+				.filter(o -> o.getAttribute("checked") != null).findFirst();
+		WebElement checkedRadioButton = (result.isPresent()) ? result.get() : null;
+		assertThat(checkedRadioButton, notNullValue());
+		System.err.println(String.format("Value : %s\tChecked: %s",
+				checkedRadioButton.getAttribute("value"),
+				checkedRadioButton.getAttribute("checked")));
+	}
+
+	@Test(enabled = true)
+	public void test27_4() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
+
+		// Act
+		WebElement inputElement = driver
+				.findElements(By.xpath(
+						"//li[contains(text(), 'India')]//input[@type='radio'][@name='country']"))
+				.stream()
+				.filter(o -> o.findElement(By.xpath("..")).getText()
+						.contains((CharSequence) "India"))
+				.findFirst().orElseThrow(RuntimeException::new);
+		inputElement.click();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		Optional<WebElement> result = driver.findElements(By.tagName("input"))
+				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
+				.filter(o -> o.findElement(By.xpath("..")).getText()
+						.contains((CharSequence) "India"))
+				.filter(o -> o.getAttribute("checked") != null).findFirst();
+		WebElement checkedRadioButton = (result.isPresent()) ? result.get() : null;
+		assertThat(checkedRadioButton, notNullValue());
+		System.err.println(String.format("Value : %s\tChecked: %s",
+				checkedRadioButton.getAttribute("value"),
+				checkedRadioButton.getAttribute("checked")));
+	}
+
+  @Test(enabled = false)
 	public void test30() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
