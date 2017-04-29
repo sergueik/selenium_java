@@ -103,7 +103,7 @@ public class SuvianTest {
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static String defaultScript = null;
-	private static final String browser = "firefox";
+	private static final String browser = "chrome";
 	private static String osName;
 
 	public static String getOsName() {
@@ -458,7 +458,7 @@ public class SuvianTest {
 	}
 
 	// http://software-testing.ru/forum/index.php?/topic/17746-podskazhite-po-xpath/
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test0_8() {
 
 		// Arrange
@@ -693,16 +693,17 @@ public class SuvianTest {
 				.findElements(By.cssSelector("label[for]")).stream()
 				.filter(o -> hobbies.contains(o.getText()))
 				.collect(Collectors.toList());
-    // C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x => x.Text);
+		// C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x =>
+		// x.Text);
 		Map<String, String> dataMap = inputElements.stream().collect(
 				Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
 		ArrayList<WebElement> checkboxes = new ArrayList<>();
 		for (String hobby : hobbies) {
 			try {
-				System.err.println("finding: " + inputIds.get(hobby));
+				System.err.println("finding: " + dataMap.get(hobby));
 				checkboxes.add(formElement.findElement(
 						// will throw exception
-						By.cssSelector(String.format("input#%s", inputIds.get(hobby)))));
+						By.cssSelector(String.format("input#%s", dataMap.get(hobby)))));
 			} catch (InvalidSelectorException e) {
 				System.err.println("ignored: " + e.toString());
 			}
@@ -1012,6 +1013,7 @@ public class SuvianTest {
 		}
 	}
 
+  // This test appears to find the button even though it is inside iframe without frame switch
 	@Test(enabled = false)
 	public void test13_1() {
 		// Arrange
@@ -1024,12 +1026,34 @@ public class SuvianTest {
 		WebElement buttonElement = wait.until(ExpectedConditions
 				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
 
+
 		assertThat(buttonElement, notNullValue());
+		// Assert
+
+		WebElement currentElement = buttonElement;
+		for (int cnt = 0; cnt != 4; cnt++) {
+			try {
+				WebElement containerElement = currentElement
+						.findElement(By.xpath(".."));
+				String elementHTML = containerElement.getAttribute("outerHTML");
+				System.err.println("Parent element: " + (elementHTML.length() > 120
+						? elementHTML.substring(0, 120) + "..." : elementHTML));
+				currentElement = containerElement;
+			} catch (InvalidSelectorException e) {
+				// InvalidSelectorError: The result of the xpath expression ".." is:
+				// [object HTMLDocument]. It should be an element.
+				// ignore - reached top level
+				break;
+			}
+		}
 		buttonElement.click();
 		// Assert
 		try {
+			alert = driver.switchTo().alert();
+			String alertText = alert.getText();
+			assertTrue(alertText.contains("You clicked a button within a frame"));
 			// confirm alert
-			driver.switchTo().alert().accept();
+			alert.accept();
 		} catch (NoAlertPresentException e) {
 			// Alert not present - ignore
 		} catch (WebDriverException e) {
@@ -1039,6 +1063,7 @@ public class SuvianTest {
 		}
 	}
 
+  // This test does switch frame fefore find the button in the iframed document
 	@Test(enabled = false)
 	public void test13_2() {
 		// Arrange
@@ -1048,17 +1073,73 @@ public class SuvianTest {
 				.until(ExpectedConditions.visibilityOfElementLocated(
 						By.cssSelector(".container .row .intro-message iframe")));
 		assertThat(frameElement, notNullValue());
+		String frameElementDocument = frameElement.getAttribute("outerHTML");
+
+		System.err
+				.println("Switching to frame:\n" + (frameElementDocument.length() > 80
+						? frameElementDocument.substring(0, 80) + "..."
+						: frameElementDocument));
+
 		driver.switchTo().frame(frameElement);
+		System.err.println("Inside the frame");
+		try {
+			frameElement.getTagName();
+		} catch (org.openqa.selenium.StaleElementReferenceException e) {
+			// Element belongs to a different frame than the current one
+			System.err.println("Exception (expected, ignored): " + e.toString());
+		}
+		WebElement rootElement = driver.findElement(By.xpath("/*"));
+		String documentText = rootElement.getAttribute("outerHTML");
+		System.err.println("Root element:\n" + (documentText.length() > 80
+				? documentText.substring(0, 80) + "..." : documentText));
+		String pageSource = driver.getPageSource();
+		System.err.println("Page source:\n" + (pageSource.length() > 80
+				? pageSource.substring(0, 80) + "..." : pageSource));
+
 		// Act
 		WebElement buttonElement = wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
+				.visibilityOf(driver.findElement(By.cssSelector("h3 button[onclick = 'myFunction()']"))));
 
 		assertThat(buttonElement, notNullValue());
 		buttonElement.click();
 		// Assert
+
 		try {
 			// confirm alert
-			driver.switchTo().alert().accept();
+			alert = driver.switchTo().alert();
+			String alertText = alert.getText();
+			assertTrue(alertText.contains("You clicked a button within a frame"));
+			alert.accept();
+		} catch (NoAlertPresentException e) {
+			// Alert not present - ignore
+		} catch (WebDriverException e) {
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
+			return;
+		}
+	}
+
+	@Test(enabled = true)
+	public void test13_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.3frame.html");
+
+		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
+				By.cssSelector(".container .row .intro-message iframe")));
+
+		// Act
+		WebElement buttonElement = driver.findElement(By.xpath("//button[@onclick = 'myFunction()']"));
+		assertThat(buttonElement, notNullValue());
+		// Assert
+
+		buttonElement.click();
+		// Assert
+		try {
+			alert = driver.switchTo().alert();
+			String alertText = alert.getText();
+			assertTrue(alertText.contains("You clicked a button within a frame"));
+			// confirm alert
+			alert.accept();
 		} catch (NoAlertPresentException e) {
 			// Alert not present - ignore
 		} catch (WebDriverException e) {
@@ -1090,6 +1171,8 @@ public class SuvianTest {
 
 	}
 
+  // https://docs.google.com/a/jazzteam.org/document/d/1PdfKMDfoqFIlF4tN1jKrOf1iZ1rqESy2xVMIj3uuV3g/pub#h.qkrwckq52qpd
+  
 	// http://sqa.stackexchange.com/questions/14247/how-can-i-get-the-value-of-the-tooltip
 	@Test(enabled = false)
 	public void test14_2() {
