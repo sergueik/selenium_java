@@ -1872,7 +1872,7 @@ public class SuvianTest {
 	}
 
 	// Attempt #5
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test20_5() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -1894,10 +1894,10 @@ public class SuvianTest {
 		Coordinates target_coords = ((Locatable) dropElement).getCoordinates();
 		String simulateDragDropScript = getScriptContent("simulateDragDrop.js");
 		System.err.println(String.format("Simulate drag an drop by: (%-4d, %-4d)",
-				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
+				target_coords.inViewPort().x, target_coords.inViewPort().y));
 
 		executeScript(simulateDragDropScript, draggableElement,
-				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10);
+				target_coords.inViewPort().x, target_coords.inViewPort().y);
 
 		try {
 			Thread.sleep(1000);
@@ -1935,7 +1935,7 @@ public class SuvianTest {
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_7() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -1965,7 +1965,7 @@ public class SuvianTest {
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_8() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -2015,9 +2015,48 @@ public class SuvianTest {
 		// Assert
 	}
 
-	// Few failing attempts. Warning: Timing out with Firefox
 	@Test(enabled = false)
-	public void test22() {
+	public void test22_1() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getAttribute("src"),
+				containsString("img/img_logo.gif"));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+		// Act
+
+		// Act
+		String dragDropScript = String.format("%s\n%s", getScriptContent("dnd.js"),
+				"var dragElememt = $(arguments[0]); var dropTargetSelector = arguments[1]; dragElememt.simulateDragDrop({ dropTarget: dropTargetSelector});");
+		// System.err.println(dragDropScript);
+
+		((JavascriptExecutor) driver).executeScript(dragDropScript,
+				String.format("#%s", draggableElement.getAttribute("id")),
+				String.format("#%s", dropElement.getAttribute("id")));
+
+		// Assert
+		assertThat(dropElement.getAttribute("innerHTML"),
+				containsString("img id=\"drag1\""));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+		Optional<WebElement> dragResult = dropElement
+				.findElements(By.cssSelector("img#drag1")).stream().findFirst();
+		WebElement dragResultElement = (dragResult.isPresent()) ? dragResult.get()
+				: null;
+		assertThat(dragResultElement, notNullValue());
+
+	}
+
+	// Few failing attempts
+	// Attempt #1
+	@Test(enabled = false)
+	public void test22_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
 
@@ -2032,7 +2071,6 @@ public class SuvianTest {
 		assertThat(dropElement, notNullValue());
 
 		// Act
-		// Attempt #1
 		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
 				.build().perform();
 		try {
@@ -2040,12 +2078,70 @@ public class SuvianTest {
 		} catch (InterruptedException e) {
 		}
 
-		// Attempt #2
+		// Assert
+		assertThat(dropElement.getAttribute("innerHTML"),
+				containsString("img id=\"drag1\""));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+		Optional<WebElement> dragResult = dropElement
+				.findElements(By.cssSelector("img#drag1")).stream().findFirst();
+		WebElement dragResultElement = (dragResult.isPresent()) ? dragResult.get()
+				: null;
+		assertThat(dragResultElement, notNullValue());
+
+	}
+
+	// Attempt #2
+	@Test(enabled = false)
+	public void test22_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getAttribute("src"),
+				containsString("img/img_logo.gif"));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
+
+		// Act
 		actions.dragAndDrop(draggableElement, dropElement).build().perform();
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 		}
+
+		// Assert
+		assertThat(dropElement.getAttribute("innerHTML"),
+				containsString("img id=\"drag1\""));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		// Assert
+		Optional<WebElement> dragResult = dropElement
+				.findElements(By.cssSelector("img#drag1")).stream().findFirst();
+		WebElement dragResultElement = (dragResult.isPresent()) ? dragResult.get()
+				: null;
+		assertThat(dragResultElement, notNullValue());
+
+	}
+
+	// Few failing attempts. Warning: Timing out with Firefox
+	@Test(enabled = false)
+	public void test22_4() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/3.2dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.id("drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getAttribute("src"),
+				containsString("img/img_logo.gif"));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath("//div[@id='div1']"))));
+		assertThat(dropElement, notNullValue());
 
 		// Attempt #3
 		Point source_location = draggableElement.getLocation();
@@ -2441,7 +2537,7 @@ public class SuvianTest {
 	}
 
 	// https://docs.google.com/a/jazzteam.org/document/d/1PdfKMDfoqFIlF4tN1jKrOf1iZ1rqESy2xVMIj3uuV3g/pub
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test27_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -2473,7 +2569,7 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test27_4() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
@@ -2504,7 +2600,7 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-  @Test(enabled = false)
+	@Test(enabled = false)
 	public void test30() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.10select1stFriday.html");
