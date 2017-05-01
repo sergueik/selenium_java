@@ -609,7 +609,7 @@ public class SuvianTest {
 		WebElement checkBoxElement = null;
 		if (checkboxValue != null) {
 			checkBoxElement = driver.findElement(By.xpath(String.format(
-					"//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married'][@value='%s']",
+					"//div[@class='intro-header']/div[@class='container']/div[@class='row']/div[@class='col-lg-12']/div[@class='intro-message']/form/input[@name='married' and @value='%s']",
 					checkboxValue)));
 		}
 		// Act
@@ -1872,7 +1872,7 @@ public class SuvianTest {
 	}
 
 	// Attempt #5
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_5() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -2050,7 +2050,6 @@ public class SuvianTest {
 		WebElement dragResultElement = (dragResult.isPresent()) ? dragResult.get()
 				: null;
 		assertThat(dragResultElement, notNullValue());
-
 	}
 
 	// Few failing attempts
@@ -2483,7 +2482,7 @@ public class SuvianTest {
 
 		WebElement inputElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
-						"//div[@class='intro-message']/ul[@id='tst']/li[.='India']/input[@type='radio'][@name='country']"))));
+						"//div[@class='intro-message']/ul[@id='tst']/li[.='India']/input[@type='radio' and @name='country']"))));
 		assertThat(inputElement, notNullValue());
 		inputElement.click();
 		try {
@@ -2518,7 +2517,7 @@ public class SuvianTest {
 		WebElement inputElement = itemList.findElements(By.tagName("li")).stream()
 				.filter(o -> o.getText().contains((CharSequence) "India"))
 				.map(o -> o
-						.findElement(By.xpath("input[@type='radio'][@name='country']")))
+						.findElement(By.xpath("input[@type='radio' and @name='country']")))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
 		try {
@@ -2548,7 +2547,7 @@ public class SuvianTest {
 		// Act
 		WebElement inputElement = itemList
 				.findElements(By.xpath(
-						"li[contains(text(), 'India')]//input[@type='radio'][@name='country']"))
+						"li[contains(text(), 'India')]//input[@type='radio' and @name='country']"))
 				.stream()
 				.filter(o -> o.findElement(By.xpath("..")).getText()
 						.contains((CharSequence) "India"))
@@ -2577,7 +2576,7 @@ public class SuvianTest {
 		// Act
 		WebElement inputElement = driver
 				.findElements(By.xpath(
-						"//li[contains(text(), 'India')]//input[@type='radio'][@name='country']"))
+						"//li[contains(text(), 'India')]//input[@type='radio' and @name='country']"))
 				.stream()
 				.filter(o -> o.findElement(By.xpath("..")).getText()
 						.contains((CharSequence) "India"))
@@ -2599,6 +2598,68 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("value"),
 				checkedRadioButton.getAttribute("checked")));
 	}
+
+	@Test(enabled = true)
+	public void test28_1() {
+		// Arrange
+		driver.get("http://toolsqa.com/automation-practice-table/");
+		// Act
+		WebElement linkElement = driver.findElement(By.xpath(
+				"//table[@summary='Sample Table']/tbody/tr/td[text()='Taipei']/../descendant::a[@href='#']"));
+		assertThat(linkElement, notNullValue());
+		highlight(linkElement);
+	}
+
+	@Test(enabled = true)
+	public void test28_2() {
+		// Arrange
+		driver.get("http://toolsqa.com/automation-practice-table/");
+		// Act
+		WebElement linkElement = driver.findElement(By.xpath(
+				"//table[@summary='Sample Table']/tbody/tr[td/text()='Taipei']/descendant::a[@href='#']"));
+		assertThat(linkElement, notNullValue());
+		highlight(linkElement);
+	}
+
+	@Test(enabled = true)
+	public void test28_3() {
+		// Arrange
+		driver.get("http://toolsqa.com/automation-practice-table/");
+		// Act
+		Optional<WebElement> trylinkElement = driver
+				.findElements(By.xpath("//table[@summary='Sample Table']/tbody/tr"))
+				.stream()
+				.filter(
+						o -> o.findElements(By.xpath("td[text()='Taipei']")).size() != 0)
+				.map(o -> o.findElement(By.xpath("td/a[@href='#']"))).findFirst();
+		WebElement linkElement = (trylinkElement.isPresent())
+				? trylinkElement.get() : null;
+		assertThat(linkElement, notNullValue());
+		highlight(linkElement);
+
+		assertThat(linkElement, notNullValue());
+		highlight(linkElement);
+	}
+
+	/*
+
+	<div>
+	<ul class="nav nav-pills nav-stacked">
+	<li>
+	<section>
+	<span name="merchant">Credit Card</span>
+	</section>
+	<section>
+	<span class="glyphicon glyphicon-pencil" name="edit"></span>
+	<span class="glyphicon glyphicon-remove" name="delete"></span>
+	</section>
+	</li>
+	</ul>
+	<div class="add-item bottom" name="new-merchant">
+	</div>
+
+	"//li/section[span/text()='Credit Card']/../following-sibling::section/span[@name='edit']"
+	*/
 
 	@Test(enabled = false)
 	public void test30() {
