@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.jprotractor</groupId>
   <artifactId>jprotractor</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>jProtractor is a port of Angular Protractor functionality to Java.</description>
@@ -28,10 +28,10 @@
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <commons-collections4.version>4.0</commons-collections4.version>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
     <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
