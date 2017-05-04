@@ -29,8 +29,6 @@ public class DynamicAnnotations extends Annotations {
 	private final Field field;
 	private final Map<String, String> substitutions;
 
-	// Again, not much is different from the Selenium default class here
-	// other than the additional substitutions parameter
 	public DynamicAnnotations(final Field field,
 			final Map<String, String> substitutions) {
 		super(field);

@@ -1,28 +1,63 @@
 package com.stackoverflow;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.Formatter;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.*;
+import static org.junit.Assume.*;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.experimental.categories.Category;
+import org.junit.experimental.runners.Enclosed;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.junit.Ignore;
+import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class SampleTest {
 
-	private final Map<String, String> substitutions;
+	private static WebDriver driver;
+	private static WebDriverWait wait;
+	private static Actions actions;
+	private static Alert alert;
+	private static int implicitWait = 10;
+	private static int flexibleWait = 5;
+	private static long pollingInterval = 500;
+	static int width = 600;
+	static int height = 400;
+	private static String baseUrl = "https://www.google.com/";
 
-	@FindBy(how = How.ID, using = "somelocator_with_a dynamic_${id}")
+	private static Map<String, String> substitutions;
+	@FindBy(how = How.ID, using = "${id}logo")
 	private WebElement someElement;
-	private WebDriver driver;
 
-	public SampleTest(final String idValue) {
+	@BeforeClass
+	public static void setup() throws IOException {
 
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -55,16 +90,36 @@ public class SampleTest {
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		driver = new ChromeDriver(capabilities);
-
-		substitutions = new HashMap<>();
-		substitutions.put("id", idValue);
-
+		driver.manage().window().setSize(new Dimension(width, height));
+		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
+				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
+				.setScriptTimeout(10, TimeUnit.SECONDS);
+		wait = new WebDriverWait(driver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		actions = new Actions(driver);
+	}
+	@AfterClass
+	
+	public static void teardown() {
+		driver.quit();
 	}
 
-	// When you call PageFactory.initElements, you need to tell it to use the
-	// DynamicElementLocatorFactory
-	protected void load() {
+
+	@Before
+	public void beforeEach() {
+		driver.navigate().to(baseUrl);
+	}
+
+	@Test
+	public void testEvaluateEvenOdd() {
+		final String idValue = "hp";
+		substitutions = new HashMap<>();
+		substitutions.put("id", idValue);
+		// NOTE: method signature
 		PageFactory.initElements(
 				new DynamicElementLocatorFactory(driver, substitutions), this);
+		assertThat(someElement, notNullValue());
+		someElement.click();
+		System.err.println(someElement.getAttribute("outerHTML"));
 	}
 }
