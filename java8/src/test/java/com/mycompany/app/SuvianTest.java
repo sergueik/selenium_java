@@ -1996,6 +1996,34 @@ public class SuvianTest {
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
+	@Test(enabled = true)
+	public void test20_9() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
+
+		WebElement draggableElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#drag1"))));
+		assertThat(draggableElement, notNullValue());
+		assertThat(draggableElement.getText(),
+				containsString("This is a draggable text."));
+
+		WebElement dropElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("#div1"))));
+		assertThat(dropElement, notNullValue());
+		assertThat(dropElement.getText(), containsString("Drop Here"));
+
+		// Act
+		dragdrop(By.id("drag1"), By.id("div1"));
+		// Assert
+		assertThat(dropElement.getText(),
+				containsString("This is a draggable text."));
+		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
+	}
+
 	// NOTE: this test is failing
 	@Test(enabled = false)
 	public void test21() {
@@ -2599,7 +2627,7 @@ public class SuvianTest {
 				checkedRadioButton.getAttribute("checked")));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test28_1() {
 		// Arrange
 		driver.get("http://toolsqa.com/automation-practice-table/");
@@ -2610,7 +2638,7 @@ public class SuvianTest {
 		highlight(linkElement);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test28_2() {
 		// Arrange
 		driver.get("http://toolsqa.com/automation-practice-table/");
@@ -2621,7 +2649,7 @@ public class SuvianTest {
 		highlight(linkElement);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test28_3() {
 		// Arrange
 		driver.get("http://toolsqa.com/automation-practice-table/");
@@ -2632,8 +2660,8 @@ public class SuvianTest {
 				.filter(
 						o -> o.findElements(By.xpath("td[text()='Taipei']")).size() != 0)
 				.map(o -> o.findElement(By.xpath("td/a[@href='#']"))).findFirst();
-		WebElement linkElement = (trylinkElement.isPresent())
-				? trylinkElement.get() : null;
+		WebElement linkElement = (trylinkElement.isPresent()) ? trylinkElement.get()
+				: null;
 		assertThat(linkElement, notNullValue());
 		highlight(linkElement);
 
@@ -2642,7 +2670,7 @@ public class SuvianTest {
 	}
 
 	/*
-
+	
 	<div>
 	<ul class="nav nav-pills nav-stacked">
 	<li>
@@ -2657,7 +2685,7 @@ public class SuvianTest {
 	</ul>
 	<div class="add-item bottom" name="new-merchant">
 	</div>
-
+	
 	"//li/section[span/text()='Credit Card']/../following-sibling::section/span[@name='edit']"
 	*/
 
@@ -2786,4 +2814,13 @@ public class SuvianTest {
 		}
 	}
 
+	// http://stackoverflow.com/questions/19384710/javascript-workaround-for-drag-and-drop-in-selenium-webdriver/26372276#26372276
+	public void dragdrop(By ByFrom, By ByTo) {
+		WebElement LocatorFrom = driver.findElement(ByFrom);
+		WebElement LocatorTo = driver.findElement(ByTo);
+		String xto = Integer.toString(LocatorTo.getLocation().x);
+		String yto = Integer.toString(LocatorTo.getLocation().y);
+		executeScript(getScriptContent("simulateDragDrop2.js"),
+				LocatorFrom, xto, yto);
+	}
 }

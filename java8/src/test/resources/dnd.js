@@ -1,5 +1,6 @@
 (function($) {
   // origin: https://github.com/tourdedave/elemental-selenium-tips
+  // http://stackoverflow.com/questions/19384710/javascript-workaround-for-drag-and-drop-in-selenium-webdriver/26372276#26372276
 	$.fn.simulateDragDrop = function(options) {
 		return this.each(function() {
 			new $.simulateDragDrop(this, options);
