@@ -102,7 +102,6 @@ public class SampleTest {
 	}
 
 	@AfterClass
-
 	public static void teardown() {
 		driver.quit();
 	}
@@ -113,7 +112,7 @@ public class SampleTest {
 	}
 
 	@Test
-	public void test1() {
+	public void testTableRows() {
 		for (String idValue : new ArrayList<>(Arrays.asList("Taipei 101",
 				"Burj Khalifa", "Financial Center", "Clock Tower Hotel"))) {
 
