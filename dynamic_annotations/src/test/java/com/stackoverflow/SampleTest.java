@@ -2,6 +2,8 @@ package com.stackoverflow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Formatter;
@@ -50,10 +52,10 @@ public class SampleTest {
 	private static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
-	private static String baseUrl = "https://www.google.com/";
+	private static String baseUrl = "http://toolsqa.com/automation-practice-table/";
 
 	private static Map<String, String> substitutions;
-	@FindBy(how = How.ID, using = "${id}logo")
+	@FindBy(how = How.XPATH, using = "//table[@summary='Sample Table']/tbody/tr/th[@scope='row' and text()='${id}']/../descendant::a[@href='#']")
 	private WebElement someElement;
 
 	@BeforeClass
@@ -98,12 +100,12 @@ public class SampleTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
 	}
+
 	@AfterClass
-	
+
 	public static void teardown() {
 		driver.quit();
 	}
-
 
 	@Before
 	public void beforeEach() {
@@ -111,15 +113,18 @@ public class SampleTest {
 	}
 
 	@Test
-	public void testEvaluateEvenOdd() {
-		final String idValue = "hp";
-		substitutions = new HashMap<>();
-		substitutions.put("id", idValue);
-		// NOTE: method signature
-		PageFactory.initElements(
-				new DynamicElementLocatorFactory(driver, substitutions), this);
-		assertThat(someElement, notNullValue());
-		someElement.click();
-		System.err.println(someElement.getAttribute("outerHTML"));
+	public void test1() {
+		for (String idValue : new ArrayList<>(Arrays.asList("Taipei 101",
+				"Burj Khalifa", "Financial Center", "Clock Tower Hotel"))) {
+
+			substitutions = new HashMap<>();
+			substitutions.put("id", idValue);
+			// NOTE: method signature
+			PageFactory.initElements(
+					new DynamicElementLocatorFactory(driver, substitutions), this);
+			assertThat(someElement, notNullValue());
+			someElement.click();
+			System.err.println(someElement.getAttribute("outerHTML"));
+		}
 	}
 }
