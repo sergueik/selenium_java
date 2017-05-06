@@ -2736,10 +2736,10 @@ public class SuvianTest {
 	}
 
 	// bad practice ?
-	// Way too much navigation and hairy locators -
-	// possibly auto-generated
+	// too much navigation and excessively detailed - possibly auto-generated -
+	// locators
 	// http://automated-testing.info/t/webdriver-java-ne-rabotaet-metod-click/13838/16
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test31_1() {
 		// Arrange
 		driver.get(
@@ -2761,27 +2761,16 @@ public class SuvianTest {
 
 	}
 
-	@Test(enabled = true)
+	// somewhat refactored
+	@Test(enabled = false)
 	public void test31_2() {
 		// Arrange
 		driver.get(
 				"https://accounts.google.com/SignUp?service=mail&hl=ru&continue=http%3A%2F%2Fmail.google.com%2Fmail%2F%3Fpc%3Dtopnav-about-ru");
 		// Act
 
-		// gradually construct the xpath
-		/*
-		WebElement element1 = driver
-				.findElement(By.xpath("//div/label[strong/text()='Пол']"));
-		assertThat(element1, notNullValue());
-		System.err.println(element1.getAttribute("innerHTML"));
-		WebElement element2 = driver.findElement(
-				By.xpath("//div/label[strong/text()='Пол']/div[@id='Gender']"));
-		assertThat(element2, notNullValue());
-		System.err.println(element2.getAttribute("innerHTML"));
-		*/
 		List<WebElement> elements = driver.findElements(By.xpath(
 				"//div/label[strong/text()='Пол']/div[@id='Gender']/div[@role='listbox']"));
-		// System.err.println("Elements size=" + elements.size());
 		assertThat(elements.get(0), notNullValue());
 		WebElement element = elements.get(0);
 		highlight(element);
@@ -2799,6 +2788,69 @@ public class SuvianTest {
 				.findElement(By.xpath("//div[@role='option'][div/text()='Мужской']"))));
 		highlight(element);
 		element.click();
+	}
+
+	//
+	@Test(enabled = true)
+	public void test32_1() {
+		// Arrange
+		driver.get(
+				"https://market.yandex.ru/catalog/54913/list?hid=90566&track=fr_ctlg&lr=0&local-offers-first=0&deliveryincluded=0&onstock=1");
+		actions.moveToElement(
+				wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.xpath("//div[@class='n-filter-panel-aside__content']/div[4]")))));
+
+		// Act
+		List<WebElement> elements = driver.findElements(By.xpath(
+				"//div[@class='n-filter-panel-aside__content']/div[4]//span[@class='checkbox__box']"));
+		System.err.println("Elements size=" + elements.size());
+		assertThat(elements.get(0), notNullValue());
+		for (WebElement element : elements) {
+			actions.moveToElement(element);
+			highlight(element);
+			System.err.println(element.getAttribute("innerHTML"));
+			try {
+				element.click();
+			} catch (Exception e) {
+				System.err.println("Exception " + e.getMessage());
+			}
+			// unknown error: Element <span class="checkbox__box">...</span> is not
+			// clickable at point (788, 669).
+			// Other element would receive the click: <label class="checkbox__label"
+			// for="glf-7893318-152809">...</label>(..)
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	@Test(enabled = true)
+	public void test32_2() {
+		// Arrange
+		driver.get(
+				"https://market.yandex.ru/catalog/54913/list?hid=90566&track=fr_ctlg&lr=0&local-offers-first=0&deliveryincluded=0&onstock=1");
+		actions.moveToElement(
+				wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.xpath("//div[@class='n-filter-panel-aside__content']/div[4]")))));
+
+		// Act
+		List<WebElement> elements = driver.findElements(By.xpath(
+				"//div[@class='n-filter-panel-aside__content']/div[4]//span[span/@class='checkbox__box']/label[@class='checkbox__label']"));
+		System.err.println("Elements size=" + elements.size());
+		assertThat(elements.get(0), notNullValue());
+		for (WebElement element : elements) {
+			actions.moveToElement(element);
+			highlight(element);
+			System.err.println(element.getAttribute("innerHTML"));
+			element.click();
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+			}
+			// cannot focus on checkbox
+			// element.sendKeys(Keys.SPACE);
+		}
 	}
 
 	// utils
