@@ -2802,22 +2802,34 @@ public class SuvianTest {
 
 		// Act
 		List<WebElement> elements = driver.findElements(By.xpath(
-				"//div[@class='n-filter-panel-aside__content']/div[4]//span[@class='checkbox__box']"));
-		System.err.println("Elements size=" + elements.size());
+				"//div[@class='n-filter-panel-aside__content']/div[4]//span[@class='checkbox__box']/input[@type='checkbox']"));
+		assertTrue(elements.size() > 0);
 		assertThat(elements.get(0), notNullValue());
 		for (WebElement element : elements) {
+			System.err
+					.println("Selecting the checkbox:\n" + element.getAttribute("id"));
 			actions.moveToElement(element);
-			highlight(element);
-			System.err.println(element.getAttribute("innerHTML"));
+			element.sendKeys(Keys.SPACE);
+			try {
+				highlight(element, 100);
+			} catch (Exception e) {
+				System.err.println("highlight() Exception " + e.getMessage());
+				// Exception Expected condition failed: waiting for visibility of
+				// element
+			}
+			try {
+				highlightNew(element, 100);
+			} catch (Exception e) {
+				System.err.println("highlightNew() Exception: " + e.getMessage());
+				// Exception unknown command: session/.../element/.../rect
+			}
 			try {
 				element.click();
 			} catch (Exception e) {
-				System.err.println("Exception " + e.getMessage());
+				System.err.println("click() Exception: " + e.getMessage());
+				// Element ... is not clickable at point ... Other element would receive
+				// the click
 			}
-			// unknown error: Element <span class="checkbox__box">...</span> is not
-			// clickable at point (788, 669).
-			// Other element would receive the click: <label class="checkbox__label"
-			// for="glf-7893318-152809">...</label>(..)
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -2842,14 +2854,14 @@ public class SuvianTest {
 		for (WebElement element : elements) {
 			actions.moveToElement(element);
 			highlight(element);
-			System.err.println(element.getAttribute("innerHTML"));
+			System.err.println("Click on label:" + element.getAttribute("for"));
 			element.click();
 			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
+				element.sendKeys(Keys.SPACE);
+			} catch (Exception e) {
+				// unknown error: cannot focus element
+				System.err.println("sendKeys() Exception " + e.getMessage());
 			}
-			// cannot focus on checkbox
-			// element.sendKeys(Keys.SPACE);
 		}
 	}
 
