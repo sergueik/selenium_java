@@ -1996,7 +1996,7 @@ public class SuvianTest {
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test20_9() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/2.10dragAndDrop.html");
@@ -2735,6 +2735,73 @@ public class SuvianTest {
 		// Assert
 	}
 
+	// bad practice ?
+	// Way too much navigation and hairy locators -
+	// possibly auto-generated
+	// http://automated-testing.info/t/webdriver-java-ne-rabotaet-metod-click/13838/16
+	@Test(enabled = true)
+	public void test31_1() {
+		// Arrange
+		driver.get(
+				"https://accounts.google.com/SignUp?service=mail&hl=ru&continue=http%3A%2F%2Fmail.google.com%2Fmail%2F%3Fpc%3Dtopnav-about-ru");
+		// Act
+		WebElement element = driver.findElement(By.xpath(
+				"//strong[text()='Пол']/following-sibling::div/div[@role='listbox'][1]"));
+		assertThat(element, notNullValue());
+		highlight(element);
+		element.click();
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+		}
+		element = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.xpath("//div[text()='Мужской']/parent::div[@role='option']"))));
+		highlight(element);
+		element.click();
+
+	}
+
+	@Test(enabled = true)
+	public void test31_2() {
+		// Arrange
+		driver.get(
+				"https://accounts.google.com/SignUp?service=mail&hl=ru&continue=http%3A%2F%2Fmail.google.com%2Fmail%2F%3Fpc%3Dtopnav-about-ru");
+		// Act
+
+		// gradually construct the xpath
+		/*
+		WebElement element1 = driver
+				.findElement(By.xpath("//div/label[strong/text()='Пол']"));
+		assertThat(element1, notNullValue());
+		System.err.println(element1.getAttribute("innerHTML"));
+		WebElement element2 = driver.findElement(
+				By.xpath("//div/label[strong/text()='Пол']/div[@id='Gender']"));
+		assertThat(element2, notNullValue());
+		System.err.println(element2.getAttribute("innerHTML"));
+		*/
+		List<WebElement> elements = driver.findElements(By.xpath(
+				"//div/label[strong/text()='Пол']/div[@id='Gender']/div[@role='listbox']"));
+		// System.err.println("Elements size=" + elements.size());
+		assertThat(elements.get(0), notNullValue());
+		WebElement element = elements.get(0);
+		highlight(element);
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+		}
+		element.click();
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+		}
+
+		element = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.xpath("//div[@role='option'][div/text()='Мужской']"))));
+		highlight(element);
+		element.click();
+	}
+
+	// utils
 	private void highlightNew(WebElement element, long highlight_interval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
@@ -2820,7 +2887,7 @@ public class SuvianTest {
 		WebElement LocatorTo = driver.findElement(ByTo);
 		String xto = Integer.toString(LocatorTo.getLocation().x);
 		String yto = Integer.toString(LocatorTo.getLocation().y);
-		executeScript(getScriptContent("simulateDragDrop2.js"),
-				LocatorFrom, xto, yto);
+		executeScript(getScriptContent("simulateDragDrop2.js"), LocatorFrom, xto,
+				yto);
 	}
 }
