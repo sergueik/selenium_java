@@ -144,6 +144,13 @@ public class SuvianTest {
 				options.addArguments(optionAgrument);
 			}
 
+			// options for headless
+			/*
+			for (String optionAgrument : (new String[] { "headless",
+					"window-size=1200x600", })) {
+				options.addArguments(optionAgrument);
+			}
+			*/
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 
@@ -349,7 +356,7 @@ public class SuvianTest {
 							"(?:" + Pattern.quote("Navigate Back") + ")",
 							Pattern.CASE_INSENSITIVE);
 					while (i.hasNext()) {
-						WebElement e = (WebElement) i.next();
+						WebElement e = i.next();
 						String t = e.getText();
 						// System.err.println("in apply iterator (2): Text = " + t);
 						Matcher matcher = pattern.matcher(t);
@@ -389,7 +396,7 @@ public class SuvianTest {
 							.iterator();
 					WebElement result = null;
 					while (elementsIterator.hasNext()) {
-						WebElement e = (WebElement) elementsIterator.next();
+						WebElement e = elementsIterator.next();
 						String t = e.getText();
 						System.err.println("in apply iterator (1): Text = " + t);
 						if (t.contains("Navigate Back")) {
@@ -881,7 +888,7 @@ public class SuvianTest {
 					}
 					Iterator<String> windowHandleIterator = windowHandles.iterator();
 					while (windowHandleIterator.hasNext()) {
-						String handle = (String) windowHandleIterator.next();
+						String handle = windowHandleIterator.next();
 						if (!handle.equals(currentHandle)) {
 							System.err.println("Switch to: " + handle);
 							driver.switchTo().window(handle);
@@ -2341,10 +2348,10 @@ public class SuvianTest {
 	}
 
 	static boolean hasScoreMethod(WebDriver driver) {
-		return (boolean) (driver
+		return driver
 				.findElement(By.cssSelector(
 						".container .row .intro-message table tbody tr td p#sachinruns"))
-				.getText().trim().length() > 0);
+				.getText().trim().length() > 0;
 	}
 
 	// This test was developed with Selenium Driver 2.53 and needs update to work
