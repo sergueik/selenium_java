@@ -140,7 +140,7 @@ public class NgQualityShepherdTest {
 		Iterator<WebElement> friendRows = ngDriver.findElements(
 				NgBy.repeater("row in rows")).iterator();
 		while (friendRows.hasNext()) {
-			WebElement currentfriendRow = (WebElement) friendRows.next();
+			WebElement currentfriendRow = friendRows.next();
 			WebElement currentfriendName = new NgWebElement(ngDriver,
 					currentfriendRow).findElement(NgBy.binding("row"));
 			if (currentfriendName.getText().indexOf(deleteFriendName) >= 0) {
@@ -172,7 +172,7 @@ public class NgQualityShepherdTest {
 		// examine remaining friends
 		friendRows = ngDriver.findElements(NgBy.repeater("row in rows")).iterator();
 		while (friendRows.hasNext()) {
-			WebElement currentFriendRow = (WebElement) friendRows.next();
+			WebElement currentFriendRow = friendRows.next();
 			highlight(currentFriendRow);
 			String currentFriendName = new NgWebElement(ngDriver, currentFriendRow)
 					.evaluate("row").toString();

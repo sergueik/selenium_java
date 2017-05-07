@@ -237,7 +237,7 @@ public class NgWay2AutomationIntegrationTest {
 		assertFalse(matcher.find());
 
 		// alternative to java.util.regex
-		ArrayList<String> oneAcountArray = new ArrayList<String>();
+		ArrayList<String> oneAcountArray = new ArrayList<>();
 		oneAcountArray.add(ng_accountNo.getText());
 		assertTrue(CollectionUtils.containsAny(oneAcountArray,
 				new ArrayList<String>(Arrays.asList(customerAccounts))));
@@ -332,7 +332,7 @@ public class NgWay2AutomationIntegrationTest {
 				.findElements(NgBy.repeater("tx in transactions")).iterator();
 		int cnt = 0;
 		while (transactions.hasNext() && cnt++ < 5) {
-			WebElement currentTransaction = (WebElement) transactions.next();
+			WebElement currentTransaction = transactions.next();
 			NgWebElement ngCurrentTransaction = new NgWebElement(ngDriver,
 					currentTransaction);
 			assertTrue(ngCurrentTransaction.evaluate("tx.amount").toString()
@@ -540,8 +540,7 @@ public class NgWay2AutomationIntegrationTest {
 				.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type"))
 				.iterator();
 		while (transactionTypeColumns.hasNext()) {
-			WebElement transactionTypeColumn = (WebElement) transactionTypeColumns
-					.next();
+			WebElement transactionTypeColumn = transactionTypeColumns.next();
 			if (transactionTypeColumn.getText().isEmpty()) {
 				break;
 			}
@@ -552,6 +551,7 @@ public class NgWay2AutomationIntegrationTest {
 	}
 
 	// @Ignore
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testAddCustomer() {
 		if (isCIBuild) {

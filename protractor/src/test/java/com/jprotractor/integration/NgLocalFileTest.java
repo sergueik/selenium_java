@@ -305,6 +305,7 @@ public class NgLocalFileTest {
 		try {
 			Object myFile = ng_file.evaluate("myFile");
 			if (myFile instanceof Map) {
+				@SuppressWarnings("rawtypes")
 				Map<?, ?> map = (Map) (myFile);
 				for (Map.Entry<?, ?> entry : map.entrySet()) {
 					String key = entry.getKey().toString();
@@ -431,7 +432,7 @@ public class NgLocalFileTest {
 		System.err.println("Customers:" + seleniumDriver.getPageSource());
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
-		ArrayList<WebElement> countries = new ArrayList<WebElement>(
+		ArrayList<WebElement> countries = new ArrayList<>(
 				ngDriver.findElements(
 						NgBy.repeaterColumn("person in people", "person.Country")));
 		System.err.println("Found Countries.size() = " + countries.size());
@@ -439,7 +440,7 @@ public class NgLocalFileTest {
 		Iterator<WebElement> countriesIterator = countries.iterator();
 		int cnt = 0;
 		while (countriesIterator.hasNext()) {
-			WebElement country = (WebElement) countriesIterator.next();
+			WebElement country = countriesIterator.next();
 			System.err.format("%s %s\n", country.getText(),
 					(country.getText().equalsIgnoreCase("Mexico")) ? " *" : "");
 			highlight(country);
@@ -483,7 +484,7 @@ public class NgLocalFileTest {
 						NgBy.options("count.id as count.name for count in countList"))
 				.iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			System.err.println("Available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -583,7 +584,7 @@ public class NgLocalFileTest {
 		Iterator<WebElement> options = ngDriver
 				.findElements(NgBy.repeater("option in options")).iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			System.err.println("available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -622,7 +623,7 @@ public class NgLocalFileTest {
 		Iterator<WebElement> options = ngDriver
 				.findElements(NgBy.repeater("fruit in Fruits")).iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			System.err.println("available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -708,7 +709,7 @@ public class NgLocalFileTest {
 		Matcher matcher = null;
 		int count = 0;
 		while (elementsIterator.hasNext()) {
-			WebElement element = (WebElement) elementsIterator.next();
+			WebElement element = elementsIterator.next();
 			NgWebElement ngElement = new NgWebElement(ngDriver, element);
 			String optionName = ngElement.evaluate("option.name").toString();
 			// switch to core Selenium
@@ -731,7 +732,7 @@ public class NgLocalFileTest {
 		assertTrue(elements.size() == count);
 		elementsIterator = elements.iterator();
 		while (elementsIterator.hasNext()) {
-			WebElement element = (WebElement) elementsIterator.next();
+			WebElement element = elementsIterator.next();
 			System.err.format("%s\n", element.getText());
 		}
 	}
@@ -744,9 +745,9 @@ public class NgLocalFileTest {
 		// use core Selenium
 		Select selectObj = new Select(element);
 		Iterator<WebElement> options = selectObj.getOptions().iterator();
-		ArrayList<String> data = new ArrayList<String>();
+		ArrayList<String> data = new ArrayList<>();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -777,7 +778,7 @@ public class NgLocalFileTest {
 		data.clear();
 		options = selectObj.getOptions().iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -917,7 +918,7 @@ public class NgLocalFileTest {
 
 		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
 		while (iteratorCountries.hasNext()) {
-			WebElement country = (WebElement) iteratorCountries.next();
+			WebElement country = iteratorCountries.next();
 			if (country.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -951,7 +952,7 @@ public class NgLocalFileTest {
 		assertThat(elementsStates.size(), equalTo(3));
 		Iterator<WebElement> iteratorStates = elementsStates.iterator();
 		while (iteratorStates.hasNext()) {
-			WebElement state = (WebElement) iteratorStates.next();
+			WebElement state = iteratorStates.next();
 			if (state.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -962,7 +963,7 @@ public class NgLocalFileTest {
 		Select selectStates = new Select(ngDriver.findElement(NgBy.model("state")));
 		Iterator<WebElement> options = selectStates.getOptions().iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -982,7 +983,7 @@ public class NgLocalFileTest {
 				.findElements(NgBy.options("city for city in cities"));
 		options = cities.iterator();
 		while (options.hasNext()) {
-			WebElement option = (WebElement) options.next();
+			WebElement option = options.next();
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -1044,7 +1045,7 @@ public class NgLocalFileTest {
 				// order
 				List<WebElement> rows = ngDriver
 						.findElements(NgBy.repeater("emp in data.employees"));
-				WebElement row = (WebElement) rows.get(0);
+				WebElement row = rows.get(0);
 				String field = row.getAttribute("ng-order-by");
 				NgWebElement ng_row = new NgWebElement(ngDriver, row);
 				boolean reverseSort = parseBoolean(
@@ -1059,7 +1060,7 @@ public class NgLocalFileTest {
 				// Iterate over all rows, selected column
 				Iterator<WebElement> iteratorEmp = rows.iterator();
 				while (iteratorEmp.hasNext()) {
-					WebElement emp = (WebElement) iteratorEmp.next();
+					WebElement emp = iteratorEmp.next();
 					NgWebElement ng_emp = new NgWebElement(ngDriver, emp);
 					try {
 						WebElement empFieldElement = ng_emp
@@ -1102,7 +1103,7 @@ public class NgLocalFileTest {
 
 		Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
 		while (iteratorSelectedColors.hasNext()) {
-			WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
+			WebElement selectedColor = iteratorSelectedColors.next();
 			NgWebElement ngSelectedColor = new NgWebElement(ngDriver, selectedColor);
 			highlight(selectedColor);
 			Object itemColor = ngSelectedColor.evaluate("$item");
@@ -1115,7 +1116,7 @@ public class NgLocalFileTest {
 				.findElements(By.cssSelector("div[role='option']"));
 		Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
 		while (iteratorAvailableColors.hasNext()) {
-			WebElement availableColor = (WebElement) iteratorAvailableColors.next();
+			WebElement availableColor = iteratorAvailableColors.next();
 			NgWebElement ngAvailableColor = new NgWebElement(ngDriver,
 					availableColor);
 			highlight(availableColor);
@@ -1143,7 +1144,7 @@ public class NgLocalFileTest {
 				.findElements(By.cssSelector("div[role='option']"));
 		Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
 		while (iteratorAvailableColors.hasNext()) {
-			WebElement availableColor = (WebElement) iteratorAvailableColors.next();
+			WebElement availableColor = iteratorAvailableColors.next();
 			NgWebElement ngAvailableColor = new NgWebElement(ngDriver,
 					availableColor);
 			highlight(availableColor);
@@ -1164,7 +1165,7 @@ public class NgLocalFileTest {
 					.findElements(NgBy.repeater("$item in $select.selected"));
 			Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
 			while (iteratorSelectedColors.hasNext()) {
-				WebElement selectedColor = (WebElement) iteratorSelectedColors.next();
+				WebElement selectedColor = iteratorSelectedColors.next();
 				NgWebElement ngSelectedColor = new NgWebElement(ngDriver,
 						selectedColor);
 				Object itemColor = ngSelectedColor.evaluate("$item");
@@ -1201,7 +1202,7 @@ public class NgLocalFileTest {
 
 		Iterator<WebElement> iteratorNames = names.iterator();
 		while (iteratorNames.hasNext()) {
-			WebElement name = (WebElement) iteratorNames.next();
+			WebElement name = iteratorNames.next();
 			// will show class="ng-binding" added to every node
 			System.err.println(name.getAttribute("outerHTML"));
 			System.err.println(getIdentity(name));
@@ -1266,7 +1267,7 @@ public class NgLocalFileTest {
 		assertThat(elementsCountries.size(), equalTo(4));
 		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
 		while (iteratorCountries.hasNext()) {
-			WebElement country = (WebElement) iteratorCountries.next();
+			WebElement country = iteratorCountries.next();
 			if (country.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -1305,7 +1306,7 @@ public class NgLocalFileTest {
 		assertThat(elementsStates.size(), equalTo(3));
 		Iterator<WebElement> iteratorStates = elementsStates.iterator();
 		while (iteratorStates.hasNext()) {
-			WebElement state = (WebElement) iteratorStates.next();
+			WebElement state = iteratorStates.next();
 			if (state.getAttribute("value").isEmpty()) {
 				continue;
 			}

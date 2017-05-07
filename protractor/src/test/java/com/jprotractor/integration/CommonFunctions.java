@@ -61,6 +61,7 @@ public class CommonFunctions {
 	private static Map<String, String> env = System.getenv();
 	private static final String browser = "firefox";
 
+	@SuppressWarnings("deprecation")
 	public static WebDriver getSeleniumDriver() throws IOException {
 		checkEnvironment();
 		if (isDestopTesting) {
