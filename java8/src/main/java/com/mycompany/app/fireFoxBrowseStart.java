@@ -148,7 +148,8 @@ public class fireFoxBrowseStart {
 		assertTrue(
 				bar.findElements(By.xpath("//a[@data-rating-value]")).size() > 7);
 		List<WebElement> ratingElements = bar
-				.findElements(By.xpath(".//a[@data-rating-value]")); // NOTE: relative xpath selector
+				.findElements(By.xpath(".//a[@data-rating-value]")); // NOTE: relative
+																															// xpath selector
 		assertTrue(ratingElements.size() > 0);
 		// TODO: test that result set elements are unique ?
 		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
