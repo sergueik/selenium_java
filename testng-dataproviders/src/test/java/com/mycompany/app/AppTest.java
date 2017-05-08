@@ -54,7 +54,6 @@ import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -66,7 +65,6 @@ import org.openqa.selenium.Dimension;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-// import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.OutputType;
@@ -84,6 +82,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.apache.poi.ss.usermodel.Row;
 
 // testng data providers
 
@@ -111,6 +110,10 @@ import org.jopendocument.dom.ODValueType;
 import org.jopendocument.dom.spreadsheet.Table;
 import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Range;
+
+// NOTE: cannot import org.apache.poi.ss.usermodel.Cell:
+// a type with the same simple name is already defined by the single-type-import of org.jopendocument.dom.spreadsheet.Cell
+// import org.apache.poi.ss.usermodel.Cell;
 
 // JSON
 import org.json.JSONArray;
@@ -155,16 +158,6 @@ public class AppTest {
 		capabilities.setCapability(CapabilityType.LOGGING_PREFS,
 				logging_preferences);
 		driver = new ChromeDriver(capabilities);
-		/*
-		 * FirefoxProfile profile = new FirefoxProfile();
-		 * profile.setPreference("browser.download.folderList",2);
-		 * profile.setPreference("browser.download.manager.showWhenStarting",false);
-		 * profile.setPreference("browser.download.dir","c:\downloads");
-		 * profile.setPreference
-		 * ("browser.helperApps.neverAsk.saveToDisk","text/csv"); WebDriver driver =
-		 * new FirefoxDriver(profile); //new RemoteWebDriver(new
-		 * URL("http://localhost:4444/wd/hub"), capability);
-		 */
 		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
 			driver.manage().timeouts().pageLoadTimeout(page_load_timeout_interval,
@@ -193,6 +186,7 @@ public class AppTest {
 		System.err.println("BeforeMethod Method: " + methodName);
 		// String dataProvider = ((IDataProvidable)annotation).getDataProvider();
 		// System.err.println("Data Provider: " + dataProvider);
+		@SuppressWarnings("deprecation")
 		Map<String, String> parameters = (((TestRunner) context).getTest())
 				.getParameters();
 		Set<String> keys = parameters.keySet();
@@ -210,25 +204,27 @@ public class AppTest {
 		}
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2003")
+	// NOTE: sporadically fails with
+	// Timeout in parseSearchResult when run together with other tests
+	@Test(enabled = true, singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2003")
 	public void test_with_Excel_2003(String search_keyword, double expected_count)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected_count);
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "OpenOffice Spreadsheet")
+	@Test(enabled = true, singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "OpenOffice Spreadsheet")
 	public void test_with_OpenOffice_Spreadsheet(String search_keyword,
 			double expected_count) throws InterruptedException {
 		parseSearchResult(search_keyword, expected_count);
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2007")
+	@Test(enabled = true, singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "Excel 2007")
 	public void test_with_Excel_2007(String search_keyword, double expected_count)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected_count);
 	}
 
-	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "JSON")
+	@Test(enabled = true, singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "JSON")
 	public void test_with_JSON(String search_keyword, double expected_count)
 			throws InterruptedException {
 		parseSearchResult(search_keyword, expected_count);
@@ -267,7 +263,7 @@ public class AppTest {
 		element.sendKeys(search_keyword);
 		element.sendKeys(Keys.RETURN);
 
-		String pubsFoundCssSelector = "ul[class*='tabs-menu_habrahabr'] a[class*='tab-item tab-item_current']";
+		String pubsFoundCssSelector = "span[class*='tabs-menu__item-counter'][class*='tabs-menu__item-counter_total']";
 		wait.until(ExpectedConditions
 				.visibilityOfElementLocated(By.cssSelector(pubsFoundCssSelector)));
 		element = driver.findElement(By.cssSelector(pubsFoundCssSelector));
@@ -294,12 +290,11 @@ public class AppTest {
 	public Object[][] createData_from_Excel2007(final ITestContext context,
 			final Method method) {
 
-		String suiteName = context.getCurrentXmlTest().getSuite().getName();
-		System.err.println("Data Provider Caller Suite: " + suiteName);
-		String testName = context.getCurrentXmlTest().getName();
-		System.err.println("Data Provider Caller Test: " + testName);
-		String methodName = method.getName();
-
+		// String suiteName = context.getCurrentXmlTest().getSuite().getName();
+		System.err.println("Data Provider Caller Suite: "
+				+ context.getCurrentXmlTest().getSuite().getName());
+		System.err.println(
+				"Data Provider Caller Test: " + context.getCurrentXmlTest().getName());
 		System.out.println("Data Provider Caller Method: " + method.getName());
 		// String testParam =
 		// context.getCurrentXmlTest().getParameter("test_param");
@@ -307,14 +302,13 @@ public class AppTest {
 		@SuppressWarnings("deprecation")
 		Map<String, String> parameters = (((TestRunner) context).getTest())
 				.getParameters();
-		Set<String> keys = parameters.keySet();
-		for (String key : keys) {
+		for (String key : parameters.keySet()) {
 			System.out.println("Data Provider Caller Parameter: " + key + " = "
 					+ parameters.get(key));
 		}
 
-		HashMap<String, String> columns = new HashMap<String, String>();
-		List<Object[]> testData = new ArrayList<Object[]>();
+		HashMap<String, String> columns = new HashMap<>();
+		List<Object[]> testData = new ArrayList<>();
 		Object[] testDataRow = {};
 
 		String fileName = "data_2007.xlsx";
@@ -332,13 +326,13 @@ public class AppTest {
 			String search_keyword = "";
 			double expected_count = 0;
 			int id = 0;
-			Iterator rows = sheet.rowIterator();
+			Iterator<Row> rows = sheet.rowIterator();
 			while (rows.hasNext()) {
 				row = (XSSFRow) rows.next();
 
 				if (row.getRowNum() == 0) {
 					// skip the header
-					Iterator cells = row.cellIterator();
+					Iterator<org.apache.poi.ss.usermodel.Cell> cells = row.cellIterator();
 					while (cells.hasNext()) {
 						cell = (XSSFCell) cells.next();
 						String dataHeader = cell.getStringCellValue();
@@ -350,7 +344,7 @@ public class AppTest {
 					}
 					continue;
 				}
-				Iterator cells = row.cellIterator();
+				Iterator<org.apache.poi.ss.usermodel.Cell> cells = row.cellIterator();
 				while (cells.hasNext()) {
 					cell = (XSSFCell) cells.next();
 					cellColumn = CellReference
@@ -385,7 +379,7 @@ public class AppTest {
 	@DataProvider(parallel = false, name = "Excel 2003")
 	public Object[][] createData_from_Excel2003() {
 
-		List<Object[]> testData = new ArrayList<Object[]>();
+		List<Object[]> testData = new ArrayList<>();
 		Object[] testDataRow = {};
 
 		String fileName = "data_2003.xls";
@@ -402,13 +396,13 @@ public class AppTest {
 			String search_keyword = "";
 			double expected_count = 0;
 
-			Iterator rows = sheet.rowIterator();
+			Iterator<Row> rows = sheet.rowIterator();
 			while (rows.hasNext()) {
 				row = (HSSFRow) rows.next();
 				if (row.getRowNum() == 0) { // ignore the header
 					continue;
 				}
-				Iterator cells = row.cellIterator();
+				Iterator<org.apache.poi.ss.usermodel.Cell> cells = row.cellIterator();
 				while (cells.hasNext()) {
 					cell = (HSSFCell) cells.next();
 					if (cell.getColumnIndex() == 2) {
@@ -443,8 +437,8 @@ public class AppTest {
 	@DataProvider(parallel = false, name = "OpenOffice Spreadsheet")
 	public Object[][] createData_from_OpenOfficeSpreadsheet() {
 
-		HashMap<String, String> columns = new HashMap<String, String>();
-		List<Object[]> testData = new ArrayList<Object[]>();
+		HashMap<String, String> columns = new HashMap<>();
+		List<Object[]> testData = new ArrayList<>();
 		Object[] testDataRow = {};
 
 		String fileName = "data.ods";
@@ -462,6 +456,7 @@ public class AppTest {
 			System.err.println("Sheet name: " + sheet.getName());
 			int nColCount = sheet.getColumnCount();
 			int nRowCount = sheet.getRowCount();
+			@SuppressWarnings("rawtypes")
 			Cell cell = null;
 			for (int nColIndex = 0; nColIndex < nColCount; nColIndex++) {
 				String header = sheet.getImmutableCellAt(nColIndex, 0).getValue()
@@ -475,7 +470,7 @@ public class AppTest {
 			}
 			// often there may be no ranges defined
 			Set<String> rangeeNames = sheet.getRangesNames();
-			Iterator rangeNamesIterator = rangeeNames.iterator();
+			Iterator<String> rangeNamesIterator = rangeeNames.iterator();
 
 			while (rangeNamesIterator.hasNext()) {
 				System.err.println("Range = " + rangeNamesIterator.next());
@@ -527,8 +522,8 @@ public class AppTest {
 
 		String fileName = "data.json";
 		JSONObject allTestData = new JSONObject();
-		List<Object[]> testData = new ArrayList<Object[]>();
-		ArrayList<String> hashes = new ArrayList<String>();
+		List<Object[]> testData = new ArrayList<>();
+		ArrayList<String> hashes = new ArrayList<>();
 		String search_keyword = "";
 		double expected_count = 0;
 
@@ -566,6 +561,7 @@ public class AppTest {
 			} catch (org.json.JSONException e) {
 				e.printStackTrace();
 			}
+			@SuppressWarnings("unchecked")
 			Iterator<String> entryKeyIterator = entryObj.keys();
 
 			while (entryKeyIterator.hasNext()) {
@@ -592,12 +588,13 @@ public class AppTest {
 	@Retention(RetentionPolicy.RUNTIME)
 	public @interface DataFileParameters {
 		String path();
+
 		String encoding() default "UTF-8";
 	}
 
 	@Test(singleThreaded = false, threadPoolSize = 1, invocationCount = 1, description = "searches publications for a keyword", dataProvider = "csv")
 	@DataFileParameters(path = "data.csv")
-	public void testSomething(Object...args) {
+	public void testSomething(Object... args) {
 		// ...
 	}
 
