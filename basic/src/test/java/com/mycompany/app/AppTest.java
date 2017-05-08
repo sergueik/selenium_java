@@ -1,7 +1,5 @@
 package com.mycompany.app;
 
-import java.awt.Toolkit;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.IOException;
@@ -9,6 +7,7 @@ import java.io.IOException;
 import java.lang.RuntimeException;
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -70,6 +69,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import static java.lang.Boolean.*;
 import static java.lang.Float.*;
 import java.lang.Float;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -78,13 +78,13 @@ public class AppTest {
 	private static WebDriver driver;
 	public static WebDriverWait wait;
 	public static Actions actions;
-	private WebElement element = null;
+	// private WebElement element = null;
 	private String selector = null;
 	private static long implicit_wait_interval = 3;
 	private static int flexible_wait_interval = 5;
 	private static long wait_polling_interval = 500;
 	private static long highlight_interval = 100;
-	private static String baseURL = "http://www.tripadvisor.com/";
+	private static String baseURL = "https://www.tripadvisor.com/";
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(AppTest.class);
@@ -123,34 +123,36 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+	@Before
+	public void loadBaseURL() {
+		driver.get(baseURL);
+	}
+
+	// @Ignore
 	@Test
-	public void verifyTextTest() {
+	public void test1() {
 		assertEquals("Hotels", findElement("link_text", "Hotels").getText());
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void test1() {
-		element = findElement("link_text", "Hotels");
+	public void test2() {
+		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = xpathOfElement(element);
 		assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
-		try {
-			element = findElement("xpath", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-			verificationErrors.append("test 1: " + e.toString());
-		}
+		element = findElement("xpath", selector);
+		assertThat(element, notNullValue());
+		highlight(element);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void test2() {
-		element = findElement("link_text", "Hotels");
+	public void test3_1() {
+		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = cssSelectorOfElement(element);
-		System.err.println("test 2: selector: " + selector);
+		System.err.println("test 2: CssSelector: " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
 				selector);
@@ -166,13 +168,26 @@ public class AppTest {
 
 	// @Ignore
 	@Test
-	public void test3() {
-		element = findElement("link_text", "Hotels");
+	public void test3_2() {
+		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = cssSelectorOfElement(element);
-		System.err.println("test 3: selector (standard): " + selector);
+		System.err.println("test 2: CssSelector: " + selector);
+		assertEquals(
+				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
+				selector);
+		element = findElement("css_selector", selector);
+		assertThat(element, notNullValue());
+		highlight(element);
+	}
+
+	// @Ignore
+	@Test
+	public void test4_1() {
+		WebElement element = findElement("link_text", "Hotels");
+		highlight(element);
 		selector = cssSelectorOfElementAlternative(element);
-		System.err.println("test 3: selector (alternative) : " + selector);
+		System.err.println("test 3: Css Selector (alternative) : " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
 				selector);
@@ -186,60 +201,70 @@ public class AppTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
-	public void test4() {
-		element = findElement("css_selector", "input#mainSearch");
-		selector = cssSelectorOfElement(element);
-		// System.err.println("test 4: selector: " + selector);
-		assertEquals("input#mainSearch", selector);
-		highlight(element);
-	}
-
-	@Ignore
-	@Test
-	public void test5() {
-		element = findElement("css_selector", "span#rdoFlights")
-				.findElement(By.cssSelector("div span.label"));
-		selector = cssSelectorOfElement(element);
-		// System.err.println("test 5: selector: " + selector);
-		assertEquals("span#rdoFlights > div.header > span.label", selector);
-		highlight(element);
-	}
-
-	@Ignore
-	@Test
-	public void test6() {
-		element = findElement("id", "searchbox");
-		selector = cssSelectorOfElement(element);
-		// System.err.println("test 6: selector: " + selector);
-		assertEquals("input#searchbox", selector);
-		highlight(element);
-	}
-
-	@Ignore
-	@Test
-	public void test7() {
-		element = findElement("id", "searchbox");
+	public void test4_2() {
+		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		selector = cssSelectorOfElementAlternative(element);
-		// System.err.println("test 7: selector (alternative): " + selector);
+		System.err.println("test 3: Css Selector (alternative) : " + selector);
 		assertEquals(
-				"form[name=\"PTPT_HAC_FORM\"] > div.metaFormWrapper > div.metaFormLine.flex > label.ptptLabelWrap > input[name=\"q\"]",
+				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
 				selector);
-		try {
-			element = findElement("css_selector", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-			verificationErrors.append("test 7: " + e.toString());
-		}
+		element = findElement("css_selector", selector);
+		assertThat(element, notNullValue());
+		highlight(element);
 	}
 
-	@Ignore
+	// @Ignore
+	@Test
+	public void test5() {
+		WebElement element = findElement("css_selector", "input#mainSearch");
+		assertEquals("input#mainSearch", cssSelectorOfElement(element));
+		assertEquals("input#mainSearch", cssSelectorOfElementAlternative(element));
+		highlight(element);
+	}
+
+	// @Ignore
+	@Test
+	public void test6() {
+		WebElement element = findElement("css_selector", "span#rdoFlights")
+				.findElement(By.cssSelector("div span.label"));
+		assertEquals("span#rdoFlights > div.header > span.label",
+				cssSelectorOfElement(element));
+		highlight(element);
+	}
+
+	// @Ignore
+	@Test
+	public void test7() {
+		WebElement element = findElement("id", "searchbox");
+		assertEquals("input#searchbox", cssSelectorOfElement(element));
+		highlight(element);
+	}
+
+	// @Ignore
 	@Test
 	public void test8() {
+		WebElement element = findElement("id", "searchbox")
+				.findElement(By.xpath(".."));
+		highlight(element);
+		selector = cssSelectorOfElementAlternative(element);
+		// System.err.println("test 7: selector (alternative):\n" + selector);
+		assertEquals(
+				"form#PTPT_HAC_FORM > div.metaFormWrapper > div.metaFormLine.flex > label.ptptLabelWrap",
+				selector);
+		element = findElement("css_selector", selector);
+		assertThat(element, notNullValue());
+		highlight(element);
+	}
 
-		element = findElement("link_text", "Hotels");
+	// @Ignore
+	@SuppressWarnings("static-access")
+	@Test
+	public void test9() {
+
+		WebElement element = findElement("link_text", "Hotels");
 		assertThat(element, notNullValue());
 		highlight(element);
 		String style = styleOfElement(element);
@@ -254,8 +279,8 @@ public class AppTest {
 		} catch (AssertionError e) {
 			// slurp
 		}
-		pattern = Pattern.compile("\\((\\d+),");
-		matcher = pattern.matcher(colorAttribute);
+		// pattern = Pattern.compile("\\((\\d+),");
+		matcher = Pattern.compile("\\((\\d+),").matcher(colorAttribute);
 		if (matcher.find()) {
 			int red = Integer.parseInt(matcher.group(1).toString());
 			Assert.assertTrue(red > 254);
@@ -337,13 +362,12 @@ public class AppTest {
 		String parent_xpath = null;
 
 		List<WebElement> elements = null;
-		Hashtable<String, Boolean> supportedSelectorStrategies = new Hashtable<String, Boolean>();
-		supportedSelectorStrategies.put("css_selector", true);
-		supportedSelectorStrategies.put("xpath", true);
+		Hashtable<String, Boolean> selectorStrategies = new Hashtable<String, Boolean>();
+		selectorStrategies.put("css_selector", true);
+		selectorStrategies.put("xpath", true);
 
-		if (selectorKind == null
-				|| !supportedSelectorStrategies.containsKey(selectorKind)
-				|| !supportedSelectorStrategies.get(selectorKind)) {
+		if (selectorKind == null || !selectorStrategies.containsKey(selectorKind)
+				|| !selectorStrategies.get(selectorKind)) {
 			return null;
 		}
 		if (parent != null) {
@@ -386,17 +410,16 @@ public class AppTest {
 
 	private WebElement findElement(String selectorKind, String selectorValue) {
 		WebElement element = null;
-		Hashtable<String, Boolean> supportedSelectorStrategies = new Hashtable<String, Boolean>();
-		supportedSelectorStrategies.put("id", true);
-		supportedSelectorStrategies.put("css_selector", true);
-		supportedSelectorStrategies.put("xpath", true);
-		supportedSelectorStrategies.put("partial_link_text", false);
-		supportedSelectorStrategies.put("link_text", true);
-		supportedSelectorStrategies.put("classname", false);
+		Hashtable<String, Boolean> selectorStrategies = new Hashtable<String, Boolean>();
+		selectorStrategies.put("id", true);
+		selectorStrategies.put("css_selector", true);
+		selectorStrategies.put("xpath", true);
+		selectorStrategies.put("partial_link_text", false);
+		selectorStrategies.put("link_text", true);
+		selectorStrategies.put("classname", false);
 
-		if (selectorKind == null
-				|| !supportedSelectorStrategies.containsKey(selectorKind)
-				|| !supportedSelectorStrategies.get(selectorKind)) {
+		if (selectorKind == null || !selectorStrategies.containsKey(selectorKind)
+				|| !selectorStrategies.get(selectorKind)) {
 			return null;
 		}
 		if (selectorKind == "id") {
@@ -519,6 +542,9 @@ public class AppTest {
 	}
 
 	public static String getBaseURL() {
+		// TODO: somehow browser is set to mobile
+		// if the next line is commented
+		System.err.println("Get base URL: " + driver.getCurrentUrl());
 		log.info("Get base URL: {}", driver.getCurrentUrl());
 		String currentURL = driver.getCurrentUrl();
 		String protocol = null;
@@ -531,6 +557,7 @@ public class AppTest {
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
+		// System.err.println("Returning: " + protocol + "://" + domain);
 		return protocol + "://" + domain;
 	}
 
