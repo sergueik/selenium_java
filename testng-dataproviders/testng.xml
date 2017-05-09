@@ -4,9 +4,9 @@
   <parameter name="selenium.host" value="127.0.0.1"/>
   <parameter name="selenium.port" value="4444"/>
   <parameter name="selenium.browser" value="firefox"/>
-  <test name="AppTest parseSearchResult" preserve-order="true" parallel="false">
+  <test name="Parse Search Result" preserve-order="true" parallel="false">
     <classes>
-      <class name="com.mycompany.app.AppTest"/>
+      <class name="com.mycompany.app.DataProviderTest"/>
       <methods>
         <include name="test_with_Excel_2007"/>
         <include name="test_with_JSON"/>

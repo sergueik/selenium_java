@@ -127,7 +127,7 @@ import org.testng.internal.Attributes;
 
 import java.lang.reflect.Method;
 
-public class AppTest {
+public class DataProviderTest {
 
 	public RemoteWebDriver driver = null;
 
@@ -310,12 +310,12 @@ public class AppTest {
 		HashMap<String, String> columns = new HashMap<>();
 		List<Object[]> testData = new ArrayList<>();
 		Object[] testDataRow = {};
-
+		XSSFWorkbook wb = null;
 		String fileName = "data_2007.xlsx";
 		try {
 
 			String sheetName = "Employee Data";
-			XSSFWorkbook wb = new XSSFWorkbook(fileName);
+			wb = new XSSFWorkbook(fileName);
 			XSSFSheet sheet = wb.getSheet(sheetName);
 			// XSSFSheet sheet = wb.getSheetAt(0);
 			// sheet.getSheetName();
@@ -370,6 +370,13 @@ public class AppTest {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (wb != null) {
+				try {
+					wb.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 		Object[][] testDataArray = new Object[testData.size()][];
 		testData.toArray(testDataArray);
@@ -383,9 +390,10 @@ public class AppTest {
 		Object[] testDataRow = {};
 
 		String fileName = "data_2003.xls";
+		HSSFWorkbook wb = null;
 		try {
 			InputStream ExcelFileToRead = new FileInputStream(fileName);
-			HSSFWorkbook wb = new HSSFWorkbook(ExcelFileToRead);
+			wb = new HSSFWorkbook(ExcelFileToRead);
 
 			// HSSFSheet sheet = wb.getSheetAt(0);
 			String sheetName = "Employee Data";
@@ -428,6 +436,13 @@ public class AppTest {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (wb != null) {
+				try {
+					wb.close();
+				} catch (IOException e) {
+				}
+			}
 		}
 		Object[][] testDataArray = new Object[testData.size()][];
 		testData.toArray(testDataArray);
