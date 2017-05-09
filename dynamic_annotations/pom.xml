@@ -16,7 +16,8 @@
     <junit.version>4.12</junit.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
     <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
     <selenium.version>3.2.0</selenium.version>
@@ -47,7 +48,7 @@
     <groupId>org.apache.commons</groupId>
     <artifactId>commons-collections4</artifactId>
     <version>${commons-collections4.version}</version>
-</dependency>
+    </dependency>
     <dependency>
       <groupId>com.jcabi</groupId>
       <artifactId>jcabi-matchers</artifactId>
@@ -130,6 +131,25 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <goals>
+          <goal>compile</goal>
+        </goals>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>utf-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+          <!--
+          <compilerArgument>-verbose</compilerArgument>
+          -->
+        </configuration>
       </plugin>
     </plugins>
   </build>

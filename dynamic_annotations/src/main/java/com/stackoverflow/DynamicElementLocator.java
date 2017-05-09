@@ -26,7 +26,6 @@ public class DynamicElementLocator implements ElementLocator {
 	// the substitutions parameter for this method.
 	public DynamicElementLocator(final SearchContext searchContext,
 			final Field field, final Map<String, String> substitutions) {
-		// log.entry(searchContext, field, substitutions);
 		this.searchContext = searchContext;
 		// DynamicAnnotations is my implementation of annotation processing
 		// that uses the substitutions to find and replace values in the
@@ -36,16 +35,13 @@ public class DynamicElementLocator implements ElementLocator {
 		shouldCache = annotations.isLookupCached();
 		by = annotations.buildBy();
 		// log.debug("Successful completion of the dynamic element locator");
-		// log.exit();
 	}
 
 	/**
 	 * Find the element.
 	 */
 	public WebElement findElement() {
-		// log.entry();
 		if (cachedElement != null && shouldCache) {
-			// return log.exit(cachedElement);
 			return cachedElement;
 		}
 
@@ -53,8 +49,6 @@ public class DynamicElementLocator implements ElementLocator {
 		if (shouldCache) {
 			cachedElement = element;
 		}
-
-		// return log.exit(element);
 		return element;
 	}
 
@@ -62,9 +56,7 @@ public class DynamicElementLocator implements ElementLocator {
 	 * Find the element list.
 	 */
 	public List<WebElement> findElements() {
-		// log.entry();
 		if (cachedElementList != null && shouldCache) {
-			// return log.exit(cachedElementList);
 			return cachedElementList;
 		}
 
@@ -72,8 +64,6 @@ public class DynamicElementLocator implements ElementLocator {
 		if (shouldCache) {
 			cachedElementList = elements;
 		}
-
-		// return log.exit(elements);
 		return elements;
 	}
 }
