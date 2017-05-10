@@ -1,4 +1,4 @@
-package com.mycompany.dataprovider;
+package org.dataprovider;
 
 import java.io.File;
 import java.io.FileInputStream;

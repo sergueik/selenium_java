@@ -6,7 +6,7 @@
   <parameter name="selenium.browser" value="chrome"/>
   <test name="Parse Search Result" preserve-order="true" parallel="false">
     <classes>
-      <class name="com.mycompany.dataprovider.DataProviderTest">
+      <class name="org.dataprovider.DataProviderTest">
         <methods>
           <include name="test_with_Excel_2007"/>
           <include name="test_with_JSON"/>
