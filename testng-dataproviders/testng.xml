@@ -3,16 +3,17 @@
 <suite name="Suite 1" verbose="10" configfailurepolicy="continue">
   <parameter name="selenium.host" value="127.0.0.1"/>
   <parameter name="selenium.port" value="4444"/>
-  <parameter name="selenium.browser" value="firefox"/>
+  <parameter name="selenium.browser" value="chrome"/>
   <test name="Parse Search Result" preserve-order="true" parallel="false">
     <classes>
-      <class name="com.mycompany.app.DataProviderTest"/>
-      <methods>
-        <include name="test_with_Excel_2007"/>
-        <include name="test_with_JSON"/>
-        <include name="test_with_OpenOffice_Spreadsheet"/>
-        <include name="test_with_Excel_2003"/>
-      </methods>
+      <class name="com.mycompany.dataprovider.DataProviderTest">
+        <methods>
+          <include name="test_with_Excel_2007"/>
+          <include name="test_with_JSON"/>
+          <include name="test_with_OpenOffice_Spreadsheet"/>
+          <include name="test_with_Excel_2003"/>
+        </methods>
+      </class>
     </classes>
   </test>
 </suite>
