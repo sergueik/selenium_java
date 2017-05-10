@@ -106,12 +106,6 @@ public class SuvianTest {
 	private static final String browser = "chrome";
 	private static String osName;
 
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name");
-		}
-		return osName;
-	}
 
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
@@ -2872,7 +2866,14 @@ public class SuvianTest {
 		}
 	}
 
-	// utils
+	// Utils
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
+
 	private void highlightNew(WebElement element, long highlight_interval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
