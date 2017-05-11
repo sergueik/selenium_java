@@ -1,6 +1,5 @@
 package net.jsourcerer.webdriver.jserrorcollector;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +13,11 @@ import org.openqa.selenium.firefox.FirefoxProfile;
  * Holds information about a JavaScript error that has occurred in the browser.
  * This can be currently only used with the {@link FirefoxDriver} (see {@link #addExtension(FirefoxProfile)}.
  * @author Marc Guillemot
- * @version $Revision:  $
  */
 public class JavaScriptError {
 	private final String errorMessage;
 	private final String sourceName;
-	private final int lineNumber;	
+	private final int lineNumber;
 	private final String console;
 
 	public JavaScriptError(final Map<String, ? extends Object> map) {
@@ -29,7 +27,8 @@ public class JavaScriptError {
 		console = (String) map.get("console");
 	}
 
-	public JavaScriptError(final String errorMessage, final String sourceName, final int lineNumber, String console) {
+	public JavaScriptError(final String errorMessage, final String sourceName,
+			final int lineNumber, String console) {
 		this.errorMessage = errorMessage;
 		this.sourceName = sourceName;
 		this.lineNumber = lineNumber;
@@ -39,27 +38,23 @@ public class JavaScriptError {
 	public String getErrorMessage() {
 		return errorMessage;
 	}
-	
+
 	public int getLineNumber() {
 		return lineNumber;
 	}
-	
+
 	public String getSourceName() {
 		return sourceName;
 	}
-	
+
 	/**
-	 * If Firebug is installed and active, this will contain the content of the Firebug Console since
+	 * If Firebug plugin is installed and active, this will contain the content of the Firebug Console since
 	 * the previous JavaScript error. 
-	 * @return
 	 */
 	public String getConsole() {
 		return console;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -73,9 +68,6 @@ public class JavaScriptError {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -132,28 +124,14 @@ public class JavaScriptError {
 	@SuppressWarnings("unchecked")
 	public static List<JavaScriptError> readErrors(final WebDriver driver) {
 		final String script = "return window.JSErrorCollector_errors ? window.JSErrorCollector_errors.pump() : []";
-		final List<Object> errors = (List<Object>) ((JavascriptExecutor) driver).executeScript(script);
+		final List<Object> errors = (List<Object>) ((JavascriptExecutor) driver)
+				.executeScript(script);
 		final List<JavaScriptError> response = new ArrayList<JavaScriptError>();
 		for (final Object rawError : errors) {
-			response.add(new JavaScriptError((Map<String, ? extends Object>) rawError));
+			response
+					.add(new JavaScriptError((Map<String, ? extends Object>) rawError));
 		}
-		
-		return response;
-	}
 
-	/**
-	 * Adds the Firefox extension collecting JS errors to the profile what allows later use of {@link #readErrors(WebDriver)}.
-	 * <p>
-	 * Example:<br>
-	 * <code><pre>
-	 * final FirefoxProfile profile = new FirefoxProfile();
-	 * JavaScriptError.addExtension(profile);
-	 * final WebDriver driver = new FirefoxDriver(profile);
-	 * </pre></code>
-	 * @param ffProfile the Firefox profile to which the extension should be added.
-	 * @throws IOException in case of problem
-	 */
-	public static void addExtension(final FirefoxProfile ffProfile) throws IOException {
-		ffProfile.addExtension(JavaScriptError.class, "JSErrorCollector.xpi");
+		return response;
 	}
 }
