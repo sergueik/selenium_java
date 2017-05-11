@@ -35,7 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.text.DateFormat;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -85,12 +85,9 @@ import org.json.JSONException;
 public class YandexTest {
 
 	private static WebDriver driver;
-	private static WebDriver frame;
 	private static WebDriverWait wait;
 	private static Actions actions;
-	private static WebElement element = null;
 	private static Boolean debug = false;
-	private static String selector = null;
 	private static long implicitWait = 10;
 	private static int flexibleWait = 30;
 	private static long polling = 1000;
@@ -107,6 +104,14 @@ public class YandexTest {
 	private static StringBuilder loggingSb;
 	private static String configurationFileName = "test.configuration";
 	private static String propertiesFileName = "test.properties";
+	private static String osName = null;
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
 
 	@BeforeClass
 	public static void setUp() {
@@ -114,9 +119,12 @@ public class YandexTest {
 		if (env.containsKey("DEBUG") && env.get("DEBUG").equals("true")) {
 			debug = true;
 		}
+		System.err.println("OS: " + getOsName());
+		/*
 		TestConfigurationParser
 				.getConfiguration(String.format("%s/src/test/resources/%s",
 						System.getProperty("user.dir"), configurationFileName));
+		*/
 		HashMap<String, String> propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/test/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
@@ -134,7 +142,7 @@ public class YandexTest {
 	@Before
 	public void beforeTest() {
 		driver.get(baseURL);
-		element = driver.findElement(By.cssSelector(
+		WebElement element = driver.findElement(By.cssSelector(
 				"table.layout__table tr.layout__header div.personal div.b-inline"));
 		highlight(element);
 		element.click();
@@ -191,7 +199,7 @@ public class YandexTest {
 		doLogout();
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void useCookieTest() throws Exception {
 		String loginUrl = doLogin();
@@ -237,7 +245,8 @@ public class YandexTest {
 	private String doLogin() {
 
 		// And I enter the username
-		element = driver.findElement(By.xpath("//form/div[1]/label/span/input"));
+		WebElement element = driver
+				.findElement(By.xpath("//form/div[1]/label/span/input"));
 		highlight(element);
 		element.clear();
 		element.sendKeys(username);
@@ -277,7 +286,7 @@ public class YandexTest {
 		element = driver.findElement(
 				By.cssSelector("form.new-auth-form span.new-auth-submit button"));
 		highlight(element);
-		String currentUrl = driver.getCurrentUrl();
+		// String currentUrl = driver.getCurrentUrl();
 		element.click();
 
 		// wait until browser is away from the login page
@@ -302,8 +311,7 @@ public class YandexTest {
 		// wait until browser is on the landing page
 		wait.until(ExpectedConditions.urlContains(retpath));
 
-		String currentURL = driver.getCurrentUrl();
-		// System.out.println("Page url: " + currentURL);
+		// System.out.println("Page url: " + driver.getCurrentUrl());
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(
 					By.cssSelector("div.mail-App-Header div.mail-User")));
@@ -317,7 +325,7 @@ public class YandexTest {
 		assertTrue(driver.getCurrentUrl().matches(".*#inbox"));
 
 		// When I am logged on user
-		element = driver.findElement(
+		WebElement element = driver.findElement(
 				By.cssSelector("div.mail-App-Header div.mail-User div.mail-User-Name"));
 		highlight(element);
 		element.click();
@@ -326,19 +334,28 @@ public class YandexTest {
 				"body.mail-Page-Body div.ui-dialog div._nb-popup-content div.b-user-dropdown-content-with-exit div.b-mail-dropdown__item a.ns-action"));
 		highlight(element);
 		element.click();
+		// to update the path, increase the sleep interval below
 		try {
 			Thread.sleep(1000);
 		} catch (InterruptedException e) {
 
 		}
 		// And I confirm I am going to log off
+		/*
+		// auto-generated xpath: no longer correct ?
 		element = driver.findElement(
 				By.xpath("//div[5]/div[2]/table/tbody/tr/td/div[3]/div/a"));
+		element = wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.xpath("//table//a[@class='ns-action'][text()='Выйти на всех устройствах']"))));
+		*/
+		element = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
+						"//table//a[@class='ns-action' and contains(string(),'Выйти на всех устройствах')]"))));
 		// Evaluate logout URL
-		String logout_href = element.getAttribute("href");
-		System.err.println("Logout href: " + logout_href);
+		System.err.println("Logout href: " + element.getAttribute("href"));
 		highlight(element);
 		/*
+		 * Logout href: https://passport.yandex.ru/passport?mode=embeddedauth&action=change_default&uid=419561298&yu=3540052471494536037&retpath=https%3A%2F%2Fpassport.yandex.ru%2Fpassport%3Fmode%3Dlogout%26global%3D1%26yu%3D3540052471494536037
 		 * String retpath = null; Pattern pattern = Pattern
 		 * .compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
 		 *
@@ -389,45 +406,46 @@ public class YandexTest {
 		}
 	}
 
-	private static class TestConfigurationParser {
-
-		private static Scanner loadTestData(final String fileName) {
-			Scanner scanner = null;
-			System.err
-					.println(String.format("Reading configuration file: '%s'", fileName));
-			try {
-				scanner = new Scanner(new File(fileName));
-			} catch (FileNotFoundException e) {
-				// fail(String.format("File '%s' was not found.", fileName));
-				System.err.println(
-						String.format("Configuration file was not found: '%s'", fileName));
-				e.printStackTrace();
-			}
-			return scanner;
-		}
-
-		public static List<String[]> getConfiguration(final String fileName) {
-			ArrayList<String[]> listOfData = new ArrayList<>();
-			Scanner scanner = loadTestData(fileName);
-			String separator = "|";
-			while (scanner.hasNext()) {
-				String line = scanner.next();
-				String[] data = line.split(Pattern.compile("(\\||\\|/)")
-						.matcher(separator).replaceAll("\\\\$1"));
-				for (String entry : data){
-					System.err.println("data entry: " + entry);
+	/*	private static class TestConfigurationParser {
+	
+			private static Scanner loadTestData(final String fileName) {
+				Scanner scanner = null;
+				System.err
+						.println(String.format("Reading configuration file: '%s'", fileName));
+				try {
+					scanner = new Scanner(new File(fileName));
+				} catch (FileNotFoundException e) {
+					// fail(String.format("File '%s' was not found.", fileName));
+					System.err.println(
+							String.format("Configuration file was not found: '%s'", fileName));
+					e.printStackTrace();
 				}
-				listOfData.add(data);
+				return scanner;
 			}
-			scanner.close();
-			return listOfData;
+	
+			public static List<String[]> getConfiguration(final String fileName) {
+				ArrayList<String[]> listOfData = new ArrayList<>();
+				Scanner scanner = loadTestData(fileName);
+				String separator = "|";
+				while (scanner.hasNext()) {
+					String line = scanner.next();
+					String[] data = line.split(Pattern.compile("(\\||\\|/)")
+							.matcher(separator).replaceAll("\\\\$1"));
+					for (String entry : data) {
+						System.err.println("data entry: " + entry);
+					}
+					listOfData.add(data);
+				}
+				scanner.close();
+				return listOfData;
+			}
 		}
-	}
-
+	*/
 	private static class PropertiesParser {
+		@SuppressWarnings("unchecked")
 		public static HashMap<String, String> getProperties(final String fileName) {
 			Properties p = new Properties();
-			HashMap<String, String> propertiesMap = new HashMap<String, String>();
+			HashMap<String, String> propertiesMap = new HashMap<>();
 			System.err
 					.println(String.format("Reading properties file: '%s'", fileName));
 			try {
@@ -450,7 +468,6 @@ public class YandexTest {
 				e.printStackTrace();
 			}
 			return (propertiesMap);
-
 		}
 	}
 }
