@@ -119,12 +119,7 @@ public class YandexTest {
 		if (env.containsKey("DEBUG") && env.get("DEBUG").equals("true")) {
 			debug = true;
 		}
-		System.err.println("OS: " + getOsName());
-		/*
-		TestConfigurationParser
-				.getConfiguration(String.format("%s/src/test/resources/%s",
-						System.getProperty("user.dir"), configurationFileName));
-		*/
+		getOsName();
 		HashMap<String, String> propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/test/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
@@ -342,9 +337,11 @@ public class YandexTest {
 		}
 		// And I confirm I am going to log off
 		/*
-		// auto-generated xpath: no longer correct ?
+		// auto-generated xpath: no longer correct, difficult to maintain
 		element = driver.findElement(
 				By.xpath("//div[5]/div[2]/table/tbody/tr/td/div[3]/div/a"));
+		*/
+		/*
 		element = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.xpath("//table//a[@class='ns-action'][text()='Выйти на всех устройствах']"))));
 		*/
@@ -352,19 +349,28 @@ public class YandexTest {
 				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
 						"//table//a[@class='ns-action' and contains(string(),'Выйти на всех устройствах')]"))));
 		// Evaluate logout URL
-		System.err.println("Logout href: " + element.getAttribute("href"));
 		highlight(element);
+		String logout_href = element.getAttribute("href");
+		System.err.println("Logout href: " + element.getAttribute("href"));
 		/*
 		 * Logout href: https://passport.yandex.ru/passport?mode=embeddedauth&action=change_default&uid=419561298&yu=3540052471494536037&retpath=https%3A%2F%2Fpassport.yandex.ru%2Fpassport%3Fmode%3Dlogout%26global%3D1%26yu%3D3540052471494536037
-		 * String retpath = null; Pattern pattern = Pattern
-		 * .compile("https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
-		 *
-		 * Matcher matcher = pattern.matcher(logout_href); if (matcher.find()) { try
-		 * { retpath = java.net.URLDecoder.decode(matcher.group(1).toString(),
-		 * "UTF-8"); } catch (UnsupportedEncodingException e) { // ignore } } //
-		 * NOTE: do not wait for retpath System.err.println("Logout relpath: " +
-		 * retpath);
 		 */
+
+		String retpath = null;
+		Pattern pattern = Pattern.compile(
+				"https://passport.yandex.ru/passport?\\?mode=.+&retpath=(.+)$");
+
+		Matcher matcher = pattern.matcher(logout_href);
+		if (matcher.find()) {
+			try {
+				retpath = java.net.URLDecoder.decode(matcher.group(1).toString(),
+						"UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// ignore
+			}
+		}
+		System.err.println("Extracted Logout relpath: " + retpath);
+
 		String currentUrl = driver.getCurrentUrl();
 		element.click();
 		try {
@@ -406,41 +412,6 @@ public class YandexTest {
 		}
 	}
 
-	/*	private static class TestConfigurationParser {
-	
-			private static Scanner loadTestData(final String fileName) {
-				Scanner scanner = null;
-				System.err
-						.println(String.format("Reading configuration file: '%s'", fileName));
-				try {
-					scanner = new Scanner(new File(fileName));
-				} catch (FileNotFoundException e) {
-					// fail(String.format("File '%s' was not found.", fileName));
-					System.err.println(
-							String.format("Configuration file was not found: '%s'", fileName));
-					e.printStackTrace();
-				}
-				return scanner;
-			}
-	
-			public static List<String[]> getConfiguration(final String fileName) {
-				ArrayList<String[]> listOfData = new ArrayList<>();
-				Scanner scanner = loadTestData(fileName);
-				String separator = "|";
-				while (scanner.hasNext()) {
-					String line = scanner.next();
-					String[] data = line.split(Pattern.compile("(\\||\\|/)")
-							.matcher(separator).replaceAll("\\\\$1"));
-					for (String entry : data) {
-						System.err.println("data entry: " + entry);
-					}
-					listOfData.add(data);
-				}
-				scanner.close();
-				return listOfData;
-			}
-		}
-	*/
 	private static class PropertiesParser {
 		@SuppressWarnings("unchecked")
 		public static HashMap<String, String> getProperties(final String fileName) {
