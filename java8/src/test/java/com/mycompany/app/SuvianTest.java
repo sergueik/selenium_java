@@ -106,7 +106,6 @@ public class SuvianTest {
 	private static final String browser = "chrome";
 	private static String osName;
 
-
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
 	public void beforeSuite() throws Exception {

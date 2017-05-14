@@ -117,7 +117,6 @@ public class TripAdvisorTest {
 	private static WebDriver driver;
 	public static WebDriverWait wait;
 	public static Actions actions;
-	private String selector = null;
 	private static long implicit_wait_interval = 3;
 	private static int flexible_wait_interval = 5;
 	private static long wait_polling_interval = 500;
@@ -130,12 +129,56 @@ public class TripAdvisorTest {
 
 	private static Pattern pattern;
 	private static Matcher matcher;
+	private static final String browser = "chrome";
 
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
 	public static void setUp() {
-    getOsName();
-		System.setProperty("webdriver.gecko.driver",
+		getOsName();
+		if (browser.equals("chrome")) {
+			System.setProperty("webdriver.chrome.driver",
+					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			ChromeOptions options = new ChromeOptions();
+
+			HashMap<String, Object> chromePrefs = new HashMap<>();
+			chromePrefs.put("profile.default_content_settings.popups", 0);
+			String downloadFilepath = System.getProperty("user.dir")
+					+ System.getProperty("file.separator") + "target"
+					+ System.getProperty("file.separator");
+			chromePrefs.put("download.default_directory", downloadFilepath);
+			chromePrefs.put("enableNetwork", "true");
+			options.setExperimentalOption("prefs", chromePrefs);
+
+			for (String optionAgrument : (new String[] {
+					"allow-running-insecure-content", "allow-insecure-localhost",
+					"enable-local-file-accesses", "disable-notifications",
+					/* "start-maximized" , */
+					"browser.download.folderList=2",
+					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
+					String.format("browser.download.dir=%s", downloadFilepath)
+					/* "user-data-dir=/path/to/your/custom/profile"  , */
+			})) {
+				options.addArguments(optionAgrument);
+			}
+
+			// options for headless
+			/*
+			for (String optionAgrument : (new String[] { "headless",
+					"window-size=1200x600", })) {
+				options.addArguments(optionAgrument);
+			}
+			*/
+			capabilities
+					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			driver = new ChromeDriver(capabilities);
+			
+		} else if (browser.equals("firefox")) {
+			// TODO: Observed user agent problem with firefox - mobile version of tripadvisor is rendered
+			System.setProperty("webdriver.gecko.driver",
 					osName.toLowerCase().startsWith("windows")
 							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
 							: "/tmp/geckodriver");
@@ -146,6 +189,7 @@ public class TripAdvisorTest {
 											.getAbsolutePath()
 									: "/usr/bin/firefox");
 			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+			// use legacy FirefoxDriver
 			capabilities.setCapability("marionette", false);
 			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
 			capabilities.setCapability("locationContextEnabled", false);
@@ -164,9 +208,7 @@ public class TripAdvisorTest {
 				e.printStackTrace();
 				throw new RuntimeException("Cannot initialize Firefox driver");
 			}
-
-		// driver = new FirefoxDriver();
-
+		}
 		wait = new WebDriverWait(driver, flexible_wait_interval);
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
 		driver.get(baseURL);
@@ -197,7 +239,7 @@ public class TripAdvisorTest {
 	public void test2() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
-		selector = xpathOfElement(element);
+		String selector = xpathOfElement(element);
 		assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
 		element = findElement("xpath", selector);
 		assertThat(element, notNullValue());
@@ -208,7 +250,7 @@ public class TripAdvisorTest {
 	public void test3_1() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
-		selector = cssSelectorOfElement(element);
+		String selector = cssSelectorOfElement(element);
 		System.err.println("test 2: CssSelector: " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
@@ -227,7 +269,7 @@ public class TripAdvisorTest {
 	public void test3_2() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
-		selector = cssSelectorOfElement(element);
+		String selector = cssSelectorOfElement(element);
 		System.err.println("test 2: CssSelector: " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
@@ -241,7 +283,7 @@ public class TripAdvisorTest {
 	public void test4_1() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
-		selector = cssSelectorOfElementAlternative(element);
+		String selector = cssSelectorOfElementAlternative(element);
 		System.err.println("test 3: Css Selector (alternative) : " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
@@ -260,7 +302,7 @@ public class TripAdvisorTest {
 	public void test4_2() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
-		selector = cssSelectorOfElementAlternative(element);
+		String selector = cssSelectorOfElementAlternative(element);
 		System.err.println("test 3: Css Selector (alternative) : " + selector);
 		assertEquals(
 				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
@@ -299,7 +341,7 @@ public class TripAdvisorTest {
 		WebElement element = findElement("id", "searchbox")
 				.findElement(By.xpath(".."));
 		highlight(element);
-		selector = cssSelectorOfElementAlternative(element);
+		String selector = cssSelectorOfElementAlternative(element);
 		// System.err.println("test 7: selector (alternative):\n" + selector);
 		assertEquals(
 				"form#PTPT_HAC_FORM > div.metaFormWrapper > div.metaFormLine.flex > label.ptptLabelWrap",
