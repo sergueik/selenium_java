@@ -40,15 +40,16 @@ public class VideoRecorder {
 			Rectangle rectangle = new Rectangle(point.x, point.y, dimension.width,
 					dimension.height);
 			// https://www.randelshofer.ch/monte/javadoc/org/monte/media/Format.html
-			this.screenRecorder = new ScreenRecorder(gc, rectangle, new Format(
-					MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
+			this.screenRecorder = new ScreenRecorder(gc, rectangle,
+					new Format(MediaTypeKey, MediaType.FILE, MimeTypeKey, MIME_AVI),
 					new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey,
 							ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, CompressorNameKey,
-							ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, 24,
-							FrameRateKey, Rational.valueOf(30), QualityKey, 1.0f,
-							KeyFrameIntervalKey, 30 * 60), new Format(MediaTypeKey,
-							MediaType.VIDEO, EncodingKey, "black", FrameRateKey,
-							Rational.valueOf(30)), null, dir);
+							ENCODING_AVI_TECHSMITH_SCREEN_CAPTURE, DepthKey, 24, FrameRateKey,
+							Rational.valueOf(30), QualityKey, 1.0f, KeyFrameIntervalKey,
+							30 * 60),
+					new Format(MediaTypeKey, MediaType.VIDEO, EncodingKey, "black",
+							FrameRateKey, Rational.valueOf(30)),
+					null, dir);
 
 			this.screenRecorder.start();
 

@@ -31,10 +31,10 @@ public class App {
 	private static WebDriver driver;
 	static String SiteURL = "http://www.tripadvisor.com/";
 
-	static int implicit_wait_interval = 1;
 	static int flexible_wait_interval = 5;
 	static long wait_polling_interval = 500;
 	static long highlight_interval = 100;
+	static long implicit_wait_interval = 3;
 
 	static WebDriverWait wait;
 	static Actions actions;
@@ -42,29 +42,27 @@ public class App {
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
 	@Before
-	public static void setup() throws Exception {
-		long implicit_wait_interval = 3;
+	public static void setup() {
 		driver = new FirefoxDriver();
 		driver.get(SiteURL);
-		driver.manage().timeouts()
-				.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
+				TimeUnit.SECONDS);
 		recorder = new VideoRecorder();
 		recorder.startRecording(driver);
 	}
 
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 		setup();
 		testVerifyText();
 		tearDown();
 	}
 
 	@Test
-	public static void testVerifyText() throws Exception {
-		String selector = null;
+	public static void testVerifyText() {
 		WebElement element = null;
 		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By
-					.linkText("Hotels")));
+			wait.until(
+					ExpectedConditions.visibilityOfElementLocated(By.linkText("Hotels")));
 		} catch (RuntimeException timeoutException) {
 
 		}
@@ -72,16 +70,19 @@ public class App {
 
 		assertEquals("Hotels", element.getText());
 		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
-		javascriptExecutor.executeScript(
-				"arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
+		javascriptExecutor
+				.executeScript("arguments[0].style.border='3px solid yellow'", element);
+		try {
+			Thread.sleep(highlight_interval);
+		} catch (InterruptedException e) {
+		}
 		javascriptExecutor.executeScript("arguments[0].style.border=''", element);
 
 		element.click();
 	}
 
 	@After
-	public static void tearDown() throws Exception {
+	public static void tearDown() {
 		recorder.stopRecording("Recording");
 		driver.quit();
 	}

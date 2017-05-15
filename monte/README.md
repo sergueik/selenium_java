@@ -11,8 +11,8 @@ Java
 ----
  + [Monte Media Library](http://www.randelshofer.ch/monte/files/demos/MonteScreenRecorder.jar)
  + [Github](https://github.com/chenry/monte)
- + [Maven central](https://mvnrepository.com/artifact/com.pojosontheweb/monte-repack/1.0).
-
+ + [Maven central](https://mvnrepository.com/artifact/com.pojosontheweb/monte-repack/1.0.1).
+ + [Monte Media](https://mvnrepository.com/artifact/ru.sbtqa/monte-media/1.0.1)
 
 .Net
 ----
