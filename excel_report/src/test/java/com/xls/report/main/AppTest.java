@@ -24,16 +24,12 @@ public class AppTest extends TestCase {
 		assertTrue(ExcelReport.generateReport("testngxmlfiles\\testng-results.xml")
 				.length() > 1);
 		Thread.sleep(2000);
-		/*
-		 * assertTrue(ExcelReport.generateReport(
-		 * "testngxmlfiles\\dptestng-results.xml").length() > 1) ;
-		 * Thread.sleep(2000);
-		 */
-		assertTrue(ExcelReport.generateReport(
-				"testngxmlfiles\\pktestng-results.xml").length() > 1);
+		assertTrue(ExcelReport
+				.generateReport("testngxmlfiles\\pktestng-results.xml").length() > 1);
 		Thread.sleep(2000);
-		assertTrue(ExcelReport.generateReport(
-				"testngxmlfiles\\AllAnotestng-results.xml").length() > 1);
+		assertTrue(
+				ExcelReport.generateReport("testngxmlfiles\\AllAnotestng-results.xml")
+						.length() > 1);
 		Thread.sleep(2000);
 	}
 

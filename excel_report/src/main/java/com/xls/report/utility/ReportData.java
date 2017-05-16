@@ -54,21 +54,20 @@ public class ReportData {
 	private static String sheetName = "";
 	private static Map<String, Map<String, ArrayList<String>>> testMethodDataMap = null;
 
-  private static DocumentBuilderFactory fact;
+	private static DocumentBuilderFactory fact;
 	private static DocumentBuilder build;
-  
 
-  public static Document getDocument(String xmlFile) throws SAXException,
-			IOException, ParserConfigurationException {
+	public static Document getDocument(String xmlFile)
+			throws SAXException, IOException, ParserConfigurationException {
 		fact = DocumentBuilderFactory.newInstance();
 		build = fact.newDocumentBuilder();
 		return build.parse(xmlFile);
 	}
 
 	public static Map<String, Map<String, ArrayList<String>>> getTestMethodDetail(
-			String xmlFile) throws SAXException, IOException,
-			ParserConfigurationException {
-		testMethodDataMap = new HashMap<String, Map<String, ArrayList<String>>>();
+			String xmlFile)
+			throws SAXException, IOException, ParserConfigurationException {
+		testMethodDataMap = new HashMap<>();
 		Map<String, ArrayList<String>> testDetailMap = null;
 		ArrayList<String> testMethodDataList = null;
 		Document doc = getDocument(xmlFile);
@@ -77,7 +76,7 @@ public class ReportData {
 																											// test nodes
 
 		for (int i = 0; i < list.getLength(); i++) {
-			testDetailMap = new HashMap<String, ArrayList<String>>();
+			testDetailMap = new HashMap<>();
 			classNodeList = getEleListByTagName(list.item(i),
 					Configuration.classNode);
 			sheetName = getNameAttribute(list.item(i), Configuration.nameAttribute);
@@ -89,7 +88,7 @@ public class ReportData {
 						Configuration.testMethodNode);
 
 				for (int k = 0; k < methodNodeList.getLength(); k++) {
-					testMethodDataList = new ArrayList<String>();
+					testMethodDataList = new ArrayList<>();
 					testMethodName = getNameAttribute(methodNodeList.item(k),
 							Configuration.nameAttribute);
 					testMethodStatus = getNameAttribute(methodNodeList.item(k),
@@ -100,32 +99,30 @@ public class ReportData {
 						String name = "";
 						for (int m = 0; m < getEleListByTagName(methodNodeList.item(k),
 								Configuration.valueAttribute).getLength(); m++) {
-							name = name
-									+ ","
+							name = name + ","
 									+ getEleListByTagName(methodNodeList.item(k),
-													Configuration.valueAttribute).item(m)
-											.getTextContent().trim();
+											Configuration.valueAttribute).item(m).getTextContent()
+													.trim();
 						}
 						testMethodName = testMethodName + "("
 								+ name.substring(1, name.length()) + ")";
 					}
-					testMethodDataList.add(Configuration.testNameIndex, classNodeName
-							+ "." + testMethodName);
+					testMethodDataList.add(Configuration.testNameIndex,
+							classNodeName + "." + testMethodName);
 					testMethodDataList.add(Configuration.testStatusIndex,
 							testMethodStatus);
 
 					if ("fail".equalsIgnoreCase(testMethodStatus)) {
 						exceptionNodeList = getEleListByTagName(methodNodeList.item(k),
 								Configuration.exceptionNode);
-						exceptionTraceNodeList = getEleListByTagName(
-								methodNodeList.item(k), Configuration.messageAttribute);
-						exceptionTrace = exceptionTraceNodeList.item(
-								Configuration.firstIndex).getTextContent();
+						exceptionTraceNodeList = getEleListByTagName(methodNodeList.item(k),
+								Configuration.messageAttribute);
+						exceptionTrace = exceptionTraceNodeList
+								.item(Configuration.firstIndex).getTextContent();
 						expMessage = getNameAttribute(
 								exceptionNodeList.item(Configuration.firstIndex),
 								Configuration.classNode);
-						testMethodDataList
-								.add(Configuration.exceptionMsgIndex, expMessage);
+						testMethodDataList.add(Configuration.exceptionMsgIndex, expMessage);
 						testMethodDataList.add(Configuration.exceptionStackTrace,
 								ExcelConfiguration.transformExpMessage(exceptionTrace).trim());
 					} else {
@@ -166,24 +163,24 @@ public class ReportData {
 				ArrayList<String> testData = testMethods.get(testMethod);
 				XSSFCell cellStatus = row.createCell(Configuration.testStatusIndex);
 
-				if ("fail".equalsIgnoreCase(testData
-						.get(Configuration.testStatusIndex))) {
+				if ("fail"
+						.equalsIgnoreCase(testData.get(Configuration.testStatusIndex))) {
 					cellStatus.setCellStyle(failCelStyle);
 					cellStatus.setCellValue(testData.get(Configuration.testStatusIndex));
 					XSSFCell expCell = row.createCell(Configuration.exceptionMsgIndex);
 					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
 					XSSFCell exceptionTraceCell = row
 							.createCell(Configuration.exceptionStackTrace);
-					exceptionTraceCell.setCellValue(testData.get(
-							Configuration.exceptionStackTrace).trim());
+					exceptionTraceCell.setCellValue(
+							testData.get(Configuration.exceptionStackTrace).trim());
 					XSSFCell locatorCell = row.createCell(Configuration.locatorIndex);
 					String text = testData.get(Configuration.exceptionStackTrace).trim();
 					String jsonString = null;
 					Gson gson = new GsonBuilder().create();
 					int sIndex = text.indexOf('{');
 					int eIndex = text.indexOf('}');
-					jsonString = (sIndex == -1 || eIndex == -1) ? "" : text.substring(
-							sIndex, (eIndex + 1));
+					jsonString = (sIndex == -1 || eIndex == -1) ? ""
+							: text.substring(sIndex, (eIndex + 1));
 					ElementLocator locator = gson.fromJson(jsonString,
 							ElementLocator.class);
 					locatorCell.setCellValue((locator == null) ? "" : locator.toString());
@@ -194,8 +191,8 @@ public class ReportData {
 					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
 					XSSFCell exceptionTraceCell = row
 							.createCell(Configuration.exceptionStackTrace);
-					exceptionTraceCell.setCellValue(testData.get(
-							Configuration.exceptionStackTrace).trim());
+					exceptionTraceCell.setCellValue(
+							testData.get(Configuration.exceptionStackTrace).trim());
 				}
 			}
 		}
