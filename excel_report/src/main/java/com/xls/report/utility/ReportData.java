@@ -138,6 +138,7 @@ public class ReportData {
 		return testMethodDataMap;
 	}
 
+	@SuppressWarnings("deprecation")
 	public static XSSFWorkbook createExcelFile(
 			HashMap<String, Map<String, ArrayList<String>>> data) {
 		XSSFWorkbook book = new XSSFWorkbook();

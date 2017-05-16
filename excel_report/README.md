@@ -10,9 +10,14 @@ This java api converts `testng-result.xml` to an excel report with columns
 |Exception        |exceptions thrown           |
 |Exception Message|stack trace                 |
 
+to run the formatter,
+```
+mvn clean install
+java -jar target\TestNgToExcel-1.0.7-jar-with-dependencies.jar testngxmlfiles\testng-results.xml
+```
+or
 ```
 mvn clean test package
-java -jar target\TestNgToExcel-1.0.7-jar-with-dependencies.jar testngxmlfiles\testng-results.xml
 java -cp target\TestNgToExcel-1.0.7.jar;target\lib\* com.xls.report.main.MainClass testngxmlfiles\testng-results.xml
 ```
 

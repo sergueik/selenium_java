@@ -11,6 +11,7 @@ import java.util.Map;
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -23,26 +24,29 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
  */
 public class ExcelConfiguration {
 
+	@SuppressWarnings("deprecation")
 	public static XSSFRow CreateHeader(XSSFWorkbook book, XSSFSheet sheet,
 			String[] aHeader) {
 		XSSFRow row = sheet.createRow(0);
 		XSSFCell[] headerCell = new XSSFCell[aHeader.length];
-		XSSFCellStyle[] sHeaderStyle = new XSSFCellStyle[aHeader.length];
+		XSSFCellStyle[] headerStyle = new XSSFCellStyle[aHeader.length];
 
 		for (int i = 0; i < headerCell.length; i++) {
 			headerCell[i] = row.createCell(i);
 
-			sHeaderStyle[i] = book.createCellStyle();
-			sHeaderStyle[i].setAlignment(HorizontalAlignment.CENTER);
-			sHeaderStyle[i].setBorderBottom(BorderStyle.THIN);
-			sHeaderStyle[i].setBorderLeft(BorderStyle.THIN);
-			sHeaderStyle[i].setBorderRight(BorderStyle.THIN);
-			sHeaderStyle[i].setBorderTop(BorderStyle.THIN);
-			sHeaderStyle[i].setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-			sHeaderStyle[i].setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-			sHeaderStyle[i].setLocked(true);
+			headerStyle[i] = book.createCellStyle();
+			headerStyle[i].setAlignment(HorizontalAlignment.CENTER);
+			headerStyle[i].setBorderBottom(BorderStyle.THIN);
+			headerStyle[i].setBorderLeft(BorderStyle.THIN);
+			headerStyle[i].setBorderRight(BorderStyle.THIN);
+			headerStyle[i].setBorderTop(BorderStyle.THIN);
+			// headerStyle[i].setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+			headerStyle[i].setFillPattern(FillPatternType.SOLID_FOREGROUND);
+			
+			headerStyle[i].setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+			headerStyle[i].setLocked(true);
 
-			headerCell[i].setCellStyle(sHeaderStyle[i]);
+			headerCell[i].setCellStyle(headerStyle[i]);
 			headerCell[i].setCellValue(aHeader[i]);
 		}
 		return row;
@@ -61,9 +65,9 @@ public class ExcelConfiguration {
 		return true;
 	}
 
-	public static XSSFWorkbook getBook(String aFileName)
+	public static XSSFWorkbook getBook(String fileName)
 			throws FileNotFoundException, IOException {
-		return new XSSFWorkbook(new FileInputStream(new File(aFileName)));
+		return new XSSFWorkbook(new FileInputStream(new File(fileName)));
 	}
 
 	public static XSSFSheet getSheet(XSSFWorkbook aBook, String bSheetName) {
@@ -101,44 +105,45 @@ public class ExcelConfiguration {
 			if (sheetMap.get(row.getCell(Configuration.testNameIndex)
 					.getStringCellValue()) == null) {
 				ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
-				sheetMap.put(row.getCell(Configuration.testNameIndex)
-						.getStringCellValue(), newData);
+				sheetMap.put(
+						row.getCell(Configuration.testNameIndex).getStringCellValue(),
+						newData);
 			}
 		}
 		return sheetMap;
 	}
 
 	private static ArrayList<String> addDataToMap(XSSFRow row,
-			ArrayList<String> arrayList) {
+			ArrayList<String> data) {
 		for (int i = row.getFirstCellNum(); i < row.getLastCellNum(); i++) {
 			try {
-				arrayList.remove(i);
+				data.remove(i);
 			} catch (Exception e) {
 				// ignored
 			}
-			arrayList.add(i, row.getCell(i).getStringCellValue());
+			data.add(i, row.getCell(i).getStringCellValue());
 		}
-		return arrayList;
+		return data;
 	}
 
 	public static HashMap<String, ArrayList<String>> appendExcelDataToMap(
 			XSSFSheet xlSheet) {
 		XSSFRow row = null;
-		Map<String, ArrayList<String>> sheetMap = new HashMap<String, ArrayList<String>>();
+		Map<String, ArrayList<String>> sheetMap = new HashMap<>();
 		int i = xlSheet.getFirstRowNum() + 1;
 		for (; i <= xlSheet.getLastRowNum(); i++) {
 			row = xlSheet.getRow(i);
 			ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
-			sheetMap.put(row.getCell(Configuration.testNameIndex)
-					.getStringCellValue(), newData);
+			sheetMap.put(
+					row.getCell(Configuration.testNameIndex).getStringCellValue(),
+					newData);
 		}
 		return (HashMap<String, ArrayList<String>>) sheetMap;
 	}
 
 	public static String transformExpMessage(String aMesg) {
 		if (aMesg.indexOf(Configuration.transformKeyword) != -1) {
-			aMesg = aMesg
-					.substring(0, aMesg.indexOf(Configuration.transformKeyword));
+			aMesg = aMesg.substring(0, aMesg.indexOf(Configuration.transformKeyword));
 			if (aMesg.indexOf(Configuration.transformKeywordTwo) != -1) {
 				return aMesg.substring(0,
 						aMesg.indexOf(Configuration.transformKeywordTwo));
