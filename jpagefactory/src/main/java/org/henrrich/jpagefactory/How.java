@@ -18,6 +18,7 @@ public enum How {
 	UNSET,
 
 	/* JProtractor locators */
+
 	/**
 	 * Finding element by Angular binding name, <code>using</code> attribute in
 	 * <code>@FindBy</code> annotation specifies the binding name.
@@ -25,11 +26,9 @@ public enum How {
 	BINDING,
 
 	/**
-	 * Finding element by its 
-	 * css attribute specified by <code>using</code> attribute 
-	 * and
-	 * partial text in the element specified by <code>text</code> attribute
-	 * in <code>@FindBy</code> annotation
+	 * Finding element by its css attribute specified by <code>using</code>
+	 * attribute and partial text in the element specified by <code>text</code>
+	 * attribute in <code>@FindBy</code> annotation
 	 */
 	CSS_CONTAINING_TEXT,
 
@@ -73,22 +72,25 @@ public enum How {
 	REPEATER_SELECTED_OPTION,
 
 	/**
-	 * Finding child element in the repeater by Angular <code>ng-repeat</code> attribute specified by <code>using</code> attribute, 
-	 * and binding row number specified by <code>column</code> attribute
-	 * in <code>@FindBy</code> annotation
+	 * Finding child element in the repeater by Angular <code>ng-repeat</code>
+	 * attribute specified by <code>using</code> attribute, and binding row number
+	 * specified by <code>column</code> attribute in <code>@FindBy</code>
+	 * annotation
 	 */
 	REPEATER_COLUMN,
 
 	/**
-	 * Finding child element in the repeater by Angular <code>ng-repeat</code> attribute specified by <code>using</code> attribute, 
-	 * row number specified by <code>row</code> attribute, 
-	 * and binding row number specified by <code>column</code> attribute
+	 * Finding child element in the repeater by Angular <code>ng-repeat</code>
+	 * attribute specified by <code>using</code> attribute, row number specified
+	 * by <code>row</code> attribute, and binding row number specified by
+	 * <code>column</code> attribute
 	 */
 	REPEATER_ELEMENT,
 
 	/**
-	 * Finding child element in the repeater by by Angular <code>ng-repeat</code> attribute specified by <code>using</code> attribute
-	 * and row number specified by <code>row</code> attribute.
+	 * Finding child element in the repeater by by Angular <code>ng-repeat</code>
+	 * attribute specified by <code>using</code> attribute and row number
+	 * specified by <code>row</code> attribute.
 	 */
 	REPEATER_ROW,
 

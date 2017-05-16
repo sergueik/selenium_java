@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Similar to selenium original <code>@FindAll</code> annotation. It contains one or more JPageFactory <code>@FindBy</code> annotations.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.TYPE})
+@Target({ ElementType.FIELD, ElementType.TYPE })
 public @interface FindAll {
-  FindBy[] value();
+	FindBy[] value();
 }

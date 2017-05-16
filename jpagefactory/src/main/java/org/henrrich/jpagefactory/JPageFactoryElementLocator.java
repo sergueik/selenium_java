@@ -11,37 +11,36 @@ import java.util.List;
 
 /**
  * Created by henrrich on 21/04/2016.
+ * Modified by sergueik on 05/16/2017
  */
 public class JPageFactoryElementLocator extends DefaultElementLocator {
 
-  public JPageFactoryElementLocator(SearchContext searchContext, Field field) {
-    // http://grepcode.com/file/repo1.maven.org/maven2/org.seleniumhq.selenium/selenium-support/2.26.0/org/openqa/selenium/support/pagefactory/DefaultElementLocator.java
-    super(searchContext, field);
-  }
+	public JPageFactoryElementLocator(SearchContext searchContext, Field field) {
+		super(searchContext, field);
+	}
 
-  public JPageFactoryElementLocator(SearchContext searchContext, AbstractAnnotations annotations) {
-    super(searchContext, annotations);
-  }
+	public JPageFactoryElementLocator(SearchContext searchContext,
+			AbstractAnnotations annotations) {
+		super(searchContext, annotations);
+	}
 
-  @Override
-  public WebElement findElement() {
+	@Override
+	public WebElement findElement() {
 
-    WebElement element = super.findElement();
-    if (element instanceof NgWebElement) {
-      return ((NgWebElement) element).getWrappedElement();
-    }
-    return element;
-  }
+		WebElement element = super.findElement();
+		return (element instanceof NgWebElement)
+				? ((NgWebElement) element).getWrappedElement() : element;
+	}
 
-  @Override
-  public List<WebElement> findElements() {
-    List<WebElement> elements = super.findElements();
-    for (int i = 0; i < elements.size(); i++) {
-      WebElement element = elements.get(i);
-      if (element instanceof NgWebElement) {
-        elements.add(i, ((NgWebElement) element).getWrappedElement());
-      }
-    }
-    return elements;
-  }
+	@Override
+	public List<WebElement> findElements() {
+		List<WebElement> elements = super.findElements();
+		for (int i = 0; i < elements.size(); i++) {
+			WebElement element = elements.get(i);
+			if (element instanceof NgWebElement) {
+				elements.add(i, ((NgWebElement) element).getWrappedElement());
+			}
+		}
+		return elements;
+	}
 }

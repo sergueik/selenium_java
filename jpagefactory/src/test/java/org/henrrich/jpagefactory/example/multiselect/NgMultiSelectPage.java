@@ -77,16 +77,16 @@ public class NgMultiSelectPage {
 			NgWebElement _ng_car = new NgWebElement(_driver, _directive)
 					.findElement(NgBy.repeaterElement("i in items", rowNum, "i.label"));
 			try {
-        System.err.println(_ng_car.getAttribute("innerHTML"));
-			} catch (NullPointerException e ) {
-			 // ignore
+				System.err.println(_ng_car.getAttribute("innerHTML"));
+			} catch (NullPointerException e) {
+				// ignore
 			}
 			try {
 				System.err.println("* " + _ng_car.evaluate("i.label").toString());
 				_ng_car.click();
-			} catch(WebDriverException e) {
-				// ignore 
-      }
+			} catch (WebDriverException e) {
+				// ignore
+			}
 		}
 	}
 

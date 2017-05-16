@@ -88,10 +88,9 @@ public class NgMultiSelectTest {
 	public void testSelectCarsOneByOne() throws Exception {
 		page.openSelect();
 		page.selectAllCars();
-    System.err.println(page
-				.getStatus());
-		Assert.assertTrue("Should be able to select cars", page
-				.getStatus().matches("There are (\\d+) car\\(s\\) selected"));
+		System.err.println(page.getStatus());
+		Assert.assertTrue("Should be able to select cars",
+				page.getStatus().matches("There are (\\d+) car\\(s\\) selected"));
 	}
 
 	@After

@@ -14,11 +14,15 @@
     <url>git@github.com:henrrich/jpagefactory.git</url>
   </scm>
   <properties>
-    <selenium.version>2.47.0</selenium.version>
-    <selenium-firefox-driver.version>2.47.0</selenium-firefox-driver.version>
-    <selenium-chrome-driver.version>2.50.1</selenium-chrome-driver.version>
-    <junit.version>4.12</junit.version>
+    <selenium.version>2.53.0</selenium.version>
+    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
+    <selenium-chrome-driver.version>2.53.1</selenium-chrome-driver.version>
     <jprotractor.version>1.1-SNAPSHOT</jprotractor.version>
+    <java.version>1.8</java.version>
+    <junit.version>4.12</junit.version>
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
   <developers>
     <developer>
@@ -77,4 +81,38 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
+        <goals>
+          <goal>compile</goal>
+        </goals>
+        <configuration>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>utf-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>install</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

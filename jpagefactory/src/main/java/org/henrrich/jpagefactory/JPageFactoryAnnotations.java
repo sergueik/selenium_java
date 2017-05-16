@@ -13,8 +13,8 @@ import org.openqa.selenium.support.pagefactory.ByChained;
 import java.lang.reflect.Field;
 
 /**
- * Created by henrrich on 13/04/2016.
- * updated by sergueik on 07/31/2016
+ * Created by henrrich on 13/04/2016. 
+ * Updated by sergueik on 07/31/2016,05/16/2017
  */
 public class JPageFactoryAnnotations extends Annotations {
 
@@ -68,7 +68,7 @@ public class JPageFactoryAnnotations extends Annotations {
 	protected By buildByFromFindBy(FindBy findBy) {
 		How how = getHowDefinition(findBy);
 		String using = getUsingDefinition(findBy);
-    String text = getTextDefinition(findBy);
+		String text = getTextDefinition(findBy);
 		String column = getColumnDefinition(findBy);
 		Integer row = getRowDefinition(findBy);
 
@@ -138,12 +138,12 @@ public class JPageFactoryAnnotations extends Annotations {
 		case REPEATER_ROW:
 			return NgBy.repeaterRows(using, row);
 
-     case SELECTED_OPTION:
+		case SELECTED_OPTION:
 			return NgBy.selectedOption(using);
 
 		case CSS_CONTAINING_TEXT:
 			return NgBy.cssContainingText(using, text);
-      
+
 		default:
 			// Note that this shouldn't happen (eg, the above matches all
 			// possible values for the How enum)
@@ -170,11 +170,7 @@ public class JPageFactoryAnnotations extends Annotations {
 	private String getUsingDefinition(FindBy findBy) {
 		String using = findBy.using();
 		if (using.isEmpty()) {
-			if (isWebChannel) {
-				using = findBy.usingWeb();
-			} else {
-				using = findBy.usingMobile();
-			}
+			using = (isWebChannel) ? findBy.usingWeb() : findBy.usingMobile();
 		} else {
 			if (!findBy.usingWeb().isEmpty() || !findBy.usingMobile().isEmpty()) {
 				throw new IllegalArgumentException(
@@ -187,11 +183,7 @@ public class JPageFactoryAnnotations extends Annotations {
 	private How getHowDefinition(FindBy findBy) {
 		How how = findBy.how();
 		if (how.equals(How.UNSET)) {
-			if (isWebChannel) {
-				how = findBy.howWeb();
-			} else {
-				how = findBy.howMobile();
-			}
+			how = (isWebChannel) ? findBy.howWeb() : findBy.howMobile();
 		} else {
 			if (!findBy.howWeb().equals(How.UNSET)
 					|| !findBy.howMobile().equals(How.UNSET)) {

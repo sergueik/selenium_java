@@ -80,15 +80,15 @@ public class SuperCalculatorTest {
 	@Test
 	public void testShouldAddOneAndTwo() throws Exception {
 		superCalculatorPage.add("1", "2");
-		Assert.assertTrue("Result is not 3!", superCalculatorPage.getLatestResult()
-				.equals("3"));
+		Assert.assertTrue("Result is not 3!",
+				superCalculatorPage.getLatestResult().equals("3"));
 	}
 
 	@Test
 	public void testShouldTwoTimesThree() throws Exception {
 		superCalculatorPage.times("2", "3");
-		Assert.assertTrue("Result is not 6!", superCalculatorPage.getLatestResult()
-				.equals("6"));
+		Assert.assertTrue("Result is not 6!",
+				superCalculatorPage.getLatestResult().equals("6"));
 	}
 
 	@Test
