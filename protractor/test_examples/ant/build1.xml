@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="TestNg Ant build file" basedir="." default="testResult">
+  <property name="src.dir" value="src"/>
+  <property name="lib.dir" value="lib"/>
+  <property name="build.dir" value="build"/>
+  <property name="classes.dir" value="classes"/>
+  <property name="reports.dir" value="REPORTS"/>
+  <property name="testNG.report" value="REPORTS/TESTNG-REPORTS"/>
+  <property name="suite.dir" value="suite"/>
+  <!-- Class-Path -->
+  <path id="classpath">
+    <pathelement location="${classes.dir}"/>
+    <fileset dir="${lib.dir}" includes="*.jar"/>
+  </path>
+  <!--Delete directories that are not needed -->
+  <target name="delete-dir">
+    <delete dir="${build.dir}"/>
+    <delete dir="${reports.dir}"/>
+    <delete dir="${classes.dir}"/>
+    <echo> /* Deleted existing Compiled Directory Classes */ </echo>
+  </target>
+  <!--Create Directories -->
+  <target name="create-source-dir" depends="delete-dir">
+    <mkdir dir="${classes.dir}"/>
+    <mkdir dir="${reports.dir}"/>
+    <mkdir dir="${testNG.report}"/>
+    <echo> /* Created Directories */ </echo>
+  </target>
+  <!--Compiling Tests -->
+  <target name="compile-classes" depends="create-source-dir">
+    <javac destdir="${classes.dir}" includeantruntime="false" debug="true" srcdir="${src.dir}">
+      <classpath refid="classpath"/>
+    </javac>
+    <echo> /* Compiled Directory Classes */ </echo>
+  </target>
+  <!--Running Tests and TestNG report generation -->
+  <target name="testNGreport" depends="compile-classes">
+    <taskdef resource="testngtasks" classpathref="classpath"/>
+    <testng classpathref="classpath" outputDir="${testNG.report}" haltOnfailure="false">
+      <xmlfileset dir="." includes="config/testng.xml"/>
+    </testng>
+    <echo> /* Run Directory Classes */ </echo>
+  </target>
+  <target name="testResult" depends="testNGreport">
+    <xslt in="${basedir}/REPORTS/TESTNG-REPORTS/testng-results.xml" style="${basedir}/config/testng-results.xsl" out="${basedir}/REPORTS/FORMATTED-REPORTS/MainReport.html" processor="SaxonLiaison">
+      <param expression="${basedir}/REPORTS/FORMATTED-REPORTS" name="testNgXslt.outputDir"/>
+      <param expression="true" name="testNgXslt.sortTestCaseLinks"/>
+      <param expression="FAIL,SKIP,PASS,CONF,BY_CLASS" name="testNgXslt.testDetailsFilter"/>
+      <param expression="true" name="testNgXslt.showRuntimeTotals"/>
+      <classpath refid="classpath">
+</classpath>
+    </xslt>
+  </target>
+</project>
