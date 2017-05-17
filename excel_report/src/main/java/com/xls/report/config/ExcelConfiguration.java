@@ -132,7 +132,7 @@ public class ExcelConfiguration {
 		Map<String, ArrayList<String>> sheetMap = new HashMap<>();
 		int i = xlSheet.getFirstRowNum() + 1;
 		for (; i <= xlSheet.getLastRowNum(); i++) {
-			row = xlSheet.getRow(i);
+			row = xlSheet.getRow(i);	
 			ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
 			sheetMap.put(
 					row.getCell(Configuration.testNameIndex).getStringCellValue(),

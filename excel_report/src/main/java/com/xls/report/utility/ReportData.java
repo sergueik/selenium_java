@@ -138,13 +138,14 @@ public class ReportData {
 		return testMethodDataMap;
 	}
 
-	@SuppressWarnings("deprecation")
+	// @SuppressWarnings("deprecation")
 	public static XSSFWorkbook createExcelFile(
 			HashMap<String, Map<String, ArrayList<String>>> data) {
 		XSSFWorkbook book = new XSSFWorkbook();
 		XSSFCellStyle failCelStyle = book.createCellStyle();
 		XSSFCellStyle passCelStyle = book.createCellStyle();
 
+		// http://stackoverflow.com/questions/19145628/auto-size-height-for-rows-in-apache-poi
 		for (String sheetNameKey : data.keySet()) {
 			XSSFSheet sheet = book.createSheet(sheetNameKey);
 			XSSFRow row = ExcelConfiguration.CreateHeader(book, sheet,
@@ -161,6 +162,7 @@ public class ReportData {
 				row = sheet.createRow(l++);
 				XSSFCell cellName = row.createCell(Configuration.testNameIndex);
 				cellName.setCellValue(testMethod);
+				sheet.autoSizeColumn(Configuration.testNameIndex);
 				ArrayList<String> testData = testMethods.get(testMethod);
 				XSSFCell cellStatus = row.createCell(Configuration.testStatusIndex);
 
@@ -170,10 +172,12 @@ public class ReportData {
 					cellStatus.setCellValue(testData.get(Configuration.testStatusIndex));
 					XSSFCell expCell = row.createCell(Configuration.exceptionMsgIndex);
 					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
+					sheet.autoSizeColumn(Configuration.exceptionMsgIndex);
 					XSSFCell exceptionTraceCell = row
 							.createCell(Configuration.exceptionStackTrace);
 					exceptionTraceCell.setCellValue(
 							testData.get(Configuration.exceptionStackTrace).trim());
+					sheet.autoSizeColumn(Configuration.exceptionStackTrace);
 					XSSFCell locatorCell = row.createCell(Configuration.locatorIndex);
 					String text = testData.get(Configuration.exceptionStackTrace).trim();
 					String jsonString = null;
@@ -188,12 +192,15 @@ public class ReportData {
 				} else {
 					cellStatus.setCellStyle(passCelStyle);
 					cellStatus.setCellValue(testData.get(Configuration.testStatusIndex));
+					sheet.autoSizeColumn(Configuration.testStatusIndex);
 					XSSFCell expCell = row.createCell(Configuration.exceptionMsgIndex);
 					expCell.setCellValue(testData.get(Configuration.exceptionMsgIndex));
+					sheet.autoSizeColumn(Configuration.exceptionMsgIndex);
 					XSSFCell exceptionTraceCell = row
 							.createCell(Configuration.exceptionStackTrace);
 					exceptionTraceCell.setCellValue(
 							testData.get(Configuration.exceptionStackTrace).trim());
+					sheet.autoSizeColumn(Configuration.exceptionStackTrace);
 				}
 			}
 		}
