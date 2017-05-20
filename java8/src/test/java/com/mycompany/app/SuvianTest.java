@@ -2791,7 +2791,7 @@ public class SuvianTest {
 	}
 
 	//
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test32_1() {
 		// Arrange
 		driver.get(
@@ -2837,7 +2837,7 @@ public class SuvianTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test32_2() {
 		// Arrange
 		driver.get(
@@ -2862,6 +2862,41 @@ public class SuvianTest {
 				// unknown error: cannot focus element
 				System.err.println("sendKeys() Exception " + e.getMessage());
 			}
+		}
+	}
+
+	//
+	@Test(enabled = true)
+	public void test33_1() {
+		// Arrange
+		driver.get("https://datatables.net/examples/api/form.html");
+		String table_id = "example";
+
+		WebElement table_element;
+		try {
+			table_element = wait.until(
+					ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
+		} catch (RuntimeException timeoutException) {
+			return;
+		}
+		String text_input_css_selector = "input[id='row-5-age']";
+		WebElement text_input_element = table_element
+				.findElement(By.cssSelector(text_input_css_selector));
+		actions.moveToElement(text_input_element).build().perform();
+		String cell_text = "Software Developer";
+		text_input_element.clear();
+		// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keys.html
+		text_input_element.sendKeys(Keys.chord(Keys.BACK_SPACE, Keys.BACK_SPACE,
+				Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE));
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+		}
+		text_input_element.sendKeys(Keys.chord("20", org.openqa.selenium.Keys.TAB,
+				cell_text, org.openqa.selenium.Keys.ENTER));
+		try {
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
 		}
 	}
 
