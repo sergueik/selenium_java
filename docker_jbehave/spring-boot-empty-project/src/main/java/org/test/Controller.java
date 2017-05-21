@@ -1,4 +1,4 @@
-package by.andd3dfx;
+package org.test;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;

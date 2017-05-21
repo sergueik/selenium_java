@@ -2,14 +2,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>dockerization</artifactId>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <spotify-docker-maven-plugin.version>0.4.13</spotify-docker-maven-plugin.version>    
+    <maven-dependency-plugin.version>2.3</maven-dependency-plugin.version>
+  </properties>
   <parent>
-    <groupId>by.andd3dfx</groupId>
-    <artifactId>testing-docker-image-with-jbehave</artifactId>
+    <groupId>org.test</groupId>
+    <artifactId>docker_jbehave</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
   <dependencies>
     <dependency>
-      <groupId>by.andd3dfx</groupId>
+      <groupId>org.test</groupId>
       <artifactId>spring-boot-empty-project</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>
@@ -19,7 +24,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.3</version>
+        <version>${maven-dependency-plugin.version}</version>
         <executions>
           <execution>
             <id>copy</id>
@@ -30,7 +35,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>by.andd3dfx</groupId>
+                  <groupId>org.test</groupId>
                   <artifactId>spring-boot-empty-project</artifactId>
                   <version>${project.version}</version>
                   <outputDirectory>${project.build.directory}/lib</outputDirectory>
@@ -43,7 +48,7 @@
       <plugin>
         <groupId>com.spotify</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>0.4.13</version>
+        <version>${spotify-docker-maven-plugin.version}</version>
         <configuration>
           <serverId>docker-hub</serverId>
           <registryUrl>https://${dockerRepository}</registryUrl>

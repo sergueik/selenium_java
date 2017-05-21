@@ -1,12 +1,12 @@
-package by.andd3dfx;
+package org.test;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringBootEmptyProjectApplication {
+public class DummyApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBootEmptyProjectApplication.class, args);
+		SpringApplication.run(DummyApp.class, args);
 	}
 }
