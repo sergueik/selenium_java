@@ -2918,7 +2918,7 @@ public class SuvianTest {
 		} catch (RuntimeException timeoutException) {
 			return;
 		}
-
+    // http://stackoverflow.com/questions/6198947/how-to-get-text-from-each-cell-of-an-html-table
 		String script = "var table_row_locator = 'div#example_wrapper table#example tbody tr';\n"
 				+ "var rows = document.querySelectorAll(table_row_locator);\n"
 				+ "var result = [];\n"
