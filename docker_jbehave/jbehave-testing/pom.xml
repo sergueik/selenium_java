@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>jbehave-testing</artifactId>
+  <parent>
+    <groupId>by.andd3dfx</groupId>
+    <artifactId>testing-docker-image-with-jbehave</artifactId>
+    <version>1.0-SNAPSHOT</version>
+  </parent>
+  <dependencies>
+    <dependency>
+      <groupId>org.jbehave</groupId>
+      <artifactId>jbehave-core</artifactId>
+      <version>4.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>by.andd3dfx</groupId>
+      <artifactId>dockerization</artifactId>
+      <version>1.0-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <version>0.18.1</version>
+        <configuration>
+          <logDate>default</logDate>
+          <autoPull>true</autoPull>
+          <images>
+            <!-- Image holding the artifact of this build -->
+            <image>
+              <!-- Alias name which can used for linking containers during runtime -->
+              <alias>service</alias>
+              <name> ${dockerRepository}/jbehave-spring-boot-simple-app-image:${project.version}</name>
+              <!-- ............................................................... -->
+              <!-- Runtime configuration for starting/stopping/linking containers -->
+              <!-- ............................................................... -->
+              <run>
+                <!-- Assign dynamically mapped ports to maven variables (which can be reused in integration tests) -->
+                <ports>
+                  <port>spring-boot-app.port:8090</port>
+                </ports>
+                <wait>
+                  <!-- Check for this URL to return a 200 return code .... -->
+                  <url> http://${docker.host.address}:${spring-boot-app.port} </url>
+                  <!-- ... but at max 120 seconds -->
+                  <time>120000</time>
+                </wait>
+                <log>
+                  <prefix>TC</prefix>
+                  <color>cyan</color>
+                </log>
+              </run>
+            </image>
+          </images>
+        </configuration>
+        <!-- Hooking into the lifecycle -->
+        <executions>
+          <execution>
+            <id>start</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>start</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>stop</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>stop</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>2.14.1</version>
+        <executions>
+          <execution>
+            <id>integration-test</id>
+            <phase>integration-test</phase>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+            <configuration>
+              <includes>
+                <include>**/stories/**/*.java</include>
+              </includes>
+              <forkCount>0</forkCount>
+              <reuseForks>true</reuseForks>
+              <systemProperties>
+                <metafilter>-pending</metafilter>
+              </systemProperties>
+            </configuration>
+          </execution>
+          <execution>
+            <id>verify</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>verify</goal>
+            </goals>
+            <configuration>
+              <testFailureIgnore>false</testFailureIgnore>
+            </configuration>
+          </execution>
+        </executions>
+        <configuration>
+          <systemPropertyVariables>
+            <docker.url>http://${docker.host.address}:${spring-boot-app.port}</docker.url>
+          </systemPropertyVariables>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
