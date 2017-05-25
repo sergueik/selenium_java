@@ -3,10 +3,10 @@ pushd %~dp0
 set SELENIUM_HOME=%CD:\=/%
 set HTTP_PORT=4444
 set HTTPS_PORT=-1
-set SELENIUM_VERSION=2.44.0
-set GROOVY_VERSION=2.3.8
-set JAVA_VERSION=1.6.0_45
-set MAVEN_VERSION=3.2.1
+set SELENIUM_VERSION=2.53.0
+set GROOVY_VERSION=2.4.4
+set JAVA_VERSION=1.8.0_101
+set MAVEN_VERSION=3.3.3
 set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
 set GROOVY_HOME=c:\java\groovy-%GROOVY_VERSION%
 set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
@@ -34,7 +34,10 @@ REM
 
 REM set LAUNCHER_OPTS=-XX:PermSize=512M -XX:MaxPermSize=1028M -Xmn128M -Xms512M -Xmx1024M
 set LAUNCHER_OPTS=-XX:MaxPermSize=1028M -Xmn128M
-REM java %LAUNCHER_OPTS% -jar selenium-server-standalone-%SELENIUM_VERSION%.jar -port %HTTP_PORT% -role hub
+java %LAUNCHER_OPTS% -jar selenium-server-standalone-%SELENIUM_VERSION%.jar -port %HTTP_PORT% -role hub
+
+
+goto :EOF
 
 java %LAUNCHER_OPTS% ^
 -classpath %SELENIUM_HOME%/log4j-1.2.17.jar;%SELENIUM_HOME%/selenium-server-standalone-%SELENIUM_VERSION%.jar; ^

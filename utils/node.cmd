@@ -14,16 +14,17 @@ set HUB_HTTP_PORT=4444
 
 set HTTPS_PORT=-1
 
-
-set SELENIUM_VERSION=2.44.0
-set GROOVY_VERSION=2.3.8
-set JAVA_VERSION=1.6.0_45
-set MAVEN_VERSION=3.2.1
+set SELENIUM_HOME=%CD:\=/%
+set HTTP_PORT=4444
+set HTTPS_PORT=-1
+set SELENIUM_VERSION=2.53.0
+set GROOVY_VERSION=2.4.4
+set JAVA_VERSION=1.8.0_101
+set MAVEN_VERSION=3.3.3
 set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
 set GROOVY_HOME=c:\java\groovy-%GROOVY_VERSION%
 set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
 set M2=%M2_HOME%\bin
-set MAVEN_OPTS=-Xms256m -Xmx512m
 
 PATH=%JAVA_HOME%\bin;%PATH%;%GROOVY_HOME%\bin;%M2%
 
@@ -50,8 +51,6 @@ where.exe iexplore.exe
 
 CHOICE /T 1 /C ync /CS /D y
 
-
-
 set MAX_MEMORY=-Xmx256m
 set STACK_SIZE=-Xss8m
 
@@ -64,9 +63,22 @@ set NODE_CONFIG=NODE.json
 set LAUNCHER_OPTS=-XX:MaxPermSize=1028M -Xmn128M
 set LAUNCHER_OPTS=%MAX_MEMORY% %STACK_SIZE%
 
-REM java %LAUNCHER_OPTS% ^
-REM -jar selenium-server-standalone-%SELENIUM_VERSION%.jar ^
 
+java -XX:MaxPermSize=1028M -Xmn128M -jar selenium-server-standalone-%SELENIUM_VERSION%.jar -role node -host SERGUEIK53 -port 5555 -hub http://127.0.0.1:4444/hub/register
+
+goto :EOF
+
+echo java %LAUNCHER_OPTS% ^
+-jar selenium-server-standalone-%SELENIUM_VERSION%.jar ^
+-role node ^
+-host %NODE_HOST% ^
+-port %NODE_HTTP_PORT% ^
+-hub http://%HUB_HOST%:%HUB_HTTP_PORT%/hub/register ^
+-nodeConfig %NODE_CONFIG%  ^
+-browserTimeout 120000 -timeout 120000 ^
+
+
+goto :EOF
 set LOGFILE=node.log
 type NUL  > %LOGFILE%
 
@@ -81,7 +93,6 @@ org.openqa.grid.selenium.GridLauncher ^
 -Dwebdriver.chrome.driver=%SELENIUM_HOME%/chromedriver.exe ^
 -nodeConfig %NODE_CONFIG%  ^
 -browserTimeout 120000 -timeout 120000 ^
--ensureCleanSession true ^
 -trustAllSSLCertificates 
 
 REM Keep the Blank line above intact
