@@ -71,153 +71,168 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
-//--
 public class App {
-  
-  private static WebDriver driver;
-  static String baseUrl = "http://www.freetranslation.com/";
-  static int flexible_wait_interval = 5;
-  static long implicit_wait_interval = 3;
-  static long wait_polling_interval = 500;
-  static WebDriverWait wait;
-  static Actions actions;
-  static JavascriptExecutor javascriptExecutor;
-  static String text = "good morning driver" ;
 
-  // TODO: write the text to the file 
-  // Write-Host ('Translating: "{0}"' -f $text)
-  // $text_file = [System.IO.Path]::Combine((Get-ScriptDirectory), 'testfile.txt')
-  // Write-Output $text | Out-File -FilePath $text_file -Encoding ascii
+	private static WebDriver driver;
+	static String baseUrl = "http://www.freetranslation.com/";
+	static int flexible_wait_interval = 5;
+	static long implicit_wait_interval = 3;
+	static long wait_polling_interval = 500;
+	static WebDriverWait wait;
+	static Actions actions;
+	static JavascriptExecutor javascriptExecutor;
+	static String text = "good morning driver";
 
-  static String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
-  
-  private static final StringBuffer verificationErrors = new StringBuffer();
+	// TODO: write the text to the file
+	// Write-Host ('Translating: "{0}"' -f $text)
+	// $text_file = [System.IO.Path]::Combine((Get-ScriptDirectory),
+	// 'testfile.txt')
+	// Write-Output $text | Out-File -FilePath $text_file -Encoding ascii
 
-  @Before
-  public static void setUp() throws Exception  {
-    
-    DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
-    driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-    // TODO:
-    // http://stackoverflow.com/questions/13204820/how-to-obtain-native-logger-in-selenium-webdriver
-    // http://vrajasankar.blogspot.com/2012/04/logging-selenium-webdriver.html
-    // https://www.nuget.org/packages/SeleniumLog﻿
-    // driver has to be of type RemoteWebDriver
-    // driver.setLogLevel(Level.ALL);
-    javascriptExecutor = (JavascriptExecutor)driver;
-    wait = new WebDriverWait(driver, flexible_wait_interval );
-    wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
+	static String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
 
-    driver.get(baseUrl);
-    driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+	private static final StringBuffer verificationErrors = new StringBuffer();
 
-    }
+	@Before
+	public static void setUp() throws Exception {
 
-  public static void main(String[] args) throws Exception {
-    setUp();
-    testUpload();
-    tearDown();
-  }
+		DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
+				Platform.ANY);
+		driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"),
+				capabilities);
+		// TODO:
+		// http://stackoverflow.com/questions/13204820/how-to-obtain-native-logger-in-selenium-webdriver
+		// http://vrajasankar.blogspot.com/2012/04/logging-selenium-webdriver.html
+		// https://www.nuget.org/packages/SeleniumLog﻿
+		// driver has to be of type RemoteWebDriver
+		// driver.setLogLevel(Level.ALL);
+		javascriptExecutor = (JavascriptExecutor) driver;
+		wait = new WebDriverWait(driver, flexible_wait_interval);
+		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
 
-  @Test
-  public static void testUpload()  throws Exception   {
-    
-    // Wait for the page to load ( check that  logo / title is updated ) 
-    WebElement element = driver.findElement(By.cssSelector("a.brand"));
-    assertThat(element.getAttribute("title"),containsString("Translate text, documents and websites for free"));
+		driver.get(baseUrl);
+		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
+				TimeUnit.SECONDS);
 
-    // optional:
-    // driver.manage().window().maximize();
+	}
 
-    WebElement uploadButton = driver.findElement(By.cssSelector("div[id = 'upload-button']"));
-    highlight(uploadButton, 1500);
+	public static void main(String[] args) throws Exception {
+		setUp();
+		testUpload();
+		tearDown();
+	}
 
-    WebElement uploadElement = driver.findElement(By.cssSelector("input[class='ajaxupload-input']"));
-    assertThat(uploadElement, notNullValue());
-    assertEquals("file", uploadElement.getAttribute("type"));   
-    assertEquals("file", uploadElement.getAttribute("name"));   
-   // the uploadElement is not visible
-   
-    LocalFileDetector detector = new LocalFileDetector();
-    File remoteFile = detector.getLocalFile(localPath );
-    // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/LocalFileDetector.html
-    // driver.setFileDetector(new LocalFileDetector());
+	@Test
+	public static void testUpload() throws Exception {
 
-    (( RemoteWebElement ) uploadElement ).setFileDetector(detector);
-    System.err.format("Uploading the file '%s'.\n" , remoteFile.getAbsolutePath());
+		// Wait for the page to load ( check that logo / title is updated )
+		WebElement element = driver.findElement(By.cssSelector("a.brand"));
+		assertThat(element.getAttribute("title"),
+				containsString("Translate text, documents and websites for free"));
 
-    // Populate upload input
-    uploadElement.sendKeys(remoteFile.getAbsolutePath());
-    // TODO : locate the progressbar
-    // hard wait
-    Thread.sleep(2000);
-    
+		// optional:
+		// driver.manage().window().maximize();
+
+		WebElement uploadButton = driver
+				.findElement(By.cssSelector("div[id = 'upload-button']"));
+		highlight(uploadButton, 1500);
+
+		WebElement uploadElement = driver
+				.findElement(By.cssSelector("input[class='ajaxupload-input']"));
+		assertThat(uploadElement, notNullValue());
+		assertEquals("file", uploadElement.getAttribute("type"));
+		assertEquals("file", uploadElement.getAttribute("name"));
+		// the uploadElement is not visible
+
+		LocalFileDetector detector = new LocalFileDetector();
+		File remoteFile = detector.getLocalFile(localPath);
+		// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/LocalFileDetector.html
+		// driver.setFileDetector(new LocalFileDetector());
+
+		((RemoteWebElement) uploadElement).setFileDetector(detector);
+		System.err.format("Uploading the file '%s'.\n",
+				remoteFile.getAbsolutePath());
+
+		// Populate upload input
+		uploadElement.sendKeys(remoteFile.getAbsolutePath());
+		// TODO : locate the progressbar
+		// hard wait
+		Thread.sleep(2000);
+
 		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("gw-download-link")));
+			wait.until(ExpectedConditions
+					.visibilityOfElementLocated(By.className("gw-download-link")));
 		} catch (RuntimeException timeoutException) {
-      // continue - assertion follows
+			// continue - assertion follows
 		}
-    WebElement downloadLink = driver.findElement(By.className("gw-download-link"));
-    assertEquals("Download", downloadLink.getText());   
+		WebElement downloadLink = driver
+				.findElement(By.className("gw-download-link"));
+		assertEquals("Download", downloadLink.getText());
 
-    WebElement downloaIndicator = driver.findElement(By.cssSelector("div [class='status-text'] img[class *= 'gw-icon']"));
-    assertThat(downloaIndicator, notNullValue());
-    // System.err.println(downloaIndicator.getAttribute("outerHTML"));
-    highlight(downloaIndicator);
-    String downloadHref = downloadLink.getAttribute("href");
-    System.err.println("Reading '" + downloadHref + "'");
-    sendGet(downloadHref);
-    // assertEquals("file", downloadElement.getAttribute("name")); 
-  }
+		WebElement downloaIndicator = driver.findElement(
+				By.cssSelector("div [class='status-text'] img[class *= 'gw-icon']"));
+		assertThat(downloaIndicator, notNullValue());
+		// System.err.println(downloaIndicator.getAttribute("outerHTML"));
+		highlight(downloaIndicator);
+		String downloadHref = downloadLink.getAttribute("href");
+		System.err.println("Reading '" + downloadHref + "'");
+		sendGet(downloadHref);
+		// assertEquals("file", downloadElement.getAttribute("name"));
+	}
 
-  @After
-  public static void tearDown()  throws Exception {
-    driver.quit();
-  }
-  
-  private static void highlight(WebElement element) throws InterruptedException {
-    highlight(element, 100);
-  }
-  
+	@After
+	public static void tearDown() throws Exception {
+		driver.quit();
+	}
+
+	private static void highlight(WebElement element)
+			throws InterruptedException {
+		highlight(element, 100);
+	}
+
 	public static void highlight(WebElement element, int highlight_interval) {
-    if (wait == null)         {
-      wait = new WebDriverWait(driver, flexible_wait_interval );
-      wait.pollingEvery(wait_polling_interval,TimeUnit.MILLISECONDS);
-    }
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexible_wait_interval);
+			wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+		}
 		try {
-    wait.until(ExpectedConditions.visibilityOf(element));
-    javascriptExecutor.executeScript("arguments[0].style.border='3px solid yellow'", element);
-    Thread.sleep(highlight_interval);
-		javascriptExecutor.executeScript("arguments[0].style.border=''", element);
+			wait.until(ExpectedConditions.visibilityOf(element));
+			javascriptExecutor.executeScript(
+					"arguments[0].style.border='3px solid yellow'", element);
+			Thread.sleep(highlight_interval);
+			javascriptExecutor.executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
 	}
 
-  // HTTP GET request FROM http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
-  private static void sendGet(String url) throws Exception {
+	// HTTP GET request FROM
+	// http://www.mkyong.com/java/how-to-send-http-request-getpost-in-java/
+	private static void sendGet(String url) throws Exception {
 
-    URL obj = new URL(url);
-    HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+		URL obj = new URL(url);
+		HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
-    connection.setRequestMethod("GET");
+		connection.setRequestMethod("GET");
 
-    // set request header
-    String USER_AGENT = "Mozilla/5.0";
-    connection.setRequestProperty("User-Agent", USER_AGENT);
+		// set request header
+		String USER_AGENT = "Mozilla/5.0";
+		connection.setRequestProperty("User-Agent", USER_AGENT);
 
-    int responseCode = connection.getResponseCode();
-    // TODO: Assert.
-    System.err.println("Response Code : " + responseCode);
+		int responseCode = connection.getResponseCode();
+		// TODO: Assert.
+		System.err.println("Response Code : " + responseCode);
 
-    BufferedReader in = new BufferedReader( new InputStreamReader(connection.getInputStream()));
-    String inputLine;
-    StringBuffer response = new StringBuffer();
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(connection.getInputStream()));
+		String inputLine;
+		StringBuffer response = new StringBuffer();
 
-    while ((inputLine = in.readLine()) != null) {
-      response.append(inputLine);
-    }
-    in.close();    System.err.println(response.toString());
+		while ((inputLine = in.readLine()) != null) {
+			response.append(inputLine);
+		}
+		in.close();
+		System.err.println(response.toString());
 
-  }
+	}
 }
