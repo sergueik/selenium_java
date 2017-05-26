@@ -94,15 +94,13 @@ public class App {
 	static long pollingInterval = 500;
 	static boolean inject_local_script = false;
 
-	static String url = "http://demo.testfire.net/";
+	static String url = "http://poshcode.org/"; // "http://demo.testfire.net/";
 
 	public static void main(String[] args)
 			throws InterruptedException, java.io.IOException {
 
 		System.out.println(System.getProperty("user.dir"));
-
 		DesiredCapabilities capabilities = new DesiredCapabilities();
-
 		capabilities.setBrowserName("chrome");
 		capabilities.setPlatform(org.openqa.selenium.Platform.ANY);
 
@@ -113,9 +111,7 @@ public class App {
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		driver.get(url);
-
 		inject();
-
 		driver.close();
 		driver.quit();
 
@@ -123,7 +119,8 @@ public class App {
 
 	public static void inject() throws InterruptedException, java.io.IOException {
 
-		WebElement loginLink = driver.findElement(By.id("_ctl0__ctl0_LoginLink"));
+/*
+ 		WebElement loginLink = driver.findElement(By.id("_ctl0__ctl0_LoginLink"));
 		loginLink.click();
 		WebElement userId = driver.findElement(By.id("uid"));
 		userId.clear();
@@ -131,7 +128,7 @@ public class App {
 		WebElement passwId = driver.findElement(By.id("passw"));
 		passwId.clear();
 		passwId.sendKeys("nobody");
-
+*/
 		String needJqueryInjectionScript = "return this.$ === undefined;";
 		boolean needJqueryInjection = (Boolean) (executeScript(
 				needJqueryInjectionScript));
@@ -143,7 +140,6 @@ public class App {
 				try {
 					URI resourceURL = App.class.getClassLoader().getResource("jquery.js")
 							.toURI();
-
 					String jqueryScript = resourceURL.toString( /* Charsets.UTF_8 */);
 					executeScript(jqueryScript);
 				} catch (URISyntaxException e) {
@@ -162,7 +158,7 @@ public class App {
 		String jqueryEnabledScript = "if (window.jQuery) {  return true } else { return false  } ";
 		boolean jqueryEnabled = (Boolean) (executeScript(jqueryEnabledScript));
 		assertTrue(jqueryEnabled);
-		String buttonElementLocator = "input[name='btnSubmit']";
+		String buttonElementLocator = "input[value='Search']";
 		StringBuilder sb = new StringBuilder();
 		// Send all output to the Appendable object sb
 		Formatter formatter = new Formatter(sb, Locale.US);
@@ -182,18 +178,19 @@ public class App {
 		while (loginButtonObjectIterator.hasNext()) {
 			Object loginButtonObject = loginButtonObjectIterator.next();
 			// [type="submit", value="Login", name="btnSubmit"]
+			// [org.openqa.selenium.remote.RemoteWebElement@30 -> unknown locator]
 			System.err.println("Returned (raw): " + loginButtonObject.toString());
 			loginButtonElement = (WebElement) loginButtonObject;
 			System.err.format("%s %s %s\n", loginButtonElement.getTagName(),
 					loginButtonElement.getAttribute("value"),
 					loginButtonElement.getAttribute("type"));
-			if (loginButtonElement.getAttribute("value").equalsIgnoreCase("login")) {
+			if (loginButtonElement.getAttribute("value").equalsIgnoreCase("search")) {
 				cnt = cnt + 1;
 				// highlight(loginButtonElement);
 			}
 		}
 
-		System.err.println("Login Button found " + cnt + " times");
+		System.err.println("Search Button found " + cnt + " times");
 		assertThat(loginButtonElement, notNullValue());
 		loginButtonElement.click();
 		try {
