@@ -10,10 +10,11 @@
   <!--  // TODO: https://github.com/maven-download-plugin/maven-download-plugin -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <junit.version>4.8.1</junit.version>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <junit.version>4.12</junit.version>
     <selenium.version>2.53.0</selenium.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <java.version>1.7</java.version> 
+    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <java.version>1.8</java.version> 
   </properties>
   <dependencies>
     <dependency>
@@ -97,8 +98,10 @@
           <goal>compile</goal>
         </goals>
         <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
+          <encoding>utf-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>
