@@ -119,16 +119,16 @@ public class App {
 
 	public static void inject() throws InterruptedException, java.io.IOException {
 
-/*
- 		WebElement loginLink = driver.findElement(By.id("_ctl0__ctl0_LoginLink"));
-		loginLink.click();
-		WebElement userId = driver.findElement(By.id("uid"));
-		userId.clear();
-		userId.sendKeys("nobody");
-		WebElement passwId = driver.findElement(By.id("passw"));
-		passwId.clear();
-		passwId.sendKeys("nobody");
-*/
+		/*
+		 		WebElement loginLink = driver.findElement(By.id("_ctl0__ctl0_LoginLink"));
+				loginLink.click();
+				WebElement userId = driver.findElement(By.id("uid"));
+				userId.clear();
+				userId.sendKeys("nobody");
+				WebElement passwId = driver.findElement(By.id("passw"));
+				passwId.clear();
+				passwId.sendKeys("nobody");
+		*/
 		String needJqueryInjectionScript = "return this.$ === undefined;";
 		boolean needJqueryInjection = (Boolean) (executeScript(
 				needJqueryInjectionScript));
@@ -138,25 +138,28 @@ public class App {
 			if (inject_local_script) {
 				// TODO: resource loading not tested
 				try {
-					URI resourceURL = App.class.getClassLoader().getResource("jquery.js")
-							.toURI();
+					URI resourceURL = App.class.getClassLoader()
+							.getResource("inject_jquery.js").toURI();
 					String jqueryScript = resourceURL.toString( /* Charsets.UTF_8 */);
 					executeScript(jqueryScript);
 				} catch (URISyntaxException e) {
 					throw new RuntimeException(e);
 				}
 			} else { // inline
-				String jqueryLoaderScript = "var jqueryScriptElement = document.createElement('script');"
-						+ "jqueryScriptElement.src = 'http://code.jquery.com/jquery-latest.min.js';"
-						+ "document.getElementsByTagName('head')[0].appendChild(jqueryScriptElement);";
+				String jqueryLoaderScript = "var jqueryScriptElement  = document.createElement('script');"
+						+ "  jqueryScriptElement.type = 'text/javascript';"
+						+ "  jqueryScriptElement.src  = unescape('http%3a%2f%2fcode.jquery.com%2fjquery-latest.min.js');"
+						+ "  var target = document.getElementsByTagName('head')[0];"
+						+ "  target.appendChild(jqueryScriptElement);";
 				executeScript(jqueryLoaderScript);
-				Thread.sleep(10000);
+				Thread.sleep(1000);
 			}
 		}
 		// TODO: disable the page animations : $('body').append('<style> *
 		// {transition: none!important;}</style>')
 		String jqueryEnabledScript = "if (window.jQuery) {  return true } else { return false  } ";
 		boolean jqueryEnabled = (Boolean) (executeScript(jqueryEnabledScript));
+		System.err.println("Jquery enabled : " + jqueryEnabled);
 		assertTrue(jqueryEnabled);
 		String buttonElementLocator = "input[value='Search']";
 		StringBuilder sb = new StringBuilder();
@@ -167,32 +170,32 @@ public class App {
 
 		System.err.println("Running : " + jQueryElementLocatorScript);
 		@SuppressWarnings("unchecked")
-		List<Object> loginButtonObjects = (List<Object>) (executeScript(
+		List<Object> searchButtonObjects = (List<Object>) (executeScript(
 				jQueryElementLocatorScript));
-		assertThat(loginButtonObjects, notNullValue());
-		assertTrue(loginButtonObjects.size() > 0);
+		assertThat(searchButtonObjects, notNullValue());
+		assertTrue(searchButtonObjects.size() > 0);
 
-		Iterator<Object> loginButtonObjectIterator = loginButtonObjects.iterator();
+		Iterator<Object> searchButtonObjectIterator = searchButtonObjects.iterator();
 		int cnt = 0;
-		WebElement loginButtonElement = null;
-		while (loginButtonObjectIterator.hasNext()) {
-			Object loginButtonObject = loginButtonObjectIterator.next();
+		WebElement searchButtonElement = null;
+		while (searchButtonObjectIterator.hasNext()) {
+			Object searchButtonObject = searchButtonObjectIterator.next();
 			// [type="submit", value="Login", name="btnSubmit"]
 			// [org.openqa.selenium.remote.RemoteWebElement@30 -> unknown locator]
-			System.err.println("Returned (raw): " + loginButtonObject.toString());
-			loginButtonElement = (WebElement) loginButtonObject;
-			System.err.format("%s %s %s\n", loginButtonElement.getTagName(),
-					loginButtonElement.getAttribute("value"),
-					loginButtonElement.getAttribute("type"));
-			if (loginButtonElement.getAttribute("value").equalsIgnoreCase("search")) {
+			System.err.println("Returned (raw): " + searchButtonObject.toString());
+			searchButtonElement = (WebElement) searchButtonObject;
+			System.err.format("%s %s %s\n", searchButtonElement.getTagName(),
+					searchButtonElement.getAttribute("value"),
+					searchButtonElement.getAttribute("type"));
+			if (searchButtonElement.getAttribute("value").equalsIgnoreCase("search")) {
 				cnt = cnt + 1;
-				// highlight(loginButtonElement);
+				// highlight(searchButtonElement);
 			}
 		}
 
 		System.err.println("Search Button found " + cnt + " times");
-		assertThat(loginButtonElement, notNullValue());
-		loginButtonElement.click();
+		assertThat(searchButtonElement, notNullValue());
+		searchButtonElement.click();
 		try {
 			// http://obscuredclarity.blogspot.com/2012/10/unit-testing-runtime-exceptions-with.html
 			WebElement accountButtonElement = driver
