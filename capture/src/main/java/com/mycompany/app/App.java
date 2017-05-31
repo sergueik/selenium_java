@@ -99,7 +99,7 @@ public static void main(String[] args) throws InterruptedException,java.io.IOExc
 // http://getfirebug.com/releases/firebug/2.0/firebug-2.0.8.xpi
 // http://getfirebug.com/releases/firebug/1.10/firebug-1.10.6.xpi
 
-File firebug = new File(System.getProperty("user.dir") + "\\resources\\firebug-1.10.6.xpi");
+File firebug = new File(System.getProperty("user.dir") + "\\resources\\firebug-3.0.0-beta.3.xpi");
 // http://getfirebug.com/releases/netexport/netExport-0.9b7.xpi
 File netExport = new File(System.getProperty("user.dir") + "\\resources\\netExport-0.9b7.xpi");
 
