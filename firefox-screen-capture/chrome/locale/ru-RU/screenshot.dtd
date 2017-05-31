@@ -1,0 +1,81 @@
+<!ENTITY account_deletion_confirm "Удалить эту учетную запись?">
+<!ENTITY autosave "Автосохранение - после захвата пропустить редактирование экрана и сразу сохранить захваченное изображение в папку по умолчанию с названием веб-страницы в качестве имени файла.">
+<!ENTITY bad_access_token "Недопустимый маркер доступа.">
+<!ENTITY blur "Пятно">
+<!ENTITY border "Только бордюр">
+<!ENTITY cancel "Отмена">
+<!ENTITY capture_area "Область захвата">
+<!ENTITY capture_screen "Захват области экрана">
+<!ENTITY capture_webpage "Захват всей страницы">
+<!ENTITY capture_window "Захват видимой части">
+<!ENTITY capturing "Захват, подождите...">
+<!ENTITY close "Закрыть">
+<!ENTITY close_upload_wrapper "Закрыть">
+<!ENTITY copy "Копировать">
+<!ENTITY default_title "Захват экрана">
+<!ENTITY deletion_title "Удалить учетную запись">
+<!ENTITY description "Захват видимого содержимого вкладки, области веб-страницы, или всей страницы в формате PNG. Поддержка горизонтальной и вертикальной прокрутки при захвате всей страницы, с использованием всех новых возможностей автосохранения.">
+<!ENTITY edit_tip "Ниже приведен скриншот, того что Вы захватили. Вы можете редактировать его с помощью инструментов слева. Нажмите Сохранить по завершении.">
+<!ENTITY facebook_get_photo_link "Получение ссылки на изображения...">
+<!ENTITY facebook_upload_header "Facebook">
+<!ENTITY failed_to_connect_to_server "Невозможно подключиться к серверу.">
+<!ENTITY failed_to_get_photo_link "Не удалось получить фото ссылку.">
+<!ENTITY failed_to_get_user_info "Не удалось получить информацию о пользователе, повторите попытку позже.">
+<!ENTITY failed_to_register_hot_key_for_screen_capture "Ярлык для Захвата области экрана зарегистрирован другим приложением. Пожалуйста, переопределите его.">
+<!ENTITY failed_to_upload_image "Не удалось загрузить изображение, повторите попытку позже.">
+<!ENTITY failure_to_create_album "Не удалось создать альбом, повторите попытку позже.">
+<!ENTITY highlight "Выделить">
+<!ENTITY hot_key_conflict "Конфликт ярлыков.">
+<!ENTITY image_caption "Название изображения">
+<!ENTITY invalid_album_id "Альбом не найден.">
+<!ENTITY invalid_caption "Требуется название изображения.">
+<!ENTITY line "Линия">
+<!ENTITY loading "Страница загружается, подождите.">
+<!ENTITY lossless "Без потери качества">
+<!ENTITY lossy "C потерей качества">
+<!ENTITY ok "OK">
+<!ENTITY open_save_path "Перейти в папку">
+<!ENTITY options "Параметры захвата экрана">
+<!ENTITY photo_link_text "Проверить изображение">
+<!ENTITY photo_size_tip "Подсказка: Вы не можете загрузить изображение больше 3Мб.">
+<!ENTITY picasa_upload_header "Picasa">
+<!ENTITY print "Печать">
+<!ENTITY progress_info "Изображение загружается, подождите...">
+<!ENTITY quality_setting "Настройки качества скриншота: ">
+<!ENTITY rect "Заполнить всю область">
+<!ENTITY redact "Скрыть">
+<!ENTITY return_to_site_selection "Назад">
+<!ENTITY save "Сохранить">
+<!ENTITY save_and_close "Сохранить &#38; Закрыть">
+<!ENTITY save_fail "Не удалось сохранить скриншот.">
+<!ENTITY save_image "Сохранить изображение">
+<!ENTITY save_setting "Настройки сохранения скриншота: ">
+<!ENTITY save_success "Скриншот сохранен.">
+<!ENTITY save_tip "Место сохранения по умолчанию: ">
+<!ENTITY set_save_path "Обзор...">
+<!ENTITY set_save_path_title "Выбор места сохранения по умолчанию.">
+<!ENTITY share "Отправить">
+<!ENTITY share_to "Отправить в">
+<!ENTITY share_to_facebook_account "Отправить на Вашу учетную запись Facebook">
+<!ENTITY share_to_other_account "Отправить на другую учетную запись">
+<!ENTITY share_to_picasa_account "Отправить на Вашу учетную запись Picasa">
+<!ENTITY share_to_sina_account "Отправить на Вашу учетную запись в Sina Microblog">
+<!ENTITY shortcut_setting "Настройки ярлыков:">
+<!ENTITY shortcutsetting_text "Вкл. горячие клавиши">
+<!ENTITY sina_failed_to_get_access_token "Не удалось получить маркер доступа, повторите попытку позже.">
+<!ENTITY sina_failed_to_get_request_token "Не удалось получить запрос маркера, повторите попытку позже.">
+<!ENTITY sina_upload_header "Sina Microblog">
+<!ENTITY size_huge "Огромный">
+<!ENTITY size_large "Большой">
+<!ENTITY size_normal "Обычный">
+<!ENTITY size_small "Мелкий">
+<!ENTITY solid_black "Сплошной">
+<!ENTITY special "Это специальная страница. Невозможно осуществить захват экрана на этой странице.">
+<!ENTITY text "Текст">
+<!ENTITY tip_copy_failed "Не удалось скопировать скриншот.">
+<!ENTITY tip_copy_succeed "Скриншот скопирован.">
+<!ENTITY unknown_error "Неизвестная ошибка.">
+<!ENTITY upload_sites_header "Отправить изображение в">
+<!ENTITY user_authentication_tip "Авторизация пользователя, подождите...">
+<!ENTITY user_denied "Пользователю отказано.">
+<!ENTITY user_logout_tip "Выход, подождите...">

@@ -1,0 +1,88 @@
+<!ENTITY description "Capture visible content of a tab, a region of a web page, or the whole page as a PNG image. Support horizontal and vertical scroll when capturing whole page, with an all new autosave capability.">
+<!ENTITY default_title "Screen Capture">
+<!ENTITY capture_screen "Capture Screen Region">
+<!ENTITY capture_window "Capture Visible Content">
+<!ENTITY capture_area "Capture Page Region">
+<!ENTITY capture_webpage "Capture Whole Page">
+<!ENTITY shortcut_setting "Shortcut Settings:">
+<!ENTITY shortcutsetting_text "Enable keyboard shortcuts">
+<!ENTITY special "This is a special page. Unable to perform screen capture actions on this page.">
+<!ENTITY loading "The page is loading, please wait.">
+<!ENTITY capturing "Capturing, please wait...">
+<!ENTITY cancel "Cancel">
+<!ENTITY ok "OK">
+<!ENTITY capture_tip "Drag and Capture (Press Esc to Exit)">
+<!ENTITY highlight "Highlight">
+<!ENTITY border "Draw Border Only">
+<!ENTITY rect "Fill Entire Area">
+<!ENTITY redact "Redact">
+<!ENTITY solid_black "Solid Black">
+<!ENTITY blur "Blur">
+<!ENTITY text "Text">
+<!ENTITY size_small "Small">
+<!ENTITY size_normal "Normal">
+<!ENTITY size_large "Large">
+<!ENTITY size_huge "Huge">
+<!ENTITY line "Line">
+<!ENTITY edit_tip "Below is the screenshot you captured. You can edit it with the tools on the left. Press Save when finished.">
+<!ENTITY copy "Copy">
+<!ENTITY save "Save">
+<!ENTITY share "Share">
+<!ENTITY print "Print">
+<!ENTITY close "Close">
+<!ENTITY save_image "Save Image">
+<!ENTITY options "Screen Capture Options">
+<!ENTITY quality_setting "Screenshot Quality Settings: ">
+<!ENTITY lossy "Lossy screenshot">
+<!ENTITY lossless "Lossless screenshot">
+<!ENTITY save_setting "Screenshot Save Settings: ">
+<!ENTITY save_tip "Default save location: ">
+<!ENTITY autosave "Autosave - after capture, bypass editing screen and directly save the captured image to the default location with the web page title as default file name">
+<!ENTITY set_save_path "Browse...">
+<!ENTITY set_save_path_title "Select Default Save Location">
+<!ENTITY open_save_path "Go to folder">
+<!ENTITY save_and_close "Save &#38; Close">
+<!ENTITY save_success "Screenshot saved.">
+<!ENTITY save_fail "Failed to save the screenshot.">
+<!ENTITY tip_copy_succeed "Screenshot copied.">
+<!ENTITY tip_copy_failed "Failed to copy the screenshot.">
+<!ENTITY upload_sites_header "Share Image To">
+<!ENTITY sina_upload_header "Sina Microblog">
+<!ENTITY facebook_upload_header "Facebook">
+<!ENTITY share_to "Share to">
+<!ENTITY deletion_title "Remove account">
+<!ENTITY photo_link_text "Check the Image">
+<!ENTITY account_deletion_confirm "Do you want to remove this account?">
+<!ENTITY return_to_site_selection "Back">
+<!ENTITY close_upload_wrapper "Close">
+<!ENTITY share_to_other_account "Share to another account">
+<!ENTITY share_to_sina_account "Share to your Sina Microblog account">
+<!ENTITY share_to_facebook_account "Share to your Facebook account">
+<!ENTITY image_caption "Image Title">
+<!ENTITY facebook_get_photo_link "Retrieving image link...">
+<!ENTITY bad_access_token "Invalid Access Token.">
+<!ENTITY unknown_error "Unknown error.">
+<!ENTITY failed_to_connect_to_server "Can not connect to server.">
+<!ENTITY invalid_caption "Image title is required.">
+<!ENTITY photo_size_tip "Hint: You may fail to upload an image bigger than 3M bytes.">
+<!ENTITY progress_info "Image uploading, please wait...">
+<!ENTITY sina_failed_to_get_request_token "Get request token failed, please try again later.">
+<!ENTITY sina_failed_to_get_access_token "Get access token failed, please try again later.">
+<!ENTITY failed_to_get_user_info "Get user information failed, please try again later.">
+<!ENTITY user_denied "User denied.">
+<!ENTITY user_authentication_tip "User authenticating, please wait...">
+<!ENTITY user_logout_tip "Signing out, please wait...">
+<!ENTITY failed_to_register_hot_key_for_screen_capture "The shortcut for Capture Screen Region is registered by another application. Please redefine it.">
+<!ENTITY hot_key_conflict "Shortcuts conflict.">
+<!ENTITY failure_to_create_album "Failed to create album, please try again later.">
+<!ENTITY failed_to_upload_image "Failed to upload image, please try again later.">
+<!ENTITY failed_to_get_photo_link "Failed to retrieve photo link.">
+<!ENTITY picasa_upload_header "Picasa Web">
+<!ENTITY share_to_picasa_account "Share to your Picasa Web account">
+<!ENTITY invalid_album_id "Album not found.">
+<!ENTITY saved_to_path "The screenshot has been saved to ">
+<!ENTITY option "Options">
+<!ENTITY imgur_upload_header "Imgur">
+<!ENTITY share_to_imgur_account "Share to your Imgur account">
+<!ENTITY imgur_failed_to_get_request_token "Get request token failed, please try again later.">
+<!ENTITY imgur_failed_to_get_access_token "Get access token failed, please try again later.">

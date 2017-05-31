@@ -1,0 +1,12 @@
+overlay chrome://browser/content/browser.xul chrome://screenshot/content/screenshot/overlay.xul
+
+content screenshot chrome/content/
+
+locale screenshot en-US chrome/locale/en-US/
+locale screenshot ru-RU chrome/locale/ru-RU/
+locale screenshot de-DE chrome/locale/de-DE/
+
+skin screenshot classic/1.0 chrome/skin/
+
+style	chrome://browser/content/browser.xul	chrome://screenshot/skin/overlay.css
+style	chrome://global/content/customizeToolbar.xul	chrome://screenshot/skin/overlay.css

@@ -1,0 +1,40 @@
+<!ENTITY autosave "Autospeichern - nach dem Erfassen, den Bearbeiten-Bildschirm überspringen und den erfassten Bereich direkt am Standard-Speicherort mit dem Webseiten-Titel als Dateinamen speichern">
+<!ENTITY blur "Verwischen">
+<!ENTITY border "Nur umranden">
+<!ENTITY cancel "Abbruch">
+<!ENTITY capture_area "Ausgewählten Bereich">
+<!ENTITY capture_webpage "Gesamte Seite">
+<!ENTITY capture_window "Sichtbaren Bereich">
+<!ENTITY capturing "Erfassen, bitte warten...">
+<!ENTITY close "Schließen">
+<!ENTITY default_title "Bildschirmerfassung">
+<!ENTITY description "Erfasse den sichtbaren Bereich eines Tabs, einen Bereich einer Webseite oder die gesamte Seite als PNG Bild. Unterstützt horizontales und vertikales scrollen wenn die gesamte Seite erfasst wird, mit der brandneuen Autospeichern-Möglichkeit.">
+<!ENTITY edit_tip "    Unten ist der erfasste Screenshot. Sie können diesen mit den Tools links bearbeiten. Wenn fertig, auf speichern drücken.">
+<!ENTITY highlight "Markieren">
+<!ENTITY line "Linie">
+<!ENTITY loading "Die Seite wird geladen, bitte warten.">
+<!ENTITY lossless "Verlustfreier Screenshot">
+<!ENTITY lossy "Verlustbehafteter Screenshot">
+<!ENTITY name "Bildschirmerfassung (von Google)">
+<!ENTITY ok "OK">
+<!ENTITY open_save_path "Gehe zu Verzeichnis">
+<!ENTITY options "Optionen Bildschirmerfassung">
+<!ENTITY quality_setting "Einstellungen Screenshot Qualität: ">
+<!ENTITY rect "Bereich füllen">
+<!ENTITY redact "Bearbeiten">
+<!ENTITY save "Speichern">
+<!ENTITY save_and_close "Speichern & Schließen">
+<!ENTITY save_fail "Screenshot konnte nicht gespeichert werden.">
+<!ENTITY save_image "Bild speichern">
+<!ENTITY save_setting "Einstellungen Screenshot speichern: ">
+<!ENTITY save_success "Screenshot gespeichert.">
+<!ENTITY save_tip "Standard-Speicherort: ">
+<!ENTITY set_save_path "Browse...">
+<!ENTITY set_save_path_title "Standard-Speicherort wählen">
+<!ENTITY size_huge "Riesig">
+<!ENTITY size_large "Groß">
+<!ENTITY size_normal "Normal">
+<!ENTITY size_small "Klein">
+<!ENTITY solid_black "Schwarz">
+<!ENTITY special "Dies ist eine spezielle Seite. Eine Bildschirmerfassung ist auf dieser Seite nicht möglich.">
+<!ENTITY text "Text">

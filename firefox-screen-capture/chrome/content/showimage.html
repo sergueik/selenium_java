@@ -1,0 +1,111 @@
+<html>
+<head>
+<title>Screen Capture</title>
+<meta charset="UTF-8">
+<link href="chrome://screenshot/skin/showimage.css" rel="stylesheet" type="text/css">
+<script src="chrome://screenshot/locale/screenshot.properties"></script>
+<script src="chrome://screenshot/content/screenshot/sqliteStorage.js"></script>
+<script src="chrome://screenshot/content/screenshot/localStorage.js"></script>
+<script src="chrome://screenshot/content/editor.js"></script>
+<script src="chrome://screenshot/content/ui.js"></script>
+<script src="chrome://screenshot/content/upload_ui.js"></script>
+</head>
+<body> 
+  <embed id="pluginobj" width="0" height="0" type="application/x-screencapture" />
+  <div id="header">
+  <div id="toolbar" class="toolbar">
+   <ul>
+    <li id="btnHighlight" class="mark">
+    <div class="colorBox" id="highlightColorBox"></div>
+    <span id="tHighlight">Highlight</span>
+        <div class="tool" id="highlightTool">
+        <div id="highlightColorPad"></div>
+        <div class="clear"></div>
+        <div class="tool-option" style="border-top: 1px solid #ccc; padding-top:2px; margin-top:5px;">
+          <div id="borderMode"><span id="border"></span></div>
+          <div id="rectMode"><span id="rect"></span></div>
+        </div>
+        <div class="tool-option-line">
+          <div id="rectangle" class="mark"><span class="rect"></span></div>
+          <div id="radiusRectangle"><span class="radiusRect"></span></div>
+          <div id="ellipse"><span class="ellipse"></span></div>
+        </div>
+      </div>
+    </li>
+    <li id="btnBlackout">
+      <div class="blurBox" id="blackoutBox"></div>
+      <span id="tRedact">Redact</span>
+      <div class="tool tool-option">
+        <div id="redact" class="mark"><span id="redactText"></span></div>
+        <div id="blur" ><span id="blurText"></span></div>
+      </div>
+    </li>
+    <li id="btnText">
+    <div class="colorBox" id="fontColorBox"></div>
+    <span id="tText">Text</span>
+    <div class="tool" id="fontTool">
+      <div id="fontColorPad"></div>
+      <div class="clear"></div>
+      <div class="tool-option" style="border-top: 1px solid #ccc; padding:2px 0 0 0; margin-top:5px">
+       <div id="size_10" style="font-size: 10px"></div>
+       <div id="size_16" style="font-size: 16px"></div>
+       <div id="size_18" style="font-size: 18px"></div>
+       <div id="size_32" class="mark" style="font-size: 32px"></div>
+     </div>
+    </div>
+    </li>
+    <li id="btnLine">
+      <canvas id="lineIconCav" width="14" height="14" ></canvas>
+      <span id="lineText">Line</span>
+      <div class="tool">
+       <div id="lineColorPad"></div>
+       <div class="clear"></div>
+       <div class="tool-option-line">
+         <div id="straightLine"><img src="chrome://screenshot/skin/img/line.png" alt=""> </div>
+         <div id="arrow"><img src="chrome://screenshot/skin/img/arrow.png" alt=""> </div>
+       </div>
+      </div>
+    </li>
+  </ul>
+  </div>
+  <div id="tip"></div>
+  <div class="toolbar" id="okBtn" style="position:fixed;margin-top: 5px; right:30px; top:0px;">
+    <ul>
+      <li id="btnSave">
+        <img src="chrome://screenshot/skin/img/icon_save.png" alt="">
+        <span id="tSave">Save</span>
+      </li>
+      <li id="btnUpload">
+        <img src="chrome://screenshot/skin/img/upload.png" alt="">
+        <span id="tUpload">Share</span>
+      </li>
+      <li id="btnClose">
+        <img src="chrome://screenshot/skin/img/icon_close.png" alt="">
+        <span id="tClose">Close</span>
+      </li>
+    </ul>
+  </div>
+  <div class="clear"></div>
+  </div>
+  <div id="showBox">
+  <div id="photo">
+  <canvas id="canvas"></canvas>
+  <canvas id="mask-canvas"></canvas>
+  <div class="layer" id="layer0"></div>
+  </div>
+  </div>
+  <div id='selectuploadposition'>
+    <div class="selectcontent" >
+    <div id="selectPrompt" style="padding:30px 0 0 30px; "></div>
+      <div style="padding: 5px 0 0 30px;">
+      <div style="padding: 5px 5px;"><input  id="selectSina" type= "radio"><span id="sina"></span></div>
+      <div style="padding: 5px 5px;"><input id="selectFacebook" type= "radio"><span id="facebook"></span></div>
+      </div>
+    </div>
+    <div style="float: right; margin: 5px 15px 0 0;"><button id="uploadFile"></button><button id="cancelUpload"></button></div>
+  </div>
+  <img id="pic" src="#" style="display:none" />
+  <div id="overlay"></div>
+  <script src="chrome://screenshot/content/showimage.js"></script>
+</body>
+</html>

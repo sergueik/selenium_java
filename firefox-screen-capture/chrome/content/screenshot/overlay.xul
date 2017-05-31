@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://screenshot/locale/screenshot.dtd">
+<overlay id="poputchikOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+    <script src="chrome://screenshot/content/screenshot/sqliteStorage.js"></script>
+    <script src="chrome://screenshot/content/screenshot/localStorage.js"></script>
+    <script src="chrome://screenshot/content/screenshot/Utils.js"/>
+    <script src="chrome://screenshot/content/screenshot/Tabs.js"/>
+    <script src="chrome://screenshot/content/screenshot/Screen.js"/>
+    <script src="chrome://screenshot/locale/screenshot.properties"></script>
+    <script src="chrome://screenshot/content/screenshot/main.js"/>
+  <toolbarpalette id="BrowserToolbarPalette">
+     <toolbarbutton id="poputchikScreen" type="menu-button" label="Screenshot" class="toolbarbutton-1" oncommand="screenshot.screen.lastAction(); event.stopPropagation();" image="chrome://screenshot/skin/img/icon.png">
+        <menupopup>
+            <menuitem label="&capture_area;" image="chrome://screenshot/skin/img/custom.png" oncommand="screenshot.screen.captureArea(); event.stopPropagation();" class="menuitem-iconic"/>
+            <menuitem label="&capture_window;" image="chrome://screenshot/skin/img/screen.png" oncommand="screenshot.screen.captureWindow(); event.stopPropagation();" class="menuitem-iconic"/>
+            <menuitem label="&capture_webpage;" image="chrome://screenshot/skin/img/whole.png" oncommand="screenshot.screen.captureWebpage(); event.stopPropagation();" class="menuitem-iconic"/>
+        </menupopup>
+     </toolbarbutton>
+  </toolbarpalette>
+</overlay>
