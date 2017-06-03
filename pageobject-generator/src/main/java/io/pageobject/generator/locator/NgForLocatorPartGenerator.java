@@ -7,30 +7,30 @@ import static io.pageobject.generator.locator.LocatorPart.prefixPart;
 
 public class NgForLocatorPartGenerator extends RepeaterLocatorPartGenerator {
 
-    private LocatorPart locatorPart;
+	private LocatorPart locatorPart;
 
-    public NgForLocatorPartGenerator(Element element) {
-        super(element, LocatorSources.NAME, LocatorSources.CSS);
-    }
+	public NgForLocatorPartGenerator(Element element) {
+		super(element, LocatorSources.NAME, LocatorSources.CSS);
+	}
 
-    @Override
-    public LocatorPart firstPart(GeneratorContext context) {
-        locatorPart = super.firstPart(context);
-        return locatorPart;
-    }
+	@Override
+	public LocatorPart firstPart(GeneratorContext context) {
+		locatorPart = super.firstPart(context);
+		return locatorPart;
+	}
 
-    @Override
-    public LocatorPart lastPart(GeneratorContext context, int index) {
-        locatorPart = super.lastPart(context, index);
-        return locatorPart;
-    }
+	@Override
+	public LocatorPart lastPart(GeneratorContext context, int index) {
+		locatorPart = super.lastPart(context, index);
+		return locatorPart;
+	}
 
-    @Override
-    public LocatorPart middlePart(GeneratorContext context, int index) {
-        StringBuilder value = new StringBuilder(locatorPart.getPart());
-        value.append(".get(rowIndex");
-        value.append(index + 1);
-        value.append(")");
-        return prefixPart(value.toString());
-    }
+	@Override
+	public LocatorPart middlePart(GeneratorContext context, int index) {
+		StringBuilder value = new StringBuilder(locatorPart.getPart());
+		value.append(".get(rowIndex");
+		value.append(index + 1);
+		value.append(")");
+		return prefixPart(value.toString());
+	}
 }

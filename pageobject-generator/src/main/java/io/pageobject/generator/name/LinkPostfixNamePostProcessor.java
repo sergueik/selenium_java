@@ -6,12 +6,12 @@ import static io.pageobject.generator.element.Elements.isLink;
 
 public class LinkPostfixNamePostProcessor extends PostfixNamePostProcessor {
 
-    public LinkPostfixNamePostProcessor() {
-        super("Link", new String[] {"Link", "Button"});
-    }
+	public LinkPostfixNamePostProcessor() {
+		super("Link", new String[] { "Link", "Button" });
+	}
 
-    @Override
-    public boolean isMatchingElement(Element element) {
-        return isLink(element);
-    }
+	@Override
+	public boolean isMatchingElement(Element element) {
+		return isLink(element);
+	}
 }

@@ -13,31 +13,34 @@ import static com.google.common.collect.Lists.newArrayList;
 
 public class NgForProcessor extends AbstractElementProcessor {
 
-    public static final String ASSERTION_COUNT = "repeater/assertion-count";
+	public static final String ASSERTION_COUNT = "repeater/assertion-count";
 
-    @Override
-    public boolean isMatchingElement(Element element, GeneratorContext context) {
-        return !isNullOrEmpty(element.attr("*ngFor"));
-    }
+	@Override
+	public boolean isMatchingElement(Element element, GeneratorContext context) {
+		return !isNullOrEmpty(element.attr("*ngFor"));
+	}
 
-    @Override
-    protected LocatorPartGenerator getLocatorPartGenerator(Element element, GeneratorContext context) {
-        return null;
-    }
+	@Override
+	protected LocatorPartGenerator getLocatorPartGenerator(Element element,
+			GeneratorContext context) {
+		return null;
+	}
 
-    @Override
-    protected LocatorSources[] getElementLocatorCandidates(GeneratorContext context) {
-        return new LocatorSources[] {LocatorSources.NAME, LocatorSources.CSS};
-    }
+	@Override
+	protected LocatorSources[] getElementLocatorCandidates(
+			GeneratorContext context) {
+		return new LocatorSources[] { LocatorSources.NAME, LocatorSources.CSS };
+	}
 
-    @Override
-    protected String getLocator(GeneratorContext context) {
-        return context.getLocator().getLocator();
-    }
+	@Override
+	protected String getLocator(GeneratorContext context) {
+		return context.getLocator().getLocator();
+	}
 
-    @Override
-    protected List<String> getTemplates(GeneratorContext context, Map<String, Object> templateModel) {
-        return newArrayList(ASSERTION_COUNT);
-    }
+	@Override
+	protected List<String> getTemplates(GeneratorContext context,
+			Map<String, Object> templateModel) {
+		return newArrayList(ASSERTION_COUNT);
+	}
 
 }

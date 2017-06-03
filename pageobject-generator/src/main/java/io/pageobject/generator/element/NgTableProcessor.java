@@ -7,14 +7,15 @@ import static io.pageobject.generator.attribute.Attributes.getNormalizedAttribut
 
 public abstract class NgTableProcessor extends AbstractElementProcessor {
 
-    protected int getIndex(Element element, String indexAttributeName) {
-        int sortableIndex = 0;
-        Element sibling = element;
-        while ((sibling = sibling.previousElementSibling()) != null) {
-            if (!isNullOrEmpty(getNormalizedAttributeValue(sibling, indexAttributeName))) {
-                sortableIndex++;
-            }
-        }
-        return sortableIndex;
-    }
+	protected int getIndex(Element element, String indexAttributeName) {
+		int sortableIndex = 0;
+		Element sibling = element;
+		while ((sibling = sibling.previousElementSibling()) != null) {
+			if (!isNullOrEmpty(
+					getNormalizedAttributeValue(sibling, indexAttributeName))) {
+				sortableIndex++;
+			}
+		}
+		return sortableIndex;
+	}
 }

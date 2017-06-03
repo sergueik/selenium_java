@@ -7,9 +7,9 @@ import org.jsoup.nodes.Element;
 
 public interface ElementProcessor {
 
-    boolean isMatchingElement(Element element, GeneratorContext context);
+	boolean isMatchingElement(Element element, GeneratorContext context);
 
-    Locator generateElementLocator(GeneratorContext context);
+	Locator generateElementLocator(GeneratorContext context);
 
-    ProcessingResult process(GeneratorContext context) throws Exception;
+	ProcessingResult process(GeneratorContext context) throws Exception;
 }

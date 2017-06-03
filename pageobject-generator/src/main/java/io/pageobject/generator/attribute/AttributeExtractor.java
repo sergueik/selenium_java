@@ -5,6 +5,6 @@ import org.jsoup.nodes.Element;
 
 public interface AttributeExtractor {
 
-    String extractValue(Element element, GeneratorContext context);
+	String extractValue(Element element, GeneratorContext context);
 
 }

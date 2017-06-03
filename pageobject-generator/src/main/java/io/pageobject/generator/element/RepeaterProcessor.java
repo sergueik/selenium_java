@@ -14,32 +14,36 @@ import static io.pageobject.generator.attribute.Attributes.getNormalizedAttribut
 
 public class RepeaterProcessor extends AbstractElementProcessor {
 
-    public static final String ASSERTION_COUNT = "repeater/assertion-count";
+	public static final String ASSERTION_COUNT = "repeater/assertion-count";
 
-    @Override
-    public boolean isMatchingElement(Element element, GeneratorContext context) {
-        return !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-repeat")) ||
-               !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-repeat-start"));
-    }
+	@Override
+	public boolean isMatchingElement(Element element, GeneratorContext context) {
+		return !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-repeat"))
+				|| !isNullOrEmpty(
+						getNormalizedAttributeValue(element, "ng-repeat-start"));
+	}
 
-    @Override
-    protected LocatorPartGenerator getLocatorPartGenerator(Element element, GeneratorContext context) {
-        return null;
-    }
+	@Override
+	protected LocatorPartGenerator getLocatorPartGenerator(Element element,
+			GeneratorContext context) {
+		return null;
+	}
 
-    @Override
-    protected LocatorSources[] getElementLocatorCandidates(GeneratorContext context) {
-        return new LocatorSources[] {LocatorSources.NG_REPEAT};
-    }
+	@Override
+	protected LocatorSources[] getElementLocatorCandidates(
+			GeneratorContext context) {
+		return new LocatorSources[] { LocatorSources.NG_REPEAT };
+	}
 
-    @Override
-    protected String getLocator(GeneratorContext context) {
-        return context.getLocator().getLocator();
-    }
+	@Override
+	protected String getLocator(GeneratorContext context) {
+		return context.getLocator().getLocator();
+	}
 
-    @Override
-    protected List<String> getTemplates(GeneratorContext context, Map<String, Object> templateModel) {
-        return newArrayList(ASSERTION_COUNT);
-    }
+	@Override
+	protected List<String> getTemplates(GeneratorContext context,
+			Map<String, Object> templateModel) {
+		return newArrayList(ASSERTION_COUNT);
+	}
 
 }

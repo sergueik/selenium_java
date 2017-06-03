@@ -14,28 +14,28 @@ import static io.pageobject.generator.attribute.Attributes.getNormalizedAttribut
 
 public class Ng1BindingProcessor extends AbstractElementProcessor {
 
-    @Override
-    public boolean isMatchingElement(Element element, GeneratorContext context) {
-        return !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-bind")) ||
-               !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-bind-html")) ||
-               !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-bind-template")) ||
-               hasExpression(element.ownText());
-    }
+	@Override
+	public boolean isMatchingElement(Element element, GeneratorContext context) {
+		return !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-bind"))
+				|| !isNullOrEmpty(getNormalizedAttributeValue(element, "ng-bind-html"))
+				|| !isNullOrEmpty(
+						getNormalizedAttributeValue(element, "ng-bind-template"))
+				|| hasExpression(element.ownText());
+	}
 
-    @Override
-    protected LocatorSources[] getElementLocatorCandidates(GeneratorContext context) {
-        return new LocatorSources[] {LocatorSources.ID,
-                                     LocatorSources.NAME,
-                                     LocatorSources.NG_MODEL,
-                                     LocatorSources.EXPRESSION_TEXT,
-                                     LocatorSources.NG_BIND,
-                                     LocatorSources.NG_BIND_HTML,
-                                     LocatorSources.NG_BIND_TEMPLATE};
-    }
+	@Override
+	protected LocatorSources[] getElementLocatorCandidates(
+			GeneratorContext context) {
+		return new LocatorSources[] { LocatorSources.ID, LocatorSources.NAME,
+				LocatorSources.NG_MODEL, LocatorSources.EXPRESSION_TEXT,
+				LocatorSources.NG_BIND, LocatorSources.NG_BIND_HTML,
+				LocatorSources.NG_BIND_TEMPLATE };
+	}
 
-    @Override
-    protected List<String> getTemplates(GeneratorContext context, Map<String, Object> templateModel) {
-        return newArrayList(ASSERTION_TEXT, ASSERTION_HAS_CLASS);
-    }
+	@Override
+	protected List<String> getTemplates(GeneratorContext context,
+			Map<String, Object> templateModel) {
+		return newArrayList(ASSERTION_TEXT, ASSERTION_HAS_CLASS);
+	}
 
 }
