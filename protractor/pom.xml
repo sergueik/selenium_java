@@ -33,7 +33,7 @@
     <junit.version>4.12</junit.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <maven-compiler-plugin.version>3.1</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.5.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
     <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
