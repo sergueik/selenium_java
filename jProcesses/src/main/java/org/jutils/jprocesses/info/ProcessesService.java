@@ -12,18 +12,11 @@ public interface ProcessesService {
 	List<ProcessInfo> getList();
 
 	List<ProcessInfo> getList(boolean fastMode);
-
 	List<ProcessInfo> getList(String name);
-
 	List<ProcessInfo> getList(String name, boolean fastMode);
-
 	ProcessInfo getProcess(int pid);
-
 	ProcessInfo getProcess(int pid, boolean fastMode);
-
 	JProcessesResponse killProcess(int pid);
-
 	JProcessesResponse killProcessGracefully(int pid);
-
 	JProcessesResponse changePriority(int pid, int priority);
 }

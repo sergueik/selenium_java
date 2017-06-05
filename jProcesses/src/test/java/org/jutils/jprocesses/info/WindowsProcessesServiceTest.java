@@ -48,9 +48,6 @@ public class WindowsProcessesServiceTest {
 		when(wmi4Java.VBSEngine()).thenReturn(wmi4Java);
 	}
 
-	/**
-	 * Test of getProcessList method, of class JProcesses.
-	 */
 	@Test
 	public void testGetList() {
 		if (OSDetector.isWindows()) {

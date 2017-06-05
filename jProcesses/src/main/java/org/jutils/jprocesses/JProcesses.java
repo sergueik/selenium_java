@@ -8,9 +8,9 @@ import org.jutils.jprocesses.model.WindowsPriority;
 
 import java.util.List;
 
- /*
- * @author Javier Garcia Alonso
- */
+/*
+* @author Javier Garcia Alonso
+*/
 public class JProcesses {
 
 	private boolean fastMode = false;
