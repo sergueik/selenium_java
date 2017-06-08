@@ -20,14 +20,15 @@
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <cucumber-version>1.2.5</cucumber-version>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
+    <junit-dataprovider.version>1.12.0</junit-dataprovider.version>
     <junit.version>4.12</junit.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>2.47.0</selenium.version>
+    <selenium.version>2.53.0</selenium.version>
   </properties>
   <dependencies>
     <dependency>
@@ -60,6 +61,11 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.tngtech.java</groupId>
+      <artifactId>junit-dataprovider</artifactId>
+      <version>${junit-dataprovider.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -124,6 +130,10 @@
         <configuration>
           <source>${java.version}</source>
           <target>${java.version}</target>
+          <encoding>utf-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
       <plugin>

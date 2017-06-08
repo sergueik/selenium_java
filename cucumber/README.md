@@ -9,3 +9,4 @@ Origins:
   * [cucumber-jvm](https://github.com/cucumber/cucumber-jvm)
   * [Cucumber hooks](https://sukesh15.gitbooks.io/cucumber-jvm-test-framework-)
   * [old Cucumber scenario hooks](http://zsoltfabok.com/blog/2012/09/cucumber-jvm-hooks/)
+  * [Java](http://www.dokwork.ru/2015/08/cucumber.html)

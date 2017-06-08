@@ -52,9 +52,9 @@ public class ProtractorDriver {
 	private Actions actions;
 	private final Logger log = LogManager.getLogger(ProtractorDriver.class);
 	private int highlightInterval = 100;
-  
+
 	public ProtractorDriver() {
-    
+
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		// DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		System.setProperty("webdriver.chrome.driver",
@@ -72,9 +72,9 @@ public class ProtractorDriver {
 		actions = new Actions(driver);
 	}
 
-  public void quit() {
-    this.driver.quit();
-  }
+	public void quit() {
+		this.driver.quit();
+	}
 
 	public void waitForElementVisible(By locator) {
 		log.info("Waiting for element visible for locator: {}", locator);
