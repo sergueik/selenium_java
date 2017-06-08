@@ -21,7 +21,7 @@ public class GridInfoTest {
 	private static final int PORT = 4444;
 
 	private RemoteWebDriver driver;
-	private ActiveNodeDeterminer determiner = new ActiveNodeDeterminer(IP, PORT);
+	private ActiveNodeDeterminer determiner = new ActiveNodeDeterminer();
 	private static String osName;
 
 	public static String getOsName() {
@@ -33,6 +33,10 @@ public class GridInfoTest {
 
 	@BeforeClass
 	public void setup() throws Exception {
+		determiner = new ActiveNodeDeterminer();
+		determiner.setGridPort(PORT);
+		determiner.setGridHostName(IP);
+
 		URL url = new URL("http://" + IP + ":" + PORT + "/wd/hub");
 		getOsName();
 		System.setProperty("webdriver.gecko.driver",

@@ -23,6 +23,31 @@ import java.util.logging.Logger;
 public class ActiveNodeDeterminer {
 	private String gridHostName;
 	private int gridPort;
+	private boolean debug = false;
+
+	public String getGridHostName() {
+		return gridHostName;
+	}
+
+	public void setGridHostName(String gridHostName) {
+		this.gridHostName = gridHostName;
+	}
+
+	public int getGridPort() {
+		return gridPort;
+	}
+
+	public void setGridPort(int gridPort) {
+		this.gridPort = gridPort;
+	}
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
 
 	private static final Logger LOGGER = Logger
 			.getLogger(ActiveNodeDeterminer.class.getCanonicalName());
@@ -35,6 +60,9 @@ public class ActiveNodeDeterminer {
 	public ActiveNodeDeterminer(String gridHostName, int gridPort) {
 		this.gridHostName = gridHostName;
 		this.gridPort = gridPort;
+	}
+
+	public ActiveNodeDeterminer() {
 	}
 
 	/**
@@ -80,6 +108,7 @@ public class ActiveNodeDeterminer {
 			while ((line = br.readLine()) != null) {
 				builder.append(line);
 			}
+			System.err.println("Raw response: " + builder.toString());
 			return new JsonParser().parse(builder.toString()).getAsJsonObject();
 		}
 	}
