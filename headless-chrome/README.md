@@ -6,4 +6,5 @@ Headless Chrome Java helper.
 
 #### See also
 * [Getting Started with Headless Chrome] (developers.google.com/web/updates/2017/04/headless-chrome)
-* [in russian, Javascript port](https://habrahabr.ru/post/329660/).
+* [in russian, Javascript port](https://habrahabr.ru/post/329660/)
+* [minimal project](https://github.com/WeikeDu/HeadlessChrome)
