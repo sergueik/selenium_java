@@ -3017,7 +3017,24 @@ public class SuvianTest {
 
 	}
 
-	private void highlight(WebElement element) {
+  private boolean areElementsPresent(WebElement parentWebElement, By byLocator) {
+    return parentWebElement.findElements(byLocator).size() == 1;
+    // usage:
+    // assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*= product]")).get(0), By.cssSelector("[class*=sticker]")));
+  }
+
+  public boolean isGreaterThen(String a, String b)
+  {
+    return a.compareTo(b) < 0;
+    // usage:
+    // List<WebElement> rows = table.findElements(By.cssSelector("td:nth-of-type(5)>a"));
+    //
+    //    for (int i = 0; i<rows.size()-1;i++) {
+    //      assertTrue(isGreaterThen(rows.get(i).getAttribute("textContent"),rows.get(i+1).getAttribute("textContent")));
+    // }
+  }
+
+  private void highlight(WebElement element) {
 		highlight(element, 100);
 	}
 
