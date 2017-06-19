@@ -1,1 +1,0 @@
-mvn jfx:jar

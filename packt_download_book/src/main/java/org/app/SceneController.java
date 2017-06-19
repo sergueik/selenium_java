@@ -1,4 +1,4 @@
-package com.twistezo;
+package org.app;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;

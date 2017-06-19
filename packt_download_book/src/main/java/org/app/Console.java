@@ -1,4 +1,4 @@
-package com.twistezo;
+package org.app;
 
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
