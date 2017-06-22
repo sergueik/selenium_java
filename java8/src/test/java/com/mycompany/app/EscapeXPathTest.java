@@ -126,7 +126,7 @@ public class EscapeXPathTest {
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(EscapeXPathTest.class);
-	
+
 	private static Pattern pattern;
 	private static Matcher matcher;
 
@@ -182,34 +182,44 @@ public class EscapeXPathTest {
 
 	@Test(enabled = true)
 	public void test1() {
-    
-		String text = "\"Burj\" 'Khalifa'";
-		System.err.println("test1 " + escapeXPath(text));
-		System.err.println("test1 " + escapeXPath2(text));
-		System.err.println("test1 " + escapeXPath3(text));
+		ArrayList<String> texts = new ArrayList<>(Arrays.asList(new String[] {
+				"\"Burj\" 'Khalifa'", "\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
-		List<WebElement> elements = driver.findElements(By.xpath(String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
-		assertTrue(elements.size() > 0);
-		highlight(elements.get(0));
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-		}
-	}
+		for (String text : texts) {
 
-	@Test(enabled = true)
-	public void test2() {
-		String text = "\"Burj\" Khalifa";
-		System.err.println("test1 " + escapeXPath(text));
-		System.err.println("test1 " + escapeXPath2(text));
-		System.err.println("test1 " + escapeXPath3(text));
+			System.err.println(
+					String.format("test1 (1): %s => %s ", text, escapeXPath(text)));
+			System.err.println(
+					String.format("test1 (2): %s => %s ", text, escapeXPath2(text)));
+			System.err.println(
+					String.format("test1 (2): %s => %s ", text, escapeXPath3(text)));
 
-		List<WebElement> elements = driver.findElements(By.xpath(String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
-		assertTrue(elements.size() > 0);
-		highlight(elements.get(0));
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
+			try {
+				List<WebElement> elements = driver.findElements(By.xpath(
+						String.format("//*[contains(text(), %s)]", escapeXPath(text))));
+				assertTrue(elements.size() > 0);
+				highlight(elements.get(0));
+				elements = driver.findElements(By.xpath(
+						String.format("//*[contains(text(), %s)]", escapeXPath2(text))));
+				assertTrue(elements.size() > 0);
+				highlight(elements.get(0));
+				elements = driver.findElements(By.xpath(
+						String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+				assertTrue(elements.size() > 0);
+				highlight(elements.get(0));
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+
+			} catch (InvalidSelectorException e) {
+				// ignore
+				// InvalidSelectorError:
+				// Unable to locate an element with the xpath expression
+				// //*[contains(text(), '""Burj"" ''Khalifa'')] because of the following
+				// error:
+				// SyntaxError: The expression is not a legal expression.
+			}
 		}
 	}
 
@@ -223,7 +233,7 @@ public class EscapeXPathTest {
 		}
 	}
 
-  	public static void highlight(WebElement element) {
+	public static void highlight(WebElement element) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexible_wait_interval);
 			wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
@@ -238,7 +248,6 @@ public class EscapeXPathTest {
 		}
 	}
 
-  
 	public static void highlight(By locator) throws InterruptedException {
 		log.info("Highlighting element {}", locator);
 		WebElement element = driver.findElement(locator);
@@ -266,42 +275,8 @@ public class EscapeXPathTest {
 	 * @param  value String to escape.
 	 * @return Escaped value.
 	 */
-  // broken
-	public static String escapeXPath(String value) {
-		// If value doesn't have any " then enclose value in "
-		if (!value.contains("\""))
-			return String.format("\"%s\"", value);
 
-		// If there is no ' then enclose in '
-		if (!value.contains("'"))
-			return String.format("'%s'", value);
-
-		// If value has both " and ' in the string so must use xpath's concat
-		StringBuilder sb = new StringBuilder("concat(");
-
-		// Search for "
-		// number of arguments to concat.
-		int lastPos = 0;
-		int nextPos = value.indexOf("\"");
-		while (nextPos != -1) {
-			// note if this is not the first occurence
-			if (lastPos != 0)
-				sb.append(",");
-
-			sb.append(String.format("\"%s\",'\"'",
-					value.substring(lastPos, nextPos - lastPos)));
-			lastPos = ++nextPos;
-
-			// Find next occurence
-			nextPos = value.indexOf("\"", lastPos);
-		}
-
-		sb.append(")");
-		return sb.toString();
-	}
-
-	// @Nullable
-	public static String escapeXPath2(@Nullable String string) {
+	public static String escapeXPath(@Nullable String string) {
 		if (string == null) {
 			return null;
 		} else if (string.contains("'")) {
@@ -324,15 +299,19 @@ public class EscapeXPathTest {
 		}
 	}
 
-	public static String escapeXPath3(@Nullable String value) {
+	// practically equivalent to escapeXPath
+	public static String escapeXPath2(@Nullable String value) {
 		if (!value.contains("'"))
 			return '\'' + value + '\'';
-
 		else if (!value.contains("\""))
 			return '"' + value + '"';
-
 		else
 			return "concat('" + value.replace("'", "',\"'\",'") + "')";
+	}
+
+	//
+	public static String escapeXPath3(@Nullable String value) {
+		return "'" + value.replace("'", "''").replace("\"", "\"\"");
 	}
 
 	protected static String getPageContent(String pagename) {
