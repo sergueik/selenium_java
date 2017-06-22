@@ -126,41 +126,41 @@ public class EscapeXPathTest {
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(EscapeXPathTest.class);
-	private static String osName;
-
+	
 	private static Pattern pattern;
 	private static Matcher matcher;
 
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
 	public static void setUp() {
-			// TODO: Observed user agent problem with firefox - mobile version of tripadvisor is rendered
-			System.setProperty("webdriver.gecko.driver", new File("c:/java/selenium/geckodriver.exe").getAbsolutePath());
-			System
-					.setProperty("webdriver.firefox.bin", new File(
-									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-											.getAbsolutePath() );
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			// use legacy FirefoxDriver
-			capabilities.setCapability("marionette", false);
-			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
-			capabilities.setCapability("locationContextEnabled", false);
-			capabilities.setCapability("acceptSslCerts", true);
-			capabilities.setCapability("elementScrollBehavior", 1);
-			FirefoxProfile profile = new FirefoxProfile();
-			profile.setAcceptUntrustedCertificates(true);
-			profile.setAssumeUntrustedCertificateIssuer(true);
-			profile.setEnableNativeEvents(false);
+		// TODO: Observed user agent problem with firefox - mobile version of
+		// tripadvisor is rendered
+		System.setProperty("webdriver.gecko.driver",
+				new File("c:/java/selenium/geckodriver.exe").getAbsolutePath());
+		System.setProperty("webdriver.firefox.bin",
+				new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+						.getAbsolutePath());
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		// use legacy FirefoxDriver
+		capabilities.setCapability("marionette", false);
+		// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+		capabilities.setCapability("locationContextEnabled", false);
+		capabilities.setCapability("acceptSslCerts", true);
+		capabilities.setCapability("elementScrollBehavior", 1);
+		FirefoxProfile profile = new FirefoxProfile();
+		profile.setAcceptUntrustedCertificates(true);
+		profile.setAssumeUntrustedCertificateIssuer(true);
+		profile.setEnableNativeEvents(false);
 
-			System.out.println(System.getProperty("user.dir"));
-			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-			try {
-				driver = new FirefoxDriver(capabilities);
-			} catch (WebDriverException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot initialize Firefox driver");
-			}
-      wait = new WebDriverWait(driver, flexible_wait_interval);
+		System.out.println(System.getProperty("user.dir"));
+		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+		try {
+			driver = new FirefoxDriver(capabilities);
+		} catch (WebDriverException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot initialize Firefox driver");
+		}
+		wait = new WebDriverWait(driver, flexible_wait_interval);
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
 		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
 				TimeUnit.SECONDS);
@@ -177,23 +177,40 @@ public class EscapeXPathTest {
 
 	@BeforeMethod
 	public void loadPage() {
-    driver.navigate().to(getPageContent("test.htm"));
+		driver.navigate().to(getPageContent("test.htm"));
 	}
 
 	@Test(enabled = true)
 	public void test1() {
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-					}
+    
+		String text = "\"Burj\" 'Khalifa'";
+		System.err.println("test1 " + escapeXPath(text));
+		System.err.println("test1 " + escapeXPath2(text));
+		System.err.println("test1 " + escapeXPath3(text));
+
+		List<WebElement> elements = driver.findElements(By.xpath(String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+		assertTrue(elements.size() > 0);
+		highlight(elements.get(0));
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	@Test(enabled = true)
 	public void test2() {
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-					}
+		String text = "\"Burj\" Khalifa";
+		System.err.println("test1 " + escapeXPath(text));
+		System.err.println("test1 " + escapeXPath2(text));
+		System.err.println("test1 " + escapeXPath3(text));
+
+		List<WebElement> elements = driver.findElements(By.xpath(String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+		assertTrue(elements.size() > 0);
+		highlight(elements.get(0));
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	public static Object executeScript(String script, Object... arguments) {
@@ -206,6 +223,22 @@ public class EscapeXPathTest {
 		}
 	}
 
+  	public static void highlight(WebElement element) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexible_wait_interval);
+			wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+		}
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
+			Thread.sleep(highlight_interval);
+			executeScript("arguments[0].style.border=''", element);
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+	}
+
+  
 	public static void highlight(By locator) throws InterruptedException {
 		log.info("Highlighting element {}", locator);
 		WebElement element = driver.findElement(locator);
@@ -233,7 +266,7 @@ public class EscapeXPathTest {
 	 * @param  value String to escape.
 	 * @return Escaped value.
 	 */
-
+  // broken
 	public static String escapeXPath(String value) {
 		// If value doesn't have any " then enclose value in "
 		if (!value.contains("\""))
