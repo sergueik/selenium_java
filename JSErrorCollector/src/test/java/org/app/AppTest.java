@@ -121,7 +121,7 @@ public class AppTest {
 	}
 
 	private static String getResource(final String string) {
-		String resource = App.class.getClassLoader().getResource(string)
+		String resource = JavaScriptError.class.getClassLoader().getResource(string)
 				.toExternalForm();
 		if (resource.startsWith("file:/") && !resource.startsWith("file:///")) {
 			resource = "file://" + resource.substring(5);
