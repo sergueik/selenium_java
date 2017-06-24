@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package org.app;
 
 import java.io.File;
 import java.io.IOException;
@@ -81,12 +81,11 @@ public class App {
 			throws InterruptedException, java.io.IOException {
 		List<JavaScriptError> expectedErrors = Arrays.asList(errorSimpleHtml);
 		System.out.println(System.getProperty("user.dir"));
-		File netExport = new File(
-				System.getProperty("user.dir") + "/src/main/resources/firefox");
 
 		FirefoxProfile profile = new FirefoxProfile();
 		try {
-			profile.addExtension(netExport);
+			profile.addExtension(new File(
+					System.getProperty("user.dir") + "/src/main/resources/firefox"));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -185,8 +184,6 @@ public class App {
 	 * JavaScriptError.addExtension(profile);
 	 * final WebDriver driver = new FirefoxDriver(profile);
 	 * </pre></code>
-	 * @param ffProfile the Firefox profile to which the extension should be added.
-	 * @throws IOException in case of problem
 	 */
 	public static void addExtension(final FirefoxProfile ffProfile)
 			throws IOException {
