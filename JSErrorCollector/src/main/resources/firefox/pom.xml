@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.jvnet.hudson.plugins</groupId>
+  <artifactId>JSErrorCollector</artifactId>
+  <version>1.6.3</version>
+  <description>Monitors Jenkins builds and displays the status on Firefox status bar.</description>
+  <inceptionYear>2008</inceptionYear>
+  <name>JSErrorCollector</name>
+  <url>http://wiki.jenkins-ci.org/display/Jenkins/Firefox+Add-on+Build+Monitor</url>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <dependencies>
+          <dependency>
+            <groupId>com.googlecode.jslint4java</groupId>
+            <artifactId>jslint4java-ant</artifactId>
+            <version>1.3</version>
+          </dependency>
+        </dependencies>
+        <executions>
+          <execution>
+            <id>jslint</id>
+            <phase>test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <ant antfile="${basedir}/jslint.xml">
+                  <property name="basedir" location="${basedir}"/>
+                  <target name="jslint"/>
+                </ant>
+              </tasks>
+            </configuration>
+          </execution>
+          <execution>
+            <phase>package</phase>
+            <configuration>
+              <tasks>
+                <property name="source.dir" value="src/main/js"/>
+                <property name="lib.dir" value="lib/main/js"/>
+                <property name="resources.dir" value="src/main/resources/firefox"/>
+                <property name="target.dir" value="target"/>
+                <property name="stage.dir" value="target/stage"/>
+                <property name="max_ff_version" value="4.*"/>
+                <mkdir dir="${stage.dir}"/>
+                <copy todir="${stage.dir}">
+                  <fileset dir="${resources.dir}" excludes="chrome/*/"/>
+                </copy>
+                <replace file="${stage.dir}/install.rdf" value="${version}">
+                  <replacefilter token="@version@"/>
+                </replace>
+                <replace file="${stage.dir}/install.rdf" value="${description}">
+                  <replacefilter token="@description@"/>
+                </replace>
+                <replace file="${stage.dir}/install.rdf" value="${url}">
+                  <replacefilter token="@url@"/>
+                </replace>
+                <replace file="${stage.dir}/install.rdf" value="${max_ff_version}">
+                  <replacefilter token="@max_ff_version@"/>
+                </replace>
+                <zip destfile="${stage.dir}/chrome/buildmonitor.jar">
+                  <zipfileset dir="${resources.dir}/chrome"/>
+                  <zipfileset dir="${source.dir}" prefix="content"/>
+                  <zipfileset dir="${lib.dir}" prefix="content/lib"/>
+                </zip>
+                <zip destfile="${target.dir}/${artifactId}-${version}.xpi" basedir="${stage.dir}"/>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
