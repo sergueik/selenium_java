@@ -133,8 +133,6 @@ public class EscapeXPathTest {
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
 	public static void setUp() {
-		// TODO: Observed user agent problem with firefox - mobile version of
-		// tripadvisor is rendered
 		System.setProperty("webdriver.gecko.driver",
 				new File("c:/java/selenium/geckodriver.exe").getAbsolutePath());
 		System.setProperty("webdriver.firefox.bin",
@@ -182,8 +180,9 @@ public class EscapeXPathTest {
 
 	@Test(enabled = true)
 	public void test1() {
-		ArrayList<String> texts = new ArrayList<>(Arrays.asList(new String[] {
-				"\"Burj\" 'Khalifa'", "\"Burj\" Khalifa", "Burj 'Khalifa'" }));
+		ArrayList<String> texts = new ArrayList<>(
+				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
+						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
 		for (String text : texts) {
 
@@ -195,16 +194,48 @@ public class EscapeXPathTest {
 					String.format("test1 (2): %s => %s ", text, escapeXPath3(text)));
 
 			try {
-				List<WebElement> elements = driver.findElements(By.xpath(
+				List<WebElement> elements1 = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath(text))));
-				assertTrue(elements.size() > 0);
-				highlight(elements.get(0));
-				elements = driver.findElements(By.xpath(
+				assertTrue(elements1.size() > 0);
+				highlight(elements1.get(0));
+				List<WebElement> elements2 = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath2(text))));
-				assertTrue(elements.size() > 0);
-				highlight(elements.get(0));
-				elements = driver.findElements(By.xpath(
+				assertTrue(elements2.size() > 0);
+				highlight(elements2.get(0));
+				List<WebElement> elements3 = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+				assertTrue(elements3.size() > 0);
+				highlight(elements3.get(0));
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+
+			} catch (InvalidSelectorException e) {
+				// ignore
+				// InvalidSelectorError:
+				// Unable to locate an element with the xpath expression
+				// //*[contains(text(), '""Burj"" ''Khalifa'')] because of the following
+				// error:
+				// SyntaxError: The expression is not a legal expression.
+				System.err.println("Test1 Ignored: " + e.toString());
+			}
+		}
+	}
+	// origin:
+	// NOTE: all failing
+	@Test(enabled = true)
+	public void test2() {
+		ArrayList<String> texts = new ArrayList<>(
+				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
+						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
+
+		for (String text : texts) {
+			System.err.println(String.format("test2: %s", text));
+
+			try {
+				List<WebElement> elements = driver.findElements(By.cssSelector(
+						String.format("th[scope='row']:contains('%s')", text)));
 				assertTrue(elements.size() > 0);
 				highlight(elements.get(0));
 				try {
@@ -219,6 +250,7 @@ public class EscapeXPathTest {
 				// //*[contains(text(), '""Burj"" ''Khalifa'')] because of the following
 				// error:
 				// SyntaxError: The expression is not a legal expression.
+				System.err.println("Test2 Ignored: " + e.toString());
 			}
 		}
 	}
@@ -261,8 +293,6 @@ public class EscapeXPathTest {
 	// alternative: use java.text.Normalizer
 	// alternative: use built-in xpath translate function e.g.
 	// "//*[contains(translate(@name,'áàâäéèêëíìîïóòôöúùûü','aaaaeeeeiiiioooouuuu'),'converted')]"
-	// one can escape quotes and apostrophes in XPath 2.0 by doubling them, but
-	// there is no way of doing it in XPath 1.0.
 	// possibly a better way yet is to use streams to query XML node texts in a
 	// way that allows one to compare the value of interest directly.
 	// not relying on possibly fragile XPath composition, but the purpose is the
@@ -309,16 +339,24 @@ public class EscapeXPathTest {
 			return "concat('" + value.replace("'", "',\"'\",'") + "')";
 	}
 
-	//
+	// one can escape quotes and apostrophes in XPath 2.0 by doubling them, but
+	// there is no way of doing it in XPath 1.0.
 	public static String escapeXPath3(@Nullable String value) {
 		return "'" + value.replace("'", "''").replace("\"", "\"\"");
 	}
+
+	// alternative: use built-in xpath translate function e.g.
+	// "//*[contains(translate(@name,'áàâäéèêëíìîïóòôöúùûü','aaaaeeeeiiiioooouuuu'),'converted')]"
+	// other XPath 2.0 Solutions
+	// "//*/text()[contains(lower-case(.),'test')]"
+	// "//*/text()[matches(.,'test', 'i')]"
+	// "//*/text()[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'test')]
 
 	protected static String getPageContent(String pagename) {
 		try {
 			URI uri = EscapeXPathTest.class.getClassLoader().getResource(pagename)
 					.toURI();
-			System.err.println("Testing: " + uri.toString());
+			System.err.println("Testing local file: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
 																			// supported in -source 1.6
