@@ -178,7 +178,7 @@ public class EscapeXPathTest {
 		driver.navigate().to(getPageContent("test.htm"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test1() {
 		ArrayList<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
@@ -222,9 +222,11 @@ public class EscapeXPathTest {
 			}
 		}
 	}
+
 	// origin:
+	// https://saucelabs.com/resources/articles/selenium-tips-css-selectors
 	// NOTE: all failing
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test2() {
 		ArrayList<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
@@ -234,8 +236,8 @@ public class EscapeXPathTest {
 			System.err.println(String.format("test2: %s", text));
 
 			try {
-				List<WebElement> elements = driver.findElements(By.cssSelector(
-						String.format("th[scope='row']:contains('%s')", text)));
+				List<WebElement> elements = driver.findElements(
+						By.cssSelector(String.format("th:contains('%s')", text)));
 				assertTrue(elements.size() > 0);
 				highlight(elements.get(0));
 				try {
@@ -253,6 +255,44 @@ public class EscapeXPathTest {
 				System.err.println("Test2 Ignored: " + e.toString());
 			}
 		}
+	}
+
+	@Test(enabled = true)
+	public void test3() {
+		ArrayList<String> texts = new ArrayList<>(
+				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
+						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
+
+		for (String text : texts) {
+			System.err.println(String.format("test3: %s", text));
+
+			Optional<WebElement> element = driver
+					.findElements(By.cssSelector("th[scope='row']")).stream()
+					.filter(o -> {
+						String t = o.getText();
+						// System.err.println("in stream filter (3): Text = " + t);
+						return (Boolean) (t.contains(text));
+					}).findFirst();
+
+			assertTrue(element.isPresent());
+			highlight(element.get());
+			try {
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+			}
+
+		}
+	}
+
+	// https://sqa.stackexchange.com/questions/362/a-way-to-match-on-text-using-css-locators
+	// requires jQuery
+	public static WebElement findByText(WebDriver driver,
+			String cssSelectorParent, String text) {
+		WebElement parent = driver.findElement(By.cssSelector(cssSelectorParent));
+		Object element = ((JavascriptExecutor) driver).executeScript(String.format(
+				"var x = $(arguments[0]).find(\":contains('%s')\"); return x;", text),
+				parent);
+		return (WebElement) element;
 	}
 
 	public static Object executeScript(String script, Object... arguments) {
