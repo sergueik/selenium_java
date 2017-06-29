@@ -178,7 +178,7 @@ public class EscapeXPathTest {
 		driver.navigate().to(getPageContent("test.htm"));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test1() {
 		ArrayList<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
@@ -190,9 +190,9 @@ public class EscapeXPathTest {
 					String.format("test1 (1): %s => %s ", text, escapeXPath(text)));
 			System.err.println(
 					String.format("test1 (2): %s => %s ", text, escapeXPath2(text)));
-			System.err.println(
-					String.format("test1 (2): %s => %s ", text, escapeXPath3(text)));
-
+			/*			System.err.println(
+								String.format("test1 (2): %s => %s ", text, escapeXPath3(text)));
+			*/
 			try {
 				List<WebElement> elements1 = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath(text))));
@@ -202,10 +202,11 @@ public class EscapeXPathTest {
 						String.format("//*[contains(text(), %s)]", escapeXPath2(text))));
 				assertTrue(elements2.size() > 0);
 				highlight(elements2.get(0));
-				List<WebElement> elements3 = driver.findElements(By.xpath(
-						String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
-				assertTrue(elements3.size() > 0);
-				highlight(elements3.get(0));
+				/*				List<WebElement> elements3 = driver.findElements(By.xpath(
+										String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+								assertTrue(elements3.size() > 0);
+								highlight(elements3.get(0));
+				*/
 				try {
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
@@ -369,7 +370,7 @@ public class EscapeXPathTest {
 		}
 	}
 
-	// practically equivalent to escapeXPath
+	// shorter version of escapeXPath
 	public static String escapeXPath2(@Nullable String value) {
 		if (!value.contains("'"))
 			return '\'' + value + '\'';
@@ -381,6 +382,7 @@ public class EscapeXPathTest {
 
 	// one can escape quotes and apostrophes in XPath 2.0 by doubling them, but
 	// there is no way of doing it in XPath 1.0.
+	// NOTE: does not work
 	public static String escapeXPath3(@Nullable String value) {
 		return "'" + value.replace("'", "''").replace("\"", "\"\"");
 	}
