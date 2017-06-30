@@ -1,4 +1,4 @@
-package net.randomsync.testng.excel;
+package org.test;
 
 /**
  * Constants used to specify the parser map

@@ -1,4 +1,4 @@
-package net.randomsync.testng.excel;
+package org.test;
 
 import java.io.File;
 import java.io.FileInputStream;

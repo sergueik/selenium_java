@@ -1,8 +1,10 @@
-package net.randomsync.testng.excel;
+package org.test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.test.ExcelTestCase;
+import org.test.ExcelTestSuite;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 import org.testng.xml.XmlSuite;
