@@ -140,24 +140,32 @@ public class TripAdvisorTest {
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
+      // origin: https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
+      // http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
 
-			HashMap<String, Object> chromePrefs = new HashMap<>();
-			chromePrefs.put("profile.default_content_settings.popups", 0);
-			String downloadFilepath = System.getProperty("user.dir")
+			HashMap<String, Object> prefs = new HashMap<>();
+			prefs.put("profile.default_content_settings.popups", 0);
+      //Put this into prefs map to switch off browser notification
+      prefs.put("profile.default_content_setting_values.notifications", 2);
+      //Put this into prefs map to switch off save password notification
+      prefs.put("credentials_enable_service", false);
+      prefs.put("profile.password_manager_enabled", false);
+			String downloadPath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
 					+ System.getProperty("file.separator");
-			chromePrefs.put("download.default_directory", downloadFilepath);
-			chromePrefs.put("enableNetwork", "true");
-			options.setExperimentalOption("prefs", chromePrefs);
+			prefs.put("download.default_directory", downloadPath);
+			prefs.put("enableNetwork", "true");
+			options.setExperimentalOption("prefs", prefs);
 
 			for (String optionAgrument : (new String[] {
-					"allow-running-insecure-content", "allow-insecure-localhost",
-					"enable-local-file-accesses", "disable-notifications",
+					"--allow-running-insecure-content", "--allow-insecure-localhost",
+					"--enable-local-file-accesses", "--disable-notifications",
 					/* "start-maximized" , */
-					"browser.download.folderList=2",
+					"--browser.download.folderList=2",
+          "--disable-web-security", "--no-proxy-server",
 					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
-					String.format("browser.download.dir=%s", downloadFilepath)
-					/* "user-data-dir=/path/to/your/custom/profile"  , */
+					String.format("--browser.download.dir=%s", downloadPath)
+					/* "--user-data-dir=/path/to/your/custom/profile"  , */
 			})) {
 				options.addArguments(optionAgrument);
 			}
