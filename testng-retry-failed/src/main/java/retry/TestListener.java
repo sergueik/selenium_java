@@ -5,21 +5,21 @@ import org.testng.TestListenerAdapter;
 
 public class TestListener extends TestListenerAdapter {
 
-  @Override
-  public void onTestSuccess(ITestResult testResult) {
-    ReportCreator.addTestInfo(testResult.getName(), testResult.getTestClass().toString(), resultOfTest(testResult) , "");
-  }
+	@Override
+	public void onTestSuccess(ITestResult testResult) {
+		ReportCreator.addTestInfo(testResult.getName(),
+				testResult.getTestClass().toString(), resultOfTest(testResult), "");
+	}
 
-  public String resultOfTest (ITestResult testResult) {
-    int status = testResult.getStatus();
-    if (status == 1) {
-      return "Success";
-    }
-    if (status == 2) {
-      return "Failure";
-    }
-    else {
-      return "Unknown";
-    }
-  }
+	public String resultOfTest(ITestResult testResult) {
+		int status = testResult.getStatus();
+		if (status == 1) {
+			return "Success";
+		}
+		if (status == 2) {
+			return "Failure";
+		} else {
+			return "Unknown";
+		}
+	}
 }
