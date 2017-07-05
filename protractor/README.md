@@ -103,38 +103,16 @@ There is a [Protractor Java and c# Client](https://gctor Java and c# Clientroups
 ![ Providing Protractor to Java / .Net](https://github.com/sergueik/selenium_java/blob/master/protractor/jProtractor.odp?raw=true)
 
 ### Building the jar
+Building the jar
+===============
 
 You can build the `jprotractor.jar` from the source by cloning the repository
 ```bash
 git clone https://github.com/sergueik/jProtractor
 ```
-and running
+and running the following in console:
 
-```bash
-mvn -Dmaven.test.skip=true clean package
-```
-
-The project contain substantial number of 'integration tests' and by default maven will run , which will take quite some time,
-also some of the tests could fail in your environment.
-If any failure in test is observed, maven will not package the jar.
-Alternaatively you can temporarily remove the `src/test/java` directory from the project:
-```bash
-rm -f -r src/test/java
-mvn clean package
-```
-
-The jar will be in the `target` folder:
-```cmd
-[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ jprotractor ---
-[INFO] Building jar: C:\developer\sergueik\jProtractor\target\jprotractor-1.2-SNAPSHOT.jar
-```
-You can install it into your local `.m2` repository as  explained below
-
-#### Building
-To compile the project in console use the regular maven setup script:
-
-##### Windows
-
+#### Windows
 ```cmd
 set M2=c:\java\apache-maven-3.2.1\bin
 set M2_HOME=c:\java\apache-maven-3.2.1
@@ -146,13 +124,30 @@ REM
 REM move %USERPROFILE%\.M2 %USERPROFILE%\.M2.MOVED
 REM rd /s/q %USERPROFILE%\.M2
 set TRAVIS=true
-mvn clean package
+mvn -Dmaven.test.skip=true clean package
 ```
-##### Linux
+#### Linux
 ```bash
 export TRAVIS=true
+mvn -Dmaven.test.skip=true clean package
+```
+
+The project contains substantial number of 'integration tests' and by default maven will run all, which will take quite some time,
+also some of the tests could fail in your environment.
+After a test failure, maven will not package the jar.
+
+Alternatively you can temporarily remove the `src/test/java` directory from the project:
+```bash
+rm -f -r src/test/java
 mvn clean package
 ```
+
+The jar will be in the `target` folder:
+```cmd
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ jprotractor ---
+[INFO] Building jar: C:\developer\sergueik\jProtractor\target\jprotractor-1.2-SNAPSHOT.jar
+```
+You can install it into your local `.m2` repository as  explained below
 
 #### Using `jProtractor` with existing Java projects
 
