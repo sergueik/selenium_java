@@ -1,17 +1,17 @@
 
 ### Note
 
-This github project is the 'development branch' of the collaborated project 
+This github project is the 'development branch' of the collaborated project
 [jProtractor](https://github.com/caarlos0/jProtractor). It may be using a different version of Java compiler but otherwise identical, just few commits ahead.
 
 #### Info
-The [Angular Protractor](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project. 
+The [Angular Protractor](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project.
 However being a Javascript testing tool, __Protractor__ enforces one to (re)write the whole web page test suite in Javascript - which may not be acceptable solution.
 
 This project and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net) try to make this unnecessary.
-On the other hand Protractor offers some advanced [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) which selenum Webdriver does not have. 
+On the other hand Protractor offers some advanced [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) which selenum Webdriver does not have.
 
-These strategier take advantage of __Angular__ features -  
+These strategier take advantage of __Angular__ features -
 this project allows the Java developer to use those strategies by supporting all Javascript methods __Protractor__ has plus few extra:
 
 ```javascript
@@ -72,7 +72,7 @@ return angular.element(element).scope().$eval(expression)
 ```
 Evaluate an Angular expression in the context of a given element.
 
-The [Protractor By locators](http://www.protractortest.org/#/api?view=ProtractorBy) and a subset of Protractor Browser API 
+The [Protractor By locators](http://www.protractortest.org/#/api?view=ProtractorBy) and a subset of Protractor Browser API
 is borrowed from __Protractor__  project's [clientsidescripts.js](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
 in a form of Javascript snippets - one file per method - stored in the
 `src/main/java/resources`:
@@ -98,9 +98,37 @@ waitForAngular.js
 #### Forum
 There is a [Protractor Java and c# Client](https://gctor Java and c# Clientroups.google.com/forum/#!forum/protractor-java--c-client) forum.
 
-#### Presentation on June 2016 South Florida Tester Meetup 
+#### Presentation on June 2016 South Florida Tester Meetup
 
 ![ Providing Protractor to Java / .Net](https://github.com/sergueik/selenium_java/blob/master/protractor/jProtractor.odp?raw=true)
+
+### Building the jar
+
+You can build the `jprotractor.jar` from the source by cloning the repository
+```bash
+git clone https://github.com/sergueik/jProtractor
+```
+and running
+
+```bash
+mvn -Dmaven.test.skip=true clean package
+```
+
+The project contain substantial number of 'integration tests' and by default maven will run , which will take quite some time,
+also some of the tests could fail in your environment.
+If any failure in test is observed, maven will not package the jar.
+Alternaatively you can temporarily remove the `src/test/java` directory from the project:
+```bash
+rm -f -r src/test/java
+mvn clean package
+```
+
+The jar will be in the `target` folder:
+```cmd
+[INFO] --- maven-jar-plugin:2.4:jar (default-jar) @ jprotractor ---
+[INFO] Building jar: C:\developer\sergueik\jProtractor\target\jprotractor-1.2-SNAPSHOT.jar
+```
+You can install it into your local `.m2` repository as  explained below
 
 #### Building
 To compile the project in console use the regular maven setup script:
@@ -111,8 +139,8 @@ To compile the project in console use the regular maven setup script:
 set M2=c:\java\apache-maven-3.2.1\bin
 set M2_HOME=c:\java\apache-maven-3.2.1
 set MAVEN_OPTS=-Xms256m -Xmx512m
-set JAVA_HOME=c:\java\jdk1.7.0_65
-set JAVA_VERSION=1.7.0_65
+set JAVA_VERSION=1.8.0_112
+set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
 PATH=%JAVA_HOME%\bin;%PATH%;%M2%
 REM
 REM move %USERPROFILE%\.M2 %USERPROFILE%\.M2.MOVED
@@ -141,7 +169,7 @@ Copy `target\jprotractor-1.0-SNAPSHOT.jar` into your project `src/main/resources
             +---resources
 
 ```
-Add the reference to the project `pom.xml` (a sample project is checked in) 
+Add the reference to the project `pom.xml` (a sample project is checked in)
 ```xml
 <properties>
     <jprotractor.version>1.0-SNAPSHOT</jprotractor.version>
@@ -163,7 +191,7 @@ Import jProractor classes in your code
 import com.jprotractor.NgBy;
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
-  
+
 ```
 
 ##### Ant
@@ -226,41 +254,41 @@ public static void setup() throws IOException {
 
 @Before
 public void beforeEach() {
-	String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";    
-	ngDriver.navigate().to(baseUrl);
+  String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
+  ngDriver.navigate().to(baseUrl);
 }
 @Test
 public void testCustomerLogin() throws Exception {
-	NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
-	highlight(element, 100);
-	element.click();
-	element = ngDriver.findElement(NgBy.input("custId"));
-	assertThat(element.getAttribute("id"), equalTo("userSelect"));
-	Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
+  NgWebElement element = ngDriver.findElement(NgBy.buttonText("Customer Login"));
+  highlight(element, 100);
+  element.click();
+  element = ngDriver.findElement(NgBy.input("custId"));
+  assertThat(element.getAttribute("id"), equalTo("userSelect"));
+  Enumeration<WebElement> elements = Collections.enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
 
-	while (elements.hasMoreElements()){
+  while (elements.hasMoreElements()){
     WebElement next_element = elements.nextElement();
     if (next_element.getText().indexOf("Harry Potter") >= 0 ){
-    	System.err.println(next_element.getText());
-    	next_element.click();
+      System.err.println(next_element.getText());
+      next_element.click();
     }
-	}
-	NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
-	assertTrue(login_element.isEnabled());	
-	login_element.click();
-	assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
-	
-	NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
-	assertThat(account_number_element, notNullValue());
-	assertTrue(account_number_element.getText().matches("^\\d+$"));
+  }
+  NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
+  assertTrue(login_element.isEnabled());  
+  login_element.click();
+  assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
+  
+  NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
+  assertThat(account_number_element, notNullValue());
+  assertTrue(account_number_element.getText().matches("^\\d+$"));
 }
 ```
 for CI build replace the Setup () with
 ```java
 @BeforeClass
 public static void setup() throws IOException {
-	seleniumDriver = new PhantomJSDriver();
-	ngDriver = new NgWebDriver(seleniumDriver);
+  seleniumDriver = new PhantomJSDriver();
+  ngDriver = new NgWebDriver(seleniumDriver);
 }
 ```
 
@@ -273,7 +301,7 @@ PhantomJs allows loading Angular samples from `file://` context:
     seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS).implicitlyWait(implicitWait, TimeUnit.SECONDS).setScriptTimeout(10, TimeUnit.SECONDS);
     wait = new WebDriverWait(seleniumDriver, flexibleWait );
     wait.pollingEvery(pollingInterval,TimeUnit.MILLISECONDS);
-    actions = new Actions(seleniumDriver);    
+    actions = new Actions(seleniumDriver);
     ngDriver = new NgWebDriver(seleniumDriver);
     localFile = "local_file.htm";
     URI uri = NgByIntegrationTest.class.getClassLoader().getResource(localFile).toURI();
@@ -284,7 +312,7 @@ PhantomJs allows loading Angular samples from `file://` context:
 Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
 ### Test setup
-The project tested to work on Linux and Windows with Java 1.8, Selenium 2.53, Selenium 3.0.1, Firefox 45 or Chrome 56. 
+The project tested to work on Linux and Windows with Java 1.8, Selenium 2.53, Selenium 3.0.1, Firefox 45 or Chrome 56.
 Download desired version of Firefox from
 [ubuntuzilla](https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/) or [ftp.mozilla.org](https://ftp.mozilla.org/pub/firefox/)) and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
 
@@ -292,21 +320,23 @@ Download desired version of Firefox from
 export NODE_PORT=5555
 export HUB_IP_ADDRESS=127.0.0.1
 export HUB_PORT=4444
-export SELENIUM_JAR_VERSION=2.47.1
+export SELENIUM_JAR_VERSION=2.53.1
 export DISPLAY_PORT=0
 export SELENIUM_HOME=`pwd`
 export LAUNCHER_OPTS='-XX:MaxPermSize=256M -Xmn128M -Xms256M -Xmx256M'
 export NODE_CONFIG=node.json
 export NODE_HOST=127.0.0.1
-java $LAUNCHER_OPTS  -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role node -host $NODE_HOST -port $NODE_PORT -hub http://${HUB_IP_ADDRESS}:${HUB_PORT}/hub/register -nodeConfig $NODE_CONFIG -browserTimeout 12000 -timeout 12000 -ensureCleanSession true -trustAllSSLCertificates
+
+java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role node -host $NODE_HOST -port $NODE_PORT -hub http://${HUB_IP_ADDRESS}:${HUB_PORT}/hub/register -nodeConfig $NODE_CONFIG -browserTimeout 12000 -timeout 12000 -ensureCleanSession true -trustAllSSLCertificates
 
 export HUB_PORT=4444
+
 java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role hub  -port $HUB_PORT
 ```
-### Related Projects 
+### Related Projects
   - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [ngWebDriver](https://github.com/paul-hammant/ngWebDriver)
-  - [angular/protractor](https://github.com/angular/protractor) 
+  - [angular/protractor](https://github.com/angular/protractor)
   - [bbaia/protractor-net](https://github.com/bbaia/protractor-net)
   - [sergueik/protractor-net](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
   - [henrrich/jpagefactory](https://github.com/henrrich/jpagefactory)
