@@ -106,6 +106,9 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.hamcrest.MatcherAssert.assertThat;
+// import static org.hamcrest.CoreMatchers.matchesPattern;
+// https://stackoverflow.com/questions/8505153/assert-regex-matches-in-junit
+// https://piotrga.wordpress.com/2009/03/27/hamcrest-regex-matcher/
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -209,9 +212,12 @@ public class PlunkerTest {
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
 
 		List<WebElement> iframes = driver.findElements(By.cssSelector("iframe"));
+		HashMap<String, Object> iframesMap = new HashMap<>();
 		for (WebElement iframe : iframes) {
-			System.err.println(String.format("Found iframe id: \'%s\", name: \"%s\"",
-					iframe.getAttribute("id"), iframe.getAttribute("name")));
+			String key = String.format("id: \'%s\", name: \"%s\"",
+					iframe.getAttribute("id"), iframe.getAttribute("name"));
+			System.err.println(String.format("Found iframe %s", key));
+			iframesMap.put(key, iframe);
 		}
 
 		WebElement runButton = wait
@@ -222,20 +228,30 @@ public class PlunkerTest {
 		runButton.click();
 		iframes = driver.findElements(By.cssSelector("iframe"));
 		for (WebElement iframe : iframes) {
-			System.err.println(String.format("Found iframe id: \'%s\", name: \"%s\"",
-					iframe.getAttribute("id"), iframe.getAttribute("name")));
+			String key = String.format("id: \'%s\", name: \"%s\"",
+					iframe.getAttribute("id"), iframe.getAttribute("name"));
+			if (!iframesMap.containsKey(key)) {
+				System.err.println(String.format("Found new iframe %s", key));
+			}
 		}
 		WebElement previewIframe = wait
 				.until(ExpectedConditions.visibilityOfElementLocated(
 						By.cssSelector("iframe[name='plunkerPreviewTarget']")));
 		assertThat(previewIframe, notNullValue());
-		System.err.println(getBaseURL());
-		// "?p=preview"
+		// System.err.println(driver.getCurrentUrl());
+		assertTrue(driver.getCurrentUrl().matches("^.*\\?p=preview$"));
+		// driver.findElement(By.linkText("urlLink")).sendKeys(Keys.chord(Keys.CONTROL,Keys.RETURN));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testEmbed() {
 		driver.get("https://embed.plnkr.co/" + projectId);
+		WebElement closeButton = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("body div.plunker-ide-workspace button.plunker-ops-close")));
+		highlight(closeButton);
+		closeButton.click();
+    // button.plunker-sidebar-selector.plunker-selector-tree is better handled via Protractor
 	}
 
 	@Test(enabled = true)
