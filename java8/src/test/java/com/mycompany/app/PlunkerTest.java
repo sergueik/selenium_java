@@ -195,7 +195,11 @@ public class PlunkerTest {
 
 	@AfterSuite
 	public static void tearDown() throws Exception {
-		driver.close();
+		try {
+			driver.close();
+		} catch (NoSuchWindowException e) {
+
+		}
 		driver.quit();
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());
@@ -207,7 +211,7 @@ public class PlunkerTest {
 		driver.get(baseURL);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testEditorPreview() {
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
 
@@ -243,18 +247,19 @@ public class PlunkerTest {
 		// driver.findElement(By.linkText("urlLink")).sendKeys(Keys.chord(Keys.CONTROL,Keys.RETURN));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testEmbed() {
 		driver.get("https://embed.plnkr.co/" + projectId);
 		WebElement closeButton = wait
-				.until(ExpectedConditions.visibilityOfElementLocated(
-						By.cssSelector("body div.plunker-ide-workspace button.plunker-ops-close")));
+				.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
+						"body div.plunker-ide-workspace button.plunker-ops-close")));
 		highlight(closeButton);
 		closeButton.click();
-    // button.plunker-sidebar-selector.plunker-selector-tree is better handled via Protractor
+		// button.plunker-sidebar-selector.plunker-selector-tree is better handled
+		// via Protractor
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testFullScreeen() {
 		projectId = "WFJYrM";
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
@@ -298,11 +303,16 @@ public class PlunkerTest {
 			System.err.println("Exception: " + e.toString());
 		}
 		assertThat(fullScreenButton, notNullValue());
-		fullScreenButton.click();
+		// confirm it opens in a new tab.
+		// fullScreenButton.click();
+		// alternatively, enforce open in a new tab:
+		String openinLinkNewTab = Keys.chord(Keys.CONTROL, Keys.RETURN);
+		fullScreenButton.sendKeys(openinLinkNewTab);
 		try {
-			Thread.sleep(1000);
+			Thread.sleep(500);
 		} catch (InterruptedException e) {
 		}
+		// confirm it opens in a new tab.
 		String currentHandle = null;
 		try {
 			currentHandle = driver.getWindowHandle();
@@ -315,12 +325,96 @@ public class PlunkerTest {
 
 		Iterator<String> windowHandleIterator = windowHandles.iterator();
 		while (windowHandleIterator.hasNext()) {
-			String handle = (String) windowHandleIterator.next();
+			String handle = windowHandleIterator.next();
 			if (!handle.equals(currentHandle)) {
 				driver.switchTo().window(handle);
 				assertThat(getBaseURL(), equalTo("https://run.plnkr.co"));
 				// System.err.println(getBaseURL());
 				driver.switchTo().defaultContent();
+			}
+		}
+	}
+
+	@Test(enabled = true)
+	public void testFullScreeenInNewWindow() {
+		projectId = "WFJYrM";
+		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
+		WebElement runButton = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("body > nav button i.icon-play")));
+		assertThat(runButton, notNullValue());
+		highlight(runButton);
+		runButton.click();
+		WebElement previewIframe = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("iframe[name='plunkerPreviewTarget']")));
+		assertThat(previewIframe, notNullValue());
+		WebDriver iframe = driver.switchTo().frame(previewIframe);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+		// System.err.println(iframe.getPageSource());
+		// the fullscreen button is not in the preview frame
+		driver.switchTo().defaultContent();
+		WebElement fullScreenButton = null;
+		try {
+			fullScreenButton = wait.until(new ExpectedCondition<WebElement>() {
+
+				@Override
+				public WebElement apply(WebDriver d) {
+					Optional<WebElement> e = d
+							.findElements(By.cssSelector("button#expand-preview")).stream()
+							.filter(o -> {
+								String t = o.getAttribute("title");
+								return (Boolean) (t
+										.contains("Launch the preview in a separate window"));
+							}).findFirst();
+					return (e.isPresent()) ? e.get() : (WebElement) null;
+				}
+			});
+		} catch (
+
+		Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+		assertThat(fullScreenButton, notNullValue());
+		String currentHandle = null;
+		try {
+			currentHandle = driver.getWindowHandle();
+			// System.err.println("Thread: Current Window handle: " + currentHandle);
+		} catch (NoSuchWindowException e) {
+
+		}
+		// open fullscreen view in a new browser window.
+		String openinLinkNewBrowserWindow = Keys.chord(Keys.SHIFT, Keys.RETURN);
+		fullScreenButton.sendKeys(openinLinkNewBrowserWindow);
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+		// confirm it opens in a new browser window.
+		windowHandles = driver.getWindowHandles();
+		assertThat(windowHandles.size(), equalTo(2));
+
+		Iterator<String> windowHandleIterator = windowHandles.iterator();
+		while (windowHandleIterator.hasNext()) {
+			String handle = windowHandleIterator.next();
+			if (!handle.equals(currentHandle)) {
+				driver.switchTo().window(handle);
+				assertThat(getBaseURL(), equalTo("https://run.plnkr.co"));
+				// System.err.println(getBaseURL());
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
+				driver.close();
+				// System.err.println("After close");
+				try {
+					driver.switchTo().defaultContent();
+					System.err.println("After defaultcontext");
+				} catch (NoSuchWindowException e) {
+				}
 			}
 		}
 	}
