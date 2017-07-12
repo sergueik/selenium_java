@@ -1,3 +1,3 @@
 ### Info
 
-This direcoty comtains [fillio](http://codoid.com/fillo/) examples
+This directory contains [fillo](http://codoid.com/fillo/) API examples.
