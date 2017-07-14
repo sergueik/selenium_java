@@ -2,6 +2,7 @@ package com.mycompany.app;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.io.IOException;
 
 import java.lang.RuntimeException;
@@ -327,6 +328,56 @@ public class EscapeXPathTest {
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight_interval);
 		executeScript("arguments[0].style.border=''", element);
+	}
+
+	// origin: https://groups.google.com/forum/#!topic/selenium-users/sTWcaVbnU6c
+
+	public static String toHexStr(byte b) {
+		String str = "0x" + String.format("%02x", b);
+		return str;
+	}
+
+	private static String replaceSpecials() {
+		// http://utf8-chartable.de/unicode-utf8-table.pl?start=8064&names=-&utf8=0x
+		String pageSource = "";
+		pageSource = driver.getPageSource();
+		byte[] allBytes = null;
+		try {
+			allBytes = pageSource.getBytes("UTF-8");
+		} catch (UnsupportedEncodingException ex) {
+			ex.printStackTrace();
+		}
+
+		String translate = "";
+		for (int i = 0; i < allBytes.length; i++) {
+			// newBytes[i + offset] = allBytes[i];
+
+			if (allBytes[i] == ((byte) 0xE2)) {
+				// System.out.println(String.format("0xE2%s%s " , toHexStr(allBytes[i +
+				// 1]), " " + toHexStr(allBytes[i + 2])));
+				switch (allBytes[i + 2]) {
+				case (byte) 0x98: // opening single quote
+				case (byte) 0x99: // closing single quote
+					translate += "'";
+					i += 2;
+					break;
+				case (byte) 0x94: // dash, also 0xe292, 0xe293
+					translate += "-";
+					i += 2;
+					break;
+				case (byte) 0x9c: // opening double quote
+				case (byte) 0x9d: // closing double quote
+					translate += "\"";
+					i += 2;
+					break;
+				}
+			} else {
+				translate += (char) allBytes[i];
+			}
+		}
+
+		// pageSource = translate;
+		return translate;
 	}
 
 	// origin:
