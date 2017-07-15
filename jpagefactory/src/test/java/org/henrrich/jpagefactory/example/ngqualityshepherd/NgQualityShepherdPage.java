@@ -16,7 +16,8 @@ public class NgQualityShepherdPage {
 
 	// the @FindBy annotation below gives an example of defining different
 	// locators
-	@FindAll({ @FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "row") })
+	@FindAll({
+			@FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "row") })
 	private List<WebElement> friendNames;
 
 	@FindBy(how = How.REPEATER_ELEMENT, using = "row in rows", column = "row", row = 1)

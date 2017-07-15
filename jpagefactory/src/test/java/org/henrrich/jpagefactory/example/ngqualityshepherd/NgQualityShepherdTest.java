@@ -80,7 +80,7 @@ public class NgQualityShepherdTest {
 		JPageFactory.initElements(ngDriver, channel, page);
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
 	public void testShouldSearchFriend() throws Exception {
 		Assert.assertTrue("Number of friends is not 3!",
@@ -89,10 +89,10 @@ public class NgQualityShepherdTest {
 
 	@Test
 	public void testShouldHaveFriendNamedJohn() throws Exception {
-		Assert.assertTrue("Unexpected name of the friend!", page
-				.getFriendName().equals("John"));
+		Assert.assertTrue("Unexpected name of the friend!",
+				page.getFriendName().equals("John"));
 	}
-  
+
 	@After
 	public void tearDown() throws Exception {
 		ngDriver.quit();

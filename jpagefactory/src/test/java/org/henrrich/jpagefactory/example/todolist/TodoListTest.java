@@ -1,35 +1,34 @@
-package org.henrrich.jpagefactory.example.multiselect;
+package org.henrrich.jpagefactory.example.todolist;
 
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
-import com.jprotractor.NgBy;
-
-import org.henrrich.jpagefactory.Channel;
-import org.henrrich.jpagefactory.JPageFactory;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.Ignore;
-
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriver;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-/**
- * Created by sergueik on 31/07/2016.
- */
-public class NgMultiSelectTest {
+import org.henrrich.jpagefactory.Channel;
+import org.henrrich.jpagefactory.JPageFactory;
+import org.henrrich.jpagefactory.example.todolist.TodoListPage;
+	
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+import com.jprotractor.NgBy;
 
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+public class TodoListTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	private String baseUrl;
@@ -37,7 +36,7 @@ public class NgMultiSelectTest {
 	// change this boolean flag to true to run on chrome emulator
 	private boolean isMobile = false;
 
-	private NgMultiSelectPage page;
+	private TodoListPage page;
 
 	@Before
 	public void setUp() throws Exception {
@@ -71,10 +70,10 @@ public class NgMultiSelectTest {
 
 		}
 
-		baseUrl = "http://amitava82.github.io/angular-multiselect/";
+		baseUrl = "http://jaykanakiya.com/demos/angular-js-todolist/";
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		page = new NgMultiSelectPage();
+		page = new TodoListPage();
 		page.setDriver(ngDriver);
 		Channel channel = Channel.WEB;
 		if (isMobile) {
@@ -87,12 +86,8 @@ public class NgMultiSelectTest {
 	// @Ignore
 	@Test
 	public void testSelectCarsOneByOne() throws Exception {
-		page.openSelect();
-		page.selectAllCars();
-		System.err.println(page.getStatus());
-		Assert.assertTrue("Should be able to select cars",
-				page.getStatus().matches("There are (\\d+) car\\(s\\) selected"));
-	}
+		Assert.assertThat("Should be able to find two rows", page.countRows(),
+				equalTo(2));	}
 
 	@After
 	public void tearDown() throws Exception {
