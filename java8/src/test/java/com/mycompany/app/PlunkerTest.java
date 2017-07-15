@@ -164,7 +164,8 @@ public class PlunkerTest {
 
 		for (String optionAgrument : (new String[] {
 				"--allow-running-insecure-content", "--allow-insecure-localhost",
-				"--enable-local-file-accesses", "--disable-notifications",
+        "--enable-local-file-accesses", "--disable-notifications",
+        "--disable-save-password-bubble",
 				/* "start-maximized" , */
 				"--browser.download.folderList=2", "--disable-web-security",
 				"--no-proxy-server",
