@@ -28,17 +28,17 @@ public class JPageFactoryAnnotations extends Annotations {
 	public By buildBy() {
 		this.assertValidAnnotations();
 		By ans = null;
-		FindBys findBys = (FindBys) this.getField().getAnnotation(FindBys.class);
+		FindBys findBys = this.getField().getAnnotation(FindBys.class);
 		if (findBys != null) {
 			ans = this.buildByFromFindBys(findBys);
 		}
 
-		FindAll findAll = (FindAll) this.getField().getAnnotation(FindAll.class);
+		FindAll findAll = this.getField().getAnnotation(FindAll.class);
 		if (ans == null && findAll != null) {
 			ans = this.buildBysFromFindByOneOf(findAll);
 		}
 
-		FindBy findBy = (FindBy) this.getField().getAnnotation(FindBy.class);
+		FindBy findBy = this.getField().getAnnotation(FindBy.class);
 		if (ans == null && findBy != null) {
 			ans = this.buildByFromFindBy(findBy);
 		}
@@ -195,9 +195,9 @@ public class JPageFactoryAnnotations extends Annotations {
 	}
 
 	protected void assertValidAnnotations() {
-		FindBys findBys = (FindBys) this.getField().getAnnotation(FindBys.class);
-		FindAll findAll = (FindAll) this.getField().getAnnotation(FindAll.class);
-		FindBy findBy = (FindBy) this.getField().getAnnotation(FindBy.class);
+		FindBys findBys = this.getField().getAnnotation(FindBys.class);
+		FindAll findAll = this.getField().getAnnotation(FindAll.class);
+		FindBy findBy = this.getField().getAnnotation(FindBy.class);
 		if (findBys != null && findBy != null) {
 			throw new IllegalArgumentException(
 					"If you use a \'@FindBys\' annotation, you must not also use a \'@FindBy\' annotation");
