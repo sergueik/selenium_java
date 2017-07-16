@@ -1,32 +1,21 @@
 package org.henrrich.jpagefactory.example.multiselect;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertFalse;
+
+import java.util.List;
 
 import org.henrrich.jpagefactory.How;
 import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.support.ui.Select;
-
-import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 import com.jprotractor.NgBy;
+
+import org.junit.Assert;
+
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 
 /**
  * Created by sergueik on 01/08/2016.

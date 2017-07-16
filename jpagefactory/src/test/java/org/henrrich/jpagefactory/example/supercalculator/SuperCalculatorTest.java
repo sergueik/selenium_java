@@ -1,24 +1,29 @@
 package org.henrrich.jpagefactory.example.supercalculator;
 
-import com.jprotractor.NgWebDriver;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
+
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+import com.jprotractor.NgBy;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriver;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Created by henrrich on 23/05/2016.

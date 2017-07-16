@@ -1,29 +1,29 @@
 package org.henrrich.jpagefactory.example.multiselect;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.henrrich.jpagefactory.Channel;
+import org.henrrich.jpagefactory.JPageFactory;
+
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 import com.jprotractor.NgBy;
 
-import org.henrrich.jpagefactory.Channel;
-import org.henrrich.jpagefactory.JPageFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.Ignore;
 
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.WebDriver;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
  * Created by sergueik on 31/07/2016.
