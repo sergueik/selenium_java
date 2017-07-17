@@ -1,0 +1,201 @@
+<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml"><head>
+    <base href="." />
+    <title>angular playground</title>
+    <script src="https://unpkg.com/core-js@2.4.1/client/shim.min.js"></script>
+    <script src="https://unpkg.com/zone.js/dist/zone.js"></script>
+    <script src="https://unpkg.com/zone.js/dist/long-stack-trace-zone.js"></script>
+    <script src="https://unpkg.com/reflect-metadata@0.1.3/Reflect.js"></script>
+    <script src="https://unpkg.com/systemjs@0.19.31/dist/system.js"></script>
+    <script src="config.js"></script>
+    <script>
+    System.import('app')
+      .catch(console.error.bind(console));
+  </script>
+  <style>ng-select {
+  display: inline-block;
+  margin: 0;
+  position: relative;
+  vertical-align: middle;
+  width: 100%; }
+  ng-select * {
+    box-sizing: border-box;
+    font-family: Sans-Serif; }
+  ng-select &gt; div {
+    border: 1px solid #ddd;
+    box-sizing: border-box;
+    cursor: pointer;
+    user-select: none;
+    width: 100%; }
+    ng-select &gt; div.disabled {
+      background-color: #eee;
+      color: #aaa;
+      cursor: default;
+      pointer-events: none; }
+    ng-select &gt; div &gt; div.single {
+      display: flex;
+      height: 30px;
+      width: 100%; }
+      ng-select &gt; div &gt; div.single &gt; div.value,
+      ng-select &gt; div &gt; div.single &gt; div.placeholder {
+        flex: 1;
+        line-height: 30px;
+        overflow: hidden;
+        padding: 0 10px;
+        white-space: nowrap; }
+      ng-select &gt; div &gt; div.single &gt; div.placeholder {
+        color: #757575; }
+      ng-select &gt; div &gt; div.single &gt; div.clear,
+      ng-select &gt; div &gt; div.single &gt; div.toggle {
+        color: #aaa;
+        line-height: 30px;
+        text-align: center;
+        width: 30px; }
+        ng-select &gt; div &gt; div.single &gt; div.clear:hover,
+        ng-select &gt; div &gt; div.single &gt; div.toggle:hover {
+          background-color: #ececec; }
+      ng-select &gt; div &gt; div.single &gt; div.clear {
+        font-size: 18px; }
+      ng-select &gt; div &gt; div.single &gt; div.toggle {
+        font-size: 14px; }
+    ng-select &gt; div &gt; div.multiple {
+      display: flex;
+      flex-flow: row wrap;
+      height: 100%;
+      min-height: 30px;
+      padding: 0 10px;
+      width: 100%; }
+      ng-select &gt; div &gt; div.multiple &gt; div.option {
+        background-color: #eee;
+        border: 1px solid #aaa;
+        border-radius: 4px;
+        color: #333;
+        cursor: default;
+        display: inline-block;
+        flex-shrink: 0;
+        font-size: 14px;
+        line-height: 22px;
+        margin: 3px 5px 3px 0;
+        padding: 0 4px; }
+        ng-select &gt; div &gt; div.multiple &gt; div.option span.deselect-option {
+          color: #aaa;
+          cursor: pointer;
+          font-size: 14px;
+          height: 20px;
+          line-height: 20px; }
+          ng-select &gt; div &gt; div.multiple &gt; div.option span.deselect-option:hover {
+            color: #555; }
+      ng-select &gt; div &gt; div.multiple input {
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        height: 30px;
+        line-height: 30px;
+        padding: 0; }
+        ng-select &gt; div &gt; div.multiple input:focus {
+          outline: none; }
+  ng-select label {
+    color: rgba(0, 0, 0, 0.38);
+    display: block;
+    font-size: 13px;
+    padding: 4px 0; }
+</style></head>
+
+  <body>
+    <my-app ng-version="4.2.5">
+<h1>ng-select demo app</h1>
+<form novalidate="" style="padding:18px;max-width:800px;" ng-reflect-form="[object Object]" class="ng-untouched ng-pristine ng-valid">
+	
+    <div style="margin:5px 0;font-weight:600;">Single select example</div>
+    <ng-select formcontrolname="selectSingle" placeholder="Select one" ng-reflect-options="[object Object],[object Object" ng-reflect-allow-clear="true" ng-reflect-multiple="false" ng-reflect-placeholder="Select one" ng-reflect-name="selectSingle" class="ng-untouched ng-pristine ng-valid"><!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+<div class="below" ng-reflect-ng-class="[object Object]" tabindex="0">
+
+    <!--bindings={
+  "ng-reflect-ng-if": "true"
+}--><div class="single">
+        <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+        <!--bindings={
+  "ng-reflect-ng-if": "true"
+}--><div class="placeholder">
+            Select one
+        </div>
+        <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+        <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+        <!--bindings={
+  "ng-reflect-ng-if": "true"
+}--><div class="toggle">
+            
+        </div>
+    </div>
+
+    <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+
+</div>
+<!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+</ng-select>
+    
+    <div style="margin:10px 0 20px 0;color:#666;font-size:11pt;font-style:italic;">
+	    Selected option id: 
+    </div>
+
+    <div>Events:</div>
+    <pre></pre>
+
+    <hr style="margin: 18px 0;" />
+
+    <div style="margin:5px 0;font-weight:600;">Multilpe select example</div>
+	<ng-select formcontrolname="selectMultiple" placeholder="Select multiple" ng-reflect-options="[object Object],[object Object" ng-reflect-multiple="true" ng-reflect-placeholder="Select multiple" ng-reflect-name="selectMultiple" class="ng-untouched ng-pristine ng-valid"><!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+<div class="below" ng-reflect-ng-class="[object Object]" tabindex="0">
+
+    <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+
+    <!--bindings={
+  "ng-reflect-ng-if": "true"
+}--><div class="multiple">
+        <!--bindings={
+  "ng-reflect-ng-for-of": ""
+}-->
+        <!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+        <!--bindings={
+  "ng-reflect-ng-if": "true"
+}--><input autocomplete="off" tabindex="-1" ng-reflect-ng-style="[object Object]" placeholder="Select multiple" style="width: 151px;" />
+    </div>
+
+</div>
+<!--bindings={
+  "ng-reflect-ng-if": "false"
+}-->
+</ng-select>
+
+    <div style="margin:10px 0 20px 0;color:#666;font-size:11pt;font-style:italic;">
+	    Selected option id: 
+    </div>
+
+    <div>Events:</div>
+    <pre></pre>
+</form></my-app>
+  
+
+
+</body></html>
+
+Tests run: 1, Errors: 0, Failures: 0, Inconclusive: 0, Time: 15.8181006416098 seconds
+  Not run: 0, Invalid: 0, Ignored: 0, Skipped: 0
+
