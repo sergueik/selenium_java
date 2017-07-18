@@ -33,9 +33,10 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 /*
-This class tests the Select 2 Element https://select2.github.io/examples.html
-intended to create a custom class implementing subset of ISelect interface
-influenced by [selenium select2 wrapper project by sskorol](https://github.com/sskorol/select2-wrapper)
+ * This class tests the Select 2 Element https://s2Obj.github.io/examples.html
+ * intended to create a custom class implementing subset of ISelect interface
+ * influenced by [selenium s2Obj wrapper project by sskorol](https://github.com/sskorol/s2Obj-wrapper)
+ * https://qa-automation-notes.blogspot.com/2015/11/webdriver-vs-select2.html
 */
 
 public class Select2WrapperTest {
@@ -43,7 +44,6 @@ public class Select2WrapperTest {
 	private WebDriver driver;
 	private WebDriverWait wait;
 	private static Actions actions;
-	private static Alert alert;
 	private int flexibleWait = 5;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
@@ -161,21 +161,21 @@ public class Select2WrapperTest {
 	}
 
 	@Test(enabled = true)
-	public void test1() {
+	public void selectByOptionValueTest() {
 		// Arrange
-
-		// Wait page to load
 		WebElement element = wait.until(ExpectedConditions
 				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
 		// Act
-		executeScript(
-				"var select2 = $('select.js-states').select2(); option = select2.val('FL'); option.trigger('select');");
-		// TODO:  note without the second script the result is updated too late
-		String result = (String) executeScript(
-				"var select2 = $('select.js-states').select2(); return select2.val();");
+		String selectScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
+		executeScript(selectScript, "select.js-states", "FL");
+		// TODO: note without the second script the result is not updated before too
+		// late
+		String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
+		String result = (String) executeScript(querySelectedValueScript,
+				"select.js-states");
 		System.err.println("Result: " + result);
 		try {
-			Thread.sleep(500);
+			Thread.sleep(150);
 		} catch (InterruptedException e) {
 		}
 
@@ -189,13 +189,20 @@ public class Select2WrapperTest {
 		System.err.println(element.getText());
 	}
 
-	@Test(enabled = false)
-	public void test2() {
+	@Test(enabled = true)
+	public void selectByVisibleOptionTextTest() {
 		// Arrange
-		// Wait page to load
-		WebElement element = wait.until(ExpectedConditions.visibilityOf(driver
-				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
-		// A
+		WebElement element = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
+		// Act
+		String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
+		String result = (String) executeScript(selectByVisibleTextScript,
+				"select.js-states", "California");
+		System.err.println("Result: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
 	}
 
 	public static String getOsName() {
@@ -242,15 +249,9 @@ public class Select2WrapperTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'", element);
-			}
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
 			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver)
-						.executeScript("arguments[0].style.border=''", element);
-			}
+			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
@@ -278,8 +279,8 @@ public class Select2WrapperTest {
 		}
 	}
 
-  // origin: https://github.com/sskorol/select2-wrapper/blob/master/src/main/java/com/tools/qaa/elements/Select2.java
-	// TODO: implement ISelect ?
+	// inspired by:
+	// https://github.com/sskorol/select2-wrapper/blob/master/src/main/java/com/tools/qaa/elements/Select2.java
 	// https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/support/ui/Select.java
 	public static class Select2 {
 		private WebElement element = null;
@@ -293,16 +294,19 @@ public class Select2WrapperTest {
 		}
 
 		public void selectByVisibleText(final String text) {
+			String selectByVisibleTextScript = "var s2Obj = $('" + this.elementValue
+					+ "').select2(); var text = arguments[0] ; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
 			// waitUntil(ExpectedConditions::visibilityOfElementLocated);
-			executeScript("var value = $(\"" + this.elementValue
-					+ "+select\").find('option:contains(\"" + text + "\")').val();"
-					+ "$(\"" + this.elementValue + "\").select2(\"val\", value);");
+			String optionValue = (String) executeScript(selectByVisibleTextScript,
+					text);
+			// TODO:
 		}
 
 		public String getSelectedText() {
 			// waitUntil(ExpectedConditions::visibilityOfElementLocated);
+			// TODO:
 			return (String) executeScript(
-					"return $(\"" + this.elementValue + "\").select2('data').text;");
+					"return $('" + this.elementValue + "').select2('data').text;");
 		}
 
 		private Object executeScript(String script, Object... arguments) {
