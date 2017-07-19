@@ -2,11 +2,14 @@ package com.mycompany.app;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
@@ -49,7 +52,6 @@ public class Select2WrapperTest {
 	private long pollingInterval = 500;
 	private static String baseURL = "https://select2.github.io/examples.html";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static String defaultScript = null;
 	private static final String browser = "chrome";
 	private static String osName;
 
@@ -160,7 +162,7 @@ public class Select2WrapperTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void selectByOptionValueTest() {
 		// Arrange
 		WebElement element = wait.until(ExpectedConditions
@@ -189,7 +191,7 @@ public class Select2WrapperTest {
 		System.err.println(element.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void selectByVisibleOptionTextTest() {
 		// Arrange
 		WebElement element = wait.until(ExpectedConditions
@@ -197,11 +199,40 @@ public class Select2WrapperTest {
 		// Act
 		String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
 		String result = (String) executeScript(selectByVisibleTextScript,
-				"select.js-states", "California");
+				"select.js-states", "Florida");
 		System.err.println("Result: " + result);
 		try {
 			Thread.sleep(150);
 		} catch (InterruptedException e) {
+		}
+	}
+
+	@Test(enabled = true)
+	public void selectBySelectWrapperObjectTest() {
+		// Arrange
+		Select2 element = new Select2(driver, "select.js-states");
+		// Act
+		highlight(element.getWrappedElement());
+		// Assert
+		assertThat(element, notNullValue());
+		// Act
+		Map<String, String> stateMap = new HashMap<>();
+		stateMap.put("Florida", "FL");
+		stateMap.put("Washington", "WA");
+		Iterator<String> stateiIterator = stateMap.keySet().iterator();
+		while (stateiIterator.hasNext()) {
+			String stateFullName = stateiIterator.next();
+			String result = element.selectByVisibleText(stateFullName);
+			// Assert
+			assertTrue(result.equals(stateMap.get(stateFullName)),
+					String.format("State %s code should be %s but was %s", stateFullName,
+							stateMap.get(stateFullName), result));
+			;
+			System.err.println("Result: " + result);
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+			}
 		}
 	}
 
@@ -283,30 +314,45 @@ public class Select2WrapperTest {
 	// https://github.com/sskorol/select2-wrapper/blob/master/src/main/java/com/tools/qaa/elements/Select2.java
 	// https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/support/ui/Select.java
 	public static class Select2 {
-		private WebElement element = null;
-		private WebDriver driver = null;
-		private boolean isMulti = false;
-		private String elementValue;
 
-		public Select2(WebDriver driver, WebElement element) {
-			this.element = element;
-			this.driver = driver;
+		private WebDriver driver = null;
+		private WebElement element;
+		private WebDriverWait wait;
+		private boolean isMulti = false;
+		private String elementCssSelector;
+		private int flexibleWait = 5;
+		private long pollingInterval = 500;
+
+		public WebElement getWrappedElement() {
+			return this.element;
 		}
 
-		public void selectByVisibleText(final String text) {
-			String selectByVisibleTextScript = "var s2Obj = $('" + this.elementValue
+		public Select2(WebDriver driver, String elementCssSelector) {
+			this.elementCssSelector = elementCssSelector;
+			this.driver = driver;
+			this.wait = new WebDriverWait(driver, this.flexibleWait);
+			this.wait.pollingEvery(this.pollingInterval, TimeUnit.MILLISECONDS);
+			this.element = wait.until(ExpectedConditions.visibilityOf(
+					driver.findElement(By.cssSelector(this.elementCssSelector))));
+		}
+
+		public String selectByVisibleText(final String text) {
+			String selectByVisibleTextScript = "var s2Obj = $('"
+					+ this.elementCssSelector
 					+ "').select2(); var text = arguments[0] ; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
-			// waitUntil(ExpectedConditions::visibilityOfElementLocated);
+			wait.until(ExpectedConditions.visibilityOf(
+					driver.findElement(By.cssSelector(this.elementCssSelector))));
 			String optionValue = (String) executeScript(selectByVisibleTextScript,
 					text);
-			// TODO:
+			return optionValue;
 		}
 
 		public String getSelectedText() {
-			// waitUntil(ExpectedConditions::visibilityOfElementLocated);
+			wait.until(ExpectedConditions.visibilityOf(
+					driver.findElement(By.cssSelector(this.elementCssSelector))));
 			// TODO:
 			return (String) executeScript(
-					"return $('" + this.elementValue + "').select2('data').text;");
+					"return $('" + this.elementCssSelector + "').select2('data').text;");
 		}
 
 		private Object executeScript(String script, Object... arguments) {
