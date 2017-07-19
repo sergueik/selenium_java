@@ -9,12 +9,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -28,6 +30,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
@@ -194,7 +197,7 @@ public class Select2WrapperTest {
 	@Test(enabled = false)
 	public void selectByVisibleOptionTextTest() {
 		// Arrange
-		WebElement element = wait.until(ExpectedConditions
+		wait.until(ExpectedConditions
 				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
 		// Act
 		String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
@@ -207,7 +210,7 @@ public class Select2WrapperTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void selectBySelectWrapperObjectTest() {
 		// Arrange
 		Select2 element = new Select2(driver, "select.js-states");
@@ -227,7 +230,6 @@ public class Select2WrapperTest {
 			assertTrue(result.equals(stateMap.get(stateFullName)),
 					String.format("State %s code should be %s but was %s", stateFullName,
 							stateMap.get(stateFullName), result));
-			;
 			System.err.println("Result: " + result);
 			try {
 				Thread.sleep(150);
@@ -236,6 +238,64 @@ public class Select2WrapperTest {
 		}
 	}
 
+	@Test(enabled = true)
+	public void select2VisualActionTest() {
+		// Arrange
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.cssSelector("select.js-example-basic-single.js-states"))));
+		// Act
+		String selectOption = "FL";
+		String selectOptionScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
+		executeScript(selectOptionScript, "select.js-states", selectOption);
+		// TODO: note without the second script the result is not updated before too
+		// late
+		String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
+		String result = (String) executeScript(querySelectedValueScript,
+				"select.js-states");
+		// Assert
+		assertTrue(result.equals(selectOption), String
+				.format("State code should be %s but was %s", selectOption, result));
+		System.err.println("Selected via script: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Act
+		WebElement arrowElement = driver
+				.findElement(By.cssSelector("span.select2-selection__arrow"));
+		highlight(arrowElement);
+		arrowElement.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		WebElement select2ResultsElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("span.select2-container span.select2-results"))));
+		List<WebElement> select2ResultOptions = select2ResultsElement
+				.findElements(By.cssSelector("li.select2-results__option"));
+		// available options
+		// select2ResultOptions.stream().forEach(o -> System.err.println(o.getText()));
+		WebElement select2ResultOptionHighlighted = select2ResultOptions.stream()
+				.filter(o -> o.getAttribute("class").contains("highlighted"))
+				.findFirst().get();
+		System.err.println("Selected Visible Text: " + select2ResultOptionHighlighted.getText());
+		highlight(select2ResultOptionHighlighted);
+		select2ResultOptionHighlighted.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		WebElement selectionElement = wait
+				.until(ExpectedConditions.visibilityOf(driver
+						.findElement(By.cssSelector("span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
+
+	// utilities
 	public static String getOsName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name");
