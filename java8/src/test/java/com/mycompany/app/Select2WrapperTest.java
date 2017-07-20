@@ -39,9 +39,9 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
 /*
- * This class tests the Select 2 Element https://s2Obj.github.io/examples.html
+ * This class tests the Select 2 Element https://select2.github.io/examples.html
  * intended to create a custom class implementing subset of ISelect interface
- * influenced by [selenium s2Obj wrapper project by sskorol](https://github.com/sskorol/s2Obj-wrapper)
+ * influenced by [selenium select2 wrapper project by sskorol](https://github.com/sskorol/sslect2-wrapper)
  * https://qa-automation-notes.blogspot.com/2015/11/webdriver-vs-select2.html
 */
 
@@ -57,9 +57,10 @@ public class Select2WrapperTest {
 	private static final String browser = "chrome";
 	private static String osName;
 
-	private static final String selectOptionScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
-	private static final String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
-	private static final String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
+	private static final String selectOptionScript = "var selector = arguments[0]; var o_val = arguments[1]; var s2_obj = $(selector).select2(); option = s2_obj.val(o_val); option.trigger('select');";
+	private static final String querySelectedValueScript = "var selector = arguments[0]; var s2_obj = $(selector).select2(); return s2_obj.val();";
+	private static final String selectByVisibleTextScript = "var selector = arguments[0]; var s2_obj = $(selector).select2(); var text = arguments[1]; var found_opt = s2_obj.find('option:contains(\"' + text + '\")').val(); return found_opt";
+	private static final String selectMultiOptionClearScript = "var selector = arguments[0]; $(selector).select2().val(null).trigger('change');";
 
 	@Test(enabled = false)
 	public void selectByOptionValueTest() {
@@ -254,11 +255,12 @@ public class Select2WrapperTest {
 		String selectOption = "MN";
 
 		// Arrange
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
-				By.cssSelector("select.js-example-basic-single.js-states"))));
+		WebElement select2 = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.cssSelector("select.js-example-theme-single.js-states"))));
+		actions.moveToElement(select2).build().perform();
 		// Act
 		WebElement arrowElement = driver
-				.findElement(By.cssSelector("span.select2-selection__arrow"));
+				.findElement(By.cssSelector("div.s2-example span.select2-selection__arrow"));
 		highlight(arrowElement);
 		arrowElement.click();
 		// TODO: convert to flexible
@@ -294,17 +296,17 @@ public class Select2WrapperTest {
 
 		// Assert
 		String result = (String) executeScript(querySelectedValueScript,
-				"select.js-states");
+				"select.js-example-theme-single.js-states");
 		assertTrue(result.equals(selectOption), String
 				.format("State code should be %s but was %s", selectOption, result));
 		System.err.println("Selected: " + result);
 		// Assert
 		WebElement selectionElement = wait
 				.until(ExpectedConditions.visibilityOf(driver
-						.findElement(By.cssSelector("span.select2-selection__rendered"))));
+						.findElement(By.cssSelector("div.s2-example span.select2-selection__rendered"))));
 		assertThat(selectionElement, notNullValue());
 		highlight(selectionElement);
-		System.err.println("Selection: " + selectionElement.getText());
+		System.err.println("Selection: " + selectionElement.getAttribute("title"));
 	}
 
 	@BeforeSuite
@@ -516,9 +518,9 @@ public class Select2WrapperTest {
 		}
 
 		public String selectByVisibleText(final String text) {
-			String selectByVisibleTextScript = "var s2Obj = $('"
+			String selectByVisibleTextScript = "var s2_obj = $('"
 					+ this.elementCssSelector
-					+ "').select2(); var text = arguments[0] ; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
+					+ "').select2(); var text = arguments[0] ; var found_opt = s2_obj.find('option:contains(\"' + text + '\")').val(); return found_opt";
 			wait.until(ExpectedConditions.visibilityOf(
 					driver.findElement(By.cssSelector(this.elementCssSelector))));
 			String optionValue = (String) executeScript(selectByVisibleTextScript,
