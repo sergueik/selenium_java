@@ -7,6 +7,8 @@ import static org.testng.Assert.assertTrue;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -114,6 +116,36 @@ public class Select2WrapperTest {
 		System.err.println("Selection: " + selectionElement.getText());
 	}
 
+	// multiple
+	@Test(enabled = false)
+	public void selectBySelectWrapperObjectMultipleOptionsTest() {
+		// Arrange
+		Select2 element = new Select2(driver,
+				"select.js-example-basic-multiple.js-states");
+		// Act
+		highlight(element.getWrappedElement());
+		// Assert
+		assertThat(element, notNullValue());
+		// Act
+		Map<String, String> stateMap = new HashMap<>();
+		stateMap.put("Florida", "FL");
+		stateMap.put("Washington", "WA");
+		Iterator<String> stateiIterator = stateMap.keySet().iterator();
+		while (stateiIterator.hasNext()) {
+			String stateFullName = stateiIterator.next();
+			String result = element.selectByVisibleText(stateFullName);
+			// Assert
+			assertTrue(result.equals(stateMap.get(stateFullName)),
+					String.format("State %s code should be %s but was %s", stateFullName,
+							stateMap.get(stateFullName), result));
+			System.err.println("Result: " + result);
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
 	@Test(enabled = false)
 	public void selectBySelectWrapperObjectTest() {
 		// Arrange
@@ -143,16 +175,17 @@ public class Select2WrapperTest {
 	}
 
 	@Test(enabled = false)
-	public void select2VisualActionVerify1Test() {
+	public void select2VisualVerifyTest1() {
 		String selectOption = "FL";
+		String select2Selector = "select.js-example-basic-single.js-states";
 
 		// Arrange
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
-				By.cssSelector("select.js-example-basic-single.js-states"))));
+		wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector(select2Selector))));
 		// Act
-		executeScript(selectOptionScript, "select.js-states", selectOption);
+		executeScript(selectOptionScript, select2Selector, selectOption);
 		String result = (String) executeScript(querySelectedValueScript,
-				"select.js-states");
+				select2Selector);
 		// Assert
 		assertTrue(result.equals(selectOption), String
 				.format("State code should be %s but was %s", selectOption, result));
@@ -181,7 +214,8 @@ public class Select2WrapperTest {
 		WebElement highlightedOption = options.stream()
 				.filter(o -> o.getAttribute("class").contains("highlighted"))
 				.findFirst().get();
-		System.err.println("Selected Visible Text: " + highlightedOption.getText());
+		System.err.println(
+				"Selected options visible text: " + highlightedOption.getText());
 		highlight(highlightedOption);
 		highlightedOption.click();
 		try {
@@ -194,7 +228,85 @@ public class Select2WrapperTest {
 						.findElement(By.cssSelector("span.select2-selection__rendered"))));
 		assertThat(selectionElement, notNullValue());
 		highlight(selectionElement);
-		System.err.println("Selection: " + selectionElement.getText());
+		System.err.println("Selection rendered: " + selectionElement.getText());
+	}
+
+	@Test(enabled = true)
+	public void select2VisualVerifyTest2() {
+		List<String> selectOptions = new ArrayList<>(
+				Arrays.asList(new String[] { "FL", "NC", "MN" }));
+		String select2Selector = "select.js-example-basic-multiple.js-states";
+
+		String divText = "Multiple select boxes";
+
+		// Arrange
+		WebElement selectElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector(select2Selector))));
+		List<WebElement> divElements = driver.findElements(By.xpath(String
+				.format("//h2[@id = 'multiple'][contains(text(), '%s')]", divText)));
+		assertTrue(divElements.size() > 0);
+		WebElement divElement = divElements.get(0);
+		actions.moveToElement(divElement).build().perform();
+		highlight(divElement);
+
+		WebElement spanElement = selectElement
+				.findElement(By.xpath("following-sibling::span"));
+		actions.moveToElement(spanElement).build().perform();
+		highlight(spanElement);
+
+		// Act
+		for (String selectOption : selectOptions) {
+			executeScript(selectOptionScript, select2Selector, selectOption);
+			@SuppressWarnings("unchecked")
+			ArrayList<String> results = (ArrayList<String>) executeScript(
+					querySelectedValueScript, select2Selector);
+			System.err.println("size = " + results.size());
+			String result = results.get(0);
+			// Assert
+			assertTrue(result.equals(selectOption), String
+					.format("State code should be %s but was %s", selectOption, result));
+			System.err.println("Selected via Javascript: " + result);
+		}
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+		}
+		// Act
+		// following-sibling js-example-basic-multiple js-states
+		WebElement arrowElement = driver
+				.findElement(By.cssSelector("span.select2-selection--multiple"));
+		highlight(arrowElement);
+		arrowElement.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		WebElement resultsElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("span.select2-container span.select2-results"))));
+		List<WebElement> options = resultsElement
+				.findElements(By.cssSelector("li.select2-results__option"));
+		// available options
+		// options.stream().forEach(o ->
+		// System.err.println(o.getText()));
+		WebElement highlightedOption = options.stream()
+				.filter(o -> o.getAttribute("class").contains("highlighted"))
+				.findFirst().get();
+		System.err.println(
+				"Selected options visible text: " + highlightedOption.getText());
+		highlight(highlightedOption);
+		// highlightedOption.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		WebElement selectionElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"span.select2-selection--multiple ul.select2-selection__rendered li.select2-selection__choice"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection rendered: " + selectionElement.getText());
 	}
 
 	// TODO: refactor
@@ -250,17 +362,18 @@ public class Select2WrapperTest {
 		System.err.println("Selection: " + selectionElement.getText());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void select2VisualActionSelectTest() {
 		String selectOption = "MN";
 
 		// Arrange
-		WebElement select2 = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
-				By.cssSelector("select.js-example-theme-single.js-states"))));
+		WebElement select2 = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("select.js-example-theme-single.js-states"))));
 		actions.moveToElement(select2).build().perform();
 		// Act
-		WebElement arrowElement = driver
-				.findElement(By.cssSelector("div.s2-example span.select2-selection__arrow"));
+		WebElement arrowElement = driver.findElement(
+				By.cssSelector("div.s2-example span.select2-selection__arrow"));
 		highlight(arrowElement);
 		arrowElement.click();
 		// TODO: convert to flexible
@@ -302,8 +415,8 @@ public class Select2WrapperTest {
 		System.err.println("Selected: " + result);
 		// Assert
 		WebElement selectionElement = wait
-				.until(ExpectedConditions.visibilityOf(driver
-						.findElement(By.cssSelector("div.s2-example span.select2-selection__rendered"))));
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.cssSelector("div.s2-example span.select2-selection__rendered"))));
 		assertThat(selectionElement, notNullValue());
 		highlight(selectionElement);
 		System.err.println("Selection: " + selectionElement.getAttribute("title"));
