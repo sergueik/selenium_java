@@ -51,12 +51,261 @@ public class Select2WrapperTest {
 	private WebDriverWait wait;
 	private static Actions actions;
 	private int flexibleWait = 5;
-	private int implicitWait = 1;
 	private long pollingInterval = 500;
 	private static String baseURL = "https://select2.github.io/examples.html";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final String browser = "chrome";
 	private static String osName;
+
+	private static final String selectOptionScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
+	private static final String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
+	private static final String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
+
+	@Test(enabled = false)
+	public void selectByOptionValueTest() {
+		String selectOption = "FL";
+
+		// Arrange
+		wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
+		// Act
+
+		executeScript(selectOptionScript, "select.js-states", selectOption);
+		// TODO: appears without running the second script the result is not updated
+		String result = (String) executeScript(querySelectedValueScript,
+				"select.js-states");
+		System.err.println("Selected via Javascript: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+
+		// Assert
+		// TODO: Update the Expectation condition with Iterator and String methods
+		WebElement selectionElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"span.selection span.select2-selection span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
+
+	@Test(enabled = false)
+	public void selectByVisibleOptionTextTest() {
+		// Arrange
+		wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
+		// Act
+		String result = (String) executeScript(selectByVisibleTextScript,
+				"select.js-states", "Florida");
+		System.err.println("Selected via Javascript: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		// TODO: Update the Expectation condition with Iterator and String methods
+		WebElement selectionElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						"span.selection span.select2-selection span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
+
+	@Test(enabled = false)
+	public void selectBySelectWrapperObjectTest() {
+		// Arrange
+		Select2 element = new Select2(driver, "select.js-states");
+		// Act
+		highlight(element.getWrappedElement());
+		// Assert
+		assertThat(element, notNullValue());
+		// Act
+		Map<String, String> stateMap = new HashMap<>();
+		stateMap.put("Florida", "FL");
+		stateMap.put("Washington", "WA");
+		Iterator<String> stateiIterator = stateMap.keySet().iterator();
+		while (stateiIterator.hasNext()) {
+			String stateFullName = stateiIterator.next();
+			String result = element.selectByVisibleText(stateFullName);
+			// Assert
+			assertTrue(result.equals(stateMap.get(stateFullName)),
+					String.format("State %s code should be %s but was %s", stateFullName,
+							stateMap.get(stateFullName), result));
+			System.err.println("Result: " + result);
+			try {
+				Thread.sleep(150);
+			} catch (InterruptedException e) {
+			}
+		}
+	}
+
+	@Test(enabled = false)
+	public void select2VisualActionVerify1Test() {
+		String selectOption = "FL";
+
+		// Arrange
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.cssSelector("select.js-example-basic-single.js-states"))));
+		// Act
+		executeScript(selectOptionScript, "select.js-states", selectOption);
+		String result = (String) executeScript(querySelectedValueScript,
+				"select.js-states");
+		// Assert
+		assertTrue(result.equals(selectOption), String
+				.format("State code should be %s but was %s", selectOption, result));
+		System.err.println("Selected via Javascript: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Act
+		WebElement arrowElement = driver
+				.findElement(By.cssSelector("span.select2-selection__arrow"));
+		highlight(arrowElement);
+		arrowElement.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		WebElement resultsElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("span.select2-container span.select2-results"))));
+		List<WebElement> options = resultsElement
+				.findElements(By.cssSelector("li.select2-results__option"));
+		// available options
+		// options.stream().forEach(o ->
+		// System.err.println(o.getText()));
+		WebElement highlightedOption = options.stream()
+				.filter(o -> o.getAttribute("class").contains("highlighted"))
+				.findFirst().get();
+		System.err.println("Selected Visible Text: " + highlightedOption.getText());
+		highlight(highlightedOption);
+		highlightedOption.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		WebElement selectionElement = wait
+				.until(ExpectedConditions.visibilityOf(driver
+						.findElement(By.cssSelector("span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
+
+	// TODO: refactor
+	@Test(enabled = false)
+	public void select2VisualActionVerify2Test() {
+		String selectOption = "FL";
+
+		// Arrange
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.cssSelector("select.js-example-basic-single.js-states"))));
+		// Act
+		String result = (String) executeScript(selectByVisibleTextScript,
+				"select.js-states", "Florida");
+		System.err.println("Selected via Javascript: " + result);
+		// Assert
+		assertTrue(result.equals(selectOption), String
+				.format("State code should be %s but was %s", selectOption, result));
+		System.err.println("Selected via Javascript: " + result);
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Act
+		WebElement arrowElement = driver
+				.findElement(By.cssSelector("span.select2-selection__arrow"));
+		highlight(arrowElement);
+		arrowElement.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		WebElement resultsElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("span.select2-container span.select2-results"))));
+
+		WebElement highlightedOption = resultsElement
+				.findElements(By.cssSelector("li.select2-results__option")).stream()
+				.filter(o -> o.getAttribute("class").contains("highlighted"))
+				.findFirst().get();
+		System.err.println("Selected Text: " + highlightedOption.getText());
+		highlight(highlightedOption);
+		highlightedOption.click();
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		// Assert
+		WebElement selectionElement = wait
+				.until(ExpectedConditions.visibilityOf(driver
+						.findElement(By.cssSelector("span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
+
+	@Test(enabled = true)
+	public void select2VisualActionSelectTest() {
+		String selectOption = "MN";
+
+		// Arrange
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
+				By.cssSelector("select.js-example-basic-single.js-states"))));
+		// Act
+		WebElement arrowElement = driver
+				.findElement(By.cssSelector("span.select2-selection__arrow"));
+		highlight(arrowElement);
+		arrowElement.click();
+		// TODO: convert to flexible
+		try {
+			Thread.sleep(150);
+		} catch (InterruptedException e) {
+		}
+		WebElement resultsElement = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(
+						By.cssSelector("span.select2-container span.select2-results"))));
+		System.err.println(resultsElement.getAttribute("innerHTML"));
+		// TODO: scroll somehow
+		// TODO: filter out role="group"
+		WebElement selectedOption = resultsElement
+				.findElements(By.cssSelector("li.select2-results__option")).stream()
+				.filter(o -> o.getAttribute("role").matches("treeitem")).filter(o -> {
+					String text = o.getText();
+					System.err.println(String.format("Option text: \"%s\"", text));
+					actions.moveToElement(o).build().perform();
+					if (text.contains("Minnesota")) {
+						return true;
+					} else {
+						return false;
+					}
+				}).findFirst().get();
+		System.err.println("Selected Visible Text: " + selectedOption.getText());
+		highlight(selectedOption);
+		actions.moveToElement(selectedOption).click().build().perform();
+		try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e) {
+		}
+
+		// Assert
+		String result = (String) executeScript(querySelectedValueScript,
+				"select.js-states");
+		assertTrue(result.equals(selectOption), String
+				.format("State code should be %s but was %s", selectOption, result));
+		System.err.println("Selected: " + result);
+		// Assert
+		WebElement selectionElement = wait
+				.until(ExpectedConditions.visibilityOf(driver
+						.findElement(By.cssSelector("span.select2-selection__rendered"))));
+		assertThat(selectionElement, notNullValue());
+		highlight(selectionElement);
+		System.err.println("Selection: " + selectionElement.getText());
+	}
 
 	@BeforeSuite
 	@SuppressWarnings("deprecation")
@@ -163,136 +412,6 @@ public class Select2WrapperTest {
 					result.getMethod().getMethodName(), verificationErrors.toString()));
 		}
 		driver.get("about:blank");
-	}
-
-	@Test(enabled = false)
-	public void selectByOptionValueTest() {
-		// Arrange
-		WebElement element = wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
-		// Act
-		String selectScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
-		executeScript(selectScript, "select.js-states", "FL");
-		// TODO: note without the second script the result is not updated before too
-		// late
-		String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
-		String result = (String) executeScript(querySelectedValueScript,
-				"select.js-states");
-		System.err.println("Result: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
-
-		// 2. TODO: Expectation condition with Iterator, use String methods
-		element = wait.until(
-				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
-						"span.selection span.select2-selection span.select2-selection__rendered"))));
-		// Assert
-		assertThat(element, notNullValue());
-		highlight(element);
-		System.err.println(element.getText());
-	}
-
-	@Test(enabled = false)
-	public void selectByVisibleOptionTextTest() {
-		// Arrange
-		wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
-		// Act
-		String selectByVisibleTextScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); var text = arguments[1]; var foundOption = s2Obj.find('option:contains(\"' + text + '\")').val(); return foundOption";
-		String result = (String) executeScript(selectByVisibleTextScript,
-				"select.js-states", "Florida");
-		System.err.println("Result: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
-	}
-
-	@Test(enabled = false)
-	public void selectBySelectWrapperObjectTest() {
-		// Arrange
-		Select2 element = new Select2(driver, "select.js-states");
-		// Act
-		highlight(element.getWrappedElement());
-		// Assert
-		assertThat(element, notNullValue());
-		// Act
-		Map<String, String> stateMap = new HashMap<>();
-		stateMap.put("Florida", "FL");
-		stateMap.put("Washington", "WA");
-		Iterator<String> stateiIterator = stateMap.keySet().iterator();
-		while (stateiIterator.hasNext()) {
-			String stateFullName = stateiIterator.next();
-			String result = element.selectByVisibleText(stateFullName);
-			// Assert
-			assertTrue(result.equals(stateMap.get(stateFullName)),
-					String.format("State %s code should be %s but was %s", stateFullName,
-							stateMap.get(stateFullName), result));
-			System.err.println("Result: " + result);
-			try {
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-			}
-		}
-	}
-
-	@Test(enabled = true)
-	public void select2VisualActionTest() {
-		// Arrange
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(
-				By.cssSelector("select.js-example-basic-single.js-states"))));
-		// Act
-		String selectOption = "FL";
-		String selectOptionScript = "var selector = arguments[0]; var oVal = arguments[1]; var s2Obj = $(selector).select2(); option = s2Obj.val(oVal); option.trigger('select');";
-		executeScript(selectOptionScript, "select.js-states", selectOption);
-		// TODO: note without the second script the result is not updated before too
-		// late
-		String querySelectedValueScript = "var selector = arguments[0]; var s2Obj = $(selector).select2(); return s2Obj.val();";
-		String result = (String) executeScript(querySelectedValueScript,
-				"select.js-states");
-		// Assert
-		assertTrue(result.equals(selectOption), String
-				.format("State code should be %s but was %s", selectOption, result));
-		System.err.println("Selected via script: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
-		// Act
-		WebElement arrowElement = driver
-				.findElement(By.cssSelector("span.select2-selection__arrow"));
-		highlight(arrowElement);
-		arrowElement.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
-		WebElement select2ResultsElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(
-						By.cssSelector("span.select2-container span.select2-results"))));
-		List<WebElement> select2ResultOptions = select2ResultsElement
-				.findElements(By.cssSelector("li.select2-results__option"));
-		// available options
-		// select2ResultOptions.stream().forEach(o -> System.err.println(o.getText()));
-		WebElement select2ResultOptionHighlighted = select2ResultOptions.stream()
-				.filter(o -> o.getAttribute("class").contains("highlighted"))
-				.findFirst().get();
-		System.err.println("Selected Visible Text: " + select2ResultOptionHighlighted.getText());
-		highlight(select2ResultOptionHighlighted);
-		select2ResultOptionHighlighted.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
-		// Assert
-		WebElement selectionElement = wait
-				.until(ExpectedConditions.visibilityOf(driver
-						.findElement(By.cssSelector("span.select2-selection__rendered"))));
-		assertThat(selectionElement, notNullValue());
-		highlight(selectionElement);
-		System.err.println("Selection: " + selectionElement.getText());
 	}
 
 	// utilities
