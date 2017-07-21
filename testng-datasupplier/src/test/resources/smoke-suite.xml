@@ -1,0 +1,9 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Common suite">
+	<test name="DataSupplier tests">
+		<classes>
+			<class name="io.github.sskorol.testcases.DataSupplierTests"/>
+			<class name="io.github.sskorol.testcases.ReflectionUtilsTests"/>
+		</classes>
+	</test>
+</suite>
