@@ -11,7 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoadTimerOO {
+public class ChromePagePerformanceObject {
 
 	private static final String JAVASCRIPT = "var performance = window.performance;"
 			+ "var timings = performance.timing;" + "return timings;";
@@ -21,7 +21,7 @@ public class LoadTimerOO {
 	private WebDriverWait wait;
 
 	// Get a driver instance, go to end point, return load time
-	public LoadTimerOO(WebDriver driver, String string, boolean javaScript) {
+	public ChromePagePerformanceObject(WebDriver driver, String string, boolean javaScript) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
 
@@ -36,7 +36,7 @@ public class LoadTimerOO {
 	}
 
 	// Get a driver instance, do a click, return load time
-	public LoadTimerOO(WebDriver driver, By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, By navigator) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
 
@@ -49,7 +49,7 @@ public class LoadTimerOO {
 	}
 
 	// Get a driver instance, go to start point, do a click, return load time
-	public LoadTimerOO(WebDriver driver, String startPoint, By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, String startPoint, By navigator) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
 		driver.navigate().to(startPoint);
@@ -60,7 +60,7 @@ public class LoadTimerOO {
 	}
 
 	// Open browser, go to end point, return load time
-	public LoadTimerOO(String endPoint) {
+	public ChromePagePerformanceObject(String endPoint) {
 		this.driver = new ChromeDriver();
 		this.wait = new WebDriverWait(driver, 30);
 		driver.navigate().to(endPoint);
@@ -69,7 +69,7 @@ public class LoadTimerOO {
 	}
 
 	// Open browser, go to start point, do a click, return load time
-	public LoadTimerOO(String startPoint, By navigator) {
+	public ChromePagePerformanceObject(String startPoint, By navigator) {
 		this.driver = new ChromeDriver();
 		this.wait = new WebDriverWait(driver, 30);
 		driver.navigate().to(startPoint);
@@ -97,7 +97,6 @@ public class LoadTimerOO {
 	private Map<String, Double> CreateDateMap(String str) {
 		Map<String, Double> dict = new HashMap<>();
 		Date currDate = new Date();
-
 		str = str.substring(1, str.length() - 1);
 		String[] pairs = str.split(",");
 

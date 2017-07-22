@@ -10,20 +10,20 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LoadTimerUtil {
+public class ChromePagePerformanceUtil {
 
 	private static final String JAVASCRIPT = "var performance = window.performance;"
 			+ "var timings = performance.timing;" + "return timings;";
 
 	private Map<String, Double> timers;
 
-	private static LoadTimerUtil ourInstance = new LoadTimerUtil();
+	private static ChromePagePerformanceUtil ourInstance = new ChromePagePerformanceUtil();
 
-	public static LoadTimerUtil getInstance() {
+	public static ChromePagePerformanceUtil getInstance() {
 		return ourInstance;
 	}
 
-	private LoadTimerUtil() {
+	private ChromePagePerformanceUtil() {
 	}
 
 	// Get a driver instance, go to endpoint, return load time
@@ -97,8 +97,9 @@ public class LoadTimerUtil {
 		return timers.get("unloadEventStart");
 	}
 
+  // TODO: use org.json
 	private Map<String, Double> CreateDateMap(String str) {
-		Map<String, Double> dict = new HashMap<String, Double>();
+		Map<String, Double> dict = new HashMap<>();
 		Date currDate = new Date();
 
 		str = str.substring(1, str.length() - 1);

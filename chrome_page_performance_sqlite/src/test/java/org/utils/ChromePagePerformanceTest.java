@@ -1,7 +1,7 @@
 package org.utils;
 
-import org.utils.LoadTimerOO;
-import org.utils.LoadTimerUtil;
+import org.utils.ChromePagePerformanceObject;
+import org.utils.ChromePagePerformanceUtil;
 
 import org.junit.Test;
 import org.junit.AfterClass;
@@ -28,7 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
 
-public class LoadTimerTest {
+public class ChromePagePerformanceTest {
 
 	private static WebDriver driver;
 
@@ -83,15 +83,15 @@ public class LoadTimerTest {
 	@Test
 	public void testSetTimer() {
 		String url = "https://www.royalcaribbean.com/";
-		double test = new LoadTimerOO(driver, url, new ById("find-a-cruise"))
+		double test = new ChromePagePerformanceObject(driver, url, new ById("find-a-cruise"))
 				.getLoadTime();
 		System.out.println(test);
 	}
 
 	@Test
 	public void testUtil() {
-		LoadTimerUtil loadTimer = LoadTimerUtil.getInstance();
-		double test = loadTimer.getLoadTime(driver, "https://www.royalcaribbean.com/", new ById("find-a-cruise"));
+		ChromePagePerformanceUtil pageLoadTimer = ChromePagePerformanceUtil.getInstance();
+		double test = pageLoadTimer.getLoadTime(driver, "https://www.royalcaribbean.com/", new ById("find-a-cruise"));
 		System.out.println(test);
 	}
 }
