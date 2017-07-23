@@ -20,22 +20,20 @@ public class ChromePagePerformanceObject {
 	private Map<String, Double> timers;
 	private WebDriverWait wait;
 
-	// Get a driver instance, go to end point, return load time
-	public ChromePagePerformanceObject(WebDriver driver, String string, boolean javaScript) {
+	public ChromePagePerformanceObject(WebDriver driver, String data, boolean javaScript) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
 
 		if (javaScript) {
 			JavascriptExecutor js = (JavascriptExecutor) driver;
-			js.executeScript(string);
+			js.executeScript(data);
 		} else {
-			driver.navigate().to(string);
+			driver.navigate().to(data);
 		}
 		waitPageToLoad(this.driver, this.wait);
 		setTimer(driver);
 	}
 
-	// Get a driver instance, do a click, return load time
 	public ChromePagePerformanceObject(WebDriver driver, By navigator) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
@@ -48,31 +46,28 @@ public class ChromePagePerformanceObject {
 		setTimer(driver);
 	}
 
-	// Get a driver instance, go to start point, do a click, return load time
-	public ChromePagePerformanceObject(WebDriver driver, String startPoint, By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, String startUrl, By navigator) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(startPoint);
+		driver.navigate().to(startUrl);
 		this.wait.until(ExpectedConditions.presenceOfElementLocated(navigator))
 				.click();
 		waitPageToLoad(this.driver, this.wait);
 		setTimer(driver);
 	}
 
-	// Open browser, go to end point, return load time
-	public ChromePagePerformanceObject(String endPoint) {
+	public ChromePagePerformanceObject(String endUrl) {
 		this.driver = new ChromeDriver();
 		this.wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(endPoint);
+		driver.navigate().to(endUrl);
 		waitPageToLoad(this.driver, this.wait);
 		setTimer(driver);
 	}
 
-	// Open browser, go to start point, do a click, return load time
-	public ChromePagePerformanceObject(String startPoint, By navigator) {
+	public ChromePagePerformanceObject(String startUrl, By navigator) {
 		this.driver = new ChromeDriver();
 		this.wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(startPoint);
+		driver.navigate().to(startUrl);
 		this.wait.until(ExpectedConditions.presenceOfElementLocated(navigator))
 				.click();
 		waitPageToLoad(this.driver, this.wait);
@@ -94,11 +89,11 @@ public class ChromePagePerformanceObject {
 				((JavascriptExecutor) driver).executeScript(JAVASCRIPT).toString());
 	}
 
-	private Map<String, Double> CreateDateMap(String str) {
+	private Map<String, Double> CreateDateMap(String data) {
 		Map<String, Double> dict = new HashMap<>();
 		Date currDate = new Date();
-		str = str.substring(1, str.length() - 1);
-		String[] pairs = str.split(",");
+		data = data.substring(1, data.length() - 1);
+		String[] pairs = data.split(",");
 
 		for (String pair : pairs) {
 			String[] values = pair.split("=");
@@ -112,7 +107,6 @@ public class ChromePagePerformanceObject {
 		return dict;
 	}
 
-	// What are the true load times??
 	public double getLoadTime() {
 		return timers.get("unloadEventStart");
 	}
@@ -203,6 +197,6 @@ public class ChromePagePerformanceObject {
 
 	@Override
 	public String toString() {
-		return "LoadTimer.LoadTimerOO{" + "timers=" + timers.toString() + '}';
+		return "org.utils.ChromePagePerformanceObject{" + "timers=" + timers.toString() + '}';
 	}
 }

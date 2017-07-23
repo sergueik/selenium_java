@@ -26,16 +26,14 @@ public class ChromePagePerformanceUtil {
 	private ChromePagePerformanceUtil() {
 	}
 
-	// Get a driver instance, go to endpoint, return load time
-	public double getLoadTime(WebDriver driver, String endPoint) {
+	public double getLoadTime(WebDriver driver, String endUrl) {
 		WebDriverWait wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(endPoint);
+		driver.navigate().to(endUrl);
 		waitPageToLoad(driver, wait);
 		setTimer(driver);
 		return calculateLoadTime();
 	}
 
-	// Get a driver instance, do a click, return load time
 	public double getLoadTime(WebDriver driver, By navigator) {
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 		wait.until(ExpectedConditions.presenceOfElementLocated(navigator)).click();
@@ -44,32 +42,29 @@ public class ChromePagePerformanceUtil {
 		return calculateLoadTime();
 	}
 
-	// Get a driver instance, go to start point, do a click, return load time
-	public double getLoadTime(WebDriver driver, String endPoint, By navigator) {
+	public double getLoadTime(WebDriver driver, String endUrl, By navigator) {
 		WebDriverWait wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(endPoint);
+		driver.navigate().to(endUrl);
 		wait.until(ExpectedConditions.presenceOfElementLocated(navigator)).click();
 		waitPageToLoad(driver, wait);
 		setTimer(driver);
 		return calculateLoadTime();
 	}
 
-	// Open browser, go to start point, return load time
-	public double getLoadTime(String endPoint) {
+	public double getLoadTime(String endUrl) {
 		WebDriver driver = new ChromeDriver();
 		WebDriverWait wait = new WebDriverWait(driver, 30);
-		driver.navigate().to(endPoint);
+		driver.navigate().to(endUrl);
 		waitPageToLoad(driver, wait);
 		setTimer(driver);
 		return calculateLoadTime();
 	}
 
-	// Open browser, go to start point, do a click, return load time
-	public double getLoadTime(String endPoint, By navigator) {
+	public double getLoadTime(String endUrl, By navigator) {
 		WebDriver driver = new ChromeDriver();
 		WebDriverWait wait = new WebDriverWait(driver, 30);
 
-		driver.navigate().to(endPoint);
+		driver.navigate().to(endUrl);
 		wait.until(ExpectedConditions.presenceOfElementLocated(navigator)).click();
 		waitPageToLoad(driver, wait);
 
@@ -97,13 +92,13 @@ public class ChromePagePerformanceUtil {
 		return timers.get("unloadEventStart");
 	}
 
-  // TODO: use org.json
-	private Map<String, Double> CreateDateMap(String str) {
+	// TODO: use org.json
+	private Map<String, Double> CreateDateMap(String data) {
 		Map<String, Double> dict = new HashMap<>();
 		Date currDate = new Date();
 
-		str = str.substring(1, str.length() - 1);
-		String[] pairs = str.split(",");
+		data = data.substring(1, data.length() - 1);
+		String[] pairs = data.split(",");
 
 		for (String pair : pairs) {
 			String[] values = pair.split("=");
