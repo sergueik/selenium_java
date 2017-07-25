@@ -223,8 +223,70 @@ public class GmailTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true)
-	public void test1() throws InterruptedException, IOException {
+	@Test(priority = 1, enabled = false)
+	public void invalidPasswordTest() throws InterruptedException, IOException {
+
+		driver.get("https://www.google.com/gmail/about/#");
+
+		driver.findElement(By.xpath("//*[@data-g-label='Sign in']")).click(); // Sign
+																																					// in
+		Thread.sleep(1000);
+
+		// Enter the email id
+		enterEmailId(By.cssSelector("#identifierId"),
+				"automationnewuser24@gmail.com");
+
+		// click on next button
+		clickNextButton(By.xpath(
+				"//*[@id='identifierNext']/content/span[contains(text(),'Next')]"));
+
+		// Enter the password
+		enterPassword(By.xpath("//*[@id='password']//input"), "InvalidPwd");
+
+		// click on next button
+		clickNextButton(By.xpath(
+				"//*[@id='passwordNext']/content/span[contains(text(),'Next')]"));
+
+		// Inspect error messages
+		List<WebElement> errMsg = waitForElements(
+				By.xpath("//*[contains (text(),'Wrong password. Try again.')]"));
+		assertTrue(errMsg.size() > 0);
+	}
+
+	@Test(priority = 2, enabled = true)
+	public void invalidUsernameTest() throws InterruptedException, IOException {
+
+		// click on Sign in link
+		driver.findElement(By.xpath("/html/body/nav/div/a[2]")).click();
+
+		enterEmailId(By.cssSelector("#identifierId"), "InvalidUser_UVW");
+
+		// click on next button
+		clickNextButton(By.xpath(
+				"//*[@id='identifierNext']/content/span[contains(text(),'Next')]"));
+
+		// Inspect error messages
+		List<WebElement> errMsg = waitForElements(By.xpath(
+				"//*[contains (text(), \"Couldn't find your Google Account\")]"));
+		assertTrue(errMsg.size() > 0);
+	}
+
+	private List<WebElement> waitForElements(By locator) {
+
+		return wait.until((WebDriver d) -> {
+			List<WebElement> elements = new ArrayList<>();
+			try {
+				elements = d.findElements(locator);
+			} catch (Exception e) {
+				return null;
+			}
+			return (elements.size() > 0) ? elements : null;
+		});
+
+	}
+
+	@Test(priority = 3, enabled = true)
+	public void loginTest() throws InterruptedException, IOException {
 
 		// Click on Sign in Link
 		driver.findElement(By.xpath("/html/body/nav/div/a[2]")).click();
@@ -245,6 +307,7 @@ public class GmailTest {
 		clickNextButton(By.xpath(
 				"//*[@id='identifierNext']/content/span[contains(text(),'Next')]"));
 
+		// Enter the password
 		enterPassword(By.xpath("//*[@id='password']//input"),
 				"automationnewuser2410");
 
@@ -255,58 +318,14 @@ public class GmailTest {
 		Thread.sleep(5000);
 		// Click on profile image
 		driver
-				.findElement(By
-						.xpath(".//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span"))
+				.findElement(
+						By.xpath("//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span"))
 				.click();
 
 		// Sign out
 		driver.findElement(By.xpath(".//*[@id='gb_71']")).click();
 	}
 
-	@Test(enabled = true)
-	public void invalidUsernameTest() throws InterruptedException, IOException {
-
-		// click on Sign in link
-		driver.findElement(By.xpath("/html/body/nav/div/a[2]")).click();
-
-		enterEmailId(By.cssSelector("#identifierId"), "InvalidUser_UVW");
-
-		// click on next button
-		clickNextButton(By.xpath(
-				"//*[@id='identifierNext']/content/span[contains(text(),'Next')]"));
-
-		Thread.sleep(3000);
-
-		List<WebElement> errMsg = driver.findElements(By.xpath(
-				"//*[contains (text(), \"Couldn't find your Google Account\")]"));
-		assertTrue(errMsg.size() > 0);
-	}
-
-	@Test(enabled = true)
-	public void invalidPasswordTest() throws InterruptedException, IOException {
-
-		driver.get("https://www.google.com/gmail/about/#");
-
-		driver.findElement(By.xpath("//*[@data-g-label='Sign in']")).click(); // Sign
-																																					// in
-		Thread.sleep(1000);
-
-		enterEmailId(By.cssSelector("#identifierId"),
-				"automationnewuser24@gmail.com");
-
-		// click on next button
-		clickNextButton(By.xpath(
-				"//*[@id='identifierNext']/content/span[contains(text(),'Next')]"));
-
-		enterPassword(By.xpath("//*[@id='password']//input"), "InvalidPwd");
-
-		driver.findElement(By.xpath(".//*[@id='passwordNext']/div[2]")).click();
-		Thread.sleep(5000);
-
-		List<WebElement> errMsg = driver.findElements(
-				By.xpath(" \\*[contains (text(),'Wrong password. Try again.')]"));
-		assertTrue(errMsg.size() > 0);
-	}
 
 	private void clickNextButton(By locator) {
 		wait.until((WebDriver d) -> {
