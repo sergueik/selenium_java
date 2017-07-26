@@ -116,10 +116,12 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
 public class GmailTest {
+
+	private Alert alert;
 	private WebDriver driver;
 	private static Actions actions;
 	private WebDriverWait wait;
-	private int flexibleWait = 5;
+	private int flexibleWait = 120;
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
 	private String baseUrl = "https://www.google.com/gmail/about/#";
@@ -253,7 +255,7 @@ public class GmailTest {
 		assertTrue(errMsg.size() > 0);
 	}
 
-	@Test(priority = 2, enabled = true)
+	@Test(priority = 2, enabled = false)
 	public void invalidUsernameTest() throws InterruptedException, IOException {
 
 		// click on Sign in link
@@ -291,8 +293,13 @@ public class GmailTest {
 		// Click on Sign in Link
 		driver.findElement(By.xpath("/html/body/nav/div/a[2]")).click();
 
-		// TODO: track the url change
-		Thread.sleep(1000);
+		// origin:
+		// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection
+
+		// Wait and track the for page url to change
+		ExpectedCondition<Boolean> urlChange = driver -> driver.getCurrentUrl()
+				.matches("^https://accounts.google.com/signin.*");
+		wait.until(urlChange);
 
 		// Enter the email id
 		enterEmailId(By.cssSelector("#identifierId"),
@@ -315,23 +322,49 @@ public class GmailTest {
 		clickNextButton(By.xpath(
 				"//*[@id='passwordNext']/content/span[contains(text(),'Next')]"));
 
-		Thread.sleep(5000);
+		// Wait and track the for page url to change
+		urlChange = driver -> {
+			String url = driver.getCurrentUrl();
+			System.err.println("The url is: " + url);
+			return (Boolean) url.matches("^https://mail.google.com/mail.*");
+		};
+		wait.until(urlChange);
+
 		// Click on profile image
-		driver
-				.findElement(
-						By.xpath("//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span"))
-				.click();
+		wait.until((WebDriver driver) -> {
+			WebElement element = null;
+			try {
+				element = driver.findElement(By
+						.xpath("//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span"));
+			} catch (Exception e) {
+				return null;
+			}
+			return (element.isDisplayed()) ? element : null;
+		}).click();
 
 		// Sign out
 		driver.findElement(By.xpath(".//*[@id='gb_71']")).click();
+
+		try {
+			alert = driver.switchTo().alert();
+			alert.accept();
+		} catch (NoAlertPresentException ex) {
+			// Alert not present
+			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
+			return;
+		} catch (WebDriverException ex) {
+			System.err.println("Alert was not handled by PhantomJS: "
+					+ ex.getStackTrace().toString());
+			return;
+		}
+
 	}
 
-
 	private void clickNextButton(By locator) {
-		wait.until((WebDriver d) -> {
+		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
-				element = d.findElement(locator);
+				element = driver.findElement(locator);
 			} catch (Exception e) {
 				return null;
 			}
@@ -340,10 +373,10 @@ public class GmailTest {
 	}
 
 	private void enterPassword(By locator, String data) {
-		wait.until((WebDriver d) -> {
+		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
-				element = d.findElement(locator);
+				element = driver.findElement(locator);
 			} catch (Exception e) {
 				return null;
 			}
@@ -353,10 +386,10 @@ public class GmailTest {
 	}
 
 	private void enterEmailId(By locator, String data) {
-		wait.until((WebDriver d) -> {
+		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
-				element = d.findElement(locator);
+				element = driver.findElement(locator);
 			} catch (Exception e) {
 				return null;
 			}
