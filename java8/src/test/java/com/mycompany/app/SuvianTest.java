@@ -277,9 +277,12 @@ public class SuvianTest {
 					return (e.isPresent()) ? e.get() : (WebElement) null;
 				}
 			});
+
 			System.err
 					.println("element check: " + checkElement.getAttribute("innerHTML"));
-		} catch (
+		}
+
+		catch (
 
 		Exception e) {
 			System.err.println("Exception: " + e.toString());
@@ -439,25 +442,16 @@ public class SuvianTest {
 				"simulateRightMouseButtonClick.js");
 		System.err.println("Simulate (1) right mouse click on element");
 		executeScript(simulateRightMouseButtonClick, element);
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 		String simulateClick = getScriptContent("simulateClick.js");
 		System.err.println("Simulate (2) right mouse click on element");
 		executeScript(simulateClick, element, "contextmenu");
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 		System.err.println("Simulate (3) right mouse click on element");
 		actions.moveToElement(element).build().perform();
 		actions.keyDown(Keys.CONTROL).contextClick().keyUp(Keys.CONTROL).build()
 				.perform();
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 	}
 
 	// http://software-testing.ru/forum/index.php?/topic/17746-podskazhite-po-xpath/
@@ -654,11 +648,7 @@ public class SuvianTest {
 		assertThat(checkBoxElement, notNullValue());
 		highlight(checkBoxElement);
 		checkBoxElement.click();
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-			// ignore
-		}
+		sleep(500);
 		// Assert
 		assertTrue(checkBoxElement.isSelected());
 	}
@@ -768,11 +758,7 @@ public class SuvianTest {
 
 		checkBoxes.stream().forEach(o -> {
 			highlight(o);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-
-			}
+			sleep(100);
 			o.click();
 		});
 		// Assert
@@ -825,11 +811,7 @@ public class SuvianTest {
 		assertTrue(checkBoxes.size() > 0);
 		checkBoxes.stream().forEach(o -> {
 			highlight(o);
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-
-			}
+			sleep(100);
 			o.click();
 		});
 		// Assert
@@ -1001,10 +983,7 @@ public class SuvianTest {
 				System.out.println("switched to default content.");
 				break;
 			} else {
-				try {
-					Thread.sleep(100);
-				} catch (InterruptedException e) {
-				}
+				sleep(100);
 			}
 		}
 		// Assert
@@ -1192,10 +1171,7 @@ public class SuvianTest {
 				.findElement(By.cssSelector("div#doc div.content h1"));
 		// Act
 		actions.moveToElement(chartTitle).build().perform();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		// the tooltip element is present on the page regardless of mouse position,
 		// but is not visible.
@@ -1208,10 +1184,7 @@ public class SuvianTest {
 
 		// Act
 		actions.moveToElement(elementWithTooltip).build().perform();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		List<WebElement> tooltips = driver
 				.findElements(By.xpath("//div[contains(@id, '_tooltip')]"));
@@ -1249,10 +1222,7 @@ public class SuvianTest {
 				.moveByOffset(distance, 0);
 		actions.release().build().perform();
 		// Assert
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		System.err.println(
 				"Text area new width: " + textAreaElement.getSize().getWidth());
 		System.err.println(
@@ -1327,10 +1297,7 @@ public class SuvianTest {
 		System.err.println(String.format("Mouse down at: (%d,%d)",
 				coords.inViewPort().x, coords.inViewPort().y));
 		mouse.mouseMove(coords, xOffset, yOffset);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 		mouse.mouseDown(coords);
 		try {
 			Thread.sleep(1000);
@@ -1338,10 +1305,7 @@ public class SuvianTest {
 		}
 		mouse.mouseUp(coords);
 		mouse.click(coords);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 	}
 
 	@Test(enabled = false)
@@ -1378,10 +1342,7 @@ public class SuvianTest {
 				.findElement(By.cssSelector("input#chapbook2"));
 		resultElement.clear();
 		resultElement.sendKeys(String.format("%d", count));
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 	}
 
 	@Test(enabled = false)
@@ -1569,10 +1530,7 @@ public class SuvianTest {
 			System.err.println("Exception: " + e.toString());
 		}
 		// Assert
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		System.err.println(
 				"Button2 attribute check (1) : " + button2.getAttribute("outerHTML"));
 		button2.click();
@@ -1757,10 +1715,7 @@ public class SuvianTest {
 		// Act
 		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
 				.build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
@@ -1786,10 +1741,7 @@ public class SuvianTest {
 
 		// Act
 		actions.dragAndDrop(draggableElement, dropElement).build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
@@ -1821,12 +1773,7 @@ public class SuvianTest {
 				target_location.y - source_location.y).build().perform();
 		actions.release().build();
 		actions.perform();
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-
+		sleep(1000);
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
 	}
@@ -1862,11 +1809,7 @@ public class SuvianTest {
 		System.err.println(String.format("Mouse up at: (%-4d, %-4d)",
 				target_coords.inViewPort().x + 10, target_coords.inViewPort().y + 10));
 		mouse.mouseUp(target_coords);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-
+		sleep(1000);
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
 	}
@@ -1899,11 +1842,7 @@ public class SuvianTest {
 		executeScript(simulateDragDropScript, draggableElement,
 				target_coords.inViewPort().x, target_coords.inViewPort().y);
 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
-
+		sleep(1000);
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
 		// Assert
 	}
@@ -2018,10 +1957,7 @@ public class SuvianTest {
 		assertThat(dropElement.getText(),
 				containsString("This is a draggable text."));
 		System.err.println("Result: " + dropElement.getAttribute("innerHTML"));
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 	}
 
 	// NOTE: this test is failing
@@ -2100,10 +2036,7 @@ public class SuvianTest {
 		// Act
 		actions.clickAndHold(draggableElement).moveToElement(dropElement).release()
 				.build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 
 		// Assert
 		assertThat(dropElement.getAttribute("innerHTML"),
@@ -2136,10 +2069,7 @@ public class SuvianTest {
 
 		// Act
 		actions.dragAndDrop(draggableElement, dropElement).build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 
 		// Assert
 		assertThat(dropElement.getAttribute("innerHTML"),
@@ -2334,10 +2264,7 @@ public class SuvianTest {
 		playerNameInput.clear();
 		playerNameInput.sendKeys(bestScoringPlayerName);
 		System.err.println(bestScoringPlayerName);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 	}
 
 	static boolean hasScoreMethod(WebDriver driver) {
@@ -2407,10 +2334,7 @@ public class SuvianTest {
 						.cssSelector("form.form-inline input#score[name='sachinruns']"))));
 		scoreInput.clear();
 		scoreInput.sendKeys(String.format("%d", scoreSachin));
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 	}
 	*/
 
@@ -2483,13 +2407,12 @@ public class SuvianTest {
 		// arguments[0].removeAttribute('readonly',0)
 		sourceElement.clear();
 		targetElement.sendKeys((CharSequence) text);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
+
 		// Assert
 		String textValue = executeScript("return arguments[0].value;",
 				targetElement).toString();
+
 		assertThat(textValue, containsString(text));
 		System.err.println("value = " + textValue);
 
@@ -2513,10 +2436,7 @@ public class SuvianTest {
 						"//div[@class='intro-message']/ul[@id='tst']/li[.='India']/input[@type='radio' and @name='country']"))));
 		assertThat(inputElement, notNullValue());
 		inputElement.click();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		String script = "var radios = document.getElementsByTagName('input');\n"
 				+ "var checkedRadioItemNumber = 1; for (var cnt = 0; cnt < radios.length; cnt++) {\n"
@@ -2548,10 +2468,7 @@ public class SuvianTest {
 						.findElement(By.xpath("input[@type='radio' and @name='country']")))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		Optional<WebElement> result = driver.findElements(By.tagName("input"))
 				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
@@ -2581,10 +2498,7 @@ public class SuvianTest {
 						.contains((CharSequence) "India"))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		Optional<WebElement> result = driver.findElements(By.tagName("input"))
 				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
@@ -2610,10 +2524,7 @@ public class SuvianTest {
 						.contains((CharSequence) "India"))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// Assert
 		Optional<WebElement> result = driver.findElements(By.tagName("input"))
 				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
@@ -2703,35 +2614,23 @@ public class SuvianTest {
 
 		actions.moveToElement(calendarElement, xOffset, yOffset);
 		actions.build().perform();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-		}
+		sleep(1000);
 		calendarElement.sendKeys("01/21/2017");
 		actions.moveToElement(calendarElement, xOffset, yOffset).click().build()
 				.perform();
 
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
+		sleep(100);
 		// NOTE: unable to locate individual calendar dates elements with Selenium
 		// WebDriver
 		driver.findElements(By.xpath("//*[contains(@class,'calendar')]")).stream()
 				.forEach(o -> {
 					System.err.println(o.getAttribute("outerHTML"));
 				});
-		try {
-			for (int i = 0; i != 8; i++) {
-				calendarElement.sendKeys(Keys.ARROW_RIGHT);
-				Thread.sleep(100);
-			}
-		} catch (InterruptedException e) {
+		for (int i = 0; i != 8; i++) {
+			calendarElement.sendKeys(Keys.ARROW_RIGHT);
+			sleep(100);
 		}
-		try {
-			Thread.sleep(10000);
-		} catch (InterruptedException e) {
-		}
+		sleep(10000);
 		// Assert
 	}
 
@@ -2750,10 +2649,7 @@ public class SuvianTest {
 		assertThat(element, notNullValue());
 		highlight(element);
 		element.click();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-		}
+		sleep(300);
 		element = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
 				By.xpath("//div[text()='Мужской']/parent::div[@role='option']"))));
 		highlight(element);
@@ -2774,16 +2670,9 @@ public class SuvianTest {
 		assertThat(elements.get(0), notNullValue());
 		WebElement element = elements.get(0);
 		highlight(element);
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-		}
+		sleep(300);
 		element.click();
-		try {
-			Thread.sleep(300);
-		} catch (InterruptedException e) {
-		}
-
+		sleep(300);
 		element = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.xpath("//div[@role='option'][div/text()='Мужской']"))));
 		highlight(element);
@@ -2830,10 +2719,7 @@ public class SuvianTest {
 				// Element ... is not clickable at point ... Other element would receive
 				// the click
 			}
-			try {
-				Thread.sleep(100);
-			} catch (InterruptedException e) {
-			}
+			sleep(100);
 		}
 	}
 
@@ -2888,16 +2774,10 @@ public class SuvianTest {
 		// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keys.html
 		text_input_element.sendKeys(Keys.chord(Keys.BACK_SPACE, Keys.BACK_SPACE,
 				Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE));
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 		text_input_element.sendKeys(Keys.chord("20", org.openqa.selenium.Keys.TAB,
 				cell_text, org.openqa.selenium.Keys.ENTER));
-		try {
-			Thread.sleep(3000);
-		} catch (InterruptedException e) {
-		}
+		sleep(3000);
 	}
 
 	@Test(enabled = true)
@@ -2918,7 +2798,7 @@ public class SuvianTest {
 		} catch (RuntimeException timeoutException) {
 			return;
 		}
-    // http://stackoverflow.com/questions/6198947/how-to-get-text-from-each-cell-of-an-html-table
+		// http://stackoverflow.com/questions/6198947/how-to-get-text-from-each-cell-of-an-html-table
 		String script = "var table_row_locator = 'div#example_wrapper table#example tbody tr';\n"
 				+ "var rows = document.querySelectorAll(table_row_locator);\n"
 				+ "var result = [];\n"
@@ -3017,24 +2897,26 @@ public class SuvianTest {
 
 	}
 
-  private boolean areElementsPresent(WebElement parentWebElement, By byLocator) {
-    return parentWebElement.findElements(byLocator).size() == 1;
-    // usage:
-    // assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*= product]")).get(0), By.cssSelector("[class*=sticker]")));
-  }
+	private boolean areElementsPresent(WebElement parentWebElement,
+			By byLocator) {
+		return parentWebElement.findElements(byLocator).size() == 1;
+		// usage:
+		// assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*=
+		// product]")).get(0), By.cssSelector("[class*=sticker]")));
+	}
 
-  public boolean isGreaterThen(String a, String b)
-  {
-    return a.compareTo(b) < 0;
-    // usage:
-    // List<WebElement> rows = table.findElements(By.cssSelector("td:nth-of-type(5)>a"));
-    //
-    //    for (int i = 0; i<rows.size()-1;i++) {
-    //      assertTrue(isGreaterThen(rows.get(i).getAttribute("textContent"),rows.get(i+1).getAttribute("textContent")));
-    // }
-  }
+	public boolean isGreaterThen(String a, String b) {
+		return a.compareTo(b) < 0;
+		// usage:
+		// List<WebElement> rows =
+		// table.findElements(By.cssSelector("td:nth-of-type(5)>a"));
+		//
+		// for (int i = 0; i<rows.size()-1;i++) {
+		// assertTrue(isGreaterThen(rows.get(i).getAttribute("textContent"),rows.get(i+1).getAttribute("textContent")));
+		// }
+	}
 
-  private void highlight(WebElement element) {
+	private void highlight(WebElement element) {
 		highlight(element, 100);
 	}
 
@@ -3095,5 +2977,14 @@ public class SuvianTest {
 		String yto = Integer.toString(LocatorTo.getLocation().y);
 		executeScript(getScriptContent("simulateDragDrop2.js"), LocatorFrom, xto,
 				yto);
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

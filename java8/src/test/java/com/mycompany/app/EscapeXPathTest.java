@@ -208,11 +208,7 @@ public class EscapeXPathTest {
 								assertTrue(elements3.size() > 0);
 								highlight(elements3.get(0));
 				*/
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-				}
-
+				sleep(500);
 			} catch (InvalidSelectorException e) {
 				// ignore
 				// InvalidSelectorError:
@@ -242,11 +238,7 @@ public class EscapeXPathTest {
 						By.cssSelector(String.format("th:contains('%s')", text)));
 				assertTrue(elements.size() > 0);
 				highlight(elements.get(0));
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-				}
-
+				sleep(500);
 			} catch (InvalidSelectorException e) {
 				// ignore
 				// InvalidSelectorError:
@@ -278,11 +270,7 @@ public class EscapeXPathTest {
 
 			assertTrue(element.isPresent());
 			highlight(element.get());
-			try {
-				Thread.sleep(500);
-			} catch (InterruptedException e) {
-			}
-
+			sleep(500);
 		}
 	}
 
@@ -454,6 +442,15 @@ public class EscapeXPathTest {
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
 																			// supported in -source 1.6
 			throw new RuntimeException(e);
+		}
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 

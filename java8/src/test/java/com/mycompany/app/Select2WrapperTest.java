@@ -78,11 +78,8 @@ public class Select2WrapperTest {
 		String result = (String) executeScript(querySelectedValueScript,
 				"select.js-states");
 		System.err.println("Selected via Javascript: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
 
+		sleep(150);
 		// Assert
 		// TODO: Update the Expectation condition with Iterator and String methods
 		WebElement selectionElement = wait.until(
@@ -102,10 +99,8 @@ public class Select2WrapperTest {
 		String result = (String) executeScript(selectByVisibleTextScript,
 				"select.js-states", "Florida");
 		System.err.println("Selected via Javascript: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		// Assert
 		// TODO: Update the Expectation condition with Iterator and String methods
 		WebElement selectionElement = wait.until(
@@ -139,10 +134,8 @@ public class Select2WrapperTest {
 					String.format("State %s code should be %s but was %s", stateFullName,
 							stateMap.get(stateFullName), result));
 			System.err.println("Result: " + result);
-			try {
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-			}
+
+			sleep(150);
 		}
 	}
 
@@ -167,10 +160,8 @@ public class Select2WrapperTest {
 					String.format("State %s code should be %s but was %s", stateFullName,
 							stateMap.get(stateFullName), result));
 			System.err.println("Result: " + result);
-			try {
-				Thread.sleep(150);
-			} catch (InterruptedException e) {
-			}
+
+			sleep(150);
 		}
 	}
 
@@ -190,19 +181,14 @@ public class Select2WrapperTest {
 		assertTrue(result.equals(selectOption), String
 				.format("State code should be %s but was %s", selectOption, result));
 		System.err.println("Selected via Javascript: " + result);
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+		sleep(150);
 		// Act
 		WebElement arrowElement = driver
 				.findElement(By.cssSelector("span.select2-selection__arrow"));
 		highlight(arrowElement);
 		arrowElement.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		WebElement resultsElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("span.select2-container span.select2-results"))));
@@ -218,10 +204,8 @@ public class Select2WrapperTest {
 				"Selected options visible text: " + highlightedOption.getText());
 		highlight(highlightedOption);
 		highlightedOption.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		// Assert
 		WebElement selectionElement = wait
 				.until(ExpectedConditions.visibilityOf(driver
@@ -267,20 +251,16 @@ public class Select2WrapperTest {
 					.format("State code should be %s but was %s", selectOption, result));
 			System.err.println("Selected via Javascript: " + result);
 		}
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(5000);
 		// Act
 		// following-sibling js-example-basic-multiple js-states
 		WebElement arrowElement = driver
 				.findElement(By.cssSelector("span.select2-selection--multiple"));
 		highlight(arrowElement);
 		arrowElement.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		WebElement resultsElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("span.select2-container span.select2-results"))));
@@ -296,10 +276,8 @@ public class Select2WrapperTest {
 				"Selected options visible text: " + highlightedOption.getText());
 		highlight(highlightedOption);
 		// highlightedOption.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		// Assert
 		WebElement selectionElement = wait.until(
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
@@ -334,10 +312,8 @@ public class Select2WrapperTest {
 				.findElement(By.cssSelector("span.select2-selection__arrow"));
 		highlight(arrowElement);
 		arrowElement.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		WebElement resultsElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("span.select2-container span.select2-results"))));
@@ -349,10 +325,8 @@ public class Select2WrapperTest {
 		System.err.println("Selected Text: " + highlightedOption.getText());
 		highlight(highlightedOption);
 		highlightedOption.click();
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		// Assert
 		WebElement selectionElement = wait
 				.until(ExpectedConditions.visibilityOf(driver
@@ -377,10 +351,8 @@ public class Select2WrapperTest {
 		highlight(arrowElement);
 		arrowElement.click();
 		// TODO: convert to flexible
-		try {
-			Thread.sleep(150);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(150);
 		WebElement resultsElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("span.select2-container span.select2-results"))));
@@ -402,10 +374,8 @@ public class Select2WrapperTest {
 		System.err.println("Selected Visible Text: " + selectedOption.getText());
 		highlight(selectedOption);
 		actions.moveToElement(selectedOption).click().build().perform();
-		try {
-			Thread.sleep(5000);
-		} catch (InterruptedException e) {
-		}
+
+		sleep(5000);
 
 		// Assert
 		String result = (String) executeScript(querySelectedValueScript,
@@ -657,6 +627,15 @@ public class Select2WrapperTest {
 			} else {
 				throw new RuntimeException("Script execution failed.");
 			}
+		}
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 }

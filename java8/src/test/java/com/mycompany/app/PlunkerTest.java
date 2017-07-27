@@ -275,10 +275,7 @@ public class PlunkerTest {
 						By.cssSelector("iframe[name='plunkerPreviewTarget']")));
 		assertThat(previewIframe, notNullValue());
 		WebDriver iframe = driver.switchTo().frame(previewIframe);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-		}
+		sleep(500);
 		// System.err.println(iframe.getPageSource());
 		// the fullscreen button is not in the preview frame
 		driver.switchTo().defaultContent();
@@ -309,10 +306,7 @@ public class PlunkerTest {
 		// alternatively, enforce open in a new tab:
 		String openinLinkNewTab = Keys.chord(Keys.CONTROL, Keys.RETURN);
 		fullScreenButton.sendKeys(openinLinkNewTab);
-		try {
-			Thread.sleep(500);
-		} catch (InterruptedException e) {
-		}
+		sleep(500);
 		// confirm it opens in a new tab.
 		String currentHandle = null;
 		try {
@@ -488,6 +482,15 @@ public class PlunkerTest {
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 }

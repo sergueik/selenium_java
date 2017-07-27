@@ -233,10 +233,7 @@ public class JqueryBarRatingTest {
 			// hover
 			actions.moveToElement(r).build().perform();
 			highlight(r);
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
+			sleep(1000);
 		});
 		// Assert
 	}
@@ -272,10 +269,7 @@ public class JqueryBarRatingTest {
 					".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
 			assertThat(comment.getText(), equalTo(o));
 			System.err.println("Mouse over rating: " + o);
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
+			sleep(1000);
 		});
 	}
 
@@ -308,10 +302,7 @@ public class JqueryBarRatingTest {
 			System.err.println("Mouse over rating: " + o);
 			// NOTE: there is a hidden select sibling element. The selected option
 			// does not appear to be updated
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-			}
+			sleep(1000);
 			final String script = "var result = $(\"section.section-examples div.box-example-movie div.br-theme-bars-movie select#example-movie option[selected='selected']\");return result.val();";
 			if (driver instanceof JavascriptExecutor) {
 				Object result = ((JavascriptExecutor) driver).executeScript(script);
@@ -368,6 +359,15 @@ public class JqueryBarRatingTest {
 					return null;
 				}
 			};
+		}
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 }
