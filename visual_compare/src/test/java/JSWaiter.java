@@ -15,15 +15,15 @@ public class JSWaiter {
 
     public void waitJS () {
         //Wait for Javascript to load
-        ExpectedCondition<Boolean> jsLoad = driver -> ((JavascriptExecutor) driver)
-                .executeScript("return document.readyState").toString().equals("complete");
+		ExpectedCondition<Boolean> jsLoad = driver -> ((JavascriptExecutor) driver)
+				.executeScript("return document.readyState").toString()
+				.equals("complete");
 
+		// JQuery Wait
+		ExpectedCondition<Boolean> jQueryLoad = driver -> ((Long) ((JavascriptExecutor) driver)
+				.executeScript("return jQuery.active") == 0);
 
-        //JQuery Wait
-        ExpectedCondition<Boolean> jQueryLoad = driver -> ((Long) ((JavascriptExecutor) driver)
-                .executeScript("return jQuery.active") == 0);
-
-        wait.until(jsLoad);
-        wait.until(jQueryLoad);
+		wait.until(jsLoad);
+		wait.until(jQueryLoad);
     }
 }

@@ -1,17 +1,21 @@
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
+
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ProcessStarter;
 import org.im4java.process.StandardStream;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 
@@ -67,7 +71,6 @@ public class BaseTest {
 	// Setup Driver
 	@BeforeClass
 	public void setupTestClass() throws IOException {
-		// Declare Chrome driver
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 		driver = new ChromeDriver();
