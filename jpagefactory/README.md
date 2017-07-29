@@ -252,7 +252,7 @@ Other use [Angular Todo List](http://jaykanakiya.com/demos/angular-js-todolist/)
 
 In order to run the example tests, Google Chrome browser is required.
 
-Copy the `jprotractor-1.2-SNAPSHOT.jar` jar into `src/test/resources`.
+Copy the `jprotractor-1.2-SNAPSHOT.jar` jar into `src/main/resources`.
 
 Make sure to import:
 ```java

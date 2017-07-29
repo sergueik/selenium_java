@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
 import org.henrrich.jpagefactory.example.todolist.TodoListPage;
-	
+
 import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 import com.jprotractor.NgBy;
@@ -87,7 +87,8 @@ public class TodoListTest {
 	@Test
 	public void testSelectCarsOneByOne() throws Exception {
 		Assert.assertThat("Should be able to find two rows", page.countRows(),
-				equalTo(2));	}
+				equalTo(2));
+	}
 
 	@After
 	public void tearDown() throws Exception {
