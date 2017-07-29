@@ -1,5 +1,6 @@
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
+
 import org.im4java.core.CommandException;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
@@ -11,6 +12,7 @@ import org.im4java.process.StandardStream;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.annotations.BeforeClass;
@@ -34,24 +36,12 @@ public class BaseTest {
 
 	public WebDriver driver;
 	public WebDriverWait wait;
-	public JavascriptExecutor js;
+	public Actions actions;
 
-	// JSWaiter object
-	JSWaiter jsWaiter;
-
-	// Test name
 	public String testName;
-
-	// Test Screenshot directory
 	public String testScreenShotDirectory;
-
-	// URL of the test website
 	public String url = "http://www.kariyer.net";
-
-	// Main Directory of the test code
 	public String currentDir = System.getProperty("user.dir");
-
-	// Main screenshot directory
 	public String parentScreenShotsLocation = currentDir + "\\ScreenShots\\";
 
 	// Main differences directory
@@ -62,30 +52,21 @@ public class BaseTest {
 	public String actualScreenShotPath;
 	public String differenceScreenShotPath;
 
-	// Image files
 	public File baselineImageFile;
 	public File actualImageFile;
 	public File differenceImageFile;
 	public File differenceFileForParent;
 
-	// Setup Driver
 	@BeforeClass
 	public void setupTestClass() throws IOException {
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 		driver = new ChromeDriver();
-
-		// Maximize the browser
 		driver.manage().window().maximize();
 
 		// Declare a 10 seconds wait time
 		wait = new WebDriverWait(driver, 10);
-
-		// JS Executor
-		js = (JavascriptExecutor) driver;
-
-		// JSWaiter
-		jsWaiter = new JSWaiter(wait);
+		actions = new Actions(driver);
 
 		// Create screenshot and differences folders if they are not exist
 		createFolder(parentScreenShotsLocation);
@@ -108,7 +89,6 @@ public class BaseTest {
 		testName = method.getName();
 		System.out.println("Test Name: " + testName + "\n");
 
-		// Create a specific directory for a test
 		testScreenShotDirectory = parentScreenShotsLocation + testName + "\\";
 		createFolder(testScreenShotDirectory);
 
@@ -118,23 +98,21 @@ public class BaseTest {
 				testName + "_Diff.png");
 	}
 
-	// Add Cookie not to see top banner animation
+	// Add Cookie to suppress top banner animation
 	public void addCookieforTopBanner() {
-		// Get Next Month Last Date for cookie expiration
+		// Set cookie expiration to Next Month Last Date
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.MONTH, 1);
 		calendar.set(Calendar.DATE,
 				calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		Date nextMonthLastDay = calendar.getTime();
 
-		// Create/Build a cookie
 		Cookie topBannerCloseCookie = new Cookie.Builder("AA-kobiBannerClosed", "4") // Name
 				.domain("www.kariyer.net") // Domain of the cookie
 				.path("/") // Path of the cookie
 				.expiresOn(nextMonthLastDay) // Expiration date
-				.build(); // Finally build it with .build() call
+				.build();
 
-		// Add a cookie
 		driver.manage().addCookie(topBannerCloseCookie);
 	}
 
@@ -154,7 +132,7 @@ public class BaseTest {
 
 	// Close popup if exists
 	public void handlePopup(String selector) throws InterruptedException {
-		jsWaiter.waitJS();
+		waitJS();
 		List<WebElement> popup = driver.findElements(By.cssSelector(selector));
 		if (!popup.isEmpty()) {
 			popup.get(0).click();
@@ -164,7 +142,7 @@ public class BaseTest {
 
 	// Close Banner
 	public void closeBanner() {
-		jsWaiter.waitJS();
+		waitJS();
 		List<WebElement> banner = driver
 				.findElements(By.cssSelector("body > div.kobi-head-banner > div > a"));
 		if (!banner.isEmpty()) {
@@ -176,32 +154,26 @@ public class BaseTest {
 
 	// Unhide an Element with JSExecutor
 	public void unhideElement(String unhideJS) {
-		js.executeScript(unhideJS);
-		jsWaiter.waitJS();
-		sleep(200);
+		executeScript(unhideJS);
+		waitJS();
 	}
 
 	// Move to Operation
 	public void moveToElement(WebElement element) {
-		jsWaiter.waitJS();
-		Actions actions = new Actions(driver);
-		jsWaiter.waitJS();
-		sleep(200);
+		waitJS();
+
 		actions.moveToElement(element).build().perform();
 	}
 
-	// Take Screenshot with AShot
 	public Screenshot takeScreenshot(WebElement element) {
-		// Take screenshot with Ashot
 		Screenshot elementScreenShot = new AShot().takeScreenshot(driver, element);
 		/*Screenshot elementScreenShot = new AShot()
 		        .coordsProvider(new WebDriverCoordsProvider())
 		        .takeScreenshot(driver,element);*/
 
-		// Print element size
-		String size = "Height: " + elementScreenShot.getImage().getHeight() + "\n"
-				+ "Width: " + elementScreenShot.getImage().getWidth() + "\n";
-		System.out.print("Size: " + size);
+		System.out.println(String.format("Size: Height: %d Width: %d",
+				elementScreenShot.getImage().getHeight(),
+				elementScreenShot.getImage().getWidth()));
 
 		return elementScreenShot;
 	}
@@ -232,8 +204,8 @@ public class BaseTest {
 	public void resizeImagesWithImageMagick(String... pImageNames)
 			throws Exception {
 		ConvertCmd cmd = new ConvertCmd();
-		String binPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
-				"SOFTWARE\\ImageMagick\\Current", "BinPath");
+		String binPath = Advapi32Util.registryGetStringValue(
+				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
 		cmd.setSearchPath(binPath);
 		IMOperation imOperation = new IMOperation();
 		imOperation.addImage();
@@ -259,11 +231,10 @@ public class BaseTest {
 	public void compareImagesWithImageMagick(String expected, String actual,
 			String difference) throws Exception {
 
-		String binPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
-				"SOFTWARE\\ImageMagick\\Current", "BinPath");
+		String binPath = Advapi32Util.registryGetStringValue(
+				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
 		System.err.println("Registry binpath: " + binPath);
-		ProcessStarter
-				.setGlobalSearchPath(binPath);
+		ProcessStarter.setGlobalSearchPath(binPath);
 
 		CompareCmd compare = new CompareCmd();
 		compare.setSearchPath(binPath);
@@ -334,13 +305,34 @@ public class BaseTest {
 		}
 	}
 
-	// Sleep Function
 	public void sleep(int milis) {
-		Long milliseconds = (long) milis;
 		try {
-			Thread.sleep(milliseconds);
+			Thread.sleep((long) milis);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void waitJS() {
+		// Wait for core Javascript to load
+		ExpectedCondition<Boolean> jsLoad = driver -> ((JavascriptExecutor) driver)
+				.executeScript("return document.readyState").toString()
+				.equals("complete");
+		wait.until(jsLoad);
+
+		// wait for JQuery
+		ExpectedCondition<Boolean> jQueryLoad = driver -> ((Long) ((JavascriptExecutor) driver)
+				.executeScript("return jQuery.active") == 0);
+		wait.until(jQueryLoad);
+	}
+
+	private Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
 		}
 	}
 }
