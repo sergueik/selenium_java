@@ -229,23 +229,27 @@ public class BaseTest {
 		differenceFileForParent = new File(parentDifferencesLocation + diff);
 	}
 
-	public void resizeImagesWithImageMagick(String... pImageNames) throws Exception {
+	public void resizeImagesWithImageMagick(String... pImageNames)
+			throws Exception {
 		ConvertCmd cmd = new ConvertCmd();
-		cmd.setSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
+		String binPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+				"SOFTWARE\\ImageMagick\\Current", "BinPath");
+		cmd.setSearchPath(binPath);
 		IMOperation imOperation = new IMOperation();
 		imOperation.addImage();
 		imOperation.resize(200, 150);
 		imOperation.addImage();
 		for (String srcImage : pImageNames) {
-			String dstImage = srcImage.substring(0, srcImage.lastIndexOf('.') - 1) + "_small.jpg";
+			String dstImage = srcImage.substring(0, srcImage.lastIndexOf('.') - 1)
+					+ "_small.jpg";
 			try {
 				System.err.println(String.format("Resized image: '%s'", dstImage));
 				cmd.run(imOperation, srcImage, dstImage);
 			} catch (IOException | InterruptedException ex) {
 				ex.printStackTrace();
-        throw ex;
+				throw ex;
 			} catch (IM4JavaException ex) {
-        System.err.println("Exception (ignored): " + ex.getClass());
+				System.err.println("Exception (ignored): " + ex.getClass());
 				ex.printStackTrace();
 			}
 		}
@@ -254,11 +258,15 @@ public class BaseTest {
 	// ImageMagick Compare Method
 	public void compareImagesWithImageMagick(String expected, String actual,
 			String difference) throws Exception {
+
+		String binPath = Advapi32Util.registryGetStringValue(WinReg.HKEY_LOCAL_MACHINE,
+				"SOFTWARE\\ImageMagick\\Current", "BinPath");
+		System.err.println("Registry binpath: " + binPath);
 		ProcessStarter
-				.setGlobalSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
+				.setGlobalSearchPath(binPath);
 
 		CompareCmd compare = new CompareCmd();
-		compare.setSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
+		compare.setSearchPath(binPath);
 
 		// fix java.lang.NullPointerExceptionTests
 		// compare.setErrorConsumer(StandardStream.STDERR);
