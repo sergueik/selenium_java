@@ -19,6 +19,7 @@
     <selenium.version>3.0.1</selenium.version>
     <selenium-firefox-driver.version>3.0.1</selenium-firefox-driver.version>
     <testng.version>6.9.10</testng.version>
+    <jna-platform.version>4.4.0</jna-platform.version>
   </properties>
   <dependencies>
     <dependency>
@@ -32,6 +33,11 @@
     <dependency>
       <groupId>org.im4java</groupId>
       <artifactId>im4java</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
+      <version>${jna-platform.version}</version>
     </dependency>
     <dependency>
       <groupId>ru.yandex.qatools.ashot</groupId>

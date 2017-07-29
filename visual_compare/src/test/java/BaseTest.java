@@ -1,6 +1,6 @@
 import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
-
+import org.im4java.core.CommandException;
 import org.im4java.core.CompareCmd;
 import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
@@ -27,9 +27,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-/**
- * Created by onurb on 06-Feb-17.
- */
+import com.sun.jna.platform.win32.WinReg;
+import com.sun.jna.platform.win32.Advapi32Util;
+
 public class BaseTest {
 
 	public WebDriver driver;
@@ -229,78 +229,75 @@ public class BaseTest {
 		differenceFileForParent = new File(parentDifferencesLocation + diff);
 	}
 
-	public void resizeImagesWithImageMagick(String... pImageNames) {
-		// create command
+	public void resizeImagesWithImageMagick(String... pImageNames) throws Exception {
 		ConvertCmd cmd = new ConvertCmd();
-		// cmd.setSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
-		cmd.setSearchPath("c:\\tools\\imagemagick");
-
-		// create the operation, add images and operators/options
-		IMOperation op = new IMOperation();
-		op.addImage();
-		op.resize(200, 150);
-		op.addImage();
+		cmd.setSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
+		IMOperation imOperation = new IMOperation();
+		imOperation.addImage();
+		imOperation.resize(200, 150);
+		imOperation.addImage();
 		for (String srcImage : pImageNames) {
-			int lastDot = srcImage.lastIndexOf('.');
-			String dstImage = srcImage.substring(0, lastDot - 1) + "_small.jpg";
+			String dstImage = srcImage.substring(0, srcImage.lastIndexOf('.') - 1) + "_small.jpg";
 			try {
-				// System.err.println(String.format("Resize: '%s'", dstImage));
-				cmd.run(op, srcImage, dstImage);
-				// NOTE: download static
-				// org.im4java.core.CommandException: org.im4java.core.CommandException:
-				// convert.exe: RegistryKeyLookupFailed `CoderModulesPath' @
-				// error/module.c/GetMagickModulePath/657.
-			} catch (IOException | InterruptedException e) {
-				e.printStackTrace();
-			} catch (IM4JavaException e) {
-				e.printStackTrace();
+				System.err.println(String.format("Resized image: '%s'", dstImage));
+				cmd.run(imOperation, srcImage, dstImage);
+			} catch (IOException | InterruptedException ex) {
+				ex.printStackTrace();
+        throw ex;
+			} catch (IM4JavaException ex) {
+        System.err.println("Exception (ignored): " + ex.getClass());
+				ex.printStackTrace();
 			}
 		}
 	}
 
 	// ImageMagick Compare Method
-	// TODO: currently not working
 	public void compareImagesWithImageMagick(String expected, String actual,
 			String difference) throws Exception {
-
-		ProcessStarter.setGlobalSearchPath("c:\\tools\\imagemagick");
+		ProcessStarter
+				.setGlobalSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
 
 		CompareCmd compare = new CompareCmd();
-		compare.setSearchPath("c:\\tools\\imagemagick");
+		compare.setSearchPath("C:\\Program Files\\ImageMagick-7.0.6-Q16");
 
-		compare.setErrorConsumer(StandardStream.STDERR);
+		// fix java.lang.NullPointerExceptionTests
+		// compare.setErrorConsumer(StandardStream.STDERR);
 
-		IMOperation cmpOp = new IMOperation();
-		cmpOp.fuzz(5.0);
+		IMOperation imOperation = new IMOperation();
+		imOperation.fuzz(5.0);
 
 		// The special "-metric" setting of 'AE' (short for "Absolute Error" count),
 		// will report (to standard error),
 		// a count of the actual number of pixels that were masked, at the current
 		// fuzz factor.
-		cmpOp.metric("AE");
+		imOperation.metric("AE");
 
 		// Add the expected image
-		cmpOp.addImage(expected);
+		imOperation.addImage(expected);
 
 		// Add the actual image
-		cmpOp.addImage(actual);
+		imOperation.addImage(actual);
 
 		// This stores the difference
-		cmpOp.addImage(difference);
+		imOperation.addImage(difference);
 
+		String script = "myscript";
 		try {
-			// Do the compare
-			// TODO: show the actual compare command
 			System.out.println("Comparison Started");
-			compare.run(cmpOp);
-			System.out.println("Comparison Finished!");
+			compare.createScript(script, imOperation);
+			System.out.println("Comparison Script written to " + script);
+			compare.run(imOperation);
+		} catch (CommandException ex) {
+			// ignore
+			System.err.println("Exception (ignored):" + ex.getClass());
+			System.err.print(ex);
 		} catch (Exception ex) {
-			System.out.print(ex);
-			System.out.println("Comparison Failed!");
-			// Put the difference image to the global differences folder
-			Files.copy(differenceImageFile, differenceFileForParent);
+			System.err.println("Comparison Failed!");
+			System.err.print(ex);
 			throw ex;
 		}
+		// Put the difference image to the global differences folder
+		Files.copy(differenceImageFile, differenceFileForParent);
 	}
 
 	// Compare Operation
