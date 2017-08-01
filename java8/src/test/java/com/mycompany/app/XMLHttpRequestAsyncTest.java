@@ -59,14 +59,16 @@ public class XMLHttpRequestAsyncTest {
 
 		// Declare JavascriptExecutor
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-    int index  = 3;
-    selectDropdownByIndex(By.xpath("select[@id='country-list']"), index);
+    int contry_index  = 3;
+    selectDropdownByIndex(By.xpath("select[@id='country-list']"), contry_index);
+    sleep(1000);
 
 		// Injecting a XMLHttpRequest and waiting for the result
-		try {
-			response = (String )js.executeAsyncScript(
-      String.format(
-					"var callback = arguments[arguments.length - 1];\n"
+    // https://stackoverflow.com/questions/13452822/webdriver-executeasyncscript-vs-executescript
+    
+    String brokenScript = String.format(
+          "var index = arguments[arguments.length - 1]; \n"
+					+ "var callback = (arguments.length > 1 )? arguments[arguments.length - 2] : new function(data){alert(data); return data; };\n"
 			    +	"var http = new XMLHttpRequest();\n" 
 					+ "var url = 'get_state.php';\n"
 					+ "var params = 'country_id=%d';\n"
@@ -76,10 +78,30 @@ public class XMLHttpRequestAsyncTest {
 					+ "http.setRequestHeader('Connection', 'close');\n"
 					+ "http.onreadystatechange = function() {\n"
           + "    if (http.readyState == 4) {\n"
-          + "        callback(http.responseText);" + "    };\n" 
+          + "        callback(http.responseText);\n"
+          + "    };\n" 
           + "};\n"
           + "http.send(params);"
-          , index));
+          , contry_index);
+    
+    String inlineScript = String.format(
+					"var callback = (arguments.length > 0 )? arguments[arguments.length - 1] : new function(data){alert(data); return data; };\n"
+			    +	"var http = new XMLHttpRequest();\n" 
+					+ "var url = 'get_state.php';\n"
+					+ "var params = 'country_id=%d';\n"
+					+	"http.open('POST', url, true);\n"
+					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
+					+ "http.setRequestHeader('Content-length', params.length);\n"
+					+ "http.setRequestHeader('Connection', 'close');\n"
+					+ "http.onreadystatechange = function() {\n"
+          + "    if (http.readyState == 4) {\n"
+          + "        callback(http.responseText);\n"
+          + "    };\n" 
+          + "};\n"
+          + "http.send(params);"
+          , contry_index );
+		try {
+			response = (String ) js.executeAsyncScript( inlineScript );
 		} catch (UnhandledAlertException e) {
 			System.err.println("Error Occured!");
 		}
@@ -99,10 +121,16 @@ public class XMLHttpRequestAsyncTest {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
 
-		Pattern p = Pattern.compile(".*<option value=\"(\\d+)\">Picardie</option>.*", Pattern.CASE_INSENSITIVE);
-		Matcher m = p.matcher(response);
-		assertTrue(m.find());
-    sleep(100);
+		Pattern pattern = Pattern.compile(".*<option value=\"(\\d+)\">Picardie</option>.*", Pattern.CASE_INSENSITIVE);
+		Matcher matcher = pattern.matcher(response);
+		assertTrue(matcher.find());
+    int state_index = 0;
+		if (matcher.find()) {
+			state_index = Integer.parseInt(matcher.group(1).toString());
+			assertTrue(state_index > 0);
+		}
+    selectDropdownByIndex(By.xpath("//*[@id='state-list']"), state_index);
+    sleep(1000);
 	}
 
   // common code
@@ -233,6 +261,7 @@ public class XMLHttpRequestAsyncTest {
   public static void selectDropdownByIndex(By locator, int index) {
     try {
       Select select = new Select(driver.findElement(locator));
+      // no vidual cue
       select.selectByIndex(index);
     } catch (Exception e) {
       e.printStackTrace();
