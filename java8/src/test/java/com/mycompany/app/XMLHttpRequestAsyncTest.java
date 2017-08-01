@@ -1,7 +1,15 @@
 package com.mycompany.app;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
+// import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.endsWith;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.startsWith;
+
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
@@ -77,13 +85,13 @@ public class XMLHttpRequestAsyncTest {
 
 		// Injecting a XMLHttpRequest and waiting for the result
     // https://stackoverflow.com/questions/13452822/webdriver-executeasyncscript-vs-executescript
+    // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/JavascriptExecutor.html#executeAsyncScript-java.lang.String-java.lang.Object...-
     
-    String inlineScript_broken = String.format(
-          "var index = arguments[arguments.length - 1]; \n"
-					+ "var callback = (arguments.length > 1 )? arguments[arguments.length - 2] : new function(data){alert(data); return data; };\n"
+    String inlineScript = "var callback = arguments[arguments.length - 1];\n" 
+					+ "var option_index = (arguments.length > 1 )? arguments[arguments.length - 2]:1;\n"
 			    +	"var http = new XMLHttpRequest();\n" 
 					+ "var url = 'get_state.php';\n"
-					+ "var params = 'country_id=%d';\n"
+					+ "var params = 'country_id=' + option_index;\n"
 					+	"http.open('POST', url, true);\n"
 					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
 					+ "http.setRequestHeader('Content-length', params.length);\n"
@@ -93,39 +101,20 @@ public class XMLHttpRequestAsyncTest {
           + "        callback(http.responseText);\n"
           + "    };\n" 
           + "};\n"
-          + "http.send(params);"
-          , contry_index);
-    
-    String inlineScript = String.format(
-					"var callback = (arguments.length > 0 )? arguments[arguments.length - 1] : new function(data){alert(data);  /* not reached */ return data; };\n"
-			    +	"var http = new XMLHttpRequest();\n" 
-					+ "var url = 'get_state.php';\n"
-					+ "var params = 'country_id=%d';\n"
-					+	"http.open('POST', url, true);\n"
-					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
-					+ "http.setRequestHeader('Content-length', params.length);\n"
-					+ "http.setRequestHeader('Connection', 'close');\n"
-					+ "http.onreadystatechange = function() {\n"
-          + "    if (http.readyState == 4) {\n"
-          + "        callback(http.responseText);\n"
-          + "    };\n" 
-          + "};\n"
-          + "http.send(params);"
-          , contry_index );
-		try {
-			response = (String ) js.executeAsyncScript( inlineScript );
+          + "http.send(params);";
+ 		try {
+			response = (String ) js.executeAsyncScript( inlineScript , contry_index );
 		} catch (UnhandledAlertException e) {
-			System.err.println("Error Occured!");
+			System.err.println("Error executing XMLHttpRequest");
 		}
 
-		// Assert that returned cities are related with USA
+		// Assert that returned cities are related with chosen country
 		System.out.println(response);
-    //  response = response.replace("\n", "");
-		assertThat(response,
-				containsString("<option value=\"13\">Picardie</option>"));
-        // evaluate !
         
+		assertThat(response,
+				org.hamcrest.CoreMatchers.containsString("<option value=\"13\">Picardie</option>"));
 		try {
+			
 			// https://stackoverflow.com/questions/8923398/regex-doesnt-work-in-string-matches
 			assertTrue(
 					response.replace("\n", "").matches(".*<option value=\"\\d+\">Picardie</option>.*"));
@@ -134,20 +123,24 @@ public class XMLHttpRequestAsyncTest {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
 
-		Pattern pattern = Pattern.compile(
-				".*<option value=\"(\\d+)\">Picardie</option>.*",
+		String stateName = "Picardie";
+		Pattern pattern = Pattern.compile(String
+				.format(".*<option value=\"(\\d+)\">%s</option>.*", stateName),
 				Pattern.CASE_INSENSITIVE);
+		// ".*<option value=\"(\\d+)\">([^<>]+)</option>.*",
 		Matcher matcher = pattern.matcher(response);
-		int state_index = 0;
+		int stateIndex = 0;
 		assertTrue(matcher.find());
-		state_index = Integer.parseInt(matcher.group(1).toString());
-		assertTrue(state_index > 0);
-		System.err.println("Selected state index: " + state_index);
+		stateIndex = Integer.parseInt(matcher.group(1).toString());
+		// stateName = matcher.group(2).toString();
+		assertTrue(stateIndex > 0);
+		assertThat(stateName, notNullValue());
+		System.err.println("Selected state index: " + stateIndex);
 		WebElement stateListElement = driver
 				.findElement(By.xpath("//select[@id='state-list']"));
 		try {
 			Select select = new Select(stateListElement);
-			select.selectByVisibleText("Picardie");
+			select.selectByVisibleText(stateName);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
