@@ -16,6 +16,7 @@ import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.UnhandledAlertException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -59,14 +60,25 @@ public class XMLHttpRequestAsyncTest {
 
 		// Declare JavascriptExecutor
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-    int contry_index  = 3;
-    selectDropdownByIndex(By.xpath("select[@id='country-list']"), contry_index);
-    sleep(1000);
+    int contry_index = 3;
+    WebElement countryListElement = driver
+				.findElement(By.xpath("//select[@id='country-list']"));
+    try {
+      Select select = new Select(countryListElement);
+      select.selectByIndex(contry_index);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    // selectDropdownByIndex(By.xpath("//select[@id='country-list']"), contry_index);
+    // driver.findElement(By.xpath("//select[@id='country-list']")).click();
+    countryListElement.click();
+    sleep(100);
 
 		// Injecting a XMLHttpRequest and waiting for the result
     // https://stackoverflow.com/questions/13452822/webdriver-executeasyncscript-vs-executescript
     
-    String brokenScript = String.format(
+    String inlineScript_broken = String.format(
           "var index = arguments[arguments.length - 1]; \n"
 					+ "var callback = (arguments.length > 1 )? arguments[arguments.length - 2] : new function(data){alert(data); return data; };\n"
 			    +	"var http = new XMLHttpRequest();\n" 
@@ -85,7 +97,7 @@ public class XMLHttpRequestAsyncTest {
           , contry_index);
     
     String inlineScript = String.format(
-					"var callback = (arguments.length > 0 )? arguments[arguments.length - 1] : new function(data){alert(data); return data; };\n"
+					"var callback = (arguments.length > 0 )? arguments[arguments.length - 1] : new function(data){alert(data);  /* not reached */ return data; };\n"
 			    +	"var http = new XMLHttpRequest();\n" 
 					+ "var url = 'get_state.php';\n"
 					+ "var params = 'country_id=%d';\n"
@@ -108,6 +120,7 @@ public class XMLHttpRequestAsyncTest {
 
 		// Assert that returned cities are related with USA
 		System.out.println(response);
+    //  response = response.replace("\n", "");
 		assertThat(response,
 				containsString("<option value=\"13\">Picardie</option>"));
         // evaluate !
@@ -115,22 +128,31 @@ public class XMLHttpRequestAsyncTest {
 		try {
 			// https://stackoverflow.com/questions/8923398/regex-doesnt-work-in-string-matches
 			assertTrue(
-					response.matches(".*<option value=\"\\d+\">Picardie</option>.*"));
+					response.replace("\n", "").matches(".*<option value=\"\\d+\">Picardie</option>.*"));
 
 		} catch (AssertionError e) {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
 
-		Pattern pattern = Pattern.compile(".*<option value=\"(\\d+)\">Picardie</option>.*", Pattern.CASE_INSENSITIVE);
+		Pattern pattern = Pattern.compile(
+				".*<option value=\"(\\d+)\">Picardie</option>.*",
+				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(response);
+		int state_index = 0;
 		assertTrue(matcher.find());
-    int state_index = 0;
-		if (matcher.find()) {
-			state_index = Integer.parseInt(matcher.group(1).toString());
-			assertTrue(state_index > 0);
+		state_index = Integer.parseInt(matcher.group(1).toString());
+		assertTrue(state_index > 0);
+		System.err.println("Selected state index: " + state_index);
+		WebElement stateListElement = driver
+				.findElement(By.xpath("//select[@id='state-list']"));
+		try {
+			Select select = new Select(stateListElement);
+			select.selectByVisibleText("Picardie");
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-    selectDropdownByIndex(By.xpath("//*[@id='state-list']"), state_index);
-    sleep(1000);
+		stateListElement.click();
+		sleep(100);
 	}
 
   // common code
@@ -261,10 +283,19 @@ public class XMLHttpRequestAsyncTest {
   public static void selectDropdownByIndex(By locator, int index) {
     try {
       Select select = new Select(driver.findElement(locator));
-      // no vidual cue
       select.selectByIndex(index);
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
+
+	public static void selectDropdownByVisibleText(By locator, String text) {
+		try {
+			Select select = new Select(driver.findElement(locator));
+			select.selectByVisibleText(text);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 }
