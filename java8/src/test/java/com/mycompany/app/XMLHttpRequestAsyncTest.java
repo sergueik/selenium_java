@@ -52,6 +52,7 @@ public class XMLHttpRequestAsyncTest {
 	private static WebDriver driver;
 	private WebDriverWait wait;
 	private static Actions actions;
+	private static JavascriptExecutor js;
 	private int flexibleWait = 5;
 	private long pollingInterval = 500;
 	private static final StringBuffer verificationErrors = new StringBuffer();
@@ -60,25 +61,21 @@ public class XMLHttpRequestAsyncTest {
 	private static String baseURL = "http://phppot.com/demo/jquery-dependent-dropdown-list-countries-and-states/";
   
 	@Test
-	public void sendXMLHTTPRequestTest() {
+	public void sendXMLHTTPRequestArgTest() {
+		// Arrange
 		String response = null;
 
-		// Set ScriptTimeout
-		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
-
-		// Declare JavascriptExecutor
-		JavascriptExecutor js = (JavascriptExecutor) driver;
-    int contry_index = 3;
+    int country_index= 3;
     WebElement countryListElement = driver
 				.findElement(By.xpath("//select[@id='country-list']"));
     try {
       Select select = new Select(countryListElement);
-      select.selectByIndex(contry_index);
+      select.selectByIndex(country_index);
     } catch (Exception e) {
       e.printStackTrace();
     }
     
-    // selectDropdownByIndex(By.xpath("//select[@id='country-list']"), contry_index);
+    // selectDropdownByIndex(By.xpath("//select[@id='country-list']"), country_index);
     // driver.findElement(By.xpath("//select[@id='country-list']")).click();
     countryListElement.click();
     sleep(100);
@@ -103,11 +100,183 @@ public class XMLHttpRequestAsyncTest {
           + "};\n"
           + "http.send(params);";
  		try {
-			response = (String ) js.executeAsyncScript( inlineScript , contry_index );
+			response = (String ) js.executeAsyncScript( inlineScript , country_index);
 		} catch (UnhandledAlertException e) {
 			System.err.println("Error executing XMLHttpRequest");
 		}
+		System.out.println("sendXMLHTTPRequestArgTest response: "+ response);
 
+		// Assert that returned cities are related with chosen country
+        
+		// Assert
+		assertThat(response,
+				org.hamcrest.CoreMatchers.containsString("<option value=\"13\">Picardie</option>"));
+		try {
+			
+			// https://stackoverflow.com/questions/8923398/regex-doesnt-work-in-string-matches
+			assertTrue(
+					response.replace("\n", "").matches(".*<option value=\"\\d+\">Picardie</option>.*"));
+
+		} catch (AssertionError e) {
+			System.err.println("Exception (ignored) " + e.toString());
+		}
+
+		String stateName = "Picardie";
+		Pattern pattern = Pattern.compile(String
+				.format(".*<option value=\"(\\d+)\">%s</option>.*", stateName),
+				Pattern.CASE_INSENSITIVE);
+		// ".*<option value=\"(\\d+)\">([^<>]+)</option>.*",
+		Matcher matcher = pattern.matcher(response);
+		int stateIndex = 0;
+		assertTrue(matcher.find());
+		stateIndex = Integer.parseInt(matcher.group(1).toString());
+		// stateName = matcher.group(2).toString();
+		assertTrue(stateIndex > 0);
+		assertThat(stateName, notNullValue());
+		System.err.println("Selected state index: " + stateIndex);
+		WebElement stateListElement = driver
+				.findElement(By.xpath("//select[@id='state-list']"));
+		try {
+			Select select = new Select(stateListElement);
+			select.selectByVisibleText(stateName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		stateListElement.click();
+		sleep(100);
+	}
+
+	@Test
+	public void sendXMLHTTPRequestJSONArgTest() {
+		String response = null;
+
+    int country_index = 3;
+    WebElement countryListElement = driver
+				.findElement(By.xpath("//select[@id='country-list']"));
+    try {
+      Select select = new Select(countryListElement);
+      select.selectByIndex(country_index);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    // selectDropdownByIndex(By.xpath("//select[@id='country-list']"), country_index);
+    // driver.findElement(By.xpath("//select[@id='country-list']")).click();
+    countryListElement.click();
+    sleep(100);
+
+		// Injecting a XMLHttpRequest, passing JSON object with the data and waiting for the result    
+    String inlineScript = "var callback = arguments[arguments.length - 1];\n" 
+					+ "var option_data = (arguments.length > 1 )? arguments[arguments.length - 2]:'{\"option_name\": \"country_id\", \"option_index\": 3}';\n"
+          + "var obj = JSON.parse(option_data);\n"
+			    +	"var http = new XMLHttpRequest();\n" 
+					+ "var url = 'get_state.php';\n"
+					+ "var params = obj.option_name + ' = ' + obj.option_index;\n"
+					+	"http.open('POST', url, true);\n"
+					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
+					+ "http.setRequestHeader('Content-length', params.length);\n"
+					+ "http.setRequestHeader('Connection', 'close');\n"
+					+ "http.onreadystatechange = function() {\n"
+          + "    if (http.readyState == 4) {\n"
+          + "        callback(http.responseText);\n"
+          + "    };\n" 
+          + "};\n"
+          + "http.send(params);";
+ 		try {
+    String args = String.format("{\"option_name\": \"%s\", \"option_index\": %d}", "country_id",  country_index ) ;
+		System.out.println("sendXMLHTTPRequestJSONArgTest script: " + inlineScript);
+		System.out.println("sendXMLHTTPRequestJSONArgTest args: " + args);
+    response = (String ) js.executeAsyncScript( inlineScript , args);
+		} catch (UnhandledAlertException e) {
+			System.err.println("Error executing XMLHttpRequest");
+		}
+		System.out.println("sendXMLHTTPRequestJSONArgTest response: "+ response);
+
+		// Assert
+		// Assert that returned cities are related with chosen country
+        
+		try {			
+			// https://stackoverflow.com/questions/8923398/regex-doesnt-work-in-string-matches
+			assertTrue(
+					response.replace("\n", "").matches(".*<option value=\"\\d+\">Picardie</option>.*"));
+
+		} catch (AssertionError e) {
+			System.err.println("Exception (ignored) " + e.toString());
+		}
+
+		String stateName = "Picardie";
+		Pattern pattern = Pattern.compile(String
+				.format(".*<option value=\"(\\d+)\">%s</option>.*", stateName),
+				Pattern.CASE_INSENSITIVE);
+		// ".*<option value=\"(\\d+)\">([^<>]+)</option>.*",
+		Matcher matcher = pattern.matcher(response);
+		int stateIndex = 0;
+		assertTrue(matcher.find());
+		stateIndex = Integer.parseInt(matcher.group(1).toString());
+		// stateName = matcher.group(2).toString();
+		assertTrue(stateIndex > 0);
+		assertThat(stateName, notNullValue());
+		System.err.println("Selected state index: " + stateIndex);
+		WebElement stateListElement = driver
+				.findElement(By.xpath("//select[@id='state-list']"));
+		try {
+			Select select = new Select(stateListElement);
+			select.selectByVisibleText(stateName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		stateListElement.click();
+		sleep(100);
+	}
+
+	@Test
+	public void sendXMLHTTPRequestJSONArgSavedTest() {
+		String response = null;
+
+		// Set ScriptTimeout
+		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
+
+		// Declare JavascriptExecutor
+		JavascriptExecutor js = (JavascriptExecutor) driver;
+    int country_index = 3;
+    WebElement countryListElement = driver
+				.findElement(By.xpath("//select[@id='country-list']"));
+    try {
+      Select select = new Select(countryListElement);
+      select.selectByIndex(country_index);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    countryListElement.click();
+    sleep(100);
+    
+    String inlineScript = "var callback = arguments[arguments.length - 1];\n" 
+					+ "var option_data = (arguments.length > 1 )? arguments[arguments.length - 2]:'{\"option_name\": \"country_id\", \"option_index\": 3}';\n"
+          + "var obj = JSON.parse(option_data);\n"
+			    +	"var http = new XMLHttpRequest();\n" 
+					+ "var url = 'get_state.php';\n"
+					+ "var params = obj.option_name + '=' + obj.option_index;\n"
+					+	"http.open('POST', url, true);\n"
+					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
+					+ "http.setRequestHeader('Content-length', params.length);\n"
+					+ "http.setRequestHeader('Connection', 'close');\n"
+					+ "http.onreadystatechange = function() {\n"
+          + "    if (http.readyState == 4) {\n"
+          + "        callback(http.responseText);\n"
+          + "    };\n" 
+          + "};\n"
+          + "http.send(params);";
+ 		try {
+		System.out.println("sendXMLHTTPRequestJSONArgSavedTest script: " + inlineScript);
+		System.out.println("sendXMLHTTPRequestJSONArgSavedTest args: " + String.format("{\"option_name\": \"%s\", \"option_index\": %d}", "country_id",  country_index) );
+    response = (String ) js.executeAsyncScript( inlineScript , String.format("{\"option_name\": \"%s\", \"option_index\": %d}", "country_id",  country_index) );
+		} catch (UnhandledAlertException e) {
+			System.err.println("Error executing XMLHttpRequest");
+		}
+		System.out.println("sendXMLHTTPRequestSavedTest response: " + response);
+
+    // Assert
 		// Assert that returned cities are related with chosen country
 		System.out.println(response);
         
@@ -147,6 +316,7 @@ public class XMLHttpRequestAsyncTest {
 		stateListElement.click();
 		sleep(100);
 	}
+
 
   // common code
 	@BeforeSuite
@@ -231,10 +401,12 @@ public class XMLHttpRequestAsyncTest {
 				"c:/java/selenium/chromedriver.exe");
 		driver = new ChromeDriver();
 		*/
-		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
+		// Declare JavascriptExecutor
+		js = (JavascriptExecutor) driver;
 	}
 
 	@AfterSuite
