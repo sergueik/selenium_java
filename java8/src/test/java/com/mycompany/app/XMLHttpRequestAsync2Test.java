@@ -47,7 +47,7 @@ import org.testng.annotations.Test;
 //Ref1: https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/JavascriptExecutor.html
 //Ref2: http://www.openjs.com/articles/ajax_xmlhttp_using_post.php
 
-public class XMLHttpRequestAsyncTest {
+public class XMLHttpRequestAsync2Test {
 
 	private static WebDriver driver;
 	private WebDriverWait wait;
@@ -76,7 +76,7 @@ public class XMLHttpRequestAsyncTest {
     }
     
     countryListElement.click();
-    sleep(1000);
+    sleep(100);
 
 		// Injecting a XMLHttpRequest and waiting for the result
     // https://stackoverflow.com/questions/13452822/webdriver-executeasyncscript-vs-executescript
@@ -141,11 +141,11 @@ public class XMLHttpRequestAsyncTest {
 			e.printStackTrace();
 		}
 		stateListElement.click();
-		sleep(1000);
+		sleep(100);
 	}
 
-  @Test(enabled = true)
-	public void sendJSONArgTest3() {
+  @Test(enabled = false)
+	public void sendJSONArgTest2() {
 		String response = null;
     int country_index = 3;
     WebElement countryListElement = driver
@@ -158,7 +158,7 @@ public class XMLHttpRequestAsyncTest {
     }
     
     countryListElement.click();
-    sleep(1000);
+    sleep(100);
     
     String inlineScript = "var callback = arguments[arguments.length - 1];\n" 
 					+ "var option_data = (arguments.length > 1 )? arguments[arguments.length - 2]:'{\"option_name\": \"country_id\", \"option_index\": 3}';\n"
@@ -176,6 +176,18 @@ public class XMLHttpRequestAsyncTest {
           + "    };\n" 
           + "};\n"
           + "http.send(params);";
+		try {
+			System.out.println("sendJSONArgTest script: " + inlineScript);
+			System.out.println("sendJSONArgTest args: "
+					+ String.format("{\"option_name\": \"%s\", \"option_index\": %d}",
+							"country_id", country_index));
+			response = (String) js.executeAsyncScript(inlineScript,
+					String.format("{\"option_name\": \"%s\", \"option_index\": %d}",
+							"country_id", country_index));
+} catch (UnhandledAlertException e) {
+			System.err.println("Error executing XMLHttpRequest");
+		}
+		System.out.println("sendJSONArgTest response: " + response);
 
 		// Assert
 		assertThat(response, org.hamcrest.CoreMatchers
@@ -212,13 +224,12 @@ public class XMLHttpRequestAsyncTest {
 			e.printStackTrace();
 		}
 		stateListElement.click();
-		sleep(1000);
+		sleep(100);
 	}
 
-  @Test(enabled = true )
-	public void sendJSONArgTest4() {
+  @Test(enabled = false)
+	public void sendJSONArgTest3() {
 		String response = null;
-
     int country_index = 3;
     WebElement countryListElement = driver
 				.findElement(By.xpath("//select[@id='country-list']"));
@@ -230,15 +241,14 @@ public class XMLHttpRequestAsyncTest {
     }
     
     countryListElement.click();
-    sleep(1000);
-
-		// Injecting a XMLHttpRequest, passing JSON object with the data and waiting for the result    
+    sleep(100);
+    
     String inlineScript = "var callback = arguments[arguments.length - 1];\n" 
 					+ "var option_data = (arguments.length > 1 )? arguments[arguments.length - 2]:'{\"option_name\": \"country_id\", \"option_index\": 3}';\n"
           + "var obj = JSON.parse(option_data);\n"
 			    +	"var http = new XMLHttpRequest();\n" 
 					+ "var url = 'get_state.php';\n"
-					+ "var params = obj.option_name + ' = ' + obj.option_index;\n"
+					+ "var params = obj.option_name + '=' + obj.option_index;\n"
 					+	"http.open('POST', url, true);\n"
 					+ "http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');\n"
 					+ "http.setRequestHeader('Content-length', params.length);\n"
@@ -249,7 +259,7 @@ public class XMLHttpRequestAsyncTest {
           + "    };\n" 
           + "};\n"
           + "http.send(params);";
-      /*
+		try {
 			System.out.println("sendJSONArgTest script: " + inlineScript);
 			System.out.println("sendJSONArgTest args: "
 					+ String.format("{\"option_name\": \"%s\", \"option_index\": %d}",
@@ -257,17 +267,7 @@ public class XMLHttpRequestAsyncTest {
 			response = (String) js.executeAsyncScript(inlineScript,
 					String.format("{\"option_name\": \"%s\", \"option_index\": %d}",
 							"country_id", country_index));
-      */
-
-		try {
-			String jsonArgs = String.format(
-					"{\"option_name\": \"%s\", \"option_index\": %d}", "country_id",
-					country_index);
-			System.out.println("sendJSONArgTest script: " + inlineScript);
-			System.out.println("sendJSONArgTest args: " + jsonArgs);
-      // error is likely here
-			response = (String) js.executeAsyncScript(inlineScript, jsonArgs);
-    } catch (UnhandledAlertException e) {
+} catch (UnhandledAlertException e) {
 			System.err.println("Error executing XMLHttpRequest");
 		}
 		System.out.println("sendJSONArgTest response: " + response);
@@ -276,6 +276,7 @@ public class XMLHttpRequestAsyncTest {
 		assertThat(response, org.hamcrest.CoreMatchers
 				.containsString("<option value=\"13\">Picardie</option>"));
 		try {
+
 			// https://stackoverflow.com/questions/8923398/regex-doesnt-work-in-string-matches
 			assertTrue(response.replace("\n", "")
 					.matches(".*<option value=\"\\d+\">Picardie</option>.*"));
@@ -306,7 +307,7 @@ public class XMLHttpRequestAsyncTest {
 			e.printStackTrace();
 		}
 		stateListElement.click();
-		sleep(1000);
+		sleep(100);
 	}
 
   // common code
@@ -392,7 +393,7 @@ public class XMLHttpRequestAsyncTest {
 				"c:/java/selenium/chromedriver.exe");
 		driver = new ChromeDriver();
 		*/
-		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
+		driver.manage().timeouts().setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		actions = new Actions(driver);
