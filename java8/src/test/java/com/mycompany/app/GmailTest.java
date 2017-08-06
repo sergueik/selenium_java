@@ -61,10 +61,11 @@ public class GmailTest {
 	private By passwordNextButton = By
 			.xpath("//*[@id='passwordNext']/content/span[contains(text(),'Next')]");
 	private By profileImage = By.xpath(
-			"//a[contains(@href,'https://accounts.google.com/SignOutOptions')]"); 
-      // By.xpath("//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span");
-	private By signOutButton = By.xpath("//div[@aria-label='Account Information']//a[contains(text(), 'Sign out')][contains(@href, 'https://accounts.google.com/Logout?')]");
-  // By.xpath(".//*[@id='gb_71']")
+			"//a[contains(@href,'https://accounts.google.com/SignOutOptions')]");
+	// By.xpath("//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span");
+	private By signOutButton = By.xpath(
+			"//div[@aria-label='Account Information']//a[contains(text(), 'Sign out')][contains(@href, 'https://accounts.google.com/Logout?')]");
+	// By.xpath(".//*[@id='gb_71']")
 
 	@SuppressWarnings("deprecation")
 	@BeforeSuite
@@ -203,7 +204,7 @@ public class GmailTest {
 		assertTrue(errMsg.size() > 0);
 	}
 
-	@Test(priority = 3, enabled = true)
+	@Test(priority = 3, enabled = false)
 	public void loginTest() throws InterruptedException, IOException {
 
 		// Click on Sign in Link
@@ -282,6 +283,115 @@ public class GmailTest {
 					+ ex.getStackTrace().toString());
 			return;
 		}
+	}
+
+	@Test(priority = 4, enabled = true)
+	public void loginAfterTest() throws InterruptedException, IOException {
+
+		// Click on Sign in Link
+		driver.findElement(signInLink).click();
+
+		// Wait and track the for page url to change
+		ExpectedCondition<Boolean> urlChange = driver -> driver.getCurrentUrl()
+				.matches("^https://accounts.google.com/signin.*");
+		wait.until(urlChange);
+
+		// Enter the email id
+		enterData(identifier, "automationnewuser24@gmail.com");
+
+		// click on next button
+		clickNextButton(identifierNextButton);
+
+    		// Enter the password
+		enterData(passwordInput, "automationnewuser2410");
+
+		// Click on next button
+		clickNextButton(passwordNextButton);
+
+		// Wait and track the for page url to change
+		urlChange = driver -> {
+			String url = driver.getCurrentUrl();
+			System.err.println("The url is: " + url);
+			return (Boolean) url.matches("^https://mail.google.com/mail.*");
+		};
+		wait.until(urlChange);
+
+		// Click on profile image
+		wait.until((WebDriver driver) -> {
+			WebElement element = null;
+			try {
+				element = driver.findElement(profileImage);
+			} catch (Exception e) {
+				return null;
+			}
+			return (element.isDisplayed()) ? element : null;
+		}).click();
+
+		// Sign out
+		highlight(driver.findElement(signOutButton), 100);
+		driver.findElement(signOutButton).click();
+
+		try {
+			alert = driver.switchTo().alert();
+			alert.accept();
+		} catch (NoAlertPresentException ex) {
+			// Alert not present
+			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
+		} catch (WebDriverException ex) {
+			System.err.println("Alert was not handled by PhantomJS: "
+					+ ex.getStackTrace().toString());
+		}
+
+		// Wait and track the for page url to change
+		urlChange = driver -> driver.getCurrentUrl()
+				.matches("^https://accounts.google.com/signin.*");
+		wait.until(urlChange);
+		// Click on Choose user Link
+		sleep(100);
+		/*
+		List<WebElement> x = driver.findElements(By.cssSelector("svg"));
+		for (WebElement y : x) {      
+		  System.err.println(y.getAttribute("outerHTML"));
+		}
+		*/
+		WebElement svgSelector =
+		// driver.findElement(By.cssSelector("div[role='button'] svg")).findElement(By.xpath(".."));
+		driver.findElements(By.cssSelector("div[role='button'] svg[width='24px']")).get(0).findElement(By.xpath(".."));
+		// System.err.println(svgSelector.findElement(By.xpath("..")).findElement(By.xpath("..")).findElement(By.xpath("..")).findElement(By.xpath("..")).findElement(By.xpath("..")).findElement(By.xpath("..")).getAttribute("outerHTML"));
+		/*
+		<?xml version="1.0"?>
+		<div>
+		<h1 class="sfYUmb" data-a11y-title-piece="" id="headingText" jsname="z6sL2b">Hi auto</h1>
+		<div class="FgbZLd r5i3od">
+		<img jsname="XpilHb" alt="" src="https://lh3.googleusercontent.com/-wFVXorRrucg/AAAAAAAAAAI/AAAAAAAAAAA/AMp5VUqt1um4XARGfeTINdbjBR3yAa_CpQ/mo/photo.jpg?sz=64" class="iarmfc"/>
+		<div id="profileIdentifier" class="RRP0oc ilEhd" data-a11y-title-piece="">automationnewuser24@gmail.com</div>
+		<div jscontroller="hgUmTc" jsaction="JIbuQc:BV9TTc(af8ijd)">
+		  <div role="button" class="mUbCce fKz7Od YYBxpf KEavsb" jscontroller="VXdfxd" jsaction="click:cOuCgd; mousedown:UX7yZ; mouseup:lbsD7e; mouseenter:tfO1Yc; mouseleave:JywGue;touchstart:p6p2H; touchmove:FwuNnf; touchend:yfqBxc(preventMouseEvents=true|preventDefault=true); touchcancel:JMtRjd;focus:AHmuwe; blur:O22p3e; contextmenu:mg9Pef;" jsshadow="" jsname="af8ijd" aria-label="Switch account" aria-disabled="false" tabindex="0">
+		    <div class="VTBa7b MbhUzd" jsname="ksKsZd"/>
+		    <content class="xjKiLb">
+		      <span style="top: -12px">
+		        <span>
+		          <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" width="24px" height="24px" viewBox="0 0 24 24" fill="#000000">
+		            <path d="M7.41 7.84L12 12.42l4.59-4.58L18 9.25l-6 6-6-6z"/>
+		            <path d="M0-.75h24v24H0z" fill="none"/>
+		          </svg>
+		        </span>
+		      </span>
+		    </content>
+		  </div>
+		</div>
+		</div>
+		</div>
+		
+		*/
+		highlight(svgSelector, 100);
+		svgSelector.click();
+		// Wait and track the for page url to change
+		urlChange = driver -> driver.getCurrentUrl()
+				.matches("^https://accounts.google.com/ServiceLogin/signinchooser.*");
+		wait.until(urlChange);
+
+		sleep(1000);
 	}
 
 	private void clickNextButton(By locator) {
