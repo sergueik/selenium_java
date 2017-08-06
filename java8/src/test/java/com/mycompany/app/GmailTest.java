@@ -3,7 +3,10 @@ package com.mycompany.app;
 import static org.testng.Assert.assertTrue;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.IOException;
+
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,10 +24,15 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -244,12 +252,23 @@ public class GmailTest {
 				"//*[@id='passwordNext']/content/span[contains(text(),'Next')]"));
 
 		// Wait and track the for page url to change
+    /*
 		urlChange = driver -> {
 			String url = driver.getCurrentUrl();
 			System.err.println("The url is: " + url);
 			return (Boolean) url.matches("^https://mail.google.com/mail.*");
 		};
 		wait.until(urlChange);
+     */
+
+     wait.until(new ExpectedCondition<Boolean>() {
+			public Boolean apply(WebDriver webDriver) {
+				System.out.println("Checking if mail page is loaded...");
+        // NOTE: in a realistic project this method will belong to the page object
+        // e.g. https://github.com/pawnu/SeleniumQA/blob/master/EcommerceProject/RunTest.java
+				return checkPage();
+			}
+		});
 
 		// Click on profile image
 		wait.until((WebDriver driver) -> {
@@ -264,6 +283,7 @@ public class GmailTest {
 		}).click();
 
 		// Sign out
+    highlight(driver.findElement(By.xpath(".//*[@id='gb_71']")),100); 
 		driver.findElement(By.xpath(".//*[@id='gb_71']")).click();
 
 		try {
@@ -278,10 +298,8 @@ public class GmailTest {
 					+ ex.getStackTrace().toString());
 			return;
 		}
-
-	}
-
-	private void clickNextButton(By locator) {
+  }
+  private void clickNextButton(By locator) {
 		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
@@ -293,7 +311,11 @@ public class GmailTest {
 		}).click();
 	}
 
-	private void enterPassword(By locator, String data) {
+  private Boolean checkPage() {
+    return driver.getCurrentUrl().matches("^https://mail.google.com/mail.*");
+  }
+
+  private void enterPassword(By locator, String data) {
 		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
@@ -328,4 +350,25 @@ public class GmailTest {
 		}
 	}
 
+  	private void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						"arguments[0].style.border='3px solid yellow'", element);
+			}
+			Thread.sleep(highlight_interval);
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver)
+						.executeScript("arguments[0].style.border=''", element);
+			}
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+	}
+  
 }
