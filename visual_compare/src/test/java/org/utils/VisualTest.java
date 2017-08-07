@@ -1,4 +1,16 @@
-import com.google.common.io.Files;
+package org.utils;
+
+import static org.testng.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import javax.imageio.ImageIO;
+
 import org.apache.commons.io.FileUtils;
 
 import org.im4java.core.CommandException;
@@ -7,40 +19,28 @@ import org.im4java.core.ConvertCmd;
 import org.im4java.core.IM4JavaException;
 import org.im4java.core.IMOperation;
 import org.im4java.process.ProcessStarter;
-import org.im4java.process.StandardStream;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.By;
+import org.openqa.selenium.Cookie;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
+
+import com.google.common.io.Files;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
 
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
-import java.lang.reflect.Method;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import com.sun.jna.platform.win32.WinReg;
-import com.sun.jna.platform.win32.Advapi32Util;
-
-public class BaseTest {
-
-	public WebDriver driver;
-	public WebDriverWait wait;
-	public Actions actions;
+public class VisualTest extends BaseTest {
 
 	public String testName;
 	public String testScreenShotDirectory;
-	public String url = "http://www.kariyer.net";
+	public String baseURL = "http://www.kariyer.net";
 	public String currentDir = System.getProperty("user.dir");
 	public String parentScreenShotsLocation = currentDir + "\\ScreenShots\\";
 
@@ -48,25 +48,35 @@ public class BaseTest {
 	public String parentDifferencesLocation = currentDir + "\\Differences\\";
 
 	// Element screenshot paths
-	public String baselineScreenShotPath;
-	public String actualScreenShotPath;
-	public String differenceScreenShotPath;
+	public String baselinePath;
+	public String screenshotPath;
+	public String differencePath;
 
 	public File baselineImageFile;
 	public File actualImageFile;
 	public File differenceImageFile;
 	public File differenceFileForParent;
 
+	private String imageMagickPath;
+
 	@BeforeClass
 	public void setupTestClass() throws IOException {
-		System.setProperty("webdriver.chrome.driver",
-				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
-		driver = new ChromeDriver();
-		driver.manage().window().maximize();
 
-		// Declare a 10 seconds wait time
-		wait = new WebDriverWait(driver, 10);
-		actions = new Actions(driver);
+		// Determine path to ImageMagick
+		imageMagickPath = Advapi32Util.registryGetStringValue(
+				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
+		System.err.println("ImageMagick path: " + imageMagickPath);
+
+		// Make sure the convert and compare are in the path
+		assertTrue(new File(imageMagickPath + "\\" + "convert.exe").exists(),
+				"\"convert.exe\" has to be present");
+		assertTrue(new File(imageMagickPath + "\\" + "compare.exe").exists(),
+				"\"compare.exe\" has to be present");
+
+		// setup WebDriver
+		super.setupTestClass();
+		// Go to URL
+		driver.get(baseURL);
 
 		// Create screenshot and differences folders if they are not exist
 		createFolder(parentScreenShotsLocation);
@@ -76,11 +86,9 @@ public class BaseTest {
 		File differencesFolder = new File(parentDifferencesLocation);
 		FileUtils.cleanDirectory(differencesFolder);
 
-		// Go to URL
-		driver.get(url);
-
 		// Add Cookie for top banner
 		addCookieforTopBanner();
+
 	}
 
 	@BeforeMethod
@@ -97,6 +105,65 @@ public class BaseTest {
 		declareScreenShotPaths(testName + "_Baseline.png", testName + "_Actual.png",
 				testName + "_Diff.png");
 	}
+
+	@Test
+	public void imageCompareTest() throws Exception {
+		// Handle popup
+		handlePopup(".ui-dialog-titlebar-close");
+
+		// Close banner
+		closeBanner();
+
+		WebElement uzmanPhotoSection = driver
+				.findElement(By.cssSelector(".item.uzman>a"));
+
+		// Unhide Text which is changing A lot
+		unhideElement(
+				"document.getElementsByClassName('count')[0].style.display='none';");
+
+		// Move To Operation
+		moveToElement(uzmanPhotoSection);
+
+		// Wait for 2 second for violet color animation
+		Thread.sleep(2000);
+
+		Screenshot screenShot = takeScreenshot(uzmanPhotoSection);
+
+		writeScreenshotToFolder(screenShot);
+
+		doComparison(screenShot);
+	}
+
+	@Test
+	public void imageResizeTest() throws Exception {
+		// Handle popup
+		handlePopup(".ui-dialog-titlebar-close");
+
+		// Close banner
+		closeBanner();
+
+		WebElement uzmanPhotoSection = driver
+				.findElement(By.cssSelector(".item.uzman>a"));
+
+		// Unhide Text which is changing A lot
+		unhideElement(
+				"document.getElementsByClassName('count')[0].style.display='none';");
+
+		// Move To Operation
+		moveToElement(uzmanPhotoSection);
+
+		// Wait for 2 second for violet color animation
+		Thread.sleep(2000);
+
+		Screenshot screenShot = takeScreenshot(uzmanPhotoSection);
+
+		writeScreenshotToFolder(screenShot);
+
+		// Resize
+		resizeImagesWithImageMagick(screenshotPath);
+	}
+
+	// utils
 
 	// Add Cookie to suppress top banner animation
 	public void addCookieforTopBanner() {
@@ -116,7 +183,6 @@ public class BaseTest {
 		driver.manage().addCookie(topBannerCloseCookie);
 	}
 
-	// Create Folder Method
 	public void createFolder(String path) {
 		File testDirectory = new File(path);
 		if (!testDirectory.exists()) {
@@ -161,7 +227,6 @@ public class BaseTest {
 	// Move to Operation
 	public void moveToElement(WebElement element) {
 		waitJS();
-
 		actions.moveToElement(element).build().perform();
 	}
 
@@ -178,7 +243,6 @@ public class BaseTest {
 		return elementScreenShot;
 	}
 
-	// Write
 	public void writeScreenshotToFolder(Screenshot screenshot)
 			throws IOException {
 		ImageIO.write(screenshot.getImage(), "PNG", actualImageFile);
@@ -188,14 +252,14 @@ public class BaseTest {
 	public void declareScreenShotPaths(String baseline, String actual,
 			String diff) {
 		// BaseLine, Actual, Difference Photo Paths
-		baselineScreenShotPath = testScreenShotDirectory + baseline;
-		actualScreenShotPath = testScreenShotDirectory + actual;
-		differenceScreenShotPath = testScreenShotDirectory + diff;
+		baselinePath = testScreenShotDirectory + baseline;
+		screenshotPath = testScreenShotDirectory + actual;
+		differencePath = testScreenShotDirectory + diff;
 
 		// BaseLine, Actual Photo Files
-		baselineImageFile = new File(baselineScreenShotPath);
-		actualImageFile = new File(actualScreenShotPath);
-		differenceImageFile = new File(differenceScreenShotPath);
+		baselineImageFile = new File(baselinePath);
+		actualImageFile = new File(screenshotPath);
+		differenceImageFile = new File(differencePath);
 
 		// For copying difference to the parent Difference Folder
 		differenceFileForParent = new File(parentDifferencesLocation + diff);
@@ -204,9 +268,7 @@ public class BaseTest {
 	public void resizeImagesWithImageMagick(String... pImageNames)
 			throws Exception {
 		ConvertCmd cmd = new ConvertCmd();
-		String binPath = Advapi32Util.registryGetStringValue(
-				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
-		cmd.setSearchPath(binPath);
+		cmd.setSearchPath(imageMagickPath);
 		IMOperation imOperation = new IMOperation();
 		imOperation.addImage();
 		imOperation.resize(200, 150);
@@ -231,13 +293,10 @@ public class BaseTest {
 	public void compareImagesWithImageMagick(String expected, String actual,
 			String difference) throws Exception {
 
-		String binPath = Advapi32Util.registryGetStringValue(
-				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
-		System.err.println("Registry binpath: " + binPath);
-		ProcessStarter.setGlobalSearchPath(binPath);
+		ProcessStarter.setGlobalSearchPath(imageMagickPath);
 
 		CompareCmd compare = new CompareCmd();
-		compare.setSearchPath(binPath);
+		compare.setSearchPath(imageMagickPath);
 
 		// fix java.lang.NullPointerExceptionTests
 		// compare.setErrorConsumer(StandardStream.STDERR);
@@ -286,21 +345,17 @@ public class BaseTest {
 			// Compare screenshot with baseline
 			System.out.println("Comparison method will be called!\n");
 
-			System.out.println("Baseline: " + baselineScreenShotPath + "\n"
-					+ "Actual: " + actualScreenShotPath + "\n" + "Diff: "
-					+ differenceScreenShotPath);
+			System.out.println("Baseline: " + baselinePath + "\n" + "Actual: "
+					+ screenshotPath + "\n" + "Diff: " + differencePath);
 
 			// Try to use IM4Java for comparison
-			compareImagesWithImageMagick(baselineScreenShotPath, actualScreenShotPath,
-					differenceScreenShotPath);
+			compareImagesWithImageMagick(baselinePath, screenshotPath,
+					differencePath);
 		} else {
 			System.out.println(
 					"BaselineScreenshot is not exist! We put it into test screenshot folder.\n");
 			// Put the screenshot to the specified folder
 			ImageIO.write(elementScreenShot.getImage(), "PNG", baselineImageFile);
-
-			// Try to use IM4Java to resize
-			resizeImagesWithImageMagick(baselineScreenShotPath);
 
 		}
 	}
@@ -335,4 +390,5 @@ public class BaseTest {
 			throw new RuntimeException("Script execution failed.");
 		}
 	}
+
 }
