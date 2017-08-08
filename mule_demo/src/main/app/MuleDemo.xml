@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:wmq="http://www.mulesoft.org/schema/mule/ee/wmq" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd http://www.mulesoft.org/schema/mule/ee/wmq http://www.mulesoft.org/schema/mule/ee/wmq/current/mule-wmq-ee.xsd">
+  <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+  <flow name="MuleDemoFlow">
+    <http:listener config-ref="HTTP_Listener_Configuration" path="/hello" doc:name="HTTP"/>
+    <set-payload doc:name="Set Payload" value="Hello World!"/>
+    <custom-transformer class="org.util.CustomTransformer" doc:name="Java"/>
+    <scatter-gather doc:name="Scatter-Gather">
+      <append-string-transformer message="Apple" doc:name="Append String"/>
+      <append-string-transformer message="Banana" doc:name="Append String"/>
+      <append-string-transformer message="Cucumber" doc:name="Append String"/>
+    </scatter-gather>
+    <collection-aggregator failOnTimeout="true" doc:name="Collection Aggregator"/>
+    <json:object-to-json-transformer doc:name="Object to JSON"/>
+  </flow>
+</mule>
