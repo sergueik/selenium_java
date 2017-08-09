@@ -35,15 +35,15 @@ public class BaseTest {
 	public WebDriverWait wait;
 	public Actions actions;
 	public Alert alert;
-	private static TakesScreenshot screenshot;
+	public TakesScreenshot screenshot;
 
 	private static final String browser = "chrome";
 	private static String osName;
 
-	private int scriptTimeout = 5;
-	private int flexibleWait = 120;
-	private int implicitWait = 1;
-	private long pollingInterval = 500;
+	public int scriptTimeout = 5;
+	public int flexibleWait = 120;
+	public int implicitWait = 1;
+	public long pollingInterval = 500;
 
 	public String baseURL = "about:blank";
 
@@ -59,7 +59,9 @@ public class BaseTest {
 
 	@AfterClass
 	public void afterClass() throws Exception {
-		driver.quit();
+		if (driver != null) {
+			driver.quit();
+		}
 	}
 
 	@BeforeClass

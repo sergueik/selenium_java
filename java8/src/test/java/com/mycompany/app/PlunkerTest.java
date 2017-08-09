@@ -90,8 +90,10 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 
 import org.testng.ITestResult;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -116,14 +118,8 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
-public class PlunkerTest {
+public class PlunkerTest extends BaseTest {
 
-	private static WebDriver driver;
-	public static WebDriverWait wait;
-	public static Actions actions;
-	private static int flexibleWait = 5;
-	private static int implicitWait = 1;
-	private static long pollingInterval = 500;
 	private static String baseURL = "https://embed.plnkr.co/";
 	private static String projectId = "ggL5oAvGgucDA5HCYk7K";
 
@@ -133,75 +129,25 @@ public class PlunkerTest {
 
 	private static Pattern pattern;
 	private static Matcher matcher;
-	private static final String browser = "chrome";
-
 	private static Set<String> windowHandles;
 
-	@BeforeSuite
-	@SuppressWarnings("deprecation")
-	public static void setUp() {
-		System.setProperty("webdriver.chrome.driver",
-				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		ChromeOptions options = new ChromeOptions();
-		// origin:
-		// https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
-		// http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
-
-		HashMap<String, Object> prefs = new HashMap<>();
-		prefs.put("profile.default_content_settings.popups", 0);
-		// Put this into prefs map to switch off browser notification
-		prefs.put("profile.default_content_setting_values.notifications", 2);
-		// Put this into prefs map to switch off save password notification
-		prefs.put("credentials_enable_service", false);
-		prefs.put("profile.password_manager_enabled", false);
-		String downloadPath = System.getProperty("user.dir")
-				+ System.getProperty("file.separator") + "target"
-				+ System.getProperty("file.separator");
-		prefs.put("download.default_directory", downloadPath);
-		prefs.put("enableNetwork", "true");
-		options.setExperimentalOption("prefs", prefs);
-
-		for (String optionAgrument : (new String[] {
-				"--allow-running-insecure-content", "--allow-insecure-localhost",
-        "--enable-local-file-accesses", "--disable-notifications",
-        "--disable-save-password-bubble",
-				/* "start-maximized" , */
-				"--browser.download.folderList=2", "--disable-web-security",
-				"--no-proxy-server",
-				"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
-				String.format("--browser.download.dir=%s", downloadPath)
-				/* "--user-data-dir=/path/to/your/custom/profile"  , */
-		})) {
-			options.addArguments(optionAgrument);
-		}
-
-		// options for headless
-		/*
-		for (String optionAgrument : (new String[] { "headless",
-		    "window-size=1200x600", })) {
-		  options.addArguments(optionAgrument);
-		}
-		*/
-		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-
-		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-		driver = new ChromeDriver(capabilities);
-		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		driver.get(baseURL);
+	@BeforeClass
+	public void beforeClass() throws IOException {
+		super.beforeClass();
+		assertThat(driver, notNullValue());
 		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 	}
 
-	@AfterSuite
-	public static void tearDown() throws Exception {
+	@Override
+	@AfterClass
+	public void afterClass() throws Exception {
 		try {
 			driver.close();
 		} catch (NoSuchWindowException e) {
 
 		}
 		driver.quit();
+		driver = null;
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());
 		}
@@ -212,7 +158,7 @@ public class PlunkerTest {
 		driver.get(baseURL);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testEditorPreview() {
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
 
@@ -248,7 +194,7 @@ public class PlunkerTest {
 		// driver.findElement(By.linkText("urlLink")).sendKeys(Keys.chord(Keys.CONTROL,Keys.RETURN));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testEmbed() {
 		driver.get("https://embed.plnkr.co/" + projectId);
 		WebElement closeButton = wait
@@ -260,7 +206,7 @@ public class PlunkerTest {
 		// via Protractor
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testFullScreeen() {
 		projectId = "WFJYrM";
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
@@ -330,7 +276,10 @@ public class PlunkerTest {
 		}
 	}
 
-	@Test(enabled = true)
+	// Failed tests: afterMethod(com.mycompany.app.PlunkerTest): no such window:
+	// target window already closed(..)
+
+	@Test(enabled = false)
 	public void testFullScreeenInNewWindow() {
 		projectId = "WFJYrM";
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
@@ -414,7 +363,7 @@ public class PlunkerTest {
 		}
 	}
 
-	public static String getBaseURL() {
+	public String getBaseURL() {
 		System.err.println("Get base URL: " + driver.getCurrentUrl());
 		log.info("Get base URL: {}", driver.getCurrentUrl());
 		String currentURL = driver.getCurrentUrl();
@@ -432,13 +381,13 @@ public class PlunkerTest {
 		return protocol + "://" + domain;
 	}
 
-	public static void scrollIntoView(By locator) {
+	public void scrollIntoView(By locator) {
 		log.info("Scrolling into view: {}", locator);
 		((JavascriptExecutor) driver).executeScript(
 				"arguments[0].scrollIntoView(true);", driver.findElement(locator));
 	}
 
-	public static void highlight(By locator, long highlight_interval) {
+	public void highlight(By locator, long highlight_interval) {
 		log.info("Highlighting element {}", locator);
 		WebElement element = driver.findElement(locator);
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
@@ -454,7 +403,7 @@ public class PlunkerTest {
 		highlight(element, 100);
 	}
 
-	private void highlight(WebElement element, long highlight_interval) {
+	public void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
 		}
@@ -475,7 +424,7 @@ public class PlunkerTest {
 		}
 	}
 
-	private static Object executeScript(String script, Object... arguments) {
+	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
