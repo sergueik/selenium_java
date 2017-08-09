@@ -47,16 +47,16 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
-	// WARMING:  do not define or the descendant test class will fail 
+	// WARMING: do not define or the descendant test class will fail
 	@AfterSuite
 	public void afterSuite() throws Exception {
 	}
 
-	// WARMING:  do not define or the descendant test class will fail 
+	// WARMING: do not define or the descendant test class will fail
 	@BeforeSuite
-	public void beforeSuite(){
-	}	
-	
+	public void beforeSuite() {
+	}
+
 	@AfterClass
 	public void afterClass() throws Exception {
 		driver.quit();
@@ -153,7 +153,7 @@ public class BaseTest {
 	public void afterMethod() {
 		driver.get("about:blank");
 	}
-// Utilities
+	// Utilities
 
 	public static String getOsName() {
 		if (osName == null) {
