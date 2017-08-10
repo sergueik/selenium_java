@@ -35,6 +35,7 @@ public class BaseTest {
 	public WebDriverWait wait;
 	public Actions actions;
 	public Alert alert;
+	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
 
 	private static final String browser = "chrome";
@@ -47,7 +48,7 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
-	// WARMING: do not define or the descendant test class will fail
+	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test class may fail
 	@AfterSuite
 	public void afterSuite() throws Exception {
 	}
@@ -55,13 +56,6 @@ public class BaseTest {
 	// WARMING: do not define or the descendant test class will fail
 	@BeforeSuite
 	public void beforeSuite() {
-	}
-
-	@AfterClass
-	public void afterClass() throws Exception {
-		if (driver != null) {
-			driver.quit();
-		}
 	}
 
 	@BeforeClass
@@ -139,10 +133,18 @@ public class BaseTest {
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		screenshot = ((TakesScreenshot) driver);
-		// driver.manage().window().maximize();
+		js = ((JavascriptExecutor) driver);
+// driver.manage().window().maximize();
 
 		// Go to URL
 		driver.get(baseURL);
+	}
+
+	@AfterClass
+	public void afterClass() throws Exception {
+		if (driver != null) {
+			driver.quit();
+		}
 	}
 
 	@BeforeMethod
@@ -155,6 +157,7 @@ public class BaseTest {
 	public void afterMethod() {
 		driver.get("about:blank");
 	}
+
 	// Utilities
 
 	public static String getOsName() {
@@ -185,4 +188,12 @@ public class BaseTest {
 		}
 	}
 
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}	
 }
