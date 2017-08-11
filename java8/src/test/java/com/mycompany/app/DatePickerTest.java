@@ -24,6 +24,12 @@ public class DatePickerTest extends BaseTest {
 		super.beforeClass();
 		assertThat(driver, notNullValue());
 		driver.get(baseURL);
+		try{
+			driver.manage().window().fullscreen();			
+		} catch (WebDriverException e) {
+			System.err.println("Exception(ignored) " + e.toString());
+			// unimplementd command
+		}
 	}
 
 	@Test(priority = 1, enabled = true)
