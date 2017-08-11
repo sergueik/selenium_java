@@ -38,7 +38,7 @@ public class BaseTest {
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
 
-	private static final String browser = "chrome";
+	private static final String browser = "chrome"; // "firefox";
 	private static String osName;
 
 	public int scriptTimeout = 5;
@@ -48,7 +48,8 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
-	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test class may fail
+	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
+	// class may fail
 	@AfterSuite
 	public void afterSuite() throws Exception {
 	}
@@ -134,7 +135,7 @@ public class BaseTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		screenshot = ((TakesScreenshot) driver);
 		js = ((JavascriptExecutor) driver);
-// driver.manage().window().maximize();
+		// driver.manage().window().maximize();
 
 		// Go to URL
 		driver.get(baseURL);
@@ -195,5 +196,5 @@ public class BaseTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}	
+	}
 }

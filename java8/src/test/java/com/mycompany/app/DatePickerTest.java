@@ -14,6 +14,10 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
 
+import java.awt.AWTException;
+import java.awt.Robot;
+import java.awt.event.KeyEvent;
+
 // origin: https://raw.githubusercontent.com/TsvetomirSlavov/DynamicDataTablesAndCallendarsTsvetomir/master/src/main/java/DatePickerAndHighlightAndScroll.java
 public class DatePickerTest extends BaseTest {
 
@@ -24,11 +28,25 @@ public class DatePickerTest extends BaseTest {
 		super.beforeClass();
 		assertThat(driver, notNullValue());
 		driver.get(baseURL);
-		try{
-			driver.manage().window().fullscreen();			
+		try {
+			driver.manage().window().fullscreen();
 		} catch (WebDriverException e) {
-			System.err.println("Exception(ignored) " + e.toString());
-			// unimplementd command
+			System.err.println("Exception (ignored) " + e.toString());
+			// unimplemented command 
+			// Firefox: org.openqa.selenium.UnsupportedCommandException
+		}
+
+		// NOTE: with Chrome, occasionally breaks the test, redirecting the user to
+		// 'As you were browsing www.skyscanner.com something about your browser
+		// made us think you were a bot'
+		// page
+		try {
+			// press F11 key of keyboard to switch the browser to full screen
+			Robot robot = new Robot();
+			sleep(2000);
+			robot.keyPress(KeyEvent.VK_F11);
+		} catch (AWTException e) {
+			System.err.println("Exception (ignored) " + e.toString());
 		}
 	}
 
