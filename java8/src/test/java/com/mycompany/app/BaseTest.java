@@ -143,6 +143,7 @@ public class BaseTest {
 
 	@AfterClass
 	public void afterClass() throws Exception {
+		driver.get("about:blank");
 		if (driver != null) {
 			driver.quit();
 		}
@@ -150,13 +151,13 @@ public class BaseTest {
 
 	@BeforeMethod
 	public void beforeMethod(Method method) {
-		String testName = method.getName();
-		System.out.println("Test Name: " + testName + "\n");
+		String methodName = method.getName();
+		System.out.println("Test Name: " + methodName + "\n");
 	}
 
 	@AfterMethod
 	public void afterMethod() {
-		driver.get("about:blank");
+		// driver.get("about:blank");
 	}
 
 	// Utilities
