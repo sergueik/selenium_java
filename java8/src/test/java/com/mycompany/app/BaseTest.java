@@ -168,6 +168,10 @@ public class BaseTest {
 		return osName;
 	}
 
+	public void highlight(WebElement element) {
+		highlight(element, 100);
+	}
+	
 	public void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
