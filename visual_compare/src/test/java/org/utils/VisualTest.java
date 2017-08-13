@@ -2,6 +2,7 @@ package org.utils;
 
 import static org.testng.Assert.assertTrue;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -23,6 +24,9 @@ import org.im4java.process.ProcessStarter;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.testng.annotations.BeforeClass;
@@ -157,6 +161,8 @@ public class VisualTest extends BaseTest {
 
 		Screenshot screenShot = takeScreenshot(uzmanPhotoSection);
 
+		takeScreenshotOfWebelement(driver, uzmanPhotoSection,
+				testScreenShotDirectory + "\\" + "test.png");
 		writeScreenshotToFolder(screenShot);
 
 		// Resize
@@ -173,12 +179,10 @@ public class VisualTest extends BaseTest {
 		calendar.set(Calendar.DATE,
 				calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		Date nextMonthLastDay = calendar.getTime();
-
+		// provide name, domain, path, expiration date of the cookie
 		Cookie topBannerCloseCookie = new Cookie.Builder("AA-kobiBannerClosed", "4") // Name
-				.domain("www.kariyer.net") // Domain of the cookie
-				.path("/") // Path of the cookie
-				.expiresOn(nextMonthLastDay) // Expiration date
-				.build();
+				.domain(baseURL.replaceAll("(?:https?://)([^/]+)(?:/.*)?$", "$1"))
+				.path("/").expiresOn(nextMonthLastDay).build();
 
 		driver.manage().addCookie(topBannerCloseCookie);
 	}
@@ -230,6 +234,22 @@ public class VisualTest extends BaseTest {
 		actions.moveToElement(element).build().perform();
 	}
 
+	// origin:
+	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
+	public static void takeScreenshotOfWebelement(WebDriver driver,
+			WebElement element, String Destination) throws Exception {
+		File v = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		BufferedImage bi = ImageIO.read(v);
+		org.openqa.selenium.Point p = element.getLocation();
+		int n = element.getSize().getWidth();
+		int m = element.getSize().getHeight();
+		BufferedImage d = bi.getSubimage(p.getX(), p.getY(), n, m);
+		ImageIO.write(d, "png", v);
+
+		FileUtils.copyFile(v, new File(Destination));
+	}
+
+	// using ashot
 	public Screenshot takeScreenshot(WebElement element) {
 		Screenshot elementScreenShot = new AShot().takeScreenshot(driver, element);
 		/*Screenshot elementScreenShot = new AShot()

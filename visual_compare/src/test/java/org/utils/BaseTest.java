@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TakesScreenshot;import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -24,7 +25,8 @@ public class BaseTest {
 	public WebDriver driver;
 	public WebDriverWait wait;
 	public Actions actions;
-	private static TakesScreenshot screenshot;
+	public JavascriptExecutor js;
+	private TakesScreenshot screenshot;
 
 	private static final String browser = "chrome";
 	private static String osName;
@@ -115,6 +117,7 @@ public class BaseTest {
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		screenshot = ((TakesScreenshot) driver);
+		js = ((JavascriptExecutor) driver);
 		driver.manage().window().maximize();
 
 		// Go to URL
