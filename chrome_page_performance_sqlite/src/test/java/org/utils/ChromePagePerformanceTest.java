@@ -4,6 +4,7 @@ import org.utils.ChromePagePerformanceObject;
 import org.utils.ChromePagePerformanceUtil;
 
 import org.junit.Test;
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -12,6 +13,8 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -20,13 +23,19 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
+
+import javax.imageio.ImageIO;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -37,19 +46,29 @@ import java.sql.Statement;
 import org.sqlite.Function;
 import org.sqlite.SQLiteConnection;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 public class ChromePagePerformanceTest {
 
 	private static WebDriver driver;
 	private static Connection conn;
+	private static String osName;
+	private static String baseURL = "https://www.royalcaribbean.com/";
 
 	@BeforeClass
-	public static void setup() throws IOException {
+	public static void beforeClass() throws IOException {
+		getOsName();
+
 		System.setProperty("webdriver.chrome.driver",
-				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+				osName.toLowerCase().startsWith("windows")
+						? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
+						: "/var/run/chromedriver");
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		ChromeOptions options = new ChromeOptions();
 
-		HashMap<String, Object> chromePrefs = new HashMap<>();
+		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		String downloadFilepath = System.getProperty("user.dir")
 				+ System.getProperty("file.separator") + "target"
@@ -69,19 +88,31 @@ public class ChromePagePerformanceTest {
 		})) {
 			options.addArguments(optionAgrument);
 		}
-
 		// options for headless
-		/*
-		for (String optionAgrument : (new String[] { "headless",
-				"window-size=1200x600", })) {
-			options.addArguments(optionAgrument);
-		}
-		*/
-		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+		if (osName.toLowerCase().startsWith("windows")) {
 
+			for (String headlessOptionAgrument : (new String[] { "headless",
+					"disable-gpu", "disable-plugins", "window-size=1200x600",
+					"window-position=-9999,0" })) {
+				options.addArguments(headlessOptionAgrument);
+			}
+			// on Windows Chrome does not seem to support headless execution yet
+			// ChromeDriver 2.31 / Chrome 60: message=chrome not reachable...
+			// https://developers.google.com/web/updates/2017/04/headless-chrome
+			// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
+		} else {
+			for (String headlessOptionAgrument : (new String[] { "headless",
+					"disable-gpu", "remote-debugging-port=9222",
+					"window-size=1200x600" })) {
+				options.addArguments(headlessOptionAgrument);
+			}
+		}
+
+		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		driver = new ChromeDriver(capabilities);
+
 		try {
 			// origin:
 			// https://github.com/xerial/sqlite-jdbc/blob/master/demo/Sample.java
@@ -104,7 +135,7 @@ public class ChromePagePerformanceTest {
 		} catch (ClassNotFoundException | SQLException ex) {
 			ex.printStackTrace();
 		} finally {
-			// TODO: refactor after the saving data is implemented
+			// TODO: refactor after saving the data is implemented
 			try {
 				if (conn != null) {
 					conn.close();
@@ -114,6 +145,26 @@ public class ChromePagePerformanceTest {
 				System.out.println(ex.getMessage());
 			}
 		}
+		assertThat(driver, notNullValue());
+		driver.get(baseURL);
+		// Wait for page url to change
+		WebDriverWait wait = new WebDriverWait(driver, 20);
+		wait.pollingEvery(500, TimeUnit.MILLISECONDS);
+		ExpectedCondition<Boolean> urlChange = driver -> driver.getCurrentUrl()
+				.matches(String.format("^%s.*", baseURL));
+		wait.until(urlChange);
+		System.err.println("Current  URL: " + driver.getCurrentUrl());
+		// Take screenshot
+		File screenShot = ((TakesScreenshot) driver)
+				.getScreenshotAs(OutputType.FILE);
+
+		// To get the width of image.
+		BufferedImage readImage = ImageIO.read(screenShot);
+		int width = readImage.getWidth();
+		FileUtils.copyFile(screenShot, new File(System.getProperty("user.dir")
+				+ System.getProperty("file.separator") + "test.png"));
+		// oops... Looks like RoyalCaribbean.com is on vacation
+		// page
 	}
 
 	@AfterClass
@@ -131,8 +182,7 @@ public class ChromePagePerformanceTest {
 
 	@Test
 	public void testSetTimer() {
-		String url = "https://www.royalcaribbean.com/";
-		double test = new ChromePagePerformanceObject(driver, url,
+		double test = new ChromePagePerformanceObject(driver, baseURL,
 				new ById("find-a-cruise")).getLoadTime();
 		System.out.println(test);
 	}
@@ -141,8 +191,17 @@ public class ChromePagePerformanceTest {
 	public void testUtil() {
 		ChromePagePerformanceUtil pageLoadTimer = ChromePagePerformanceUtil
 				.getInstance();
-		double test = pageLoadTimer.getLoadTime(driver,
-				"https://www.royalcaribbean.com/", new ById("find-a-cruise"));
+		double test = pageLoadTimer.getLoadTime(driver, baseURL,
+				new ById("find-a-cruise"));
 		System.out.println(test);
+	}
+
+	// Utilities
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
 	}
 }

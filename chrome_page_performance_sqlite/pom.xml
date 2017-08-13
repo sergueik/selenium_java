@@ -19,8 +19,8 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
-    <selenium.version>3.2.0</selenium.version>
-    <sqlite-jdbc.version>3.18.0</sqlite-jdbc.version>
+    <selenium.version>3.4.0</selenium.version>
+    <sqlite-jdbc.version>3.20.0</sqlite-jdbc.version>
     <!-- LATEST -->
   </properties>
   <dependencies>
