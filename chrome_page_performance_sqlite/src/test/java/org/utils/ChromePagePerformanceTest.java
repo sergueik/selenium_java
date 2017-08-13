@@ -6,6 +6,7 @@ import org.utils.ChromePagePerformanceUtil;
 import org.junit.Test;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 import org.openqa.selenium.Alert;
@@ -54,7 +55,17 @@ public class ChromePagePerformanceTest {
 	private static WebDriver driver;
 	private static Connection conn;
 	private static String osName;
-	private static String baseURL = "https://www.royalcaribbean.com/";
+
+	// private static String baseURL = "https://www.royalcaribbean.com/";
+	// private static By elementSelector = By.id("find-a-cruise");
+
+	// private static String baseURL = "https://www.expedia.com/";
+	// private static By elementSelector = By.cssSelector(
+	// "#tab-flight-tab-hp > span.icons-container" );
+
+	private static String baseURL = "https://www.priceline.com/";
+	private static By elementSelector = By.cssSelector(
+			"#global-header-nav-section > ul > li.global-header-nav-product-item.global-header-nav-product-item-hotels > a");
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
@@ -96,8 +107,8 @@ public class ChromePagePerformanceTest {
 					"window-position=-9999,0" })) {
 				options.addArguments(headlessOptionAgrument);
 			}
-			// on Windows Chrome does not seem to support headless execution yet
-			// ChromeDriver 2.31 / Chrome 60: message=chrome not reachable...
+			// on Windows need ChromeDriver 2.31 / Chrome 60 to support headless
+			// With earlier versions of chromedriver: chrome not reachable...
 			// https://developers.google.com/web/updates/2017/04/headless-chrome
 			// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
 		} else {
@@ -146,25 +157,33 @@ public class ChromePagePerformanceTest {
 			}
 		}
 		assertThat(driver, notNullValue());
+	}
+
+	@Before
+	public void beforeMethod() throws IOException {
+
 		driver.get(baseURL);
-		// Wait for page url to change
+		// Wait for page url to update
 		WebDriverWait wait = new WebDriverWait(driver, 20);
 		wait.pollingEvery(500, TimeUnit.MILLISECONDS);
 		ExpectedCondition<Boolean> urlChange = driver -> driver.getCurrentUrl()
 				.matches(String.format("^%s.*", baseURL));
 		wait.until(urlChange);
 		System.err.println("Current  URL: " + driver.getCurrentUrl());
+		/*
 		// Take screenshot
+		// under headless Chrome, some vendor pages behave differently e.g.
+		// www.royalcaribbean.com redirects to the
+		// "Oops... Looks like RoyalCaribbean.com is on vacation" page
 		File screenShot = ((TakesScreenshot) driver)
 				.getScreenshotAs(OutputType.FILE);
-
+		
 		// To get the width of image.
 		BufferedImage readImage = ImageIO.read(screenShot);
 		int width = readImage.getWidth();
 		FileUtils.copyFile(screenShot, new File(System.getProperty("user.dir")
 				+ System.getProperty("file.separator") + "test.png"));
-		// oops... Looks like RoyalCaribbean.com is on vacation
-		// page
+		 */
 	}
 
 	@AfterClass
@@ -183,7 +202,7 @@ public class ChromePagePerformanceTest {
 	@Test
 	public void testSetTimer() {
 		double test = new ChromePagePerformanceObject(driver, baseURL,
-				new ById("find-a-cruise")).getLoadTime();
+				elementSelector).getLoadTime();
 		System.out.println(test);
 	}
 
@@ -191,13 +210,11 @@ public class ChromePagePerformanceTest {
 	public void testUtil() {
 		ChromePagePerformanceUtil pageLoadTimer = ChromePagePerformanceUtil
 				.getInstance();
-		double test = pageLoadTimer.getLoadTime(driver, baseURL,
-				new ById("find-a-cruise"));
+		double test = pageLoadTimer.getLoadTime(driver, baseURL, elementSelector);
 		System.out.println(test);
 	}
 
 	// Utilities
-
 	public static String getOsName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name");
