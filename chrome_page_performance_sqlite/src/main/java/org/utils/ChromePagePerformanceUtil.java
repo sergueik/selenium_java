@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -134,47 +135,56 @@ public class ChromePagePerformanceUtil {
 		return dict;
 	}
 
-	private ArrayList<Map<String, String>> CreateDateMapFromJSON(String data) throws JSONException {
-		// System.err.println("Data: " + data);
-		ArrayList<Map<String, String>> hashes = new ArrayList<Map<String, String>>();
-    
+	private ArrayList<Map<String, String>> CreateDateMapFromJSON(String jsonData)
+			throws JSONException {
 
+		ArrayList<Map<String, String>> resultDataSet = new ArrayList<Map<String, String>>();
+		// columns to collect
 		Pattern pattern = Pattern.compile("(?:name|duration)");
-		JSONArray hashesDataArray = new JSONArray(data);
-		// System.err.println("# data rows : " + hashesDataArray.length());
-		for (int row = 0; row < hashesDataArray.length(); row++) {
-			// System.err.println("Data row: " + hashesDataArray.get(row));
-			JSONObject resultObj = new JSONObject(
-					hashesDataArray.get(row).toString());
-			assertThat(resultObj, notNullValue());
-			Iterator<String> dataKeys = resultObj.keys();
-			Map<String, String> peformanceData = new HashMap<>();
+		JSONArray dataRows = new JSONArray(jsonData);
+		for (int row = 0; row < dataRows.length(); row++) {
+			JSONObject jsonObj = new JSONObject(dataRows.get(row).toString());
+			assertThat(jsonObj, notNullValue());
+			Iterator<String> dataKeys = jsonObj.keys();
+			Map<String, String> resultRow = new HashMap<>();
 			while (dataKeys.hasNext()) {
 				String dataKey = dataKeys.next();
-				// JSONArray resultDataArray = resultObj.getJSONArray(dataKey);
-				// System.err.println(dataKey + " = " + resultObj.get(dataKey));
-				Matcher matcher = pattern.matcher(dataKey);
-				if (matcher.find()) {
-					peformanceData.put(dataKey, resultObj.get(dataKey).toString());
+				// Matcher matcher = pattern.matcher(dataKey);
+				if (pattern.matcher(dataKey).find()) {
+					// only collect certain columns
+					resultRow.put(dataKey, jsonObj.get(dataKey).toString());
 				}
 			}
-			hashes.add(peformanceData);
+			resultDataSet.add(resultRow);
 		}
-        
-		assertTrue(hashes.size() > 0);
-		System.err.println("Hash: " + hashes.size());
-		for (Map<String, String> row : hashes) {
-			Set<String> dataKeys = row.keySet();
+
+		assertTrue(resultDataSet.size() > 0);
+		System.err.println(String.format("Addd %d rows", resultDataSet.size()));
+		for (Map<String, String> resultRow : resultDataSet) {
+			Set<String> dataKeys = resultRow.keySet();
 			for (String dataKey : dataKeys) {
-				System.err.println(dataKey + " = " + row.get(dataKey));
+				System.err.println(dataKey + " = " + resultRow.get(dataKey));
 			}
 		}
 
-		return hashes;
+		return resultDataSet;
 	}
 
 	private void setTimerNew(WebDriver driver) {
 		String performanceScript = getScriptContent("performance_script.js");
+
+		// NOTE: the following does not work (works in c#):
+		/*
+		// cannot cast from String to List
+		@SuppressWarnings("unchecked")
+		List<Object> rawData = (List<Object>) ((JavascriptExecutor) driver)
+				.executeScript(performanceScript);
+		
+		for (Object rawRow : rawData) {
+			@SuppressWarnings("unchecked")
+			Map<String, String> resultRow = (Map<String, String>) rawRow;
+		}
+		*/
 		this.timersNew = CreateDateMapFromJSON(((JavascriptExecutor) driver)
 				.executeScript(performanceScript).toString());
 	}
