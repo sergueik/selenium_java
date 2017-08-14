@@ -8,7 +8,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
-
+import org.junit.Ignore;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.By.ById;
@@ -55,7 +55,8 @@ public class ChromePagePerformanceTest {
 	private static WebDriver driver;
 	private static Connection conn;
 	private static String osName;
-
+  private static boolean headless = false;
+  
 	// private static String baseURL = "https://www.royalcaribbean.com/";
 	// private static By elementSelector = By.id("find-a-cruise");
 
@@ -100,6 +101,8 @@ public class ChromePagePerformanceTest {
 			options.addArguments(optionAgrument);
 		}
 		// options for headless
+    if (headless) {
+      
 		if (osName.toLowerCase().startsWith("windows")) {
 
 			for (String headlessOptionAgrument : (new String[] { "headless",
@@ -118,6 +121,7 @@ public class ChromePagePerformanceTest {
 				options.addArguments(headlessOptionAgrument);
 			}
 		}
+    }
 
 		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -199,6 +203,8 @@ public class ChromePagePerformanceTest {
 		}
 	}
 
+
+  @Ignore
 	@Test
 	public void testSetTimer() {
 		double test = new ChromePagePerformanceObject(driver, baseURL,
