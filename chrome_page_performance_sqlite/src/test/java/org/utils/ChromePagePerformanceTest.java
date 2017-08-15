@@ -140,12 +140,12 @@ public class ChromePagePerformanceTest {
 			String dbURL = "jdbc:sqlite:performance.db";
 			conn = DriverManager.getConnection(dbURL);
 			if (conn != null) {
-				System.out.println("Connected to the database");
-				DatabaseMetaData dm = (DatabaseMetaData) conn.getMetaData();
-				// System.out.println("Driver name: " + dm.getDriverName());
-				// System.out.println("Driver version: " + dm.getDriverVersion());
-				// System.out.println("Product name: " + dm.getDatabaseProductName());
-				// System.out.println("Product version: " + dm.getDatabaseProductVersion());
+				// System.out.println("Connected to the database");
+				DatabaseMetaData databaseMetadata = conn.getMetaData();
+				// System.out.println("Driver name: " + databaseMetadata.getDriverName());
+				// System.out.println("Driver version: " + databaseMetadata.getDriverVersion());
+				// System.out.println("Product name: " + databaseMetadata.getDatabaseProductName());
+				// System.out.println("Product version: " + databaseMetadata.getDatabaseProductVersion());
 				createNewTable();
 				// insertData("name", 1.0);
 				// conn.close();
@@ -214,11 +214,11 @@ public class ChromePagePerformanceTest {
 		double pageLoadTime = pageLoadTimer.getLoadTime(driver, baseURL,
 				elementSelector);
 		System.out.println("Page Load Time: " + pageLoadTime);
-		Map<String, Double> pageLoadDetails = pageLoadTimer.getPageLoadDetails();
+		Map<String, Double> pageElementTimers = pageLoadTimer.getPageElementTimers();
 		if (conn != null) {
-			Set<String> names = pageLoadDetails.keySet();
+			Set<String> names = pageElementTimers.keySet();
 			for (String name : names) {
-				insertData(name, pageLoadDetails.get(name));
+				insertData(name, pageElementTimers.get(name));
 			}
 		}
 	}
