@@ -32,7 +32,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
@@ -40,6 +42,7 @@ import javax.imageio.ImageIO;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -55,8 +58,8 @@ public class ChromePagePerformanceTest {
 	private static WebDriver driver;
 	private static Connection conn;
 	private static String osName;
-  private static boolean headless = false;
-  
+	private static boolean headless = true;
+
 	// private static String baseURL = "https://www.royalcaribbean.com/";
 	// private static By elementSelector = By.id("find-a-cruise");
 
@@ -67,6 +70,8 @@ public class ChromePagePerformanceTest {
 	private static String baseURL = "https://www.priceline.com/";
 	private static By elementSelector = By.cssSelector(
 			"#global-header-nav-section > ul > li.global-header-nav-product-item.global-header-nav-product-item-hotels > a");
+
+	private static String sql;
 
 	@BeforeClass
 	public static void beforeClass() throws IOException {
@@ -101,27 +106,27 @@ public class ChromePagePerformanceTest {
 			options.addArguments(optionAgrument);
 		}
 		// options for headless
-    if (headless) {
-      
-		if (osName.toLowerCase().startsWith("windows")) {
+		if (headless) {
 
-			for (String headlessOptionAgrument : (new String[] { "headless",
-					"disable-gpu", "disable-plugins", "window-size=1200x600",
-					"window-position=-9999,0" })) {
-				options.addArguments(headlessOptionAgrument);
-			}
-			// on Windows need ChromeDriver 2.31 / Chrome 60 to support headless
-			// With earlier versions of chromedriver: chrome not reachable...
-			// https://developers.google.com/web/updates/2017/04/headless-chrome
-			// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
-		} else {
-			for (String headlessOptionAgrument : (new String[] { "headless",
-					"disable-gpu", "remote-debugging-port=9222",
-					"window-size=1200x600" })) {
-				options.addArguments(headlessOptionAgrument);
+			if (osName.toLowerCase().startsWith("windows")) {
+
+				for (String headlessOptionAgrument : (new String[] { "headless",
+						"disable-gpu", "disable-plugins", "window-size=1200x600",
+						"window-position=-9999,0" })) {
+					options.addArguments(headlessOptionAgrument);
+				}
+				// on Windows need ChromeDriver 2.31 / Chrome 60 to support headless
+				// With earlier versions of chromedriver: chrome not reachable...
+				// https://developers.google.com/web/updates/2017/04/headless-chrome
+				// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
+			} else {
+				for (String headlessOptionAgrument : (new String[] { "headless",
+						"disable-gpu", "remote-debugging-port=9222",
+						"window-size=1200x600" })) {
+					options.addArguments(headlessOptionAgrument);
+				}
 			}
 		}
-    }
 
 		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
@@ -130,35 +135,24 @@ public class ChromePagePerformanceTest {
 
 		try {
 			// origin:
-			// https://github.com/xerial/sqlite-jdbc/blob/master/demo/Sample.java
-			// http://www.codejava.net/java-se/jdbc/connect-to-sqlite-via-jdbc
-			// http://www.sqlitetutorial.net/sqlite-java/sqlite-jdbc-driver/
 			// https://www.tutorialspoint.com/sqlite/sqlite_java.htm
 			Class.forName("org.sqlite.JDBC");
-			String dbURL = "jdbc:sqlite:product.db";
+			String dbURL = "jdbc:sqlite:performance.db";
 			conn = DriverManager.getConnection(dbURL);
 			if (conn != null) {
 				System.out.println("Connected to the database");
 				DatabaseMetaData dm = (DatabaseMetaData) conn.getMetaData();
-				System.out.println("Driver name: " + dm.getDriverName());
-				System.out.println("Driver version: " + dm.getDriverVersion());
-				System.out.println("Product name: " + dm.getDatabaseProductName());
-				System.out
-						.println("Product version: " + dm.getDatabaseProductVersion());
-				conn.close();
+				// System.out.println("Driver name: " + dm.getDriverName());
+				// System.out.println("Driver version: " + dm.getDriverVersion());
+				// System.out.println("Product name: " + dm.getDatabaseProductName());
+				// System.out.println("Product version: " + dm.getDatabaseProductVersion());
+				createNewTable();
+				// insertData("name", 1.0);
+				// conn.close();
 			}
 		} catch (ClassNotFoundException | SQLException ex) {
 			ex.printStackTrace();
 		} finally {
-			// TODO: refactor after saving the data is implemented
-			try {
-				if (conn != null) {
-					conn.close();
-					conn = null;
-				}
-			} catch (SQLException ex) {
-				System.out.println(ex.getMessage());
-			}
 		}
 		assertThat(driver, notNullValue());
 	}
@@ -197,14 +191,14 @@ public class ChromePagePerformanceTest {
 		try {
 			if (conn != null) {
 				conn.close();
+				conn = null;
 			}
 		} catch (SQLException ex) {
 			System.out.println(ex.getMessage());
 		}
 	}
 
-
-  @Ignore
+	@Ignore
 	@Test
 	public void testSetTimer() {
 		double test = new ChromePagePerformanceObject(driver, baseURL,
@@ -212,12 +206,21 @@ public class ChromePagePerformanceTest {
 		System.out.println(test);
 	}
 
+	// @Ignore
 	@Test
 	public void testUtil() {
 		ChromePagePerformanceUtil pageLoadTimer = ChromePagePerformanceUtil
 				.getInstance();
-		double test = pageLoadTimer.getLoadTime(driver, baseURL, elementSelector);
-		System.out.println(test);
+		double pageLoadTime = pageLoadTimer.getLoadTime(driver, baseURL,
+				elementSelector);
+		System.out.println("Page Load Time: " + pageLoadTime);
+		Map<String, Double> pageLoadDetails = pageLoadTimer.getPageLoadDetails();
+		if (conn != null) {
+			Set<String> names = pageLoadDetails.keySet();
+			for (String name : names) {
+				insertData(name, pageLoadDetails.get(name));
+			}
+		}
 	}
 
 	// Utilities
@@ -226,5 +229,35 @@ public class ChromePagePerformanceTest {
 			osName = System.getProperty("os.name");
 		}
 		return osName;
+	}
+
+	// http://www.sqlitetutorial.net/sqlite-java/create-table/
+	public static void createNewTable() {
+		sql = "DROP TABLE IF EXISTS performance";
+		try (java.sql.Statement statement = conn.createStatement()) {
+			statement.execute(sql);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		sql = "CREATE TABLE IF NOT EXISTS performance (\n"
+				+ "	id integer PRIMARY KEY,\n" + "	name text NOT NULL,\n"
+				+ "	duration real\n" + ");";
+		try (java.sql.Statement statement = conn.createStatement()) {
+			statement.execute(sql);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+	}
+
+	// http://www.sqlitetutorial.net/sqlite-java/insert/
+	public static void insertData(String name, double duration) {
+		sql = "INSERT INTO performance(name,duration) VALUES(?,?)";
+		try (PreparedStatement statement = conn.prepareStatement(sql)) {
+			statement.setString(1, name);
+			statement.setDouble(2, duration);
+			statement.executeUpdate();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
 	}
 }

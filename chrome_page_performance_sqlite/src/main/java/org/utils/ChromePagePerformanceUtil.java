@@ -14,6 +14,7 @@ import static org.junit.Assume.assumeFalse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -36,8 +37,18 @@ public class ChromePagePerformanceUtil {
 	private static final String JAVASCRIPT = "var performance = window.performance;"
 			+ "var timings = performance.timing;" + "return timings;";
 
+	public Map<String, Double> getPageLoadDetails() {
+		return pageLoadDetails;
+	}
+
+	private Map<String, Double> pageLoadDetails;
 	private Map<String, Double> timers;
-	private ArrayList<Map<String, String>> timersNew;
+
+	private boolean debug = false;
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
 
 	private static ChromePagePerformanceUtil ourInstance = new ChromePagePerformanceUtil();
 
@@ -131,16 +142,27 @@ public class ChromePagePerformanceUtil {
 						((currDate.getTime() - Long.valueOf(values[1]))) / 1000.0);
 			}
 		}
-
 		return dict;
 	}
 
-	private ArrayList<Map<String, String>> CreateDateMapFromJSON(String jsonData)
+	private Map<String, Double> CreateDateMapFromJSON(String jsonData)
 			throws JSONException {
 
 		ArrayList<Map<String, String>> resultDataSet = new ArrayList<Map<String, String>>();
 		// columns to collect
-		Pattern pattern = Pattern.compile("(?:name|duration)");
+		Pattern columnSelectionattern = Pattern.compile("(?:name|duration)");
+		// TODO: store events separate from page elements
+		ArrayList<String> events = new ArrayList<>(Arrays.asList(new String[] {
+				"first-contentful-paint", "first-paint", "intentmedia.all.end",
+				"intentmedia.all.start", "intentmedia.core.fetch.page.request",
+				"intentmedia.core.fetch.page.response", "intentmedia.core.init.end",
+				"intentmedia.core.init.start", "intentmedia.core.newPage.end",
+				"intentmedia.core.newPage.start", "intentmedia.core.scriptLoader.end",
+				"intentmedia.core.scriptLoader.start",
+				"intentmedia.sca.fetch.config.request",
+				"intentmedia.sca.fetch.config.response" }));
+		Pattern nameSelectionPattern = Pattern
+				.compile(String.format("(?:%s)", String.join("|", events)));
 		JSONArray dataRows = new JSONArray(jsonData);
 		for (int row = 0; row < dataRows.length(); row++) {
 			JSONObject jsonObj = new JSONObject(dataRows.get(row).toString());
@@ -149,43 +171,49 @@ public class ChromePagePerformanceUtil {
 			Map<String, String> resultRow = new HashMap<>();
 			while (dataKeys.hasNext()) {
 				String dataKey = dataKeys.next();
-				// Matcher matcher = pattern.matcher(dataKey);
-				if (pattern.matcher(dataKey).find()) {
-					// only collect certain columns
+				if (columnSelectionattern.matcher(dataKey).find()) {
 					resultRow.put(dataKey, jsonObj.get(dataKey).toString());
 				}
 			}
-			resultDataSet.add(resultRow);
+			// only collect page elements, skip events
+			if (!nameSelectionPattern.matcher(resultRow.get("name")).find()) {
+				resultDataSet.add(resultRow);
+			}
 		}
-
 		assertTrue(resultDataSet.size() > 0);
-		System.err.println(String.format("Addd %d rows", resultDataSet.size()));
+		System.err.println(String.format("Added %d rows", resultDataSet.size()));
+		if (debug) {
+			for (Map<String, String> resultRow : resultDataSet) {
+				Set<String> dataKeys = resultRow.keySet();
+				for (String dataKey : dataKeys) {
+					System.err.println(dataKey + " = " + resultRow.get(dataKey));
+				}
+			}
+		}
+		Map<String, Double> result = new HashMap<>();
+
 		for (Map<String, String> resultRow : resultDataSet) {
-			Set<String> dataKeys = resultRow.keySet();
-			for (String dataKey : dataKeys) {
-				System.err.println(dataKey + " = " + resultRow.get(dataKey));
+			try {
+				result.put(resultRow.get("name"),
+						java.lang.Double.parseDouble(resultRow.get("duration")));
+			} catch (NumberFormatException e) {
+				result.put(resultRow.get("name"), 0.0);
 			}
 		}
 
-		return resultDataSet;
+		if (debug) {
+			Set<String> names = result.keySet();
+			for (String name : names) {
+				System.err.println(name + " = " + result.get(name));
+			}
+		}
+		return result;
 	}
 
 	private void setTimerNew(WebDriver driver) {
 		String performanceScript = getScriptContent("performance_script.js");
 
-		// NOTE: the following does not work (works in c#):
-		/*
-		// cannot cast from String to List
-		@SuppressWarnings("unchecked")
-		List<Object> rawData = (List<Object>) ((JavascriptExecutor) driver)
-				.executeScript(performanceScript);
-		
-		for (Object rawRow : rawData) {
-			@SuppressWarnings("unchecked")
-			Map<String, String> resultRow = (Map<String, String>) rawRow;
-		}
-		*/
-		this.timersNew = CreateDateMapFromJSON(((JavascriptExecutor) driver)
+		this.pageLoadDetails = CreateDateMapFromJSON(((JavascriptExecutor) driver)
 				.executeScript(performanceScript).toString());
 	}
 
