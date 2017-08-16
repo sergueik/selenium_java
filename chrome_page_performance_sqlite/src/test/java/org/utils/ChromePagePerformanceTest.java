@@ -198,7 +198,7 @@ public class ChromePagePerformanceTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testSetTimer() {
 		double test = new ChromePagePerformanceObject(driver, baseURL,
