@@ -38,7 +38,7 @@ public class BaseTest {
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
 
-	private static final String browser = "chrome"; // "firefox";
+	private static final String browser = System.getProperty("webdriver.driver", "chrome"); // "firefox";
 	private static String osName;
 
 	public int scriptTimeout = 5;

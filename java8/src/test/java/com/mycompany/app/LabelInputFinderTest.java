@@ -5,6 +5,7 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -48,16 +49,12 @@ public class LabelInputFinderTest extends BaseTest {
 	public void testInputByLabel() {
 		List<WebElement> labels = driver.findElements(By.tagName("label"));
 		@SuppressWarnings("unchecked")
-		List<WebElement> inputs = (List<WebElement>) (js.executeScript(
-				"var labels = arguments[0],\n"
-		    + "inputs = [];\n"
-		    + "		for (var i = 0; i < labels.length; i++) {\n"
-        + "				if (labels[i].getAttribute('for') != null) {\n"
-        + "						inputs.push(document.getElementById(labels[i].getAttribute('for')));\n"
-        + "				}\n"
-        + "		}\n"
-        + "return inputs;",
-				labels));
+		List<WebElement> inputs = (List<WebElement>) (js
+				.executeScript("var labels = arguments[0],\n" + "inputs = [];\n"
+						+ "		for (var i = 0; i < labels.length; i++) {\n"
+						+ "				if (labels[i].getAttribute('for') != null) {\n"
+						+ "						inputs.push(document.getElementById(labels[i].getAttribute('for')));\n"
+						+ "				}\n" + "		}\n" + "return inputs;", labels));
 		inputs.stream().forEach(o -> {
 			System.err.println(o.getAttribute("outerHTML"));
 			scrolltoElement(o);
@@ -152,8 +149,8 @@ public class LabelInputFinderTest extends BaseTest {
 
 	// origin:
 	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
-	public void scrolltoElement(WebElement ScrolltoThisElement) {
-		Coordinates coordinate = ((Locatable) ScrolltoThisElement).getCoordinates();
+	public void scrolltoElement(WebElement element) {
+		Coordinates coordinate = ((Locatable) element).getCoordinates();
 		coordinate.onPage();
 		coordinate.inViewPort();
 	}
