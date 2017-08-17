@@ -38,7 +38,8 @@ public class BaseTest {
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
 
-	private static final String browser = System.getProperty("webdriver.driver", "chrome"); // "firefox";
+	private static final String browser = getPropertyEnv("webdriver.driver",
+			"chrome"); // "firefox";
 	private static String osName;
 
 	public int scriptTimeout = 5;
@@ -169,10 +170,23 @@ public class BaseTest {
 		return osName;
 	}
 
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
 	public void highlight(WebElement element) {
 		highlight(element, 100);
 	}
-	
+
 	public void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -202,4 +216,5 @@ public class BaseTest {
 			e.printStackTrace();
 		}
 	}
+
 }
