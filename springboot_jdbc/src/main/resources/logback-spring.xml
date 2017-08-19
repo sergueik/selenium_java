@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="false" scan="true" scanPeriod="1 seconds">
+    <contextName>logback</contextName>
+    <property name="log.path" value="D:\\logs\\logback.log"/>
+    <!--控制台日志输出格式-->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %contextName [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!--文件日志输出格式-->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log.path}</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 每天一归档 -->
+            <fileNamePattern>${log.path}-%d{yyyy-MM-dd}.%i.txt</fileNamePattern>
+            <!-- 单个日志文件最多10MB, 365天的日志周期，最大不能超过10GB -->
+            <maxFileSize>10MB</maxFileSize>    
+            <maxHistory>365</maxHistory>
+            <totalSizeCap>10GB</totalSizeCap>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date %level [%thread] %logger{36} [%file : %line] %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+    <root level="info">
+        <appender-ref ref="console" />
+        <appender-ref ref="file" />
+    </root>
+</configuration>

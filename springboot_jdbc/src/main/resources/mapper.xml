@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>  
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"      
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+<mapper namespace="com.wuwei.dao.Dao">
+    
+    <insert id="addStudent" parameterType="com.wuwei.entity.Student">
+        insert into student(name,course)values(#{name},#{course})
+    </insert>
+    
+    <select id="findAllStudent" resultType="com.wuwei.entity.Student">
+        select * from student
+    </select>
+    
+    <update id="updateStudent" parameterType="com.wuwei.entity.Student">
+        update student set name=#{name},course=#{course} where id=#{id}
+    </update>
+    
+    <update id="delStudentById" parameterType="long">
+        delete from student where id=#{id}
+    </update>
+    
+</mapper>
