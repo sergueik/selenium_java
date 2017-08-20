@@ -40,7 +40,7 @@ public class HttpClient {
 		httpGet.setConfig(requestConfig);
 		CloseableHttpResponse response = null;
 		try {
-			response = httpClient.execute(httpGet); // 获取到response对象
+			response = httpClient.execute(httpGet);
 			System.out.println("output URI: " + httpGet.getURI());
 			int status = response.getStatusLine().getStatusCode();
 			System.out.println("HTTP Status： " + status);
