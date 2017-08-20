@@ -1,9 +1,13 @@
 package org.utils.util;
 
 import java.sql.*;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -11,17 +15,25 @@ import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-// import org.springframework.context.annotation.Configuration;
-// import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.env.Environment;
 
-// https://stackoverflow.com/questions/42320221/spring-boot-how-to-add-an-unconventional-propertysource?rq=1
+// http://www.baeldung.com/properties-with-spring
+// annotations currently do not work, commented
 // @Configuration
-// @PropertySource("file:application.properties")
+// @PropertySource("classpath:application.properties")
 public class JDBCUtils {
-
+	/*	
+			@Bean
+			public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+				return new PropertySourcesPlaceholderConfigurer();
+			}
+	*/
 	@Autowired
-	private Environment env;
+	private static Environment env;
 
 	private static final Logger logger = Logger
 			.getLogger(JDBCUtils.class.getName());
@@ -32,24 +44,36 @@ public class JDBCUtils {
 	private JDBCUtils() {
 	}
 
+	// does not work
 	@Value("${spring.datasource.url}")
-	private static String url;
+	private static String datasourceUrl;
 
 	public static Connection getConnection() {
-
-		// resolveEnvVars(System.getProperty("spring.datasource.url"));
-		String url = resolveEnvVars(
-				"jdbc:sqlite:${USERPROFILE}\\sqlite\\springboot.db"); //
-		// "jdbc:sqlserver://localhost:1434;databaseName=student";
+		Properties prop = new Properties();
+		InputStream input = null;
+		try {
+			input = JDBCUtils.class.getClassLoader()
+					.getResourceAsStream("application.properties");
+			prop.load(input);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		String url = resolveEnvVars(prop.getProperty("spring.datasource.url"));
 		String username = "";
 		String password = "";
 		if (connection != null) {
 			return connection;
 		}
 		try {
-			Class
-					.forName(
-							"org.sqlite.JDBC" /* "com.microsoft.sqlserver.jdbc.SQLServerDriver" */)
+			Class.forName(prop.getProperty("spring.datasource.driver-class-name"))
 					.newInstance();
 			connection = DriverManager.getConnection(url, username, password);
 		} catch (ClassNotFoundException | InstantiationException
