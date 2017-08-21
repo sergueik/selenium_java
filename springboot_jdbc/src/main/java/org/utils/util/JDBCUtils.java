@@ -1,10 +1,14 @@
 package org.utils.util;
 
-import java.sql.*;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -13,42 +17,22 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-import org.springframework.core.env.Environment;
 
-// http://www.baeldung.com/properties-with-spring
-// annotations currently do not work, commented
-// @Configuration
-// @PropertySource("classpath:application.properties")
 public class JDBCUtils {
-	/*	
-			@Bean
-			public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
-				return new PropertySourcesPlaceholderConfigurer();
-			}
-	*/
-	@Autowired
-	private static Environment env;
 
 	private static final Logger logger = Logger
 			.getLogger(JDBCUtils.class.getName());
 	public static Connection connection = null;
 	public static PreparedStatement preparedStatement = null;
 	public static ResultSet resultSet = null;
+	private static String datasourceUrl;
 
 	private JDBCUtils() {
 	}
 
-	// does not work
-	@Value("${spring.datasource.url}")
-	private static String datasourceUrl;
-
 	public static Connection getConnection() {
+
 		Properties prop = new Properties();
 		InputStream input = null;
 		try {
@@ -66,7 +50,10 @@ public class JDBCUtils {
 				}
 			}
 		}
-		String url = resolveEnvVars(prop.getProperty("spring.datasource.url"));
+
+		datasourceUrl = prop.getProperty("spring.datasource.url");
+		String url = resolveEnvVars(datasourceUrl);
+
 		String username = "";
 		String password = "";
 		if (connection != null) {

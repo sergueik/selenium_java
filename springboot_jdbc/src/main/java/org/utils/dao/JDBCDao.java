@@ -6,12 +6,19 @@ import java.sql.ResultSet;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.utils.entity.Student;
 import org.utils.util.JDBCUtils;
 
 @Repository("JdbcDao")
 public class JDBCDao implements Dao {
+
+	// http://www.baeldung.com/properties-with-spring
+	// Autowired annotation is not supported on static fields
+	@Value("${spring.datasource.url}")
+	private String datasourceUrl;
 
 	private static final Logger logger = Logger
 			.getLogger(JDBCDao.class.getName());
@@ -34,6 +41,7 @@ public class JDBCDao implements Dao {
 
 	@Override
 	public List<?> findAllStudent() {
+		logger.info("datasourceUrl = " + datasourceUrl);
 		List<?> students = null;
 		String sql = "SELECT * FROM student";
 		try {
