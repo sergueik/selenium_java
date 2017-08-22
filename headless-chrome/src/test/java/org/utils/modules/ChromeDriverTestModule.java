@@ -1,4 +1,4 @@
-package software.reinvent.headless.chrome.modules;
+package org.utils.modules;
 
 import com.google.inject.AbstractModule;
 import com.typesafe.config.Config;

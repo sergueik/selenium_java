@@ -25,6 +25,8 @@ import static org.slf4j.LoggerFactory.getLogger;
 
 public class HeadlessChromeProvider implements Provider<ChromeDriver> {
 	private static final Logger LOG = getLogger(HeadlessChromeProvider.class);
+	private static String osName;
+
 	private Config config;
 
 	@Inject
@@ -34,19 +36,28 @@ public class HeadlessChromeProvider implements Provider<ChromeDriver> {
 
 	@Override
 	public ChromeDriver get() {
+
 		if (config == null) {
 			config = ConfigLoader.load();
 		}
+
+		getOsName();
 
 		if (config.hasPath("webdriver.chrome.driver")) {
 			setProperty("webdriver.chrome.driver",
 					config.getString("webdriver.chrome.driver"));
 		} else {
 			try {
-				final File tempDriver = new File("/tmp/headless_chromedriver");
+				final File tempDriver = osName.toLowerCase().startsWith("windows")
+						? new File("c:/java/selenium/chromedriver.exe")
+						: new File("/tmp/headless_chromedriver");
 				if (!tempDriver.exists()) {
 					copyInputStreamToFile(
-							getResource(this.getClass(), "chromedriver_linux64").openStream(),
+							// TODO: check if resource exist
+							getResource(this.getClass(),
+									osName.toLowerCase().startsWith("windows")
+											? "chromedriver_win64" : "chromedriver_linux64")
+													.openStream(),
 							tempDriver);
 				}
 				tempDriver.setExecutable(true);
@@ -59,7 +70,10 @@ public class HeadlessChromeProvider implements Provider<ChromeDriver> {
 		final ChromeOptions chromeOptions = new ChromeOptions();
 		final String binary = config.hasPath("webdriver.chrome.binary")
 				? config.getString("webdriver.chrome.binary")
-				: "/usr/bin/google-chrome-unstable";
+				: osName.toLowerCase().startsWith("windows") ? (new File(
+						"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
+								.getAbsolutePath()
+						: "/usr/bin/google-chrome";
 		chromeOptions.setBinary(binary);
 		final String windowSize;
 		if (config.hasPath("chrome.window.size")) {
@@ -84,5 +98,13 @@ public class HeadlessChromeProvider implements Provider<ChromeDriver> {
 		LOG.info("Providing chromedriver from {} for {}.",
 				getProperty("webdriver.chrome.driver"), binary);
 		return new ChromeDriver(capabilities);
+	}
+	// Utilities
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
 	}
 }
