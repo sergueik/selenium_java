@@ -26,17 +26,17 @@ public class JDBCDao implements Dao {
 
 	@Override
 	public int addStudent(Student student) {
-		int res = 0;
+		int result = 0;
 		String sql = "INSERT INTO student(name,course) VALUES (?,?)";
 		try {
 			PreparedStatement pre = conn.prepareStatement(sql);
 			pre.setString(1, student.getName());
 			pre.setString(2, student.getCourse());
-			res = pre.executeUpdate();
+			result = pre.executeUpdate();
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
-		return res;
+		return result;
 	}
 
 	@Override
@@ -45,9 +45,9 @@ public class JDBCDao implements Dao {
 		List<?> students = null;
 		String sql = "SELECT * FROM student";
 		try {
-			PreparedStatement pre = conn.prepareStatement(sql);
-			ResultSet rs = pre.executeQuery();
-			students = JDBCUtils.TranverseToList(rs, Student.class);
+			PreparedStatement preparedStatement = conn.prepareStatement(sql);
+			ResultSet resultSet = preparedStatement.executeQuery();
+			students = JDBCUtils.TranverseToList(resultSet, Student.class);
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
@@ -56,31 +56,31 @@ public class JDBCDao implements Dao {
 
 	@Override
 	public int updateStudent(Student student) {
-		int res = 0;
+		int result = 0;
 		String sql = "UPDATE student SET name = ?,course = ? WHERE id = ?";
 		try {
 			PreparedStatement pre = conn.prepareStatement(sql);
 			pre.setString(1, student.getName());
 			pre.setString(2, student.getCourse());
 			pre.setLong(3, student.getId());
-			res = pre.executeUpdate();
+			result = pre.executeUpdate();
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
-		return res;
+		return result;
 	}
 
 	@Override
 	public int delStudentById(long id) {
-		int res = 0;
+		int result = 0;
 		String sql = "DELETE FROM student WHERE id = ?";
 		try {
 			PreparedStatement pre = conn.prepareStatement(sql);
 			pre.setLong(1, id);
-			res = pre.executeUpdate();
+			result = pre.executeUpdate();
 		} catch (Exception ex) {
 			logger.log(Level.SEVERE, null, ex);
 		}
-		return res;
+		return result;
 	}
 }

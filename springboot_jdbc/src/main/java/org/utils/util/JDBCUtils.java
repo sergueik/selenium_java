@@ -89,22 +89,23 @@ public class JDBCUtils {
 		}
 	}
 
-	public static List<?> TranverseToList(ResultSet rs, Class<?> clazz)
+	public static List<?> TranverseToList(ResultSet resultSet,
+			Class<?> targetClass)
 			throws SQLException, InstantiationException, IllegalAccessException {
-		ResultSetMetaData rsm = rs.getMetaData();
-		int colNumber = rsm.getColumnCount();
+		ResultSetMetaData resultMetaData = resultSet.getMetaData();
+		int columnCount = resultMetaData.getColumnCount();
 		List<Object> list = new ArrayList<>();
-		Field[] fields = clazz.getDeclaredFields();
-		while (rs.next()) {
-			Object obj = clazz.newInstance();
-			for (int i = 1; i <= colNumber; i++) {
-				Object value = rs.getObject(i);
-				for (Field f : fields) {
-					if (f.getName().equals(rsm.getColumnName(i))) {
-						boolean flag = f.isAccessible();
-						f.setAccessible(true);
-						f.set(obj, value);
-						f.setAccessible(flag);
+		Field[] fields = targetClass.getDeclaredFields();
+		while (resultSet.next()) {
+			Object obj = targetClass.newInstance();
+			for (int column = 1; column <= columnCount; column++) {
+				Object value = resultSet.getObject(column);
+				for (Field field : fields) {
+					if (field.getName().equals(resultMetaData.getColumnName(column))) {
+						boolean flag = field.isAccessible();
+						field.setAccessible(true);
+						field.set(obj, value);
+						field.setAccessible(flag);
 						break;
 					}
 				}
