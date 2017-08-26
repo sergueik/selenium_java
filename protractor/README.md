@@ -1,82 +1,81 @@
-
 ### Note
 
 This github project is the 'development branch' of the collaborated project
-[jProtractor](https://github.com/caarlos0/jProtractor). It may be using a different version of Java compiler but otherwise identical, just few commits ahead.
+[__jProtractor__](https://github.com/caarlos0/jProtractor). It may be few commits ahead.
 
 #### Info
-The [Angular Protractor](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project.
-However being a Javascript testing tool, __Protractor__ enforces one to (re)write the whole web page test suite in Javascript - which may not be acceptable solution.
+The [__Angular Protractor__](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project.
+However being a Javascript testing tool, __Protractor__ enforces one to (re)write the whole test suite in Javascript which some may find not acceptable solution.
 
-This project and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net) try to make this unnecessary.
-On the other hand Protractor offers some advanced [locator strategies](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) which selenum Webdriver does not have.
+This project and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net) tries to make such conversion unnecessary.
 
-These strategier take advantage of __Angular__ features -
-this project allows the Java developer to use those strategies by supporting all Javascript methods __Protractor__ has plus few extra:
+On the other hand __Angular 1.x__  a.k.a. __AngularJS__ offered unique features: `ng-repeat` and `ng_model`,
+which __Protractor__ takes advantage of by providing unique MVC-style [locator strategies](http://www.protractortest.org/#/api?view=ProtractorBy)
+
+The __jProtractor__ project makes these, plus few extra, locator extensions available to Java:
 
 ```javascript
 findBindings = function(binding, exactMatch, using, rootSelector)
 ```
-Find a list of elements in the page by their angular binding.
-
+finds a list of elements in the page by their `angular` binding
 ```javascript
 findByButtonText = function(searchText, using)
 ```
-Find buttons by textual content
+finds buttons by textual content
 ```javascript
 findByCssContainingText = function(cssSelector, searchText, using)
 ```
-Find elements by css selector and textual content
+finds elements by css selector and textual content
 ```javascript
 findByModel = function(model, using, rootSelector)
 ```
-Find elements by model name
+finds elements by model name
 ```javascript
 findByOptions = function(options, using)
 ```
-Find elements by options
+finds elements by options
 ```javascript
 findByPartialButtonText = function(searchText, using)
 ```
-Find buttons by textual content fragment
+finds button(s) by textual content fragment
 ```javascript
 findAllRepeaterRows = function(using, repeater)
 ```
-Find an array of elements matching a row within an ng-repeat
+finds an array of elements matching a row within an `ng-repeat`
 ```javascript
 findRepeaterColumn = function(repeater, exact, binding, using, rootSelector)
 ```
-Find the elements in a column of an ng-repeat
+finds the elements in a column of an `ng-repeat`
 ```javascript
 findRepeaterElement = function(repeater, exact, index, binding, using, rootSelector)
 ```
-Find an element within an ng-repeat by its row and column.
+finds an element within an `ng-repeat` by its row and column.
 ```javascript
 findSelectedOption = function(model, using)
 ```
-Find selected option elements by model name
+finds the selected option elements by model name (Angular 1.x).
 ```javascript
 findSelectedRepeaterOption = function(repeater, using)
 ```
-Find selected option elements in the select implemented via repeater without a model.
+finds selected option elements in the select implemented via repeater without a model.
 ```javascript
 TestForAngular = function(attempts)
 ```
-Tests whether the angular global variable is present on a page
+tests whether the angular global variable is present on a page
 ```javascript
 waitForAngular = function(rootSelector, callback)
 ```
-Wait until Angular has finished rendering
+waits until Angular has finished rendering
 ```javascript
 return angular.element(element).scope().$eval(expression)
 ```
-Evaluate an Angular expression in the context of a given element.
+evaluates an Angular expression in the context of a given element.
 
-The [Protractor By locators](http://www.protractortest.org/#/api?view=ProtractorBy) and a subset of Protractor Browser API
-is borrowed from __Protractor__  project's [clientsidescripts.js](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
-in a form of Javascript snippets - one file per method - stored in the
-`src/main/java/resources`:
-```
+These are 
+implemented in a form of Javascript snippets, one file per method, 
+borrowed from __Protractor__  project's [`clientsidescripts.js`](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js)
+and can be found in the `src/main/java/resources` directory:
+```bash
 binding.js
 buttonText.js
 cssContainingText.js
@@ -95,6 +94,13 @@ selectedRepeaterOption.js
 testForAngular.js
 waitForAngular.js
 ```
+
+Majority of __AngularJS__-specific locators [aren't any longer supported](https://stackoverflow.com/questions/36201691/protractor-angular-2-failed-unknown-error-angular-is-not-defined) by __Angular 2__.
+
+The __E2E_Tests__ section of the [document](https://angular.io/guide/upgrade) covers the migration.
+
+The standard pure Java Selenium locators are also supported.
+
 #### Forum
 There is a [Protractor Java and c# Client](https://gctor Java and c# Clientroups.google.com/forum/#!forum/protractor-java--c-client) forum.
 
@@ -233,7 +239,10 @@ import com.jprotractor.NgWebDriver;
 import com.jprotractor.NgWebElement;
 ```
 
-### Example Test
+### Example Tests
+
+There is a big number of examples in  [`src/test/java/com/jprotractor/integration`](https://github.com/sergueik/jProtractor/tree/master/src/test/java/com/jprotractor/integration) directory.
+
 For desktop browser testing, run a Selenium node and Selenium hub on port 4444. Likewise, for Vagrant box browser testing have localhost port 4444 forwarded to the hub 4444
 Then create a typical TestNG test class with the annotated methods like below.
 
@@ -269,10 +278,10 @@ public void testCustomerLogin() throws Exception {
     }
   }
   NgWebElement login_element = ngDriver.findElement(NgBy.buttonText("Login"));
-  assertTrue(login_element.isEnabled());  
+  assertTrue(login_element.isEnabled());
   login_element.click();
   assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),containsString("Harry"));
-  
+
   NgWebElement account_number_element = ngDriver.findElement(NgBy.binding("accountNo"));
   assertThat(account_number_element, notNullValue());
   assertTrue(account_number_element.getText().matches("^\\d+$"));
