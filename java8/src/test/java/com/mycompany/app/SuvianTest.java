@@ -91,6 +91,10 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
+import org.testng.asserts.SoftAssert;
+// http://www.softwaretestingmaterial.com/soft-assert/
+
+
 public class SuvianTest {
 
 	private WebDriver driver;
@@ -226,7 +230,12 @@ public class SuvianTest {
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
 		List<WebElement> elements = driver
 				.findElements(By.xpath("//div[1]/div/div/div/div/h3[2]/a"));
-		assertTrue(elements.size() > 0);
+		// assertTrue(elements.size() > 0);
+    // http://grepcode.com/file/repo1.maven.org/maven2/org.testng/testng/6.8/org/testng/asserts/SoftAssert.java
+    SoftAssert softAssert = new SoftAssert ();
+    softAssert.assertTrue(elements.size() > 0);
+		// System.out.println("softAssert Method Was Executed");
+		softAssert.assertAll();
 
 		// Act
 		WebElement element = elements.get(0);
