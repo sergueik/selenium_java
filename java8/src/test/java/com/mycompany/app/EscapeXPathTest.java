@@ -115,7 +115,7 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
-public class EscapeXPathTest {
+public class EscapeXPathTest extends BaseTest {
 
 	private static WebDriver driver;
 	public static WebDriverWait wait;
@@ -130,49 +130,6 @@ public class EscapeXPathTest {
 
 	private static Pattern pattern;
 	private static Matcher matcher;
-
-	@BeforeSuite
-	@SuppressWarnings("deprecation")
-	public static void setUp() {
-		System.setProperty("webdriver.gecko.driver",
-				new File("c:/java/selenium/geckodriver.exe").getAbsolutePath());
-		System.setProperty("webdriver.firefox.bin",
-				new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-						.getAbsolutePath());
-		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-		// use legacy FirefoxDriver
-		capabilities.setCapability("marionette", false);
-		// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
-		capabilities.setCapability("locationContextEnabled", false);
-		capabilities.setCapability("acceptSslCerts", true);
-		capabilities.setCapability("elementScrollBehavior", 1);
-		FirefoxProfile profile = new FirefoxProfile();
-		profile.setAcceptUntrustedCertificates(true);
-		profile.setAssumeUntrustedCertificateIssuer(true);
-		profile.setEnableNativeEvents(false);
-
-		System.out.println(System.getProperty("user.dir"));
-		capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-		try {
-			driver = new FirefoxDriver(capabilities);
-		} catch (WebDriverException e) {
-			e.printStackTrace();
-			throw new RuntimeException("Cannot initialize Firefox driver");
-		}
-		wait = new WebDriverWait(driver, flexible_wait_interval);
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
-				TimeUnit.SECONDS);
-	}
-
-	@AfterSuite
-	public static void tearDown() throws Exception {
-		driver.close();
-		driver.quit();
-		if (verificationErrors.length() != 0) {
-			throw new Exception(verificationErrors.toString());
-		}
-	}
 
 	@BeforeMethod
 	public void loadPage() {
@@ -224,7 +181,7 @@ public class EscapeXPathTest {
 	// origin:
 	// https://saucelabs.com/resources/articles/selenium-tips-css-selectors
 	// NOTE: all failing
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test2() {
 		ArrayList<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
@@ -283,39 +240,6 @@ public class EscapeXPathTest {
 				"var x = $(arguments[0]).find(\":contains('%s')\"); return x;", text),
 				parent);
 		return (WebElement) element;
-	}
-
-	public static Object executeScript(String script, Object... arguments) {
-		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver); // a.k.a. (JavascriptExecutor) driver;
-			return javascriptExecutor.executeScript(script, arguments);
-		} else {
-			throw new RuntimeException("Script execution failed.");
-		}
-	}
-
-	public static void highlight(WebElement element) {
-		if (wait == null) {
-			wait = new WebDriverWait(driver, flexible_wait_interval);
-			wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		}
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'", element);
-			Thread.sleep(highlight_interval);
-			executeScript("arguments[0].style.border=''", element);
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-	}
-
-	public static void highlight(By locator) throws InterruptedException {
-		log.info("Highlighting element {}", locator);
-		WebElement element = driver.findElement(locator);
-		executeScript("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
-		executeScript("arguments[0].style.border=''", element);
 	}
 
 	// origin: https://groups.google.com/forum/#!topic/selenium-users/sTWcaVbnU6c
@@ -444,14 +368,4 @@ public class EscapeXPathTest {
 			throw new RuntimeException(e);
 		}
 	}
-
-	public void sleep(Integer seconds) {
-		long secondsLong = (long) seconds;
-		try {
-			Thread.sleep(secondsLong);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
 }

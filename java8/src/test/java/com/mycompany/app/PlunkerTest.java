@@ -399,47 +399,4 @@ public class PlunkerTest extends BaseTest {
 		executeScript("arguments[0].style.border=''", element);
 	}
 
-	private void highlight(WebElement element) {
-		highlight(element, 100);
-	}
-
-	public void highlight(WebElement element, long highlight_interval) {
-		if (wait == null) {
-			wait = new WebDriverWait(driver, flexibleWait);
-		}
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'", element);
-			}
-			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver)
-						.executeScript("arguments[0].style.border=''", element);
-			}
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-	}
-
-	private Object executeScript(String script, Object... arguments) {
-		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver);
-			return javascriptExecutor.executeScript(script, arguments);
-		} else {
-			throw new RuntimeException("Script execution failed.");
-		}
-	}
-
-	public void sleep(Integer seconds) {
-		long secondsLong = (long) seconds;
-		try {
-			Thread.sleep(secondsLong);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
 }

@@ -65,6 +65,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+@SuppressWarnings("deprecation")
 public class SessionTest {
 
 	public RemoteWebDriver driver;

@@ -50,6 +50,7 @@ public class BaseTest {
 	public String baseURL = "about:blank";
 
 	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
+	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
 	// class may fail
 	@AfterSuite
 	public void afterSuite() throws Exception {
@@ -60,6 +61,7 @@ public class BaseTest {
 	public void beforeSuite() {
 	}
 
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public void beforeClass() throws IOException {
 
@@ -208,7 +210,17 @@ public class BaseTest {
 		}
 	}
 
-	public void sleep(Integer seconds) {
+  public Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+  public void sleep(Integer seconds) {
 		long secondsLong = (long) seconds;
 		try {
 			Thread.sleep(secondsLong);
