@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -93,6 +94,15 @@ public class TestWithData {
 		capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		driver = new ChromeDriver(capabilities);
+		actions = new Actions(driver);
+
+		driver.manage().timeouts().setScriptTimeout(scriptTimeout,
+				TimeUnit.SECONDS);
+		// Declare a wait time
+		wait = new WebDriverWait(driver, flexibleWait);
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		screenshot = ((TakesScreenshot) driver);
+		js = ((JavascriptExecutor) driver);
 		mySheet = getSpreadSheet();
 	}
 
@@ -129,28 +139,26 @@ public class TestWithData {
 		driver.get("about:blank");
 	}
 
-	@SuppressWarnings("deprecation")
 	@Test
 	public void failedLoginPage() {
 
 		String user = mySheet.getRow(0).getCell(0).toString();
 		String pass = mySheet.getRow(0).getCell(1).toString();
 
-		// the first time around, it should not work!
+		System.out.println("Enter username: " + user);
 		driver.findElement(By.name("username")).sendKeys(user);
 
-		// then by entering the password
-		System.out.println("Entering password");
+		System.out.println("Enter password: " + pass);
 		driver.findElement(By.name("password")).sendKeys(pass);
 
-		// then by clicking the login button
 		System.out.println("Logging in");
 		driver.findElement(By.cssSelector("div.form-actions > button")).click();
 
-		WebDriverWait wait = new WebDriverWait(driver, 10);
-		wait.until(ExpectedConditions.textToBePresentInElement(
+		System.out.println("Confirm unable to Log in");
+		wait.until(ExpectedConditions.textToBePresentInElementLocated(
 				By.xpath("/html/body/div/div/div/div[1]"),
 				"Username or password is incorrect"));
+		System.out.println("Test Finished");
 	}
 
 	@Test
@@ -159,27 +167,26 @@ public class TestWithData {
 		String user = mySheet.getRow(1).getCell(0).toString();
 		String pass = mySheet.getRow(1).getCell(1).toString();
 
+		System.out.println("Enter username: " + user);
 		driver.findElement(By.name("username")).sendKeys(user);
 
-		// then by entering the password
-		System.out.println("Entering password");
+		System.out.println("Enter password: " + pass);
 		driver.findElement(By.name("password")).sendKeys(pass);
 
-		// then by clicking the login button
 		System.out.println("Logging in");
 		driver.findElement(By.cssSelector("div.form-actions > button")).click();
 
-		// let's wait here to ensure the page has loaded completely
-		wait = new WebDriverWait(driver, 10);
+		System.out.println("Ensure the page has loaded completely");
 		wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.xpath("//*[@id=\"logged-in-message\"]/h2")));
 
+		System.out.println("Confirm welcome message");
 		String welcomeMessage = driver
 				.findElement(By.xpath("//*[@id=\"logged-in-message\"]/h2")).getText();
 		Assert.assertEquals("Welcome tester@crossbrowsertesting.com",
 				welcomeMessage);
 
-		System.out.println("TestFinished");
+		System.out.println("Test Finished");
 	}
 
 	@AfterSuite
