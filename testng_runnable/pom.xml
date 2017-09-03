@@ -18,12 +18,12 @@
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>3.2.0</selenium.version>
     <selenium.firefox-driver.version>3.2.0</selenium.firefox-driver.version>
     <testng.version>6.9.10</testng.version>
     <poi.version>3.14</poi.version>
     <poiooxml.version>3.14</poiooxml.version>
+    <mainClass>demo.EntryPoint</mainClass>
   </properties>
   <dependencies>
     <dependency>
@@ -73,29 +73,30 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-server</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+    <!-- 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium.firefox-driver.version}</version>
     </dependency>
+    -->
+    <!-- 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-remote-driver</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+    -->
+    <!-- 
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>
       <version>20080701</version>
     </dependency>
+    -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
@@ -108,19 +109,6 @@
     </dependency>
   </dependencies>
   <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.opera</groupId>
-        <artifactId>firefoxdriver</artifactId>
-        <version>1.1</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-    </dependencies>
   </dependencyManagement>
   <build>
     <plugins>
@@ -143,11 +131,13 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-      	<version>3.0.2</version>
+        <version>3.0.2</version>
         <configuration>
           <archive>
             <manifest>
-              <mainClass>demo.EntryPoint</mainClass>
+              <addClasspath>true</addClasspath>
+              <classpathPrefix>libs/</classpathPrefix>
+              <mainClass>${mainClass}</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -156,12 +146,37 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
+            <id>copy-dependencies</id>
+            <phase>prepare-package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
               <outputDirectory>${project.build.directory}/lib</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <archive>
+                <manifest>
+                  <mainClass>
+                        ${mainClass}
+                    </mainClass>
+                </manifest>
+              </archive>
+              <descriptorRefs>
+                <descriptorRef>jar-with-dependencies</descriptorRef>
+              </descriptorRefs>
             </configuration>
           </execution>
         </executions>
