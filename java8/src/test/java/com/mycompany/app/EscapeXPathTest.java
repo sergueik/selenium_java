@@ -94,6 +94,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -117,22 +118,27 @@ import static org.testng.AssertJUnit.fail;
 
 public class EscapeXPathTest extends BaseTest {
 
-	private static WebDriver driver;
-	public static WebDriverWait wait;
-	public static Actions actions;
-	private static long implicit_wait_interval = 3;
-	private static int flexible_wait_interval = 5;
-	private static long wait_polling_interval = 500;
-	private static long highlight_interval = 100;
-
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(EscapeXPathTest.class);
 
+	@SuppressWarnings("unused")
 	private static Pattern pattern;
 	private static Matcher matcher;
 
+	@BeforeClass
+	public void beforeClass() throws IOException {
+		super.beforeClass();
+		assertThat(driver, notNullValue());
+	}
+
 	@BeforeMethod
 	public void loadPage() {
+		// TODO:
+		// mvn surefire:test -Dtest=EscapeXPathTest
+		// tests are failing, FF and Chrome both shown
+		// mvn -Dtest=EscapeXPathTest test
+		// java.lang.NullPointerException
+		// at com.mycompany.app.EscapeXPathTest.loadPage(EscapeXPathTest.java:136)
 		driver.navigate().to(getPageContent("test.htm"));
 	}
 
@@ -183,6 +189,7 @@ public class EscapeXPathTest extends BaseTest {
 	// NOTE: all failing
 	@Test(enabled = true)
 	public void test2() {
+		// sleep(10000);
 		ArrayList<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
 						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
@@ -249,7 +256,7 @@ public class EscapeXPathTest extends BaseTest {
 		return str;
 	}
 
-	private static String replaceSpecials() {
+	private String replaceSpecials() {
 		// http://utf8-chartable.de/unicode-utf8-table.pl?start=8064&names=-&utf8=0x
 		String pageSource = "";
 		pageSource = driver.getPageSource();
@@ -310,7 +317,7 @@ public class EscapeXPathTest extends BaseTest {
 	 * @return Escaped value.
 	 */
 
-	public static String escapeXPath(@Nullable String string) {
+	public String escapeXPath(@Nullable String string) {
 		if (string == null) {
 			return null;
 		} else if (string.contains("'")) {
@@ -334,7 +341,7 @@ public class EscapeXPathTest extends BaseTest {
 	}
 
 	// shorter version of escapeXPath
-	public static String escapeXPath2(@Nullable String value) {
+	public String escapeXPath2(@Nullable String value) {
 		if (!value.contains("'"))
 			return '\'' + value + '\'';
 		else if (!value.contains("\""))
@@ -346,7 +353,7 @@ public class EscapeXPathTest extends BaseTest {
 	// one can escape quotes and apostrophes in XPath 2.0 by doubling them, but
 	// there is no way of doing it in XPath 1.0.
 	// NOTE: does not work
-	public static String escapeXPath3(@Nullable String value) {
+	public String escapeXPath3(@Nullable String value) {
 		return "'" + value.replace("'", "''").replace("\"", "\"\"");
 	}
 
@@ -357,7 +364,7 @@ public class EscapeXPathTest extends BaseTest {
 	// "//*/text()[matches(.,'test', 'i')]"
 	// "//*/text()[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'test')]
 
-	protected static String getPageContent(String pagename) {
+	protected String getPageContent(String pagename) {
 		try {
 			URI uri = EscapeXPathTest.class.getClassLoader().getResource(pagename)
 					.toURI();
