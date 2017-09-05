@@ -25,6 +25,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
@@ -163,6 +164,11 @@ public class BaseTest {
 		// driver.get("about:blank");
 	}
 
+	@AfterTest(alwaysRun = true)
+	public void afterTest() throws Exception {
+		killProcess("chromedriver");
+	}
+
 	// Utilities
 
 	public static String getOsName() {
@@ -210,7 +216,7 @@ public class BaseTest {
 		}
 	}
 
-  public Object executeScript(String script, Object... arguments) {
+	public Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
 					.cast(driver);
@@ -220,7 +226,7 @@ public class BaseTest {
 		}
 	}
 
-  public void sleep(Integer seconds) {
+	public void sleep(Integer seconds) {
 		long secondsLong = (long) seconds;
 		try {
 			Thread.sleep(secondsLong);
@@ -229,4 +235,18 @@ public class BaseTest {
 		}
 	}
 
+	public static void killProcess(String processName) throws Exception {
+
+		try {
+			if (osName.toLowerCase().startsWith("windows")) {
+				Runtime.getRuntime().exec("taskkill.exe /F /IM " + processName.trim());
+			} else // mac, linux
+			{
+				Runtime.getRuntime().exec("killall " + processName.trim());
+			}
+		} catch (Exception e) {
+			System.err.println("Got exception " + e.getMessage());
+			throw e;
+		}
+	}
 }
