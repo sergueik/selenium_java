@@ -1,7 +1,11 @@
 package com.mycompany.app;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -172,7 +176,7 @@ public class BaseTest {
 	}
 
 	@AfterTest(alwaysRun = true)
-	public void afterTest() throws Exception {
+	public void afterTest() {
 		killProcess(browserDrivers.get(browser));
 	}
 
@@ -242,18 +246,46 @@ public class BaseTest {
 	}
 
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
-	public static void killProcess(String processName) throws Exception {
+	public static void killProcess(String processName) {
+
+		String command = String.format((osName.toLowerCase().startsWith("windows"))
+				? "taskkill.exe /F /IM %s" : "killall %s", processName.trim());
 
 		try {
-			if (osName.toLowerCase().startsWith("windows")) {
-				Runtime.getRuntime().exec("taskkill.exe /F /IM " + processName.trim());
-			} else // mac, linux
-			{
-				Runtime.getRuntime().exec("killall " + processName.trim());
+			Runtime runtime = Runtime.getRuntime();
+			Process process = runtime.exec(command);
+			// process.redirectErrorStream( true);
+
+			BufferedReader stdoutBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
+
+			BufferedReader stderrBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getErrorStream()));
+			String line = null;
+
+			StringBuffer processOutput = new StringBuffer();
+			while ((line = stdoutBufferedReader.readLine()) != null) {
+				processOutput.append(line);
+			}
+			StringBuffer processError = new StringBuffer();
+			while ((line = stderrBufferedReader.readLine()) != null) {
+				processError.append(line);
+			}
+			int exitCode = process.waitFor();
+			if (exitCode != 0) {
+				System.out.println("Process exit code: " + exitCode);
+				if (processOutput.length() > 0) {
+					System.out.println("<OUTPUT>" + processOutput + "</OUTPUT>");
+				}
+				if (processError.length() > 0) {
+					// e.g.
+					// The process "chromedriver.exe" with PID 5540 could not be terminated.
+					// Reason: Access is denied.
+					System.out.println("<ERROR>" + processError + "</ERROR>");
+				}
 			}
 		} catch (Exception e) {
-			System.err.println("Got exception " + e.getMessage());
-			throw e;
+			System.err.println("Exception (ignored): " + e.getMessage());
 		}
 	}
 }
