@@ -133,12 +133,6 @@ public class EscapeXPathTest extends BaseTest {
 
 	@BeforeMethod
 	public void loadPage() {
-		// TODO:
-		// mvn surefire:test -Dtest=EscapeXPathTest
-		// tests are failing, FF and Chrome both shown
-		// mvn -Dtest=EscapeXPathTest test
-		// java.lang.NullPointerException
-		// at com.mycompany.app.EscapeXPathTest.loadPage(EscapeXPathTest.java:136)
 		driver.navigate().to(getPageContent("test.htm"));
 	}
 

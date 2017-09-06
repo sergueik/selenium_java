@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
@@ -41,6 +42,12 @@ public class BaseTest {
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome"); // "firefox";
+	private static final Map<String, String> browserDrivers = new HashMap<>();
+	static {
+		browserDrivers.put("chrome", "chromedriver.exe");
+		browserDrivers.put("firefox", "geckodriver.exe");
+	}
+
 	private static String osName;
 
 	public int scriptTimeout = 5;
@@ -166,29 +173,7 @@ public class BaseTest {
 
 	@AfterTest(alwaysRun = true)
 	public void afterTest() throws Exception {
-		killProcess("chromedriver");
-	}
-
-	// Utilities
-
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name");
-		}
-		return osName;
-	}
-
-	// origin:
-	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
-	public static String getPropertyEnv(String name, String defaultValue) {
-		String value = System.getProperty(name);
-		if (value == null) {
-			value = System.getenv(name);
-			if (value == null) {
-				value = defaultValue;
-			}
-		}
-		return value;
+		killProcess(browserDrivers.get(browser));
 	}
 
 	public void highlight(WebElement element) {
@@ -235,6 +220,28 @@ public class BaseTest {
 		}
 	}
 
+	// Utilities
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
+
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
+	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void killProcess(String processName) throws Exception {
 
 		try {
