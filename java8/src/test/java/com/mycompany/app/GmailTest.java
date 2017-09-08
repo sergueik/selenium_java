@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -104,29 +105,29 @@ public class GmailTest extends BaseTest {
 	public void loginAfterTest() throws InterruptedException, IOException {
 
 		// Click on Sign in Link
-		System.err.println("// Click on Sign in Link");
+		System.err.println("Click on Sign in Link");
 		driver.findElement(signInLink).click();
 
 		// Wait for page url to change
-		System.err.println("// Wait for page url to change");
+		System.err.println("Wait for page url to change");
 		ExpectedCondition<Boolean> urlChange = driver -> driver.getCurrentUrl()
 				.matches("^https://accounts.google.com/signin.*");
 		wait.until(urlChange);
 
 		// Enter the email id
-		System.err.println("// Enter the email id");
+		System.err.println("Enter the email id");
 		enterData(identifier, "automationnewuser24@gmail.com");
 
 		// Click on next button
-		System.err.println("// Click on next button");
+		System.err.println("Click on next button");
 		clickNextButton(identifierNextButton);
 
 		// Enter the password
-		System.err.println("// Enter the password");
+		System.err.println("Enter the password");
 		enterData(passwordInput, "automationnewuser2410");
 
 		// Click on next button
-		System.err.println("// Click on next button");
+		System.err.println("Click on next button");
 		clickNextButton(passwordNextButton);
 
 		// Wait for page url to change
@@ -138,7 +139,7 @@ public class GmailTest extends BaseTest {
 		wait.until(urlChange);
 
 		// Click on profile image
-		System.err.println("// Click on profile image");
+		System.err.println("Click on profile image");
 		wait.until((WebDriver driver) -> {
 			WebElement element = null;
 			try {
@@ -150,7 +151,7 @@ public class GmailTest extends BaseTest {
 		}).click();
 
 		// Sign out
-		System.err.println("// Sign out");
+		System.err.println("Sign out");
 		highlight(driver.findElement(signOutButton), 100);
 		driver.findElement(signOutButton).click();
 
@@ -166,7 +167,7 @@ public class GmailTest extends BaseTest {
 		}
 
 		// Wait for page url to change
-		System.err.println("// Wait for page url to change");
+		System.err.println("Wait for page url to change");
 		urlChange = driver -> driver.getCurrentUrl()
 				.matches("^https://accounts.google.com/signin.*");
 		wait.until(urlChange);
@@ -178,7 +179,7 @@ public class GmailTest extends BaseTest {
 		  System.err.println(y.getAttribute("outerHTML"));
 		}
 		*/
-		System.err.println("// Click on users list link");
+		System.err.println("Click on users list link");
 		WebElement svgSelector =
 				// driver.findElement(By.cssSelector("div[role='button']
 				// svg")).findElement(By.xpath(".."));
@@ -216,7 +217,7 @@ public class GmailTest extends BaseTest {
 		highlight(svgSelector, 100);
 		svgSelector.click();
 		// Wait for page url to change
-		System.err.println("// Wait for page url to change");
+		System.err.println("Wait for page url to change");
 		urlChange = driver -> driver.getCurrentUrl()
 				.matches("^https://accounts.google.com/ServiceLogin/signinchooser.*");
 		wait.until(urlChange);
@@ -277,6 +278,22 @@ public class GmailTest extends BaseTest {
 			}
 		});
 
+		// Wait until form is redndered, old semantics
+		wait.until(new ExpectedCondition<Boolean>() {
+			@Override
+			public Boolean apply(WebDriver driver) {
+        System.err.println("Wait for form to finish rendering");
+				JavascriptExecutor js = ((JavascriptExecutor) driver);
+				Boolean active = (Boolean) js
+						.executeScript("return document.readyState == 'complete'");
+            if (active) { 
+              System.err.println("Done");
+            }
+				return active;
+			}
+		});
+
+    System.err.println("Click on profile image");
 		// Click on profile image
 		wait.until((WebDriver driver) -> {
 			WebElement element = null;
@@ -288,7 +305,20 @@ public class GmailTest extends BaseTest {
 			return (element.isDisplayed()) ? element : null;
 		}).click();
 
+		// Wait until form is redndered, lambda semantics
+		wait.until((WebDriver driver) -> {
+      System.err.println("Wait for form to finish rendering");
+      JavascriptExecutor js = ((JavascriptExecutor) driver);
+      Boolean active = (Boolean) js
+        .executeScript("return document.readyState == 'complete'");
+        if (active) { 
+          System.err.println("Done");
+        }
+      return active;
+		});
+
 		// Sign out
+		System.err.println("Sign out");
 		highlight(driver.findElement(signOutButton), 100);
 		driver.findElement(signOutButton).click();
 
@@ -297,7 +327,7 @@ public class GmailTest extends BaseTest {
 			alert.accept();
 		} catch (NoAlertPresentException ex) {
 			// Alert not present
-			System.err.println("NoAlertPresentException: " + ex.getStackTrace());
+			System.err.println("NoAlertPresentException (ignored): " + ex.getStackTrace());
 			return;
 		} catch (WebDriverException ex) {
 			System.err.println("Alert was not handled by PhantomJS: "
