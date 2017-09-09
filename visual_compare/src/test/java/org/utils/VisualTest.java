@@ -3,16 +3,19 @@ package org.utils;
 import static org.testng.Assert.assertTrue;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
+import com.google.common.io.Files;
+
 import java.lang.reflect.Method;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
 import javax.imageio.ImageIO;
-
-import org.apache.commons.io.FileUtils;
 
 import org.im4java.core.CommandException;
 import org.im4java.core.CompareCmd;
@@ -33,7 +36,6 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.google.common.io.Files;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
@@ -45,11 +47,12 @@ public class VisualTest extends BaseTest {
 	public String testName;
 	public String testScreenShotDirectory;
 	public String baseURL = "http://www.kariyer.net";
-	public String currentDir = System.getProperty("user.dir");
-	public String parentScreenShotsLocation = currentDir + "\\ScreenShots\\";
+	public String parentScreenShotsLocation = System.getProperty("user.dir")
+			+ "\\ScreenShots\\";
 
 	// Main differences directory
-	public String parentDifferencesLocation = currentDir + "\\Differences\\";
+	public String parentDifferencesLocation = System.getProperty("user.dir")
+			+ "\\Differences\\";
 
 	// Element screenshot paths
 	public String baselinePath;
@@ -85,7 +88,6 @@ public class VisualTest extends BaseTest {
 		// Create screenshot and differences folders if they are not exist
 		createFolder(parentScreenShotsLocation);
 		createFolder(parentDifferencesLocation);
-
 		// Clean Differences Root Folder
 		File differencesFolder = new File(parentDifferencesLocation);
 		FileUtils.cleanDirectory(differencesFolder);
@@ -236,8 +238,9 @@ public class VisualTest extends BaseTest {
 
 	// origin:
 	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
-	public static void takeScreenshotOfWebelement(WebDriver driver,
-			WebElement element, String Destination) throws Exception {
+	public void takeScreenshotOfWebelement(WebDriver driver, WebElement element,
+			String Destination) throws Exception {
+		highlight(element);
 		File v = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		BufferedImage bi = ImageIO.read(v);
 		org.openqa.selenium.Point p = element.getLocation();

@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.TakesScreenshot;import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -15,6 +17,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.annotations.AfterClass;
@@ -36,7 +39,7 @@ public class BaseTest {
 	private int implicitWait = 1;
 	private long pollingInterval = 500;
 
-	public String baseURL =	 "about:blank";
+	public String baseURL = "about:blank";
 
 	@AfterClass
 	public void afterSuiteMethod() throws Exception {
@@ -99,7 +102,6 @@ public class BaseTest {
 			FirefoxProfile profile = new FirefoxProfile();
 			profile.setAcceptUntrustedCertificates(true);
 			profile.setAssumeUntrustedCertificateIssuer(true);
-			profile.setEnableNativeEvents(false);
 
 			System.out.println(System.getProperty("user.dir"));
 			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
@@ -111,8 +113,9 @@ public class BaseTest {
 			}
 		}
 		actions = new Actions(driver);
-		
-		driver.manage().timeouts().setScriptTimeout(scriptTimeout, TimeUnit.SECONDS);
+
+		driver.manage().timeouts().setScriptTimeout(scriptTimeout,
+				TimeUnit.SECONDS);
 		// Declare a wait time
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -122,6 +125,31 @@ public class BaseTest {
 
 		// Go to URL
 		driver.get(baseURL);
+	}
+
+	public void highlight(WebElement element) {
+		highlight(element, 100);
+	}
+
+	public void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						"arguments[0].style.border='3px solid yellow'", element);
+			}
+			Thread.sleep(highlight_interval);
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver)
+						.executeScript("arguments[0].style.border=''", element);
+			}
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
 	}
 
 	public static String getOsName() {
