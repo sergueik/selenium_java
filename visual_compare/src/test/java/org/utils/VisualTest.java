@@ -32,6 +32,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -67,7 +68,7 @@ public class VisualTest extends BaseTest {
 	private String imageMagickPath;
 
 	@BeforeClass
-	public void setupTestClass() throws IOException {
+	public void setupTestClass(ITestContext context) throws IOException {
 
 		// Determine path to ImageMagick
 		imageMagickPath = Advapi32Util.registryGetStringValue(
@@ -81,7 +82,7 @@ public class VisualTest extends BaseTest {
 				"\"compare.exe\" has to be present");
 
 		// setup WebDriver
-		super.setupTestClass();
+		super.setupTestClass(context);
 		// Go to URL
 		driver.get(baseURL);
 
@@ -243,10 +244,8 @@ public class VisualTest extends BaseTest {
 		highlight(element);
 		File v = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		BufferedImage bi = ImageIO.read(v);
-		org.openqa.selenium.Point p = element.getLocation();
-		int n = element.getSize().getWidth();
-		int m = element.getSize().getHeight();
-		BufferedImage d = bi.getSubimage(p.getX(), p.getY(), n, m);
+		org.openqa.selenium.Point point = element.getLocation();
+		BufferedImage d = bi.getSubimage(point.getX(), point.getY(), element.getSize().getWidth(), element.getSize().getHeight());
 		ImageIO.write(d, "png", v);
 
 		FileUtils.copyFile(v, new File(Destination));

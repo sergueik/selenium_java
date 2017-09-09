@@ -3,6 +3,7 @@ package org.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.JavascriptExecutor;
@@ -22,6 +23,10 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
+import org.testng.ITestContext;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BaseTest {
 
@@ -30,6 +35,12 @@ public class BaseTest {
 	public Actions actions;
 	public JavascriptExecutor js;
 	private TakesScreenshot screenshot;
+
+	private static Map<String, String> config = new HashMap<>();
+	static {
+		config.put("success", "screenshot\\pass");
+		config.put("failure", "screenshot\\fail");
+	}
 
 	private static final String browser = "chrome";
 	private static String osName;
@@ -41,13 +52,15 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
+	private static final Logger log = LoggerFactory.getLogger(BaseTest.class);
+
 	@AfterClass
 	public void afterSuiteMethod() throws Exception {
 		driver.quit();
 	}
 
 	@BeforeClass
-	public void setupTestClass() throws IOException {
+	public void setupTestClass(ITestContext context) throws IOException {
 
 		getOsName();
 		if (browser.equals("chrome")) {
@@ -122,7 +135,8 @@ public class BaseTest {
 		screenshot = ((TakesScreenshot) driver);
 		js = ((JavascriptExecutor) driver);
 		driver.manage().window().maximize();
-
+		context.setAttribute("driver", driver);
+		context.setAttribute("config", config);
 		// Go to URL
 		driver.get(baseURL);
 	}

@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
 
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
+
 import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
@@ -22,8 +23,10 @@ import org.testng.ITestResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Map;
 /**
- * origin: https://github.com/boonyasukd/headless-chrome/blob/master/src/test/java/com/telenordigital/wowbox/admin/test/utils/listener/ScreenshotTestListener.java *
+ * origin: 
+ * https://github.com/boonyasukd/headless-chrome/blob/master/src/test/java/com/telenordigital/wowbox/admin/test/utils/listener/ScreenshotTestListener.java
  */
 public class ScreenshotTestListener implements ITestListener {
 	private static final Logger log = LoggerFactory
@@ -37,14 +40,22 @@ public class ScreenshotTestListener implements ITestListener {
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		log.debug("Test succeeded: Capture screenshot");
-		this.captureScreenShot(result);
+		log.info("Capture screenshot (success): {} ", result.getMethod().getMethodName());
+		try {
+			this.captureScreenShot(result);
+		} catch (Exception e) {
+			log.debug("Capture screenshot exception(ignored): " + e.toString());
+		}
 	}
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-		log.debug("Test failed: Capture screenshot");
-		this.captureScreenShot(result);
+		log.info("Capture screenshot (failure): {} ", result.getMethod().getMethodName());
+		try {
+			this.captureScreenShot(result);
+		} catch (Exception e) {
+			log.debug("Capture screenshot exception(ignored): " + e.toString());
+		}
 	}
 
 	@Override
@@ -69,8 +80,7 @@ public class ScreenshotTestListener implements ITestListener {
 	}
 
 	private void captureScreenShot(ITestResult result) {
-		String timestamp = DateTimeFormatter
-			.ofPattern("yyyy-MM-dd - HH-mm-ss")
+		String timestamp = DateTimeFormatter.ofPattern("yyyy-MM-dd - HH-mm-ss")
 				.format(toLocalDateTime(result.getEndMillis()));
 		String methodName = result.getMethod().getRealClass().getSimpleName() + "."
 				+ result.getMethod().getMethodName();
@@ -78,20 +88,26 @@ public class ScreenshotTestListener implements ITestListener {
 				methodName + " - " + timestamp + ".png");
 
 		try {
-			TakesScreenshot screenshot = (TakesScreenshot) ((WebDriver) result
-					.getTestContext().getAttribute("driver"));
+			WebDriver driver = (WebDriver) result.getTestContext()
+					.getAttribute("driver");
+
+			TakesScreenshot screenshot = (TakesScreenshot) driver;
 			byte[] bytes = screenshot.getScreenshotAs(BYTES);
 
 			log.debug("Writing screenshot to path {}", path);
 			Files.createDirectories(path.getParent());
 			Files.write(path, bytes, CREATE);
-		} catch (Exception ex) {
-			throw new RuntimeException("Unable to take screenshot", ex);
+		} catch (Exception e) {
+			log.debug("Exception: {} ", e.toString());
+
+			throw new RuntimeException("Unable to take screenshot", e);
 		}
 	}
 
 	private String getDir(ITestResult result) {
-		return (result.getStatus() == SUCCESS) ? "successes" : "failure";
+		@SuppressWarnings("unchecked")
+		Map<String, String>  config = (Map<String, String> ) result.getTestContext().getAttribute("config");
+		return (result.getStatus() == SUCCESS) ? config.get("success"): config.get("failure");
 	}
 
 	private LocalDateTime toLocalDateTime(long millisecs) {

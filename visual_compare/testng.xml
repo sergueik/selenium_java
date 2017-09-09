@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-
-<suite name="Kariyer Visual Automation with IM4JAVA Selenium AShot">
-    <test name="RunTest" preserve-order="true">
-        <classes>
-            <class name="KariyerVisualTest" />
-        </classes>
-    </test>
+<suite name="Visual Automation">
+  <listeners>
+    <listener class-name="org.utils.ScreenshotTestListener"/>
+  </listeners>
+  <test name="RunTest" preserve-order="true">
+    <classes>
+      <class name="org.utils.VisualTest"/>
+    </classes>
+  </test>
 </suite>
