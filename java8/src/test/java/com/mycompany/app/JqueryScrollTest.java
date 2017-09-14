@@ -25,7 +25,7 @@ import org.testng.annotations.Test;
 
 // based on https://stackoverflow.com/questions/4884839/how-do-i-get-an-element-to-scroll-into-view-using-jquery
 
-public class JQueryScrollTest extends BaseTest {
+public class JqueryScrollTest extends BaseTest {
 
 	private String baseURL = "http://demos.flesler.com/jquery/scrollTo/old/";
 
@@ -37,15 +37,14 @@ public class JQueryScrollTest extends BaseTest {
 	}
 
 	private void waitJQueryDone() {
-
 		// Wait until form is rendered, lambda semantics
 		wait.until((WebDriver driver) -> {
-			System.err.println("Wait for form to finish rendering");
+			// System.err.println("Wait for form to finish rendering");
 			JavascriptExecutor js = ((JavascriptExecutor) driver);
 			Boolean done = (Boolean) ((Long) js
 					.executeScript("return jQuery.active") == 0);
 			if (done) {
-				System.err.println("Done");
+				// System.err.println("Done");
 			}
 			return done;
 		});
@@ -63,46 +62,51 @@ public class JQueryScrollTest extends BaseTest {
 		String script = String.format(
 				"var element = $('%s'); return JSON.stringify(element.offset());",
 				fragmentLocator);
-		WebElement element = null;
+		WebElement fragmentElement = null;
 
 		waitJQueryDone();
-		List<WebElement> elements = driver
+		List<WebElement> fragmentElements = driver
 				.findElements(By.cssSelector(fragmentLocator));
-		assertTrue(elements.size() > 0);
+		assertTrue(fragmentElements.size() > 0);
 
-		element = elements.get(0);
+		fragmentElement = fragmentElements.get(0);
 		data = (String) js.executeScript(script);
 		result = parseOffsets(data);
 		for (String dimension : result.keySet()) {
-			System.err
-					.println(String.format("%s = %d", dimension, result.get(dimension)));
+			System.err.println(
+					String.format("%s = %2$,.2f", dimension, result.get(dimension)));
 		}
 		try {
 			data = (String) js.executeScript(
-					"var element = arguments[0]; return element.offset()", element);
+					"var element = arguments[0]; return element.offset()", fragmentElement);
 		} catch (WebDriverException e) {
+			System.err.println("Exception (ignored): " + e.toString());
 			// unknown error: element.offset is not a function
 			// ignore
 		}
-		WebElement text = driver.findElement(
+
+		// scroll the fragment
+		WebElement input = driver.findElement(
 				By.cssSelector("body > label:nth-child(6) > input[type='text']"));
-		highlight(text);
-		text.clear();
-		text.sendKeys(String.format("%d", fragmentId));
+		highlight(input);
+		input.clear();
+		input.sendKeys(String.format("%d", fragmentId));
 		WebElement button = driver
 				.findElement(By.cssSelector("body > label:nth-child(6) > button"));
 		highlight(button);
 		button.click();
 
 		waitJQueryDone();
-		highlight(element);
+		sleep(1000);
+		highlight(fragmentElement);
 
 		data = (String) js.executeScript(script);
 		result = parseOffsets(data);
 		for (String dimension : result.keySet()) {
-			System.err
-					.println(String.format("%s = %d", dimension, result.get(dimension)));
+			System.err.println(
+					String.format("%s = %2$,.2f", dimension, result.get(dimension)));
 		}
+		sleep(1000);
 	}
 
 	private Map<String, Double> parseOffsets(String payload) {
