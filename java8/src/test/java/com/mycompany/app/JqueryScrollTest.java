@@ -6,6 +6,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,53 +37,106 @@ public class JqueryScrollTest extends BaseTest {
 		driver.get(baseURL);
 	}
 
-	private void waitJQueryDone() {
-		// Wait until form is rendered, lambda semantics
-		wait.until((WebDriver driver) -> {
-			// System.err.println("Wait for form to finish rendering");
-			JavascriptExecutor js = ((JavascriptExecutor) driver);
-			Boolean done = (Boolean) ((Long) js
-					.executeScript("return jQuery.active") == 0);
-			if (done) {
-				// System.err.println("Done");
-			}
-			return done;
-		});
+	@BeforeMethod
+	public void loadPageInBrowser() {
+		driver.get(baseURL);
+		waitJQueryDone();
+	}
 
+
+	@Test(priority = 2, enabled = true)
+	public void computeOffsetTest() {
+		List<Integer> fragmentIds = new ArrayList<>(Arrays.asList(3, 4, 5, 6, 7));
+		for (int fragmentId : fragmentIds) {
+			WebElement fragmentElement = null;
+			String fragmentLocator = String.format("#y > ul > li:nth-child(%d) > a",
+					fragmentId);
+			Map<String, Double> result = new HashMap<>();
+			String data = null;
+			String script = String.format(
+					"var element = $('%s'); return JSON.stringify(element.offset());",
+					fragmentLocator);
+
+			List<WebElement> fragmentElements = driver
+					.findElements(By.cssSelector(fragmentLocator));
+			assertTrue(fragmentElements.size() > 0);
+
+			fragmentElement = fragmentElements.get(0);
+
+			data = (String) js.executeScript(script);
+			result = parseOffsets(data);
+			System.err.println("Fragment " + fragmentId + ":");
+			for (String dimension : result.keySet()) {
+				System.err.println(
+						String.format("%s = %2$,.2f", dimension, result.get(dimension)));
+			}
+			try {
+				data = (String) js.executeScript(
+						"var element = arguments[0]; return element.offset()",
+						fragmentElement);
+			} catch (WebDriverException e) {
+				// System.err.println("Exception (ignored): " + e.toString());
+				// unknown error: element.offset is not a function
+				// ignore
+			}
+
+			// scroll the fragment
+			WebElement input = driver.findElement(
+					By.cssSelector("body > label:nth-child(6) > input[type='text']"));
+			highlight(input);
+			input.clear();
+			input.sendKeys(String.format("%d", fragmentId));
+			WebElement button = driver
+					.findElement(By.cssSelector("body > label:nth-child(6) > button"));
+			highlight(button);
+			button.click();
+
+			waitJQueryDone();
+			sleep(1000);
+			highlight(fragmentElement);
+
+			data = (String) js.executeScript(script);
+			result = parseOffsets(data);
+			System.err.println("Fragment " + fragmentId + " (after scroll):");
+			for (String dimension : result.keySet()) {
+				System.err.println(
+						String.format("%s = %2$,.2f", dimension, result.get(dimension)));
+			}
+			sleep(1000);
+		}
 	}
 
 	@Test(priority = 1, enabled = true)
-	public void computeOffsetTest() throws InterruptedException, IOException {
-
+	public void compareOffsetsTest() {
 		int fragmentId = 5;
+		WebElement fragmentElement = null;
+		WebElement containerElement = null;
 		String fragmentLocator = String.format("#y > ul > li:nth-child(%d) > a",
 				fragmentId);
+		String containerLocator = "#y";
 		Map<String, Double> result = new HashMap<>();
-		String data = null;
-		String script = String.format(
+		String data1 = null;
+		String data2 = null;
+		String script1 = String.format(
 				"var element = $('%s'); return JSON.stringify(element.offset());",
 				fragmentLocator);
-		WebElement fragmentElement = null;
+		String script2 = String.format(
+				"var element = $('%s'); return JSON.stringify(element.offset());",
+				containerLocator);
 
-		waitJQueryDone();
 		List<WebElement> fragmentElements = driver
 				.findElements(By.cssSelector(fragmentLocator));
 		assertTrue(fragmentElements.size() > 0);
 
 		fragmentElement = fragmentElements.get(0);
-		data = (String) js.executeScript(script);
-		result = parseOffsets(data);
+		containerElement = fragmentElement.findElement(By.xpath(".."));
+
+		data2 = (String) js.executeScript(script2);
+		result = parseOffsets(data2);
+		System.err.println("Container: ");
 		for (String dimension : result.keySet()) {
 			System.err.println(
 					String.format("%s = %2$,.2f", dimension, result.get(dimension)));
-		}
-		try {
-			data = (String) js.executeScript(
-					"var element = arguments[0]; return element.offset()", fragmentElement);
-		} catch (WebDriverException e) {
-			System.err.println("Exception (ignored): " + e.toString());
-			// unknown error: element.offset is not a function
-			// ignore
 		}
 
 		// scroll the fragment
@@ -100,13 +154,37 @@ public class JqueryScrollTest extends BaseTest {
 		sleep(1000);
 		highlight(fragmentElement);
 
-		data = (String) js.executeScript(script);
-		result = parseOffsets(data);
+		data1 = (String) js.executeScript(script1);
+		result = parseOffsets(data1);
+		System.err.println("Fragment " + fragmentId + " (after scroll):");
 		for (String dimension : result.keySet()) {
 			System.err.println(
 					String.format("%s = %2$,.2f", dimension, result.get(dimension)));
 		}
-		sleep(1000);
+	}
+
+	@AfterMethod
+	public void resetBrowser() {
+		if (driver != null) {
+			driver.get("about:blank");
+		}
+	}
+
+	// utils
+
+	private void waitJQueryDone() {
+		// Wait until form is rendered, lambda semantics
+		wait.until((WebDriver driver) -> {
+			// System.err.println("Wait for form to finish rendering");
+			JavascriptExecutor js = ((JavascriptExecutor) driver);
+			Boolean done = (Boolean) ((Long) js
+					.executeScript("return jQuery.active") == 0);
+			if (done) {
+				// System.err.println("Done");
+			}
+			return done;
+		});
+
 	}
 
 	private Map<String, Double> parseOffsets(String payload) {
@@ -130,13 +208,6 @@ public class JqueryScrollTest extends BaseTest {
 			Thread.sleep(secondsLong);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-	}
-
-	@AfterMethod
-	public void resetBrowser() {
-		if (driver != null) {
-			driver.get("about:blank");
 		}
 	}
 
