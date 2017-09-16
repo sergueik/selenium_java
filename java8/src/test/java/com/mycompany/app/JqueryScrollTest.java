@@ -25,7 +25,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 // based on https://stackoverflow.com/questions/4884839/how-do-i-get-an-element-to-scroll-into-view-using-jquery
-
 public class JqueryScrollTest extends BaseTest {
 
 	private String baseURL = "http://demos.flesler.com/jquery/scrollTo/old/";

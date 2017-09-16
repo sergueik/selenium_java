@@ -50,7 +50,7 @@ public class BaseTest {
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
 
-	private static ArrayList<String> chromeExtensions = new ArrayList<>();
+	private ArrayList<String> chromeExtensions = new ArrayList<>();
 
 	private String extensionDir = String.format(
 			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
@@ -106,7 +106,47 @@ public class BaseTest {
 
 	// without .crx extension
 	public void addChromeExtension(String chromeExtension) {
-		chromeExtensions.add(chromeExtension);
+		this.chromeExtensions.add(chromeExtension);
+	}
+
+	// https://stackoverflow.com/questions/35858679/adding-extension-to-selenium2webdriver-chrome-driver
+	// https://productforums.google.com/forum/#!topic/chrome/g02KlhK12fU
+	// NOTE: simpler solution for local driver exist
+	// https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-List-of-recognized-capabilities
+	private void loadChromeExtensionsBase64Encoded(ChromeOptions chromeOptions) {
+		ArrayList<String> chromeExtensionsBase64Encoded = new ArrayList<>();
+		for (String extensionName : this.chromeExtensions) {
+			String extensionLocation = this.extensionDir + "\\" + extensionName
+					+ ".crx";
+			// System.err.println("About to load extension " + extensionLocation);
+			File extensionFile = new File(extensionLocation);
+
+			if (extensionFile.exists() && !extensionFile.isDirectory()) {
+				// origin:
+				// http://www.oodlestechnologies.com/blogs/Encode-%26-Decode-Image-Using-Base64-encoding-and-Decoding
+				// http://www.java2s.com/Code/Java/File-Input-Output/Base64encodedecodedatausingtheBase64encodingscheme.htm
+				try {
+					FileInputStream extensionFileInputStream = new FileInputStream(
+							extensionFile);
+					byte extensionData[] = new byte[(int) extensionFile.length()];
+					extensionFileInputStream.read(extensionData);
+
+					byte[] base64EncodedByteArray = Base64.encodeBase64(extensionData);
+
+					extensionFileInputStream.close();
+					chromeExtensionsBase64Encoded.add(new String(base64EncodedByteArray));
+					System.out.println(String.format(
+							"Chrome Extension successfully encoded and added: %s...",
+							new String(base64EncodedByteArray).substring(0, 64)));
+				} catch (FileNotFoundException e1) {
+					System.out.println(
+							"Chrome Extension not found: " + extensionLocation + " " + e1);
+				} catch (IOException e2) {
+					System.out.println("Problem in reading The Chrome Extension" + e2);
+				}
+			}
+			chromeOptions.addEncodedExtensions(chromeExtensionsBase64Encoded);
+		}
 	}
 
 	@SuppressWarnings("deprecation")
@@ -140,45 +180,10 @@ public class BaseTest {
 			// chromeOptions.addArguments("user-data-dir=/path/to/your/custom/profile");
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-			capabilities.setCapability(chromeOptions.CAPABILITY, chromeOptions);
+			capabilities.setCapability(
+					org.openqa.selenium.chrome.ChromeOptions.CAPABILITY, chromeOptions);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-
-			// https://stackoverflow.com/questions/35858679/adding-extension-to-selenium2webdriver-chrome-driver
-			// https://productforums.google.com/forum/#!topic/chrome/g02KlhK12fU
-
-			ArrayList<String> chromeExtensionsBase64Encoded = new ArrayList<>();
-			for (String extensionName : chromeExtensions) {
-				String extensionLocation = extensionDir + "\\" + extensionName + ".crx";
-				System.err.println("About to load extension " + extensionLocation);
-				File extensionFile = new File(extensionLocation);
-
-				if (extensionFile.exists() && !extensionFile.isDirectory()) {
-					// origin:
-					// http://www.oodlestechnologies.com/blogs/Encode-%26-Decode-Image-Using-Base64-encoding-and-Decoding
-					// http://www.java2s.com/Code/Java/File-Input-Output/Base64encodedecodedatausingtheBase64encodingscheme.htm
-					try {
-						FileInputStream extensionFileInputStream = new FileInputStream(
-								extensionFile);
-						byte extensionData[] = new byte[(int) extensionFile.length()];
-						extensionFileInputStream.read(extensionData);
-
-						byte[] base64EncodedByteArray = Base64.encodeBase64(extensionData);
-
-						extensionFileInputStream.close();
-						chromeExtensionsBase64Encoded
-								.add(new String(base64EncodedByteArray));
-						System.out.println(String.format(
-								"Chrome Extension successfully encoded and added: %s...",
-								new String(base64EncodedByteArray).substring(0, 64)));
-					} catch (FileNotFoundException e) {
-						System.out
-								.println("Chrome Extension Not Found on that Location" + e);
-					} catch (IOException ex) {
-						System.out.println("Problem in Reading The Chrome Extension" + ex);
-					}
-				}
-				chromeOptions.addEncodedExtensions(chromeExtensionsBase64Encoded);
-			}
+			loadChromeExtensionsBase64Encoded(chromeOptions);
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
 
