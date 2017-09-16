@@ -29,9 +29,16 @@ import org.testng.annotations.Test;
 public class JqueryScrollTest extends BaseTest {
 
 	private String baseURL = "http://demos.flesler.com/jquery/scrollTo/old/";
+	private static ArrayList<String> chromeExtensions = new ArrayList<>();
+	static {
+		chromeExtensions.add("chropath"); // without .crx extension
+	}
 
 	@BeforeClass
 	public void beforeClass() throws IOException {
+		for (String chromeExtention : chromeExtensions) {
+			super.addChromeExtension(chromeExtention);
+		}
 		super.beforeClass();
 		assertThat(driver, notNullValue());
 		driver.get(baseURL);
@@ -42,7 +49,6 @@ public class JqueryScrollTest extends BaseTest {
 		driver.get(baseURL);
 		waitJQueryDone();
 	}
-
 
 	@Test(priority = 2, enabled = true)
 	public void computeOffsetTest() {

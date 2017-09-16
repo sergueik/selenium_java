@@ -51,11 +51,10 @@ public class BaseTest {
 	public TakesScreenshot screenshot;
 
 	private static ArrayList<String> chromeExtensions = new ArrayList<>();
-	static {
-		chromeExtensions.add("chropath"); // without .crx extension
-	}
 
-	private static String extensionDir = "C:\\Users\\Serguei\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions";
+	private String extensionDir = String.format(
+			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
+			getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"));
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome"); // "firefox";
@@ -63,6 +62,26 @@ public class BaseTest {
 	static {
 		browserDrivers.put("chrome", "chromedriver.exe");
 		browserDrivers.put("firefox", "geckodriver.exe");
+	}
+
+	public void setExtensionDir(String extensionDir) {
+		this.extensionDir = extensionDir;
+	}
+
+	public void setScriptTimeout(int scriptTimeout) {
+		this.scriptTimeout = scriptTimeout;
+	}
+
+	public void setFlexibleWait(int flexibleWait) {
+		this.flexibleWait = flexibleWait;
+	}
+
+	public void setImplicitWait(int implicitWait) {
+		this.implicitWait = implicitWait;
+	}
+
+	public void setPollingInterval(long pollingInterval) {
+		this.pollingInterval = pollingInterval;
 	}
 
 	private static String osName;
@@ -83,6 +102,11 @@ public class BaseTest {
 	// WARMING: do not define or the descendant test class will fail
 	@BeforeSuite
 	public void beforeSuite() {
+	}
+
+	// without .crx extension
+	public void addChromeExtension(String chromeExtension) {
+		chromeExtensions.add(chromeExtension);
 	}
 
 	@SuppressWarnings("deprecation")
