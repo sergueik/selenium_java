@@ -66,6 +66,7 @@
           <target>${maven.compiler.target}</target>
           <encoding>utf-8</encoding>
           <compilerArgument>-Xlint:all</compilerArgument>
+          <compilerArgument>-Xlint:-processing</compilerArgument>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
           <!--
