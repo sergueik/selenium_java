@@ -2,11 +2,15 @@ package com.mycompany.app;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -35,6 +39,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
+import org.apache.commons.codec.binary.Base64;
+
 public class BaseTest {
 
 	public WebDriver driver;
@@ -43,6 +49,13 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
+
+	private static ArrayList<String> chromeExtensions = new ArrayList<>();
+	static {
+		chromeExtensions.add("chropath"); // without .crx extension
+	}
+
+	private static String extensionDir = "C:\\Users\\Serguei\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions";
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome"); // "firefox";
@@ -61,7 +74,6 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
-	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
 	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
 	// class may fail
 	@AfterSuite
@@ -82,30 +94,67 @@ public class BaseTest {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			ChromeOptions options = new ChromeOptions();
+			ChromeOptions chromeOptions = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+			HashMap<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
 					+ System.getProperty("file.separator");
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
-			options.setExperimentalOption("prefs", chromePrefs);
-			options.addArguments("allow-running-insecure-content");
-			options.addArguments("allow-insecure-localhost");
-			options.addArguments("enable-local-file-accesses");
-			options.addArguments("disable-notifications");
-			// options.addArguments("start-maximized");
-			options.addArguments("browser.download.folderList=2");
-			options.addArguments(
+			chromeOptions.setExperimentalOption("prefs", chromePrefs);
+			chromeOptions.addArguments("allow-running-insecure-content");
+			chromeOptions.addArguments("allow-insecure-localhost");
+			chromeOptions.addArguments("enable-local-file-accesses");
+			chromeOptions.addArguments("disable-notifications");
+			// chromeOptions.addArguments("start-maximized");
+			chromeOptions.addArguments("browser.download.folderList=2");
+			chromeOptions.addArguments(
 					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
-			options.addArguments("browser.download.dir=" + downloadFilepath);
-			// options.addArguments("user-data-dir=/path/to/your/custom/profile");
+			chromeOptions.addArguments("browser.download.dir=" + downloadFilepath);
+			// chromeOptions.addArguments("user-data-dir=/path/to/your/custom/profile");
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+			capabilities.setCapability(chromeOptions.CAPABILITY, chromeOptions);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+
+			// https://stackoverflow.com/questions/35858679/adding-extension-to-selenium2webdriver-chrome-driver
+			// https://productforums.google.com/forum/#!topic/chrome/g02KlhK12fU
+
+			ArrayList<String> chromeExtensionsBase64Encoded = new ArrayList<>();
+			for (String extensionName : chromeExtensions) {
+				String extensionLocation = extensionDir + "\\" + extensionName + ".crx";
+				System.err.println("About to load extension " + extensionLocation);
+				File extensionFile = new File(extensionLocation);
+
+				if (extensionFile.exists() && !extensionFile.isDirectory()) {
+					// origin:
+					// http://www.oodlestechnologies.com/blogs/Encode-%26-Decode-Image-Using-Base64-encoding-and-Decoding
+					// http://www.java2s.com/Code/Java/File-Input-Output/Base64encodedecodedatausingtheBase64encodingscheme.htm
+					try {
+						FileInputStream extensionFileInputStream = new FileInputStream(
+								extensionFile);
+						byte extensionData[] = new byte[(int) extensionFile.length()];
+						extensionFileInputStream.read(extensionData);
+
+						byte[] base64EncodedByteArray = Base64.encodeBase64(extensionData);
+
+						extensionFileInputStream.close();
+						chromeExtensionsBase64Encoded
+								.add(new String(base64EncodedByteArray));
+						System.out.println(String.format(
+								"Chrome Extension successfully encoded and added: %s...",
+								new String(base64EncodedByteArray).substring(0, 64)));
+					} catch (FileNotFoundException e) {
+						System.out
+								.println("Chrome Extension Not Found on that Location" + e);
+					} catch (IOException ex) {
+						System.out.println("Problem in Reading The Chrome Extension" + ex);
+					}
+				}
+				chromeOptions.addEncodedExtensions(chromeExtensionsBase64Encoded);
+			}
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
 
@@ -273,7 +322,7 @@ public class BaseTest {
 			}
 			int exitCode = process.waitFor();
 			// ignore exit code 128: the process "<browser driver>" not found.
-			if ( exitCode != 0 && (exitCode ^ 128) != 0) {
+			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				System.out.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
 					System.out.println("<OUTPUT>" + processOutput + "</OUTPUT>");
