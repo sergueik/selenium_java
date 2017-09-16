@@ -166,6 +166,7 @@
           <target>${java.version}</target>
           <encoding>utf-8</encoding>
           <compilerArgument>-Xlint:all</compilerArgument>
+          <compilerArgument>-Xlint:-processing</compilerArgument>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
         </configuration>
