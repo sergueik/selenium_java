@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,6 +29,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -184,6 +186,12 @@ public class BaseTest {
 					org.openqa.selenium.chrome.ChromeOptions.CAPABILITY, chromeOptions);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			loadChromeExtensionsBase64Encoded(chromeOptions);
+			// see also: https://github.com/pulkitsinghal/selenium/blob/master/java/client/src/org/openqa/selenium/chrome/ChromeOptions.java
+			// For use with RemoteWebDriver
+			/*
+			RemoteWebDriver driver = new RemoteWebDriver(
+			     new URL("http://localhost:4444/wd/hub"), capabilities);
+			  */
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
 
