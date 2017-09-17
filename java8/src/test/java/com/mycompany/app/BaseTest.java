@@ -51,6 +51,14 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
+	private static String osName;
+
+	public int scriptTimeout = 5;
+	public int flexibleWait = 120;
+	public int implicitWait = 1;
+	public long pollingInterval = 500;
+
+	public String baseURL = "about:blank";
 
 	private ArrayList<String> chromeExtensions = new ArrayList<>();
 
@@ -66,34 +74,25 @@ public class BaseTest {
 		browserDrivers.put("firefox", "geckodriver.exe");
 	}
 
-	public void setExtensionDir(String extensionDir) {
-		this.extensionDir = extensionDir;
+	public void setExtensionDir(String value) {
+		this.extensionDir = value;
 	}
 
-	public void setScriptTimeout(int scriptTimeout) {
-		this.scriptTimeout = scriptTimeout;
+	public void setScriptTimeout(int value) {
+		this.scriptTimeout = value;
 	}
 
-	public void setFlexibleWait(int flexibleWait) {
-		this.flexibleWait = flexibleWait;
+	public void setFlexibleWait(int value) {
+		this.flexibleWait = value;
 	}
 
-	public void setImplicitWait(int implicitWait) {
-		this.implicitWait = implicitWait;
+	public void setImplicitWait(int value) {
+		this.implicitWait = value;
 	}
 
-	public void setPollingInterval(long pollingInterval) {
-		this.pollingInterval = pollingInterval;
+	public void setPollingInterval(long value) {
+		this.pollingInterval = value;
 	}
-
-	private static String osName;
-
-	public int scriptTimeout = 5;
-	public int flexibleWait = 120;
-	public int implicitWait = 1;
-	public long pollingInterval = 500;
-
-	public String baseURL = "about:blank";
 
 	// WARNING: do not use @Before... or @AfterSuite otherwise the descendant test
 	// class may fail
@@ -107,14 +106,17 @@ public class BaseTest {
 	}
 
 	// without .crx extension
-	public void addChromeExtension(String chromeExtension) {
-		this.chromeExtensions.add(chromeExtension);
+	public void addChromeExtension(String value) {
+		this.chromeExtensions.add(value);
 	}
 
 	// https://stackoverflow.com/questions/35858679/adding-extension-to-selenium2webdriver-chrome-driver
 	// https://productforums.google.com/forum/#!topic/chrome/g02KlhK12fU
 	// NOTE: simpler solution for local driver exist
 	// https://sites.google.com/a/chromium.org/chromedriver/capabilities#TOC-List-of-recognized-capabilities
+	// alternative:
+	// options = webdriver.ChromeOptions()
+	// options.add_argument("--app-id = mbopgmdnpcbohhpnfglgohlbhfongabi")
 	private void loadChromeExtensionsBase64Encoded(ChromeOptions chromeOptions) {
 		ArrayList<String> chromeExtensionsBase64Encoded = new ArrayList<>();
 		for (String extensionName : this.chromeExtensions) {
@@ -186,7 +188,8 @@ public class BaseTest {
 					org.openqa.selenium.chrome.ChromeOptions.CAPABILITY, chromeOptions);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			loadChromeExtensionsBase64Encoded(chromeOptions);
-			// see also: https://github.com/pulkitsinghal/selenium/blob/master/java/client/src/org/openqa/selenium/chrome/ChromeOptions.java
+			// see also:
+			// https://github.com/pulkitsinghal/selenium/blob/master/java/client/src/org/openqa/selenium/chrome/ChromeOptions.java
 			// For use with RemoteWebDriver
 			/*
 			RemoteWebDriver driver = new RemoteWebDriver(
@@ -376,4 +379,10 @@ public class BaseTest {
 			System.err.println("Exception (ignored): " + e.getMessage());
 		}
 	}
+
+	public String getResourcePath(String resourceFileName) {
+		return String.format("%s/src/main/resources/%s",
+				System.getProperty("user.dir"), resourceFileName);
+	}
+
 }

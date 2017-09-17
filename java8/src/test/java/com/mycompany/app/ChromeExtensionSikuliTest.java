@@ -49,20 +49,18 @@ import org.sikuli.script.Screen;
 // http://www.software-testing-tutorials-automation.com/2016/05/how-to-get-browser-and-os-details-on.html
 // http://screenster.io/running-tests-from-selenium-ide-in-chrome/ screenster
 // http://screenster.io/running-tests-from-selenium-ide-in-chrome/ screenster
-public class ChromeExtensionTest extends BaseTest {
+public class ChromeExtensionSikuliTest extends BaseTest {
 
 	private String baseURL = "https://auth-demo.aerobatic.io/";
-	// options = webdriver.ChromeOptions()
-	// options.add_argument("--app-id = mbopgmdnpcbohhpnfglgohlbhfongabi")
 
-	@Test
-	public void openExtensioPopupTest() {
+	@Test(priority = 1, enabled = true)
+	public void openExtensionPopupTest() {
 
 		Screen screen = new Screen();
-
+		String imagePath = getResourcePath("chrome_automation_extension.png");
 		try {
-			screen.find("C:\\developer\\sergueik\\selenium_java\\java8\\src\\test\\resources\\chrome_automation_extension.png");
-			screen.click("C:\\developer\\sergueik\\selenium_java\\java8\\src\\test\\resources\\chrome_automation_extension.png");
+			screen.find(imagePath);
+			screen.click(imagePath);
 		} catch (FindFailed e) {
 			e.printStackTrace();
 		}
