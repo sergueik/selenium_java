@@ -7,6 +7,7 @@
   <test name="RunTest" preserve-order="true">
     <classes>
       <class name="org.utils.VisualTest"/>
+      <class name="org.utils.ShareDataTest"/>
     </classes>
   </test>
 </suite>

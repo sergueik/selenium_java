@@ -113,7 +113,7 @@ public class VisualTest extends BaseTest {
 				testName + "_Diff.png");
 	}
 
-	@Test
+	@Test( enabled = false )
 	public void imageCompareTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -141,7 +141,7 @@ public class VisualTest extends BaseTest {
 		doComparison(screenShot);
 	}
 
-	@Test
+	@Test( enabled = false )
 	public void imageResizeTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -245,8 +245,8 @@ public class VisualTest extends BaseTest {
 		File v = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		BufferedImage bi = ImageIO.read(v);
 		org.openqa.selenium.Point point = element.getLocation();
-		BufferedImage d = bi.getSubimage(point.getX(), point.getY(), element.getSize().getWidth(), element.getSize().getHeight());
-		ImageIO.write(d, "png", v);
+		BufferedImage data = bi.getSubimage(point.getX(), point.getY(), element.getSize().getWidth(), element.getSize().getHeight());
+		ImageIO.write(data, "png", v);
 
 		FileUtils.copyFile(v, new File(Destination));
 	}
