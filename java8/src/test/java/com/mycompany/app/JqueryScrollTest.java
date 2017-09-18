@@ -28,16 +28,9 @@ import org.testng.annotations.Test;
 public class JqueryScrollTest extends BaseTest {
 
 	private String baseURL = "http://demos.flesler.com/jquery/scrollTo/old/";
-	private static ArrayList<String> chromeExtensions = new ArrayList<>();
-	static {
-		chromeExtensions.add("chropath"); // without .crx extension
-	}
 
 	@BeforeClass
 	public void beforeClass() throws IOException {
-		for (String chromeExtention : chromeExtensions) {
-			super.addChromeExtension(chromeExtention);
-		}
 		super.beforeClass();
 		assertThat(driver, notNullValue());
 		driver.get(baseURL);
@@ -49,7 +42,7 @@ public class JqueryScrollTest extends BaseTest {
 		waitJQueryDone();
 	}
 
-	@Test(priority = 2, enabled = true)
+	@Test(priority = 2, enabled = false)
 	public void computeOffsetTest() {
 		List<Integer> fragmentIds = new ArrayList<>(Arrays.asList(3, 4, 5, 6, 7));
 		for (int fragmentId : fragmentIds) {
@@ -111,7 +104,7 @@ public class JqueryScrollTest extends BaseTest {
 		}
 	}
 
-	@Test(priority = 1, enabled = true)
+	@Test(priority = 1, enabled = false)
 	public void compareOffsetsTest() {
 		int fragmentId = 5;
 		WebElement fragmentElement = null;

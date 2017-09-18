@@ -52,12 +52,26 @@ import org.sikuli.script.Screen;
 public class ChromeExtensionSikuliTest extends BaseTest {
 
 	private String baseURL = "https://auth-demo.aerobatic.io/";
+	private static ArrayList<String> chromeExtensions = new ArrayList<>();
+	static {
+		chromeExtensions.add("chropath"); // without .crx extension
+	}
+
+	@BeforeClass
+	public void beforeClass() throws IOException {
+		for (String chromeExtention : chromeExtensions) {
+			super.addChromeExtension(chromeExtention);
+		}
+		super.beforeClass();
+		assertThat(driver, notNullValue());
+		driver.get(baseURL);
+	}
 
 	@Test(priority = 1, enabled = true)
 	public void openExtensionPopupTest() {
 
 		Screen screen = new Screen();
-		String imagePath = getResourcePath("chrome_automation_extension.png");
+		String imagePath = getResourcePath("chropath.png");
 		try {
 			screen.find(imagePath);
 			screen.click(imagePath);
