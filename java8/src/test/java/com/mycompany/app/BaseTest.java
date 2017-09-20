@@ -384,5 +384,13 @@ public class BaseTest {
 		return String.format("%s/src/main/resources/%s",
 				System.getProperty("user.dir"), resourceFileName);
 	}
-
+	// based on: https://raw.githubusercontent.com/lopukhDA/Angular-tests-on-c-sharp-and-protractor/master/NUnit.Tests1/WebDriver.cs
+	public Boolean checkElementAttribute(WebElement element, String value, Optional<String> attributeOpt  /* String... attributes*/ ) {
+	Boolean flag = false;
+	// String attribute = attributes.length > 0 ? attributes[0] : "class";
+	String attribute  = attributeOpt.isPresent() ? attributeOpt.get() : "class";        
+	if (element.getAttribute(attribute).contains(value)){  flag = true; 
+	} 
+	return flag;
+	}
 }
