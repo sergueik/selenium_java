@@ -23,8 +23,8 @@ public class KeywordLibrary {
 	public static void callMethod(String param1, String param2, String param3,
 			String param4) {
 		try {
-			Class<?> c = Class.forName("org.utils.KeywordLibrary");
-			Method m = c.getMethod(param1, String.class, String.class, String.class);
+			Class<?> _class = Class.forName("org.utils.KeywordLibrary");
+			Method m = _class.getMethod(param1, String.class, String.class, String.class);
 			m.invoke(null, param2, param3, param4);
 
 		} catch (Exception e) {
@@ -34,17 +34,15 @@ public class KeywordLibrary {
 
 	public static void loadProperties() throws IOException {
 		File file = new File("ObjectRepo.Properties");
-		FileInputStream fis = new FileInputStream(file);
 		objectRepo = new Properties();
-		objectRepo.load(fis);
+		objectRepo.load(new FileInputStream(file));
 	}
 
 	public static void openBrowser() throws IOException {
 		try {
 			File file = new File("Config.properties");
-			FileInputStream fis = new FileInputStream(file);
 			Properties config = new Properties();
-			config.load(fis);
+			config.load(new FileInputStream(file));
 			if (config.getProperty("browser").equalsIgnoreCase("Chrome")) {
 				System.setProperty("webdriver.chrome.driver",
 						"C:\\java\\selenium\\chromedriver.exe");
@@ -214,7 +212,7 @@ public class KeywordLibrary {
 					break;
 				}
 			} else {
-				List<WebElement> elements = new ArrayList<WebElement>();
+				List<WebElement> elements = new ArrayList<>();
 				switch (param1) {
 				case "name":
 					elements = driver
@@ -266,7 +264,7 @@ public class KeywordLibrary {
 					break;
 				}
 			} else {
-				List<WebElement> elements = new ArrayList<WebElement>();
+				List<WebElement> elements = new ArrayList<>();
 				switch (param1) {
 				case "name":
 					elements = driver

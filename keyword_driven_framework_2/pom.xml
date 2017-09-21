@@ -26,16 +26,10 @@
     <guava.version>21.0</guava.version>
     <browser.name>chrome</browser.name>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
-    <sikulixapi.version>1.1.0</sikulixapi.version>
     <poi.version>3.14</poi.version>
     <poiooxml.version>3.14</poiooxml.version>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>com.sikulix</groupId>
-      <artifactId>sikulixapi</artifactId>
-      <version>${sikulixapi.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
@@ -92,19 +86,6 @@
       <version>${poi.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium.fluent</groupId>
-      <artifactId>fluent-selenium</artifactId>
-      <version>1.16.1</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <!-- declare the exclusion here -->
-          <groupId>org.seleniumhq.selenium</groupId>
-          <artifactId>selenium-java</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
@@ -120,41 +101,10 @@
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium.firefox-driver.version}</version>
     </dependency>
-    <!-- 
-    <dependency>
-     <groupId>org.seleniumhq.selenium</groupId>
-     <artifactId>selenium-server-standalone</artifactId>
-     <version>3.3.1</version>
-     <scope>system</scope>
-     <systemPath>${project.basedir}/src/main/resources/selenium-server-standalone-3.3.1.jar</systemPath>
-    </dependency>
-    -->
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-remote-driver</artifactId>
       <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.json</groupId>
-      <artifactId>json</artifactId>
-      <version>20080701</version>
-    </dependency>
-    <dependency>
-      <groupId>org.testng</groupId>
-      <artifactId>testng</artifactId>
-      <version>${testng.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
     </dependency>
   </dependencies>
   <dependencyManagement>
