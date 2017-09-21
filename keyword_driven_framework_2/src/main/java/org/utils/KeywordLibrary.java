@@ -5,7 +5,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.openqa.selenium.By;
@@ -14,18 +16,39 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 
+import org.utils.Utils;
+
 public class KeywordLibrary {
 
 	static WebDriver driver;
 	static Properties objectRepo;
 	static String result;
+	private static Map<String, String> methodTable = new HashMap<>();
+	static {
+		methodTable.put("CREATE_BROWSER", "openBrowser");
+		methodTable.put("GOTOURL", "navigateTo");
+		methodTable.put("SETTEXT", "enterText");
+		methodTable.put("CLICK", "clickButton");
+		methodTable.put("CLICKBUTTON", "clickButton");
+		methodTable.put("CLICKLINK", "clickLink");
+		methodTable.put("CLICKRADIO", "clickRadioButton");
+		methodTable.put("CLICKCHECKBOX", "clickCheckBox");
+		methodTable.put("SELECTOPTION", "selectDropDown");
+		methodTable.put("VERIFYTEXT", "verifyText");
+		methodTable.put("SWITHFRAME", "switchFrame");
+	}
 
-	public static void callMethod(String param1, String param2, String param3,
+	public static void navigateTo(String param1, String param2, String param3) {
+		driver.navigate().to(param1);
+	}
+
+	public static void callMethod(String method, String param2, String param3,
 			String param4) {
 		try {
 			Class<?> _class = Class.forName("org.utils.KeywordLibrary");
-			Method m = _class.getMethod(param1, String.class, String.class, String.class);
-			m.invoke(null, param2, param3, param4);
+			Method _method = _class.getMethod(methodTable.get(method), String.class,
+					String.class, String.class);
+			_method.invoke(null, param2, param3, param4);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -159,7 +182,6 @@ public class KeywordLibrary {
 		} catch (Exception e) {
 			result = "Failed";
 		}
-
 	}
 
 	public static void verifyText(String param1, String param2, String param3) {
@@ -323,5 +345,4 @@ public class KeywordLibrary {
 		}
 
 	}
-
 }

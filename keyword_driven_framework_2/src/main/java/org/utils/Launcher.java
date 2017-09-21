@@ -8,15 +8,19 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.utils.Utils;
 
 public class Launcher {
 
+	private static String arguments = null;
 	private static String suite = "Test Suite.xls";
+	private static HashMap<String, String> elementData = new HashMap<>(); // empty
 
 	public static void main(String[] args) throws IOException {
 
@@ -39,9 +43,16 @@ public class Launcher {
 				for (int j = 0; j < stepMap.size(); j++) {
 					stepList = stepMap.get(j);
 					if (stepList.get(0).equals("openBrowser")) {
+						arguments = Utils.writeDataJSON(elementData, "{}");
 						KeywordLibrary.openBrowser();
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					} else {
+						Utils.readData(Optional.of(elementData));
+						if (!elementData.containsKey(Utils.requiredKey)) {
+							elementData.put(Utils.requiredKey, "none");
+						}
+
+						arguments = Utils.writeDataJSON(elementData, "{}");
 						KeywordLibrary.callMethod(stepList.get(0), stepList.get(1),
 								stepList.get(2), stepList.get(3));
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
