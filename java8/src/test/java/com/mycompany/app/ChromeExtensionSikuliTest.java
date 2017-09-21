@@ -67,7 +67,7 @@ public class ChromeExtensionSikuliTest extends BaseTest {
 		driver.get(baseURL);
 	}
 
-	@Test(priority = 1, enabled = true)
+	@Test(priority = 1, enabled = false)
 	public void openExtensionPopupTest() {
 
 		Screen screen = new Screen();

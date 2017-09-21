@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
@@ -42,7 +43,7 @@ public class JqueryScrollTest extends BaseTest {
 		waitJQueryDone();
 	}
 
-	@Test(priority = 2, enabled = false)
+	@Test(priority = 2, enabled = true)
 	public void computeOffsetTest() {
 		List<Integer> fragmentIds = new ArrayList<>(Arrays.asList(3, 4, 5, 6, 7));
 		for (int fragmentId : fragmentIds) {
@@ -79,11 +80,20 @@ public class JqueryScrollTest extends BaseTest {
 			}
 
 			// scroll the fragment
-			WebElement input = driver.findElement(
-					By.cssSelector("body > label:nth-child(6) > input[type='text']"));
-			highlight(input);
-			input.clear();
-			input.sendKeys(String.format("%d", fragmentId));
+			WebElement label1 = driver.findElement(By.xpath(String
+					.format("//*[contains(text(), '%s')]", "Scroll the window to")));
+			highlight(label1);
+			Assert.assertTrue(checkElementAttribute(label1, "txt_screen", "for"));
+			WebElement input1 = label1.findElement(By
+					.cssSelector(String.format("input#%s", label1.getAttribute("for"))));
+			highlight(input1);
+			Assert.assertTrue(checkElementAttribute(input1, "text", "type"));
+			WebElement label2 = label1.findElement(By.xpath("following::label"));
+			highlight(label2);
+			WebElement input2 = label2.findElement(By.xpath("input[@type='text']"));
+			highlight(input2);
+			input2.clear();
+			input2.sendKeys(String.format("%d", fragmentId));
 			WebElement button = driver
 					.findElement(By.cssSelector("body > label:nth-child(6) > button"));
 			highlight(button);
@@ -104,7 +114,7 @@ public class JqueryScrollTest extends BaseTest {
 		}
 	}
 
-	@Test(priority = 1, enabled = false)
+	@Test(priority = 1, enabled = true)
 	public void compareOffsetsTest() {
 		int fragmentId = 5;
 		WebElement fragmentElement = null;
@@ -112,6 +122,7 @@ public class JqueryScrollTest extends BaseTest {
 		String fragmentLocator = String.format("#y > ul > li:nth-child(%d) > a",
 				fragmentId);
 		String containerLocator = "#y";
+
 		Map<String, Double> result = new HashMap<>();
 		String data1 = null;
 		String data2 = null;
@@ -127,7 +138,9 @@ public class JqueryScrollTest extends BaseTest {
 		assertTrue(fragmentElements.size() > 0);
 
 		fragmentElement = fragmentElements.get(0);
-		containerElement = fragmentElement.findElement(By.xpath(".."));
+		// containerElement = fragmentElement.findElement(By.xpath(".."));
+		containerElement = driver.findElement(By.cssSelector(containerLocator));
+		Assert.assertTrue(checkElementAttribute(containerElement, "container"));
 
 		data2 = (String) js.executeScript(script2);
 		result = parseOffsets(data2);

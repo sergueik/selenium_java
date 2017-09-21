@@ -14,6 +14,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
@@ -169,6 +170,11 @@ public class BaseTest {
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
 					+ System.getProperty("file.separator");
+			chromePrefs.put("download.prompt_for_download", "false");
+			chromePrefs.put("download.directory_upgrade", "true");
+			chromePrefs.put("plugins.always_open_pdf_externally", "true");
+
+
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
 			chromeOptions.setExperimentalOption("prefs", chromePrefs);
@@ -384,13 +390,26 @@ public class BaseTest {
 		return String.format("%s/src/main/resources/%s",
 				System.getProperty("user.dir"), resourceFileName);
 	}
-	// based on: https://raw.githubusercontent.com/lopukhDA/Angular-tests-on-c-sharp-and-protractor/master/NUnit.Tests1/WebDriver.cs
-	public Boolean checkElementAttribute(WebElement element, String value, Optional<String> attributeOpt  /* String... attributes*/ ) {
-	Boolean flag = false;
-	// String attribute = attributes.length > 0 ? attributes[0] : "class";
-	String attribute  = attributeOpt.isPresent() ? attributeOpt.get() : "class";        
-	if (element.getAttribute(attribute).contains(value)){  flag = true; 
-	} 
-	return flag;
+
+	// based on:
+	// https://github.com/lopukhDA/Angular-tests-on-c-sharp-and-protractor/blob/master/NUnit.Tests1/WebDriver.cs
+	public Boolean checkElementAttribute(WebElement element, String value,
+			Optional<String> attributeOpt) {
+		Boolean flag = false;
+		String attribute = attributeOpt.isPresent() ? attributeOpt.get() : "class";
+		if (element.getAttribute(attribute).contains(value)) {
+			flag = true;
+		}
+		return flag;
+	}
+
+	public Boolean checkElementAttribute(WebElement element, String value,
+			String... attributes) {
+		Boolean flag = false;
+		String attribute = attributes.length > 0 ? attributes[0] : "class";
+		if (element.getAttribute(attribute).contains(value)) {
+			flag = true;
+		}
+		return flag;
 	}
 }
