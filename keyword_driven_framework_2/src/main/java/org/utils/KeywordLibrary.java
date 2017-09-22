@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.openqa.selenium.By;
@@ -23,6 +24,14 @@ public class KeywordLibrary {
 	static WebDriver driver;
 	static Properties objectRepo;
 	static String result;
+	private static String selectorType = null;
+	private static String selectorValue = null;
+	private static String expectedValue = null;
+	private static String textdata = null;
+	private static String visibleText = null;
+	private static String expectedText = null;
+
+	private static HashMap<String, String> parameterTable = new HashMap<>(); // empty
 	private static Map<String, String> methodTable = new HashMap<>();
 	static {
 		methodTable.put("CREATE_BROWSER", "openBrowser");
@@ -38,17 +47,20 @@ public class KeywordLibrary {
 		methodTable.put("SWITHFRAME", "switchFrame");
 	}
 
-	public static void navigateTo(String param1, String param2, String param3) {
+	public static void navigateTo(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// driver.navigate().to(parameterTable.get("url"));
 		driver.navigate().to(param1);
 	}
 
-	public static void callMethod(String method, String param2, String param3,
-			String param4) {
+	public static void callMethod(String method, String param1, String param2,
+			String param3, String paramJS) {
 		try {
 			Class<?> _class = Class.forName("org.utils.KeywordLibrary");
 			Method _method = _class.getMethod(methodTable.get(method), String.class,
-					String.class, String.class);
-			_method.invoke(null, param2, param3, param4);
+					String.class, String.class, String.class);
+			_method.invoke(null, param1, param2, param3, paramJS);
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -80,7 +92,12 @@ public class KeywordLibrary {
 
 	}
 
-	public static void enterText(String param1, String param2, String param3) {
+	public static void enterText(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
+		// textdata = parameterTable.get("textdata"));
 		try {
 			switch (param1) {
 			case "name":
@@ -106,7 +123,11 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickButton(String param1, String param2, String param3) {
+	public static void clickButton(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
 		try {
 			switch (param1) {
 			case "name":
@@ -129,7 +150,11 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickLink(String param1, String param2, String param3) {
+	public static void clickLink(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
 		try {
 			switch (param1) {
 			case "linkText":
@@ -153,8 +178,12 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void selectDropDown(String param1, String param2,
-			String param3) {
+	public static void selectDropDown(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
+		// visibleText = parameterTable.get("visibleText"));
 		try {
 			switch (param1) {
 			case "name":
@@ -184,8 +213,13 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void verifyText(String param1, String param2, String param3) {
+	public static void verifyText(String param1, String param2, String param3,
+			String paramJS) {
 		boolean flag = false;
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
+		// expectedText = parameterTable.get("expectedText"));
 		try {
 			switch (param1) {
 			case "name":
@@ -214,8 +248,11 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickCheckBox(String param1, String param2,
-			String param3) {
+	public static void clickCheckBox(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
 		try {
 			if (param3.equals("null")) {
 				switch (param1) {
@@ -267,7 +304,11 @@ public class KeywordLibrary {
 	}
 
 	public static void clickRadioButton(String param1, String param2,
-			String param3) {
+			String param3, String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// selectorType = parameterTable.get("selectorType"));
+		// selectorValue = parameterTable.get("selectorValue"));
+		// expectedValue = parameterTable.get("expectedValue"));
 		try {
 			if (param3.equals("null")) {
 				switch (param1) {
@@ -317,7 +358,13 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void switchFrame(String param1, String param2, String param3) {
+	public static void switchFrame(String param1, String param2, String param3,
+			String paramJS) {
+		Utils.readData(paramJS, Optional.of(parameterTable));
+		// TODO: cleanup wrong code
+		// param1 = parameterTable.get("frameName"));
+		// param2 = parameterTable.get("selectorValue"));
+		// param3 = parameterTable.get("expectedValue"));
 		try {
 			switch (param1) {
 			case "name":

@@ -18,14 +18,14 @@ import org.utils.Utils;
 
 public class Launcher {
 
-	private static String arguments = null;
+	private static String argumentsJS = null;
 	private static String suite = "Test Suite.xls";
 	private static HashMap<String, String> elementData = new HashMap<>(); // empty
 
 	public static void main(String[] args) throws IOException {
 
-		FileInputStream file = new FileInputStream(String.format("%s\\Desktop\\%s",
-				getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"), suite));
+		FileInputStream file = new FileInputStream(getPropertyEnv("suite",
+				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet indexSheet = workbook.getSheet("Index");
 		Row indexRow;
@@ -43,7 +43,7 @@ public class Launcher {
 				for (int j = 0; j < stepMap.size(); j++) {
 					stepList = stepMap.get(j);
 					if (stepList.get(0).equals("openBrowser")) {
-						arguments = Utils.writeDataJSON(elementData, "{}");
+						argumentsJS = Utils.writeDataJSON(elementData, "{}");
 						KeywordLibrary.openBrowser();
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					} else {
@@ -52,9 +52,9 @@ public class Launcher {
 							elementData.put(Utils.requiredKey, "none");
 						}
 
-						arguments = Utils.writeDataJSON(elementData, "{}");
+						argumentsJS = Utils.writeDataJSON(elementData, "{}");
 						KeywordLibrary.callMethod(stepList.get(0), stepList.get(1),
-								stepList.get(2), stepList.get(3));
+								stepList.get(2), stepList.get(3), argumentsJS);
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					}
 				}
@@ -68,8 +68,8 @@ public class Launcher {
 
 	public static void writeStatus(String sheetName, int rowNumber)
 			throws IOException {
-		File file = new File(String.format("%s\\Desktop\\%s",
-				getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"), suite));
+		File file = new File(getPropertyEnv("suite",
+				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
 
 		FileInputStream istream = new FileInputStream(file);
 		HSSFWorkbook workbook = new HSSFWorkbook(istream);
@@ -87,8 +87,8 @@ public class Launcher {
 	public static HashMap<Integer, ArrayList<String>> readSteps(String sheetName)
 			throws IOException {
 		HashMap<Integer, ArrayList<String>> map = new HashMap<>();
-		FileInputStream file = new FileInputStream(String.format("%s\\Desktop\\%s",
-				getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"), suite));
+		FileInputStream file = new FileInputStream(getPropertyEnv("suite",
+				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
 
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet testcaseSheet = workbook.getSheet(sheetName);
