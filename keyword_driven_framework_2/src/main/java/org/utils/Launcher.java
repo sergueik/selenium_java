@@ -15,7 +15,6 @@ import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
-import org.utils.Utils;
 
 public class Launcher {
 
@@ -49,11 +48,10 @@ public class Launcher {
 					stepData = stepDataMap.get(j);
 					if (stepList.get(0).equals("	")) {
 						// implicit
-						KeywordLibrary.openBrowser(null, null, null, null);
+						KeywordLibrary.openBrowser(null);
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					} else {
-						KeywordLibrary.callMethod(stepList.get(0), stepList.get(1),
-								stepList.get(2), stepList.get(3), stepData );
+						KeywordLibrary.callMethod(stepList.get(0), stepData);
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					}
 				}
