@@ -27,7 +27,7 @@ public class KeywordLibrary {
 	private static String selectorType = null;
 	private static String selectorValue = null;
 	private static String expectedValue = null;
-	private static String textdata = null;
+	private static String textData = null;
 	private static String visibleText = null;
 	private static String expectedText = null;
 
@@ -92,30 +92,30 @@ public class KeywordLibrary {
 
 	}
 
-	public static void enterText(String param1, String param2, String param3,
+	public static void enterText(String selectorType, String selectorValue, String textData,
 			String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
-		// textdata = parameterTable.get("textdata"));
+		// textData = parameterTable.get("textData"));
 		try {
-			switch (param1) {
+			switch (selectorType) {
 			case "name":
-				driver.findElement(By.name(objectRepo.getProperty(param2)))
-						.sendKeys(param3);
+				driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
+						.sendKeys(textData);
 				break;
 			case "id":
-				driver.findElement(By.id(objectRepo.getProperty(param2)))
-						.sendKeys(param3);
+				driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
+						.sendKeys(textData);
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
-						.sendKeys(param3);
+				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
+						.sendKeys(textData);
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(param2)))
-						.sendKeys(param3);
-				;
+				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
+						.sendKeys(textData);
+				break;
 			}
 			result = "Passed";
 		} catch (Exception e) {
@@ -123,25 +123,25 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickButton(String param1, String param2, String param3,
+	public static void clickButton(String selectorType, String selectorValue, String param3,
 			String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
 		try {
-			switch (param1) {
+			switch (selectorType) {
 			case "name":
-				driver.findElement(By.name(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.name(objectRepo.getProperty(selectorValue))).click();
 				break;
 			case "id":
-				driver.findElement(By.id(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.id(objectRepo.getProperty(selectorValue))).click();
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
+				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
 						.click();
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
 				;
 			}
 			result = "Passed";
@@ -150,26 +150,26 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickLink(String param1, String param2, String param3,
+	public static void clickLink(String selectorType, String selectorValue, String param3,
 			String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
 		try {
-			switch (param1) {
+			switch (selectorType) {
 			case "linkText":
-				driver.findElement(By.linkText(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.linkText(objectRepo.getProperty(selectorValue))).click();
 				break;
 			case "partialLinkText":
-				driver.findElement(By.partialLinkText(objectRepo.getProperty(param2)))
+				driver.findElement(By.partialLinkText(objectRepo.getProperty(selectorValue)))
 						.click();
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
+				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
 						.click();
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
 				;
 			}
 			result = "Passed";
@@ -178,33 +178,33 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void selectDropDown(String param1, String param2, String param3,
+	public static void selectDropDown(String selectorType, String selectorValue, String visibleText,
 			String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
 		// visibleText = parameterTable.get("visibleText"));
 		try {
-			switch (param1) {
+			switch (selectorType) {
 			case "name":
 				Select select_name = new Select(
-						driver.findElement(By.name(objectRepo.getProperty(param2))));
-				select_name.selectByVisibleText(param3);
+						driver.findElement(By.name(objectRepo.getProperty(selectorValue))));
+				select_name.selectByVisibleText(visibleText);
 				break;
 			case "id":
 				Select select_id = new Select(
-						driver.findElement(By.id(objectRepo.getProperty(param2))));
-				select_id.selectByVisibleText(param3);
+						driver.findElement(By.id(objectRepo.getProperty(selectorValue))));
+				select_id.selectByVisibleText(visibleText);
 				break;
 			case "css":
 				Select select_css = new Select(
-						driver.findElement(By.cssSelector(objectRepo.getProperty(param2))));
-				select_css.selectByVisibleText(param3);
+						driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue))));
+				select_css.selectByVisibleText(visibleText);
 				break;
 			case "xpath":
 				Select select_xpath = new Select(
-						driver.findElement(By.xpath(objectRepo.getProperty(param2))));
-				select_xpath.selectByVisibleText(param3);
+						driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))));
+				select_xpath.selectByVisibleText(visibleText);
 				break;
 			}
 			result = "Passed";
@@ -213,7 +213,7 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void verifyText(String param1, String param2, String param3,
+	public static void verifyText(String selectorType, String selectorValue, String expectedText,
 			String paramJS) {
 		boolean flag = false;
 		Utils.readData(paramJS, Optional.of(parameterTable));
@@ -221,23 +221,23 @@ public class KeywordLibrary {
 		// selectorValue = parameterTable.get("selectorValue"));
 		// expectedText = parameterTable.get("expectedText"));
 		try {
-			switch (param1) {
+			switch (selectorType) {
 			case "name":
-				flag = driver.findElement(By.name(objectRepo.getProperty(param2)))
-						.getText().equals(param3);
+				flag = driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
+						.getText().equals(expectedText);
 				break;
 			case "id":
-				flag = driver.findElement(By.id(objectRepo.getProperty(param2)))
-						.getText().equals(param3);
+				flag = driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
+						.getText().equals(expectedText);
 				break;
 			case "css":
 				flag = driver
-						.findElement(By.cssSelector(objectRepo.getProperty(param2)))
-						.getText().equals(param3);
+						.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
+						.getText().equals(expectedText);
 				break;
 			case "xpath":
-				flag = driver.findElement(By.xpath(objectRepo.getProperty(param2)))
-						.getText().equals(param3);
+				flag = driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
+						.getText().equals(expectedText);
 				break;
 			}
 
@@ -248,49 +248,50 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickCheckBox(String param1, String param2, String param3,
+	public static void clickCheckBox(String selectorType, String selectorValue, String expectedValue,
 			String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
+		// expectedValue = parameterTable.get("expectedValue"));
 		try {
-			if (param3.equals("null")) {
-				switch (param1) {
+			if (expectedValue.equals("null")) {
+				switch (selectorType) {
 				case "name":
-					driver.findElement(By.name(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.name(objectRepo.getProperty(selectorValue))).click();
 					break;
 				case "id":
-					driver.findElement(By.id(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.id(objectRepo.getProperty(selectorValue))).click();
 					break;
 				case "css":
-					driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
+					driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
 							.click();
 					break;
 				case "xpath":
-					driver.findElement(By.xpath(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
 					break;
 				}
 			} else {
 				List<WebElement> elements = new ArrayList<>();
-				switch (param1) {
+				switch (selectorType) {
 				case "name":
 					elements = driver
-							.findElements(By.name(objectRepo.getProperty(param2)));
+							.findElements(By.name(objectRepo.getProperty(selectorValue)));
 					break;
 				case "id":
-					elements = driver.findElements(By.id(objectRepo.getProperty(param2)));
+					elements = driver.findElements(By.id(objectRepo.getProperty(selectorValue)));
 					break;
 				case "css":
 					elements = driver
-							.findElements(By.cssSelector(objectRepo.getProperty(param2)));
+							.findElements(By.cssSelector(objectRepo.getProperty(selectorValue)));
 					break;
 				case "xpath":
 					elements = driver
-							.findElements(By.xpath(objectRepo.getProperty(param2)));
+							.findElements(By.xpath(objectRepo.getProperty(selectorValue)));
 					break;
 				}
 				for (WebElement element : elements) {
-					if (element.getAttribute("value").equals(param3)) {
+					if (element.getAttribute("value").equals(expectedValue)) {
 						element.click();
 					}
 				}
@@ -303,50 +304,56 @@ public class KeywordLibrary {
 
 	}
 
-	public static void clickRadioButton(String param1, String param2,
-			String param3, String paramJS) {
+	public static void clickRadioButton(String selectorType, String selectorValue,
+			String expectedValue, String paramJS) {
 		Utils.readData(paramJS, Optional.of(parameterTable));
 		// selectorType = parameterTable.get("selectorType"));
 		// selectorValue = parameterTable.get("selectorValue"));
 		// expectedValue = parameterTable.get("expectedValue"));
 		try {
-			if (param3.equals("null")) {
-				switch (param1) {
+			if (expectedValue.equals("null")) {
+				switch (selectorType) {
 				case "name":
-					driver.findElement(By.name(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				case "id":
-					driver.findElement(By.id(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				case "css":
-					driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
+					driver
+							.findElement(
+									By.cssSelector(objectRepo.getProperty(selectorValue)))
 							.click();
 					break;
 				case "xpath":
-					driver.findElement(By.xpath(objectRepo.getProperty(param2))).click();
+					driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				}
 			} else {
 				List<WebElement> elements = new ArrayList<>();
-				switch (param1) {
+				switch (selectorType) {
 				case "name":
 					elements = driver
-							.findElements(By.name(objectRepo.getProperty(param2)));
+							.findElements(By.name(objectRepo.getProperty(selectorValue)));
 					break;
 				case "id":
-					elements = driver.findElements(By.id(objectRepo.getProperty(param2)));
+					elements = driver
+							.findElements(By.id(objectRepo.getProperty(selectorValue)));
 					break;
 				case "css":
-					elements = driver
-							.findElements(By.cssSelector(objectRepo.getProperty(param2)));
+					elements = driver.findElements(
+							By.cssSelector(objectRepo.getProperty(selectorValue)));
 					break;
 				case "xpath":
 					elements = driver
-							.findElements(By.xpath(objectRepo.getProperty(param2)));
+							.findElements(By.xpath(objectRepo.getProperty(selectorValue)));
 					break;
 				}
 				for (WebElement element : elements) {
-					if (element.getAttribute("value").equals(param3)) {
+					if (element.getAttribute("value").equals(expectedValue)) {
 						element.click();
 					}
 				}
