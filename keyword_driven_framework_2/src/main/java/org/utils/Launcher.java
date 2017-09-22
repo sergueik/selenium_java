@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.apache.poi.hssf.usermodel.HSSFSheet;
@@ -19,8 +20,9 @@ import org.utils.Utils;
 public class Launcher {
 
 	private static String argumentsJS = null;
-	private static String suite = "Test Suite.xls";
-	private static HashMap<String, String> elementData = new HashMap<>(); // empty
+	private static String suite = "TestCase.xls";
+	private static HashMap<String, String> stepData = new HashMap<>(); // empty
+	private static HashMap<Integer, HashMap<String, String>> stepDataMap = new HashMap<>();
 
 	public static void main(String[] args) throws IOException {
 
@@ -37,24 +39,21 @@ public class Launcher {
 		for (int i = 1; i <= indexSheet.getLastRowNum(); i++) {
 			indexRow = indexSheet.getRow(i);
 			if (indexRow.getCell(1).getStringCellValue().equalsIgnoreCase("Yes")) {
+				System.out.println(
+						"Reading suite: " + indexRow.getCell(0).getStringCellValue());
 				stepMap = readSteps(indexRow.getCell(0).getStringCellValue());
 				System.out.println(stepMap);
 
 				for (int j = 0; j < stepMap.size(); j++) {
 					stepList = stepMap.get(j);
-					if (stepList.get(0).equals("openBrowser")) {
-						argumentsJS = Utils.writeDataJSON(elementData, "{}");
-						KeywordLibrary.openBrowser();
+					stepData = stepDataMap.get(j);
+					if (stepList.get(0).equals("	")) {
+						// implicit
+						KeywordLibrary.openBrowser(null, null, null, null);
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					} else {
-						Utils.readData(Optional.of(elementData));
-						if (!elementData.containsKey(Utils.requiredKey)) {
-							elementData.put(Utils.requiredKey, "none");
-						}
-
-						argumentsJS = Utils.writeDataJSON(elementData, "{}");
 						KeywordLibrary.callMethod(stepList.get(0), stepList.get(1),
-								stepList.get(2), stepList.get(3), argumentsJS);
+								stepList.get(2), stepList.get(3), stepData );
 						writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 					}
 				}
@@ -86,6 +85,7 @@ public class Launcher {
 
 	public static HashMap<Integer, ArrayList<String>> readSteps(String sheetName)
 			throws IOException {
+		HashMap<String, String> data = new HashMap<>();
 		HashMap<Integer, ArrayList<String>> map = new HashMap<>();
 		FileInputStream file = new FileInputStream(getPropertyEnv("suite",
 				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
@@ -95,13 +95,24 @@ public class Launcher {
 		Row stepRow;
 		Cell stepCell;
 		for (int i = 1; i <= testcaseSheet.getLastRowNum(); i++) {
+			// System.out.println("Row: " + i);
+			data = new HashMap<>();
 			ArrayList<String> stepList = new ArrayList<>();
 			stepRow = testcaseSheet.getRow(i);
 			for (int j = 0; j < 4; j++) {
+				// System.out.println("Col: " + j);
 				stepCell = stepRow.getCell(j);
-				stepList.add(stepCell.getStringCellValue());
+				String cellValue = null;
+				try {
+					cellValue = stepCell.getStringCellValue();
+				} catch (NullPointerException e) {
+					cellValue = "";
+				}
+				data.put(String.format("param%d", j), cellValue);
+				stepList.add(cellValue);
 			}
 			map.put(i - 1, stepList);
+			stepDataMap.put(i - 1, data);
 		}
 		workbook.close();
 		return map;

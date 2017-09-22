@@ -10,18 +10,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.utils.Utils;
 
 public class KeywordLibrary {
 
-	static WebDriver driver;
+	public static WebDriver driver;
+	public static WebDriverWait wait;
+	public Actions actions;
 	static Properties objectRepo;
 	static String result;
 	private static String selectorType = null;
@@ -30,6 +36,11 @@ public class KeywordLibrary {
 	private static String textData = null;
 	private static String visibleText = null;
 	private static String expectedText = null;
+
+	public static int scriptTimeout = 5;
+	public static int flexibleWait = 120;
+	public static int implicitWait = 1;
+	public static long pollingInterval = 500;
 
 	private static HashMap<String, String> parameterTable = new HashMap<>(); // empty
 	private static Map<String, String> methodTable = new HashMap<>();
@@ -45,25 +56,43 @@ public class KeywordLibrary {
 		methodTable.put("SELECTOPTION", "selectDropDown");
 		methodTable.put("VERIFYTEXT", "verifyText");
 		methodTable.put("SWITHFRAME", "switchFrame");
+		methodTable.put("CLOSE_BROWSER", "closeBrowser");
+
+	}
+
+	public static void closeBrowser(String param1, String param2, String param3,
+			HashMap<String, String> parameterTable) {
+		driver.quit();
 	}
 
 	public static void navigateTo(String param1, String param2, String param3,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// driver.navigate().to(parameterTable.get("url"));
-		driver.navigate().to(param1);
+			HashMap<String, String> parameterTable) {
+		String url = parameterTable.get("param1");
+		System.err.println("Navigate to: " + url);
+		driver.navigate().to(url);
 	}
 
 	public static void callMethod(String method, String param1, String param2,
-			String param3, String paramJS) {
-		try {
-			Class<?> _class = Class.forName("org.utils.KeywordLibrary");
-			Method _method = _class.getMethod(methodTable.get(method), String.class,
-					String.class, String.class, String.class);
-			_method.invoke(null, param1, param2, param3, paramJS);
+			String param3, HashMap<String, String> parameterTable) {
+		System.out.println("calling method for: " + method);
+		if (methodTable.containsKey(method)) {
+			String methodName = methodTable.get(method);
+			try {
+				Class<?> _class = Class.forName("org.utils.KeywordLibrary");
+				// System.out.println("getting method: " + methodName);
+				Method _method = _class.getMethod(methodName, String.class,
+						String.class, String.class, HashMap.class);
+				// System.out.println("Invoking method: " + methodName + " with " +
+				// param1
+				// + "," + param2 + "," + param3 + "," + paramJS);
+				_method.invoke(null, param1, param2, param3, parameterTable);
 
-		} catch (Exception e) {
-			e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else {
+			System.out.println("No method for: " + method);
+
 		}
 	}
 
@@ -73,7 +102,9 @@ public class KeywordLibrary {
 		objectRepo.load(new FileInputStream(file));
 	}
 
-	public static void openBrowser() throws IOException {
+	public static void openBrowser(String selectorType, String selectorValue,
+			String textData, HashMap<String, String> parameterTable)
+			throws IOException {
 		try {
 			File file = new File("Config.properties");
 			Properties config = new Properties();
@@ -92,29 +123,24 @@ public class KeywordLibrary {
 
 	}
 
-	public static void enterText(String selectorType, String selectorValue, String textData,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
-		// textData = parameterTable.get("textData"));
+	public static void enterText(String selectorType, String selectorValue,
+			String textData, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		textData = parameterTable.get("param3");
 		try {
 			switch (selectorType) {
 			case "name":
-				driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
-						.sendKeys(textData);
+				driver.findElement(By.name(selectorValue)).sendKeys(textData);
 				break;
 			case "id":
-				driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
-						.sendKeys(textData);
+				driver.findElement(By.id(selectorValue)).sendKeys(textData);
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
-						.sendKeys(textData);
+				driver.findElement(By.cssSelector(selectorValue)).sendKeys(textData);
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
-						.sendKeys(textData);
+				driver.findElement(By.xpath(selectorValue)).sendKeys(textData);
 				break;
 			}
 			result = "Passed";
@@ -123,26 +149,24 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickButton(String selectorType, String selectorValue, String param3,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
+	public static void clickButton(String selectorType, String selectorValue,
+			String param3, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
 		try {
 			switch (selectorType) {
 			case "name":
-				driver.findElement(By.name(objectRepo.getProperty(selectorValue))).click();
+				driver.findElement(By.name(selectorValue)).click();
 				break;
 			case "id":
-				driver.findElement(By.id(objectRepo.getProperty(selectorValue))).click();
+				driver.findElement(By.id(selectorValue)).click();
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
-						.click();
+				driver.findElement(By.cssSelector(selectorValue)).click();
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
-				;
+				driver.findElement(By.xpath(selectorValue)).click();
+				break;
 			}
 			result = "Passed";
 		} catch (Exception e) {
@@ -150,60 +174,68 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickLink(String selectorType, String selectorValue, String param3,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
+	public static void clickLink(String selectorType, String selectorValue,
+			String param3, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		System.err.println("Locate via " + selectorType + " " + selectorValue);
+		WebElement element;
 		try {
 			switch (selectorType) {
 			case "linkText":
-				driver.findElement(By.linkText(objectRepo.getProperty(selectorValue))).click();
+				//
+				driver.findElement(By.linkText(selectorValue)).click();
 				break;
 			case "partialLinkText":
-				driver.findElement(By.partialLinkText(objectRepo.getProperty(selectorValue)))
-						.click();
+				driver.findElement(By.partialLinkText(selectorValue)).click();
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
-						.click();
+				element = driver.findElement(By.cssSelector(selectorValue));
+				highlight(element);
+				element.click();
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
-				;
+				element = driver.findElement(By.xpath(selectorValue));
+				highlight(element);
+				element.click();
+				break;
 			}
 			result = "Passed";
 		} catch (Exception e) {
 			result = "Failed";
 		}
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+
 	}
 
-	public static void selectDropDown(String selectorType, String selectorValue, String visibleText,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
-		// visibleText = parameterTable.get("visibleText"));
+	public static void selectDropDown(String selectorType, String selectorValue,
+			String visibleText, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		visibleText = parameterTable.get("param3");
 		try {
 			switch (selectorType) {
 			case "name":
 				Select select_name = new Select(
-						driver.findElement(By.name(objectRepo.getProperty(selectorValue))));
+						driver.findElement(By.name(selectorValue)));
 				select_name.selectByVisibleText(visibleText);
 				break;
 			case "id":
-				Select select_id = new Select(
-						driver.findElement(By.id(objectRepo.getProperty(selectorValue))));
+				Select select_id = new Select(driver.findElement(By.id(selectorValue)));
 				select_id.selectByVisibleText(visibleText);
 				break;
 			case "css":
 				Select select_css = new Select(
-						driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue))));
+						driver.findElement(By.cssSelector(selectorValue)));
 				select_css.selectByVisibleText(visibleText);
 				break;
 			case "xpath":
 				Select select_xpath = new Select(
-						driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))));
+						driver.findElement(By.xpath(selectorValue)));
 				select_xpath.selectByVisibleText(visibleText);
 				break;
 			}
@@ -213,22 +245,21 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void verifyText(String selectorType, String selectorValue, String expectedText,
-			String paramJS) {
+	public static void verifyText(String selectorType, String selectorValue,
+			String expectedText, HashMap<String, String> parameterTable) {
 		boolean flag = false;
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
-		// expectedText = parameterTable.get("expectedText"));
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		expectedText = parameterTable.get("param3");
 		try {
 			switch (selectorType) {
 			case "name":
-				flag = driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
-						.getText().equals(expectedText);
+				flag = driver.findElement(By.name(selectorValue)).getText()
+						.equals(expectedText);
 				break;
 			case "id":
-				flag = driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
-						.getText().equals(expectedText);
+				flag = driver.findElement(By.id(selectorValue)).getText()
+						.equals(expectedText);
 				break;
 			case "css":
 				flag = driver
@@ -236,7 +267,8 @@ public class KeywordLibrary {
 						.getText().equals(expectedText);
 				break;
 			case "xpath":
-				flag = driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
+				flag = driver
+						.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
 						.getText().equals(expectedText);
 				break;
 			}
@@ -248,27 +280,31 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickCheckBox(String selectorType, String selectorValue, String expectedValue,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
-		// expectedValue = parameterTable.get("expectedValue"));
+	public static void clickCheckBox(String selectorType, String selectorValue,
+			String expectedValue, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		expectedValue = parameterTable.get("param3");
 		try {
 			if (expectedValue.equals("null")) {
 				switch (selectorType) {
 				case "name":
-					driver.findElement(By.name(objectRepo.getProperty(selectorValue))).click();
+					driver.findElement(By.name(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				case "id":
-					driver.findElement(By.id(objectRepo.getProperty(selectorValue))).click();
+					driver.findElement(By.id(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				case "css":
-					driver.findElement(By.cssSelector(objectRepo.getProperty(selectorValue)))
+					driver
+							.findElement(
+									By.cssSelector(objectRepo.getProperty(selectorValue)))
 							.click();
 					break;
 				case "xpath":
-					driver.findElement(By.xpath(objectRepo.getProperty(selectorValue))).click();
+					driver.findElement(By.xpath(objectRepo.getProperty(selectorValue)))
+							.click();
 					break;
 				}
 			} else {
@@ -279,11 +315,12 @@ public class KeywordLibrary {
 							.findElements(By.name(objectRepo.getProperty(selectorValue)));
 					break;
 				case "id":
-					elements = driver.findElements(By.id(objectRepo.getProperty(selectorValue)));
+					elements = driver
+							.findElements(By.id(objectRepo.getProperty(selectorValue)));
 					break;
 				case "css":
-					elements = driver
-							.findElements(By.cssSelector(objectRepo.getProperty(selectorValue)));
+					elements = driver.findElements(
+							By.cssSelector(objectRepo.getProperty(selectorValue)));
 					break;
 				case "xpath":
 					elements = driver
@@ -301,15 +338,13 @@ public class KeywordLibrary {
 		} catch (Exception e) {
 			result = "Failed";
 		}
-
 	}
 
 	public static void clickRadioButton(String selectorType, String selectorValue,
-			String expectedValue, String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// selectorType = parameterTable.get("selectorType"));
-		// selectorValue = parameterTable.get("selectorValue"));
-		// expectedValue = parameterTable.get("expectedValue"));
+			String expectedValue, HashMap<String, String> parameterTable) {
+		selectorType = parameterTable.get("param1");
+		selectorValue = parameterTable.get("param2");
+		expectedValue = parameterTable.get("param3");
 		try {
 			if (expectedValue.equals("null")) {
 				switch (selectorType) {
@@ -366,37 +401,56 @@ public class KeywordLibrary {
 	}
 
 	public static void switchFrame(String param1, String param2, String param3,
-			String paramJS) {
-		Utils.readData(paramJS, Optional.of(parameterTable));
-		// TODO: cleanup wrong code
-		// param1 = parameterTable.get("frameName"));
-		// param2 = parameterTable.get("selectorValue"));
-		// param3 = parameterTable.get("expectedValue"));
+			HashMap<String, String> parameterTable) {
+		param1 = parameterTable.get("param1");
+		param2 = parameterTable.get("param2");
+		param3 = parameterTable.get("param3");
 		try {
 			switch (param1) {
 			case "name":
-				driver.switchTo().frame(objectRepo.getProperty(param2));
+				driver.switchTo().frame(param2);
 				break;
 			case "id":
-				driver.findElement(By.id(objectRepo.getProperty(param2))).click();
+				driver.findElement(By.id(param2)).click();
 				break;
 			case "css":
-				driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
-						.click();
-				System.out.println(
-						driver.findElement(By.cssSelector(objectRepo.getProperty(param2)))
-								.getText());
+				driver.findElement(By.cssSelector(param2)).click();
+				System.out
+						.println(driver.findElement(By.cssSelector(param2)).getText());
 				break;
 			case "xpath":
-				driver.findElement(By.xpath(objectRepo.getProperty(param2))).click();
-				System.out.println(driver
-						.findElement(By.xpath(objectRepo.getProperty(param2))).getText());
+				driver.findElement(By.xpath(param2)).click();
+				System.out.println(driver.findElement(By.xpath(param2)).getText());
 				break;
 			}
 			result = "Passed";
 		} catch (Exception e) {
 			result = "Failed";
 		}
+	}
 
+	public static void highlight(WebElement element) {
+		highlight(element, 100);
+	}
+
+	public static void highlight(WebElement element, long highlight_interval) {
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						"arguments[0].style.border='3px solid yellow'", element);
+			}
+			Thread.sleep(highlight_interval);
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver)
+						.executeScript("arguments[0].style.border=''", element);
+			}
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
 	}
 }
