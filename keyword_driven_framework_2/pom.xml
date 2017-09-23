@@ -4,7 +4,7 @@
   <groupId>org.utils</groupId>
   <artifactId>automation_framework_selenium</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>

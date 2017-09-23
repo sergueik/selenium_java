@@ -16,9 +16,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 
-public class Launcher {
+public class Launcher2 {
 
 	private static String suite = "TestCase.xls";
+	private static HashMap<String, String> stepData = new HashMap<>();
 
 	public static void main(String[] args) throws IOException {
 
@@ -27,6 +28,7 @@ public class Launcher {
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet indexSheet = workbook.getSheet("Index");
 		Row indexRow;
+
 		KeywordLibrary.loadProperties();
 
 		for (int i = 1; i <= indexSheet.getLastRowNum(); i++) {
@@ -34,13 +36,20 @@ public class Launcher {
 			if (indexRow.getCell(1).getStringCellValue().equalsIgnoreCase("Yes")) {
 				System.out.println(
 						"Reading suite: " + indexRow.getCell(0).getStringCellValue());
-				Map<Integer, Map<String, String>> steps = readSteps(
+				HashMap<Integer, ArrayList<String>> stepMap = readSteps(
 						indexRow.getCell(0).getStringCellValue());
+				System.out.println(stepMap);
 
-				for (int j = 0; j < steps.size(); j++) {
-					Map<String, String> data = steps.get(j);
-					String keyword = data.get("keyword");
-					KeywordLibrary.callMethod(keyword, data);
+				for (int j = 0; j < stepMap.size(); j++) {
+					List<String> stepList = stepMap.get(j);
+					String keyword = stepList.get(0);
+					if (keyword.equals("	")) {
+						// implicit
+						KeywordLibrary.openBrowser(null);
+					} else {
+						// TODO: define methods with List<String> params
+						KeywordLibrary.callMethod(keyword, stepData);
+					}
 					writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
 				}
 			}
@@ -69,23 +78,21 @@ public class Launcher {
 		workbook.close();
 	}
 
-	public static Map<Integer, Map<String, String>> readSteps(String sheetName)
+	public static HashMap<Integer, ArrayList<String>> readSteps(String sheetName)
 			throws IOException {
-		HashMap<String, String> data = new HashMap<>();
-		Map<Integer, Map<String, String>> stepDataMap = new HashMap<>();
 		FileInputStream file = new FileInputStream(getPropertyEnv("suite",
 				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
 
+		HashMap<Integer, ArrayList<String>> map = new HashMap<>();
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet testcaseSheet = workbook.getSheet(sheetName);
 		Row stepRow;
 		Cell stepCell;
 		for (int i = 1; i <= testcaseSheet.getLastRowNum(); i++) {
 			// System.out.println("Row: " + i);
-			data = new HashMap<>();
+			ArrayList<String> stepList = new ArrayList<>();
 			stepRow = testcaseSheet.getRow(i);
-			data.put("keyword", stepRow.getCell(0).getStringCellValue());
-			for (int j = 1; j < 4; j++) {
+			for (int j = 0; j < 4; j++) {
 				// System.out.println("Col: " + j);
 				stepCell = stepRow.getCell(j);
 				String cellValue = null;
@@ -94,12 +101,12 @@ public class Launcher {
 				} catch (NullPointerException e) {
 					cellValue = "";
 				}
-				data.put(String.format("param%d", j), cellValue);
+				stepList.add(cellValue);
 			}
-			stepDataMap.put(i - 1, data);
+			map.put(i - 1, stepList);
 		}
 		workbook.close();
-		return stepDataMap;
+		return map;
 	}
 
 	public static String getPropertyEnv(String name, String defaultValue) {
