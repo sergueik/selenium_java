@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -19,6 +20,7 @@ import org.apache.poi.ss.usermodel.Row;
 public class Launcher {
 
 	private static String suite = "TestCase.xls";
+	private static int statusColumn = 6;
 
 	public static void main(String[] args) throws IOException {
 
@@ -60,8 +62,8 @@ public class Launcher {
 		HSSFWorkbook workbook = new HSSFWorkbook(istream);
 		HSSFSheet sheet = workbook.getSheet(sheetName);
 		Row row = sheet.getRow(rowNumber);
-		Cell cell = row.createCell(4);
-		cell.setCellValue(KeywordLibrary.result);
+		Cell cell = row.createCell(statusColumn);
+		cell.setCellValue(KeywordLibrary.status);
 
 		FileOutputStream ostream = new FileOutputStream(file);
 		workbook.write(ostream);
@@ -80,26 +82,54 @@ public class Launcher {
 		HSSFSheet testcaseSheet = workbook.getSheet(sheetName);
 		Row stepRow;
 		Cell stepCell;
-		for (int i = 1; i <= testcaseSheet.getLastRowNum(); i++) {
-			// System.out.println("Row: " + i);
+		for (int row = 1; row <= testcaseSheet.getLastRowNum(); row++) {
+			System.err.println("Row: " + row);
 			data = new HashMap<>();
-			stepRow = testcaseSheet.getRow(i);
+			stepRow = testcaseSheet.getRow(row);
 			data.put("keyword", stepRow.getCell(0).getStringCellValue());
-			for (int j = 1; j < 4; j++) {
-				// System.out.println("Col: " + j);
-				stepCell = stepRow.getCell(j);
+			for (int col = 1; col < statusColumn; col++) {
+				stepCell = stepRow.getCell(col);
 				String cellValue = null;
 				try {
-					cellValue = stepCell.getStringCellValue();
-				} catch (NullPointerException e) {
+					cellValue = safeCellToString(stepCell);
+				} catch (NullPointerException|IllegalStateException e) {
+					System.err.println("Exception (ignored): " + e.toString());
 					cellValue = "";
 				}
-				data.put(String.format("param%d", j), cellValue);
+				System.err.println("Column[" + col + "] = " + cellValue);
+				data.put(String.format("param%d", col), cellValue);
 			}
-			stepDataMap.put(i - 1, data);
+			stepDataMap.put(row - 1, data);
 		}
 		workbook.close();
 		return stepDataMap;
+	}
+
+	// Safe conversion of type Excel cell object to String value
+	public static String safeCellToString(Cell cell) {
+		int type = cell.getCellType();
+		Object result;
+		switch (type) {
+		case HSSFCell.CELL_TYPE_NUMERIC: // 0
+			result = cell.getNumericCellValue();
+			break;
+		case HSSFCell.CELL_TYPE_STRING: // 1
+			result = cell.getStringCellValue();
+			break;
+		case HSSFCell.CELL_TYPE_FORMULA: // 2
+			throw new IllegalStateException("Can't evaluate formula cell");
+		case HSSFCell.CELL_TYPE_BLANK: // 3
+			result = "-";
+			break;
+		case HSSFCell.CELL_TYPE_BOOLEAN: // 4
+			result = cell.getBooleanCellValue();
+			break;
+		case HSSFCell.CELL_TYPE_ERROR: // 5
+			throw new RuntimeException("Cell has an error");
+		default:
+			throw new IllegalStateException("Unsupported cell type: " + type);
+		}
+		return result.toString();
 	}
 
 	public static String getPropertyEnv(String name, String defaultValue) {

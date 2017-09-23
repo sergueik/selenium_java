@@ -14,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -28,6 +29,7 @@ public class KeywordLibrary {
 	public static WebDriverWait wait;
 	public Actions actions;
 	static Properties objectRepo;
+	static String status;
 	static String result;
 
 	private static String selectorType = null;
@@ -50,21 +52,25 @@ public class KeywordLibrary {
 
 	private static Map<String, String> methodTable = new HashMap<>();
 	static {
-		methodTable.put("CREATE_BROWSER", "openBrowser");
-		methodTable.put("GOTOURL", "navigateTo");
-		methodTable.put("SETTEXT", "enterText");
-		methodTable.put("GETTEXT", "getText");
-		methodTable.put("GETATTR", "getElementAttribute");
 		methodTable.put("CLICK", "clickButton");
-		methodTable.put("CLICKBUTTON", "clickButton");
-		methodTable.put("CLICKLINK", "clickLink");
-		methodTable.put("CLICKRADIO", "clickRadioButton");
-		methodTable.put("CLICKCHECKBOX", "clickCheckBox");
-		methodTable.put("SELECTOPTION", "selectDropDown");
-		methodTable.put("VERIFYTEXT", "verifyText");
-		methodTable.put("SWITHFRAME", "switchFrame");
+		methodTable.put("CLICK_BUTTON", "clickButton");
+		methodTable.put("CLICK_CHECKBOX", "clickCheckBox");
+		methodTable.put("CLICK_LINK", "clickLink");
+		methodTable.put("CLICK_RADIO", "clickRadioButton");
 		methodTable.put("CLOSE_BROWSER", "closeBrowser");
-
+		methodTable.put("CREATE_BROWSER", "openBrowser");
+		methodTable.put("ELEMENT_PRESENT", "elementPresent");
+		methodTable.put("GET_ATTR", "getElementAttribute");
+		methodTable.put("GET_TEXT", "getText");
+		methodTable.put("GOTO_URL", "navigateTo");
+		methodTable.put("SELECT_OPTION", "selectDropDown");
+		methodTable.put("SET_TEXT", "enterText");
+		methodTable.put("SEND_KEYS", "enterText");
+		methodTable.put("SWITCH_FRAME", "switchFrame");
+		methodTable.put("VERIFY_ATTR", "verifyAttribute");
+		methodTable.put("VERIFY_TEXT", "verifyText");
+		methodTable.put("WAIT", "wait");
+		
 	}
 
 	public static void closeBrowser(Map<String, String> params) {
@@ -85,10 +91,7 @@ public class KeywordLibrary {
 				Method _method = _class.getMethod(methodName, Map.class);
 				System.out.println(keyword + " call method: " + methodName + " with "
 						+ String.join(",", params.values()));
-				Object _result = _method.invoke(null, params);
-				System.out.println(
-						String.format("%s returned %s", methodName, (String) _result));
-
+			 _method.invoke(null, params);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -116,9 +119,9 @@ public class KeywordLibrary {
 				driver.get(config.getProperty("url"));
 			}
 			driver.manage().window().maximize();
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 
 	}
@@ -142,9 +145,9 @@ public class KeywordLibrary {
 				driver.findElement(By.xpath(selectorValue)).sendKeys(textData);
 				break;
 			}
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 	}
 
@@ -166,9 +169,9 @@ public class KeywordLibrary {
 				driver.findElement(By.xpath(selectorValue)).click();
 				break;
 			}
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 	}
 
@@ -200,9 +203,9 @@ public class KeywordLibrary {
 				element.click();
 				break;
 			}
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 		try {
 			Thread.sleep(stepWait);
@@ -236,9 +239,42 @@ public class KeywordLibrary {
 				select.selectByVisibleText(visibleText);
 				break;
 			}
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
+		}
+	}
+
+	public static void verifyAttribute(Map<String, String> params) {
+		boolean flag = false;
+		selectorType = params.get("param1");
+		selectorValue = params.get("param2");
+		attributeName = params.get("param3");
+		expectedValue = params.get("param4");
+		try {
+			switch (selectorType) {
+			case "name":
+				flag = driver.findElement(By.name(selectorValue))
+						.getAttribute(attributeName).equals(expectedValue);
+				break;
+			case "id":
+				flag = driver.findElement(By.id(selectorValue))
+						.getAttribute(attributeName).equals(expectedValue);
+				break;
+			case "css":
+				flag = driver.findElement(By.cssSelector(selectorValue))
+						.getAttribute(attributeName).equals(expectedValue);
+				break;
+			case "xpath":
+				flag = driver.findElement(By.xpath(selectorValue))
+						.getAttribute(attributeName).equals(expectedValue);
+				break;
+			}
+
+			if (flag)
+				status = "Passed";
+		} catch (Exception e) {
+			status = "Failed";
 		}
 	}
 
@@ -268,13 +304,13 @@ public class KeywordLibrary {
 			}
 
 			if (flag)
-				result = "Passed";
+				status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 	}
 
-	public static String getText(Map<String, String> params) {
+	public static void getText(Map<String, String> params) {
 		String text = null;
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
@@ -295,15 +331,14 @@ public class KeywordLibrary {
 			}
 
 			if (text != null)
-				result = "Passed";
+				status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
-		System.err.println("gettext -> '" + text + "'");
-		return (text);
+		result = text;
 	}
 
-	public static String getElementAttribute(Map<String, String> params) {
+	public static void getElementAttribute(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
 		attributeName = params.get("param3");
@@ -330,10 +365,44 @@ public class KeywordLibrary {
 			}
 			value = element.getAttribute(attributeName);
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
-		System.err.println("getAttribute -> '" + value + "'");
-		return (value);
+		result = value;
+		System.out.println(
+				String.format("%s returned %s", "getElementAttribute", result));
+	}
+
+	public static void elementPresent(HashMap<String, String> params) {
+		selectorType = params.get("param1");
+		selectorValue = params.get("param2");
+		Boolean flag = false;
+		try {
+			switch (selectorType) {
+			case "name":
+				flag = driver.findElement(By.name(selectorValue)).isDisplayed();
+				break;
+			case "id":
+				flag = driver.findElement(By.id(selectorValue)).isDisplayed();
+				break;
+			case "css":
+				flag = driver.findElement(By.cssSelector(selectorValue)).isDisplayed();
+				break;
+			case "xpath":
+				flag = driver.findElement(By.xpath(selectorValue)).isDisplayed();
+				break;
+			}
+
+			if (flag) {
+				status = "Passed";
+				result = "true";
+			} else {
+				status = "Failed";
+				result = "false";
+			}
+		} catch (Exception e) {
+			status = "Failed";
+			result = "false";
+		}
 	}
 
 	public static void clickCheckBox(HashMap<String, String> params) {
@@ -389,9 +458,9 @@ public class KeywordLibrary {
 				}
 			}
 
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 	}
 
@@ -456,9 +525,9 @@ public class KeywordLibrary {
 				}
 			}
 
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
 		}
 	}
 
@@ -484,9 +553,17 @@ public class KeywordLibrary {
 				System.out.println(driver.findElement(By.xpath(param2)).getText());
 				break;
 			}
-			result = "Passed";
+			status = "Passed";
 		} catch (Exception e) {
-			result = "Failed";
+			status = "Failed";
+		}
+	}
+
+	public static void wait(Map<String, String> params) {
+		Long wait = Long.parseLong(params.get("param1"));
+		try {
+			Thread.sleep(wait);
+		} catch (InterruptedException e) {
 		}
 	}
 
