@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -26,6 +27,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class KeywordLibrary {
 
+	private static Class<?> _class = null;
 	public static WebDriver driver;
 	public static WebDriverWait wait;
 	public Actions actions;
@@ -70,8 +72,11 @@ public class KeywordLibrary {
 		methodTable.put("SWITCH_FRAME", "switchFrame");
 		methodTable.put("VERIFY_ATTR", "verifyAttribute");
 		methodTable.put("VERIFY_TEXT", "verifyText");
+		methodTable.put("CLEAR_TEXT", "clearText");
 		methodTable.put("WAIT", "wait");
 	}
+
+	private static Map<String, Method> locatorTable = new HashMap<>();
 
 	public static void closeBrowser(Map<String, String> params) {
 		driver.quit();
@@ -83,7 +88,32 @@ public class KeywordLibrary {
 		driver.navigate().to(url);
 	}
 
-	public static void callMethod(String keyword, Map<String, String> params) {
+	public static void initMethods() {
+		try {
+			_class = Class.forName("org.utils.KeywordLibrary");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		}
+
+		for (String keyword : methodTable.keySet()
+				.toArray(new String[methodTable.keySet().size()])) {
+			if (methodTable.get(keyword).isEmpty()) {
+				System.out.println("Removing keyword: " + keyword);
+				methodTable.remove(keyword);
+			} else {
+				try {
+					_class.getMethod(methodTable.get(keyword), Map.class);
+				} catch (NoSuchMethodException e) {
+					System.out.println(
+							"Removing keyword: " + keyword + " exception: " + e.toString());
+					methodTable.remove(keyword);
+				} catch (SecurityException e) {
+					// ignore
+				}
+			}
+
+		}
 		// reciprocal references
 		for (String methodName : methodTable.values()
 				.toArray(new String[methodTable.values().size()])) {
@@ -92,14 +122,27 @@ public class KeywordLibrary {
 				methodTable.put(methodName, methodName);
 			}
 		}
+		try {
+			locatorTable.put("css", By.class.getMethod("cssSelector", String.class));
+			locatorTable.put("xpath", By.class.getMethod("xpath", String.class));
+			locatorTable.put("id", By.class.getMethod("id", String.class));
+			locatorTable.put("name", By.class.getMethod("name", String.class));
+			
+		} catch (NoSuchMethodException e) {
+
+		}
+	}
+
+	public static void callMethod(String keyword, Map<String, String> params) {
+		if (_class == null) {
+			initMethods();
+		}
 		if (methodTable.containsKey(keyword)) {
 			String methodName = methodTable.get(keyword);
 			try {
-				Class<?> _class = Class.forName("org.utils.KeywordLibrary");
-				Method _method = _class.getMethod(methodName, Map.class);
 				System.out.println(keyword + " call method: " + methodName + " with "
 						+ String.join(",", params.values()));
-				_method.invoke(null, params);
+				_class.getMethod(methodName, Map.class).invoke(null, params);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -380,7 +423,7 @@ public class KeywordLibrary {
 				String.format("%s returned %s", "getElementAttribute", result));
 	}
 
-	public static void elementPresent(HashMap<String, String> params) {
+	public static void elementPresent(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
 		Boolean flag = false;
@@ -413,7 +456,7 @@ public class KeywordLibrary {
 		}
 	}
 
-	public static void clickCheckBox(HashMap<String, String> params) {
+	public static void clickCheckBox(Map<String, String> params) {
 		WebElement element;
 		List<WebElement> elements = new ArrayList<>();
 		selectorType = params.get("param1");
