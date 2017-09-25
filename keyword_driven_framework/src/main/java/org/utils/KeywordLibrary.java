@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,7 +71,6 @@ public class KeywordLibrary {
 		methodTable.put("VERIFY_ATTR", "verifyAttribute");
 		methodTable.put("VERIFY_TEXT", "verifyText");
 		methodTable.put("WAIT", "wait");
-		
 	}
 
 	public static void closeBrowser(Map<String, String> params) {
@@ -84,6 +84,14 @@ public class KeywordLibrary {
 	}
 
 	public static void callMethod(String keyword, Map<String, String> params) {
+		// reciprocal references
+		for (String methodName : methodTable.values()
+				.toArray(new String[methodTable.values().size()])) {
+			// System.out.println("Adding keyword for method: " + methodName);
+			if (!methodTable.containsKey(methodName)) {
+				methodTable.put(methodName, methodName);
+			}
+		}
 		if (methodTable.containsKey(keyword)) {
 			String methodName = methodTable.get(keyword);
 			try {
@@ -91,7 +99,7 @@ public class KeywordLibrary {
 				Method _method = _class.getMethod(methodName, Map.class);
 				System.out.println(keyword + " call method: " + methodName + " with "
 						+ String.join(",", params.values()));
-			 _method.invoke(null, params);
+				_method.invoke(null, params);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -129,7 +137,7 @@ public class KeywordLibrary {
 	public static void enterText(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		textData = params.get("param3");
+		textData = params.get("param5");
 		try {
 			switch (selectorType) {
 			case "name":
@@ -218,7 +226,7 @@ public class KeywordLibrary {
 	public static void selectDropDown(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		visibleText = params.get("param3");
+		visibleText = params.get("param5");
 		Select select;
 		try {
 			switch (selectorType) {
@@ -249,7 +257,7 @@ public class KeywordLibrary {
 		boolean flag = false;
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		attributeName = params.get("param3");
+		attributeName = params.get("param5");
 		expectedValue = params.get("param4");
 		try {
 			switch (selectorType) {
@@ -282,7 +290,7 @@ public class KeywordLibrary {
 		boolean flag = false;
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		expectedText = params.get("param3");
+		expectedText = params.get("param5");
 		try {
 			switch (selectorType) {
 			case "name":
@@ -341,7 +349,7 @@ public class KeywordLibrary {
 	public static void getElementAttribute(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		attributeName = params.get("param3");
+		attributeName = params.get("param5");
 		WebElement element = null;
 		String value = null;
 		try {
@@ -410,7 +418,7 @@ public class KeywordLibrary {
 		List<WebElement> elements = new ArrayList<>();
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		expectedValue = params.get("param3");
+		expectedValue = params.get("param5");
 		try {
 			if (expectedValue.equals("null")) {
 				switch (selectorType) {
@@ -467,7 +475,7 @@ public class KeywordLibrary {
 	public static void clickRadioButton(Map<String, String> params) {
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
-		expectedValue = params.get("param3");
+		expectedValue = params.get("param5");
 		List<WebElement> elements = new ArrayList<>();
 		WebElement element;
 		try {
@@ -534,7 +542,7 @@ public class KeywordLibrary {
 	public static void switchFrame(Map<String, String> params) {
 		param1 = params.get("param1");
 		param2 = params.get("param2");
-		param3 = params.get("param3");
+		param3 = params.get("param5");
 		try {
 			switch (param1) {
 			case "name":

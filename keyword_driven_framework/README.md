@@ -11,7 +11,16 @@ cp TestCase.xls ~/Desktop
 mvn install
 java -jar target/keyword_framework-0.3-SNAPSHOT.jar
 ```
-The launcher uses reflection to associate _keywords_ with *class methods* - a single method mayhave several keywords pointing to it:
+The launcher uses reflection to associate _keywords_ with *class methods* 
+```java
+private static Map<String, String> methodTable = new HashMap<>();
+static {
+  methodTable.put("CLICK", "clickButton");
+  methodTable.put("CLICK_BUTTON", "clickButton");
+...
+
+```
+- a single method may have several keywords pointing to it;
 ```java
 
 String methodName = methodTable.get(keyword);
@@ -23,7 +32,14 @@ try {
   _method.invoke(null, params);
 ```
 
-The test step arguments are passed as hash of parameters. The step status is retutned via `params["status"]` entry, the step result (if any) is returned via `param["result"]`
+The test step arguments are passed as hash of parameters.  That is done so one does not care about the method signature. 
+Also the [AngularJS](https://angularjs.org/) introduced `NgBy` 
+locators which fequently require (multiple) additional arguments like e.g.
+```java
+@FindAll({ @FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "name") })
+private List<WebElement> friendNames;
+```
+The step status is returned via `params["status"]` entry, the step result (if any) is returned via `params["result"]`
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
