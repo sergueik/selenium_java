@@ -26,11 +26,11 @@ import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class KeywordLibrary {
-	
-	
+
 	private static boolean instance_flag = false;
 
-  private Class<?> _class = null;
+	private Object _object  = null;
+	private Class<?> _class = null;
 	public WebDriver driver;
 	public WebDriverWait wait;
 	public Actions actions;
@@ -93,9 +93,9 @@ public class KeywordLibrary {
 
 	private KeywordLibrary() {
 		initMethods();
-  }
+	}
 
-  public String getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
@@ -104,23 +104,22 @@ public class KeywordLibrary {
 	}
 
 	public static KeywordLibrary Instance() {
-    if (!instance_flag) {
-      instance_flag = true;
-      return new KeywordLibrary();
-    } else
-      return null;
-  }
+		if (!instance_flag) {
+			instance_flag = true;
+			return new KeywordLibrary();
+		} else
+			return null;
+	}
 
-  public void finalize() {
-    instance_flag = false;
-  }
-  
+	public void finalize() {
+		instance_flag = false;
+	}
 
 	public void initMethods() {
 		try {
 			_class = Class.forName("org.utils.KeywordLibrary");
+
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 
@@ -163,12 +162,21 @@ public class KeywordLibrary {
 
 	public void callMethod(String keyword, Map<String, String> params) {
 
+		if (_object == null ) {
+			
+			try {
+				_object = _class.newInstance();
+			} catch (IllegalAccessException | InstantiationException e) {
+				throw new RuntimeException(e);
+			}
+
+		}
 		if (methodTable.containsKey(keyword)) {
 			String methodName = methodTable.get(keyword);
 			try {
 				System.out.println(keyword + " call method: " + methodName + " with "
 						+ String.join(",", params.values()));
-				_class.getMethod(methodName, Map.class).invoke(null, params);
+				_class.getMethod(methodName, Map.class).invoke(_object, params);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -183,8 +191,7 @@ public class KeywordLibrary {
 		objectRepo.load(new FileInputStream(file));
 	}
 
-	public void openBrowser(Map<String, String> params)
-			throws IOException {
+	public void openBrowser(Map<String, String> params) throws IOException {
 		try {
 			File file = new File("Config.properties");
 			Properties config = new Properties();
