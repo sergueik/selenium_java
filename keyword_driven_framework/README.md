@@ -41,6 +41,40 @@ private List<WebElement> friendNames;
 ```
 The step status is returned via `params["status"]` entry, the step result (if any) is returned via `params["result"]`
 
+### Adding jProtractor
+
+[jProtractor](https://github.com/sergueik/jProtractor) is not available in maven central, therefore to use it with framework one needs do build it from source and 
+install it into current user's `.m2` repo:
+
+```cmd
+git clone https://github.com/sergueik/jProtractor.git
+pushd jProtractor
+mvn -Dmaven.test.skip=true clean install
+```
+which will install the jar:
+```cmd
+[INFO] Installing C:\developer\sergueik\selenium_java\protractor\target\jprotractor-1.2-SNAPSHOT.jar to C:\Users\Serguei\.m2\repository\com\jprotractor\jprotractor\1.2-SNAPSHOT\jprotractor-1.2-SNAPSHOT.jar
+[INFO] Installing C:\developer\sergueik\selenium_java\protractor\pom.xml to C:\Users\Serguei\.m2\repository\com\jprotractor\jprotractor\1.2-SNAPSHOT\jprotractor-1.2-SNAPSHOT.pom
+```
+This will add about 10 AngularJS-specific `NgBy` locators:
+
+![NgBy methods](https://github.com/sergueik/selenium_java/blob/master/keyword_driven_framework/images/ngby_methods.png)
+
+
+* `options`
+* `input`
+* `selectedOption`
+* `repeater`
+* `model`
+* `binding`
+* `repeaterElement`
+* `repeaterRows`
+* `buttonText`
+* `repeaterColumn`
+* `cssContainingText`
+* `selectedRepeaterOption`
+* `partialButtonText`
+
 ### See Also
 
 * [qaf](https://github.com/qmetry/qaf)

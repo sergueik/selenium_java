@@ -4,7 +4,7 @@
   <groupId>org.utils</groupId>
   <artifactId>keyword_framework</artifactId>
   <packaging>jar</packaging>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.5-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -26,10 +26,21 @@
     <guava.version>21.0</guava.version>
     <browser.name>chrome</browser.name>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+    <jprotractor.version>1.2-SNAPSHOT</jprotractor.version>
     <poi.version>3.14</poi.version>
     <poiooxml.version>3.14</poiooxml.version>
   </properties>
   <dependencies>
+    <dependency>
+     <groupId>com.jprotractor</groupId>
+     <artifactId>jprotractor</artifactId>
+     <version>${jprotractor.version}</version>
+<!--
+ installing to system scope is not sufficient
+     <scope>system</scope>
+     <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
+-->
+    </dependency>
     <dependency>
       <groupId>org.json</groupId>
       <artifactId>json</artifactId>

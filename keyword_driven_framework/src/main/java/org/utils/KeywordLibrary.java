@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.By.ByCssSelector;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -25,15 +24,24 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import com.jprotractor.NgBy;
+import com.jprotractor.NgWebDriver;
+import com.jprotractor.NgWebElement;
+
 public class KeywordLibrary {
 
 	private static boolean instance_flag = false;
 
-	private Object _object  = null;
+	private Object _object = null;
 	private Class<?> _class = null;
+
 	public WebDriver driver;
 	public WebDriverWait wait;
 	public Actions actions;
+	
+	private NgWebDriver ngDriver;
+	private NgBy ngBy;
+	
 	Properties objectRepo;
 	String status;
 	String result;
@@ -150,6 +158,27 @@ public class KeywordLibrary {
 			}
 		}
 		try {
+			Class<?> _locatorHelper = Class.forName("org.openqa.selenium.By");
+			Method[] _locatorMethods = _locatorHelper.getMethods();
+			for (Method _locatorMethod : _locatorMethods) {
+				System.out.println("Adding locator: " + _locatorMethod.getName());
+			}
+		} catch (ClassNotFoundException | SecurityException e) {
+
+		}
+
+		try {
+			Class<?> _locatorHelper = Class.forName("com.jprotractor.NgBy");
+			Method[] _locatorMethods = _locatorHelper.getMethods();
+			for (Method _locatorMethod : _locatorMethods) {
+				System.out.println("Adding locator from com.jprotractor.NgBy: " + _locatorMethod.getName());
+			}
+		} catch (ClassNotFoundException | SecurityException e) {
+			System.out.println("Execption (ignored): " + e.toString());
+
+		}
+
+		try {
 			locatorTable.put("css", By.class.getMethod("cssSelector", String.class));
 			locatorTable.put("xpath", By.class.getMethod("xpath", String.class));
 			locatorTable.put("id", By.class.getMethod("id", String.class));
@@ -162,8 +191,8 @@ public class KeywordLibrary {
 
 	public void callMethod(String keyword, Map<String, String> params) {
 
-		if (_object == null ) {
-			
+		if (_object == null) {
+
 			try {
 				_object = _class.newInstance();
 			} catch (IllegalAccessException | InstantiationException e) {
@@ -200,6 +229,8 @@ public class KeywordLibrary {
 				System.setProperty("webdriver.chrome.driver",
 						"C:\\java\\selenium\\chromedriver.exe");
 				driver = new ChromeDriver();
+				ngDriver = new NgWebDriver(driver);
+					//			java.lang.NoClassDefFoundError: com/jprotractor/NgWebDriver
 				driver.get(config.getProperty("url"));
 			}
 			driver.manage().window().maximize();
