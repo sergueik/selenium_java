@@ -8,8 +8,8 @@ This directory contains a skeleton keyword framework project based on
 The project builds a runnable jar:
 ```bash
 cp TestCase.xls ~/Desktop
-mvn install
-java -jar target/keyword_framework-0.3-SNAPSHOT.jar
+mvn -Dmaven.test.skip=true clean install
+java -jar target/keyword_framework-0.4-SNAPSHOT.jar
 ```
 The launcher uses reflection to associate _keywords_ with *class methods* 
 ```java
@@ -40,6 +40,10 @@ locators which fequently require (multiple) additional arguments like e.g.
 private List<WebElement> friendNames;
 ```
 The step status is returned via `params["status"]` entry, the step result (if any) is returned via `params["result"]`
+
+### See Also
+
+* [qaf](https://github.com/qmetry/qaf)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
