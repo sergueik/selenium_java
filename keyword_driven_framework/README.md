@@ -11,7 +11,7 @@ cp TestCase.xls ~/Desktop
 mvn -Dmaven.test.skip=true clean install
 java -jar target/keyword_framework-0.4-SNAPSHOT.jar
 ```
-The launcher uses reflection to associate _keywords_ with *class methods* 
+The launcher uses reflection to associate _keywords_ with *class methods*
 ```java
 private static Map<String, String> methodTable = new HashMap<>();
 static {
@@ -22,28 +22,30 @@ static {
 ```
 - a single method may have several keywords pointing to it;
 ```java
-
 String methodName = methodTable.get(keyword);
 try {
   Class<?> _class = Class.forName("org.utils.KeywordLibrary");
   Method _method = _class.getMethod(methodName, Map.class);
   System.out.println(keyword + " call method: " + methodName + " with "
 			+ String.join(",", params.values()));
-  _method.invoke(null, params);
+  // for static methods
+  _method.invoke(null, params); 
+  // or when using instances methods
+  Object _object = _class.newInstance();
+  _method.invoke(_object, params);
 ```
 
-The test step arguments are passed as hash of parameters.  That is done so one does not care about the method signature. 
-Also the [AngularJS](https://angularjs.org/) introduced `NgBy` 
-locators which fequently require (multiple) additional arguments like e.g.
+The test step arguments are passed as hash of parameters.  That is done so one does not care about the method signature.
+Also the [AngularJS](https://angularjs.org/) introduced `NgBy` locators which fequently require (multiple) additional arguments like e.g.
 ```java
-@FindAll({ @FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "name") })
+@FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "name")
 private List<WebElement> friendNames;
 ```
 The step status is returned via `params["status"]` entry, the step result (if any) is returned via `params["result"]`
 
 ### Adding jProtractor
 
-[jProtractor](https://github.com/sergueik/jProtractor) is not available in maven central, therefore to use it with framework one needs do build it from source and 
+[jProtractor](https://github.com/sergueik/jProtractor) is not available in maven central, therefore to use it with framework one needs do build it from source and
 install it into current user's `.m2` repo:
 
 ```cmd

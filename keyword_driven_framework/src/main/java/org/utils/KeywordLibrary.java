@@ -38,10 +38,10 @@ public class KeywordLibrary {
 	public WebDriver driver;
 	public WebDriverWait wait;
 	public Actions actions;
-	
+
 	private NgWebDriver ngDriver;
 	private NgBy ngBy;
-	
+
 	Properties objectRepo;
 	String status;
 	String result;
@@ -126,7 +126,6 @@ public class KeywordLibrary {
 	public void initMethods() {
 		try {
 			_class = Class.forName("org.utils.KeywordLibrary");
-
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -171,11 +170,11 @@ public class KeywordLibrary {
 			Class<?> _locatorHelper = Class.forName("com.jprotractor.NgBy");
 			Method[] _locatorMethods = _locatorHelper.getMethods();
 			for (Method _locatorMethod : _locatorMethods) {
-				System.out.println("Adding locator from com.jprotractor.NgBy: " + _locatorMethod.getName());
+				System.out.println("Adding locator from com.jprotractor.NgBy: "
+						+ _locatorMethod.getName());
 			}
 		} catch (ClassNotFoundException | SecurityException e) {
 			System.out.println("Execption (ignored): " + e.toString());
-
 		}
 
 		try {
@@ -183,9 +182,7 @@ public class KeywordLibrary {
 			locatorTable.put("xpath", By.class.getMethod("xpath", String.class));
 			locatorTable.put("id", By.class.getMethod("id", String.class));
 			locatorTable.put("name", By.class.getMethod("name", String.class));
-
 		} catch (NoSuchMethodException e) {
-
 		}
 	}
 
@@ -230,7 +227,6 @@ public class KeywordLibrary {
 						"C:\\java\\selenium\\chromedriver.exe");
 				driver = new ChromeDriver();
 				ngDriver = new NgWebDriver(driver);
-					//			java.lang.NoClassDefFoundError: com/jprotractor/NgWebDriver
 				driver.get(config.getProperty("url"));
 			}
 			driver.manage().window().maximize();
