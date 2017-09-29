@@ -42,6 +42,9 @@ public class KeywordLibrary {
 	private NgWebDriver ngDriver;
 	private NgBy ngBy;
 
+	private WebElement element;
+	private NgWebElement ng_element;
+
 	Properties objectRepo;
 	String status;
 	String result;
@@ -133,14 +136,14 @@ public class KeywordLibrary {
 		for (String keyword : methodTable.keySet()
 				.toArray(new String[methodTable.keySet().size()])) {
 			if (methodTable.get(keyword).isEmpty()) {
-				System.out.println("Removing keyword: " + keyword);
+				// System.err.println("Removing keyword: " + keyword);
 				methodTable.remove(keyword);
 			} else {
 				try {
 					_class.getMethod(methodTable.get(keyword), Map.class);
 				} catch (NoSuchMethodException e) {
-					System.out.println(
-							"Removing keyword: " + keyword + " exception: " + e.toString());
+					// System.err.println(
+					// "Removing keyword: " + keyword + " exception: " + e.toString());
 					methodTable.remove(keyword);
 				} catch (SecurityException e) {
 					// ignore
@@ -151,7 +154,7 @@ public class KeywordLibrary {
 		// reciprocal references
 		for (String methodName : methodTable.values()
 				.toArray(new String[methodTable.values().size()])) {
-			// System.out.println("Adding keyword for method: " + methodName);
+			// System.err.println("Adding keyword for method: " + methodName);
 			if (!methodTable.containsKey(methodName)) {
 				methodTable.put(methodName, methodName);
 			}
@@ -160,8 +163,8 @@ public class KeywordLibrary {
 			Class<?> _locatorHelper = Class.forName("org.openqa.selenium.By");
 			Method[] _locatorMethods = _locatorHelper.getMethods();
 			for (Method _locatorMethod : _locatorMethods) {
-				System.out.println("Adding locator of org.openqa.selenium.By: "
-						+ _locatorMethod.toString());
+				// System.err.println("Adding locator of org.openqa.selenium.By: "
+				// + _locatorMethod.toString());
 			}
 		} catch (ClassNotFoundException | SecurityException e) {
 
@@ -171,8 +174,8 @@ public class KeywordLibrary {
 			Class<?> _locatorHelper = Class.forName("com.jprotractor.NgBy");
 			Method[] _locatorMethods = _locatorHelper.getMethods();
 			for (Method _locatorMethod : _locatorMethods) {
-				System.out.println("Adding locator of com.jprotractor.NgBy: "
-						+ _locatorMethod.toString());
+				// System.err.println("Adding locator of com.jprotractor.NgBy: "
+				// + _locatorMethod.toString());
 			}
 		} catch (ClassNotFoundException | SecurityException e) {
 			System.out.println("Execption (ignored): " + e.toString());
@@ -226,14 +229,14 @@ public class KeywordLibrary {
 		if (methodTable.containsKey(keyword)) {
 			String methodName = methodTable.get(keyword);
 			try {
-				System.out.println(keyword + " call method: " + methodName + " with "
+				System.err.println(keyword + " call method: " + methodName + " with "
 						+ String.join(",", params.values()));
 				_class.getMethod(methodName, Map.class).invoke(_object, params);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		} else {
-			System.out.println("No method found for keyword: " + keyword);
+			throw new RuntimeException("No method found for keyword: " + keyword);
 		}
 	}
 
@@ -264,90 +267,35 @@ public class KeywordLibrary {
 	}
 
 	public void enterText(Map<String, String> params) {
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
+		element = _findElement(params);
 		textData = params.get("param5");
-		try {
-			switch (selectorType) {
-			case "model":
-				ngDriver.findElement(NgBy.model(selectorValue)).sendKeys(textData);
-				break;
-			case "name":
-				driver.findElement(By.name(selectorValue)).sendKeys(textData);
-				break;
-			case "id":
-				driver.findElement(By.id(selectorValue)).sendKeys(textData);
-				break;
-			case "css":
-				driver.findElement(By.cssSelector(selectorValue)).sendKeys(textData);
-				break;
-			case "xpath":
-				driver.findElement(By.xpath(selectorValue)).sendKeys(textData);
-				break;
-			}
+		if (element != null) {
+			highlight(element);
+			element.sendKeys(textData);
 			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 	}
 
 	public void clickButton(Map<String, String> params) {
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
-		try {
-			switch (selectorType) {
-			case "buttontext":
-				ngDriver.findElement(NgBy.buttonText(selectorValue)).click();
-				break;
-			case "name":
-				driver.findElement(By.name(selectorValue)).click();
-				break;
-			case "id":
-				driver.findElement(By.id(selectorValue)).click();
-				break;
-			case "css":
-				driver.findElement(By.cssSelector(selectorValue)).click();
-				break;
-			case "xpath":
-				driver.findElement(By.xpath(selectorValue)).click();
-				break;
-			}
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
+			element.click();
 			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 	}
 
 	public void clickLink(Map<String, String> params) {
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
-		System.err.println("Locate via " + selectorType + " " + selectorValue);
-		WebElement element;
-		try {
-			switch (selectorType) {
-			case "linkText":
-				element = driver.findElement(By.linkText(selectorValue));
-				highlight(element);
-				element.click();
-				break;
-			case "partialLinkText":
-				element = driver.findElement(By.partialLinkText(selectorValue));
-				highlight(element);
-				element.click();
-				break;
-			case "css":
-				element = driver.findElement(By.cssSelector(selectorValue));
-				highlight(element);
-				element.click();
-				break;
-			case "xpath":
-				element = driver.findElement(By.xpath(selectorValue));
-				highlight(element);
-				element.click();
-				break;
-			}
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
+			element.click();
 			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 		try {
@@ -360,6 +308,9 @@ public class KeywordLibrary {
 
 	public void selectDropDown(Map<String, String> params) {
 		selectorType = params.get("param1");
+		if (!locatorTable.containsKey(selectorType)) {
+			throw new RuntimeException("Unknown Selector Type: " + selectorType);
+		}
 		selectorValue = params.get("param2");
 		visibleText = params.get("param5");
 		Select select;
@@ -390,168 +341,74 @@ public class KeywordLibrary {
 
 	public void verifyAttribute(Map<String, String> params) {
 		boolean flag = false;
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
 		attributeName = params.get("param5");
 		expectedValue = params.get("param4");
-		try {
-			switch (selectorType) {
-			case "name":
-				flag = driver.findElement(By.name(selectorValue))
-						.getAttribute(attributeName).equals(expectedValue);
-				break;
-			case "id":
-				flag = driver.findElement(By.id(selectorValue))
-						.getAttribute(attributeName).equals(expectedValue);
-				break;
-			case "css":
-				flag = driver.findElement(By.cssSelector(selectorValue))
-						.getAttribute(attributeName).equals(expectedValue);
-				break;
-			case "xpath":
-				flag = driver.findElement(By.xpath(selectorValue))
-						.getAttribute(attributeName).equals(expectedValue);
-				break;
-			}
-
-			if (flag)
-				status = "Passed";
-		} catch (Exception e) {
-			status = "Failed";
+		element = _findElement(params);
+		if (element != null) {
+			flag = element.getAttribute(attributeName).equals(expectedValue);
 		}
+		if (flag)
+			status = "Passed";
+		else
+			status = "Failed";
 	}
 
 	public void verifyText(Map<String, String> params) {
 		boolean flag = false;
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
 		expectedText = params.get("param5");
-		try {
-			switch (selectorType) {
-			case "name":
-				flag = driver.findElement(By.name(selectorValue)).getText()
-						.equals(expectedText);
-				break;
-			case "id":
-				flag = driver.findElement(By.id(selectorValue)).getText()
-						.equals(expectedText);
-				break;
-			case "css":
-				flag = driver.findElement(By.cssSelector(selectorValue)).getText()
-						.equals(expectedText);
-				break;
-			case "xpath":
-				flag = driver.findElement(By.xpath(selectorValue)).getText()
-						.equals(expectedText);
-				break;
-			}
-
-			if (flag)
-				status = "Passed";
-		} catch (Exception e) {
-			status = "Failed";
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
+			flag = element.getText().equals(expectedText);
 		}
+		if (flag)
+			status = "Passed";
+		else
+			status = "Failed";
 	}
 
 	public void getElementText(Map<String, String> params) {
 		String text = null;
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
-		try {
-			switch (selectorType) {
-			case "binding":
-				text = ngDriver.findElement(NgBy.binding(selectorValue)).getText();
-				break;
-			case "name":
-				text = driver.findElement(By.name(selectorValue)).getText();
-				break;
-			case "id":
-				text = driver.findElement(By.id(selectorValue)).getText();
-				break;
-			case "css":
-				text = driver.findElement(By.cssSelector(selectorValue)).getText();
-				break;
-			case "xpath":
-				text = driver.findElement(By.xpath(selectorValue)).getText();
-				break;
-			}
-
-			if (text != null)
-				status = "Passed";
-		} catch (Exception e) {
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
+			text = element.getText();
+			status = "Passed";
+			result = text;
+			System.err.println(
+					String.format("%s returned \"%s\"", "getElementText", result));
+		} else {
 			status = "Failed";
 		}
-		result = text;
-		System.out
-				.println(String.format("%s returned \"%s\"", "getElementText", result));
 	}
 
 	public void getElementAttribute(Map<String, String> params) {
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
 		attributeName = params.get("param5");
-		WebElement element = null;
 		String value = null;
-		try {
-			switch (selectorType) {
-			case "linkText":
-				element = driver.findElement(By.linkText(selectorValue));
-				highlight(element);
-				break;
-			case "options":
-				element = ngDriver.findElement(NgBy.options(selectorValue));
-				highlight(element);
-				break;
-			case "partialLinkText":
-				element = driver.findElement(By.partialLinkText(selectorValue));
-				highlight(element);
-				break;
-			case "css":
-				element = driver.findElement(By.cssSelector(selectorValue));
-				highlight(element);
-				break;
-			case "xpath":
-				element = driver.findElement(By.xpath(selectorValue));
-				highlight(element);
-				break;
-			}
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
 			value = element.getAttribute(attributeName);
-		} catch (Exception e) {
+			status = "Passed";
+			result = value;
+			System.err.println(
+					String.format("%s returned \"%s\"", "getElementAttribute", result));
+		} else {
 			status = "Failed";
 		}
-		result = value;
-		System.out.println(
-				String.format("%s returned \"%s\"", "getElementAttribute", result));
 	}
 
 	public void elementPresent(Map<String, String> params) {
-		selectorType = params.get("param1");
-		selectorValue = params.get("param2");
 		Boolean flag = false;
-		try {
-			switch (selectorType) {
-			case "name":
-				flag = driver.findElement(By.name(selectorValue)).isDisplayed();
-				break;
-			case "id":
-				flag = driver.findElement(By.id(selectorValue)).isDisplayed();
-				break;
-			case "css":
-				flag = driver.findElement(By.cssSelector(selectorValue)).isDisplayed();
-				break;
-			case "xpath":
-				flag = driver.findElement(By.xpath(selectorValue)).isDisplayed();
-				break;
-			}
-
-			if (flag) {
-				status = "Passed";
-				result = "true";
-			} else {
-				status = "Failed";
-				result = "false";
-			}
-		} catch (Exception e) {
+		element = _findElement(params);
+		if (element != null) {
+			flag = element.isDisplayed();
+		}
+		if (flag) {
+			highlight(element);
+			status = "Passed";
+			result = "true";
+		} else {
 			status = "Failed";
 			result = "false";
 		}
@@ -561,31 +418,18 @@ public class KeywordLibrary {
 		WebElement element;
 		List<WebElement> elements = new ArrayList<>();
 		selectorType = params.get("param1");
+		if (!locatorTable.containsKey(selectorType)) {
+			throw new RuntimeException("Unknown Selector Type: " + selectorType);
+		}
 		selectorValue = params.get("param2");
 		expectedValue = params.get("param5");
 		try {
 			if (expectedValue.equals("null")) {
-				switch (selectorType) {
-				case "name":
-					element = driver.findElement(By.name(selectorValue));
+
+				element = _findElement(params);
+				if (element != null) {
 					highlight(element);
 					element.click();
-					break;
-				case "id":
-					element = driver.findElement(By.id(selectorValue));
-					highlight(element);
-					element.click();
-					break;
-				case "css":
-					element = driver.findElement(By.cssSelector(selectorValue));
-					highlight(element);
-					element.click();
-					break;
-				case "xpath":
-					element = driver.findElement(By.xpath(selectorValue));
-					highlight(element);
-					element.click();
-					break;
 				}
 			} else {
 				switch (selectorType) {
@@ -618,6 +462,9 @@ public class KeywordLibrary {
 
 	public void clickRadioButton(Map<String, String> params) {
 		selectorType = params.get("param1");
+		if (!locatorTable.containsKey(selectorType)) {
+			throw new RuntimeException("Unknown Selector Type: " + selectorType);
+		}
 		selectorValue = params.get("param2");
 		expectedValue = params.get("param5");
 		List<WebElement> elements = new ArrayList<>();
@@ -709,6 +556,58 @@ public class KeywordLibrary {
 		} catch (Exception e) {
 			status = "Failed";
 		}
+	}
+
+	public WebElement _findElement(Map<String, String> params) {
+		selectorType = params.get("param1");
+		if (!locatorTable.containsKey(selectorType)) {
+			throw new RuntimeException("Unknown Selector Type: " + selectorType);
+		}
+		selectorValue = params.get("param2");
+		WebElement _element = null;
+		try {
+			switch (selectorType) {
+			case "binding":
+				_element = ngDriver.findElement(NgBy.binding(selectorValue));
+				break;
+			case "buttontext":
+				_element = ngDriver.findElement(NgBy.buttonText(selectorValue));
+				break;
+			case "css":
+				_element = driver.findElement(By.cssSelector(selectorValue));
+				break;
+			case "cssSelector":
+				_element = driver.findElement(By.cssSelector(selectorValue));
+				break;
+			case "id":
+				_element = driver.findElement(By.id(selectorValue));
+				break;
+			case "model":
+				_element = ngDriver.findElement(NgBy.model(selectorValue));
+				break;
+			case "linkText":
+				_element = driver.findElement(By.linkText(selectorValue));
+				break;
+			case "name":
+				_element = driver.findElement(By.name(selectorValue));
+				break;
+			case "options":
+				_element = ngDriver.findElement(NgBy.options(selectorValue));
+				break;
+			case "partialLinkText":
+				_element = driver.findElement(By.partialLinkText(selectorValue));
+				break;
+			case "repeater":
+				_element = ngDriver.findElement(NgBy.repeater(selectorValue));
+				break;
+			case "xpath":
+				_element = driver.findElement(By.xpath(selectorValue));
+				break;
+			}
+		} catch (Exception e) {
+			// TODO: logging
+		}
+		return _element;
 	}
 
 	public void wait(Map<String, String> params) {
