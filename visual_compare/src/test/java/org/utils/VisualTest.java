@@ -2,6 +2,7 @@ package org.utils;
 
 import static org.testng.Assert.assertTrue;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
@@ -31,6 +32,7 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.testng.ITestContext;
 import org.testng.annotations.BeforeClass;
@@ -113,7 +115,7 @@ public class VisualTest extends BaseTest {
 				testName + "_Diff.png");
 	}
 
-	@Test( enabled = false )
+	@Test(enabled = true)
 	public void imageCompareTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -141,7 +143,7 @@ public class VisualTest extends BaseTest {
 		doComparison(screenShot);
 	}
 
-	@Test( enabled = false )
+	@Test(enabled = true)
 	public void imageResizeTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -239,16 +241,31 @@ public class VisualTest extends BaseTest {
 
 	// origin:
 	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
+	// https://github.com/roydekleijn/WebDriver-take-screenshot-of-element/blob/master/src/main/java/TakeScreenshotOfElement/TakeElementScreenshot.java
 	public void takeScreenshotOfWebelement(WebDriver driver, WebElement element,
 			String Destination) throws Exception {
 		highlight(element);
-		File v = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-		BufferedImage bi = ImageIO.read(v);
+		try {
+			driver = new Augmenter().augment(driver);
+		} catch (Exception ignored) {
+		}
+		File screen = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+		BufferedImage bi = ImageIO.read(screen);
 		org.openqa.selenium.Point point = element.getLocation();
-		BufferedImage data = bi.getSubimage(point.getX(), point.getY(), element.getSize().getWidth(), element.getSize().getHeight());
-		ImageIO.write(data, "png", v);
 
-		FileUtils.copyFile(v, new File(Destination));
+		int width = element.getSize().getWidth();
+		int height = element.getSize().getHeight();
+
+		Rectangle rect = new Rectangle(width, height);
+
+		BufferedImage img = null;
+		img = ImageIO.read(screen);
+
+		BufferedImage dest = img.getSubimage(point.getX(), point.getY(), rect.width,
+				rect.height);
+
+		ImageIO.write(dest, "png", screen);
+		FileUtils.copyFile(screen, new File(Destination));
 	}
 
 	// using ashot
