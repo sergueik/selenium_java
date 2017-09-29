@@ -75,7 +75,7 @@ public class KeywordLibrary {
 		methodTable.put("CREATE_BROWSER", "openBrowser");
 		methodTable.put("ELEMENT_PRESENT", "elementPresent");
 		methodTable.put("GET_ATTR", "getElementAttribute");
-		methodTable.put("GET_TEXT", "getText");
+		methodTable.put("GET_TEXT", "getElementText");
 		methodTable.put("GOTO_URL", "navigateTo");
 		methodTable.put("SELECT_OPTION", "selectDropDown");
 		methodTable.put("SET_TEXT", "enterText");
@@ -160,7 +160,8 @@ public class KeywordLibrary {
 			Class<?> _locatorHelper = Class.forName("org.openqa.selenium.By");
 			Method[] _locatorMethods = _locatorHelper.getMethods();
 			for (Method _locatorMethod : _locatorMethods) {
-				System.out.println("Adding locator: " + _locatorMethod.getName());
+				System.out.println("Adding locator of org.openqa.selenium.By: "
+						+ _locatorMethod.toString());
 			}
 		} catch (ClassNotFoundException | SecurityException e) {
 
@@ -170,8 +171,8 @@ public class KeywordLibrary {
 			Class<?> _locatorHelper = Class.forName("com.jprotractor.NgBy");
 			Method[] _locatorMethods = _locatorHelper.getMethods();
 			for (Method _locatorMethod : _locatorMethods) {
-				System.out.println("Adding locator from com.jprotractor.NgBy: "
-						+ _locatorMethod.getName());
+				System.out.println("Adding locator of com.jprotractor.NgBy: "
+						+ _locatorMethod.toString());
 			}
 		} catch (ClassNotFoundException | SecurityException e) {
 			System.out.println("Execption (ignored): " + e.toString());
@@ -183,6 +184,31 @@ public class KeywordLibrary {
 			locatorTable.put("id", By.class.getMethod("id", String.class));
 			locatorTable.put("name", By.class.getMethod("name", String.class));
 		} catch (NoSuchMethodException e) {
+		}
+		try {
+			locatorTable.put("binding",
+					NgBy.class.getMethod("binding", String.class));
+			locatorTable.put("buttontext",
+					NgBy.class.getMethod("buttonText", String.class));
+			locatorTable.put("cssContainingText", NgBy.class
+					.getMethod("cssContainingText", String.class, String.class));
+			locatorTable.put("model", NgBy.class.getMethod("model", String.class));
+			locatorTable.put("options",
+					NgBy.class.getMethod("options", String.class));
+			locatorTable.put("repeater",
+					NgBy.class.getMethod("repeater", String.class));
+			locatorTable.put("repeaterColumn",
+					NgBy.class.getMethod("repeaterColumn", String.class, String.class));
+			locatorTable.put("repeaterElement", NgBy.class.getMethod(
+					"repeaterElement", String.class, Integer.class, String.class));
+			locatorTable.put("repeaterRows",
+					NgBy.class.getMethod("repeaterRows", String.class, Integer.class));
+			locatorTable.put("selectedOption",
+					NgBy.class.getMethod("selectedOption", String.class));
+			locatorTable.put("selectedRepeaterOption",
+					NgBy.class.getMethod("selectedRepeaterOption", String.class));
+		} catch (NoSuchMethodException e) {
+			System.out.println("Execption (ignored): " + e.toString());
 		}
 	}
 
@@ -243,6 +269,9 @@ public class KeywordLibrary {
 		textData = params.get("param5");
 		try {
 			switch (selectorType) {
+			case "model":
+				ngDriver.findElement(NgBy.model(selectorValue)).sendKeys(textData);
+				break;
 			case "name":
 				driver.findElement(By.name(selectorValue)).sendKeys(textData);
 				break;
@@ -267,6 +296,9 @@ public class KeywordLibrary {
 		selectorValue = params.get("param2");
 		try {
 			switch (selectorType) {
+			case "buttontext":
+				ngDriver.findElement(NgBy.buttonText(selectorValue)).click();
+				break;
 			case "name":
 				driver.findElement(By.name(selectorValue)).click();
 				break;
@@ -421,12 +453,15 @@ public class KeywordLibrary {
 		}
 	}
 
-	public void getText(Map<String, String> params) {
+	public void getElementText(Map<String, String> params) {
 		String text = null;
 		selectorType = params.get("param1");
 		selectorValue = params.get("param2");
 		try {
 			switch (selectorType) {
+			case "binding":
+				text = ngDriver.findElement(NgBy.binding(selectorValue)).getText();
+				break;
 			case "name":
 				text = driver.findElement(By.name(selectorValue)).getText();
 				break;
@@ -447,6 +482,8 @@ public class KeywordLibrary {
 			status = "Failed";
 		}
 		result = text;
+		System.out
+				.println(String.format("%s returned \"%s\"", "getElementText", result));
 	}
 
 	public void getElementAttribute(Map<String, String> params) {
@@ -459,6 +496,10 @@ public class KeywordLibrary {
 			switch (selectorType) {
 			case "linkText":
 				element = driver.findElement(By.linkText(selectorValue));
+				highlight(element);
+				break;
+			case "options":
+				element = ngDriver.findElement(NgBy.options(selectorValue));
 				highlight(element);
 				break;
 			case "partialLinkText":
@@ -480,7 +521,7 @@ public class KeywordLibrary {
 		}
 		result = value;
 		System.out.println(
-				String.format("%s returned %s", "getElementAttribute", result));
+				String.format("%s returned \"%s\"", "getElementAttribute", result));
 	}
 
 	public void elementPresent(Map<String, String> params) {

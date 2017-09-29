@@ -1,6 +1,6 @@
 ### Info
 
-![TestCase.xls](https://github.com/sergueik/selenium_java/blob/master/keyword_driven_framework/images/testcase.png)
+![TestCase.xls](https://github.com/sergueik/selenium_java/blob/master/keyword_driven_framework/images/testcase_selenium.png)
 
 This directory contains a skeleton keyword framework project based on
 [ashokkhape/automation_framework_selenium](https://github.com/ashokkhape/automation_framework_selenium) and [ashokkhape/automation_framework_selenium](https://github.com/ashokkhape/automation_framework_selenium) and [selenium-webdriver-software-testing/keyword-driven-framework](https://github.com/selenium-webdriver-software-testing/keyword-driven-framework)
@@ -44,6 +44,7 @@ private List<WebElement> friendNames;
 The step status is returned via `params["status"]` entry, the step result (if any) is returned via `params["result"]`
 
 ### Adding jProtractor
+![TestCase.xls](https://github.com/sergueik/selenium_java/blob/master/keyword_driven_framework/images/testcase_protractor.png)
 
 [jProtractor](https://github.com/sergueik/jProtractor) is not available in maven central, therefore to use it with framework one needs do build it from source and
 install it into current user's `.m2` repo:
