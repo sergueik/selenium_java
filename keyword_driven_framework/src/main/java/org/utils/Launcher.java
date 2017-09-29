@@ -22,33 +22,33 @@ public class Launcher {
 	private static String suite = "TestCase.xls";
 	private static int statusColumn = 6;
 	private static KeywordLibrary keywordLibrary;
-	
+
 	public static void main(String[] args) throws IOException {
 
 		FileInputStream file = new FileInputStream(getPropertyEnv("suite",
 				String.format("%s\\Desktop\\%s", System.getenv("USERPROFILE"), suite)));
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet indexSheet = workbook.getSheet("Index");
-		Row indexRow;
+
 		keywordLibrary = KeywordLibrary.Instance();
-		
-		for (int i = 1; i <= indexSheet.getLastRowNum(); i++) {
-			indexRow = indexSheet.getRow(i);
-			if (indexRow.getCell(1).getStringCellValue().equalsIgnoreCase("Yes")) {
+
+		for (int row = 1; row <= indexSheet.getLastRowNum(); row++) {
+			Row indexRow = indexSheet.getRow(row);
+			if (safeCellToString(indexRow.getCell(1)).equalsIgnoreCase("Yes")
+					&& !safeCellToString(indexRow.getCell(0)).isEmpty()) {
 				System.out.println(
 						"Reading suite: " + indexRow.getCell(0).getStringCellValue());
 				Map<Integer, Map<String, String>> steps = readSteps(
 						indexRow.getCell(0).getStringCellValue());
 
-				for (int j = 0; j < steps.size(); j++) {
-					Map<String, String> data = steps.get(j);
+				for (int step = 0; step < steps.size(); step++) {
+					Map<String, String> data = steps.get(step);
 					String keyword = data.get("keyword");
 					keywordLibrary.callMethod(keyword, data);
-					writeStatus(indexRow.getCell(0).getStringCellValue(), j + 1);
+					writeStatus(indexRow.getCell(0).getStringCellValue(), step + 1);
 				}
 			}
 		}
-
 		System.out.println("Done");
 		workbook.close();
 
@@ -93,7 +93,7 @@ public class Launcher {
 				String cellValue = null;
 				try {
 					cellValue = safeCellToString(stepCell);
-				} catch (NullPointerException|IllegalStateException e) {
+				} catch (NullPointerException | IllegalStateException e) {
 					System.err.println("Exception (ignored): " + e.toString());
 					cellValue = "";
 				}
@@ -108,6 +108,9 @@ public class Launcher {
 
 	// Safe conversion of type Excel cell object to String value
 	public static String safeCellToString(Cell cell) {
+		if (cell == null) {
+			return "";
+		}
 		int type = cell.getCellType();
 		Object result;
 		switch (type) {
