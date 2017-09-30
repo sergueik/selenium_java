@@ -51,6 +51,10 @@ public class KeywordLibrary {
 
 	private String selectorType = null;
 	private String selectorValue = null;
+	private String selectorRow = null;
+	private String selectorColumn = null;
+	private String selectorContainedText = null;
+
 	private String expectedValue = null;
 	private String textData = null;
 	private String visibleText = null;
@@ -263,7 +267,6 @@ public class KeywordLibrary {
 		} catch (Exception e) {
 			status = "Failed";
 		}
-
 	}
 
 	public void enterText(Map<String, String> params) {
@@ -307,34 +310,19 @@ public class KeywordLibrary {
 	}
 
 	public void selectDropDown(Map<String, String> params) {
-		selectorType = params.get("param1");
-		if (!locatorTable.containsKey(selectorType)) {
-			throw new RuntimeException("Unknown Selector Type: " + selectorType);
-		}
-		selectorValue = params.get("param2");
-		visibleText = params.get("param5");
 		Select select;
-		try {
-			switch (selectorType) {
-			case "name":
-				select = new Select(driver.findElement(By.name(selectorValue)));
+		visibleText = params.get("param5");
+		element = _findElement(params);
+		if (element != null) {
+			highlight(element);
+			select = new Select(element);
+			try {
 				select.selectByVisibleText(visibleText);
-				break;
-			case "id":
-				select = new Select(driver.findElement(By.id(selectorValue)));
-				select.selectByVisibleText(visibleText);
-				break;
-			case "css":
-				select = new Select(driver.findElement(By.cssSelector(selectorValue)));
-				select.selectByVisibleText(visibleText);
-				break;
-			case "xpath":
-				select = new Select(driver.findElement(By.xpath(selectorValue)));
-				select.selectByVisibleText(visibleText);
-				break;
+				status = "Passed";
+			} catch (Exception e) {
+				status = "Failed";
 			}
-			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 	}
@@ -415,121 +403,53 @@ public class KeywordLibrary {
 	}
 
 	public void clickCheckBox(Map<String, String> params) {
-		WebElement element;
-		List<WebElement> elements = new ArrayList<>();
-		selectorType = params.get("param1");
-		if (!locatorTable.containsKey(selectorType)) {
-			throw new RuntimeException("Unknown Selector Type: " + selectorType);
-		}
-		selectorValue = params.get("param2");
 		expectedValue = params.get("param5");
-		try {
-			if (expectedValue.equals("null")) {
-
-				element = _findElement(params);
-				if (element != null) {
-					highlight(element);
-					element.click();
-				}
-			} else {
-				switch (selectorType) {
-				case "name":
-					elements = driver.findElements(By.name(selectorValue));
-					break;
-				case "id":
-					elements = driver.findElements(By.id(selectorValue));
-					break;
-				case "css":
-					elements = driver.findElements(By.cssSelector(selectorValue));
-					break;
-				case "xpath":
-					elements = driver.findElements(By.xpath(selectorValue));
-					break;
-				}
-				for (WebElement e : elements) {
-					if (e.getAttribute("value").equals(expectedValue)) {
-						highlight(e);
-						e.click();
-					}
+		if (expectedValue.equals("null")) {
+			element = _findElement(params);
+			if (element != null) {
+				highlight(element);
+				element.click();
+			}
+		} else {
+			element = null;
+			for (WebElement e : _findElements(params)) {
+				if (e.getAttribute("value").equals(expectedValue)) {
+					element = e;
 				}
 			}
+		}
 
+		if (element != null) {
+			highlight(element);
+			element.click();
 			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 	}
 
 	public void clickRadioButton(Map<String, String> params) {
-		selectorType = params.get("param1");
-		if (!locatorTable.containsKey(selectorType)) {
-			throw new RuntimeException("Unknown Selector Type: " + selectorType);
-		}
-		selectorValue = params.get("param2");
 		expectedValue = params.get("param5");
-		List<WebElement> elements = new ArrayList<>();
-		WebElement element;
-		try {
-			if (expectedValue.equals("null")) {
-				switch (selectorType) {
-				case "name":
-					element = driver
-							.findElement(By.name(objectRepo.getProperty(selectorValue)));
-					highlight(element);
-					element.click();
-					break;
-				case "id":
-					element = driver
-							.findElement(By.id(objectRepo.getProperty(selectorValue)));
-					highlight(element);
-					element.click();
-					break;
-				case "css":
-					element = driver.findElement(
-							By.cssSelector(objectRepo.getProperty(selectorValue)));
-					highlight(element);
-					element.click();
-					break;
-				case "xpath":
-					element = driver
-							.findElement(By.xpath(objectRepo.getProperty(selectorValue)));
-					highlight(element);
-					element.click();
-					break;
-				}
-			} else {
-				switch (selectorType) {
-				case "name":
-					elements = driver
-							.findElements(By.name(objectRepo.getProperty(selectorValue)));
-					break;
-				case "id":
-					elements = driver
-							.findElements(By.id(objectRepo.getProperty(selectorValue)));
-					break;
-				case "css":
-					elements = driver.findElements(
-							By.cssSelector(objectRepo.getProperty(selectorValue)));
-					break;
-				case "xpath":
-					elements = driver
-							.findElements(By.xpath(objectRepo.getProperty(selectorValue)));
-					break;
-				}
-				for (WebElement e : elements) {
-					if (e.getAttribute("value").equals(expectedValue)) {
-						highlight(e);
-						e.click();
-					}
+		if (expectedValue.equals("null")) {
+			element = _findElement(params);
+		} else {
+			element = null;
+			for (WebElement e : _findElements(params)) {
+				if (e.getAttribute("value").equals(expectedValue)) {
+					element = e;
 				}
 			}
-
+		}
+		if (element != null) {
+			highlight(element);
+			element.click();
 			status = "Passed";
-		} catch (Exception e) {
+		} else {
 			status = "Failed";
 		}
 	}
 
+	// TODO:
 	public void switchFrame(Map<String, String> params) {
 		param1 = params.get("param1");
 		param2 = params.get("param2");
@@ -563,7 +483,18 @@ public class KeywordLibrary {
 		if (!locatorTable.containsKey(selectorType)) {
 			throw new RuntimeException("Unknown Selector Type: " + selectorType);
 		}
+		// TODO: objectRepo.getProperty(selectorValue) || selectorValue
 		selectorValue = params.get("param2");
+		if (params.containsKey("param3")) {
+			selectorRow = params.get("param3");
+		}
+		if (params.containsKey("param4")) {
+			selectorColumn = params.get("param4");
+		}
+		// TODO: ambiguity
+		if (params.containsKey("param5")) {
+			selectorContainedText = params.get("param5");
+		}
 		WebElement _element = null;
 		try {
 			switch (selectorType) {
@@ -575,6 +506,10 @@ public class KeywordLibrary {
 				break;
 			case "css":
 				_element = driver.findElement(By.cssSelector(selectorValue));
+				break;
+			case "cssContainingText":
+				_element = ngDriver.findElement(
+						NgBy.cssContainingText(selectorValue, selectorContainedText));
 				break;
 			case "cssSelector":
 				_element = driver.findElement(By.cssSelector(selectorValue));
@@ -600,6 +535,26 @@ public class KeywordLibrary {
 			case "repeater":
 				_element = ngDriver.findElement(NgBy.repeater(selectorValue));
 				break;
+			case "repeaterColumn":
+				_element = ngDriver
+						.findElement(NgBy.repeaterColumn(selectorValue, selectorColumn));
+				break;
+			case "repeatereElement":
+				_element = ngDriver.findElement(NgBy.repeaterElement(selectorValue,
+						Integer.parseInt(selectorRow), selectorColumn));
+				break;
+			case "repeaterRows":
+				_element = ngDriver.findElement(
+						NgBy.repeaterRows(selectorValue, Integer.parseInt(selectorRow)));
+				break;
+			// repeatereElement
+			case "selectedOption":
+				_element = ngDriver.findElement(NgBy.selectedOption(selectorValue));
+				break;
+			case "selectedRepeaterOption":
+				_element = ngDriver
+						.findElement(NgBy.selectedRepeaterOption(selectorValue));
+				break;
 			case "xpath":
 				_element = driver.findElement(By.xpath(selectorValue));
 				break;
@@ -608,6 +563,72 @@ public class KeywordLibrary {
 			// TODO: logging
 		}
 		return _element;
+	}
+
+	public List<WebElement> _findElements(Map<String, String> params) {
+		selectorType = params.get("param1");
+		if (!locatorTable.containsKey(selectorType)) {
+			throw new RuntimeException("Unknown Selector Type: " + selectorType);
+		}
+		// TODO: objectRepo.getProperty(selectorValue) || selectorValue
+		selectorValue = params.get("param2");
+		// TODO: ambiguity
+		if (params.containsKey("param5")) {
+			selectorContainedText = params.get("param5");
+		}
+		List<WebElement> _elements = new ArrayList<>();
+		try {
+			switch (selectorType) {
+			case "binding":
+				_elements = ngDriver.findElements(NgBy.binding(selectorValue));
+				break;
+			case "buttontext":
+				_elements = ngDriver.findElements(NgBy.buttonText(selectorValue));
+				break;
+			case "css":
+				_elements = driver.findElements(By.cssSelector(selectorValue));
+				break;
+			case "cssContainingText":
+				_elements = ngDriver.findElements(
+						NgBy.cssContainingText(selectorValue, selectorContainedText));
+				break;
+			case "cssSelector":
+				_elements = driver.findElements(By.cssSelector(selectorValue));
+				break;
+			case "id":
+				_elements = driver.findElements(By.id(selectorValue));
+				break;
+			case "model":
+				_elements = ngDriver.findElements(NgBy.model(selectorValue));
+				break;
+			case "linkText":
+				_elements = driver.findElements(By.linkText(selectorValue));
+				break;
+			case "name":
+				_elements = driver.findElements(By.name(selectorValue));
+				break;
+			case "options":
+				_elements = ngDriver.findElements(NgBy.options(selectorValue));
+				break;
+			case "partialLinkText":
+				_elements = driver.findElements(By.partialLinkText(selectorValue));
+				break;
+			case "repeater":
+				_elements = ngDriver.findElements(NgBy.repeater(selectorValue));
+				break;
+			// repeaterColumn
+			// repeatereElement
+			// selectedOption
+			// selectedRepeaterOption
+			// are unlikely to be used here
+			case "xpath":
+				_elements = driver.findElements(By.xpath(selectorValue));
+				break;
+			}
+		} catch (Exception e) {
+			// TODO: logging
+		}
+		return _elements;
 	}
 
 	public void wait(Map<String, String> params) {
