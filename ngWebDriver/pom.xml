@@ -8,21 +8,17 @@
   </parent>
   <groupId>com.mycompany</groupId>
   <artifactId>app</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>ngWebDriver</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
-    <java.version>1.7</java.version>
-    <selenium.version>2.47.0</selenium.version>
-    <!-- [2.53.0,) -->
-    
-    <jetty-server.version>9.3.0.M2</jetty-server.version>
-    
-    <testng.version>6.9.10</testng.version>
-
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <java.version>1.8</java.version>
+    <selenium.version>[3.3.7,)</selenium.version>
+    <jetty-server.version>9.4.3.v20170317</jetty-server.version>
+    <testng.version>6.10</testng.version>
   </properties>
   <dependencies>
     <dependency>
@@ -46,11 +42,10 @@
     <dependency>
       <groupId>org.seleniumhq.selenium.fluent</groupId>
       <artifactId>fluent-selenium</artifactId>
-      <version>1.16.1</version>
+      <version>1.17</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
-          <!-- declare the exclusion here -->
           <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-java</artifactId>
         </exclusion>
@@ -60,6 +55,12 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
       <version>${selenium.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.jetty.websocket</groupId>
+          <artifactId>websocket-client</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>

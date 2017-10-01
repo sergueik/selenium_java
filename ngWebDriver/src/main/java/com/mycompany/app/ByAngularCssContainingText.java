@@ -3,29 +3,29 @@ package com.mycompany.app;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
-
 public class ByAngularCssContainingText extends ByAngular.BaseBy {
 
-	public ByAngularCssContainingText(String cssSelector,String searchText) {
-		super();
+	private String cssSelector;
+	private String searchText;
+
+	public ByAngularCssContainingText(String rootSelector, String cssSelector,
+			String searchText) {
+		super(rootSelector);
 		this.cssSelector = cssSelector;
 		this.searchText = searchText;
 	}
 
-	private String cssSelector,searchText;
-
-	protected Object getObject(SearchContext context, JavascriptExecutor javascriptExecutor) {
+	protected Object getObject(SearchContext context,
+			JavascriptExecutor javascriptExecutor) {
 		return javascriptExecutor.executeScript(
-						"var cssSelector = '" + cssSelector + "';\n" +
-						"var searchText = '" + searchText + "';\n" +
-						"var using = arguments[0] || document;\n" +
-						"\n" +
-						ByAngular.functions.get("findByCssContainingText")
-				, context);
+				"var cssSelector = '" + cssSelector + "';\n" + "var searchText = '"
+						+ searchText + "';\n" + "var using = arguments[0] || document;\n"
+						+ "\n" + ByAngular.functions.get("findByCssContainingText"),
+				context);
 	}
 
 	@Override
 	public String toString() {
-		return "cssContainingText(" +cssSelector + searchText + ')';
+		return "cssContainingText(" + cssSelector + searchText + ')';
 	}
 }

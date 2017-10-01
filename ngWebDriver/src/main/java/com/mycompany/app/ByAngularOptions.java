@@ -2,24 +2,22 @@ package com.mycompany.app;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 
 public class ByAngularOptions extends ByAngular.BaseBy {
 
-	public ByAngularOptions(String options) {
-		super();
+	private String options;
+
+	public ByAngularOptions(String rootSelector, String options) {
+		super(rootSelector);
 		this.options = options;
 	}
 
-	private String options;
-
-	protected Object getObject(SearchContext context, JavascriptExecutor javascriptExecutor) {
-		return javascriptExecutor.executeScript(
-				"var using = arguments[0] || document;\n" +
-						"var optionsDescriptor = '" + options + "';\n" +
-						"\n" +
-						ByAngular.functions.get("findByOptions")
-				, context);
+	protected Object getObject(SearchContext context,
+			JavascriptExecutor javascriptExecutor) {
+		return javascriptExecutor
+				.executeScript("var using = arguments[0] || document;\n"
+						+ "var optionsDescriptor = '" + options + "';\n" + "\n"
+						+ ByAngular.functions.get("findByOptions"), context);
 	}
 
 	@Override

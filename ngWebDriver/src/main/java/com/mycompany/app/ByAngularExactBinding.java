@@ -2,26 +2,23 @@ package com.mycompany.app;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
 
 public class ByAngularExactBinding extends ByAngular.BaseBy {
 
-	public ByAngularExactBinding(String exactBinding) {
-		super();
+	private String binding;
+
+	public ByAngularExactBinding(String rootSelector, String exactBinding) {
+		super(rootSelector);
 		this.binding = exactBinding;
 	}
 
-	private String binding;
-
-	protected Object getObject(SearchContext context, JavascriptExecutor javascriptExecutor) {
-		return javascriptExecutor.executeScript(
-				"var using = arguments[0] || document;\n" +
-						"var rootSelector = 'body';\n" +
-						"var exactMatch = true;\n" +
-						"var binding = '" + binding + "';\n" +
-						"\n" +
-						ByAngular.functions.get("findBindings")
-				, context);
+	protected Object getObject(SearchContext context,
+			JavascriptExecutor javascriptExecutor) {
+		return javascriptExecutor
+				.executeScript("var using = arguments[0] || document;\n"
+						+ "var rootSelector = '" + rootSelector + "';\n"
+						+ "var exactMatch = true;\n" + "var binding = '" + binding + "';\n"
+						+ "\n" + ByAngular.functions.get("findBindings"), context);
 	}
 
 	@Override
