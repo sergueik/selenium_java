@@ -29,13 +29,19 @@
     <jprotractor.version>1.2-SNAPSHOT</jprotractor.version>
     <poi.version>3.14</poi.version>
     <poiooxml.version>3.14</poiooxml.version>
+    <ngwebdriver.version>1.0</ngwebdriver.version>
   </properties>
   <dependencies>
     <dependency>
-     <groupId>com.jprotractor</groupId>
-     <artifactId>jprotractor</artifactId>
-     <version>${jprotractor.version}</version>
-<!--
+      <groupId>com.paulhammant</groupId>
+      <artifactId>ngwebdriver</artifactId>
+      <version>${ngwebdriver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jprotractor</groupId>
+      <artifactId>jprotractor</artifactId>
+      <version>${jprotractor.version}</version>
+      <!--
  installing to system scope is not sufficient
      <scope>system</scope>
      <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
