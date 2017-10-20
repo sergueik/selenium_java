@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite name="DP test suite" parallel="tests" thread-count="2">
+    <test name="DP - 1">
+        <classes>
+            <class name="example.DataProviderTests">
+                <methods>
+                    <include name="loginWithValidCredentials"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+    <test name="DP - 2">
+        <classes>
+            <class name="example.DataProviderTests">
+                <methods>
+                    <include name="createPayment"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+</suite>
