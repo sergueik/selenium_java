@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SWT Preferences" default="release" basedir=".">
+
+    <description>Builds, tests, and runs the project.</description>
+
+    <!-- defines the version number -->
+    <property name="version" value="0.0.1" />
+
+    <target name="release" depends="jars">
+    </target>
+
+    <target name="clean">
+        <delete dir="build" failonerror="true" />
+        <delete dir="jars" failonerror="true" />
+    </target>
+
+    <target name="prepare" depends="clean">
+        <mkdir dir="build" />
+        <mkdir dir="jars" />
+    </target>
+
+    <target name="compile" depends="prepare" description="compile the source ">
+    	 <copy todir="build/de/linearbits/preferences" overwrite="true">
+    	            <fileset dir="src/main/de/linearbits/preferences" defaultexcludes="yes">
+    	                <exclude name="**/*.java" />
+    	            </fileset>
+    	        </copy>
+        <javac srcdir="src/main" destdir="build" source="1.7">
+            <classpath>
+                <path path="src/main" />
+            </classpath>
+
+            <classpath>
+            	 <fileset dir="lib">
+            	        <or>
+            	            <filename name="**/swt-4.2.1-gtk-linux-x86_64.jar" />
+            	        	<filename name="**/org.eclipse.core.commands_3.6.2.v20130123-162658.jar" />
+            	        	<filename name="**/org.eclipse.core.runtime_3.8.0.v20120912-155025.jar" />
+            	        	<filename name="**/org.eclipse.equinox.common_3.6.100.v20120522-1841.jar" />
+            	        	<filename name="**/org.eclipse.jface_3.8.102.v20130123-162658.jar" />
+        				</or>
+            	 </fileset>
+            </classpath>
+        </javac>
+    </target>
+
+    <target name="jars" depends="compile">
+        <jar destfile="jars/swtpreferences-${version}-doc.jar">
+            <fileset dir="doc" defaultexcludes="no" />
+        </jar>
+        <jar destfile="jars/swtpreferences-${version}.jar">
+            <fileset dir="build" defaultexcludes="no" />
+        </jar>
+        <delete dir="build" failonerror="true" />
+    </target>
+</project>
