@@ -8,7 +8,6 @@ package com.jprotractor.scripts;
 public final class WaitForAngular implements Script {
 	@Override
 	public String content() {
-		return new Loader(
-				"waitForAngularAndAngular2Combined" ).content();
+		return new Loader("waitForAngular").content();
 	}
 }
