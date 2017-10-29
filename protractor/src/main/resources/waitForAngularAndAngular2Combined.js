@@ -9,7 +9,8 @@
  * @param {function(string)} callback callback. If a failure occurs, it will
  *     be passed as a parameter.
  */
-functions.waitForAngular = function(rootSelector, callback) {
+
+ waitForAngular = function(rootSelector, callback) {
 
   try {
     // Wait for both angular1 testability and angular2 testability.
