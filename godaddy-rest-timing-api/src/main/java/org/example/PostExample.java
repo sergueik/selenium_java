@@ -14,7 +14,10 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
@@ -26,17 +29,22 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+// origin: http://www.baeldung.com/httpclient-post-http-request
+
 public class PostExample {
 
-	private static String json = "{\"id\":1,\"name\":\"John\"}";
+	private static String json = "{\"title\": \"foo\", \"body\": \"bar\",	\"userId\": 1}";
 	private static StringEntity entity = null;
 	private static CloseableHttpResponse response = null;
+	private static String readLine;
+	private static BufferedReader br;
 
 	public static void main(String args[]) {
 
 		CloseableHttpClient client = HttpClients.createDefault();
 		// "http://localhost/v2/api/cicd/injectjs"
-		HttpPost httpPost = new HttpPost("http://www.example.com");
+		HttpPost httpPost = new HttpPost(
+				"http://jsonplaceholder.typicode.com/posts");
 
 		try {
 			entity = new StringEntity(json);
@@ -55,49 +63,16 @@ public class PostExample {
 			e.printStackTrace();
 		}
 		assertThat(response, notNullValue());
-		assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+		assertThat(response.getStatusLine().getStatusCode(), equalTo(201)); // 201 created	
+
 		try {
+			br = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+			while ((readLine = br.readLine()) != null) {
+				System.err.println(readLine);
+			}
 			client.close();
-		} catch (IOException e) {
+		} catch (UnsupportedOperationException | IOException e) {
 			e.printStackTrace();
 		}
 	}
-
-	/* 	HttpClient client = new HttpClient();
-		client.getParams().setParameter("http.useragent", "Test Client");
-	
-		BufferedReader br = null;
-	
-		PostMethod method = new PostMethod("http://search.yahoo.com/search");
-		method.addParameter("p", "\"java2s\"");
-		StringEntity params = new StringEntity("details={\"p\":\"java2s\"} ");
-		request.addHeader("content-type", "application/x-www-form-urlencoded");
-		request.setEntity(params);
-		try {
-			int returnCode = client.executeMethod(method);
-	
-			if (returnCode == HttpStatus.SC_NOT_IMPLEMENTED) {
-				System.err.println("The Post method is not implemented by this URI");
-				// still consume the response body
-				method.getResponseBodyAsString();
-			} else {
-				br = new BufferedReader(
-						new InputStreamReader(method.getResponseBodyAsStream()));
-				String readLine;
-				while (((readLine = br.readLine()) != null)) {
-					System.err.println(readLine);
-				}
-			}
-		} catch (Exception e) {
-			System.err.println(e);
-		} finally {
-			method.releaseConnection();
-			if (br != null)
-				try {
-					br.close();
-				} catch (Exception fe) {
-				}
-		}
-		}
-	*/
 }
