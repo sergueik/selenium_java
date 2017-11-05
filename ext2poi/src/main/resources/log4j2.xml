@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="log-path">logs</Property>
+	</Properties>
+	<Appenders>
+		<Console name="console-log" target="SYSTEM_OUT">
+			<PatternLayout
+				pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{[%level]} [%C{1}.%M.%L] - %msg%n" />
+		</Console>
+		<RollingFile name="trace-log" fileName="${log-path}/ext2poi-trace.log"
+			filePattern="${log-path}/ext2poi-trace-%d{yyyy-MM-dd}.log">
+			<PatternLayout>
+				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%C{1}.%M.%L] - %msg%n
+				</pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+		</RollingFile>
+		<RollingFile name="error-log" fileName="${log-path}/ext2poi-error.log"
+			filePattern="${log-path}/ext2poi-error-%d{yyyy-MM-dd}.log">
+			<PatternLayout>
+				<pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%level] [%C{1}.%M.%L] - %msg%n
+				</pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1"
+					modulate="true" />
+			</Policies>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Logger name="io.vodqa.ext2poi" level="debug" additivity="false">
+			<appender-ref ref="trace-log" level="debug" />
+			<appender-ref ref="error-log" level="error" />
+			<appender-ref ref="console-log" level="debug" />
+		</Logger>
+		<Root level="info" additivity="false">
+			<AppenderRef ref="console-log" />
+		</Root>
+	</Loggers>
+</Configuration>
+

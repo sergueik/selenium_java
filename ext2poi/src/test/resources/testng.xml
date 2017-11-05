@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+
+<suite verbose="10" name="Extension2POI" preserve-order="true"
+	parallel="false" allow-return-values="true">
+
+	<test verbose="10" name="Functional Test" preserve-order="true">
+		<classes>
+			<class name="io.vodqa.ext2poi.ExcelTest" />
+		</classes>
+	</test>
+</suite>
+
