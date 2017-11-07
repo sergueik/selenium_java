@@ -219,7 +219,7 @@ public class NgDatePickerTest {
 		assertTrue(matcher.find());
 		// Act
 		String[] months = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-				"Sep", "Oct", "Dec", "Jan" };
+				"Sep", "Oct", "Nov", "Dec", "Jan" };
 		String display_month = matcher.group("month");
 		String next_month = months[java.util.Arrays.asList(months)
 				.indexOf(display_month) + 1];
@@ -317,12 +317,23 @@ public class NgDatePickerTest {
 		assertThat(ng_dataDates.size(), equalTo(24));
 		// Thread.sleep(10000);
 
-		String timeOfDay = "6:00 PM";
+		Pattern patternTimeOfDay = Pattern.compile("(?:[1-9]|1[0-2]):00 pM",
+				Pattern.CASE_INSENSITIVE);
 		WebElement ng_hour = ng_datepicker
+				.findElements(NgBy.cssContainingText("span.hour", patternTimeOfDay))
+				.get(0);
+		assertThat(ng_hour, notNullValue());
+		highlight(ng_hour);
+		System.err
+				.println("Hour of the day (pattern search): " + ng_hour.getText());
+		String timeOfDay = "6:00 PM";
+		ng_hour = ng_datepicker
 				.findElements(NgBy.cssContainingText("span.hour", timeOfDay)).get(0);
 		assertThat(ng_hour, notNullValue());
 		highlight(ng_hour);
-		System.err.println("Hour of the day: " + ng_hour.getText());
+		System.err
+				.println("Hour of the day (exact text search): " + ng_hour.getText());
+
 		ng_hour.click();
 		ngDriver.waitForAngular();
 		String specificMinute = "6:35 PM";
