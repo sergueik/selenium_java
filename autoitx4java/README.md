@@ -5,7 +5,7 @@ This directory contains a replica of Richard Kanavati's AutoItX4Java - Java Auto
 
 ### See Also
 
-* https://sourceforge.net/projects/jacob-project/
-* https://stackoverflow.com/questions/tagged/autoit?page=2&sort=newest
-* https://github.com/daluu/AutoItDriverServer
-
+  * https://sourceforge.net/projects/jacob-project/
+  * https://stackoverflow.com/questions/tagged/autoit?page=2&sort=newest
+  * https://github.com/daluu/AutoItDriverServer
+  * https://www.autoitconsulting.com/site/scripting/autoit-cmdlets-for-windows-powershell/
