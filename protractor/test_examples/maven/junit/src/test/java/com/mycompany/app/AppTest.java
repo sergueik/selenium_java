@@ -560,7 +560,7 @@ public class AppTest {
 		highlight(currency);
 
 		// And I can switch to any of my accounts
-		ArrayList<String> avaliableAccounts = new ArrayList<String>();
+		List<String> avaliableAccounts = new ArrayList<>();
 		Enumeration<WebElement> options = Collections.enumeration(ngDriver
 				.findElements(NgBy.options("account for account in Accounts")));
 		while (options.hasMoreElements()) {

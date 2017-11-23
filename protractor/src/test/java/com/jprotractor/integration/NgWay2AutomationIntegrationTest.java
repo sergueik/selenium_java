@@ -58,8 +58,8 @@ public class NgWay2AutomationIntegrationTest {
 	static boolean isCIBuild = false;
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
 
-	@BeforeClass
-	public static void setup() throws IOException {
+    @BeforeClass
+    public static void setup() throws IOException {
 		isCIBuild = CommonFunctions.checkEnvironment();
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
 		seleniumDriver.manage().window().setSize(new Dimension(width, height));
@@ -206,10 +206,10 @@ public class NgWay2AutomationIntegrationTest {
 		assertFalse(matcher.find());
 
 		// alternative to java.util.regex
-		ArrayList<String> oneAcountArray = new ArrayList<>();
+		List<String> oneAcountArray = new ArrayList<>();
 		oneAcountArray.add(ng_accountNo.getText());
 		assertTrue(CollectionUtils.containsAny(oneAcountArray,
-				new ArrayList<String>(Arrays.asList(customerAccounts))));
+				new ArrayList<>(Arrays.asList(customerAccounts))));
 		oneAcountArray.clear();
 
 		WebElement balance = ngDriver.findElement(NgBy.binding("amount"));
@@ -221,7 +221,7 @@ public class NgWay2AutomationIntegrationTest {
 		highlight(currency);
 
 		// And I can switch to every account owned
-		ArrayList<String> avaliableAccounts = new ArrayList<String>();
+		List<String> avaliableAccounts = new ArrayList<>();
 		Enumeration<WebElement> accounts = Collections.enumeration(
 				ngDriver.findElements(NgBy.options("account for account in Accounts")));
 
@@ -589,7 +589,7 @@ public class NgWay2AutomationIntegrationTest {
 			assertThat(objLastName, notNullValue());
 			System.err.println("Customer's Last Name: " + objLastName.toString());
 			// fName, lName, accountNo, postCD, id, date
-			ArrayList<Long> accounts = (ArrayList<Long>) new NgWebElement(ngDriver,
+			List<Long> accounts = (List<Long>) new NgWebElement(ngDriver,
 					firstNameElement).evaluate("cust.accountNo");
 			if (accounts != null) {
 				for (Long account : accounts) {

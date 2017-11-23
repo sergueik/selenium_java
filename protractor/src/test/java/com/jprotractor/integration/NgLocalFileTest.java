@@ -218,7 +218,7 @@ public class NgLocalFileTest {
 
 		Pattern pattern = Pattern.compile(dateDattern);
 		Matcher matcher = pattern.matcher(ng_display.getText());
-		ArrayList<String> months = new ArrayList<>(
+		List<String> months = new ArrayList<>(
 				Arrays.asList(new String[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun",
 						"Jul", "Aug", "Sep", "Oct", "Dec", "Jan" }));
 		String followingMonth = null;
@@ -415,7 +415,7 @@ public class NgLocalFileTest {
 		System.err.println("Customers:" + seleniumDriver.getPageSource());
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
-		ArrayList<WebElement> countries = new ArrayList<>(
+		List<WebElement> countries = new ArrayList<>(
 				ngDriver.findElements(
 						NgBy.repeaterColumn("person in people", "person.Country")));
 		System.err.println("Found Countries.size() = " + countries.size());
@@ -728,7 +728,7 @@ public class NgLocalFileTest {
 		// use core Selenium
 		Select selectObj = new Select(element);
 		Iterator<WebElement> options = selectObj.getOptions().iterator();
-		ArrayList<String> data = new ArrayList<>();
+		List<String> data = new ArrayList<>();
 		while (options.hasNext()) {
 			WebElement option = options.next();
 			if (option.getText().isEmpty()) {
