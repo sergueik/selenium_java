@@ -46,9 +46,9 @@ public class TodoListTest {
 				"C:\\java\\selenium\\chromedriver.exe");
 
 		if (isMobile) {
-			Map<String, String> mobileEmulation = new HashMap<String, String>();
+			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");
-			Map<String, Object> chromeOptions = new HashMap<String, Object>();
+			Map<String, Object> chromeOptions = new HashMap<>();
 			chromeOptions.put("mobileEmulation", mobileEmulation);
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
