@@ -242,7 +242,7 @@ public class Select2WrapperTest {
 		for (String selectOption : selectOptions) {
 			executeScript(selectOptionScript, select2Selector, selectOption);
 			@SuppressWarnings("unchecked")
-			ArrayList<String> results = (ArrayList<String>) executeScript(
+			List<String> results = (ArrayList<String>) executeScript(
 					querySelectedValueScript, select2Selector);
 			System.err.println("size = " + results.size());
 			String result = results.get(0);

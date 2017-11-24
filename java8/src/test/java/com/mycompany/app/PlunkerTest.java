@@ -163,7 +163,7 @@ public class PlunkerTest extends BaseTest {
 		driver.get(String.format("https://plnkr.co/edit/%s/?p=info", projectId));
 
 		List<WebElement> iframes = driver.findElements(By.cssSelector("iframe"));
-		HashMap<String, Object> iframesMap = new HashMap<>();
+		Map<String, Object> iframesMap = new HashMap<>();
 		for (WebElement iframe : iframes) {
 			String key = String.format("id: \'%s\", name: \"%s\"",
 					iframe.getAttribute("id"), iframe.getAttribute("name"));

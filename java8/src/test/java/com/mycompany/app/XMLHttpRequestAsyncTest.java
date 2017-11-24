@@ -14,6 +14,7 @@ import static org.testng.Assert.assertTrue;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -520,7 +521,7 @@ public class XMLHttpRequestAsyncTest {
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<>();
+			Map<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"

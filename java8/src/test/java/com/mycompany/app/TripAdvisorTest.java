@@ -143,7 +143,7 @@ public class TripAdvisorTest {
       // origin: https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
       // http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
 
-			HashMap<String, Object> prefs = new HashMap<>();
+			Map<String, Object> prefs = new HashMap<>();
 			prefs.put("profile.default_content_settings.popups", 0);
       //Put this into prefs map to switch off browser notification
       prefs.put("profile.default_content_setting_values.notifications", 2);

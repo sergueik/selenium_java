@@ -138,7 +138,7 @@ public class EscapeXPathTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void test1() {
-		ArrayList<String> texts = new ArrayList<>(
+		List<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
 						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
@@ -184,7 +184,7 @@ public class EscapeXPathTest extends BaseTest {
 	@Test(enabled = true)
 	public void test2() {
 		// sleep(10000);
-		ArrayList<String> texts = new ArrayList<>(
+		List<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
 						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
@@ -211,7 +211,7 @@ public class EscapeXPathTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void test3() {
-		ArrayList<String> texts = new ArrayList<>(
+		List<String> texts = new ArrayList<>(
 				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
 						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 

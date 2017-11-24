@@ -52,7 +52,7 @@ import org.sikuli.script.Screen;
 public class ChromeExtensionSikuliTest extends BaseTest {
 
 	private String baseURL = "https://auth-demo.aerobatic.io/";
-	private static ArrayList<String> chromeExtensions = new ArrayList<>();
+	private static List<String> chromeExtensions = new ArrayList<>();
 	static {
 		chromeExtensions.add("chropath"); // without .crx extension
 	}

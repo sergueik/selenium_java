@@ -13,6 +13,7 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -61,7 +62,7 @@ public class BaseTest {
 
 	public String baseURL = "about:blank";
 
-	private ArrayList<String> chromeExtensions = new ArrayList<>();
+	private List<String> chromeExtensions = new ArrayList<>();
 
 	private String extensionDir = String.format(
 			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
@@ -119,7 +120,7 @@ public class BaseTest {
 	// options = webdriver.ChromeOptions()
 	// options.add_argument("--app-id = mbopgmdnpcbohhpnfglgohlbhfongabi")
 	private void loadChromeExtensionsBase64Encoded(ChromeOptions chromeOptions) {
-		ArrayList<String> chromeExtensionsBase64Encoded = new ArrayList<>();
+		List<String> chromeExtensionsBase64Encoded = new ArrayList<>();
 		for (String extensionName : this.chromeExtensions) {
 			String extensionLocation = this.extensionDir + "\\" + extensionName
 					+ ".crx";
@@ -165,7 +166,7 @@ public class BaseTest {
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions chromeOptions = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<>();
+			Map<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"

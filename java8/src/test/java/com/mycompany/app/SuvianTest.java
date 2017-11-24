@@ -120,7 +120,7 @@ public class SuvianTest extends BaseTest {
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<>();
+			Map<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
@@ -665,7 +665,7 @@ public class SuvianTest extends BaseTest {
 	@Test(enabled = false)
 	public void test6_1() {
 		// Arrange
-		ArrayList<String> hobbies = new ArrayList<>(
+		List<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		try {
@@ -699,7 +699,7 @@ public class SuvianTest extends BaseTest {
 		// x.Text);
 		Map<String, String> dataMap = inputElements.stream().collect(
 				Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
-		ArrayList<WebElement> checkboxes = new ArrayList<>();
+		List<WebElement> checkboxes = new ArrayList<>();
 		for (String hobby : hobbies) {
 			try {
 				System.err.println("finding: " + dataMap.get(hobby));
@@ -739,7 +739,7 @@ public class SuvianTest extends BaseTest {
 	@Test(enabled = false)
 	public void test6_2() {
 		// Arrange
-		ArrayList<String> hobbies = new ArrayList<>(
+		List<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
@@ -783,7 +783,7 @@ public class SuvianTest extends BaseTest {
 	public void test6_3() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
-		ArrayList<String> hobbies = new ArrayList<>(
+		List<String> hobbies = new ArrayList<>(
 				Arrays.asList("Singing", "Dancing", "Sports"));
 		WebElement checkElement = null;
 		try {

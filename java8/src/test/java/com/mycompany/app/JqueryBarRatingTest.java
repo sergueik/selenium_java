@@ -125,7 +125,7 @@ public class JqueryBarRatingTest {
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 
-			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+			Map<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
 			String downloadFilepath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
