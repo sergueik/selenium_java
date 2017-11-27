@@ -1,12 +1,17 @@
 package sample;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.lang.reflect.Method;
 
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-import io.webfolder.cdp.type.runtime.CallFunctionOnResult;
-import io.webfolder.cdp.type.runtime.RemoteObject;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
+// http://tutorials.jenkov.com/java-util-concurrent/countdownlatch.html
 
 public class HighlightTest extends BaseTest {
 
@@ -15,87 +20,89 @@ public class HighlightTest extends BaseTest {
 	@BeforeMethod
 	public void beforeMethod(Method method) {
 		super.beforeMethod(method);
+		assertThat(session, notNullValue());
 		session.navigate(baseURL).waitDocumentReady();
+		System.err.println("url: " + session.getLocation());
 	}
 
-	@Test(enabled = false)
-	public void xPath1Test() {
+	@Test(enabled = true)
+	public void testBasicXPath() {
+		String xpath = "/html/head/title";
 		// Arrange
-		session.waitUntil(o -> o.matches("/html/head/title"), 1000, 100);
+		session.waitUntil(o -> o.matches(xpath), 1000, 100);
 		// Act
-		String pageTitle = session.getText("/html/head/title");
+		String pageTitle = session.getText(xpath);
+		// Assert
+		Assert.assertEquals(pageTitle, "WebFolder");
+	}
 
+	@Test(enabled = true)
+	public void testBasicCSSselector() {
+		String cssSelector = "head > title";
+		// Arrange
+		session.waitUntil(o -> o.matches(cssSelector), 1000, 100);
+		// Act
+		String pageTitle = session.getText(cssSelector);
 		// Assert
 		Assert.assertEquals(pageTitle, "WebFolder");
 
 	}
 
 	@Test(enabled = true)
-	public void xPath2Test() {
-		String linkSupportXPath = "//*[@id='nav']//a[contains(@href, 'support.html')]";
+	public void testXPathContains() {
 
+		String xpath = "//*[@id='nav']//a[contains(@href, 'support.html')]";
 		// Arrange
-		session.waitUntil(o -> {
-			return isVisible(linkSupportXPath);
-		}, 1000, 100);
-
+		session.waitUntil(o -> isVisible(xpath), 1000, 100);
 		// Act
-		String linkSupport = session.getText(linkSupportXPath);
-
+		String text = session.getText(xpath);
+		highlight(xpath, 1000);
 		// Assert
-		Assert.assertEquals(linkSupport, "Support");
-		highlight(linkSupportXPath, session, 1000);
+		Assert.assertEquals(text, "Support");
 
-	}
-
-	@Test(enabled = false)
-	public void xPath3Test() {
-
-		String linkAboutXPath = "//*[@id='nav']//a[contains(@href, 'support.html')]/../following-sibling::li/a";
-
-		// Arrange
-		session.waitUntil(o -> {
-			return isVisible(linkAboutXPath);
-		}, 1000, 100);
-
-		// Act
-		String linkAbout = session.getText(linkAboutXPath);
+		/*
+		// Act	
+		String linkSupportComputedXPath = xpathOfElement(linkSupportXPath);
 		// Assert
-		Assert.assertEquals(linkAbout, "About");
+		Assert.assertEquals(linkSupportComputedXPath, "...");
+		*/
 	}
 
 	@Test(enabled = true)
-	public void xPath4Test() {
-		String linkSupportXPath = "//*[@id='nav']//a[contains(@href, 'support.html')]";
+	public void elementIteratorTest() {
+
+		String cssSelector = "#nav a";
 
 		// Arrange
-		session.waitUntil(o -> {
-			return isVisible(linkSupportXPath);
-		}, 1000, 100);
-
+		session.waitUntil(o -> o.getObjectIds(cssSelector).size() > 0, 1000, 100);
 		// Act
-		String linkSupportComputedXPath = xpathOfElement(linkSupportXPath);
-
+		String id = session.getObjectIds(cssSelector).stream().filter(_id -> {
+			System.err.println("object id: " + _id);
+			String _href = (String) session.getPropertyByObjectId(_id, "href");
+			System.err.println("href attribute: " + _href);
+			return _href.matches(".*about.html$");
+		}).collect(Collectors.toList()).get(0);
 		// Assert
-		Assert.assertEquals(linkSupportComputedXPath, "Support");
-		highlight(linkSupportXPath, session, 1000);
-
+		Assert.assertEquals(session.getPropertyByObjectId(id, "href"),
+				"https://webfolder.io/about.html");
+		// Assert
+		Assert.assertEquals(session.getPropertyByObjectId(id, "innerHTML"),
+				"About");
 	}
 
-	@Test(enabled = false)
-	public void xPath5Test() {
+	@Test(enabled = true)
+	public void testSiblingXPath() {
 
-		String linkAboutXPath = "//*[@id='nav']//a[contains(@href, 'support.html')]/../following-sibling::li/a";
-
+		String xpath = "//*[@id='nav']//a[contains(@href, 'support.html')]/../following-sibling::li/a";
 		// Arrange
-		session.waitUntil(o -> {
-			return isVisible(linkAboutXPath);
-		}, 1000, 100);
+		session.waitUntil(o -> isVisible(xpath), 1000, 100);
 
 		// Act
-		String linkAbout = session.getText(linkAboutXPath);
+		String text = session.getText(xpath);
+		highlight(xpath);
 		// Assert
-		Assert.assertEquals(linkAbout, "About");
+		Assert.assertEquals(text, "About");
+		// System.err.println("xpath: " + session.getPathname());
 	}
 
 }

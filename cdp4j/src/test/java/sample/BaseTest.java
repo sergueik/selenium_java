@@ -29,8 +29,10 @@ public class BaseTest {
 		session = factory.create();
 		// install extensions
 		session.installSizzle();
+		session.useSizzle();
 		// Go to URL
 		session.navigate(baseURL);
+		System.err.println("Location:" + session.getLocation());
 	}
 
 	@AfterClass
@@ -71,6 +73,14 @@ public class BaseTest {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	protected void highlight(String selectorOfElement) {
+		highlight(selectorOfElement, session, 100);
+	}
+
+	protected void highlight(String selectorOfElement, int interval) {
+		highlight(selectorOfElement, session, (long) interval);
 	}
 
 	protected void highlight(String selectorOfElement, Session session) {
@@ -118,7 +128,7 @@ public class BaseTest {
 		} catch (Exception e) {
 			System.err.println("Exception (ignored): " + e.getMessage());
 		}
-		System.err.println("value: " + value);
+		// System.err.println("value: " + value);
 		return value;
 	}
 
