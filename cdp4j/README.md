@@ -9,6 +9,8 @@ The project practices Selenium alternative [Chrome DevTools Protocol for Java](h
   * [http://suvian.in/selenium](http://suvian.in/selenium)
   * [http://www.way2automation.com](http://www.way2automation.com)
   * [kw-udon/cdp4j-demo](https://github.com/kw-udon/cdp4j-demo)
+  * [ChromeDevTools/debugger-protocol-viewer](https://github.com/ChromeDevTools/debugger-protocol-viewer)
+  * [GoogleChrome/puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
