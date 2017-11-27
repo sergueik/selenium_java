@@ -3,7 +3,7 @@
 This project exercises the [Chrome DevTools Protocol for Java](https://github.com/webfolderio/cdp4j) Selenium alternative API.
 
   * [ChromeDevTools/awesome-chrome-devtools](https://github.com/ChromeDevTools/awesome-chrome-devtools)
-  * [https://webfolder.io/cdp4j/javadoc/index.html]
+  * [cdp4j/javadoc](https://webfolder.io/cdp4j/javadoc/index.html)
 
 The project is in active development, so bookmark and check for updates.
 

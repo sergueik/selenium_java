@@ -30,7 +30,8 @@ public class BaseTest {
 		// install extensions
 		session.installSizzle();
 		session.useSizzle();
-		// Go to URL
+		session.setUserAgent(
+				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari/534.34");
 		session.navigate(baseURL);
 		System.err.println("Location:" + session.getLocation());
 	}
@@ -110,6 +111,9 @@ public class BaseTest {
 
 	protected Object executeScript(Session session, String script,
 			String selectorOfElement) {
+		if (!session.matches(selectorOfElement)) {
+			return null;
+		}
 		String objectId = session.getObjectId(selectorOfElement);
 		Integer nodeId = session.getNodeId(selectorOfElement);
 		CallFunctionOnResult functionResult = null;
@@ -138,9 +142,10 @@ public class BaseTest {
 
 	// https://stackoverflow.com/questions/1343237/how-to-check-elements-visibility-via-javascript
 	protected boolean isVisible(String selectorOfElement) {
-		return (boolean) executeScript(
-				"function() { return(this.offsetWidth > 0 || this.offsetHeight > 0); }",
-				selectorOfElement);
+		return (boolean) (session.matches(selectorOfElement)
+				&& (boolean) executeScript(
+						"function() { return(this.offsetWidth > 0 || this.offsetHeight > 0); }",
+						selectorOfElement));
 	}
 
 	// NOTE: broken
