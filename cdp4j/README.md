@@ -1,14 +1,25 @@
 ### Info
-
-This project exercises the [Chrome DevTools Protocol for Java](https://github.com/webfolderio/cdp4j) Selenium alternative API.
-
-  * [ChromeDevTools/awesome-chrome-devtools](https://github.com/ChromeDevTools/awesome-chrome-devtools)
-  * [cdp4j/javadoc](https://webfolder.io/cdp4j/javadoc/index.html)
+The [Chrome Devtools](https://github.com/ChromeDevTools/awesome-chrome-devtools)
+ project 
+ offers an alternative powerful set of API to manage te browser, and appears currently targeted primarily for Javascript developers.
   * [puppeteer online](https://try-puppeteer.appspot.com/)
+  * [GoogleChrome/puppeteer](https://github.com/GoogleChrome/puppeteer)
+  * [ChromeDevTools/debugger-protocol-viewer](https://github.com/ChromeDevTools/debugger-protocol-viewer)
+
+This project exercises the [Java client of Chrome DevTools Protocol](https://github.com/webfolderio/cdp4j) trying to (re)construct code patterns familiar to a __Selenium__ developer to reduce the effort of rewriting existing __Selenium__ -based test suite to __CDP__ backend.
+
+  * [cdp4j/javadoc](https://webfolder.io/cdp4j/javadoc/index.html)
+
+
+A massive test suite developed earlier practicing various publicly available practice pages is uses as a reference.
+  * [practice Selenium testing](https://github.com/sergueik/selenium_java/tree/master/java8)
+  * [http://suvian.in/selenium](http://suvian.in/selenium)
+  * [http://www.way2automation.com](http://www.way2automation.com)
+
 
 The project is in active development, so please bookmark and check for updates.
 
-### Status
+### Examples
 The following code fragments familiar to a Selenium developer are implemented on top of __CDP__ and demonstrated:
 
 * Iterating over and filtering of the set of elements returned, then perform further action with the specific members similar to Selenium `findElements`:
@@ -108,13 +119,6 @@ The following code fragments are yet unclear how to implement:
 
 * Finding the target element by applying `findElement(s)` to a certain element found earlier.
 * Alerts
-
-### See Also
-  * [http://suvian.in/selenium](http://suvian.in/selenium)
-  * [http://www.way2automation.com](http://www.way2automation.com)
-  * [kw-udon/cdp4j-demo](https://github.com/kw-udon/cdp4j-demo)
-  * [ChromeDevTools/debugger-protocol-viewer](https://github.com/ChromeDevTools/debugger-protocol-viewer)
-  * [GoogleChrome/puppeteer](https://github.com/GoogleChrome/puppeteer)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
