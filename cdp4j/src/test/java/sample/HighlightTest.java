@@ -25,7 +25,7 @@ public class HighlightTest extends BaseTest {
 		System.err.println("url: " + session.getLocation());
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testBasicXPath() {
 		String xpath = "/html/head/title";
 		// Arrange
@@ -36,7 +36,7 @@ public class HighlightTest extends BaseTest {
 		Assert.assertEquals(pageTitle, "WebFolder");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testBasicCSSselector() {
 		String cssSelector = "head > title";
 		// Arrange
@@ -48,7 +48,7 @@ public class HighlightTest extends BaseTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testXPathContains() {
 
 		String xpath = "//*[@id='nav']//a[contains(@href, 'support.html')]";
@@ -68,7 +68,7 @@ public class HighlightTest extends BaseTest {
 		*/
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void elementIteratorTest() {
 
 		String cssSelector = "#nav a";
@@ -90,7 +90,7 @@ public class HighlightTest extends BaseTest {
 				"About");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testSiblingXPath() {
 
 		String xpath = "//*[@id='nav']//a[contains(@href, 'support.html')]/../following-sibling::li/a";

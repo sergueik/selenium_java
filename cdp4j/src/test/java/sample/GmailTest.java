@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import io.webfolder.cdp.session.Session;
+import io.webfolder.cdp.exception.CommandException;
 
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -46,8 +47,6 @@ public class GmailTest extends BaseTest {
 
 	@BeforeMethod
 	public void beforeMethod() {
-		session.setUserAgent(
-				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari/534.34");
 		System.err.println("Navigate to URL: " + baseURL);
 		session.navigate(baseURL);
 
@@ -57,7 +56,7 @@ public class GmailTest extends BaseTest {
 		session.waitUntil(urlChange, 1000, 100);
 	}
 
-	@Test(priority = 1, enabled = true)
+	@Test(priority = 1, enabled = false)
 	public void invalidUsernameTest() throws InterruptedException, IOException {
 
 		// click on Sign in link
@@ -72,6 +71,7 @@ public class GmailTest extends BaseTest {
 				session.getLocation().matches(String.format("^%s.*", accountsURL)));
 		sleep(10000);
 
+		// enter a non-existing account
 		enterData(identifier, "InvalidUser_UVW");
 
 		// Click on next button
@@ -83,17 +83,75 @@ public class GmailTest extends BaseTest {
 		assertTrue(errMsg.size() > 0);
 	}
 
+	@Test(priority = 2, enabled = true)
+	public void invalidPasswordTest() {
+
+		// Sign in
+		executeScript(session, "function() { this.click(); }", signInLink);
+
+		// if we are on sign up page
+		if (session.getLocation()
+				.matches("https://accounts.google.com/SignUp.*$")) {
+			// if we are on sign up page, there is a 'Sign in' link, click it again
+			if (session.matches("#link-signin")) {
+				session.focus("#link-signin");
+				highlight("#link-signin");
+				session.click("#link-signin");
+			}
+		} else {
+			// we are on sign in page
+		}
+
+		Predicate<Session> urlChange = session -> session.getLocation()
+				.matches(String.format("^%s.*", accountsURL));
+		session.waitUntil(urlChange, 1000, 100);
+
+		assertTrue(
+				// String.format("Unexpected title '%s'", row.getAttribute("role")),
+				session.getLocation().matches(String.format("^%s.*", accountsURL)));
+
+		// Enter existing email id
+		enterData(identifier, "automationnewuser24@gmail.com");
+
+		// Click on next button
+		clickNextButton(identifierNextButton);
+
+		// Enter invalid password
+		enterData(passwordInput, "InvalidPwd");
+
+		// Click on next button
+		clickNextButton(passwordNextButton);
+
+		// Inspect error messages
+		sleep(1000);
+		List<String> errMsg = session
+				.getObjectIds("//*[contains (text(),'Wrong password')]");
+		assertTrue(errMsg.size() > 0);
+	}
+
 	private void enterData(String selector, String data) {
 		session.waitUntil(o -> isVisible(selector), 1000, 100);
-		session.focus(selector);
-		session.sendKeys(data);
+		try {
+			session.focus(selector);
+			session.sendKeys(data);
+		} catch (CommandException e) {
+			// Element is not focusable ?
+			System.err.println("Exception in enerData: " + e.getMessage());
+		}
 	}
 
 	private void clickNextButton(String selector) {
 		session.waitUntil(o -> isVisible(selector), 1000, 100);
-		session.focus(selector);
+		try {
+			session.focus(selector);
+		} catch (CommandException e) {
+			// Element is not focusable ?
+			System.err.println("Exception in clickNextButton: " + e.getMessage());
+		}
 		highlight(selector);
-		session.click(selector);
+		executeScript(session, "function() { this.click(); }", selector);
+		// session.click is not too reliable
+		// session.click(selector);
 	}
 
 }

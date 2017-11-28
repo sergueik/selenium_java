@@ -4,6 +4,7 @@ This project exercises the [Chrome DevTools Protocol for Java](https://github.co
 
   * [ChromeDevTools/awesome-chrome-devtools](https://github.com/ChromeDevTools/awesome-chrome-devtools)
   * [https://webfolder.io/cdp4j/javadoc/index.html]
+  * [puppeteer online](https://try-puppeteer.appspot.com/)
 
 The project is in active development, so bookmark and check for updates.
 
