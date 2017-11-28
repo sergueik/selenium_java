@@ -24,15 +24,14 @@ public class GmailTest extends BaseTest {
 
 	private String baseURL = "https://www.google.com/gmail/about/#";
 	private String accountsURL = "https://accounts.google.com/signin/v2/identifier\\?continue=";
-	//
+	// Alternatives (do not work)
+	// "//*[contains(text(),'Sign in')]"; // xpath
+	// "body > nav > div > a.gmail-nav__nav-link.gmail-nav__nav-link__sign-in"
+	private String signInLink = "a[class *= 'gmail-nav__nav-link__sign-in']"; // css
 
-	// private String signInLink = "//*[contains(text(),'Sign in')]"; // xpath
-	// private String signInLink =
-	// "//nav/div/a[contains(@class,'gmail-nav__nav-link__sign-in')]"; // xpath
-	private String signInLink = "body > nav > div > a.gmail-nav__nav-link.gmail-nav__nav-link__sign-in"; // cssSelector
-	private String identifier = "#identifierId"; // cssSelector
+	private String identifier = "#identifierId"; // css
 	private String identifierNextButton = "//*[@id='identifierNext']/content/span[contains(text(),'Next')]"; // xpath
-	private String passwordInput = "//*[@id='password']//input"; // xpath
+	private String passwordInput = "#password input"; // css
 	private String passwordNextButton = "//*[@id='passwordNext']/content/span[contains(text(),'Next')]"; // xpath
 	private String profileImage = "//a[contains(@href,'https://accounts.google.com/SignOutOptions')]"; // xpath
 	// "//*[@id='gb']/div[1]/div[1]/div[2]/div[4]/div[1]/a/span"
@@ -56,12 +55,15 @@ public class GmailTest extends BaseTest {
 		session.waitUntil(urlChange, 1000, 100);
 	}
 
-	@Test(priority = 1, enabled = false)
+	@Test(priority = 1, enabled = true)
 	public void invalidUsernameTest() throws InterruptedException, IOException {
 
-		// click on Sign in link
+		// Arrange
+		// Sign in
 		highlight(signInLink);
-		session.click(signInLink);
+		click(signInLink);
+		// NOTE: session.click does not work
+		// session.click(signInLink);
 
 		Predicate<Session> urlChange = session -> session.getLocation()
 				.matches(String.format("^%s.*", accountsURL));
@@ -69,7 +71,6 @@ public class GmailTest extends BaseTest {
 		assertTrue(
 				// String.format("Unexpected title '%s'", row.getAttribute("role")),
 				session.getLocation().matches(String.format("^%s.*", accountsURL)));
-		sleep(10000);
 
 		// enter a non-existing account
 		enterData(identifier, "InvalidUser_UVW");
@@ -86,8 +87,13 @@ public class GmailTest extends BaseTest {
 	@Test(priority = 2, enabled = true)
 	public void invalidPasswordTest() {
 
+		// Arrange
 		// Sign in
-		executeScript(session, "function() { this.click(); }", signInLink);
+		highlight(signInLink);
+		click(signInLink);
+
+		// NOTE: session.click does not work
+		// session.click(signInLink);
 
 		// if we are on sign up page
 		if (session.getLocation()
@@ -122,10 +128,85 @@ public class GmailTest extends BaseTest {
 		clickNextButton(passwordNextButton);
 
 		// Inspect error messages
-		sleep(1000);
+		sleep(10000);
+
 		List<String> errMsg = session
 				.getObjectIds("//*[contains (text(),'Wrong password')]");
 		assertTrue(errMsg.size() > 0);
+	}
+
+	@Test(priority = 4, enabled = true)
+	public void loginTest() throws InterruptedException, IOException {
+
+		// Arrange
+		// Sign in
+		highlight(signInLink);
+		click(signInLink);
+
+		// origin:
+		// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection
+
+		// Wait for page url to change
+		Predicate<Session> urlChange = session -> session.getLocation()
+				.matches(String.format("^%s.*", accountsURL));
+		session.waitUntil(urlChange, 1000, 100);
+		assertTrue(
+				// String.format("Unexpected title '%s'", row.getAttribute("role")),
+				session.getLocation().matches(String.format("^%s.*", accountsURL)));
+
+		// TODO: examine it landed on https://accounts.google.com/AccountChooser
+
+		// Enter existing email id
+		enterData(identifier, "automationnewuser24@gmail.com");
+
+		// Click on next button
+		clickNextButton(identifierNextButton);
+
+		// Enter the valid password
+		enterData(passwordInput, "automationnewuser2410");
+
+		// Click on next button
+		clickNextButton(passwordNextButton);
+
+		// Wait for page url to change
+		/*
+		urlChange = driver -> {
+			String url = driver.getCurrentUrl();
+			System.err.println("The url is: " + url);
+			return (Boolean) url.matches("^https://mail.google.com/mail.*");
+		};
+		wait.until(urlChange);
+		 */
+		session.waitUntil(o -> {
+			System.out.println("Checking if mail page is loaded...");
+			return checkPage();
+		}, 1000, 100);
+
+		// Wait until form is rendered
+		session.waitUntil(
+				o -> ((String) o.evaluate("document.readyState")).matches("complete"),
+				1000, 100);
+
+		System.err.println("Click on profile image");
+		// Click on profile image
+		if (session.waitUntil(o -> o.matches(profileImage), 1000, 10)) {
+			click(profileImage);
+		}
+
+		// Wait until form is rendered
+		session.waitUntil(o -> {
+			return (boolean) o.evaluate("return document.readyState == 'complete'");
+		}, 1000, 100);
+
+		// Sign out
+		System.err.println("Sign out");
+
+		highlight(signOutButton, 100);
+		click(signOutButton);
+	}
+
+	private Boolean checkPage() {
+		return session.getLocation().matches("^https://mail.google.com/mail.*");
 	}
 
 	private void enterData(String selector, String data) {

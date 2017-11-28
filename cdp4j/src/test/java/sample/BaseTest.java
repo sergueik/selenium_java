@@ -30,6 +30,8 @@ public class BaseTest {
 		// install extensions
 		session.installSizzle();
 		session.useSizzle();
+		session.clearCookies();
+		session.clearCache();
 		session.setUserAgent(
 				"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari/534.34");
 		session.navigate(baseURL);
@@ -179,5 +181,9 @@ public class BaseTest {
 		} catch (IOException e) {
 			throw new RuntimeException("Cannot load file: " + scriptName);
 		}
+	}
+
+	protected void click(String selector) {
+		executeScript(session, "function() { this.click(); }", selector);
 	}
 }
