@@ -105,7 +105,6 @@ public class GmailTest extends BaseTest {
 		Predicate<Session> urlChange = session -> session.getLocation()
 				.matches(String.format("^%s.*", accountsURL));
 		session.waitUntil(urlChange, 1000, 100);
-
 		assertTrue(
 				// String.format("Unexpected title '%s'", row.getAttribute("role")),
 				session.getLocation().matches(String.format("^%s.*", accountsURL)));
