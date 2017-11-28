@@ -90,21 +90,12 @@ public class BaseTest {
 		highlight(selectorOfElement, session, 100);
 	}
 
-	// NOTE: alternative solution:
-	// https://stackoverflow.com/questions/45985234/how-to-highlight-elements-in-a-chrome-extension-similar-to-how-devtools-does-it
-	// https://github.com/gorhill/uBlock/blob/5cc7a3a8524371ce8d7ab669813b80ef09276c7f/src/js/scriptlets/element-picker.js#L228
-	// https://github.com/kdzwinel/DevToolsVoiceCommands/blob/26d2f8a78bb681a121bddd62e4cb57225e726304/scripts/lib/commands/node-inspection.js#L29
 	protected void highlight(String selectorOfElement, Session session,
 			long interval) {
 		String objectId = session.getObjectId(selectorOfElement);
 		Integer nodeId = session.getNodeId(selectorOfElement);
 		CallFunctionOnResult functionResult = null;
 		RemoteObject result = null;
-		// TODO: alternative solution:
-		// https://stackoverflow.com/questions/45985234/how-to-highlight-elements-in-a-chrome-extension-similar-to-how-devtools-does-it
-		// https://github.com/gorhill/uBlock/blob/5cc7a3a8524371ce8d7ab669813b80ef09276c7f/src/js/scriptlets/element-picker.js#L228
-		// https://github.com/kdzwinel/DevToolsVoiceCommands/blob/26d2f8a78bb681a121bddd62e4cb57225e726304/scripts/lib/commands/node-inspection.js#L29
-
 		executeScript("function() { this.style.border='3px solid yellow'; }",
 				selectorOfElement);
 		sleep(interval);
