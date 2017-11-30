@@ -40,6 +40,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 /*
  * This class tests the Select 2 Element https://select2.github.io/examples.html
  * intended to create a custom class implementing subset of ISelect interface

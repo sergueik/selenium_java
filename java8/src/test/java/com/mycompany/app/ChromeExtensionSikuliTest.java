@@ -43,7 +43,13 @@ import org.sikuli.script.Match;
 import org.sikuli.script.Pattern;
 import org.sikuli.script.Screen;
 
-// based on https://stackoverflow.com/questions/25557533/open-a-chrome-extension-through-selenium-webdriver
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
+// based on
+// https://stackoverflow.com/questions/25557533/open-a-chrome-extension-through-selenium-webdriver
 // https://www.blazemeter.com/blog/6-easy-steps-testing-your-chrome-extension-selenium
 // https://stackoverflow.com/questions/25557533/open-a-chrome-extension-through-selenium-webdriver
 // http://www.software-testing-tutorials-automation.com/2016/05/how-to-get-browser-and-os-details-on.html

@@ -116,10 +116,18 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
+/**
+ * Selected test scenarions for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class EscapeXPathTest extends BaseTest {
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static final Logger log = LogManager.getLogger(EscapeXPathTest.class);
+	private List<String> texts = new ArrayList<>(
+			Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
+					"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
 	@SuppressWarnings("unused")
 	private static Pattern pattern;
@@ -138,12 +146,9 @@ public class EscapeXPathTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void test1() {
-		List<String> texts = new ArrayList<>(
-				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
-						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
+		List<WebElement> elements = new ArrayList<>();
 
 		for (String text : texts) {
-
 			System.err.println(
 					String.format("test1 (1): %s => %s ", text, escapeXPath(text)));
 			System.err.println(
@@ -152,18 +157,21 @@ public class EscapeXPathTest extends BaseTest {
 								String.format("test1 (2): %s => %s ", text, escapeXPath3(text)));
 			*/
 			try {
-				List<WebElement> elements1 = driver.findElements(By.xpath(
+				elements = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath(text))));
-				assertTrue(elements1.size() > 0);
-				highlight(elements1.get(0));
-				List<WebElement> elements2 = driver.findElements(By.xpath(
+				assertTrue(elements.size() > 0);
+				highlight(elements.get(0));
+				elements.clear();
+				elements = driver.findElements(By.xpath(
 						String.format("//*[contains(text(), %s)]", escapeXPath2(text))));
-				assertTrue(elements2.size() > 0);
-				highlight(elements2.get(0));
-				/*				List<WebElement> elements3 = driver.findElements(By.xpath(
-										String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
-								assertTrue(elements3.size() > 0);
-								highlight(elements3.get(0));
+				assertTrue(elements.size() > 0);
+				highlight(elements.get(0));
+				elements.clear();
+				/*	elements = driver.findElements(By.xpath(
+								String.format("//*[contains(text(), %s)]", escapeXPath3(text))));
+						assertTrue(elements.size() > 0);
+						highlight(elements.get(0));
+						elements.clear();
 				*/
 				sleep(500);
 			} catch (InvalidSelectorException e) {
@@ -183,16 +191,13 @@ public class EscapeXPathTest extends BaseTest {
 	// NOTE: all failing
 	@Test(enabled = true)
 	public void test2() {
-		// sleep(10000);
-		List<String> texts = new ArrayList<>(
-				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
-						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
+		List<WebElement> elements = new ArrayList<>();
 
 		for (String text : texts) {
 			System.err.println(String.format("test2: %s", text));
 
 			try {
-				List<WebElement> elements = driver.findElements(
+				elements = driver.findElements(
 						By.cssSelector(String.format("th:contains('%s')", text)));
 				assertTrue(elements.size() > 0);
 				highlight(elements.get(0));
@@ -211,9 +216,6 @@ public class EscapeXPathTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void test3() {
-		List<String> texts = new ArrayList<>(
-				Arrays.asList(new String[] { "Burj Khalifa", "\"Burj\" 'Khalifa'",
-						"\"Burj\" Khalifa", "Burj 'Khalifa'" }));
 
 		for (String text : texts) {
 			System.err.println(String.format("test3: %s", text));
@@ -233,7 +235,7 @@ public class EscapeXPathTest extends BaseTest {
 	}
 
 	// https://sqa.stackexchange.com/questions/362/a-way-to-match-on-text-using-css-locators
-	// requires jQuery
+	// NOTE: uses jQuery
 	public static WebElement findByText(WebDriver driver,
 			String cssSelectorParent, String text) {
 		WebElement parent = driver.findElement(By.cssSelector(cssSelectorParent));
@@ -244,14 +246,12 @@ public class EscapeXPathTest extends BaseTest {
 	}
 
 	// origin: https://groups.google.com/forum/#!topic/selenium-users/sTWcaVbnU6c
-
 	public static String toHexStr(byte b) {
-		String str = "0x" + String.format("%02x", b);
-		return str;
+		return String.format("0x%02x", b);
 	}
 
+	// http://utf8-chartable.de/unicode-utf8-table.pl?start=8064&names=-&utf8=0x
 	private String replaceSpecials() {
-		// http://utf8-chartable.de/unicode-utf8-table.pl?start=8064&names=-&utf8=0x
 		String pageSource = "";
 		pageSource = driver.getPageSource();
 		byte[] allBytes = null;

@@ -95,31 +95,27 @@ import static org.testng.AssertJUnit.fail;
 import org.testng.asserts.SoftAssert;
 // http://www.softwaretestingmaterial.com/soft-assert/
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class SuvianTest extends BaseTest {
 
-	// private WebDriver driver;
-	// private WebDriverWait wait;
-	// private static Actions actions;
-	// private static Alert alert;
-	// private int flexibleWait = 5;
-	// private int implicitWait = 1;
-	// private long pollingInterval = 500;
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static String defaultScript = null;
-	// private static final String browser = "chrome";
-	// private static String osName;
 
 	@BeforeMethod
 	public void BeforeMethod(Method method) {
 		super.beforeMethod(method);
-		driver.get(baseURL);
+		// ?
 	}
 
 	@AfterMethod
 	public void AfterMethod(ITestResult result) {
 		if (verificationErrors.length() != 0) {
-			throw new RuntimeException(String.format("Error in the method %s : %s",
+			throw new RuntimeException(String.format("Error(s) in the method %s : %s",
 					result.getMethod().getMethodName(), verificationErrors.toString()));
 		}
 		driver.get("about:blank");
@@ -2780,41 +2776,7 @@ public class SuvianTest extends BaseTest {
 		return result;
 	}
 
-	private void highlightNew(WebElement element, long highlight_interval) {
-		Rectangle elementRect = element.getRect();
-		String highlightScript = getScriptContent("highlight.js");
-		// append calling
-
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format(
-								"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
-								highlightScript),
-						elementRect.y, elementRect.x, elementRect.width,
-						elementRect.height);
-			}
-			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format("%s\nhighlight_remove();", highlightScript));
-			}
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-
-	}
-
-	private boolean areElementsPresent(WebElement parentWebElement,
-			By byLocator) {
-		return parentWebElement.findElements(byLocator).size() == 1;
-		// usage:
-		// assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*=
-		// product]")).get(0), By.cssSelector("[class*=sticker]")));
-	}
-
-	public boolean isGreaterThen(String a, String b) {
+		public boolean isGreaterThen(String a, String b) {
 		return a.compareTo(b) < 0;
 		// usage:
 		// List<WebElement> rows =
@@ -2829,18 +2791,6 @@ public class SuvianTest extends BaseTest {
 		String getStyleScript = getScriptContent("getStyle.js");
 
 		return (String) executeScript(getStyleScript, element, arguments);
-	}
-
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = SuvianTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
 	}
 
 	// http://stackoverflow.com/questions/19384710/javascript-workaround-for-drag-and-drop-in-selenium-webdriver/26372276#26372276

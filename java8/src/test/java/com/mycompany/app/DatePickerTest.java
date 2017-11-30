@@ -1,5 +1,9 @@
 package com.mycompany.app;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
@@ -9,6 +13,7 @@ import org.testng.annotations.Test;
 
 import java.io.IOException;
 import java.util.List;
+
 import java.util.concurrent.TimeUnit;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -18,13 +23,24 @@ import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.KeyEvent;
 
-// origin: https://raw.githubusercontent.com/TsvetomirSlavov/DynamicDataTablesAndCallendarsTsvetomir/master/src/main/java/DatePickerAndHighlightAndScroll.java
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
+// based on:
+// https://raw.githubusercontent.com/TsvetomirSlavov/DynamicDataTablesAndCallendarsTsvetomir/master/src/main/java/DatePickerAndHighlightAndScroll.java
 public class DatePickerTest extends BaseTest {
 
 	public String baseURL = "https://www.skyscanner.com";
+	private Calendar cal = Calendar.getInstance();
+	private Date today = new Date();
+	private SimpleDateFormat simpDate = new SimpleDateFormat(
+			"MMMMM" /* EEEE MMMMM dd yyyy kk:mm:ss */);
 
 	@BeforeClass
 	public void beforeClass() throws IOException {
+		cal.setTime(today);
 		super.beforeClass();
 		assertThat(driver, notNullValue());
 		driver.get(baseURL);
@@ -32,7 +48,7 @@ public class DatePickerTest extends BaseTest {
 			driver.manage().window().fullscreen();
 		} catch (WebDriverException e) {
 			System.err.println("Exception (ignored) " + e.toString());
-			// unimplemented command 
+			// unimplemented command
 			// Firefox: org.openqa.selenium.UnsupportedCommandException
 		}
 
@@ -50,27 +66,34 @@ public class DatePickerTest extends BaseTest {
 		}
 	}
 
+	// chooses a date in the middle of the month next year to exercise browsing
+	// through months and inspecting dates
 	@Test(priority = 1, enabled = true)
 	public void datePickTest() {
-		wait.until((WebDriver driver) -> {
-			WebElement element = null;
+
+		wait.until((WebDriver d) -> {
+			WebElement e = null;
 			try {
-				element = driver.findElement(By.id("js-depart-input"));
-			} catch (Exception e) {
+				e = d.findElement(By.id("js-depart-input"));
+			} catch (Exception ex) {
 				return null;
 			}
-			return (element.isDisplayed()) ? element : null;
+			return (e.isDisplayed()) ? e : null;
 		});
-		//
 		driver.findElement(By.id("js-depart-input")).click();
+		// adjust the browser window
 		scroll(15, 100);
 		// zoomMinus();
 		sleep(1000);
-		String expectedMonth = "December 2017";
+		;
+		String expectedMonth = String.format("%s %s", simpDate.format(today),
+				cal.get(Calendar.YEAR) + 1);
+		System.err.println("Scrolling to: " + expectedMonth);
 		String currentMonth = driver
 				.findElement(By.cssSelector("div.depart span.current")).getText();
+		// TODO: coverage
 		if (expectedMonth.equals(currentMonth)) {
-			System.out.println("Month is already selected!");
+			System.out.println("Intended month is already current!");
 		} else {
 			for (int i = 1; i < 12; i++) {
 				driver.findElement(By.cssSelector("div.depart button.next")).click();
@@ -78,18 +101,26 @@ public class DatePickerTest extends BaseTest {
 				currentMonth = driver
 						.findElement(By.cssSelector("div.depart span.current")).getText();
 				if (expectedMonth.equals(currentMonth)) {
-					System.out.println("Month Selected: " + currentMonth);
+					highlight(
+							driver.findElement(By.cssSelector("div.depart span.current")));
+					System.out.println("Selected: " + currentMonth);
 					break;
 				}
 			}
 		}
 		sleep(1000);
+		String expectedDate = String.format("%s-%s-15", cal.get(Calendar.YEAR) + 1,
+				cal.get(Calendar.MONTH) + 1);
+		System.err.println("Locating: " + expectedDate);
 		WebElement datePicker = driver.findElement(
 				By.cssSelector("div.depart div.container-body table tbody"));
 		List<WebElement> dates = datePicker.findElements(By.tagName("td"));
+		System.err
+				.println("Start with date : " + dates.get(0).getAttribute("data-id"));
+
 		for (WebElement date : dates) {
 			String calDate = date.getAttribute(("data-id"));
-			if (calDate.equals("2017-12-30")) {
+			if (calDate.equals(expectedDate)) {
 				flash(date);
 				date.click();
 				System.out.println("Date Selected: " + calDate);
@@ -97,23 +128,6 @@ public class DatePickerTest extends BaseTest {
 			}
 		}
 		sleep(1000);
-	}
-
-	public void flash(WebElement element) {
-		String bgcolor = element.getCssValue("backgroundColor");
-		for (int i = 0; i < 3; i++) {
-			changeColor("rgb(0,200,0)", element);
-			changeColor(bgcolor, element);
-		}
-	}
-
-	public void changeColor(String color, WebElement element) {
-		js.executeScript("arguments[0].style.backgroundColor = '" + color + "'",
-				element);
-		try {
-			Thread.sleep(20);
-		} catch (InterruptedException e) {
-		}
 	}
 
 	// Scroll

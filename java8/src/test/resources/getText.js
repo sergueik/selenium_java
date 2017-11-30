@@ -1,10 +1,10 @@
 /**
- * Computes text value of the element
+ * Computes text value of the element recursively
  *
  * arguments[0] {Element} The event target.
  * arguments[1] {Boolean} Whether to concatenate element text fragments with spaces.
  */
-// http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
+// based on  http://stackoverflow.com/questions/6743912/get-the-pure-text-without-html-element-by-javascript
 getText = function(element, addSpaces) {
 	var i, result, text, child;
 	if (element.childNodes && element.childNodes > 1) {
@@ -29,3 +29,5 @@ getText = function(element, addSpaces) {
 	result = result.replace(/\r?\n/g, ' ').replace(/\s+/g, ' ').replace(/^\s+/, '').replace(/\s+$/, '')
 	return result;
 }
+
+return getText(arguments[0], arguments[1]);

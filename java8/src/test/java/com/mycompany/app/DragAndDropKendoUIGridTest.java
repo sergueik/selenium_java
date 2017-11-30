@@ -29,8 +29,13 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.lang.reflect.Method;
 
-//origin: https://github.com/TsvetomirSlavov/DynamicDataTablesAndCallendarsTsvetomir/blob/master/src/main/java/DragAndDropKendoUIGrid.java
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
+// based on:
+// https://github.com/TsvetomirSlavov/DynamicDataTablesAndCallendarsTsvetomir/blob/master/src/main/java/DragAndDropKendoUIGrid.java
 public class DragAndDropKendoUIGridTest {
 
 	public static WebElement dragItem1;
@@ -75,7 +80,6 @@ public class DragAndDropKendoUIGridTest {
 		driver.get("http://demos.telerik.com/kendo-ui/grid/index");
 	}
 
-	
 	@BeforeMethod
 	public void loadPage() {
 	}
@@ -90,21 +94,14 @@ public class DragAndDropKendoUIGridTest {
 		}
 
 		JavascriptExecutor js = (JavascriptExecutor) driver;
-		js.executeScript(
-        "$(\"#grid\").kendoGrid({\n"
-        + "  columns: [\n"
-				+ "    { field: \"name\" },\n" 
-        + "    { field: \"age\" }\n"
-        + "  ],\n"
-				+ "  dataSource: [\n" 
-        + "      { name: \"Ceko\", age: 30 },\n"
-				+ "      { name: \"Zai\", age: 33 }\n" 
-        +	"  ]\n" + "});\n" 
-        + "var grid = $(\"#grid\").data(\"kendoGrid\");\n"
-				+ "grid.reorderColumn(1, grid.columns[0]);"
-        );
-		WebElement columnValue = driver
-    		.findElement(By.xpath("//*[@id='grid']/div[3]/table/tbody/tr[1]/td[2]"));
+		js.executeScript("$(\"#grid\").kendoGrid({\n" + "  columns: [\n"
+				+ "    { field: \"name\" },\n" + "    { field: \"age\" }\n" + "  ],\n"
+				+ "  dataSource: [\n" + "      { name: \"Ceko\", age: 30 },\n"
+				+ "      { name: \"Zai\", age: 33 }\n" + "  ]\n" + "});\n"
+				+ "var grid = $(\"#grid\").data(\"kendoGrid\");\n"
+				+ "grid.reorderColumn(1, grid.columns[0]);");
+		WebElement columnValue = driver.findElement(
+				By.xpath("//*[@id='grid']/div[3]/table/tbody/tr[1]/td[2]"));
 		String text = columnValue.getText();
 		Assert.assertEquals("Ceko", text);
 
@@ -127,7 +124,7 @@ public class DragAndDropKendoUIGridTest {
 		// dragAndDrop(driver, dragItem1, dragItem2);
 	}
 
-  @AfterSuite
+	@AfterSuite
 	public void afterSuiteMethod() throws Exception {
 		driver.quit();
 	}

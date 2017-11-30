@@ -22,7 +22,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -48,6 +50,11 @@ import org.testng.annotations.BeforeSuite;
 
 import org.apache.commons.codec.binary.Base64;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class BaseTest {
 
 	public WebDriver driver;
@@ -56,7 +63,6 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
-	private static String osName;
 
 	public int scriptTimeout = 5;
 	public int flexibleWait = 120;
@@ -66,6 +72,7 @@ public class BaseTest {
 	public String baseURL = "about:blank";
 
 	private List<String> chromeExtensions = new ArrayList<>();
+	private static String osName;
 
 	private String extensionDir = String.format(
 			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
@@ -125,15 +132,15 @@ public class BaseTest {
 	private void loadChromeExtensionsBase64Encoded(ChromeOptions chromeOptions) {
 		List<String> chromeExtensionsBase64Encoded = new ArrayList<>();
 		for (String extensionName : this.chromeExtensions) {
-			String extensionLocation = this.extensionDir + "\\" + extensionName
+			String extensionFilePath = this.extensionDir + "\\" + extensionName
 					+ ".crx";
-			// System.err.println("About to load extension " + extensionLocation);
-			File extensionFile = new File(extensionLocation);
+			// System.err.println("About to load extension " + extensionFilePath);
+			File extensionFile = new File(extensionFilePath);
 
+			// origin:
+			// http://www.oodlestechnologies.com/blogs/Encode-%26-Decode-Image-Using-Base64-encoding-and-Decoding
+			// http://www.java2s.com/Code/Java/File-Input-Output/Base64encodedecodedatausingtheBase64encodingscheme.htm
 			if (extensionFile.exists() && !extensionFile.isDirectory()) {
-				// origin:
-				// http://www.oodlestechnologies.com/blogs/Encode-%26-Decode-Image-Using-Base64-encoding-and-Decoding
-				// http://www.java2s.com/Code/Java/File-Input-Output/Base64encodedecodedatausingtheBase64encodingscheme.htm
 				try {
 					FileInputStream extensionFileInputStream = new FileInputStream(
 							extensionFile);
@@ -145,13 +152,13 @@ public class BaseTest {
 					extensionFileInputStream.close();
 					chromeExtensionsBase64Encoded.add(new String(base64EncodedByteArray));
 					System.out.println(String.format(
-							"Chrome Extension successfully encoded and added: %s...",
+							"Chrome extension successfully encoded and added: %s...",
 							new String(base64EncodedByteArray).substring(0, 64)));
 				} catch (FileNotFoundException e1) {
 					System.out.println(
-							"Chrome Extension not found: " + extensionLocation + " " + e1);
+							"Chrome extension not found: " + extensionFilePath + " " + e1);
 				} catch (IOException e2) {
-					System.out.println("Problem in reading The Chrome Extension" + e2);
+					System.out.println("Problem with reading Chrome extension: " + e2);
 				}
 			}
 			chromeOptions.addEncodedExtensions(chromeExtensionsBase64Encoded);
@@ -177,7 +184,6 @@ public class BaseTest {
 			chromePrefs.put("download.prompt_for_download", "false");
 			chromePrefs.put("download.directory_upgrade", "true");
 			chromePrefs.put("plugins.always_open_pdf_externally", "true");
-
 
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
@@ -231,7 +237,7 @@ public class BaseTest {
 			profile.setAssumeUntrustedCertificateIssuer(true);
 			profile.setEnableNativeEvents(false);
 
-			System.out.println(System.getProperty("user.dir"));
+			// System.out.println(System.getProperty("user.dir"));
 			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 			try {
 				driver = new FirefoxDriver(capabilities);
@@ -300,7 +306,62 @@ public class BaseTest {
 						.executeScript("arguments[0].style.border=''", element);
 			}
 		} catch (InterruptedException e) {
+			// System.err.println("Exception (ignored): " + e.toString());
+		}
+	}
+
+	protected void highlightNew(WebElement element, long highlight_interval) {
+		Rectangle elementRect = element.getRect();
+		String highlightScript = getScriptContent("highlight.js");
+		// append calling
+
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						String.format(
+								"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
+								highlightScript),
+						elementRect.y, elementRect.x, elementRect.width,
+						elementRect.height);
+			}
+			Thread.sleep(highlight_interval);
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						String.format("%s\nhighlight_remove();", highlightScript));
+			}
+		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
+		}
+
+	}
+
+	protected static String getScriptContent(String scriptName) {
+		try {
+			final InputStream stream = SuvianTest.class.getClassLoader()
+					.getResourceAsStream(scriptName);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			return new String(bytes, "UTF-8");
+		} catch (IOException e) {
+			throw new RuntimeException(scriptName);
+		}
+	}
+
+	public void flash(WebElement element) {
+		String bgcolor = element.getCssValue("backgroundColor");
+		for (int i = 0; i < 3; i++) {
+			changeColor("rgb(0,200,0)", element);
+			changeColor(bgcolor, element);
+		}
+	}
+
+	public void changeColor(String color, WebElement element) {
+		js.executeScript("arguments[0].style.backgroundColor = '" + color + "'",
+				element);
+		try {
+			Thread.sleep(20);
+		} catch (InterruptedException e) {
 		}
 	}
 
@@ -399,21 +460,22 @@ public class BaseTest {
 	// https://github.com/lopukhDA/Angular-tests-on-c-sharp-and-protractor/blob/master/NUnit.Tests1/WebDriver.cs
 	public Boolean checkElementAttribute(WebElement element, String value,
 			Optional<String> attributeOpt) {
-		Boolean flag = false;
 		String attribute = attributeOpt.isPresent() ? attributeOpt.get() : "class";
-		if (element.getAttribute(attribute).contains(value)) {
-			flag = true;
-		}
-		return flag;
+		return (element.getAttribute(attribute).contains(value)) ? true : false;
 	}
 
 	public Boolean checkElementAttribute(WebElement element, String value,
 			String... attributes) {
-		Boolean flag = false;
 		String attribute = attributes.length > 0 ? attributes[0] : "class";
-		if (element.getAttribute(attribute).contains(value)) {
-			flag = true;
-		}
-		return flag;
+		return (element.getAttribute(attribute).contains(value)) ? true : false;
 	}
+
+	protected boolean areElementsPresent(WebElement parentWebElement,
+			By byLocator) {
+		return parentWebElement.findElements(byLocator).size() == 1;
+		// usage:
+		// assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*=
+		// product]")).get(0), By.cssSelector("[class*=sticker]")));
+	}
+
 }

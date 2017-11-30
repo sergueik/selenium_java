@@ -112,6 +112,11 @@ import static org.testng.Assert.assertNotEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.AssertJUnit.fail;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class TripAdvisorTest {
 
 	private static WebDriver driver;
@@ -140,16 +145,17 @@ public class TripAdvisorTest {
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
-      // origin: https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
-      // http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
+			// origin:
+			// https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
+			// http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
 
 			Map<String, Object> prefs = new HashMap<>();
 			prefs.put("profile.default_content_settings.popups", 0);
-      //Put this into prefs map to switch off browser notification
-      prefs.put("profile.default_content_setting_values.notifications", 2);
-      //Put this into prefs map to switch off save password notification
-      prefs.put("credentials_enable_service", false);
-      prefs.put("profile.password_manager_enabled", false);
+			// Put this into prefs map to switch off browser notification
+			prefs.put("profile.default_content_setting_values.notifications", 2);
+			// Put this into prefs map to switch off save password notification
+			prefs.put("credentials_enable_service", false);
+			prefs.put("profile.password_manager_enabled", false);
 			String downloadPath = System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + "target"
 					+ System.getProperty("file.separator");
@@ -160,10 +166,10 @@ public class TripAdvisorTest {
 			for (String optionAgrument : (new String[] {
 					"--allow-running-insecure-content", "--allow-insecure-localhost",
 					"--enable-local-file-accesses", "--disable-notifications",
-          "--disable-save-password-bubble",
+					"--disable-save-password-bubble",
 					/* "start-maximized" , */
-					"--browser.download.folderList=2",
-          "--disable-web-security", "--no-proxy-server",
+					"--browser.download.folderList=2", "--disable-web-security",
+					"--no-proxy-server",
 					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
 					String.format("--browser.download.dir=%s", downloadPath)
 					/* "--user-data-dir=/path/to/your/custom/profile"  , */
@@ -184,9 +190,10 @@ public class TripAdvisorTest {
 			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 			driver = new ChromeDriver(capabilities);
-			
+
 		} else if (browser.equals("firefox")) {
-			// TODO: Observed user agent problem with firefox - mobile version of tripadvisor is rendered
+			// TODO: Observed user agent problem with firefox - mobile version of
+			// tripadvisor is rendered
 			System.setProperty("webdriver.gecko.driver",
 					osName.toLowerCase().startsWith("windows")
 							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()

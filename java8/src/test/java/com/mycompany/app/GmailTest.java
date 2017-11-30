@@ -63,6 +63,7 @@ public class GmailTest extends BaseTest {
 		// click on Sign in link
 		driver.findElement(signInLink).click();
 
+		// enter a non-existing account
 		enterData(identifier, "InvalidUser_UVW");
 
 		// Click on next button
@@ -83,7 +84,7 @@ public class GmailTest extends BaseTest {
 		driver.findElement(signInLink).click();
 		sleep(1000);
 
-		// Enter the email id
+		// Enter existing email id
 		enterData(identifier, "automationnewuser24@gmail.com");
 
 		// Click on next button
@@ -97,7 +98,7 @@ public class GmailTest extends BaseTest {
 
 		// Inspect error messages
 		List<WebElement> errMsg = waitForElements(
-				By.xpath("//*[contains (text(),'Wrong password. Try again.')]"));
+				By.xpath("//*[contains (text(),'Wrong password')]"));
 		assertTrue(errMsg.size() > 0);
 	}
 

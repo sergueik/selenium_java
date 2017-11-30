@@ -32,6 +32,11 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class LabelInputFinderTest extends BaseTest {
 
 	public String baseURL = "https://v4-alpha.getbootstrap.com/components/forms/";
