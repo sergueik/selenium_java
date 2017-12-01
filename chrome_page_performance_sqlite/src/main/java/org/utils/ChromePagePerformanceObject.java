@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +28,11 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class ChromePagePerformanceObject {
 
 	private static final String JAVASCRIPT = "var performance = window.performance;"
@@ -38,12 +44,12 @@ public class ChromePagePerformanceObject {
 	public Map<String, Double> getPageElementTimers() {
 		return pageElementTimers;
 	}
+
 	private Map<String, Double> pageEventTimers;
 
 	public Map<String, Double> getPageEventTimers() {
 		return pageEventTimers;
 	}
-
 
 	private boolean debug = false;
 
@@ -59,7 +65,8 @@ public class ChromePagePerformanceObject {
 
 	private WebDriverWait wait;
 
-	public ChromePagePerformanceObject(WebDriver driver, String data, boolean javaScript) {
+	public ChromePagePerformanceObject(WebDriver driver, String data,
+			boolean javaScript) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, flexibleWait);
 
@@ -85,7 +92,8 @@ public class ChromePagePerformanceObject {
 		setTimer(driver);
 	}
 
-	public ChromePagePerformanceObject(WebDriver driver, String startUrl, By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, String startUrl,
+			By navigator) {
 		this.driver = driver;
 		this.wait = new WebDriverWait(driver, flexibleWait);
 		driver.navigate().to(startUrl);
@@ -93,7 +101,7 @@ public class ChromePagePerformanceObject {
 				.click();
 		waitPageToLoad(this.driver, this.wait);
 		setTimer(driver);
-    setTimerNew(driver);
+		setTimerNew(driver);
 	}
 
 	public ChromePagePerformanceObject(String endUrl) {
@@ -160,11 +168,11 @@ public class ChromePagePerformanceObject {
 	private Map<String, Double> CreateDateMapFromJSON(String payload)
 			throws JSONException {
 
-		ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> result = new ArrayList<>();
 		// select columns to collect
 		Pattern columnSelectionattern = Pattern.compile("(?:name|duration)");
 		// ignore page events
-		ArrayList<String> events = new ArrayList<>(Arrays.asList(new String[] {
+		List<String> events = new ArrayList<>(Arrays.asList(new String[] {
 				"first-contentful-paint", "first-paint", "intentmedia.all.end",
 				"intentmedia.all.start", "intentmedia.core.fetch.page.request",
 				"intentmedia.core.fetch.page.response", "intentmedia.core.init.end",
@@ -324,6 +332,7 @@ public class ChromePagePerformanceObject {
 
 	@Override
 	public String toString() {
-		return "org.utils.ChromePagePerformanceObject{" + "pageEventTimers=" + pageEventTimers.toString() + '}';
+		return "org.utils.ChromePagePerformanceObject{" + "pageEventTimers="
+				+ pageEventTimers.toString() + '}';
 	}
 }

@@ -84,7 +84,7 @@ public class ChromePagePerformanceTest {
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		ChromeOptions options = new ChromeOptions();
 
-		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+		Map<String, Object> chromePrefs = new HashMap<>();
 
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		String downloadFilepath = System.getProperty("user.dir")
@@ -94,38 +94,31 @@ public class ChromePagePerformanceTest {
 		chromePrefs.put("enableNetwork", "true");
 		options.setExperimentalOption("prefs", chromePrefs);
 
-		for (String optionAgrument : (new String[] {
-				"allow-running-insecure-content", "allow-insecure-localhost",
-				"enable-local-file-accesses", "disable-notifications",
+		for (String option : (new String[] { "allow-running-insecure-content",
+				"allow-insecure-localhost", "enable-local-file-accesses",
+				"disable-notifications",
 				/* "start-maximized" , */
 				"browser.download.folderList=2",
 				"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
 				String.format("browser.download.dir=%s", downloadFilepath)
 				/* "user-data-dir=/path/to/your/custom/profile"  , */
 		})) {
-			options.addArguments(optionAgrument);
+			options.addArguments(option);
 		}
 		// options for headless
 		if (headless) {
-
-			if (osName.toLowerCase().startsWith("windows")) {
-
-				for (String headlessOptionAgrument : (new String[] { "headless",
-						"disable-gpu", "disable-plugins", "window-size=1200x600",
-						"window-position=-9999,0" })) {
-					options.addArguments(headlessOptionAgrument);
-				}
-				// on Windows need ChromeDriver 2.31 / Chrome 60 to support headless
-				// With earlier versions of chromedriver: chrome not reachable...
-				// https://developers.google.com/web/updates/2017/04/headless-chrome
-				// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
-			} else {
-				for (String headlessOptionAgrument : (new String[] { "headless",
-						"disable-gpu", "remote-debugging-port=9222",
-						"window-size=1200x600" })) {
-					options.addArguments(headlessOptionAgrument);
-				}
+			// headless option arguments
+			for (String option : (osName.toLowerCase().startsWith("windows"))
+					? new String[] { "headless", "disable-gpu", "disable-plugins",
+							"window-size=1200x600", "window-position=-9999,0" }
+					: new String[] { "headless", "disable-gpu",
+							"remote-debugging-port=9222", "window-size=1200x600" }) {
+				options.addArguments(option);
 			}
+			// on Windows need ChromeDriver 2.31 / Chrome 60 to support headless
+			// With earlier versions of chromedriver: chrome not reachable...
+			// https://developers.google.com/web/updates/2017/04/headless-chrome
+			// https://stackoverflow.com/questions/43880619/headless-chrome-and-selenium-on-windows
 		}
 
 		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
@@ -137,15 +130,19 @@ public class ChromePagePerformanceTest {
 			// origin:
 			// https://www.tutorialspoint.com/sqlite/sqlite_java.htm
 			Class.forName("org.sqlite.JDBC");
-			String dbURL = "jdbc:sqlite:performance.db";
-			conn = DriverManager.getConnection(dbURL);
+			// String dbURL = "jdbc:sqlite:performance.db";
+			conn = DriverManager.getConnection("jdbc:sqlite:performance.db");
 			if (conn != null) {
 				// System.out.println("Connected to the database");
 				DatabaseMetaData databaseMetadata = conn.getMetaData();
-				// System.out.println("Driver name: " + databaseMetadata.getDriverName());
-				// System.out.println("Driver version: " + databaseMetadata.getDriverVersion());
-				// System.out.println("Product name: " + databaseMetadata.getDatabaseProductName());
-				// System.out.println("Product version: " + databaseMetadata.getDatabaseProductVersion());
+				// System.out.println("Driver name: " +
+				// databaseMetadata.getDriverName());
+				// System.out.println("Driver version: " +
+				// databaseMetadata.getDriverVersion());
+				// System.out.println("Product name: " +
+				// databaseMetadata.getDatabaseProductName());
+				// System.out.println("Product version: " +
+				// databaseMetadata.getDatabaseProductVersion());
 				createNewTable();
 				// insertData("name", 1.0);
 				// conn.close();
@@ -214,7 +211,8 @@ public class ChromePagePerformanceTest {
 		double pageLoadTime = pageLoadTimer.getLoadTime(driver, baseURL,
 				elementSelector);
 		System.out.println("Page Load Time: " + pageLoadTime);
-		Map<String, Double> pageElementTimers = pageLoadTimer.getPageElementTimers();
+		Map<String, Double> pageElementTimers = pageLoadTimer
+				.getPageElementTimers();
 		if (conn != null) {
 			Set<String> names = pageElementTimers.keySet();
 			for (String name : names) {
@@ -260,4 +258,5 @@ public class ChromePagePerformanceTest {
 			System.err.println(e.getMessage());
 		}
 	}
+
 }

@@ -36,6 +36,10 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
 public class ChromePagePerformanceUtil {
 
@@ -170,11 +174,11 @@ public class ChromePagePerformanceUtil {
 	private Map<String, Double> CreateDateMapFromJSON(String payload)
 			throws JSONException {
 
-		ArrayList<Map<String, String>> result = new ArrayList<Map<String, String>>();
+		List<Map<String, String>> result = new ArrayList<>();
 		// select columns to collect
 		Pattern columnSelectionattern = Pattern.compile("(?:name|duration)");
 		// ignore page events
-		ArrayList<String> events = new ArrayList<>(Arrays.asList(new String[] {
+		List<String> events = new ArrayList<>(Arrays.asList(new String[] {
 				"first-contentful-paint", "first-paint", "intentmedia.all.end",
 				"intentmedia.all.start", "intentmedia.core.fetch.page.request",
 				"intentmedia.core.fetch.page.response", "intentmedia.core.init.end",

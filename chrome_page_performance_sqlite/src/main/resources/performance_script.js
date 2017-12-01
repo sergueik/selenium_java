@@ -1,3 +1,4 @@
+// see also: https://github.com/addyosmani/timing.js/blob/master/timing.js
 var ua = window.navigator.userAgent;
 if (ua.match(/PhantomJS/)) {
   return [{}];
