@@ -338,7 +338,7 @@ public class BaseTest {
 
 	protected static String getScriptContent(String scriptName) {
 		try {
-			final InputStream stream = SuvianTest.class.getClassLoader()
+			final InputStream stream = BaseTest.class.getClassLoader()
 					.getResourceAsStream(scriptName);
 			final byte[] bytes = new byte[stream.available()];
 			stream.read(bytes);

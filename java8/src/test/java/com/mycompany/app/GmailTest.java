@@ -1,5 +1,10 @@
 package com.mycompany.app;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
@@ -226,7 +231,8 @@ public class GmailTest extends BaseTest {
 		sleep(1000);
 	}
 
-	@Test(priority = 4, enabled = true)
+	// the gmail of showing the identity confirmation page the test is not ready to handle
+	@Test(priority = 4, enabled = false)
 	public void loginTest() throws InterruptedException, IOException {
 
 		// Click on Sign in Link
@@ -283,18 +289,18 @@ public class GmailTest extends BaseTest {
 		wait.until(new ExpectedCondition<Boolean>() {
 			@Override
 			public Boolean apply(WebDriver driver) {
-        System.err.println("Wait for form to finish rendering");
+				System.err.println("Wait for form to finish rendering");
 				JavascriptExecutor js = ((JavascriptExecutor) driver);
 				Boolean active = (Boolean) js
 						.executeScript("return document.readyState == 'complete'");
-            if (active) { 
-              System.err.println("Done");
-            }
+				if (active) {
+					System.err.println("Done");
+				}
 				return active;
 			}
 		});
 
-    System.err.println("Click on profile image");
+		System.err.println("Click on profile image");
 		// Click on profile image
 		wait.until((WebDriver driver) -> {
 			WebElement element = null;
@@ -308,14 +314,14 @@ public class GmailTest extends BaseTest {
 
 		// Wait until form is redndered, lambda semantics
 		wait.until((WebDriver driver) -> {
-      System.err.println("Wait for form to finish rendering");
-      JavascriptExecutor js = ((JavascriptExecutor) driver);
-      Boolean active = (Boolean) js
-        .executeScript("return document.readyState == 'complete'");
-        if (active) { 
-          System.err.println("Done");
-        }
-      return active;
+			System.err.println("Wait for form to finish rendering");
+			JavascriptExecutor js = ((JavascriptExecutor) driver);
+			Boolean active = (Boolean) js
+					.executeScript("return document.readyState == 'complete'");
+			if (active) {
+				System.err.println("Done");
+			}
+			return active;
 		});
 
 		// Sign out
@@ -328,7 +334,8 @@ public class GmailTest extends BaseTest {
 			alert.accept();
 		} catch (NoAlertPresentException ex) {
 			// Alert not present
-			System.err.println("NoAlertPresentException (ignored): " + ex.getStackTrace());
+			System.err
+					.println("NoAlertPresentException (ignored): " + ex.getStackTrace());
 			return;
 		} catch (WebDriverException ex) {
 			System.err.println("Alert was not handled by PhantomJS: "
