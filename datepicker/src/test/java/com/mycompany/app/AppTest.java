@@ -4,7 +4,6 @@ import java.awt.Toolkit;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.IOException;
 
 import java.lang.RuntimeException;
 
@@ -74,6 +73,11 @@ import static java.lang.Boolean.*;
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
+
 public class AppTest {
 
 	private static WebDriver driver;
@@ -101,22 +105,24 @@ public class AppTest {
 		calendar = new GregorianCalendar();
 		calendar.add(Calendar.DAY_OF_YEAR, 4);
 		// SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-    // for 4-digit yer for locale-specific dateFormat, use workaround 
-    // http://stackoverflow.com/questions/7796321/simpledateformat-pattern-based-on-locale
-    DateFormat dateFormatLocale =  DateFormat.getDateInstance(DateFormat.SHORT, Locale.US);
-    SimpleDateFormat simpleDateFormatLocale = (SimpleDateFormat) dateFormatLocale;
-    String pattern = simpleDateFormatLocale.toPattern().replaceAll("\\byy\\b", "yyyy");
-    SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+		// for 4-digit yer for locale-specific dateFormat, use workaround
+		// http://stackoverflow.com/questions/7796321/simpledateformat-pattern-based-on-locale
+		DateFormat dateFormatLocale = DateFormat.getDateInstance(DateFormat.SHORT,
+				Locale.US);
+		SimpleDateFormat simpleDateFormatLocale = (SimpleDateFormat) dateFormatLocale;
+		String pattern = simpleDateFormatLocale.toPattern().replaceAll("\\byy\\b",
+				"yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 		dateString = dateFormat.format(calendar.getTime());
-    System.err.println("Testing date: " + dateString);
+		System.err.println("Testing date: " + dateString);
 		driver.get(baseURL);
 	}
 
 	@Before
 	public void beforeTest() {
 		driver.get(baseURL);
-		frame = driver.switchTo().frame(
-				driver.findElement(By.cssSelector("iframe.demo-frame")));
+		frame = driver.switchTo()
+				.frame(driver.findElement(By.cssSelector("iframe.demo-frame")));
 	}
 
 	@After
@@ -140,8 +146,8 @@ public class AppTest {
 		WebElement element = frame.findElement(By.cssSelector(cssSelector));
 		highlight(element);
 		setDate(frame, cssSelector, dateString);
-		System.err.println("datepicker input value: "
-			+ element.getAttribute("value"));
+		System.err
+				.println("datepicker input value: " + element.getAttribute("value"));
 		System.err.println("datepicker getDate(): " + getDate(frame, cssSelector));
 	}
 
@@ -154,8 +160,8 @@ public class AppTest {
 		WebElement element = frame.findElement(By.cssSelector(cssSelector));
 		highlight(element);
 		element.click();
-		WebElement dateWidget = driver.findElement(By
-			.xpath("//*[@id = 'ui-datepicker-div' ]"));
+		WebElement dateWidget = driver
+				.findElement(By.xpath("//*[@id = 'ui-datepicker-div' ]"));
 		dateWidget.sendKeys(Keys.ARROW_RIGHT);
 		dateWidget.sendKeys(Keys.ENTER);
 	}
@@ -170,10 +176,10 @@ public class AppTest {
 		element = frame.findElement(By.xpath(xpath));
 
 		element.click();
-		WebElement dateWidget = driver.findElement(By
-			.xpath("//*[@id = 'ui-datepicker-div' ]"));
-		Enumeration<WebElement> elements = Collections.enumeration(dateWidget
-			.findElements(By.tagName("td")));
+		WebElement dateWidget = driver
+				.findElement(By.xpath("//*[@id = 'ui-datepicker-div' ]"));
+		Enumeration<WebElement> elements = Collections
+				.enumeration(dateWidget.findElements(By.tagName("td")));
 		String dayString = String.format("%d", calendar.get(Calendar.DAY_OF_MONTH));
 		while (elements.hasMoreElements()) {
 			WebElement currentElement = elements.nextElement();
@@ -185,26 +191,24 @@ public class AppTest {
 				System.err.println("day of month: " + currentElement.getText());
 			}
 		}
-		WebElement monthElement = driver
-			.findElement(By
-				.xpath("//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-month' ]"));
+		WebElement monthElement = driver.findElement(By.xpath(
+				"//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-month' ]"));
 		assertEquals(new SimpleDateFormat("MMMM").format(calendar.getTime()),
-			monthElement.getText());
+				monthElement.getText());
 		System.err.println("month: " + monthElement.getText());
-		WebElement yearElement = driver
-			.findElement(By
-				.xpath("//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-year' ]"));
+		WebElement yearElement = driver.findElement(By.xpath(
+				"//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-year' ]"));
 		assertEquals(String.format("%d", calendar.get(Calendar.YEAR)),
-			yearElement.getText());
+				yearElement.getText());
 		System.err.println("year: " + yearElement.getText());
 	}
 
 	private String getDate(WebDriver driver, String cssSelector)
-		throws InterruptedException {
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-			.cssSelector(cssSelector)));
-		Object result = executeScript(String.format(
-			"$('%s').datepicker('getDate')", cssSelector));
+			throws InterruptedException {
+		wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(cssSelector)));
+		Object result = executeScript(
+				String.format("$('%s').datepicker('getDate')", cssSelector));
 		if (result != null) {
 			return result.toString();
 		} else {
@@ -213,15 +217,15 @@ public class AppTest {
 	}
 
 	private void setDate(WebDriver driver, String cssSelector, String date)
-		throws InterruptedException {
+			throws InterruptedException {
 		// Java 8 style
 		/*
 		 * new WebDriverWait(driver, flexible_wait).until( (WebDriver d) ->
 		 * d.findElement(By.cssSelector(cssSelector)).isDisplayed() );
 		 */
 		// Java 7 style
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By
-			.cssSelector(cssSelector)));
+		wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(cssSelector)));
 		// alternatively use defaultDate instead of setDate:
 		// $('#dateselector').datepicker('option', 'defaultDate', targetDate);
 		// http://stackoverflow.com/questions/606463/jquery-datepicker-set-selected-date-on-the-fly
@@ -237,7 +241,7 @@ public class AppTest {
 	}
 
 	private void highlight(WebElement element, long highlight)
-		throws InterruptedException {
+			throws InterruptedException {
 		wait.until(ExpectedConditions.visibilityOf(element));
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlight);
@@ -247,7 +251,7 @@ public class AppTest {
 	private Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
 			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-				.cast(driver);
+					.cast(driver);
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
