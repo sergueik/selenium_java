@@ -7,6 +7,7 @@ import java.io.InputStream;
 
 import java.lang.RuntimeException;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -85,7 +86,7 @@ public class JqueryDatePickerTest extends BaseTest {
 	private String selector = null;
 	private static int afterTest = 10000;
 
-	private static String baseURL = "http://jqueryui.com/datepicker/";
+	private static String baseURL = "http://jqueryui.com/datepicker/#buttonbar";
 	private static String dateString;
 	private static Calendar calendar;
 	private static final StringBuffer verificationErrors = new StringBuffer();
@@ -98,7 +99,7 @@ public class JqueryDatePickerTest extends BaseTest {
 		calendar = new GregorianCalendar();
 		calendar.add(Calendar.DAY_OF_YEAR, 4);
 		// SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
-		// for 4-digit yer for locale-specific dateFormat, use workaround
+		// for 4-digit year for locale-specific dateFormat, use workaround
 		// http://stackoverflow.com/questions/7796321/simpledateformat-pattern-based-on-locale
 		DateFormat dateFormatLocale = DateFormat.getDateInstance(DateFormat.SHORT,
 				Locale.US);
@@ -114,6 +115,10 @@ public class JqueryDatePickerTest extends BaseTest {
 	public void beforeMethod(Method method) {
 		super.beforeMethod(method);
 		driver.get(baseURL);
+		String buttonBarSelector = "#content > div.demo-list > ul > li.active > a[href *= '/buttonbar.html']";
+		WebElement element = driver.findElement(By.cssSelector(buttonBarSelector));
+		highlight(element);
+		element.click();
 		frame = driver.switchTo()
 				.frame(driver.findElement(By.cssSelector("iframe.demo-frame")));
 	}
@@ -124,9 +129,13 @@ public class JqueryDatePickerTest extends BaseTest {
 	}
 
 	@AfterClass
-	public void afterTest() {
+	public void afterClass() {
 		sleep(afterTest);
-		super.afterTest();
+		try {
+			super.afterClass();
+		} catch (Exception e) {
+			System.err.println("Exception (ignored): " + e.toString());
+		}
 		if (verificationErrors.length() != 0) {
 			throw new RuntimeException(verificationErrors.toString());
 		}
@@ -144,21 +153,23 @@ public class JqueryDatePickerTest extends BaseTest {
 	}
 
 	// http://software-testing.ru/forum/index.php?/topic/31835-peredacha-daty-v-pole/
-	// keyboard navigation works with some jqueryUI-deriver datepicker widgets
+	// keyboard navigation works with some jqueryUI-derived datepicker widgets
 	// e.g. https://yt.ua/ru/railway
-	@Test
+	@Test(priority = 2, enabled = false)
 	public void keyboardNavigationTest() throws Exception {
 		String cssSelector = "#datepicker";
 		WebElement element = frame.findElement(By.cssSelector(cssSelector));
-		highlight(element);
+		highlight(element, 1000);
 		element.click();
+		wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.xpath("//*[@id = 'ui-datepicker-div' ]")));
 		WebElement dateWidget = driver
 				.findElement(By.xpath("//*[@id = 'ui-datepicker-div' ]"));
 		dateWidget.sendKeys(Keys.ARROW_RIGHT);
 		dateWidget.sendKeys(Keys.ENTER);
 	}
 
-	@Test
+	@Test(priority = 3, enabled = true)
 	public void setDateTest() throws Exception {
 		String cssSelector = "#datepicker";
 		WebElement element = frame.findElement(By.cssSelector(cssSelector));
@@ -180,11 +191,14 @@ public class JqueryDatePickerTest extends BaseTest {
 			}
 			if (currentElement.getText().equals(dayString)) {
 				highlight(currentElement);
+				// NOTE: flash->() has no visual effect ?
+				flash(currentElement);
 				System.err.println("day of month: " + currentElement.getText());
 			}
 		}
 		WebElement monthElement = driver.findElement(By.xpath(
 				"//div[@class = 'ui-datepicker-title']/span[@class = 'ui-datepicker-month' ]"));
+		flash(monthElement);
 		assertEquals(new SimpleDateFormat("MMMM").format(calendar.getTime()),
 				monthElement.getText());
 		System.err.println("month: " + monthElement.getText());

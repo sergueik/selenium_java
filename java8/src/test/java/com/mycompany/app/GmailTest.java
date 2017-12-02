@@ -1,10 +1,5 @@
 package com.mycompany.app;
 
-/**
- * Selected test scenarios for Selenium WebDriver
- * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
- */
-
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertTrue;
@@ -25,6 +20,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+/**
+ * Selected test scenarios for Selenium WebDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
 public class GmailTest extends BaseTest {
 
