@@ -1,0 +1,578 @@
+[
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='pluralsight horizontal--logo']"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "header_nav_primary"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles software-development header_tabs_link active']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles it-ops header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles creative-professional header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles data-professional header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles architecture-construction header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles manufacturing-design header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles business-professional header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//li[@class='header_roles info-cybersecurity header_tabs_link']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Web Development']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='C++']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Mobile Development']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//ul[@class='header_topics_menu']//li[@class='last']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Angular2']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Database Administration']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Servers']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Microsoft Office']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Linux']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Cloud Computing']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='3D Design']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='VFX']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@class='item  creative']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='3D \u0026 Visual Effects']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Visual Communication']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Big Data']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Revit']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='V-Ray']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='AutoCAD']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Adobe']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='3ds Max']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Drafting']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Architecture Modeling']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='BIM']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Structural Modeling']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Visualization Rendering']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Civil Engineering']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Sketchbook']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Solidworks']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Modo']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='PMP® Exam Prep']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Kanban']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Secure by Design']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='hidden header_search--url']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='header_sign_up_link']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='header_sign_in_link sign_in_link']"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "header_menu"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='btn-xs header_sign_up_link']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='btn-xs flat white header_sign_in_link sign_in_link']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='tiles--thumb outline scale--4']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Angular']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='MCSA']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='CCNP']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Network+']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='fundamentals of security']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='security auditing']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='digital forensics']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='ethical hacking']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='malware analysis']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='btn lg']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@class='universe--toggle universe--main']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='iris']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='advanced']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='certifications']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='channel-analytics']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='library']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='library-business']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='iq']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='mentors']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='mobile']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@data='paths']//div[@class='universe--info--desc']//a"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='button  button--small cta-link']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='See all features']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Start a FREE 10-Day Trial']"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "redirect-path"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='About']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Events']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Small business']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Academic']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Federal government']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='State \u0026 local government']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Free courses for kids']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Browse library']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Pluralsight IQ']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Iris']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Paths']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Mentoring']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Authors']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Mobile apps']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Professional Services']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Help center']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Knowledge base']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Integrations']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='IP whitelist']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Partners']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='PluralsightOne.org']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Customer stories']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Teach']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Blog']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Newsroom']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Pluralsight engineering']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Affiliate program']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Subscribe']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link face-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link insta-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link tweet-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link linkedin-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link goog-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[@class='share__link youtube-icon']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Site Map']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Terms of Use']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//a[normalize-space(text())='Privacy Policy']"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "header_search--input"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "search-menu__search-term--shadow"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "persona--option_001"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "persona--option_002"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "persona--option_003"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "persona--option_004"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "universe--option--001"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "universe--option--002"
+  },
+  {
+    "locatorType": "id",
+    "locatorValue": "universe--option--003"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='21']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='27']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='40']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='6']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='26']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='33']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='10']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='22']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='64']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='7']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='25']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='5']"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//span[normalize-space(text())='42']"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "text-highlight-gradient"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "text-highlight-gradient-block"
+  },
+  {
+    "locatorType": "Xpath",
+    "locatorValue": "//div[@class='pillars--item personalize--security']//a//div[@class='pillars--meta']//span"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "ps_cigar_banner--title"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "form-preset"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "form-id"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "download-path"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "success-message"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "marketo-wid"
+  },
+  {
+    "locatorType": "class",
+    "locatorValue": "marketo-biz-email"
+  }
+]
