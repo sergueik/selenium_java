@@ -43,8 +43,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ChromePagePerformanceUtil {
 
-	private static final String JAVASCRIPT = "var performance = window.performance;"
-			+ "var timings = performance.timing;" + "return timings;";
+	private static String performanceTimerScript = String.format(
+			"%s\nreturn window.timing.getTimes();",
+			getScriptContent("performance_script.js"));
+	private static String performanceNetworkScript = String.format(
+			"%s\nreturn window.timing.getNetwork();",
+			getScriptContent("performance_script.js"));
+
+	private static final String simplePerformanceTimingsScript = "var performance = window.performancevar timings = performance.timing;"
+			+ "return timings;";
 
 	private Map<String, Double> pageElementTimers;
 
@@ -141,8 +148,17 @@ public class ChromePagePerformanceUtil {
 	}
 
 	private void setTimer(WebDriver driver) {
-		this.pageEventTimers = CreateDateMap(
-				((JavascriptExecutor) driver).executeScript(JAVASCRIPT).toString());
+		String result = ((JavascriptExecutor) driver)
+				.executeScript(
+						performanceTimerScript /* simplePerformanceTimingsScript */)
+				.toString();
+		if (result == null) {
+			throw new RuntimeException("result is null");
+		}
+		if (debug) {
+			System.err.println("Processig result: " + result);
+		}
+		this.pageEventTimers = CreateDateMap(result);
 	}
 
 	private double calculateLoadTime() {
@@ -237,10 +253,8 @@ public class ChromePagePerformanceUtil {
 	}
 
 	private void setTimerNew(WebDriver driver) {
-		String performanceScript = getScriptContent("performance_script.js");
-
 		this.pageElementTimers = CreateDateMapFromJSON(((JavascriptExecutor) driver)
-				.executeScript(performanceScript).toString());
+				.executeScript(performanceNetworkScript).toString());
 	}
 
 	protected static String getScriptContent(String scriptName) {

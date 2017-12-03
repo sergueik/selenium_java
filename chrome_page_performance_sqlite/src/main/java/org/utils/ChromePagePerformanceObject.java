@@ -35,8 +35,15 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class ChromePagePerformanceObject {
 
-	private static final String JAVASCRIPT = "var performance = window.performance;"
-			+ "var timings = performance.timing;" + "return timings;";
+	private static String performanceTimerScript = String.format(
+			"%s\nreturn window.timing.getTimes();",
+			getScriptContent("performance_script.js"));
+	private static String performanceNetworkScript = String.format(
+			"%s\nreturn window.timing.getNetwork();",
+			getScriptContent("performance_script.js"));
+
+	private static final String simplePerformanceTimingsScript = "var performance = window.performancevar timings = performance.timing;"
+			+ "return timings;";
 
 	private WebDriver driver;
 	private Map<String, Double> pageElementTimers;
@@ -133,15 +140,14 @@ public class ChromePagePerformanceObject {
 	}
 
 	private void setTimer(WebDriver driver) {
-		this.pageEventTimers = CreateDateMap(
-				((JavascriptExecutor) driver).executeScript(JAVASCRIPT).toString());
+
+		this.pageEventTimers = CreateDateMap(((JavascriptExecutor) driver)
+				.executeScript(performanceTimerScript).toString());
 	}
 
 	private void setTimerNew(WebDriver driver) {
-		String performanceScript = getScriptContent("performance_script.js");
-
 		this.pageElementTimers = CreateDateMapFromJSON(((JavascriptExecutor) driver)
-				.executeScript(performanceScript).toString());
+				.executeScript(performanceNetworkScript).toString());
 	}
 
 	private Map<String, Double> CreateDateMap(String payload) {
