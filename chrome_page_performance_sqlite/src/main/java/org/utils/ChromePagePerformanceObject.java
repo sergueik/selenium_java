@@ -39,7 +39,7 @@ public class ChromePagePerformanceObject {
 			"%s\nreturn window.timing.getTimes();",
 			getScriptContent("performance_script.js"));
 	private static String performanceNetworkScript = String.format(
-			"%s\nreturn window.timing.getNetwork();",
+			"%s\nreturn window.timing.getNetwork({stringify:true});",
 			getScriptContent("performance_script.js"));
 
 	private static final String simplePerformanceTimingsScript = "var performance = window.performancevar timings = performance.timing;"

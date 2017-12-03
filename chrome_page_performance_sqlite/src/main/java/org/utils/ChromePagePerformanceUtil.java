@@ -47,7 +47,7 @@ public class ChromePagePerformanceUtil {
 			"%s\nreturn window.timing.getTimes();",
 			getScriptContent("performance_script.js"));
 	private static String performanceNetworkScript = String.format(
-			"%s\nreturn window.timing.getNetwork();",
+			"%s\nreturn window.timing.getNetwork({stringify:true});",
 			getScriptContent("performance_script.js"));
 
 	private static final String simplePerformanceTimingsScript = "var performance = window.performancevar timings = performance.timing;"
@@ -156,7 +156,7 @@ public class ChromePagePerformanceUtil {
 			throw new RuntimeException("result is null");
 		}
 		if (debug) {
-			System.err.println("Processig result: " + result);
+			System.err.println("Processing result: " + result);
 		}
 		this.pageEventTimers = CreateDateMap(result);
 	}
@@ -190,6 +190,9 @@ public class ChromePagePerformanceUtil {
 	private Map<String, Double> CreateDateMapFromJSON(String payload)
 			throws JSONException {
 
+		if (debug) {
+			System.err.println("payload: " + payload);
+		}
 		List<Map<String, String>> result = new ArrayList<>();
 		// select columns to collect
 		Pattern columnSelectionattern = Pattern.compile("(?:name|duration)");
