@@ -117,7 +117,7 @@ import static org.testng.AssertJUnit.fail;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-public class TripAdvisorTest extends BaseTest {
+public class TripAdvisorTest {
 
 	private static WebDriver driver;
 	public static WebDriverWait wait;
@@ -424,6 +424,52 @@ public class TripAdvisorTest extends BaseTest {
 		return osName;
 	}
 
+	private String cssSelectorOfElement(WebElement element) {
+		return (String) executeScript(getScriptContent("cssSelectorOfElement.js"),
+				element);
+	}
+
+	private String styleOfElement(WebElement element, Object... arguments) {
+		return (String) executeScript(getScriptContent("getStyle.js"), element,
+				arguments);
+	}
+
+	private String cssSelectorOfElementAlternative(WebElement element) {
+		return (String) executeScript(
+				getScriptContent("cssSelectorOfElementAlternative.js"), element);
+	}
+
+	private void highlight(WebElement element) {
+		highlight(element, highlight_interval);
+	}
+
+	private static void highlight(WebElement element, long highlight) {
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript("arguments[0].style.border='3px solid yellow'",
+					new Object[] { element });
+			Thread.sleep(highlight);
+			executeScript("arguments[0].style.border=''", new Object[] { element });
+
+		} catch (InterruptedException e) {
+			// System.err.println("Ignored: " + e.toString());
+		}
+	}
+
+	private String xpathOfElement(WebElement element) {
+		return (String) executeScript(getScriptContent("xpathOfElement.js"),
+				new Object[] { element });
+	}
+
+	public static Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver); // a.k.a. (JavascriptExecutor) driver;
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
+		}
+	}
 
 	private List<WebElement> findElements(String selectorKind,
 			String selectorValue, WebElement parent) {
@@ -701,4 +747,27 @@ public class TripAdvisorTest extends BaseTest {
 		});
 	}
 
+	public static boolean isElementNotVisible(By locator) {
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+			log.info("Element {} is visible", locator);
+			return false;
+		} catch (Exception e) {
+			log.info("Element {} is not visible", locator);
+			return true;
+		}
+	}
+
+	public static String getBodyText() {
+		log.info("Getting boby text");
+		return driver.findElement(By.tagName("body")).getText();
+	}
+
+	public static void highlight(By locator) throws InterruptedException {
+		log.info("Highlighting element {}", locator);
+		WebElement element = driver.findElement(locator);
+		executeScript("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlight_interval);
+		executeScript("arguments[0].style.border=''", element);
+	}
 }
