@@ -34,6 +34,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -49,6 +51,8 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Selected test scenarios for Selenium WebDriver
@@ -63,11 +67,13 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
+	private static final Logger log = LogManager.getLogger(BaseTest.class);
 
 	public int scriptTimeout = 5;
 	public int flexibleWait = 120;
 	public int implicitWait = 1;
 	public long pollingInterval = 500;
+	private static long highlight_interval = 100;
 
 	public String baseURL = "about:blank";
 
@@ -310,7 +316,15 @@ public class BaseTest {
 		}
 	}
 
-	protected void highlightNew(WebElement element, long highlight_interval) {
+	public void highlight(By locator) throws InterruptedException {
+		log.info("Highlighting element {}", locator);
+		WebElement element = driver.findElement(locator);
+		executeScript("arguments[0].style.border='3px solid yellow'", element);
+		Thread.sleep(highlight_interval);
+		executeScript("arguments[0].style.border=''", element);
+	}
+
+		protected void highlightNew(WebElement element, long highlight_interval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
 		// append calling
@@ -476,6 +490,61 @@ public class BaseTest {
 		// usage:
 		// assertTrue(areElementsPresent(driver.findElements(By.cssSelector("li[class*=
 		// product]")).get(0), By.cssSelector("[class*=sticker]")));
+	}
+
+	// Scroll
+	public void scroll(final int x, final int y) {
+		final JavascriptExecutor js = (JavascriptExecutor) driver;
+		for (int i = 0; i <= x; i = i + 50) {
+			js.executeScript("scroll(" + i + ",0)");
+		}
+		for (int j = 0; j <= y; j = j + 50) {
+			js.executeScript("scroll(0," + j + ")");
+		}
+	}
+
+	// origin:
+	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
+	public void scrolltoElement(WebElement element) {
+		Coordinates coordinate = ((Locatable) element).getCoordinates();
+		coordinate.onPage();
+		coordinate.inViewPort();
+	}
+
+	protected String cssSelectorOfElement(WebElement element) {
+		return (String) executeScript(getScriptContent("cssSelectorOfElement.js"),
+				element);
+	}
+
+	protected String styleOfElement(WebElement element, Object... arguments) {
+		return (String) executeScript(getScriptContent("getStyle.js"), element,
+				arguments);
+	}
+
+	protected String cssSelectorOfElementAlternative(WebElement element) {
+		return (String) executeScript(
+				getScriptContent("cssSelectorOfElementAlternative.js"), element);
+	}
+
+	protected String xpathOfElement(WebElement element) {
+		return (String) executeScript(getScriptContent("xpathOfElement.js"),
+				new Object[] { element });
+	}
+
+	protected boolean isElementNotVisible(By locator) {
+		try {
+			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+			log.info("Element {} is visible", locator);
+			return false;
+		} catch (Exception e) {
+			log.info("Element {} is not visible", locator);
+			return true;
+		}
+	}
+
+	protected String getBodyText() {
+		log.info("Getting boby text");
+		return driver.findElement(By.tagName("body")).getText();
 	}
 
 }

@@ -71,12 +71,11 @@ public class LabelInputFinderTest extends BaseTest {
 	@Test(priority = 2, enabled = false)
 	public void testInputByLabelTextOrdered() {
 		List<WebElement> labelElements = driver.findElements(By.tagName("label"));
-		// more info:
-		// https://www.mkyong.com/java/java-how-to-convert-a-primitive-array-to-list/
 		List<Integer> elementOrder = new ArrayList<Integer>();
 		for (int cnt = 0; cnt < labelElements.size(); cnt++) {
 			elementOrder.add(cnt);
 		}
+
 		Map<String, WebElement> elementMap = labelElements.stream()
 				// java.lang.IllegalArgumentException: Cannot find elements with a null
 				// id attribute.
@@ -122,42 +121,6 @@ public class LabelInputFinderTest extends BaseTest {
 			highlight(input);
 			flash(input);
 		});
-	}
-
-	public void flash(WebElement element) {
-		String bgcolor = element.getCssValue("backgroundColor");
-		for (int i = 0; i < 3; i++) {
-			changeColor("rgb(0,200,0)", element);
-			changeColor(bgcolor, element);
-		}
-	}
-
-	public void changeColor(String color, WebElement element) {
-		js.executeScript("arguments[0].style.backgroundColor = '" + color + "'",
-				element);
-		try {
-			Thread.sleep(20);
-		} catch (InterruptedException e) {
-		}
-	}
-
-	// Scroll
-	public void scroll(final int x, final int y) {
-		final JavascriptExecutor js = (JavascriptExecutor) driver;
-		for (int i = 0; i <= x; i = i + 50) {
-			js.executeScript("scroll(" + i + ",0)");
-		}
-		for (int j = 0; j <= y; j = j + 50) {
-			js.executeScript("scroll(0," + j + ")");
-		}
-	}
-
-	// origin:
-	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
-	public void scrolltoElement(WebElement element) {
-		Coordinates coordinate = ((Locatable) element).getCoordinates();
-		coordinate.onPage();
-		coordinate.inViewPort();
 	}
 
 }

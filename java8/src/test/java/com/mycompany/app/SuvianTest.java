@@ -600,8 +600,16 @@ public class SuvianTest extends BaseTest {
 				.collect(Collectors.toList());
 		// C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x =>
 		// x.Text);
-		Map<String, String> dataMap = inputElements.stream().collect(
-				Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
+		Map<String, String> dataMap = inputElements.stream().filter(o -> {
+			System.err.println("input element id: " + o);
+			System.err.println("input element text: " + o.getText());
+			System.err
+					.println("input element 'for' attribute: " + o.getAttribute("for"));
+			System.err.println("input element HTML: " + o.getAttribute("outerHTML"));
+			System.err.println("input element XPath: " + xpathOfElement(o));
+			System.err.println("input element CSS: " + cssSelectorOfElement(o));
+			return true;
+		}).collect(Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
 		List<WebElement> checkboxes = new ArrayList<>();
 		for (String hobby : hobbies) {
 			try {
@@ -632,6 +640,7 @@ public class SuvianTest extends BaseTest {
 				formElement.findElements(By.cssSelector("input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
+
 
 	// NOTE: this test is broken
 	// label follows the check box therefore
@@ -2776,7 +2785,7 @@ public class SuvianTest extends BaseTest {
 		return result;
 	}
 
-		public boolean isGreaterThen(String a, String b) {
+	public boolean isGreaterThen(String a, String b) {
 		return a.compareTo(b) < 0;
 		// usage:
 		// List<WebElement> rows =
@@ -2785,12 +2794,6 @@ public class SuvianTest extends BaseTest {
 		// for (int i = 0; i<rows.size()-1;i++) {
 		// assertTrue(isGreaterThen(rows.get(i).getAttribute("textContent"),rows.get(i+1).getAttribute("textContent")));
 		// }
-	}
-
-	private String styleOfElement(WebElement element, Object... arguments) {
-		String getStyleScript = getScriptContent("getStyle.js");
-
-		return (String) executeScript(getStyleScript, element, arguments);
 	}
 
 	// http://stackoverflow.com/questions/19384710/javascript-workaround-for-drag-and-drop-in-selenium-webdriver/26372276#26372276
