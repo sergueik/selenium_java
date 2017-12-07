@@ -78,7 +78,7 @@ public class BaseTest {
 	public String baseURL = "about:blank";
 
 	private List<String> chromeExtensions = new ArrayList<>();
-	private static String osName;
+	private static String osName = getOsName();
 
 	private String extensionDir = String.format(
 			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
@@ -175,7 +175,6 @@ public class BaseTest {
 	@BeforeClass
 	public void beforeClass() throws IOException {
 
-		getOsName();
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -324,7 +323,7 @@ public class BaseTest {
 		executeScript("arguments[0].style.border=''", element);
 	}
 
-		protected void highlightNew(WebElement element, long highlight_interval) {
+	protected void highlightNew(WebElement element, long highlight_interval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
 		// append calling
@@ -422,6 +421,9 @@ public class BaseTest {
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void killProcess(String processName) {
 
+		if (processName.isEmpty()) {
+			return;
+		}
 		String command = String.format((osName.toLowerCase().startsWith("windows"))
 				? "taskkill.exe /F /IM %s" : "killall %s", processName.trim());
 
