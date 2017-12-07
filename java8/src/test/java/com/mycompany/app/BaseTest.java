@@ -1,5 +1,7 @@
 package com.mycompany.app;
 
+import static com.mycompany.app.BaseTest.log;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -67,13 +69,13 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
-	private static final Logger log = LogManager.getLogger(BaseTest.class);
+	protected static final Logger log = LogManager.getLogger(BaseTest.class);
 
 	public int scriptTimeout = 5;
 	public int flexibleWait = 120;
 	public int implicitWait = 1;
 	public long pollingInterval = 500;
-	private static long highlight_interval = 100;
+	private static long highlightInterval = 100;
 
 	public String baseURL = "about:blank";
 
@@ -175,6 +177,13 @@ public class BaseTest {
 	@BeforeClass
 	public void beforeClass() throws IOException {
 
+		/*	 TODO: TripadvisorTest: observed user agent problem with firefox - mobile version of
+				 page is rendered, and the toast message displayed with the warning:
+				 "We noticed that you're using an unsupported browser. The TripAdvisor
+		     website may not display properly.We support the following browsers:
+				 Windows: Internet Explorer, Mozilla Firefox, Google Chrome. Mac:
+				 Safari".
+		*/
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -193,16 +202,32 @@ public class BaseTest {
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
 			chromeOptions.setExperimentalOption("prefs", chromePrefs);
-			chromeOptions.addArguments("allow-running-insecure-content");
-			chromeOptions.addArguments("allow-insecure-localhost");
-			chromeOptions.addArguments("enable-local-file-accesses");
-			chromeOptions.addArguments("disable-notifications");
-			// chromeOptions.addArguments("start-maximized");
-			chromeOptions.addArguments("browser.download.folderList=2");
-			chromeOptions.addArguments(
-					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
-			chromeOptions.addArguments("browser.download.dir=" + downloadFilepath);
+
+			for (String optionAgrument : (new String[] {
+					"--user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0",
+					"--allow-running-insecure-content", "--allow-insecure-localhost",
+					"--enable-local-file-accesses", "--disable-notifications",
+					"--disable-save-password-bubble",
+					/* "start-maximized" , */
+					"--browser.download.folderList=2", "--disable-web-security",
+					"--no-proxy-server",
+					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
+					String.format("--browser.download.dir=%s", downloadFilepath)
+					/* "--user-data-dir=/path/to/your/custom/profile"  , */
+
+			})) {
+				chromeOptions.addArguments(optionAgrument);
+			}
+
 			// chromeOptions.addArguments("user-data-dir=/path/to/your/custom/profile");
+			// options for headless
+			/*
+			for (String optionAgrument : (new String[] { "headless",
+					"window-size=1200x600", })) {
+				options.addArguments(optionAgrument);
+			}
+			*/
+
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
 			capabilities.setCapability(
@@ -241,7 +266,11 @@ public class BaseTest {
 			profile.setAcceptUntrustedCertificates(true);
 			profile.setAssumeUntrustedCertificateIssuer(true);
 			profile.setEnableNativeEvents(false);
-
+			// optional
+			/* 
+			 profile.setPreference("general.useragent.override",
+			 		"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
+			*/
 			// System.out.println(System.getProperty("user.dir"));
 			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 			try {
@@ -262,6 +291,7 @@ public class BaseTest {
 		js = ((JavascriptExecutor) driver);
 		// driver.manage().window().maximize();
 
+		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 		// Go to URL
 		driver.get(baseURL);
 	}
@@ -294,7 +324,7 @@ public class BaseTest {
 		highlight(element, 100);
 	}
 
-	public void highlight(WebElement element, long highlight_interval) {
+	public void highlight(WebElement element, long highlightInterval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
 		}
@@ -305,7 +335,7 @@ public class BaseTest {
 				((JavascriptExecutor) driver).executeScript(
 						"arguments[0].style.border='3px solid yellow'", element);
 			}
-			Thread.sleep(highlight_interval);
+			Thread.sleep(highlightInterval);
 			if (driver instanceof JavascriptExecutor) {
 				((JavascriptExecutor) driver)
 						.executeScript("arguments[0].style.border=''", element);
@@ -319,11 +349,11 @@ public class BaseTest {
 		log.info("Highlighting element {}", locator);
 		WebElement element = driver.findElement(locator);
 		executeScript("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
+		Thread.sleep(highlightInterval);
 		executeScript("arguments[0].style.border=''", element);
 	}
 
-	protected void highlightNew(WebElement element, long highlight_interval) {
+	protected void highlightNew(WebElement element, long highlightInterval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
 		// append calling
@@ -338,7 +368,7 @@ public class BaseTest {
 						elementRect.y, elementRect.x, elementRect.width,
 						elementRect.height);
 			}
-			Thread.sleep(highlight_interval);
+			Thread.sleep(highlightInterval);
 			if (driver instanceof JavascriptExecutor) {
 				((JavascriptExecutor) driver).executeScript(
 						String.format("%s\nhighlight_remove();", highlightScript));

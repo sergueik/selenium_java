@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.IOException;
 
 import java.lang.RuntimeException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -117,142 +118,25 @@ import static org.testng.AssertJUnit.fail;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-public class TripAdvisorTest {
+public class TripAdvisorTest extends BaseTest {
 
-	private static WebDriver driver;
-	public static WebDriverWait wait;
-	public static Actions actions;
-	private static long implicit_wait_interval = 3;
-	private static int flexible_wait_interval = 5;
-	private static long wait_polling_interval = 500;
-	private static long highlight_interval = 100;
 	private static String baseURL = "https://www.tripadvisor.com/";
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static final Logger log = LogManager.getLogger(TripAdvisorTest.class);
-	private static String osName;
-
 	private static Pattern pattern;
 	private static Matcher matcher;
 	private static final String browser = "firefox";
 
-	@BeforeSuite
-	@SuppressWarnings("deprecation")
-	public static void setUp() {
-		getOsName();
-		if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver",
-					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			ChromeOptions options = new ChromeOptions();
-			// origin:
-			// https://sqa.stackexchange.com/questions/26275/how-to-disable-chrome-save-your-password-selenium-java
-			// http://learn-automation.com/disable-chrome-notifications-selenium-webdriver/
-
-			Map<String, Object> prefs = new HashMap<>();
-			prefs.put("profile.default_content_settings.popups", 0);
-			// Put this into prefs map to switch off browser notification
-			prefs.put("profile.default_content_setting_values.notifications", 2);
-			// Put this into prefs map to switch off save password notification
-			prefs.put("credentials_enable_service", false);
-			prefs.put("profile.password_manager_enabled", false);
-			String downloadPath = System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + "target"
-					+ System.getProperty("file.separator");
-			prefs.put("download.default_directory", downloadPath);
-			prefs.put("enableNetwork", "true");
-			options.setExperimentalOption("prefs", prefs);
-
-			for (String optionAgrument : (new String[] {
-					"--user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0",
-					"--allow-running-insecure-content", "--allow-insecure-localhost",
-					"--enable-local-file-accesses", "--disable-notifications",
-					"--disable-save-password-bubble",
-					/* "start-maximized" , */
-					"--browser.download.folderList=2", "--disable-web-security",
-					"--no-proxy-server",
-					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
-					String.format("--browser.download.dir=%s", downloadPath)
-					/* "--user-data-dir=/path/to/your/custom/profile"  , */
-
-			})) {
-				options.addArguments(optionAgrument);
-			}
-
-			// options for headless
-			/*
-			for (String optionAgrument : (new String[] { "headless",
-					"window-size=1200x600", })) {
-				options.addArguments(optionAgrument);
-			}
-			*/
-			capabilities
-					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-
-			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-			driver = new ChromeDriver(capabilities);
-
-		} else if (browser.equals("firefox")) {
-			// TODO: Observed user agent problem with firefox - mobile version of
-			// Tripadvisor is rendered
-			// page shows the toast message with the warning:
-			// We noticed that you're using an unsupported browser. The TripAdvisor
-			// website may not display properly.We support the following browsers:
-			// Windows: Internet Explorer, Mozilla Firefox, Google Chrome. Mac:
-			// Safari.
-
-			System.setProperty("webdriver.gecko.driver",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: "/tmp/geckodriver");
-			System
-					.setProperty("webdriver.firefox.bin",
-							osName.toLowerCase().startsWith("windows") ? new File(
-									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-											.getAbsolutePath()
-									: "/usr/bin/firefox");
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			// use legacy FirefoxDriver
-			capabilities.setCapability("marionette", false);
-			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
-			capabilities.setCapability("locationContextEnabled", false);
-			capabilities.setCapability("acceptSslCerts", true);
-			capabilities.setCapability("elementScrollBehavior", 1);
-			FirefoxProfile profile = new FirefoxProfile();
-			profile.setAcceptUntrustedCertificates(true);
-			profile.setAssumeUntrustedCertificateIssuer(true);
-			profile.setEnableNativeEvents(false);
-			profile.setPreference("general.useragent.override",
-					"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
-
-			System.out.println(System.getProperty("user.dir"));
-			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-			try {
-				driver = new FirefoxDriver(capabilities);
-			} catch (WebDriverException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot initialize Firefox driver");
-			}
-		}
-		wait = new WebDriverWait(driver, flexible_wait_interval);
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		driver.get(baseURL);
-		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
-				TimeUnit.SECONDS);
-	}
-
 	@AfterSuite
 	public static void tearDown() throws Exception {
-		driver.close();
-		driver.quit();
 		if (verificationErrors.length() != 0) {
 			throw new Exception(verificationErrors.toString());
 		}
 	}
 
 	@BeforeMethod
-	public void loadBaseURL() {
+	public void beforeMethod(Method method) {
+		super.beforeMethod(method);
 		driver.get(baseURL);
 	}
 
@@ -457,61 +341,6 @@ public class TripAdvisorTest {
 		// System.err.println("height:" + heightAttribute);
 	}
 
-	// Utils
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name");
-		}
-		return osName;
-	}
-
-	private String cssSelectorOfElement(WebElement element) {
-		return (String) executeScript(getScriptContent("cssSelectorOfElement.js"),
-				element);
-	}
-
-	private String styleOfElement(WebElement element, Object... arguments) {
-		return (String) executeScript(getScriptContent("getStyle.js"), element,
-				arguments);
-	}
-
-	private String cssSelectorOfElementAlternative(WebElement element) {
-		return (String) executeScript(
-				getScriptContent("cssSelectorOfElementAlternative.js"), element);
-	}
-
-	private void highlight(WebElement element) {
-		highlight(element, highlight_interval);
-	}
-
-	private static void highlight(WebElement element, long highlight) {
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'",
-					new Object[] { element });
-			Thread.sleep(highlight);
-			executeScript("arguments[0].style.border=''", new Object[] { element });
-
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-	}
-
-	private String xpathOfElement(WebElement element) {
-		return (String) executeScript(getScriptContent("xpathOfElement.js"),
-				new Object[] { element });
-	}
-
-	public static Object executeScript(String script, Object... arguments) {
-		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver); // a.k.a. (JavascriptExecutor) driver;
-			return javascriptExecutor.executeScript(script, arguments);
-		} else {
-			throw new RuntimeException("Script execution failed.");
-		}
-	}
-
 	private List<WebElement> findElements(String selectorKind,
 			String selectorValue, WebElement parent) {
 		SearchContext finder;
@@ -629,41 +458,29 @@ public class TripAdvisorTest {
 		return element;
 	}
 
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = TripAdvisorTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException("Cannot load file: " + scriptName);
-		}
-	}
-
-	public static void waitForElementVisible(By locator) {
-		log.info("Waiting for element visible for locator: {}", locator);
-		wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-	}
-
-	public static void waitForElementVisible(By locator, long timeout) {
+	public void waitForElementVisible(By locator, long timeout) {
 		log.info("Waiting for element visible for locator: {}", locator);
 		WebDriverWait wait = new WebDriverWait(driver, timeout);
 		wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 	}
 
-	public static void waitForElementPresent(By locator) {
+	public void waitForElementVisible(By locator) {
+		log.info("Waiting for element visible for locator: {}", locator);
+		wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+	}
+
+	public void waitForElementPresent(By locator) {
 		log.info("Waiting for element present  for locator: {}", locator);
 		wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public static void waitForElementPresent(By locator, long timeout) {
+	public void waitForElementPresent(By locator, long timeout) {
 		log.info("Waiting for element present for locator: {}", locator);
 		WebDriverWait wait = new WebDriverWait(driver, timeout);
 		wait.until(ExpectedConditions.presenceOfElementLocated(locator));
 	}
 
-	public static void waitForPageLoad() {
+	public void waitForPageLoad() {
 		log.info("Wait for page load via JS...");
 		String state = "";
 		int counter = 0;
@@ -682,13 +499,13 @@ public class TripAdvisorTest {
 
 	}
 
-	public static boolean isAttributePresent(By locator, String attribute) {
+	public boolean isAttributePresent(By locator, String attribute) {
 		log.info("Is Attribute Present for locator: {}, attribute: {}", locator,
 				attribute);
 		return driver.findElement(locator).getAttribute(attribute) != null;
 	}
 
-	public static void selectDropdownByIndex(By locator, int index) {
+	public void selectDropdownByIndex(By locator, int index) {
 		log.info("Select Dropdown for locator: {} and index: {}", locator, index);
 		try {
 			Select select = new Select(driver.findElement(locator));
@@ -698,7 +515,7 @@ public class TripAdvisorTest {
 		}
 	}
 
-	public static String getBaseURL() {
+	public String getBaseURL() {
 		// TODO: somehow browser is set to mobile
 		// if the next line is commented
 		System.err.println("Get base URL: " + driver.getCurrentUrl());
@@ -718,7 +535,7 @@ public class TripAdvisorTest {
 		return protocol + "://" + domain;
 	}
 
-	public static void clickJS(By locator) {
+	public void clickJS(By locator) {
 		log.info("Clicking on locator via JS: {}", locator);
 		wait.until(
 				ExpectedConditions.elementToBeClickable(driver.findElement(locator)));
@@ -726,46 +543,46 @@ public class TripAdvisorTest {
 				driver.findElement(locator));
 	}
 
-	public static void scrollIntoView(By locator) {
+	public void scrollIntoView(By locator) {
 		log.info("Scrolling into view: {}", locator);
 		((JavascriptExecutor) driver).executeScript(
 				"arguments[0].scrollIntoView(true);", driver.findElement(locator));
 	}
 
-	public static void mouseOver(By locator) {
+	public void mouseOver(By locator) {
 		log.info("Mouse over: {}", locator);
 		actions.moveToElement(driver.findElement(locator)).build().perform();
 	}
 
-	public static void click(By locator) {
+	public void click(By locator) {
 		log.info("Clicking: {}", locator);
 		driver.findElement(locator).click();
 	}
 
-	public static void clear(By locator) {
+	public void clear(By locator) {
 		log.info("Clearing input: {}", locator);
 		driver.findElement(locator).clear();
 	}
 
-	public static void sendKeys(By locator, String text) {
+	public void sendKeys(By locator, String text) {
 		log.info("Typing \"{}\" into locator: {}", text, locator);
 		driver.findElement(locator).sendKeys(text);
 	}
 
-	public static String getText(By locator) {
+	public String getText(By locator) {
 		String text = driver.findElement(locator).getText();
 		log.info("The string at {} is: {}", locator, text);
 		return text;
 	}
 
-	public static String getAttributeValue(By locator, String attribute) {
+	public String getAttributeValue(By locator, String attribute) {
 		String value = driver.findElement(locator).getAttribute(attribute);
 		log.info("The attribute \"{}\" value of {} is: {}", attribute, locator,
 				value);
 		return value;
 	}
 
-	public static boolean isElementVisible(By locator) {
+	public boolean isElementVisible(By locator) {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			log.info("Element {} is visible", locator);
@@ -778,7 +595,7 @@ public class TripAdvisorTest {
 
 	// custom wait while Login Lightbox is visible
 
-	public static void waitWhileElementIsVisible(By locator) {
+	public void waitWhileElementIsVisible(By locator) {
 		final By locatorFinal = locator;
 		wait.until(new ExpectedCondition<Boolean>() {
 			@Override
@@ -788,7 +605,7 @@ public class TripAdvisorTest {
 		});
 	}
 
-	public static boolean isElementNotVisible(By locator) {
+	public boolean isElementNotVisible(By locator) {
 		try {
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			log.info("Element {} is visible", locator);
@@ -797,18 +614,5 @@ public class TripAdvisorTest {
 			log.info("Element {} is not visible", locator);
 			return true;
 		}
-	}
-
-	public static String getBodyText() {
-		log.info("Getting boby text");
-		return driver.findElement(By.tagName("body")).getText();
-	}
-
-	public static void highlight(By locator) throws InterruptedException {
-		log.info("Highlighting element {}", locator);
-		WebElement element = driver.findElement(locator);
-		executeScript("arguments[0].style.border='3px solid yellow'", element);
-		Thread.sleep(highlight_interval);
-		executeScript("arguments[0].style.border=''", element);
 	}
 }
