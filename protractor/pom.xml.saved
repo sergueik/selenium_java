@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.github.sergueik.jprotractor</groupId>
+  <groupId>com.jprotractor</groupId>
   <artifactId>jprotractor</artifactId>
-  <version>1.3-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>jProtractor is a port of Angular Protractor functionality to Java.</description>
@@ -24,21 +24,18 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <commons-collections4.version>4.0</commons-collections4.version>
-    <java.version>1.8</java.version>
+    <java.version>1.7</java.version>
     <junit.version>4.12</junit.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
-    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
-    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
-    <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
-    <selenium.version>3.2.0</selenium.version>
-    <selenium-firefox-driver.version>3.2.0</selenium-firefox-driver.version>
+    <maven.compiler.source>1.7</maven.compiler.source>
+    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
+    <selenium.version>2.53.1</selenium.version>
+    <selenium-firefox-driver.version>2.53.1</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -68,6 +65,17 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.codeborne</groupId>
+      <artifactId>phantomjsdriver</artifactId>
+      <version>${phantomjsdriver.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+          </exclusion>
+        </exclusions>
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
@@ -83,44 +91,13 @@
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.codeborne</groupId>
-      <artifactId>phantomjsdriver</artifactId>
-      <version>${phantomjsdriver.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.seleniumhq.selenium</groupId>
-            <artifactId>selenium-remote-driver</artifactId>
-          </exclusion>
-        </exclusions>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <goals>
-          <goal>compile</goal>
-        </goals>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <encoding>utf-8</encoding>
-          <compilerArgument>-Xlint:all</compilerArgument>
-          <showWarnings>true</showWarnings>
-          <showDeprecation>true</showDeprecation>
-          <!--
-          <compilerArgument>-verbose</compilerArgument>
-          -->
-        </configuration>
-      </plugin>
-      <plugin>
         <!-- Separates the unit tests from the integration tests. -->
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <!-- Skip the default running of this plug-in (or everything is run twice...see below) -->
           <skip>true</skip>
