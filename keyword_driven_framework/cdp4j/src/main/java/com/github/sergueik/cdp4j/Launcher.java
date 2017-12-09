@@ -1,4 +1,4 @@
-package com.github.sergueik.utils;
+package com.github.sergueik.cdp4j;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -14,18 +14,21 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 
+import com.github.sergueik.cdp4j.PropertiesParser;
+
 /**
- * Standalone Launcher for Selenium WebDriver Keyword Driven Library
+ * Standalone Launcher for Chrome Devkit Protocol 4 Java Library
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
 public class Launcher {
 
 	private static String propertiesFileName = "application.properties";
-	private static String defaultTestCase = "TestCase.xls";
-	private static int statusColumn = 9;
-	private static boolean debug = false;
 	private static String testCase;
+	private static String defaultTestCase = "TestCase.xls";
+	private static int statusColumn;
+	private static int defaultStatusColumn = 9;
+	private static boolean debug = false;
 
 	public static void main(String[] args) throws IOException {
 
@@ -37,10 +40,10 @@ public class Launcher {
 				? propertiesMap.get("testCase")
 				: getPropertyEnv("testCase", String.format("%s\\Desktop\\%s",
 						System.getenv("USERPROFILE"), defaultTestCase));
+		System.err.println("Loading test case from: " + testCase);
 		FileInputStream file = new FileInputStream(testCase);
 		HSSFWorkbook workbook = new HSSFWorkbook(file);
 		HSSFSheet indexSheet = workbook.getSheet("Index");
-		KeywordLibrary.loadProperties();
 		for (int row = 1; row <= indexSheet.getLastRowNum(); row++) {
 			Row indexRow = indexSheet.getRow(row);
 			if (safeCellToString(indexRow.getCell(1)).equalsIgnoreCase("Yes")

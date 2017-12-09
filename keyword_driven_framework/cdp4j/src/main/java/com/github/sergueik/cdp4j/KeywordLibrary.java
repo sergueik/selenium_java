@@ -1,4 +1,4 @@
-package com.github.sergueik.utils;
+package com.github.sergueik.cdp4j;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,10 +39,8 @@ public final class KeywordLibrary {
 	private static String selector;
 	private static long timeout;
 
-	private static Properties objectRepo;
 	private static String status;
 	private static String result;
-	private static String selectorType = null;
 	private static String selectorValue = null;
 	private static String expectedValue = null;
 	private static String textData = null;
@@ -50,7 +48,6 @@ public final class KeywordLibrary {
 	private static String attributeName = null;
 
 	private static String elementID;
-	// private static String param3;
 
 	public static int scriptTimeout = 5;
 	public static int stepWait = 150;
@@ -73,6 +70,7 @@ public final class KeywordLibrary {
 		methodTable.put("VERIFY_TEXT", "verifyText");
 		methodTable.put("CLEAR_TEXT", "clearText");
 		methodTable.put("WAIT", "wait");
+		methodTable.put("WAIT_SESSION", "waitSession");
 		methodTable.put("WAIT_URL_CHANGE", "waitURLChange");
 	}
 	private static Map<String, Method> locatorTable = new HashMap<>();
@@ -98,18 +96,13 @@ public final class KeywordLibrary {
 		return result;
 	}
 
-	// https://stackoverflow.com/questions/7486012/static-classes-in-java
-	// https://github.com/sergueik/selenium_java/commit/57724dafc4fa33339
-
-	// A top-level Java class mimicking static class behavior
-	// All methods are static
 	private KeywordLibrary() { // private constructor
 		_class = null;
 	}
 
 	public static void initMethods() {
 		try {
-			_class = Class.forName("com.github.sergueik.utils.KeywordLibrary");
+			_class = Class.forName("com.github.sergueik.cdp4j.KeywordLibrary");
 		} catch (ClassNotFoundException e) {
 			throw new RuntimeException(e);
 		}
@@ -137,31 +130,6 @@ public final class KeywordLibrary {
 				methodTable.put(methodName, methodName);
 			}
 		}
-		/*
-		// optional: list all methods
-		try {
-			Class<?> _locatorHelper = Class.forName("org.openqa.selenium.By");
-			Method[] _locatorMethods = _locatorHelper.getMethods();
-			for (Method _locatorMethod : _locatorMethods) {
-				System.err.println("Adding locator of org.openqa.selenium.By: "
-						+ _locatorMethod.toString());
-			}
-		} catch (ClassNotFoundException | SecurityException e) {
-		}
-		*/
-		/*
-		// optional: list all methods
-		try {
-			Class<?> _locatorHelper = Class.forName("com.jprotractor.NgBy");
-			Method[] _locatorMethods = _locatorHelper.getMethods();
-			for (Method _locatorMethod : _locatorMethods) {
-				System.err.println("Adding locator of com.jprotractor.NgBy:"
-						+ _locatorMethod.toString());
-			}
-		} catch (ClassNotFoundException | SecurityException e) {
-			System.out.println("Exception (ignored): " + e.toString());
-		}
-		*/
 		// there is no By's
 		// use phony method
 		Method methodMissing = null;
@@ -205,12 +173,6 @@ public final class KeywordLibrary {
 		}
 	}
 
-	public static void loadProperties() throws IOException {
-		File file = new File("ObjectRepo.Properties");
-		objectRepo = new Properties();
-		objectRepo.load(new FileInputStream(file));
-	}
-
 	public static void openBrowser(Map<String, String> params)
 			throws IOException {
 		try {
@@ -232,10 +194,10 @@ public final class KeywordLibrary {
 
 	public static void enterText(Map<String, String> params) {
 		elementID = _findElement(params);
-		selectorValue = params.get("param2");
-		textData = params.get("param5");
+		selectorValue = params.get("param1");
+		textData = params.get("param2");
 		if (elementID != null) {
-			// highlight(element)
+			highlight(selectorValue);
 			session.focus(selectorValue);
 			session.sendKeys(textData);
 			status = "Passed";
@@ -245,17 +207,19 @@ public final class KeywordLibrary {
 	}
 
 	public static void clickElement(Map<String, String> params) {
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
 		elementID = _findElement(params);
 		if (elementID != null) {
 			highlight(selectorValue);
-			System.err.println("click");
-			session.click(selectorValue);
+			// does not work
+			// session.click(selectorValue);
+			KeywordLibrary.click(selectorValue);
 			status = "Passed";
 		} else {
-			System.err.println("Can't click");
 			status = "Failed";
 		}
+		System.err.println(
+				((elementID != null) ? "Click: " : "Can't click: ") + selectorValue);
 		try {
 			Thread.sleep(stepWait);
 		} catch (InterruptedException e) {
@@ -266,9 +230,9 @@ public final class KeywordLibrary {
 
 	public static void verifyAttribute(Map<String, String> params) {
 		boolean flag = false;
-		attributeName = params.get("param5");
-		expectedValue = params.get("param6");
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
+		attributeName = params.get("param2");
+		expectedValue = params.get("param3");
 		elementID = _findElement(params);
 		if (elementID != null) {
 			highlight(selectorValue);
@@ -284,8 +248,8 @@ public final class KeywordLibrary {
 	public static void verifyText(Map<String, String> params) {
 		boolean flag = false;
 
-		expectedText = params.get("param5");
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
+		expectedText = params.get("param2");
 		elementID = _findElement(params);
 		if (elementID != null) {
 			highlight(selectorValue);
@@ -299,7 +263,7 @@ public final class KeywordLibrary {
 
 	public static void getElementText(Map<String, String> params) {
 		String text = null;
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
 		String value = null;
 		elementID = _findElement(params);
 		if (elementID != null) {
@@ -307,16 +271,18 @@ public final class KeywordLibrary {
 			value = session.getText(selectorValue);
 			status = "Passed";
 			result = text;
-			System.err.println(
-					String.format("%s returned \"%s\"", "getElementText", result));
+			System.err.println(String.format("%s->(%s) returned \"%s\"",
+					"getElementText", selectorValue, result));
 		} else {
 			status = "Failed";
+			System.err.println(
+					String.format("Failed %s->(%s)", "getElementText", selectorValue));
 		}
 	}
 
 	public static void getElementAttribute(Map<String, String> params) {
-		attributeName = params.get("param5");
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
+		attributeName = params.get("param2");
 		String value = null;
 		elementID = _findElement(params);
 		if (elementID != null) {
@@ -324,16 +290,18 @@ public final class KeywordLibrary {
 			value = session.getAttribute(selectorValue, attributeName);
 			status = "Passed";
 			result = value;
-			System.err.println(
-					String.format("%s returned \"%s\"", "getElementAttribute", result));
+			System.err.println(String.format("%s->(%s) returned \"%s\"",
+					"getElementAttribute", selectorValue, result));
 		} else {
+			System.err.println(String.format("Failed %s->(%s)", "getElementAttribute",
+					selectorValue));
 			status = "Failed";
 		}
 	}
 
 	public static void elementPresent(Map<String, String> params) {
 		Boolean flag = false;
-		selectorValue = params.get("param2");
+		selectorValue = params.get("param1");
 		elementID = _findElement(params);
 		if (elementID != null) {
 			flag = isVisible(selectorValue);
@@ -349,20 +317,11 @@ public final class KeywordLibrary {
 	}
 
 	public static String _findElement(Map<String, String> params) {
-		selectorType = params.get("param1");
-		if (!locatorTable.containsKey(selectorType)) {
-			throw new RuntimeException("Unknown Selector Type: " + selectorType);
-		}
-		/* TODO: objectRepo.getProperty(selectorValue) || selectorValue */
-		selectorValue = params.get("param2");
-		if (params.containsKey("param5")) {
-			selectorContainedText = params.get("param5");
-		}
-		if (params.containsKey("param6")) {
-			selectorTagName = params.get("param6");
-		}
-
 		String _elementID = null;
+		selectorValue = params.get("param1");
+		// TODO: containedText, tagName
+
+		/*
 		switch (selectorType) {
 		case "cssContainingText":
 			// TODO:
@@ -370,56 +329,45 @@ public final class KeywordLibrary {
 		case "text":
 			// TODO:
 			break;
-
+		
 		default:
 			_elementID = session.getObjectId(selectorValue);
 			break;
 		}
+		*/
+		_elementID = session.getObjectId(selectorValue);
+		System.err.println(
+				((_elementID == null) ? "Not found: " : "Found: ") + selectorValue);
 		return _elementID;
 	}
 
 	public static List<String> _findElements(Map<String, String> params) {
-		selectorType = params.get("param1");
-		if (!locatorTable.containsKey(selectorType)) {
-			throw new RuntimeException("Unknown Selector Type: " + selectorType);
-		}
-		/* TODO: objectRepo.getProperty(selectorValue) || selectorValue */
-		selectorValue = params.get("param2");
-		if (params.containsKey("param5")) {
-			selectorContainedText = params.get("param5");
-		}
-		if (params.containsKey("param6")) {
-			selectorTagName = params.get("param6");
-		}
-
+		selectorValue = params.get("param1");
+		// TODO: containedText, tagName
 		List<String> _elementIDs = new ArrayList<>();
-		switch (selectorType) {
-		case "cssContainingText":
-			// TODO:
-			break;
-		case "text":
-			// TODO:
-			break;
-
-		default:
-			_elementIDs = session.getObjectIds(selectorValue);
-			break;
-		}
+		_elementIDs = session.getObjectIds(selectorValue);
 		return _elementIDs;
+	}
+
+	public static void waitSession(Map<String, String> params) {
+		final String expectedSelector = params.get("param1");
+		final int timeout = (int) (Float.parseFloat(params.get("param2")));
+		session.waitUntil(_session -> session.matches(expectedSelector), timeout,
+				timeout / 10);
 	}
 
 	// wait for the page url to change to contain expectedURL
 	public static void waitURLChange(Map<String, String> params) {
 		final String expectedURL = params.get("param1");
-		final int timeout = (int) (Float.parseFloat(params.get("param7")));
+		final int timeout = (int) (Float.parseFloat(params.get("param2")));
 		session.waitUntil(o -> {
 			String url = o.getLocation();
 			return (boolean) url.matches(String.format("^%s.*", expectedURL));
-		}, timeout, 100);
+		}, timeout, timeout / 10);
 	}
 
 	public static void wait(Map<String, String> params) {
-		timeout = (long) (Float.parseFloat(params.get("param7")));
+		timeout = (long) (Float.parseFloat(params.get("param1")));
 		try {
 			Thread.sleep(timeout);
 		} catch (InterruptedException e) {

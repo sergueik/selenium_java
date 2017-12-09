@@ -1,4 +1,4 @@
-package com.github.sergueik.utils;
+package com.github.sergueik.cdp4j;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Property file Reader for Selenium WebDriver Keyword Driven Library
+ * Property file Reader for Chrome Devkit Protocol 4 Java Keyword Driven Library
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -52,16 +52,27 @@ public class PropertiesParser {
 		if (null == input) {
 			return null;
 		}
-		Pattern p = Pattern.compile("\\$(?:\\{(\\w+)\\}|(\\w+))");
+		Pattern p = Pattern.compile("\\$(?:\\{([\\.\\w]+)\\}|(\\w+))");
 		Matcher m = p.matcher(input);
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
-			String envVarValue = System.getenv(envVarName);
+			String envVarValue = getPropertyEnv(envVarName, "");
 			m.appendReplacement(sb,
 					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
 		}
 		m.appendTail(sb);
 		return sb.toString();
+	}
+
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
 	}
 }
