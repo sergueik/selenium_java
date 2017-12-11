@@ -141,7 +141,7 @@ public class RowSubsetTest extends BaseTest {
 	}
 
 	// collect column data from all rows until the 'Developer' in that column #2
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test1() {
 		String text = "Developer";
 		// Arrange
@@ -154,10 +154,11 @@ public class RowSubsetTest extends BaseTest {
 						return false;
 					}
 					try {
-						element.findElement(
-								By.xpath(String.format("../following::tr/td[contains(text(), '%s')]", text)));
+						// find the following element with specific text
+						element.findElement(By.xpath(String
+								.format("../following::tr/td[contains(text(), '%s')]", text)));
 						return true;
-					} catch (org.openqa.selenium.NoSuchElementException ex) {
+					} catch (NoSuchElementException ex) {
 						return false;
 					}
 				}).collect(Collectors.toList());
@@ -166,7 +167,74 @@ public class RowSubsetTest extends BaseTest {
 		System.err.println("Found elements: " + elements.size());
 		elements.stream().forEach(e -> highlight(e));
 		elements.stream().forEach(e -> System.err.println(e.getText()));
-		// will be 6
+		// will be 6 - should be 5
+	}
+
+	// collect column data from all rows until the 'Developer' in that column #2
+	// same test refactored /
+	// Both tests fail to achieve result, Streams should not be used
+	@Test(enabled = false)
+	public void test2() {
+		String text = "Developer";
+		// Arrange
+		wait.until(e -> e.findElement(By.cssSelector("#example")));
+		// Act
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//*[@id=\"example\"]/tbody/tr/td[2]")).stream()
+				.filter(element -> (boolean) (element
+						.findElements(By.xpath(String
+								.format("following::tr/td[contains(text(), '%s')]", text)))
+						.size() >= 1))
+				.filter(element -> {
+					List<WebElement> followingElements = element.findElements(By.xpath(
+							String.format("following::tr/td[contains(text(), '%s')]", text)));
+					System.err.println("element: " + element.getText());
+					for (WebElement followingElement : followingElements) {
+						System.err
+								.println("Following element: " + followingElement.getText());
+					}
+					return (boolean) (followingElements.size() >= 1);
+				}
+
+				).collect(Collectors.toList());
+		// Assert
+		assertThat(elements.size(), is(7));
+		// will be 7 - should be 5
+		System.err.println("Found elements: " + elements.size());
+		elements.stream().forEach(e -> highlight(e));
+		elements.stream().forEach(e -> System.err.println(e.getText()));
+	}
+
+	@Test(enabled = true)
+	public void test3() {
+		String text = "Developer";
+		// Arrange
+		wait.until(e -> e.findElement(By.cssSelector("#example")));
+		// Act
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//*[@id=\"example\"]/tbody/tr/td[2]"));
+		List<WebElement> elementsFiltered = new ArrayList<>();
+		boolean foundText = false;
+		for (WebElement element : elements) {
+			List<WebElement> followingElements = element.findElements(By.xpath(
+					String.format("following::tr/td[contains(text(), '%s')]", text)));
+			System.err.println("element: " + element.getText());
+			for (WebElement followingElement : followingElements) {
+				System.err.println("Following element: " + followingElement.getText());
+			}
+			foundText = (boolean) ((followingElements.size() >= 1)
+					&& !element.getText().matches(text));
+			if (foundText) {
+				elementsFiltered.add(element);
+			} else {
+				break;
+			}
+		}
+		// Assert
+		assertThat(elementsFiltered.size(), is(5));
+		System.err.println("Found elements: " + elementsFiltered.size());
+		elementsFiltered.stream().forEach(e -> highlight(e));
+		elementsFiltered.stream().forEach(e -> System.err.println(e.getText()));
 	}
 
 }
