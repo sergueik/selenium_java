@@ -121,10 +121,9 @@ import static org.testng.AssertJUnit.fail;
 public class RowSubsetTest extends BaseTest {
 
 	private static String baseURL = "https://datatables.net/extensions/rowgroup/examples/initialisation/customRow.html";
-
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static Pattern pattern;
-	private static Matcher matcher;
+	private static String text = "Developer";
+	private static Pattern pattern = Pattern.compile(String.format("^%s", text));
 	private static final String browser = "chrome";
 
 	@AfterSuite
@@ -141,9 +140,8 @@ public class RowSubsetTest extends BaseTest {
 	}
 
 	// collect column data from all rows until the 'Developer' in that column #2
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test1() {
-		String text = "Developer";
 		// Arrange
 		wait.until(e -> e.findElement(By.cssSelector("#example")));
 		// Act
@@ -172,22 +170,24 @@ public class RowSubsetTest extends BaseTest {
 
 	// collect column data from all rows until the 'Developer' in that column #2
 	// same test refactored /
-	// Both tests fail to achieve result, Streams should not be used
-	@Test(enabled = false)
+	// test1,2 fail to achieve result
+
+	@Test(enabled = true)
 	public void test2() {
-		String text = "Developer";
 		// Arrange
 		wait.until(e -> e.findElement(By.cssSelector("#example")));
 		// Act
 		List<WebElement> elements = driver
 				.findElements(By.xpath("//*[@id=\"example\"]/tbody/tr/td[2]")).stream()
-				.filter(element -> (boolean) (element
-						.findElements(By.xpath(String
-								.format("following::tr/td[contains(text(), '%s')]", text)))
-						.size() >= 1))
+				.filter(
+						element -> (boolean) (element
+								.findElements(By.xpath(String.format(
+										"../following::tr/td[contains(text(), '%s')]", text)))
+								.size() >= 1))
 				.filter(element -> {
-					List<WebElement> followingElements = element.findElements(By.xpath(
-							String.format("following::tr/td[contains(text(), '%s')]", text)));
+					List<WebElement> followingElements = element
+							.findElements(By.xpath(String.format(
+									"../following::tr/td[contains(text(), '%s')]", text)));
 					System.err.println("element: " + element.getText());
 					for (WebElement followingElement : followingElements) {
 						System.err
@@ -207,7 +207,6 @@ public class RowSubsetTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void test3() {
-		String text = "Developer";
 		// Arrange
 		wait.until(e -> e.findElement(By.cssSelector("#example")));
 		// Act
@@ -217,7 +216,7 @@ public class RowSubsetTest extends BaseTest {
 		boolean foundText = false;
 		for (WebElement element : elements) {
 			List<WebElement> followingElements = element.findElements(By.xpath(
-					String.format("following::tr/td[contains(text(), '%s')]", text)));
+					String.format("../following::tr/td[contains(text(), '%s')]", text)));
 			System.err.println("element: " + element.getText());
 			for (WebElement followingElement : followingElements) {
 				System.err.println("Following element: " + followingElement.getText());
@@ -235,6 +234,81 @@ public class RowSubsetTest extends BaseTest {
 		System.err.println("Found elements: " + elementsFiltered.size());
 		elementsFiltered.stream().forEach(e -> highlight(e));
 		elementsFiltered.stream().forEach(e -> System.err.println(e.getText()));
+	}
+
+	// NOTE: if the node name is changing
+	// (this is possible to test with XPath)
+	// a much shorter solution is available
+	// "//parent-node-name/node-name[not(preceding::alternative-node-name)]"
+	@Test(enabled = true)
+	public void test4() {
+		// Arrange
+		wait.until(e -> e.findElement(By.cssSelector("#example")));
+		// Act
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//*[@id=\"example\"]/tbody/tr/td[2]")).stream()
+				.filter(_element -> {
+					if (pattern.matcher(_element.getText()).find()) {
+						return false;
+					}
+					try {
+						// find the preceding element with specific text
+						// NOTE: one has to collect all preceding elements and inspect every
+						// one
+						// of them
+						List<WebElement> _precedingElements = _element
+								.findElements(By.xpath(String.format(
+										"../preceding::tr/td[contains(text(), '%s')]", text)));
+						for (WebElement _precedingElement : _precedingElements) {
+							if (pattern.matcher(_precedingElement.getText()).find()) {
+								return false;
+							} else {
+								// continue
+							}
+						}
+						return true;
+					} catch (NoSuchElementException ex) {
+						// no preceding elements
+						return true;
+					}
+				}).collect(Collectors.toList());
+		// Assert
+		assertThat(elements.size(), is(5));
+		/*
+		System.err.println("Found elements: " + elements.size());
+		elements.stream().forEach(e -> highlight(e));
+		elements.stream().forEach(e -> System.err.println(e.getText()));
+		*/
+	}
+
+	@Test(enabled = true)
+	public void test5() {
+		// Arrange
+		wait.until(e -> e.findElement(By.cssSelector("#example")));
+		// Act
+		List<WebElement> elements = driver
+				.findElements(By.xpath("//*[@id=\"example\"]/tbody/tr/td[2]")).stream()
+				.filter(_element -> {
+					if (pattern.matcher(_element.getText()).find()) {
+						return false;
+					}
+					// Count the number of preceding elements starting with specific text
+					List<WebElement> _precedingElements = _element
+							.findElements(By.xpath(String.format(
+									"../preceding::tr/td[starts-with(text(), '%s')]", text)));
+					return (boolean) (_precedingElements.size() == 0);
+				}).collect(Collectors.toList());
+
+		// Assert
+		System.err.println("Found elements: " + elements.size());
+		elements.stream().forEach(e -> highlight(e));
+		elements.stream().forEach(e -> System.err.println(e.getText()));
+		assertThat(elements.size(), is(5));
+		/*
+		System.err.println("Found elements: " + elements.size());
+		elements.stream().forEach(e -> highlight(e));
+		elements.stream().forEach(e -> System.err.println(e.getText()));
+		*/
 	}
 
 }
