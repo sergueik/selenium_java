@@ -565,12 +565,16 @@ public class BaseTest {
 
 	protected boolean isElementNotVisible(By locator) {
 		try {
+			// disable implicit wait
+			driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
 			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
 			log.info("Element {} is visible", locator);
 			return false;
 		} catch (Exception e) {
 			log.info("Element {} is not visible", locator);
 			return true;
+		} finally {
+			driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 		}
 	}
 
