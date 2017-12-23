@@ -1,0 +1,34 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form">
+    <link href="${rootURL}/plugin/audit2db/css/screen.css" type="text/css" rel="stylesheet" media="screen"/>
+    <link href="${rootURL}/plugin/audit2db/css/print.css" type="text/css" rel="stylesheet" media="print"/>
+    <l:layout title="${it.displayName}" permission="${app.getPlugin('audit2db').RUN}">
+        <!--  
+        sidepanel.jelly cannot be found !!!
+        <st:include page="sidepanel.jelly" it="${it.owner}" />
+        -->
+        <l:main-panel>
+            <!--  
+            -->
+            <div class="report-title">${%Jenkins Audit Reports}</div>
+			<table class="pane bigtable" id="auditReportsList">
+				<tr>
+					<th>
+						<st:nbsp />
+					</th>
+					<th>${%Report Title}</th>
+					<th>${%Description}</th>
+					<th>${%Displayed Information}</th>
+				</tr>
+		        <j:forEach var="report" items="${it.allReports}">
+		            <tr>
+		                <td><a href="${report.urlName}"><img alt="" src="${imagesURL}/48x48/document.gif" /></a></td>
+		                <td><a href="${report.urlName}">${report.displayName}</a></td>
+		                <td>${report.reportDescription}</td>
+		                <td>${report.reportDisplayedInfo}</td>
+		            </tr>
+		        </j:forEach>
+			</table>
+        </l:main-panel>
+    </l:layout>
+</j:jelly>

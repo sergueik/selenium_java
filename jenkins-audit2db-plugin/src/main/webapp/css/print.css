@@ -1,0 +1,21 @@
+@import "screen.css";
+
+#main-table{
+    background-image: none !important;
+}
+
+#header {
+    display: none;
+}
+        
+#footer {
+    display: none;
+}
+        
+#side-panel {
+    display: none;
+}
+
+.report-filter {
+    display: none;
+}

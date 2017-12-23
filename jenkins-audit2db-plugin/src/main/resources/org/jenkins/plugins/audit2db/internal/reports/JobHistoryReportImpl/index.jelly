@@ -1,0 +1,74 @@
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:fmt="jelly:fmt">
+	<link href="${rootURL}/plugin/audit2db/css/screen.css" type="text/css"
+		rel="stylesheet" media="screen" />
+	<link href="${rootURL}/plugin/audit2db/css/print.css" type="text/css"
+		rel="stylesheet" media="print" />
+	<l:layout title="${it.displayName}" permission="${app.getPlugin('audit2db').RUN}">
+		<l:main-panel>
+			<!-- Grab parameter values from the request, if they exist -->
+			<j:set var="jobName"
+				value="${request.getParameter('jobName')}" />
+			<j:set var="startDate"
+				value="${it.getStartDateParam(request.getParameter('startDate'))}" />
+			<j:set var="endDate"
+				value="${it.getEndDateParam(request.getParameter('endDate'))}" />
+			<div class="report-title">${%Jenkins Audit Report} - ${it.displayName}</div>
+			<div class="report-filter">
+                <div class="report-filter">
+                    <form name="reportFilter" method="GET">
+	                    <table class="pane">
+	                       <tr>
+	                           <td colspan="2">${%jobNameHelp}</td>
+	                       </tr>
+	                       <tr>
+	                           <td>${%Job Name}:</td>
+	                           <td><input type="text" name="jobName" value="${jobName}"/></td>
+	                       </tr>
+	                       <tr>
+	                           <td>${%Start Date}:</td>
+	                           <td><input type="text" name="startDate" value="${startDate}"/></td>
+	                       </tr>
+	                       <tr>
+	                           <td>${%End Date}:</td>
+	                           <td><input type="text" name="endDate" value="${endDate}"/></td>
+	                       </tr>
+	                    </table>
+	                    <input type="submit" value="Apply Filter" class="yui-button"/>
+                    </form>
+                </div>
+			</div>
+			<hr />
+			<div class="report-description">${%reportDescription}</div>
+			<div class="report-header">${%Jenkins Server}: ${it.jenkinsHostname}
+				(${it.jenkinsIpAddr})</div>
+			<j:choose>
+				<j:when test="${empty(jobName)}">
+					<div id="noJobNameWarning" class="warning">${%No job name selected}!</div>
+				</j:when>
+				<j:otherwise>
+					<div class="report-subheader">
+						${%Job Name:} ${jobName}
+                    </div>
+					<div class="report-subheader">
+						${%Date Range:} ${startDate} - ${endDate} (${%inclusive})
+		            </div>
+					<div class="report-subheader">${%Generated On:} ${it.dateGenerated}</div>
+					<j:set var="projectExecutions"
+						value="${it.getProjectExecutions(jobName,startDate, endDate)}" />
+					<j:choose>
+						<j:when test="${empty(projectExecutions)}">
+							<p>
+								<div id="noDataWarning" class="warning">${%noData}</div>
+							</p>
+						</j:when>
+						<j:otherwise>
+							<st:include page="report-body.jelly" />
+						</j:otherwise>
+					</j:choose>
+				</j:otherwise>
+			</j:choose>
+		</l:main-panel>
+	</l:layout>
+</j:jelly>

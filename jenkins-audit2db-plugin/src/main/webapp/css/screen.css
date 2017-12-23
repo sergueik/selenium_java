@@ -1,0 +1,68 @@
+#main-panel .report-title {
+	font-size: x-large;
+	font-weight: bold;
+	color: rgb(23,54,93);
+    padding-bottom: 0.3em;
+}
+
+#main-panel .report-header {
+	color: rgb(54,95,145);
+	font-size: large;
+	padding-top: 1em;
+	padding-bottom: 0.5em;
+}
+
+#main-panel .report-subheader {
+	color: rgb(79,129,189);
+    font-size: medium;
+    font-style: italic;
+}
+
+#main-panel .report-groupheader {
+    color: rgb(54,95,145);
+    font-size: large;
+    padding-top: 1em;
+    padding-bottom: 0.3em;
+}
+
+#main-panel .report-table {
+	border: 1px solid black;
+	border-collapse: collapse;
+	white-space: nowrap;
+}
+
+#main-panel .report-table TH {
+	color: white;
+	background-color: rgb(54,95,145);
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+}
+
+#main-panel .report-table TR {
+	page-break-inside: avoid;
+}
+
+#main-panel .report-table TD {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    text-align: center;
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+}
+
+#main-panel .report-paramtable TR {
+	border: none;
+}
+
+#main-panel .report-paramtable TD {
+    padding-top: 0em;
+    padding-bottom: 0em;
+	text-align: justify;
+	border: none;
+}
+
+#main-panel .setting-input {
+	width: auto;
+}	
