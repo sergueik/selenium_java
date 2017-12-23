@@ -1,0 +1,17 @@
+{
+  "request": {
+    "method": "GET",
+    "url": "/example3"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "example3.html",
+    "headers": {
+      "Content-Type": "text/html; charset=utf-8",
+      "User-Agent": "{{request.headers.User-Agent}}",
+      "Set-Cookie": "logged_in=no",
+      "Custom-Header": "custom value",
+      "Referer": "http://www.google.com"
+    }
+  }
+}

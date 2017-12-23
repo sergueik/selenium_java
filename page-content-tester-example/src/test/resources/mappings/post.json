@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/example"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "data.json",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

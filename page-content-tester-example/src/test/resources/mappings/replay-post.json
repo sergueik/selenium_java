@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/replay-post"
+  },
+  "response": {
+    "status": 200,
+    "body": "{{request.body}}",
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

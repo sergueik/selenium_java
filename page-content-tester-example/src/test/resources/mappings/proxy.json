@@ -1,0 +1,9 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPattern": ".*/proxy.*"
+  },
+  "response": {
+    "proxyBaseUrl" : "http://localhost:8089/example"
+  }
+}
