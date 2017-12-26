@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.github.sergueik.selenium;
 
 import java.io.IOException;
 import java.io.InputStream;

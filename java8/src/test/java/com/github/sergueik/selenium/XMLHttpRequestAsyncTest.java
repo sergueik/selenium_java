@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.github.sergueik.selenium;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 // import static org.hamcrest.Matchers.containsString;

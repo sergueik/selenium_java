@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.github.sergueik.selenium;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;

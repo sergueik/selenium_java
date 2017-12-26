@@ -1,6 +1,6 @@
-package com.mycompany.app;
+package com.github.sergueik.selenium;
 
-import static com.mycompany.app.BaseTest.log;
+import static com.github.sergueik.selenium.BaseTest.log;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -87,7 +87,12 @@ public class BaseTest {
 			getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"));
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
-			"chrome"); // "firefox";
+			"chrome");
+
+	public static String getBrowser() {
+		return browser;
+	}
+
 	private static final Map<String, String> browserDrivers = new HashMap<>();
 	static {
 		browserDrivers.put("chrome", "chromedriver.exe");
@@ -184,6 +189,7 @@ public class BaseTest {
 				 Windows: Internet Explorer, Mozilla Firefox, Google Chrome. Mac:
 				 Safari".
 		*/
+		System.err.println("Launching " + browser);
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
 					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());

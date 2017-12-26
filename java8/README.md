@@ -1,15 +1,27 @@
 ### Info
-The project practices Java 8 with Selenium using the Selenium newbie test practice sites:
+
+The project practices Java with selected Selenium test scenarios using the test practice sites:
 
   * [http://suvian.in/selenium](http://suvian.in/selenium)
   * [http://www.way2automation.com](http://www.way2automation.com)
+
+  and misc. standalone examples found on
+
+  * [https://www.skyscanner.com](https://www.skyscanner.com)
+  * [https://embed.plnkr.co/](https://embed.plnkr.co/)
+  * [https://datatables.net/extensions/rowgroup/examples/initialisation/customRow.html](https://datatables.net/extensions/rowgroup/examples/initialisation/customRow.html)
+  * [https://select2.github.io/examples.html](https://select2.github.io/examples.html)
+  * [http://phppot.com/demo/jquery-dependent-dropdown-list-countries-and-states/)
+  * [http://jqueryui.com/datepicker/#buttonbar](http://jqueryui.com/datepicker/#buttonbar)
+  * [http://demos.telerik.com/kendo-ui/grid/index](http://demos.telerik.com/kendo-ui/grid/index)
+  * [http://antenna.io/demo/jquery-bar-rating/examples/](http://antenna.io/demo/jquery-bar-rating/examples/)
 
 ### Selenium 3 Testing
 
 This project is also used to debug the issue with launching tests in Firefox 52 / Geckodriver 0.15
 under Windows x86 or x64 under Selenium 3.2 / Maven / TestNg. No problem observed on Linux.
 
-The following standalone class invocation works fine, browser launched and navigated succesfully: 
+The following standalone class invocation works fine, browser launched and navigated succesfully:
 ```cmd
 rd /s/q src\test\java
 mvn clean install
