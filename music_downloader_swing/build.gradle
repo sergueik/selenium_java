@@ -1,0 +1,59 @@
+// https://dzone.com/articles/how-to-convert-maven-to-gradle-and-vice-versa
+
+plugins {
+    id 'java'
+    id 'maven'
+    id 'org.springframework.boot' version '1.5.9.RELEASE'
+}
+
+group = 'me.ruslanys'
+version = '2.1.2'
+sourceCompatibility = JavaVersion.VERSION_1_8
+
+repositories {
+    mavenCentral()
+}
+
+
+ext.jacksonVersion = '2.9.2'
+
+dependencies {
+    // Spring
+    compile('org.springframework.boot:spring-boot-starter')
+    compile('org.springframework.boot:spring-boot-starter-cache')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+
+    // DB
+    compile('com.enigmabridge:hibernate4-sqlite-dialect:0.1.2')
+    compile('org.xerial:sqlite-jdbc:3.20.0')
+
+    // Jackson
+    compile("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
+    compile("com.fasterxml.jackson.core:jackson-annotations:$jacksonVersion")
+    compile("com.fasterxml.jackson.core:jackson-core:$jacksonVersion")
+
+    // Utils
+    compile('commons-codec:commons-codec:1.10')
+    compile('org.apache.commons:commons-text:1.1')
+    compile('org.apache.commons:commons-lang3:3.6')
+    compile('com.google.guava:guava:23.0')
+    compile('org.jsoup:jsoup:1.10.3')
+    compile('com.mpatric:mp3agic:0.9.0')
+
+    // DevTools
+    compileOnly('org.projectlombok:lombok')
+
+    // Tests
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+jar {
+    manifest {
+        attributes("Implementation-Version": version)
+    }
+    archiveName = rootProject.name + ".jar"
+}
+
+bootRepackage {
+    executable = true
+}
