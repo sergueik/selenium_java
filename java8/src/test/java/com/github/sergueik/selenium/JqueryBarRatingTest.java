@@ -89,13 +89,11 @@ public class JqueryBarRatingTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void test2() {
-		/*
+	public void test2_1() {
 		if (!BaseTest.getBrowser().matches("firefox")) {
 			System.err.println("This test is only working with firefox");
 			return;
 		}
-		*/
 		// Arrange
 
 		wait.until(ExpectedConditions.or(
@@ -108,8 +106,8 @@ public class JqueryBarRatingTest extends BaseTest {
 		WebElement bar = wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.cssSelector("div.examples div.box-example-reversed")));
 
-		scrolltoElement(bar);
-		scroll(0, 600);
+		// scrolltoElement(bar);
+		scroll(0, 800);
 		sleep(2000);
 		List<WebElement> ratingElements = bar
 				.findElements(By.xpath(".//a[@data-rating-value]"));
@@ -120,10 +118,7 @@ public class JqueryBarRatingTest extends BaseTest {
 		ratings.keySet().stream().forEach(o -> {
 			WebElement r = ratings.get(o);
 			assertThat(r, notNullValue());
-			System.err.println("element: " + r.getAttribute("outerHTML"));
 			// hover
-			// TODO: $('<locator>').mouseenter().mouseleave();
-			// https://stackoverflow.com/questions/11038638/simulate-hover-in-jquery
 			actions.moveToElement(r).build().perform();
 			flash(r);
 			// Assert
@@ -133,6 +128,59 @@ public class JqueryBarRatingTest extends BaseTest {
 			System.err.println("Mouse over rating: " + o);
 			sleep(1000);
 		});
+	}
+
+	@Test(enabled = true)
+	public void test2_2() {
+		// Arrange
+
+		wait.until(ExpectedConditions.or(
+				// NOTE: Boolean
+				ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("div.examples div.box-example-reversed")),
+				ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("div.examples div.box-example-reversed"))));
+
+		WebElement bar = wait.until(ExpectedConditions.visibilityOfElementLocated(
+				By.cssSelector("div.examples div.box-example-reversed")));
+
+		scroll(0, 800);
+		sleep(2000);
+		List<WebElement> ratingElements = bar
+				.findElements(By.xpath(".//a[@data-rating-value]"));
+		assertTrue(ratingElements.size() > 0);
+		Map<String, WebElement> ratings = ratingElements.stream().collect(Collectors
+				.toMap(o -> o.getAttribute("data-rating-text"), Function.identity()));
+		// Act
+		int cnt = 0;
+		// TODO: change ratings object to map elements to their labels
+		Object[] ratingsKeys = ratings.keySet().toArray();
+		for (cnt = 0; cnt < ratingsKeys.length; cnt++) {
+			String o = (String) ratingsKeys[cnt];
+			System.err.println("Trying to select " + o);
+			WebElement r = ratings.get(o);
+			assertThat(r, notNullValue());
+			String cssSelector = cssSelectorOfElement(r);
+			cssSelector = String.format(
+					"html.no-js > body > section.section.section-examples > div.examples > div.row >div.col > div.box.box-green.box-large.box-example-reversed > div.box-body > div.br-wrapper.br-theme-bars-reversed > div.br-widget.br-reverse > a:nth-of-type(%d)",
+					cnt + 1);
+			// the selectors are indistinguishable. Have to add ":nth-of-type(cnt)"
+			System.err.println(String.format("element: %s\n%s\n",
+					r.getAttribute("outerHTML"), cssSelector));
+			// hover
+			// https://stackoverflow.com/questions/11038638/simulate-hover-in-jquery
+			super.executeScript(
+					"var selector = arguments[0]; $(selector).mouseenter().mouseleave();",
+					cssSelector);
+			flash(r);
+			// Assert
+			WebElement comment = bar.findElement(By.xpath(
+					".//*[contains(@class, 'br-current-rating') and contains(@class ,'br-selected')]"));
+			System.err.println("Mouse over rating: " + o);
+			// NOTE: order
+			// assertThat(comment.getText(), equalTo(o));
+			sleep(1000);
+		}
 	}
 
 	@Test(enabled = true)
