@@ -83,6 +83,20 @@ public class Quickstart {
 				HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
 						.setDataStoreFactory(DATA_STORE_FACTORY).setAccessType("offline")
 						.build();
+		/*
+		Exception in thread "main" java.lang.IllegalArgumentException
+        at com.google.api.client.repackaged.com.google.common.base.Preconditions
+.checkArgument(Preconditions.java:111)
+        at com.google.api.client.util.Preconditions.checkArgument(Preconditions.
+java:37)
+        at com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets.getD
+etails(GoogleClientSecrets.java:82)
+        at com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeF
+low$Builder.<init>(GoogleAuthorizationCodeFlow.java:195)
+        at com.github.sergueik.Quickstart.authorize(Quickstart.java:82)
+        at com.github.sergueik.Quickstart.getSheetsService(Quickstart.java:99)
+        at com.github.sergueik.Quickstart.main(Quickstart.java:106) 
+		 */
 		Credential credential = new AuthorizationCodeInstalledApp(flow,
 				new LocalServerReceiver()).authorize("user");
 		System.out
