@@ -26,23 +26,22 @@ public final class DbAuditUtil {
     }
 
     static {
-	try {
-	    final InetAddress iaddr = InetAddress.getLocalHost();
-	    ipaddr = iaddr.getHostAddress();
-	    hostname = iaddr.getHostName();
-	} catch (final UnknownHostException e) {
-	    LOGGER.log(
-		    Level.SEVERE,
-		    "An error occurred while trying to resolve the master's network name and address: "
-		    + e.getMessage(), e);
-	}
+        try {
+            final InetAddress iaddr = InetAddress.getLocalHost();
+            ipaddr = iaddr.getHostAddress();
+            hostname = iaddr.getHostName();
+        } catch (final UnknownHostException e) {
+            LOGGER.log(Level.SEVERE,
+                    "An error occurred while trying to resolve the master's network name and address: "
+                    + e.getMessage(), e);
+        }
     }
 
     public static String getHostName() {
-	return hostname;
+        return hostname;
     }
 
     public static String getIpAddress() {
-	return ipaddr;
+        return ipaddr;
     }
 }

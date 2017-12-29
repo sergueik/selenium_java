@@ -41,7 +41,7 @@ public abstract class AbstractJenkinsPage {
 	}
 
 	this.webClient = client;
-	this.webClient.setTimeout(60000);
+	this.webClient.setJavaScriptTimeout(60000);
 
 	if ((null == urlPath) || urlPath.isEmpty()) {
 	    throw new IllegalArgumentException("Page URL path must be provided");

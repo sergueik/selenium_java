@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.jenkins.plugins.audit2db.test.integration.webpages;
 
@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.jvnet.hudson.test.HudsonTestCase.WebClient;
 
+import com.gargoylesoftware.htmlunit.html.DomElement;
 import com.gargoylesoftware.htmlunit.html.HtmlButton;
 import com.gargoylesoftware.htmlunit.html.HtmlCheckBoxInput;
 import com.gargoylesoftware.htmlunit.html.HtmlElement;
@@ -45,10 +46,10 @@ public class JenkinsConfigurationPage extends AbstractJenkinsPage {
 	configForm = getPage().getFormByName("config");
     }
 
-    public HtmlElement getJndiDatasourceRadioButton() {
-	HtmlElement retval = null;
-	final List<HtmlElement> elements = getPage().getElementsByName(AUDIT2DB_DATASOURCE);
-	for (final HtmlElement element : elements) {
+    public DomElement getJndiDatasourceRadioButton() {
+    DomElement retval = null;
+	final List<DomElement> elements = getPage().getElementsByName(AUDIT2DB_DATASOURCE);
+	for (final DomElement element : elements) {
 	    if (element.getAttribute("value").equalsIgnoreCase("true")) {
 		retval = element;
 		break;
@@ -57,10 +58,10 @@ public class JenkinsConfigurationPage extends AbstractJenkinsPage {
 	return retval;
     }
 
-    public HtmlElement getJdbcDatasourceRadioButton() {
-	HtmlElement retval = null;
-	final List<HtmlElement> elements = getPage().getElementsByName(AUDIT2DB_DATASOURCE);
-	for (final HtmlElement element : elements) {
+    public DomElement getJdbcDatasourceRadioButton() {
+    	DomElement retval = null;
+	final List<DomElement> elements = getPage().getElementsByName(AUDIT2DB_DATASOURCE);
+	for (final DomElement element : elements) {
 	    if (element.getAttribute("value").equalsIgnoreCase("false")) {
 		retval = element;
 		break;
@@ -70,7 +71,7 @@ public class JenkinsConfigurationPage extends AbstractJenkinsPage {
     }
 
     public boolean isUseJndi() {
-	final HtmlElement element = getJndiDatasourceRadioButton();
+	final DomElement element = getJndiDatasourceRadioButton();
 	final String checked = element.getAttribute("checked");
 	return ((checked != null) && (!checked.isEmpty()));
     }
@@ -160,7 +161,8 @@ public class JenkinsConfigurationPage extends AbstractJenkinsPage {
 	}
 
 	try {
-	    configForm.submit((HtmlButton) saveButton);
+		((HtmlButton) saveButton).click();
+	    // configForm.submit((HtmlButton) saveButton);
 	} catch (final IOException e) {
 	    throw new RuntimeException(e);
 	}
@@ -206,7 +208,7 @@ public class JenkinsConfigurationPage extends AbstractJenkinsPage {
 	    throw new RuntimeException(e);
 	}
 
-	return (HtmlTable) configForm
+	return (HtmlTable) configForm.getOwnerDocument()
 	.getElementById("hudson-security-GlobalMatrixAuthorizationStrategy");
     }
 

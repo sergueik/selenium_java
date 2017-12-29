@@ -3,10 +3,10 @@
 	<parent>
 		<groupId>org.jenkins-ci.plugins</groupId>
 		<artifactId>plugin</artifactId>
-		<version>1.460</version>
+		<version>3.0</version>
 	</parent>
 	<artifactId>audit2db</artifactId>
-	<version>0.4</version>
+	<version>0.6-SNAPSHOT</version>
 	<packaging>hpi</packaging>
 	<name>Jenkins Audit to Database Plugin</name>
 	<description>This plugin provides database audit functionality to Jenkins.  It allows recording build information to database, including the build parameters (if any), and the user who started the build.</description>
@@ -24,25 +24,29 @@
 		<tag>HEAD</tag>
 	</scm>
 	<properties>
+	    <maven.javadoc.skip>true</maven.javadoc.skip>
+	    <jenkins.version>2.73.3</jenkins.version>
+
 	    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	    <version.jdk>1.6</version.jdk>
-	    
+
 	    <!-- Versions of project dependencies -->
 	    <version.cglib>2.2</version.cglib>
-	    <version.commons-io>1.4</version.commons-io>
+	    <version.commons-io>2.5</version.commons-io>
 		<version.hibernate>3.5.6-Final</version.hibernate>
 		<version.hibernate-annotations>3.2.0.Final</version.hibernate-annotations>
 		<version.hibernate-jpa>1.0.0.Final</version.hibernate-jpa>
 		<version.c3p0>0.9.1.2</version.c3p0>
 		<version.javassist>3.8.0.GA</version.javassist>
-		<version.junit>4.4</version.junit>
+		<version.junit>4.12</version.junit>
 		<version.mockito>1.9.0</version.mockito>
 		<version.springframework>3.1.2.RELEASE</version.springframework>
-		<version.slf4j>1.6.1</version.slf4j>
+		<version.slf4j>1.7.25</version.slf4j>
 		<version.hsqldb>2.0.0</version.hsqldb>
 		<version.sqljdbc>3.0</version.sqljdbc>
 		<version.ojdbc14>10.2.0.2.0</version.ojdbc14>
-		
+		<version.workflow>2.12</version.workflow>
+
 		<!-- Versions of Maven plugins -->
 		<version.maven-dependency-plugin>2.5.1</version.maven-dependency-plugin>
 		<version.maven-cobertura-plugin>2.5.1</version.maven-cobertura-plugin>
@@ -58,6 +62,35 @@
 		</developer>
 	</developers>
 	<dependencies>
+        <!-- Start pipeline changes -->
+        <!-- Enforcer appeasement -->
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${version.springframework}</version>
+		</dependency>
+		<!-- Pipeline API -->
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-api</artifactId>
+            <version>${version.workflow}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-step-api</artifactId>
+            <version>${version.workflow}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jenkins-ci.plugins.workflow</groupId>
+            <artifactId>workflow-cps</artifactId>
+            <version>2.24</version>
+        </dependency>
+        <!-- End pipeline changes -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -110,7 +143,7 @@
 			     <!-- IMPORTANT:
 			         Dom4J causes a conflict with a custom
 			         version of it that gets used by the
-			         Jenkins test harness.  
+			         Jenkins test harness.
 			     -->
 			     <exclusion>
 			         <groupId>dom4j</groupId>
@@ -156,6 +189,7 @@
 		    <plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-doap-plugin</artifactId>
+		        <version>1.2</version>
 		        <executions>
 		            <execution>
 		                <id>site</id>
@@ -218,7 +252,7 @@
 		        </executions>
 		        <configuration>
 		            <instrumentation>
-		                <!-- 
+		                <!--
 		                    Don't worry about localization containers
 		                 -->
 		                <ignores>
@@ -264,7 +298,7 @@
 		              <pluginFirstClassLoader>true</pluginFirstClassLoader>
 		          </configuration>
 		        </plugin>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -306,6 +340,25 @@
 									</pluginExecutionFilter>
 									<action>
 										<ignore />
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>
+											org.apache.maven.plugins
+										</groupId>
+										<artifactId>
+											maven-javadoc-plugin
+										</artifactId>
+										<versionRange>
+											[2.10.1,)
+										</versionRange>
+										<goals>
+											<goal>javadoc</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
@@ -364,7 +417,7 @@
 			</activation>
 			<dependencies>
 			    <!--
-                    JDBC DRIVERS Used for testing only 
+                    JDBC DRIVERS Used for testing only
                 -->
 		        <dependency>
 		            <groupId>org.hsqldb</groupId>
@@ -384,7 +437,7 @@
 		    <id>microsoft</id>
             <dependencies>
                 <!--
-                    JDBC DRIVERS Used for testing only 
+                    JDBC DRIVERS Used for testing only
                 -->
                 <dependency>
                     <groupId>com.microsoft.jdbc.sqlserver</groupId>
@@ -398,7 +451,7 @@
             <id>oracle</id>
             <dependencies>
                 <!--
-                    JDBC DRIVERS Used for testing only 
+                    JDBC DRIVERS Used for testing only
                 -->
                 <dependency>
                     <groupId>com.oracle</groupId>
@@ -410,7 +463,7 @@
 		</profile>
 	</profiles>
 	<issueManagement>
-		<url>https://github.com/mscata/jenkins-audit2db-plugin/issues</url>
+		<url>https://github.com/jenkinsci/audit2db-plugin/issues</url>
 		<system>GitHub</system>
 	</issueManagement>
 	<ciManagement>

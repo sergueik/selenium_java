@@ -22,7 +22,7 @@
 			                   <td><input type="text" name="endDate" value="${endDate}"/></td>
 			               </tr>
 				        </table>
-	                    <input type="submit" name="submit" value="Apply Filter" class="yui-button"/>
+	                    <input type="submit" value="Apply Filter" class="yui-button"/>
     			    </form>
 	            </div>
             <hr/>

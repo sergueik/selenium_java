@@ -86,7 +86,7 @@ public class HibernateUtil {
 
         final Configuration config = getConfig(props);
         final SchemaExport generator = new SchemaExport(config);
-        final File tempDdlFile = new File("jenkins_audit2db.ddl");
+        final File tempDdlFile = File.createTempFile("jenkins_audit2db", ".ddl");
         generator.setOutputFile(tempDdlFile.getPath());
         generator.setFormat(true);
         generator.execute(true, false, false, true);

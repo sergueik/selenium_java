@@ -62,8 +62,7 @@ public class JobHistoryReportPage extends AbstractJenkinsPage {
 
 	    // just trust that the submit button is the last one
 	    // see https://wiki.jenkins-ci.org/display/JENKINS/Unit+Test#UnitTest-Submittingforms
-	    return (HtmlPage) reportFilter.submit(
-		    (HtmlButton) buttons.get(buttons.size() - 1));
+	    return ((HtmlButton) buttons.get(buttons.size() - 1)).click();
 	} catch (final IOException e) {
 	    throw new RuntimeException(e);
 	}
