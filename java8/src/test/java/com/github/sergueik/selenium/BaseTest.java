@@ -385,6 +385,14 @@ public class BaseTest {
 
 	}
 
+	// hover
+	// https://stackoverflow.com/questions/11038638/simulate-hover-in-jquery
+	public void jqueryHover(String cssSelector) {
+		executeScript(
+				"var selector = arguments[0]; $(selector).mouseenter().mouseleave();",
+				cssSelector);
+	}
+
 	protected static String getScriptContent(String scriptName) {
 		try {
 			final InputStream stream = BaseTest.class.getClassLoader()

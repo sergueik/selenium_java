@@ -161,17 +161,12 @@ public class JqueryBarRatingTest extends BaseTest {
 			WebElement r = ratings.get(o);
 			assertThat(r, notNullValue());
 			String cssSelector = cssSelectorOfElement(r);
-			cssSelector = String.format(
-					"html.no-js > body > section.section.section-examples > div.examples > div.row >div.col > div.box.box-green.box-large.box-example-reversed > div.box-body > div.br-wrapper.br-theme-bars-reversed > div.br-widget.br-reverse > a:nth-of-type(%d)",
-					cnt + 1);
+			cssSelector = String
+					.format("div.examples div.br-widget > a:nth-of-type(%d)", cnt + 1);
 			// the selectors are indistinguishable. Have to add ":nth-of-type(cnt)"
 			System.err.println(String.format("element: %s\n%s\n",
 					r.getAttribute("outerHTML"), cssSelector));
-			// hover
-			// https://stackoverflow.com/questions/11038638/simulate-hover-in-jquery
-			super.executeScript(
-					"var selector = arguments[0]; $(selector).mouseenter().mouseleave();",
-					cssSelector);
+			jqueryHover(cssSelector);
 			flash(r);
 			// Assert
 			WebElement comment = bar.findElement(By.xpath(
