@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd"> -->
+<!-- ch.qos.logback.core.util.IncompatibleClassException -->
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+  <appender name="EventLogAppender" type="log4net.Appender.EventLogAppender">
+    <layout type="log4net.Layout.PatternLayout">
+      <conversionPattern value="%date [%thread] %-5level %logger [%property{NDC}] - %message%newline"/>
+    </layout>
+  </appender>
+  <appender name="fileAppender" class="org.apache.log4j.RollingFileAppender">
+    <param name="Threshold" value="INFO"/>
+    <param name="File" value="c:/developer/sergueik/logback_example/myLogFile.log"/>
+    <layout class="org.apache.log4j.PatternLayout">
+      <param name="ConversionPattern" value="%d %-5p  [%c{1}] %m %n"/>
+    </layout>
+  </appender>
+  <root>
+    <priority value="info"/>
+    <appender-ref ref="fileAppender"/>
+    <appender-ref ref="EventLogAppender"/>
+  </root>
+</log4j:configuration>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+<appender name="EventLogAppender" class="log4net.Appender.EventLogAppender" >
+    <layout type="log4net.Layout.PatternLayout">
+        <conversionPattern value="%date [%thread] %-5level %logger [%property{NDC}] - %message%newline" />
+    </layout>
+</appender>
+   <root level="info">
+    <appender-ref ref="EventLogAppender"/>
+  </root>
+
+</log4j:configuration>

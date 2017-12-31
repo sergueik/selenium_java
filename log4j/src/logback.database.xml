@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="DBAppender" class="ch.qos.logback.classic.db.DBAppender">
+    <connectionSource class="ch.qos.logback.core.db.DataSourceConnectionSource">
+      <dataSource class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
+        <serverName>localhost</serverName>
+        <port>3306</port>
+        <databaseName>selenium_java</databaseName>
+        <user>root</user>
+        <password/>
+      </dataSource>
+    </connectionSource>
+  </appender>
+  <root level="debug">
+    <appender-ref ref="DBAppender"/>
+  </root>
+</configuration>

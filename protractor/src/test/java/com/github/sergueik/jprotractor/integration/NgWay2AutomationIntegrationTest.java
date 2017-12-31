@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -79,6 +80,7 @@ public class NgWay2AutomationIntegrationTest {
 		ngDriver.navigate().to(baseUrl);
 	}
 
+  @Ignore
 	@Test
 	public void testSiteLogint() {
 		String login_url = "http://way2automation.com/way2auto_jquery/index.php";
