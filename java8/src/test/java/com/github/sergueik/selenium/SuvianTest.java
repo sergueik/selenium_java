@@ -411,7 +411,8 @@ public class SuvianTest extends BaseTest {
 
 		// Act
 		highlight(element);
-		highlightNew(element, 1000);
+		// UnsupportedCommand
+		// highlightNew(element, 1000);
 		assertTrue(element.getText().equalsIgnoreCase(elementText),
 				element.getText());
 	}
@@ -566,6 +567,7 @@ public class SuvianTest extends BaseTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
+	// Selecting check boxes by their sibling labels
 	@Test(enabled = true)
 	public void test6_1() {
 		// Arrange
@@ -593,7 +595,7 @@ public class SuvianTest extends BaseTest {
 		WebElement formElement = driver.findElement(By.cssSelector("input[id]"))
 				.findElement(By.xpath(".."));
 		assertThat(formElement, notNullValue());
-		highlight(formElement);
+		highlight(formElement, 1000);
 		List<WebElement> inputElements = formElement
 				.findElements(By.cssSelector("label[for]")).stream()
 				.filter(o -> hobbies.contains(o.getText()))
@@ -640,7 +642,6 @@ public class SuvianTest extends BaseTest {
 				formElement.findElements(By.cssSelector("input[type='checkbox']"))
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
-
 
 	// NOTE: this test is broken
 	// label follows the check box therefore
@@ -1881,8 +1882,8 @@ public class SuvianTest extends BaseTest {
 		sleep(3000);
 	}
 
-	// NOTE: this test is failing
-	@Test(enabled = true)
+	// TODO: rectify this test
+	@Test(enabled = false)
 	public void test21() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.1fileupload.html");
@@ -2139,6 +2140,7 @@ public class SuvianTest extends BaseTest {
 		// Assert
 	}
 
+	// find the player with the highest score, and a score of a specific player
 	@Test(enabled = true)
 	public void test25_1() {
 		// Arrange
@@ -2179,13 +2181,23 @@ public class SuvianTest extends BaseTest {
 				});
 
 		String bestScoringPlayerName = playerScoresList.get(0).getKey();
+		System.err.println(String.format("%s : %d", bestScoringPlayerName,
+				playerScores.get(bestScoringPlayerName)));
 		WebElement playerNameInput = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("form.form-inline input#score[name='topscorer']"))));
 		playerNameInput.clear();
 		playerNameInput.sendKeys(bestScoringPlayerName);
-		System.err.println(bestScoringPlayerName);
-		sleep(1000);
+		String sachinName = "Sachin Tendulkar";
+		WebElement sachinScoreInput = wait
+				.until(ExpectedConditions.visibilityOf(driver.findElement(By
+						.cssSelector("form.form-inline input#score[name='sachinruns']"))));
+		sachinScoreInput.clear();
+		sachinScoreInput
+				.sendKeys(String.format("%d", playerScores.get(sachinName)));
+		System.err.println(
+				String.format("%s: %d", sachinName, playerScores.get(sachinName)));
+		sleep(2000);
 	}
 
 	static boolean hasScoreMethod(WebDriver driver) {
@@ -2197,20 +2209,19 @@ public class SuvianTest extends BaseTest {
 
 	// This test was developed with Selenium Driver 2.53 and needs update to work
 	// with Selenium 3.x.x
-	/*
 	@Test(enabled = true)
 	public void test25_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/3.5cricketScorecard.html");
-	
+
 		WebElement link = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
 		// Act
-	
+
 		assertThat(link, notNullValue());
 		assertThat(link.getText(), containsString("Generate Scorecard"));
 		link.click();
-	
+
 		// Wait page to update
 		com.google.common.base.Predicate<WebDriver> hasScore = d -> {
 			return (boolean) (d
@@ -2218,8 +2229,19 @@ public class SuvianTest extends BaseTest {
 							".container .row .intro-message table tbody tr td p#sachinruns"))
 					.getText().trim().length() > 0);
 		};
+		/*
+		method until in class org.openqa.selenium.supprt.ui.FluentWait<T> cannot be applied to given types;
+		[ERROR] required: java.util.function.Function<? super org.openqa.selenium.WebDriver,V>
+		 */
+		// wait.until(hasScore);
+
 		try {
-			wait.until(hasScore);
+			wait.until(d -> {
+				return (boolean) (d
+						.findElement(By.cssSelector(
+								".container .row .intro-message table tbody tr td p#sachinruns"))
+						.getText().trim().length() > 0);
+			});
 		} catch (UnreachableBrowserException e) {
 		}
 		// Assert
@@ -2232,7 +2254,7 @@ public class SuvianTest extends BaseTest {
 		int maxScore = scores.get(0);
 		int minScore = scores.get(scores.size() - 1);
 		assertTrue(maxScore >= minScore);
-	
+
 		List<String> players = driver
 				.findElements(By.cssSelector(
 						".container .row .intro-message table tbody tr td:nth-of-type(1)"))
@@ -2257,7 +2279,6 @@ public class SuvianTest extends BaseTest {
 		scoreInput.sendKeys(String.format("%d", scoreSachin));
 		sleep(1000);
 	}
-	*/
 
 	// This test was developed with Selenium Driver 2.53 and needs update to work
 	// with Selenium 3.x.x
@@ -2347,50 +2368,72 @@ public class SuvianTest extends BaseTest {
 		}
 	}
 
+	// Locating radio button by its label
+	// Cosnruct XPath with the filter
 	@Test(enabled = true)
 	public void test27_1() {
 		// Arrange
+		String country = "India";
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
-		WebElement inputElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath(
-						"//div[@class='intro-message']/ul[@id='tst']/li[.='India']/input[@type='radio' and @name='country']"))));
+		WebElement inputElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath(String.format(
+						"//div[@class='intro-message']/ul[@id='tst']/li[.='%s']/input[@type='radio' and @name='country']",
+						country)))));
+		assertThat(inputElement, notNullValue());
+		// alternative XPath
+		inputElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.xpath(String.format(
+						"//div[@class='intro-message']/ul/li[contains(text(), '%s')]//input[@type='radio' and @name='country']",
+						country)))));
+
 		assertThat(inputElement, notNullValue());
 		inputElement.click();
 		sleep(100);
 		// Assert
+
+		// Run Javascript to compute the checked radio box index
 		String script = "var radios = document.getElementsByTagName('input');\n"
-				+ "var checkedRadioItemNumber = 1; for (var cnt = 0; cnt < radios.length; cnt++) {\n"
+				+ "var checkedRadioIndex = 1; for (var cnt = 0; cnt < radios.length; cnt++) {\n"
 				+ "if (radios[cnt].type === 'radio' && radios[cnt].checked) {\n"
-				+ "checkedRadioItemNumber = cnt; }\n}\n"
-				+ "var value = radios[checkedRadioItemNumber].value;"
-				+ "return (checkedRadioItemNumber + 1).toString();";
+				+ "checkedRadioIndex = cnt; }\n}\n"
+				+ "var value = radios[checkedRadioIndex].value;\n"
+				+ "return (checkedRadioIndex + 1).toString();";
 		String checkedRadioItemNumber = executeScript(script).toString();
 		System.err.println("Checked is Radio item #" + checkedRadioItemNumber);
+		// Construct XPath fo find the item by index in the list
 		WebElement itemElement = driver.findElement(By.xpath(
 				String.format("//ul[@id='tst']/li[%s]", checkedRadioItemNumber)));
 		assertThat(itemElement, notNullValue());
 		System.err.println("Result : " + itemElement.getText());
+		assertThat(itemElement.getText(), is(country));
 	}
 
+	// Locating radio button by its label
 	@Test(enabled = true)
 	public void test27_2() {
 		// Arrange
+		String country = "India";
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
+		// get the list parent object
 		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
 				.findElement(By.cssSelector(".container .row .intro-message ul#tst"))));
 		assertThat(itemList, notNullValue());
 		// Act
 
+		// first, find the list element with a specific label text
+		// then click on the input element within the list element just found
 		WebElement inputElement = itemList.findElements(By.tagName("li")).stream()
-				.filter(o -> o.getText().contains((CharSequence) "India"))
+				.filter(o -> o.getText().matches(country))
 				.map(o -> o
 						.findElement(By.xpath("input[@type='radio' and @name='country']")))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
 		sleep(100);
 		// Assert
+		// find the radio button element which is checked
+		// Note: this will not give us the label information
 		Optional<WebElement> result = driver.findElements(By.tagName("input"))
 				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
 				.filter(o -> o.getAttribute("checked") != null).findFirst();
@@ -2405,6 +2448,7 @@ public class SuvianTest extends BaseTest {
 	@Test(enabled = true)
 	public void test27_3() {
 		// Arrange
+		String country = "India";
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
 		WebElement itemList = wait.until(ExpectedConditions.visibilityOf(driver
@@ -2412,11 +2456,9 @@ public class SuvianTest extends BaseTest {
 		assertThat(itemList, notNullValue());
 		// Act
 		WebElement inputElement = itemList
-				.findElements(By.xpath(
-						"li[contains(text(), 'India')]//input[@type='radio' and @name='country']"))
+				.findElements(By.xpath("li//input[@type='radio' and @name='country']"))
 				.stream()
-				.filter(o -> o.findElement(By.xpath("..")).getText()
-						.contains((CharSequence) "India"))
+				.filter(o -> o.findElement(By.xpath("..")).getText().matches(country))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
 		sleep(100);
@@ -2434,23 +2476,25 @@ public class SuvianTest extends BaseTest {
 	@Test(enabled = true)
 	public void test27_4() {
 		// Arrange
+		String country = "India";
 		driver.get("http://suvian.in/selenium/3.7correspondingRadio.html");
 
 		// Act
 		WebElement inputElement = driver
-				.findElements(By.xpath(
-						"//li[contains(text(), 'India')]//input[@type='radio' and @name='country']"))
+				.findElements(
+						By.xpath("//li//input[@type='radio' and @name='country']"))
 				.stream()
 				.filter(o -> o.findElement(By.xpath("..")).getText()
-						.contains((CharSequence) "India"))
+						.contains((CharSequence) country))
 				.findFirst().orElseThrow(RuntimeException::new);
 		inputElement.click();
 		sleep(100);
 		// Assert
+		// locate element again and confirm it is checked
 		Optional<WebElement> result = driver.findElements(By.tagName("input"))
 				.stream().filter(o -> o.getAttribute("type").equalsIgnoreCase("radio"))
 				.filter(o -> o.findElement(By.xpath("..")).getText()
-						.contains((CharSequence) "India"))
+						.contains((CharSequence) country))
 				.filter(o -> o.getAttribute("checked") != null).findFirst();
 		WebElement checkedRadioButton = (result.isPresent()) ? result.get() : null;
 		assertThat(checkedRadioButton, notNullValue());
