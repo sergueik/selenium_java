@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.Alert;
@@ -28,6 +29,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -69,10 +71,22 @@ public class BaseTest {
 	public Alert alert;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
+	private static String handle = null;
+
+	public String getHandle() {
+		return handle;
+	}
+
+	private String parentHandle;
+
+	public String getParentHandle() {
+		return parentHandle;
+	}
+
 	protected static final Logger log = LogManager.getLogger(BaseTest.class);
 
 	public int scriptTimeout = 5;
-	public int flexibleWait = 120;
+	public int flexibleWait = 60; // too long
 	public int implicitWait = 1;
 	public long pollingInterval = 500;
 	private static long highlightInterval = 100;
@@ -597,4 +611,70 @@ public class BaseTest {
 		return driver.findElement(By.tagName("body")).getText();
 	}
 
+	private static int instanceCount = 0;
+
+	// Creates a new window / browser tab using script injection
+	// Loads a specified url there
+	protected String createWindow(String url) {
+
+		Set<String> oldHandles = driver.getWindowHandles();
+		parentHandle = driver.getWindowHandle();
+
+		// Inject an anchor element
+		String name = "Window_" + instanceCount++;
+		executeScript("var anchorTag = document.createElement('a'); "
+				+ "anchorTag.appendChild(document.createTextNode('nwh'));"
+				+ "anchorTag.setAttribute('id', arguments[0]);"
+				+ "anchorTag.setAttribute('href', arguments[1]);"
+				+ "anchorTag.setAttribute('target', '_blank');"
+				+ "anchorTag.setAttribute('style', 'display:block;');"
+				+ "var firstElement = document.getElementsByTagName('body')[0].getElementsByTagName('*')[0];"
+				+ "firstElement.parentElement.appendChild(anchorTag);", name, url);
+		// common error with this approach: Element is not clickable at point
+		// HTML, HEAD, BODY, some element
+
+		WebElement element = driver.findElement(By.id(name));
+		sleep(1000);
+		try {
+			// element.getLocation()
+			System.err.println("Scrolling to " + element.getLocation().y);
+			scroll(element.getLocation().x, element.getLocation().y);
+		} catch (UnsupportedCommandException e) {
+
+		}
+		scrolltoElement(element);
+		// Click on the anchor element
+		element.click();
+		Set<String> newHandles = driver.getWindowHandles();
+
+		newHandles.removeAll(oldHandles);
+		// the remaining item is the new window handle
+		for (String handle : newHandles) {
+			return handle;
+		}
+		return null;
+	}
+
+	private void confirmHanldeNotClosed(String windowHandle) {
+		if (windowHandle == null || windowHandle.equals("")) {
+			throw new WebDriverException("Window/Tab was closed");
+		}
+	}
+
+	protected void close(String windowHandle) {
+		switchToWindow(windowHandle).close();
+		handle = null;
+		driver.switchTo().window(parentHandle);
+	}
+
+	protected WebDriver switchToWindow(String windowHandle) {
+		confirmHanldeNotClosed(windowHandle);
+		handle = windowHandle;
+		return driver.switchTo().window(windowHandle);
+	}
+
+	protected WebDriver switchToParent() {
+		confirmHanldeNotClosed(handle);
+		return driver.switchTo().window(parentHandle);
+	}
 }
