@@ -17,7 +17,28 @@ import java.util.List;
 
 public class FruitsService {
 
-	// a backend database mockup
+	// DTO mockup 
+	public static class Fruit {
+		private String name;
+
+		public Fruit(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		@Override
+		public String toString() {
+			// return getName();
+			// Exception: SyntaxError: JSON Parse error: Unexpected identifier
+			// "orange", data: '[orange,apple,banana,strawberry]'
+			return String.format("\"%s\"", this.name);
+		}
+	}
+
+	// Service mockup
 	private static Fruit[] fruits;
 	static {
 		fruits = new Fruit[] { new Fruit("orange"), new Fruit("apple"),
@@ -36,13 +57,16 @@ public class FruitsService {
 		// launch a background thread
 		System.err.println(
 				"loadFruits called with: " + callback.toString().substring(0, 100));
+		JSONArray fruitList = new JSONArray();
+		for (Fruit fruit : Arrays.asList(FruitsService.getFruits())) {
+			fruitList.add((Object) fruit);
+		}
 		new Thread(() -> {
 			try {
 				shuffleFruits();
 				sleep(1000); // add some processing simulation...
 				runLater(() -> {
-					call(callback, /* (JSONArray) FruitsService.getFruits() */
-							Arrays.toString(FruitsService.getFruits()));
+					call(callback, fruitList);
 				});
 
 			} catch (InterruptedException e) {
@@ -57,19 +81,4 @@ public class FruitsService {
 		FruitsService.fruits = list.toArray(new Fruit[] {});
 	}
 
-	public static class Fruit {
-		private String name;
-
-		public Fruit(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return this.name;
-		}
-
-		public String toString() {
-			return String.format("'%s'", this.name);
-		}
-	}
 }

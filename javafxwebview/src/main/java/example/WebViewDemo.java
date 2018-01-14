@@ -11,32 +11,29 @@ import static example.Java2JavascriptUtils.connectBackendObject;
 
 import example.CalculatorService;
 import example.FruitsService;
+// TODO: https://stackoverflow.com/questions/25222811/access-restriction-the-type-application-is-not-api-restriction-on-required-l
 
+// based on: https://github.com/lipido/javafxwebview 
 public class WebViewDemo extends Application {
 
 	private final String PAGE = "/index.html";
 
 	@Override
-	public void start(Stage primaryStage) {
-		createWebView(primaryStage, PAGE);
+	public void start(Stage stage) {
+		createWebView(stage, PAGE);
 	}
 
-	private void createWebView(Stage primaryStage, String page) {
+	private void createWebView(Stage stage, String page) {
 
-		// create the JavaFX webview
 		final WebView webView = new WebView();
 
-		// connect the FruitsService instance as "fruitsService"
-		// javascript variable
 		connectBackendObject(webView.getEngine(), "fruitsService",
 				new FruitsService());
 
-		// connect the CalculatorService instance as "calculatorService"
-		// javascript variable
 		connectBackendObject(webView.getEngine(), "calculatorService",
 				new CalculatorService());
 
-		// show "alert" Javascript messages in stdout (useful to debug)
+		// show "alert" Javascript messages in stderr for debuging
 		webView.getEngine().setOnAlert(new EventHandler<WebEvent<String>>() {
 			@Override
 			public void handle(WebEvent<String> arg) {
@@ -47,13 +44,13 @@ public class WebViewDemo extends Application {
 		// load index.html
 		webView.getEngine().load(getClass().getResource(page).toExternalForm());
 
-		primaryStage.setScene(new Scene(webView));
-		primaryStage.setTitle("WebView with Java backend");
-		primaryStage.show();
+		stage.setScene(new Scene(webView));
+		stage.setTitle("WebView with Java backend");
+		stage.show();
 	}
 
 	public static void main(String[] args) {
-		// System.setProperty("prism.lcdtext", "false"); // enhance fonts
+		System.setProperty("prism.lcdtext", "false"); // enhance fonts
 		launch(args);
 	}
 }

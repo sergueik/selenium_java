@@ -11,11 +11,9 @@ app.controller('JavaFXWebDemoController', function($scope) {
       }
     }];
     var callback = function(data) {
-      // clone the array to prevent [$rootScope:infdig] exception when raw data from Java backend is used directly
       try {
-        // TODO:
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify
-        $scope.fruits = eval(data).slice();
+      alert(data);
+        $scope.fruits = JSON.parse(data);
       } catch (err) {
         throw new Error("Exception: " + err.toString() + ", data: " +
           "'" + data + "'");
