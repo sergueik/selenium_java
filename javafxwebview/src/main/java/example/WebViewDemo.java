@@ -39,8 +39,8 @@ public class WebViewDemo extends Application {
 		// show "alert" Javascript messages in stdout (useful to debug)
 		webView.getEngine().setOnAlert(new EventHandler<WebEvent<String>>() {
 			@Override
-			public void handle(WebEvent<String> arg0) {
-				System.err.println("alertwb1: " + arg0.getData());
+			public void handle(WebEvent<String> arg) {
+				System.err.println("alertwb1: " + arg.getData());
 			}
 		});
 
@@ -53,7 +53,7 @@ public class WebViewDemo extends Application {
 	}
 
 	public static void main(String[] args) {
-		System.setProperty("prism.lcdtext", "false"); // enhance fonts
+		// System.setProperty("prism.lcdtext", "false"); // enhance fonts
 		launch(args);
 	}
 }

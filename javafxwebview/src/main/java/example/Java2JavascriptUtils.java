@@ -16,13 +16,6 @@ import java.net.URLDecoder;
 import netscape.javascript.JSException;
 import netscape.javascript.JSObject;
 
-/**
- * Utilities to connect Java objects as javascript objects in a WebEngine.
- * 
- * It also allows to call callback functions.
- * 
- * @author lipido
- */
 public class Java2JavascriptUtils {
 
 	private static Map<WebEngine, Map<String, Object>> backendObjects = new HashMap<>();
@@ -119,11 +112,9 @@ public class Java2JavascriptUtils {
 		}
 
 		String call = "this(" + argumentsList + ")";
-		// System.err.println("Calling: " + call);
 		try {
 			callback.eval(call);
 		} catch (JSException e) {
-			// angular  Error: [$rootScope:infdig]
 			System.err
 					.println("Exception (ignored): " + URLDecoder.decode(e.getMessage()));
 		}
@@ -144,14 +135,14 @@ public class Java2JavascriptUtils {
 		}
 
 		@Override
-		public void handle(WebEvent<String> arg0) {
-			if (arg0.getData().contains(CONNECT_BACKEND_MAGIC_WORD)) {
-				String varname = arg0.getData()
+		public void handle(WebEvent<String> arg) {
+			if (arg.getData().contains(CONNECT_BACKEND_MAGIC_WORD)) {
+				String varname = arg.getData()
 						.substring(CONNECT_BACKEND_MAGIC_WORD.length());
 
 				connectToWebEngine(engine, varname);
 			} else if (wrappedHandler != null)
-				wrappedHandler.handle(arg0);
+				wrappedHandler.handle(arg);
 		}
 	}
 }
