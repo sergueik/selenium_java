@@ -95,7 +95,9 @@ testForAngular.js
 waitForAngular.js
 ```
 
-Majority of __AngularJS__-specific locators [aren't any longer supported](https://stackoverflow.com/questions/36201691/protractor-angular-2-failed-unknown-error-angular-is-not-defined) by __Angular 2__.
+Many __AngularJS__-specific locators [aren't any longer supported](https://stackoverflow.com/questions/36201691/protractor-angular-2-failed-unknown-error-angular-is-not-defined) by __Angular 2__.
+
+The newest Protractor [`By.deepCss` (Shadow DOM)](http://www.protractortest.org/#/api?view=ProtractorBy.prototype.deepCss) and [flexible `By.addLocator`](http://www.protractortest.org/#/api?view=ProtractorBy.prototype.addLocator) are not yet supported.
 
 The __E2E_Tests__ section of the [document](https://angular.io/guide/upgrade) covers the migration.
 
