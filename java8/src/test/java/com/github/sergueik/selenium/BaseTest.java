@@ -613,6 +613,7 @@ public class BaseTest {
 
 	private static int instanceCount = 0;
 
+	// based on http://automated-testing.info/t/kak-ya-mogu-otkrit-v-firefox-dve-vkladki-i-perehodit-s-odnoj-na-vtoruyu-pri-neobhodimosti/1741/4
 	// Creates a new window / browser tab using script injection
 	// Loads a specified url there
 	protected String createWindow(String url) {
