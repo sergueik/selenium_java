@@ -12,8 +12,11 @@ based on:https://github.com/jesuino/jfx8-app
     <!-- The final name for the JAR that you can find in target directory-->
     <jar.final.name>javafx_example_app</jar.final.name>
     <!--  the default class that has the public static void main(String[]) method -->
-<!--    <main.class>example.App</main.class> -->
+<!--    <main.class>example.App</main.class> 
 <main.class>example.HelloBreadCrumbBar</main.class>
+
+-->
+<main.class>example.FlowPaneEx</main.class>
 
   </properties>
   <dependencies>
