@@ -38,12 +38,17 @@
     <sikulixapi.version>1.1.0</sikulixapi.version>
   </properties>
   <dependencies>
-<dependency>
-    <groupId>org.hamcrest</groupId>
-    <artifactId>hamcrest-all</artifactId>
-    <version>${hamcrest-all.version}</version>
-    <scope>test</scope>
-</dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>3.6.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>${hamcrest-all.version}</version>
+      <scope>test</scope>
+    </dependency>
     <dependency>
       <groupId>com.sikulix</groupId>
       <artifactId>sikulixapi</artifactId>
@@ -236,4 +241,41 @@
       </properties>
     </profile>
   </profiles>
+  <repositories>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+    <repository>
+      <id>maven-central</id>
+      <name>maven central repo</name>
+      <url>https://mvnrepository.com/repos/central</url>
+    </repository>
+    <repository>
+      <id>osgeo</id>
+      <name>osgeo repo</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+    </repository>
+    <repository>
+      <id>seasar</id>
+      <name>seasar repo</name>
+      <url>https://www.seasar.org/maven/maven2</url>
+    </repository>
+    <repository>
+      <id>jcenter</id>
+      <url>https://jcenter.bintray.com/</url>
+    </repository>
+    <repository>
+      <id>swt-repo</id>
+      <url>https://swt-repo.googlecode.com/svn/repo/</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>consol</id>
+      <url>http://labs.consol.de/maven/repository/</url>
+    </repository>
+  </repositories>
 </project>
