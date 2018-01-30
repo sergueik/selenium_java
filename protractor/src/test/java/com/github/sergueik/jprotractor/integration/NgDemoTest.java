@@ -1,13 +1,18 @@
 package com.github.sergueik.jprotractor.integration;
 
+import static org.exparity.hamcrest.date.DateMatchers.sameOrBefore;
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -34,6 +39,9 @@ public class NgDemoTest {
 	static WebDriverWait wait;
 	static Actions actions;
 	static Alert alert;
+	private int cnt = 0;
+	private LocalDate today = LocalDate.now();
+	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
 
 	@Test
@@ -59,18 +67,18 @@ public class NgDemoTest {
 		login.click();
 
 		// Then I am greeted by my first and last name
-		assertThat(ngDriver.findElement(NgBy.binding("user")).getText(),
+		assertThat("greeting", ngDriver.findElement(NgBy.binding("user")).getText(),
 				containsString("Hermoine Granger"));
 
 		// And I see balance on one of my accounts
 		NgWebElement ng_accountNo = ngDriver.findElement(NgBy.binding("accountNo"));
-		assertThat(Integer.parseInt(ng_accountNo.getText()),
-				anyOf(is(1001), is(1002), is(1003)));
+		assertThat("account number", ng_accountNo.getText(),
+				anyOf(is("1001"), is("1002"), is("1003")));
 		highlight(ng_accountNo);
 
 		// And I open account
 		ngDriver.findElements(NgBy.options("account for account in Accounts"))
-				.stream().filter(account -> Integer.parseInt(account.getText()) == 1001)
+				.stream().filter(account -> account.getText().matches("1001"))
 				.collect(Collectors.toList()).get(0).click();
 
 		// And I inspect transactions
@@ -79,10 +87,11 @@ public class NgDemoTest {
 		highlight(transactions_button);
 		transactions_button.click();
 
-		// wait until transactions are loaded
+		// And I wait until transactions are loaded
 		wait.until(ExpectedConditions.visibilityOf(ngDriver
 				.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
-		int cnt = 0;
+
+		// Then I can inspect few transactions
 		for (WebElement tx : ngDriver
 				.findElements(NgBy.repeater("tx in transactions"))) {
 			if (cnt++ > 5) {
@@ -90,18 +99,28 @@ public class NgDemoTest {
 			}
 			NgWebElement ngTx = new NgWebElement(ngDriver, tx);
 
-			// it will be either debit or credit
-			assertThat(ngTx.evaluate("tx.type").toString(),
-					anyOf(containsString("debit"), containsString("credit")));
+			// it would be either Debit or Credit
+			String txType = ngTx.evaluate("tx.type").toString();
+			assertThat("transaction type", txType,
+					anyOf(containsString("Debit"), containsString("Credit")));
 
 			// it will have non zero amount
-			assertTrue(Integer.parseInt(ngTx.evaluate("tx.amount").toString()) > 0);
+			int txAmount = Integer.parseInt(ngTx.evaluate("tx.amount").toString());
+			assertThat("it will have non zero amount", txAmount, greaterThan(0));
 			highlight(ngTx.findElement(NgBy.binding("tx.amount")));
 
-			Object transaction_date = ngTx.evaluate("tx.date");
+			// its transaction dates should be the past
+			try {
+				Date txDate = dateFormat.parse(ngTx.evaluate("tx.date").toString());
+				assertThat("transaction date", txDate, sameOrBefore(new Date()));
+			} catch (ParseException e) {
+				// ignore
+			}
 		}
 	}
 
+	
+	
 	@BeforeClass
 	public static void setup() throws IOException {
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
