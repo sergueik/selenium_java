@@ -22,6 +22,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
@@ -53,17 +54,24 @@ public class NgDemoTest {
 		highlight(element);
 		element.click();
 
-		// choose myself from the list of existing customers
+		// And I find myself in the list of existing customers
 		NgWebElement custId = ngDriver.findElement(NgBy.input("custId"));
 		highlight(custId);
+		custId.click();
 
-		custId.findElements(NgBy.repeater("cust in Customers")).stream()
+		WebElement customer = custId
+				.findElements(NgBy.repeater("cust in Customers")).stream()
 				.filter(c -> c.getText().indexOf("Hermoine Granger") >= 0).findFirst()
-				.get().click();
+				.get();
+
+		customer.sendKeys(Keys.SPACE);
+		customer.click();
+		ngDriver.waitForAngular();
 
 		// And I log in
 		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 		assertTrue(login.isEnabled());
+		highlight(login);
 		login.click();
 
 		// Then I am greeted by my first and last name
@@ -87,11 +95,11 @@ public class NgDemoTest {
 		highlight(transactions_button);
 		transactions_button.click();
 
-		// And I wait until transactions are loaded
+		// wait until transactions are loaded
 		wait.until(ExpectedConditions.visibilityOf(ngDriver
 				.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
 
-		// Then I can inspect few transactions
+		// Then I can observe few transactions
 		for (WebElement tx : ngDriver
 				.findElements(NgBy.repeater("tx in transactions"))) {
 			if (cnt++ > 5) {
@@ -99,7 +107,7 @@ public class NgDemoTest {
 			}
 			NgWebElement ngTx = new NgWebElement(ngDriver, tx);
 
-			// it would be either Debit or Credit
+			// every transaction would be either Debit or Credit
 			String txType = ngTx.evaluate("tx.type").toString();
 			assertThat("transaction type", txType,
 					anyOf(containsString("Debit"), containsString("Credit")));
@@ -119,8 +127,6 @@ public class NgDemoTest {
 		}
 	}
 
-	
-	
 	@BeforeClass
 	public static void setup() throws IOException {
 		seleniumDriver = CommonFunctions.getSeleniumDriver();
