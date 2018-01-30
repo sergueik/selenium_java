@@ -1,97 +1,54 @@
 package com.github.sergueik.selenium;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.testng.Assert.assertTrue;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
-import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import java.io.File;
-import java.io.InputStream;
-import java.lang.reflect.Method;
-import java.io.IOException;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.lang3.StringUtils;
-
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.Dimension;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.HasInputDevices;
-import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.interactions.Mouse;
-import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
-import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriverService;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.Point;
-import org.openqa.selenium.Rectangle;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.HasInputDevices;
+import org.openqa.selenium.interactions.Mouse;
+import org.openqa.selenium.interactions.internal.Coordinates;
+import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.UnreachableBrowserException;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
-
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
-import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-
-import org.hamcrest.CoreMatchers;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
-
 import org.testng.asserts.SoftAssert;
 // http://www.softwaretestingmaterial.com/soft-assert/
 
@@ -177,50 +134,43 @@ public class SuvianTest extends BaseTest {
 		try {
 			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
 
-				@Override
-				public WebElement apply(WebDriver d) {
-					Optional<WebElement> e = d
-							.findElements(
-									By.cssSelector("div.container div.row div.intro-message h3"))
-							.stream().filter(o -> {
-								String t = o.getText();
-								System.err.println("in stream filter (3): Text = " + t);
-								return (Boolean) (t.contains("Navigate Back"));
-							}).findFirst();
-					return (e.isPresent()) ? e.get() : (WebElement) null;
-				}
-			});
+	@Override
+	public WebElement apply(WebDriver d) {
+		Optional<WebElement> e = d
+				.findElements(
+						By.cssSelector("div.container div.row div.intro-message h3"))
+				.stream().filter(o -> {
+					String t = o.getText();
+					System.err.println("in stream filter (3): Text = " + t);
+					return (Boolean) (t.contains("Navigate Back"));
+				}).findFirst();
+		return (e.isPresent()) ? e.get() : (WebElement) null;
+	}});
 
-			System.err
-					.println("element check: " + checkElement.getAttribute("innerHTML"));
-		}
+	System.err.println("element check: "+checkElement.getAttribute("innerHTML"));}
 
-		catch (
+	catch(
 
-		Exception e) {
+	Exception e)
+	{
 			System.err.println("Exception: " + e.toString());
 		}
 
-		// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
-		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
-		elements = driver
-				.findElements(By.cssSelector(".container .row .intro-message h3"));
-		// longer version
-		Stream<WebElement> elementsStream = elements.stream();
-		elements = elementsStream.filter(o -> {
-			String t = o.getText();
-			System.err.println("(in filter) Text: " + t);
-			return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
-		}).collect(Collectors.toList());
+	// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
+	// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
+	elements=driver.findElements(By.cssSelector(".container .row .intro-message h3"));
+	// longer version
+	Stream<WebElement> elementsStream = elements.stream();elements=elementsStream.filter(o->
+	{
+		String t = o.getText();
+		System.err.println("(in filter) Text: " + t);
+		return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
+	}).collect(Collectors.toList());
 
-		// shorter version
-		elements = driver
-				.findElements(By.cssSelector(".container .row .intro-message h3"))
-				.stream()
-				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
-				.collect(Collectors.toList());
+	// shorter version
+	elements=driver.findElements(By.cssSelector(".container .row .intro-message h3")).stream().filter(o->"Link Successfully clicked".equalsIgnoreCase(o.getText())).collect(Collectors.toList());
 
-		assertThat(elements.size(), equalTo(1));
+	assertThat(elements.size(), equalTo(1));
 
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"))
@@ -368,54 +318,66 @@ public class SuvianTest extends BaseTest {
 	}
 
 	// http://software-testing.ru/forum/index.php?/topic/17746-podskazhite-po-xpath/
+	// http://automated-testing.info/t/vopros-na-znanie-xpath-pochemu-ne-nahodit-element/18600/4
 	@Test(enabled = true)
 	public void test0_8() {
 
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.1link.html");
-		String elementText = "Click Here";
+		String expectedText = "Click Here";
 		WebElement element = null;
-		try {
+		String[] xpathMatchers = new String[] { "//a[text() = '%s']",
+				"//a[normalize-space(.) = '%s']", "//a[normalize-space(text()) = '%s']",
+				"//*[normalize-space(text()) = '%s']",
+				"//a[contains(text()[normalize-space()],'%s')]",
+				"//a[contains(normalize-space(.), '%s')]",
+				// NOTE: way too permissive for a selector
+				"//*[contains(normalize-space(.), '%s')]" };
+		for (int cnt = 0; cnt != xpathMatchers.length; cnt++) {
+			String xpathMatcher = String.format(xpathMatchers[cnt], expectedText);
+			// try {
+
 			element = wait.until(new ExpectedCondition<WebElement>() {
 				@Override
 				public WebElement apply(WebDriver _driver) {
-					int cnt = 4;
-					String[] xpaths = new String[] { "//a[text() = '%s']",
-							"//a[normalize-space(.) = '%s']",
-							"//a[normalize-space(text()) = '%s']",
-							"//*[normalize-space(text()) = '%s']",
-							"//a[contains(normalize-space(.), '%s')]",
-							// NOTE: way too permissive for a selector
-							"//*[contains(normalize-space(.), '%s')]" };
-					String xpath = String.format(xpaths[cnt], elementText);
-					System.err.println("Locator: xpath " + xpath);
-					Optional<WebElement> _element = _driver.findElements(By.xpath(xpath))
-							.stream().filter(o -> {
+					System.err.println("xpath matcher:" + xpathMatcher);
+					Optional<WebElement> _element = _driver
+							.findElements(By.xpath(xpathMatcher)).stream().filter(o -> {
 								String t = o.getText();
 								System.err.println("In filter: " + o.getTagName() + ' '
 										+ (t.length() > 20 ? t.substring(0, 20) : t));
 								Pattern pattern = Pattern.compile(
-										"^ *" + Pattern.quote(elementText),
+										"^ *" + Pattern.quote(expectedText),
 										Pattern.CASE_INSENSITIVE);
 								return pattern.matcher(t).find();
 								// quicker, less precise
-								// return (Boolean) (__element.getText().contains(elementText));
+								// return (Boolean)
+								// (__element.getText().contains(expectedText));
 							}).findFirst();
 					return (_element.isPresent()) ? _element.get() : (WebElement) null;
 				}
 			});
-			System.err.println("Element: " + element.getAttribute("innerHTML"));
-		} catch (Exception e) {
-			System.err.println("Exception: " + e.toString());
+			String expectedTag = null;
+			Pattern pattern = Pattern.compile("^/+([^\\[]+)\\[.*$",
+					Pattern.CASE_INSENSITIVE);
+			Matcher matcher = pattern.matcher(xpathMatcher);
+			if (matcher.find()) {
+				expectedTag = matcher.group(1);
+			}
+			System.err.println(String.format("Expecting tag: \"%s\": ", expectedTag));
+			if (!expectedTag.matches("\\*")) {
+				assertThat("tag match", element.getTagName(), is(expectedTag)); // case
+			}
+			assertThat("text match", element.getAttribute("innerHTML"),
+					containsString(expectedText));
+			System.err.println("Element: " + element.getTagName() + " with text: "
+					+ element.getAttribute("innerHTML"));
+			// } catch (Exception e) {
+			// System.err.println("Exception: " + e.toString());
+			// }
+			// Act
+			highlight(element);
 		}
-
-		// Act
-		highlight(element);
-		// UnsupportedCommand
-		// highlightNew(element, 1000);
-		assertTrue(element.getText().equalsIgnoreCase(elementText),
-				element.getText());
-	}
 
 	@Test(enabled = true)
 	public void test1() {
@@ -730,7 +692,7 @@ public class SuvianTest extends BaseTest {
 					}
 				}).collect(Collectors.toList());
 
-		assertTrue(checkBoxes.size() > 0);
+	assertTrue(checkBoxes.size() > 0);
 		checkBoxes.stream().forEach(o -> {
 			highlight(o);
 			sleep(100);
