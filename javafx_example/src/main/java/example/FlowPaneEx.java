@@ -19,6 +19,9 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import example.ChoiceItem;
+import example.ChoicesDialog;
+
 @SuppressWarnings("restriction")
 public class FlowPaneEx extends Application {
 
@@ -92,7 +95,13 @@ public class FlowPaneEx extends Application {
 
 		stage.setOnCloseRequest(e -> {
 			e.consume();
-			ChoicesDialog choicesDialog = new ChoicesDialog(stage);
+			ChoiceItem[] items = new ChoiceItem[] {
+					new ChoiceItem("Exit and save my project", 2),
+					new ChoiceItem("Exit and don't save", 1),
+					new ChoiceItem("Don't exit", 10), };
+
+			ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
+			choicesDialog.setChoices(items);
 			// choicesDialog.initStyle(StageStyle.UNDECORATED);
 			choicesDialog.sizeToScene();
 			// optionally hide self
@@ -114,7 +123,13 @@ public class FlowPaneEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// Stage stage = new Stage();
-				ChoicesDialog choicesDialog = new ChoicesDialog(stage);
+				ChoiceItem[] items = new ChoiceItem[] {
+						new ChoiceItem("Exit and save my project", 2),
+						new ChoiceItem("Exit and don't save", 1),
+						new ChoiceItem("Don't exit", 10), };
+
+				ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
+				// ChoicesDialog choicesDialog = new ChoicesDialog(stage);
 				choicesDialog.initStyle(StageStyle.UNDECORATED);
 				choicesDialog.sizeToScene();
 				// Hide this current window (if this is what you want)
