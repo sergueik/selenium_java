@@ -9,17 +9,17 @@ based on:https://github.com/jesuino/jfx8-app
   <artifactId>javafx_example</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <properties>
-    <!-- The final name for the JAR that you can find in target directory-->
+    <log4j.version>1.2.17</log4j.version>
     <jar.final.name>javafx_example_app</jar.final.name>
-    <!--  the default class that has the public static void main(String[]) method -->
-<!--    <main.class>example.App</main.class> 
-<main.class>example.HelloBreadCrumbBar</main.class>
-
--->
 <main.class>example.FlowPaneEx</main.class>
 
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
     <!-- 
     <dependency>
       <groupId>{groupId}</groupId>
