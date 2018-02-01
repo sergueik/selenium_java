@@ -21,6 +21,7 @@ import javafx.stage.StageStyle;
 
 import example.ChoiceItem;
 import example.ChoicesDialog;
+import example.ConfigFormEx;
 
 @SuppressWarnings("restriction")
 public class FlowPaneEx extends Application {
@@ -86,7 +87,16 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("preferences_32.png"));
 		configButton.setGraphic(new ImageView(configImage));
 		configButton.setTooltip(new Tooltip("Configure"));
-
+		configButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Stage stage = new Stage();
+				ConfigFormEx s = new ConfigFormEx();
+				s.start(stage);
+			}
+		});
+		
+		
 		Button quitButton = new Button();
 		Image quitImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("quit_32.png"));
@@ -95,51 +105,13 @@ public class FlowPaneEx extends Application {
 
 		stage.setOnCloseRequest(e -> {
 			e.consume();
-			ChoiceItem[] items = new ChoiceItem[] {
-					new ChoiceItem("Exit and save my project", 2),
-					new ChoiceItem("Exit and don't save", 1),
-					new ChoiceItem("Don't exit", 10), };
-
-			ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
-			choicesDialog.setChoices(items);
-			// choicesDialog.initStyle(StageStyle.UNDECORATED);
-			choicesDialog.sizeToScene();
-			// optionally hide self
-			// ((Node)(event.getSource())).getScene().getWindow().hide();
-			/*		choicesDialog.show();
-			while (choicesDialog.isShowing()) {
-			
-			}
-			*/
-			choicesDialog.showAndWait();
-			int code = Integer.parseInt(choicesDialog.getResult());
-			logger.info("Exit app with code: " + code);
-			if (code == 1 || code == 2) {
-				stage.close();
-			}
+			confirmClose();
 		});
 
 		quitButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				// Stage stage = new Stage();
-				ChoiceItem[] items = new ChoiceItem[] {
-						new ChoiceItem("Exit and save my project", 2),
-						new ChoiceItem("Exit and don't save", 1),
-						new ChoiceItem("Don't exit", 10), };
-
-				ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
-				// ChoicesDialog choicesDialog = new ChoicesDialog(stage);
-				choicesDialog.initStyle(StageStyle.UNDECORATED);
-				choicesDialog.sizeToScene();
-				// Hide this current window (if this is what you want)
-				// ((Node)(event.getSource())).getScene().getWindow().hide();
-				choicesDialog.showAndWait();
-				int code = Integer.parseInt(choicesDialog.getResult());
-				logger.info("Exit app with code: " + code);
-				if (code == 1 || code == 2) {
-					stage.close();
-				}
+				confirmClose();
 			}
 		});
 
@@ -165,5 +137,32 @@ public class FlowPaneEx extends Application {
 
 	public static void main(String[] args) {
 		launch(args);
+	}
+
+	public void confirmClose() {
+
+		ChoiceItem[] items = new ChoiceItem[] {
+				new ChoiceItem("Exit and save my project", 2),
+				new ChoiceItem("Exit and don't save", 1),
+				new ChoiceItem("Don't exit", 10), };
+
+		ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
+		choicesDialog.setChoices(items);
+		// choicesDialog.initStyle(StageStyle.UNDECORATED);
+		choicesDialog.sizeToScene();
+		// optionally hide self
+		// ((Node)(event.getSource())).getScene().getWindow().hide();
+		/*		choicesDialog.show();
+		while (choicesDialog.isShowing()) {
+		
+		}
+		*/
+		choicesDialog.showAndWait();
+		int code = Integer.parseInt(choicesDialog.getResult());
+		logger.info("Exit app with code: " + code);
+		if (code == 1 || code == 2) {
+			stage.close();
+		}
+
 	}
 }
