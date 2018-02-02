@@ -111,7 +111,7 @@ public class ConfigFormEx extends Application {
 		gridpane.setPadding(new Insets(5));
 		gridpane.setHgap(5);
 		gridpane.setVgap(5);
-// https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
+		// https://docs.oracle.com/javafx/2/api/javafx/scene/doc-files/cssref.html
 		gridpane.setStyle(
 				"-fx-padding: 10; -fx-border-style: solid inside; -fx-border-width: 2; -fx-border-insets: 5; -fx-border-radius: 0; -fx-border-color: darkgray;");
 		// origin:
@@ -124,12 +124,12 @@ public class ConfigFormEx extends Application {
 		gridpane.getColumnConstraints().addAll(column1, column2);
 
 		// First name label
-		Label fNameLbl = new Label("Base URL");
-		GridPane.setHalignment(fNameLbl, HPos.RIGHT);
-		// Places the label at the first row and first column
+		Label baseURLLbl = new Label("Base URL");
+		GridPane.setHalignment(baseURLLbl, HPos.RIGHT);
 		// Set one constraint at a time...
-		GridPane.setRowIndex(fNameLbl, 0);
-		GridPane.setColumnIndex(fNameLbl, 0);
+		// Places the label at the first row and first column
+		GridPane.setRowIndex(baseURLLbl, 0);
+		GridPane.setColumnIndex(baseURLLbl, 0);
 
 		// Last name label
 		Label templateDirLabel = new Label("Template directory");
@@ -138,20 +138,17 @@ public class ConfigFormEx extends Application {
 		// Set column and row constraint at once...
 		// Places the label at the third row and first column
 		gridpane.add(templateDirLabel, 0, 2);
-		// GridPane.setRowIndex(templateDirLabel, 1);
-		// GridPane.setColumnIndex(templateDirLabel, 0);
-		// gridpane.getChildren().addAll(fNameLbl, templateDirLabel);
-		gridpane.getChildren().addAll(fNameLbl);
+		gridpane.getChildren().addAll(baseURLLbl);
 
-		// First name field
-		TextField fNameFld = new TextField();
-		GridPane.setHalignment(fNameFld, HPos.LEFT);
-		gridpane.add(fNameFld, 1, 0);
+		// base URL field
+		TextField baseURLFld = new TextField();
+		GridPane.setHalignment(baseURLFld, HPos.LEFT);
+		gridpane.add(baseURLFld, 1, 0);
 
-		// tempalteDir
-		TextField lNameFld = new TextField();
-		GridPane.setHalignment(lNameFld, HPos.LEFT);
-		lNameFld.setMaxWidth(Double.MAX_VALUE);
+		// tempalteDir field
+		TextField tempalteDirFld = new TextField();
+		GridPane.setHalignment(tempalteDirFld, HPos.LEFT);
+		tempalteDirFld.setMaxWidth(Double.MAX_VALUE);
 
 		Button browseButton = new Button("Browse");
 		GridPane.setHalignment(browseButton, HPos.RIGHT);
@@ -164,7 +161,7 @@ public class ConfigFormEx extends Application {
 
 		HBox browseButtonbarHbox = new HBox(10);
 		browseButtonbarHbox.setPadding(new Insets(10));
-		browseButtonbarHbox.getChildren().addAll(lNameFld, browseButton);
+		browseButtonbarHbox.getChildren().addAll(tempalteDirFld, browseButton);
 
 		gridpane.add(browseButtonbarHbox, 1, 2);
 		browseButtonbarHbox.setMaxWidth(Double.MAX_VALUE);

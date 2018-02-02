@@ -111,42 +111,7 @@ public class ChoicesDialog extends Stage {
 		labelHBox.getChildren().add(label);
 		outerVBox.setSpacing(12);
 		outerVBox.getChildren().addAll(labelHBox);
-		/*
-				HBox buttonHBox1 = new HBox();
-				Button button1 = new Button();
-				button1.setText("Exit and save my project");
-				button1.setMaxWidth(Double.MAX_VALUE);
-				buttonHBox1.setHgrow(button1, Priority.ALWAYS);
-				buttonHBox1.getChildren().add(button1);
-				Map<String, String> userData = new HashMap<>();
-				userData.put("index", "1");
-				// userData.replace("test", "1");
-				button1.setUserData(userData);
-				button1.setOnAction(new buttonHandler());
-		
-				HBox buttonHBox2 = new HBox();
-				Button button2 = new Button();
-				button2.setText("Exit and don't save");
-				button2.setMaxWidth(Double.MAX_VALUE);
-				buttonHBox2.setHgrow(button2, Priority.ALWAYS);
-				buttonHBox2.getChildren().add(button2);
-				userData = new HashMap<>();
-				userData.put("index", "2");
-				// userData.replace("index", "2");
-				button2.setUserData(userData);
-				button2.setOnAction(new buttonHandler());
-		
-				HBox buttonHBox3 = new HBox();
-				Button button3 = new Button();
-				button3.setText("Don't exit");
-				button3.setMaxWidth(Double.MAX_VALUE);
-				userData = new HashMap<>();
-				userData.put("index", "3");
-				button3.setUserData(userData);
-				button3.setOnAction(new buttonHandler());
-				buttonHBox3.setHgrow(button3, Priority.ALWAYS);
-				buttonHBox3.getChildren().add(button3);
-		*/
+
 		int index = 0;
 		for (ChoiceItem item : choices) {
 			index++;
