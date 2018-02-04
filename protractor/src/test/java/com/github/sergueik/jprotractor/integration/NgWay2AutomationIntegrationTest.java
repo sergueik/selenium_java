@@ -11,10 +11,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -167,12 +164,6 @@ public class NgWay2AutomationIntegrationTest {
 		assertThat(element.getAttribute("id"), equalTo("userSelect"));
 		highlight(element);
 
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(element.findElements(NgBy.repeater("cust in Customers")));
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
-
 		for (WebElement currentCustomer : element
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("Harry Potter") >= 0) {
@@ -228,13 +219,6 @@ public class NgWay2AutomationIntegrationTest {
 		// And I can switch to every account owned
 		List<String> avaliableAccounts = new ArrayList<>();
 
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> accounts = Collections.enumeration(
-		// ngDriver.findElements(NgBy.options("account for account in Accounts")));
-		//
-		// while (accounts.hasMoreElements()) {
-		// String otherAccountId = accounts.nextElement().getText();
-
 		for (WebElement account : ngDriver
 				.findElements(NgBy.options("account for account in Accounts"))) {
 			String otherAccountId = account.getText();
@@ -250,13 +234,6 @@ public class NgWay2AutomationIntegrationTest {
 		// And I can find every my account
 		assertTrue(avaliableAccounts
 				.containsAll(new HashSet<String>(Arrays.asList(customerAccounts))));
-
-		// legacy Java explicit collection iterators style
-		// accounts = Collections.enumeration(
-		// ngDriver.findElements(NgBy.options("account for account in Accounts")));
-		//
-		// while (accounts.hasMoreElements()) {
-		// WebElement currentAccount = accounts.nextElement();
 
 		ngDriver.findElements(NgBy.options("account for account in Accounts"))
 				.stream().forEach(currentAccount -> {
@@ -279,15 +256,6 @@ public class NgWay2AutomationIntegrationTest {
 				equalTo("userSelect"));
 
 		// Select customer/account with transactions
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(ngDriver.findElement(NgBy.model("custId"))
-		// .findElements(NgBy.repeater("cust in Customers")));
-		//
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
-
 		for (WebElement currentCustomer : ngDriver.findElement(NgBy.model("custId"))
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0) {
@@ -300,14 +268,6 @@ public class NgWay2AutomationIntegrationTest {
 		login.click();
 
 		// NOTE: need to select account with transactions
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> accounts = Collections.enumeration(
-		// ngDriver.findElements(NgBy.options("account for account in Accounts")));
-		//
-		// while (accounts.hasMoreElements()) {
-		// WebElement currentAccount = accounts.nextElement();
-
 		for (WebElement currentAccount : ngDriver
 				.findElements(NgBy.options("account for account in Accounts"))) {
 
@@ -329,12 +289,6 @@ public class NgWay2AutomationIntegrationTest {
 
 		// inspect max 5 transactions
 		int cnt = 0;
-
-		// legacy Java explicit collection iterators style
-		// Iterator<WebElement> transactions = ngDriver
-		// .findElements(NgBy.repeater("tx in transactions")).iterator();
-		// while (transactions.hasNext() && cnt++ < 5) {
-		// WebElement currentTransaction = transactions.next();
 
 		for (WebElement currentTransaction : ngDriver
 				.findElements(NgBy.repeater("tx in transactions"))) {
@@ -440,13 +394,6 @@ public class NgWay2AutomationIntegrationTest {
 				.findElement(NgBy.repeater("cust in Customers")).getWrappedElement()));
 
 		// find the customer by name
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customersEnum = Collections
-		// .enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
-		// while (customersEnum.hasMoreElements()) {
-		// WebElement currentCustomer = customersEnum.nextElement();
-
 		for (WebElement currentCustomer : ngDriver
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf(customerName) >= 0) {
@@ -455,13 +402,6 @@ public class NgWay2AutomationIntegrationTest {
 				NgWebElement ng_currentCustomer = new NgWebElement(ngDriver,
 						currentCustomer);
 				// find the account we just added
-
-				// legacy Java explicit collection iterators style
-				// Enumeration<WebElement> accountsEnum = Collections
-				// .enumeration(ng_currentCustomer
-				// .findElements(NgBy.repeater("account in cust.accountNo")));
-				// while (accountsEnum.hasMoreElements()) {
-				// WebElement currentAccount = accountsEnum.nextElement();
 				for (WebElement currentAccount : ng_currentCustomer
 						.findElements(NgBy.repeater("account in cust.accountNo"))) {
 					if (currentAccount.getText().indexOf(newAccount) >= 0) {
@@ -517,13 +457,6 @@ public class NgWay2AutomationIntegrationTest {
 		assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"),
 				equalTo("userSelect"));
 
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(ngDriver.findElement(NgBy.model("custId"))
-		// .findElements(NgBy.repeater("cust in Customers")));
-		//
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
 		for (WebElement currentCustomer : ngDriver.findElement(NgBy.model("custId"))
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("Hermoine Granger") >= 0) {
@@ -534,12 +467,6 @@ public class NgWay2AutomationIntegrationTest {
 		NgWebElement login = ngDriver.findElement(NgBy.buttonText("Login"));
 		assertTrue(login.isEnabled());
 		login.click();
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> accounts = Collections.enumeration(
-		// ngDriver.findElements(NgBy.options("account for account in Accounts")));
-		// while (accounts.hasMoreElements()) {
-		// WebElement currentAccount = accounts.nextElement();
 
 		for (WebElement currentAccount : ngDriver
 				.findElements(NgBy.options("account for account in Accounts"))) {
@@ -564,14 +491,6 @@ public class NgWay2AutomationIntegrationTest {
 				.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
 
 		// perform some Credit transaction-specific checks
-
-		// legacy Java explicit collection iterators style
-		// Iterator<WebElement> transactionTypeColumns = ngDriver
-		// .findElements(NgBy.repeaterColumn("tx in transactions", "tx.type"))
-		// .iterator();
-		// while (transactionTypeColumns.hasNext()) {
-		// WebElement transactionTypeColumn = transactionTypeColumns.next();
-
 		for (WebElement transactionTypeColumn : ngDriver
 				.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type"))) {
 			if (transactionTypeColumn.getText().isEmpty()) {
@@ -635,16 +554,10 @@ public class NgWay2AutomationIntegrationTest {
 
 		// switch to "Customers" screen
 		ngDriver.findElement(NgBy.partialButtonText("Customers")).click();
-		// Wait the grid to get populated
 
+		// block and wait the customers list to get populated
 		wait.until(ExpectedConditions.visibilityOf(
 				ngDriver.findElement(NgBy.repeater("cust in Customers"))));
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> fNamecells = Collections.enumeration(ngDriver
-		// .findElements(NgBy.repeaterColumn("cust in Customers", "cust.fName")));
-		// while (fNamecells.hasMoreElements()) {
-		// WebElement firstNameElement = fNamecells.nextElement();
 
 		for (WebElement firstNameElement : ngDriver
 				.findElements(NgBy.repeaterColumn("cust in Customers", "cust.fName"))) {
@@ -660,21 +573,11 @@ public class NgWay2AutomationIntegrationTest {
 			// fName, lName, accountNo, postCD, id, date
 			List<Long> accounts = (List<Long>) new NgWebElement(ngDriver,
 					firstNameElement).evaluate("cust.accountNo");
-			if (accounts != null) {
-				for (Long account : accounts) {
-					System.err.println("Account No: " + account.toString());
-				}
-			} else {
-				System.err.println("No accounts");
-			}
+			System.err.println(accounts == null ? "No accounts"
+					: "Account No: " + Arrays.toString(accounts.toArray()));
 		}
 
 		NgWebElement ng_deleteCustomer = null;
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(ngDriver.findElements(NgBy.repeater("cust in Customers")));
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
 		for (WebElement currentCustomer : ngDriver
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("John Doe") >= 0) {
@@ -686,9 +589,8 @@ public class NgWay2AutomationIntegrationTest {
 		actions.moveToElement(ng_deleteCustomer.getWrappedElement()).build()
 				.perform();
 
+		// delete the customer we added
 		highlight(ng_deleteCustomer);
-
-		// delete the new customer
 		NgWebElement deleteCustomerButton = ng_deleteCustomer
 				.findElement(NgBy.buttonText("Delete"));
 		assertThat(deleteCustomerButton, notNullValue());
@@ -770,13 +672,6 @@ public class NgWay2AutomationIntegrationTest {
 
 		// And I login as "John Doe"
 
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(ngDriver.findElement(NgBy.model("custId"))
-		// .findElements(NgBy.repeater("cust in Customers")));
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
-
 		for (WebElement currentCustomer : ngDriver.findElement(NgBy.model("custId"))
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("John Doe") >= 0) {
@@ -832,13 +727,6 @@ public class NgWay2AutomationIntegrationTest {
 		// select customer with accounts
 		assertThat(ngDriver.findElement(NgBy.input("custId")).getAttribute("id"),
 				equalTo("userSelect"));
-
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> customers = Collections
-		// .enumeration(ngDriver.findElement(NgBy.model("custId"))
-		// .findElements(NgBy.repeater("cust in Customers")));
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
 
 		for (WebElement currentCustomer : ngDriver.findElement(NgBy.model("custId"))
 				.findElements(NgBy.repeater("cust in Customers"))) {
@@ -908,13 +796,6 @@ public class NgWay2AutomationIntegrationTest {
 
 		// find the same customer / account
 
-		// legacy Java explicit collection iterators style
-		// customers = Collections
-		// .enumeration(ngDriver.findElement(NgBy.model("custId"))
-		// .findElements(NgBy.repeater("cust in Customers")));
-		// while (customers.hasMoreElements()) {
-		// WebElement currentCustomer = customers.nextElement();
-
 		for (WebElement currentCustomer : ngDriver.findElement(NgBy.model("custId"))
 				.findElements(NgBy.repeater("cust in Customers"))) {
 			if (currentCustomer.getText().indexOf("Harry Potter") >= 0) {
@@ -928,11 +809,6 @@ public class NgWay2AutomationIntegrationTest {
 				ngDriver.findElement(NgBy.options("account for account in Accounts"))
 						.getWrappedElement()));
 
-		// legacy Java explicit collection iterators style
-		// Enumeration<WebElement> accounts2 = Collections.enumeration(
-		// ngDriver.findElements(NgBy.options("account for account in Accounts")));
-		// while (accounts2.hasMoreElements()) {
-		// WebElement currentAccount = accounts2.nextElement();
 		for (WebElement currentAccount : ngDriver
 				.findElements(NgBy.options("account for account in Accounts"))) {
 			if (currentAccount.getText().indexOf(targetAccount) >= 0) {

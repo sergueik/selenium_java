@@ -133,7 +133,6 @@ public class NgDemoTest {
 				.stream().filter(txType -> !txType.getText().isEmpty())
 				.filter(txType -> txType.getText().equalsIgnoreCase("Credit"))
 				.forEach(txType -> highlight(txType));
-
 	}
 
 	@BeforeClass
