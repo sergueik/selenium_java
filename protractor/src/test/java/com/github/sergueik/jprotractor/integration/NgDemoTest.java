@@ -40,7 +40,7 @@ public class NgDemoTest {
 	static WebDriverWait wait;
 	static Actions actions;
 	static Alert alert;
-	
+
 	private LocalDate today = LocalDate.now();
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
@@ -100,13 +100,13 @@ public class NgDemoTest {
 				.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
 
 		// Then I can observe few transactions
-    int cnt = 0;
+		int cnt = 0;
 		for (WebElement tx : ngDriver
 				.findElements(NgBy.repeater("tx in transactions"))) {
 			if (cnt++ > 5) {
 				break;
 			}
-      // view-source:http://www.way2automation.com/angularjs-protractor/banking/listTx.html
+			// view-source:http://www.way2automation.com/angularjs-protractor/banking/listTx.html
 			NgWebElement ngTx = new NgWebElement(ngDriver, tx);
 
 			// every transaction would be either Debit or Credit
@@ -127,6 +127,13 @@ public class NgDemoTest {
 				// ignore
 			}
 		}
+
+		// perform some Credit transaction-specific checks
+		ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type"))
+				.stream().filter(txType -> !txType.getText().isEmpty())
+				.filter(txType -> txType.getText().equalsIgnoreCase("Credit"))
+				.forEach(txType -> highlight(txType));
+
 	}
 
 	@BeforeClass
