@@ -12,11 +12,8 @@ import static org.junit.Assume.assumeFalse;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -246,10 +243,8 @@ public class NgLocalFileIntegrationTest {
 			return;
 		}
 		getPageContent("ng_service.htm");
-		Enumeration<WebElement> elements = Collections
-				.enumeration(ngDriver.findElements(NgBy.repeater("person in people")));
-		while (elements.hasMoreElements()) {
-			WebElement currentElement = elements.nextElement();
+		for (WebElement currentElement : ngDriver
+				.findElements(NgBy.repeater("person in people"))) {
 			if (currentElement.getText().isEmpty()) {
 				break;
 			}
@@ -353,19 +348,11 @@ public class NgLocalFileIntegrationTest {
 			return;
 		}
 		getPageContent("ng_table_even_odd.htm");
-		Enumeration<WebElement> rows = Collections
-				.enumeration(ngDriver.findElements(NgBy.repeater("x in names")));
-
-		while (rows.hasMoreElements()) {
-			WebElement currentRow = rows.nextElement();
-
-			Enumeration<WebElement> cells = Collections
-					.enumeration(currentRow.findElements(By.tagName("td")));
-			while (cells.hasMoreElements()) {
-				WebElement currentCell = cells.nextElement();
+		for (WebElement currentRow : ngDriver
+				.findElements(NgBy.repeater("x in names"))) {
+			for (WebElement currentCell : currentRow.findElements(By.tagName("td"))) {
 				System.err.println(currentCell.getTagName() + " '"
 						+ currentCell.getText() + "' " + currentCell.getAttribute("style"));
-
 				boolean odd = ((Boolean) new NgWebElement(ngDriver, currentCell)
 						.evaluate("$odd")).booleanValue();
 				if (odd) {
@@ -390,17 +377,16 @@ public class NgLocalFileIntegrationTest {
 			length = Integer.parseInt(matcher.group(1).toString());
 		}
 		for (int cnt = 0; cnt != length; cnt++) {
-			Enumeration<WebElement> cells = Collections
-					.enumeration(ngDriver.findElements(
-							NgBy.repeaterElement("client in filtered ", cnt, "client.name")));
-			while (cells.hasMoreElements()) {
-				WebElement currentCell = cells.nextElement();
+			for (WebElement currentCell : ngDriver.findElements(
+					NgBy.repeaterElement("client in filtered ", cnt, "client.name"))) {
 				actions.moveToElement(currentCell).build().perform();
 				highlight(currentCell);
 			}
 		}
+
 		List<WebElement> elements = ngDriver.findElements(
 				NgBy.repeaterElement("client in filtered ", length, "client.name"));
+
 		assertThat(elements.size(), equalTo(0));
 	}
 
@@ -415,15 +401,12 @@ public class NgLocalFileIntegrationTest {
 		System.err.println("Customers:" + seleniumDriver.getPageSource());
 		getPageContent("ng_service.htm");
 		ngDriver.waitForAngular();
-		List<WebElement> countries = new ArrayList<>(
-				ngDriver.findElements(
-						NgBy.repeaterColumn("person in people", "person.Country")));
+		List<WebElement> countries = new ArrayList<>(ngDriver.findElements(
+				NgBy.repeaterColumn("person in people", "person.Country")));
 		System.err.println("Found Countries.size() = " + countries.size());
 		assertTrue(countries.size() > 0);
-		Iterator<WebElement> countriesIterator = countries.iterator();
 		int cnt = 0;
-		while (countriesIterator.hasNext()) {
-			WebElement country = countriesIterator.next();
+		for (WebElement country : countries) {
 			System.err.format("%s %s\n", country.getText(),
 					(country.getText().equalsIgnoreCase("Mexico")) ? " *" : "");
 			highlight(country);
@@ -462,12 +445,8 @@ public class NgLocalFileIntegrationTest {
 				+ element.getAttribute("outerHTML"));
 		assertThat(element.getText(), containsString("One"));
 
-		Iterator<WebElement> options = ngDriver
-				.findElements(
-						NgBy.options("count.id as count.name for count in countList"))
-				.iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : ngDriver.findElements(
+				NgBy.options("count.id as count.name for count in countList"))) {
 			System.err.println("Available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -564,10 +543,9 @@ public class NgLocalFileIntegrationTest {
 			return;
 		}
 		getPageContent("ng_select_array.htm");
-		Iterator<WebElement> options = ngDriver
-				.findElements(NgBy.repeater("option in options")).iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+
+		for (WebElement option : ngDriver
+				.findElements(NgBy.repeater("option in options"))) {
 			System.err.println("available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -603,10 +581,8 @@ public class NgLocalFileIntegrationTest {
 			return;
 		}
 		getPageContent("ng_repeat_selected.htm");
-		Iterator<WebElement> options = ngDriver
-				.findElements(NgBy.repeater("fruit in Fruits")).iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : ngDriver
+				.findElements(NgBy.repeater("fruit in Fruits"))) {
 			System.err.println("available option: " + option.getText());
 			if (option.getText().isEmpty()) {
 				break;
@@ -685,14 +661,12 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> elements = ngDriver
 				.findElements(NgBy.binding("option.name"));
 		assertTrue(elements.size() > 0);
-		Iterator<WebElement> elementsIterator = elements.iterator();
 		// find what is selected based on the bootstrap class attribute
 		String expression = "\\-remove\\-";
 		Pattern pattern = Pattern.compile(expression);
 		Matcher matcher = null;
 		int count = 0;
-		while (elementsIterator.hasNext()) {
-			WebElement element = elementsIterator.next();
+		for (WebElement element : elements) {
 			NgWebElement ngElement = new NgWebElement(ngDriver, element);
 			String optionName = ngElement.evaluate("option.name").toString();
 			// switch to core Selenium
@@ -713,11 +687,8 @@ public class NgLocalFileIntegrationTest {
 		elements = ngDriver.findElements(
 				NgBy.repeaterColumn("country in SelectedCountries", "country.name"));
 		assertTrue(elements.size() == count);
-		elementsIterator = elements.iterator();
-		while (elementsIterator.hasNext()) {
-			WebElement element = elementsIterator.next();
-			System.err.format("%s\n", element.getText());
-		}
+		elements.stream()
+				.forEach(element -> System.err.format("%s\n", element.getText()));
 	}
 
 	@Ignore
@@ -727,10 +698,8 @@ public class NgLocalFileIntegrationTest {
 		WebElement element = ngDriver.findElement(NgBy.model("selectedValues"));
 		// use core Selenium
 		Select selectObj = new Select(element);
-		Iterator<WebElement> options = selectObj.getOptions().iterator();
 		List<String> data = new ArrayList<>();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : selectObj.getOptions()) {
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -759,9 +728,7 @@ public class NgLocalFileIntegrationTest {
 
 		// change selected options
 		data.clear();
-		options = selectObj.getOptions().iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : selectObj.getOptions()) {
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -899,9 +866,7 @@ public class NgLocalFileIntegrationTest {
 				.findElements(NgBy.options(optionsCountry));
 		assertThat(elementsCountries.size(), equalTo(3));
 
-		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
-		while (iteratorCountries.hasNext()) {
-			WebElement country = iteratorCountries.next();
+		for (WebElement country : elementsCountries) {
 			if (country.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -933,9 +898,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> elementsStates = ngDriver
 				.findElements(NgBy.options(optionsState));
 		assertThat(elementsStates.size(), equalTo(3));
-		Iterator<WebElement> iteratorStates = elementsStates.iterator();
-		while (iteratorStates.hasNext()) {
-			WebElement state = iteratorStates.next();
+		for (WebElement state : elementsStates) {
 			if (state.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -944,9 +907,7 @@ public class NgLocalFileIntegrationTest {
 			System.err.println("state = " + state.getText());
 		}
 		Select selectStates = new Select(ngDriver.findElement(NgBy.model("state")));
-		Iterator<WebElement> options = selectStates.getOptions().iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : selectStates.getOptions()) {
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -964,9 +925,7 @@ public class NgLocalFileIntegrationTest {
 
 		List<WebElement> cities = ngDriver
 				.findElements(NgBy.options("city for city in cities"));
-		options = cities.iterator();
-		while (options.hasNext()) {
-			WebElement option = options.next();
+		for (WebElement option : cities) {
 			if (option.getText().isEmpty()) {
 				break;
 			}
@@ -1041,9 +1000,7 @@ public class NgLocalFileIntegrationTest {
 						+ ", Reverse:	" + reverseSort /* sortOrders[cnt] */);
 
 				// Iterate over all rows, selected column
-				Iterator<WebElement> iteratorEmp = rows.iterator();
-				while (iteratorEmp.hasNext()) {
-					WebElement emp = iteratorEmp.next();
+				for (WebElement emp : rows) {
 					NgWebElement ng_emp = new NgWebElement(ngDriver, emp);
 					try {
 						WebElement empFieldElement = ng_emp
@@ -1084,9 +1041,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> selectedColors = ngDriver
 				.findElements(NgBy.repeater("$item in $select.selected"));
 
-		Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
-		while (iteratorSelectedColors.hasNext()) {
-			WebElement selectedColor = iteratorSelectedColors.next();
+		for (WebElement selectedColor : selectedColors) {
 			NgWebElement ngSelectedColor = new NgWebElement(ngDriver, selectedColor);
 			highlight(selectedColor);
 			Object itemColor = ngSelectedColor.evaluate("$item");
@@ -1097,9 +1052,7 @@ public class NgLocalFileIntegrationTest {
 		ngDriver.waitForAngular();
 		List<WebElement> availableColors = ngDriver
 				.findElements(By.cssSelector("div[role='option']"));
-		Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
-		while (iteratorAvailableColors.hasNext()) {
-			WebElement availableColor = iteratorAvailableColors.next();
+		for (WebElement availableColor : availableColors) {
 			NgWebElement ngAvailableColor = new NgWebElement(ngDriver,
 					availableColor);
 			highlight(availableColor);
@@ -1125,9 +1078,7 @@ public class NgLocalFileIntegrationTest {
 		ngDriver.waitForAngular();
 		List<WebElement> availableColors = ngDriver
 				.findElements(By.cssSelector("div[role='option']"));
-		Iterator<WebElement> iteratorAvailableColors = availableColors.iterator();
-		while (iteratorAvailableColors.hasNext()) {
-			WebElement availableColor = iteratorAvailableColors.next();
+		for (WebElement availableColor : availableColors) {
 			NgWebElement ngAvailableColor = new NgWebElement(ngDriver,
 					availableColor);
 			highlight(availableColor);
@@ -1146,9 +1097,7 @@ public class NgLocalFileIntegrationTest {
 		while (selectedColors.size() != 0) {
 			selectedColors = ngDriver
 					.findElements(NgBy.repeater("$item in $select.selected"));
-			Iterator<WebElement> iteratorSelectedColors = selectedColors.iterator();
-			while (iteratorSelectedColors.hasNext()) {
-				WebElement selectedColor = iteratorSelectedColors.next();
+			for (WebElement selectedColor : selectedColors) {
 				NgWebElement ngSelectedColor = new NgWebElement(ngDriver,
 						selectedColor);
 				Object itemColor = ngSelectedColor.evaluate("$item");
@@ -1183,9 +1132,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> names = ngDriver.findElements(NgBy.binding("name"));
 		assertTrue(names.size() == 5);
 
-		Iterator<WebElement> iteratorNames = names.iterator();
-		while (iteratorNames.hasNext()) {
-			WebElement name = iteratorNames.next();
+		for (WebElement name : names) {
 			// will show class="ng-binding" added to every node
 			System.err.println(name.getAttribute("outerHTML"));
 			System.err.println(getIdentity(name));
@@ -1248,9 +1195,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> elementsCountries = ngDriver
 				.findElements(NgBy.options(optionsCountry));
 		assertThat(elementsCountries.size(), equalTo(4));
-		Iterator<WebElement> iteratorCountries = elementsCountries.iterator();
-		while (iteratorCountries.hasNext()) {
-			WebElement country = iteratorCountries.next();
+		for (WebElement country : elementsCountries) {
 			if (country.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -1287,9 +1232,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> elementsStates = ngDriver
 				.findElements(NgBy.options(optionsState));
 		assertThat(elementsStates.size(), equalTo(3));
-		Iterator<WebElement> iteratorStates = elementsStates.iterator();
-		while (iteratorStates.hasNext()) {
-			WebElement state = iteratorStates.next();
+		for (WebElement state : elementsStates) {
 			if (state.getAttribute("value").isEmpty()) {
 				continue;
 			}
@@ -1306,22 +1249,20 @@ public class NgLocalFileIntegrationTest {
 		assumeFalse(isCIBuild);
 		getPageContent("ng_drag_and_drop1.htm");
 
-		Enumeration<WebElement> ng_cars = Collections.enumeration(
-				ngDriver.findElements(NgBy.repeater("car in models.cars")));
+		List<WebElement> ng_cars = ngDriver
+				.findElements(NgBy.repeater("car in models.cars"));
 
-		WebElement basket = seleniumDriver
-				.findElement(By.xpath("//*[@id='my-basket']"));
-		NgWebElement ng_basket = new NgWebElement(ngDriver, basket);
-		highlight(basket);
-		while (ng_cars.hasMoreElements()) {
-			WebElement ng_car = ng_cars.nextElement();
+		NgWebElement ng_basket = new NgWebElement(ngDriver,
+				seleniumDriver.findElement(By.xpath("//*[@id='my-basket']")));
+		highlight(ng_basket.getWrappedElement());
+		for (WebElement ng_car : ng_cars) {
 			if (ng_car.getText().isEmpty()) {
 				break;
 			}
 			highlight(ng_car);
 			actions.moveToElement(ng_car).build().perform();
-			actions.clickAndHold(ng_car).moveToElement(basket).release().build()
-					.perform();
+			actions.clickAndHold(ng_car).moveToElement(ng_basket.getWrappedElement())
+					.release().build().perform();
 			ngDriver.waitForAngular();
 			// System.err.println(basket.getAttribute("innerHTML"));
 			List<WebElement> ng_cars_basket = ng_basket
@@ -1343,14 +1284,12 @@ public class NgLocalFileIntegrationTest {
 	public void testDragAndDropSimulate() {
 		getPageContent("ng_drag_and_drop1.htm");
 
-		Enumeration<WebElement> ng_cars = Collections.enumeration(
-				ngDriver.findElements(NgBy.repeater("car in models.cars")));
-
 		WebElement basket = seleniumDriver
 				.findElement(By.xpath("//*[@id='my-basket']"));
 		highlight(basket);
-		while (ng_cars.hasMoreElements()) {
-			WebElement ng_car = ng_cars.nextElement();
+
+		for (WebElement ng_car : ngDriver
+				.findElements(NgBy.repeater("car in models.cars"))) {
 			if (ng_car.getText().isEmpty()) {
 				break;
 			}

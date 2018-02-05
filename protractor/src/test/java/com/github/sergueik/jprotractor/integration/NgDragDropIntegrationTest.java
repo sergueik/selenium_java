@@ -4,8 +4,6 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
@@ -87,10 +85,8 @@ public class NgDragDropIntegrationTest {
 		highlight(column3);
 		NgWebElement ng_column3 = new NgWebElement(ngDriver, column3);
 		// alternative search
-		Enumeration<WebElement> elements = Collections.enumeration(
-				ngDriver.findElements(NgBy.repeater("column in kanbanBoard.columns")));
-		while (elements.hasMoreElements()) {
-			WebElement element = elements.nextElement();
+		for (WebElement element : ngDriver
+				.findElements(NgBy.repeater("column in kanbanBoard.columns"))) {
 			System.err.println("id: " + element.getAttribute("id"));
 			if (element.getAttribute("id").equalsIgnoreCase("column3")) {
 				System.err.println("id: " + element.getAttribute("id") + " found");
@@ -99,15 +95,11 @@ public class NgDragDropIntegrationTest {
 			}
 		}
 
-		Enumeration<WebElement> cards = Collections
-				.enumeration(ng_column3.findElement(NgBy.model("column.cards"))
-						.findElements(NgBy.repeater("card in column.cards")));
-
 		WebElement source_card = null;
 		WebElement target_card = null;
 
-		while (cards.hasMoreElements()) {
-			WebElement card = cards.nextElement();
+		for (WebElement card : ng_column3.findElement(NgBy.model("column.cards"))
+				.findElements(NgBy.repeater("card in column.cards"))) {
 			if (card.getText().isEmpty()) {
 				break;
 			}

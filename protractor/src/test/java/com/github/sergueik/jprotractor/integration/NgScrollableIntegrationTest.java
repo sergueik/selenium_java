@@ -5,8 +5,6 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -86,9 +84,7 @@ public class NgScrollableIntegrationTest {
 		assertTrue(rows.size() > 1);
 		int size = rows.size();
 		System.err.println(String.format("Protractor finds: %d rows", size));
-		Enumeration<WebElement> rowsEnum = Collections.enumeration(rows);
-		while (rowsEnum.hasMoreElements()) {
-			WebElement rowElement = rowsEnum.nextElement();
+		for (WebElement rowElement : rows) {
 			try {
 				if (!rowElement.isDisplayed()) {
 					break;

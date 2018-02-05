@@ -89,6 +89,7 @@ public class NgDatePickerTest {
 			(new WebDriverWait(driver, 5)).until(new ExpectedCondition<Boolean>() {
 				@Override
 				public Boolean apply(WebDriver d) {
+					// cannot use Java streams here ?
 					Iterator<WebElement> elements = d
 							.findElements(By.className("col-sm-6")).iterator();
 					Boolean result = false;
