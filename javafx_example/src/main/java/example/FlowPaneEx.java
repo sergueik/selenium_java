@@ -23,9 +23,12 @@ import example.ChoiceItem;
 import example.ChoicesDialog;
 import example.ConfigFormEx;
 
+import name.antonsmirnov.javafx.dialog.Dialog;
+
 @SuppressWarnings("restriction")
 public class FlowPaneEx extends Application {
 
+	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(FlowPaneEx.class);
 	static Stage stage = null;
 
@@ -49,7 +52,18 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("browsers_32.png"));
 		launchButton.setGraphic(new ImageView(launchImage));
 		launchButton.setTooltip(new Tooltip("Launch browser"));
+		launchButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				try {
+					testFunction();
+				} catch (Exception e) {
 
+					Dialog.showThrowable("title of exxeption", "xxx",
+							(Exception) e /* e.getCause()*/, stage);
+				}
+			}
+		});
 		Button injectButton = new Button();
 		Image injectImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("find_32.png"));
@@ -95,8 +109,7 @@ public class FlowPaneEx extends Application {
 				s.start(stage);
 			}
 		});
-		
-		
+
 		Button quitButton = new Button();
 		Image quitImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("quit_32.png"));
@@ -164,5 +177,9 @@ public class FlowPaneEx extends Application {
 			stage.close();
 		}
 
+	}
+
+	private static void testFunction() throws Exception {
+		throw new Exception("This is a test exception.");
 	}
 }
