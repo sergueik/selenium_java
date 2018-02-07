@@ -85,16 +85,15 @@ public class AppTest {
 	@DataProvider
 	public static Object[][] dataProviderStringIsNullOrEmpty() {
 		// @formatter:off
-		return new Object[][] { { null }, { "" } /*, { "non-empty" } */};
+		return new Object[][] { { null }, { "" } /*, { "non-empty" } */ };
 		// @formatter:on
 	}
 
 	@Test
 	@UseDataProvider("dataProviderStringIsNullOrEmpty")
 	public void testIsEmptyString(String input) {
-		// Given:		
-    System.err.println(
-				String.format("Test: input = %s", input));
+		// Given:
+		System.err.println(String.format("Test: input = %s", input));
 		// When:
 		// Then:
 		assertTrue((input == null) ? true : input.isEmpty());
@@ -107,7 +106,7 @@ public class AppTest {
 		// @formatter:on
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@UseDataProvider("dataProviderNotNullStringsSetInBeforeClass")
 	public void testNotNullStringsSetInBeforeClass(String input) {
@@ -119,19 +118,19 @@ public class AppTest {
 	@DataProvider(format = "%m: %p[0] * %p[1] == %p[2]")
 	public static Object[][] dataProviderMultiply() {
 		// @formatter:off
-		return new Object[][] { { 0, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 },
-				{ 1, 1, 1 }, { 1, -1, -1 }, { -1, -1, 1 }, { 1, 2, 2 }, { -1, 2, -2 },
-				{ -1, -2, 2 }, { -1, -2, 2 }, { 6, 7, 42 }, };
+		return new Object[][] { { 0, 0, 0 }, { -1, 0, 0 }, { 0, 1, 0 }, { 1, 1, 1 },
+				{ 1, -1, -1 }, { -1, -1, 1 }, { 1, 2, 2 }, { -1, 2, -2 }, { -1, -2, 2 },
+				{ -1, -2, 2 }, { 6, 7, 42 }, };
 		// @formatter:on
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
 	@UseDataProvider("dataProviderMultiply")
 	public void testMultiply(int a, int b, int c) {
 		System.err.println(
 				String.format("Test: inputs = %d,%d expected result = %d", a, b, c));
-		// Expect:    
+		// Expect:
 		assertThat(a * b, is(c));
 	}
 
@@ -146,24 +145,19 @@ public class AppTest {
 		tomorrow.add(Calendar.DAY_OF_MONTH, 1);
 
 		// @formatter:off
-		return new Object[][] { 
-      { yesterday, yesterday, false },
-      { yesterday, now, true }, 
-      { yesterday, tomorrow, true },
-      { now, yesterday, false }, 
-      { now, now, false },
-      { now, tomorrow, true },
-      { tomorrow, yesterday, false }, 
-      { tomorrow, now, false },
-      { tomorrow, tomorrow, false }, };
+		return new Object[][] { { yesterday, yesterday, false },
+				{ yesterday, now, true }, { yesterday, tomorrow, true },
+				{ now, yesterday, false }, { now, now, false }, { now, tomorrow, true },
+				{ tomorrow, yesterday, false }, { tomorrow, now, false },
+				{ tomorrow, tomorrow, false }, };
 		// @formatter:on
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@UseDataProvider("dataProviderWithNonConstantObjects")
-	public void testWithNonConstantObjects(Calendar calendar1,
-			Calendar calendar2, boolean result) {
+	public void testWithNonConstantObjects(Calendar calendar1, Calendar calendar2,
+			boolean result) {
 		// Given:
 
 		// When:
@@ -175,17 +169,13 @@ public class AppTest {
 	@DataProvider(splitBy = "\\|", trimValues = true)
 	public static String[] dataProviderFileExistence() {
 		// @formatter:off
-		return new String[] { 
-				"src             | true", 
-				"src/main        | true",
-				"src/main/java/  | true", 
-				"src/test/java/  | true",
-				"test            | false", 
-		};
+		return new String[] { "src             | true", "src/main        | true",
+				"src/main/java/  | true", "src/test/java/  | true",
+				"test            | false", };
 		// @formatter:on
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@UseDataProvider("dataProviderFileExistence")
 	public void testFileExistence(File file, boolean expected) {
@@ -208,68 +198,55 @@ public class AppTest {
 		return result;
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
 	@UseDataProvider("dataProviderNumberFormat")
 	public void testNumberFormat(Number value, String format, String expected) {
 		// Given:
-		System.err.println(
-				String.format("Test: inputs value = %d, format = '%s' expected result = %s", value, format, expected));
+		System.err.println(String.format(
+				"Test: inputs value = %d, format = '%s' expected result = %s", value,
+				format, expected));
 
 		// When:
 		String result = String.format(format, value);
 
 		// Then:
-    assertThat(String.format(format, value) , equalTo(expected));
+		assertThat(String.format(format, value), equalTo(expected));
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	// @formatter:off
-	@DataProvider({ 
-		",                 0", 
-		"a,                1",
-		"abc,              3", 
-		"veryLongString,  14",
-	})
+	@DataProvider({ ",                 0", "a,                1",
+			"abc,              3", "veryLongString,  14", })
 	// @formatter:on
 	public void testStringLength(String string, int length) {
 		// Expect:
 		assertThat(string.length(), is(length));
 	}
 
-  @Ignore
+	@Ignore
 	// @formatter:off
 	@Test
-	@DataProvider(value = { 
-			"               |  0", 
-			"a              |  1",
-			"abc            |  3", 
-			"veryLongString | 14", 
-		}, 
-		splitBy = "\\|", 
-		trimValues = true, 
-		convertNulls = true)
+	@DataProvider(value = { "               |  0", "a              |  1",
+			"abc            |  3",
+			"veryLongString | 14", }, splitBy = "\\|", trimValues = true, convertNulls = true)
 	// @formatter:on
 	public void testStringLength2(String string, int length) {
 		// Expect:
 		assertThat(string.length(), is(length));
 	}
 
-  @Ignore
+	@Ignore
 	// @formatter:off
 	@Test
-	@DataProvider({ 
-		"0, UP", 
-		"1, DOWN", 
-		"3, FLOOR", 
-		})
+	@DataProvider({ "0, UP", "1, DOWN", "3, FLOOR", })
 	// @formatter:on
 	public void testOldModeToRoundingMode(int oldMode, RoundingMode expected) {
 		// Expect:
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@DataProvider({ "null", "", })
 	public void testIsEmptyString2(String str) {
@@ -298,7 +275,7 @@ public class AppTest {
 		return new Object[][] { { testDataFile } };
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@UseDataProvider("loadFromExternalFile")
 	@ExternalFile(format = ExternalFile.Format.CSV, value = "testdata.csv")
@@ -312,7 +289,7 @@ public class AppTest {
 		return result;
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	@DataProvider({ "Do it.\nOr let it." })
 	public void testWithStringContainingTabsNewlineAndCarriageReturn(
