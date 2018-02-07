@@ -134,43 +134,50 @@ public class SuvianTest extends BaseTest {
 		try {
 			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
 
-	@Override
-	public WebElement apply(WebDriver d) {
-		Optional<WebElement> e = d
-				.findElements(
-						By.cssSelector("div.container div.row div.intro-message h3"))
-				.stream().filter(o -> {
-					String t = o.getText();
-					System.err.println("in stream filter (3): Text = " + t);
-					return (Boolean) (t.contains("Navigate Back"));
-				}).findFirst();
-		return (e.isPresent()) ? e.get() : (WebElement) null;
-	}});
+				@Override
+				public WebElement apply(WebDriver d) {
+					Optional<WebElement> e = d
+							.findElements(
+									By.cssSelector("div.container div.row div.intro-message h3"))
+							.stream().filter(o -> {
+								String t = o.getText();
+								System.err.println("in stream filter (3): Text = " + t);
+								return (Boolean) (t.contains("Navigate Back"));
+							}).findFirst();
+					return (e.isPresent()) ? e.get() : (WebElement) null;
+				}
+			});
 
-	System.err.println("element check: "+checkElement.getAttribute("innerHTML"));}
+			System.err
+					.println("element check: " + checkElement.getAttribute("innerHTML"));
+		}
 
-	catch(
+		catch (
 
-	Exception e)
-	{
+		Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}
 
-	// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
-	// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
-	elements=driver.findElements(By.cssSelector(".container .row .intro-message h3"));
-	// longer version
-	Stream<WebElement> elementsStream = elements.stream();elements=elementsStream.filter(o->
-	{
-		String t = o.getText();
-		System.err.println("(in filter) Text: " + t);
-		return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
-	}).collect(Collectors.toList());
+		// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
+		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
+		elements = driver
+				.findElements(By.cssSelector(".container .row .intro-message h3"));
+		// longer version
+		Stream<WebElement> elementsStream = elements.stream();
+		elements = elementsStream.filter(o -> {
+			String t = o.getText();
+			System.err.println("(in filter) Text: " + t);
+			return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
+		}).collect(Collectors.toList());
 
-	// shorter version
-	elements=driver.findElements(By.cssSelector(".container .row .intro-message h3")).stream().filter(o->"Link Successfully clicked".equalsIgnoreCase(o.getText())).collect(Collectors.toList());
+		// shorter version
+		elements = driver
+				.findElements(By.cssSelector(".container .row .intro-message h3"))
+				.stream()
+				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
+				.collect(Collectors.toList());
 
-	assertThat(elements.size(), equalTo(1));
+		assertThat(elements.size(), equalTo(1));
 
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"))
@@ -376,8 +383,9 @@ public class SuvianTest extends BaseTest {
 			// System.err.println("Exception: " + e.toString());
 			// }
 			// Act
-			highlight(element);
 		}
+		highlight(element);
+	}
 
 	@Test(enabled = true)
 	public void test1() {
@@ -692,7 +700,7 @@ public class SuvianTest extends BaseTest {
 					}
 				}).collect(Collectors.toList());
 
-	assertTrue(checkBoxes.size() > 0);
+		assertTrue(checkBoxes.size() > 0);
 		checkBoxes.stream().forEach(o -> {
 			highlight(o);
 			sleep(100);
@@ -745,9 +753,10 @@ public class SuvianTest extends BaseTest {
 						System.out.println("No other tabs found");
 						return false;
 					}
-					Iterator<String> windowHandleIterator = windowHandles.iterator();
-					while (windowHandleIterator.hasNext()) {
-						String handle = windowHandleIterator.next();
+					// Iterator<String> windowHandleIterator = windowHandles.iterator();
+					// while (windowHandleIterator.hasNext()) {
+					// String handle = windowHandleIterator.next();
+					for (String handle : windowHandles) {
 						if (!handle.equals(currentHandle)) {
 							System.err.println("Switch to: " + handle);
 							driver.switchTo().window(handle);

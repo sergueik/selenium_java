@@ -269,9 +269,10 @@ public class PlunkerTest extends BaseTest {
 		windowHandles = driver.getWindowHandles();
 		assertThat(windowHandles.size(), equalTo(2));
 
-		Iterator<String> windowHandleIterator = windowHandles.iterator();
-		while (windowHandleIterator.hasNext()) {
-			String handle = windowHandleIterator.next();
+		// Iterator<String> windowHandleIterator = windowHandles.iterator();
+		// while (windowHandleIterator.hasNext()) {
+		// String handle = windowHandleIterator.next();
+			for (String handle: windowHandles) { 
 			if (!handle.equals(currentHandle)) {
 				driver.switchTo().window(handle);
 				assertThat(getBaseURL(), equalTo("https://run.plnkr.co"));

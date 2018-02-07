@@ -22,7 +22,7 @@ import org.testng.annotations.Test;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-public class CodemirrorTest extends BaseTest {
+public class CodeMirrorTest extends BaseTest {
 
 	private static String baseURL = "about:blank";
 	private static final StringBuffer verificationErrors = new StringBuffer();
