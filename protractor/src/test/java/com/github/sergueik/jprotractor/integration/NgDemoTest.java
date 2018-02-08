@@ -63,8 +63,8 @@ public class NgDemoTest {
 				.findElements(NgBy.repeater("cust in Customers")).stream()
 				.filter(c -> c.getText().indexOf("Hermoine Granger") >= 0).findFirst()
 				.get();
-
-		customer.sendKeys(Keys.SPACE);
+		// NOTE: works differently in firefox and chrome
+		// customer.sendKeys(Keys.SPACE);
 		customer.click();
 		ngDriver.waitForAngular();
 

@@ -46,7 +46,9 @@ public class CommonFunctions {
 	static boolean isCIBuild = false;
 	private static long highlightInterval = 100;
 	private static Map<String, String> env = System.getenv();
-	private static final String browser = "firefox";
+	private static final String browser = "chrome";
+	private static String chromeDriverPath = null;
+	private static String osName = null;
 
 	@SuppressWarnings("deprecation")
 	public static WebDriver getSeleniumDriver() throws IOException {
@@ -57,10 +59,14 @@ public class CommonFunctions {
 			// For Vagrant box browser testing have localhost port 4444 forwarded to
 			// the hub 4444
       // Alternatively make the test class launch the browser
-
+			osName = System.getProperty("os.name");
 			if (browser.equals("chrome")) {
 				System.setProperty("webdriver.chrome.driver",
-						(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+						new File((chromeDriverPath == null)
+								? osName.toLowerCase().startsWith("windows")
+										? "C:\\java\\selenium\\chromedriver.exe"
+										: "/tmp/chromedriver"
+								: chromeDriverPath).getAbsolutePath());
 				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 				ChromeOptions options = new ChromeOptions();
 
