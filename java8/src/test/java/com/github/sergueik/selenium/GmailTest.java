@@ -32,7 +32,7 @@ public class GmailTest extends BaseTest {
 
 	private By signInLink = By.xpath("//*[@data-g-label='Sign in']");
 	// By.xpath("/html/body/nav/div/a[2]");
-	private By identifier = By.cssSelector("#identifierId");
+	private By identifier = By.id("identifierId");
 	private By identifierNextButton = By
 			.xpath("//*[@id='identifierNext']/content/span[contains(text(),'Next')]");
 	private By passwordInput = By.xpath("//*[@id='password']//input");
