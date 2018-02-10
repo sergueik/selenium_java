@@ -145,9 +145,62 @@ public class TripAdvisorTest extends BaseTest {
 		assertEquals("Hotels", findElement("link_text", "Hotels").getText());
 	}
 
+	private WebElement findWithWait(final String strategy,
+			final String selectorValue, final int timeout) {
+		WebElement element = (new WebDriverWait(driver, timeout))
+				.until(new ExpectedCondition<WebElement>() {
+					@Override
+					public WebElement apply(WebDriver d) {
+						// NOTE: has to initialize the locator
+						By locator = By.cssSelector(selectorValue);
+						switch (strategy) {
+						case "css":
+							locator = By.cssSelector(selectorValue);
+							break;
+						case "id":
+							locator = By.id(selectorValue);
+							break;
+						case "xpath":
+							locator = By.xpath(selectorValue);
+							break;
+						case "class":
+							locator = By.className(selectorValue);
+							break;
+						case "link_text":
+							locator = By.linkText(selectorValue);
+							break;
+						}
+						;
+						Optional<WebElement> e = d.findElements(locator).stream()
+								.findFirst();
+						if (e.isPresent())
+							System.err
+									.println("find using: " + strategy + " = " + selectorValue
+											+ "  => " + e.get().getAttribute("outerHTML"));
+						return (e.isPresent() && e.get().isDisplayed()) ? e.get()
+								: (WebElement) null;
+					}
+				});
+		return element;
+	}
+
 	@Test(enabled = true)
-	public void test2() {
+	public void findWithWaitTest() {
+		WebElement element = findWithWait("link_text", "Hotels", 30);
+		assertThat(element, notNullValue());
+		highlight(element);
+		String selector = cssSelectorOfElement(element);
+		System.err.println("findWithWaitTest: CssSelector: " + selector);
+		element = findWithWait("css", selector, 30);
+		assertThat(element, notNullValue());
+		highlight(element);
+
+	}
+
+	@Test(enabled = true)
+	public void buildXPathTest() {
 		WebElement element = findElement("link_text", "Hotels");
+
 		highlight(element);
 		String selector = xpathOfElement(element);
 		assertEquals(selector, "//a[@id=\"global-nav-hotels\"]");
@@ -160,7 +213,7 @@ public class TripAdvisorTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void test3_1() {
+	public void buildCssSelectorTest() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		String selector = cssSelectorOfElement(element);
@@ -180,7 +233,7 @@ public class TripAdvisorTest extends BaseTest {
 			element = findElement("css_selector", selector);
 			highlight(element);
 		} catch (NullPointerException e) {
-			verificationErrors.append("test 2: " + e.toString());
+			verificationErrors.append("buildCssSelectorTest: " + e.toString());
 		}
 	}
 
@@ -205,11 +258,13 @@ public class TripAdvisorTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void test4_1() {
+	public void buildCssSelectorOfElementAlternativeTest() {
 		WebElement element = findElement("link_text", "Hotels");
 		highlight(element);
 		String selector = cssSelectorOfElementAlternative(element);
-		System.err.println("test 3: Css Selector (alternative) : " + selector);
+		System.err.println(
+				"buildCssSelectorOfElementAlternativeTest: Css Selector (alternative) : "
+						+ selector);
 		assertEquals(selector, "a#global-nav-hotels");
 
 		// assertEquals(selector,
@@ -291,7 +346,7 @@ public class TripAdvisorTest extends BaseTest {
 	// @Ignore
 	@SuppressWarnings("static-access")
 	@Test(enabled = true)
-	public void test9() {
+	public void styleOfElementTest() {
 
 		WebElement element = findElement("link_text", "Hotels");
 		assertThat(element, notNullValue());
