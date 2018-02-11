@@ -150,7 +150,7 @@ public class TripAdvisorTest extends BaseTest {
 		WebElement element = (new WebDriverWait(driver, timeout))
 				.until(new ExpectedCondition<WebElement>() {
 					@Override
-					public WebElement apply(WebDriver d) {
+					public WebElement apply(WebDriver _driver) {
 						// NOTE: has to initialize the locator
 						By locator = By.cssSelector(selectorValue);
 						switch (strategy) {
@@ -170,15 +170,17 @@ public class TripAdvisorTest extends BaseTest {
 							locator = By.linkText(selectorValue);
 							break;
 						}
-						;
-						Optional<WebElement> e = d.findElements(locator).stream()
-								.findFirst();
-						if (e.isPresent())
-							System.err
-									.println("find using: " + strategy + " = " + selectorValue
-											+ "  => " + e.get().getAttribute("outerHTML"));
-						return (e.isPresent() && e.get().isDisplayed()) ? e.get()
-								: (WebElement) null;
+						WebElement result = (WebElement) null;
+						Optional<WebElement> _element = _driver.findElements(locator)
+								.stream().findFirst();
+						if (_element.isPresent()) {
+							result = _element.get();
+							System.err.println("Found using: " + strategy + " = "
+									+ selectorValue + " => " + result.getAttribute("outerHTML"));
+							if (!result.isDisplayed())
+								result = (WebElement) null;
+						}
+						return result;
 					}
 				});
 		return element;

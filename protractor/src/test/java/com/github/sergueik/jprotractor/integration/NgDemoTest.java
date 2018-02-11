@@ -100,10 +100,12 @@ public class NgDemoTest {
 				.findElement(NgBy.repeater("tx in transactions")).getWrappedElement()));
 
 		// Then I can observe few transactions
+		// to speed up test, limit to first 4
+
 		int cnt = 0;
 		for (WebElement tx : ngDriver
 				.findElements(NgBy.repeater("tx in transactions"))) {
-			if (cnt++ > 5) {
+			if (cnt++ > 4) {
 				break;
 			}
 			// view-source:http://www.way2automation.com/angularjs-protractor/banking/listTx.html
@@ -129,9 +131,10 @@ public class NgDemoTest {
 		}
 
 		// perform some Credit transaction-specific checks
+		// to speed up test, limit to first 3
 		ngDriver.findElements(NgBy.repeaterColumn("tx in transactions", "tx.type"))
 				.stream().filter(txType -> !txType.getText().isEmpty())
-				.filter(txType -> txType.getText().equalsIgnoreCase("Credit"))
+				.filter(txType -> txType.getText().equalsIgnoreCase("Credit")).limit(3)
 				.forEach(txType -> highlight(txType));
 	}
 
