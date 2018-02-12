@@ -1,20 +1,14 @@
 package com.github.sergueik.selenium;
 
-import static com.github.sergueik.selenium.BaseTest.log;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 import java.lang.reflect.Method;
-
-import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,6 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.codec.binary.Base64;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
@@ -42,7 +41,6 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -53,10 +51,6 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
-
-import org.apache.commons.codec.binary.Base64;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 /**
  * Selected test scenarios for Selenium WebDriver
@@ -613,7 +607,8 @@ public class BaseTest {
 
 	private static int instanceCount = 0;
 
-	// based on http://automated-testing.info/t/kak-ya-mogu-otkrit-v-firefox-dve-vkladki-i-perehodit-s-odnoj-na-vtoruyu-pri-neobhodimosti/1741/4
+	// based on
+	// http://automated-testing.info/t/kak-ya-mogu-otkrit-v-firefox-dve-vkladki-i-perehodit-s-odnoj-na-vtoruyu-pri-neobhodimosti/1741/4
 	// Creates a new window / browser tab using script injection
 	// Loads a specified url there
 	protected String createWindow(String url) {

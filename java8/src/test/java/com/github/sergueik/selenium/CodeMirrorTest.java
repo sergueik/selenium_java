@@ -1,17 +1,21 @@
 package com.github.sergueik.selenium;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.testng.Assert.assertTrue;
-
 import java.lang.reflect.Method;
 import java.util.List;
+
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static org.testng.Assert.assertTrue;
+
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -60,13 +64,16 @@ public class CodeMirrorTest extends BaseTest {
 		// Assert
 		assertTrue(codeLines.size() > 0);
 		System.err.println(String.format("%d Lines of code:", codeLines.size()));
-		List<String> code = codeLines.stream().map(e -> {
+		UnaryOperator<WebElement> scrollInfoView = (e) -> {
 			executeScript("arguments[0].scrollIntoView(true);", e);
 			highlight(e);
-			return e.getText();
-		}).collect(Collectors.toList());
+			return e;
+		};
+		List<String> code = codeLines.stream()
+				.map(scrollInfoView.andThen(e -> e.getText()))
+				.collect(Collectors.toList());
 
-		code.stream().forEach(e -> System.err.println(e));
+		code.stream().forEach(System.err::println);
 	}
 
 	// only loads first 35 lines of code
