@@ -1,9 +1,16 @@
 ### Info
 
-This directory contains a refactored replica of [aaschmid/junit-dataprovider-and-selenium](https://github.com/aaschmid/junit-dataprovider-and-selenium) project.
+This directory contains a refactored replica of the
+[aaschmid/junit-dataprovider-and-selenium](https://github.com/aaschmid/junit-dataprovider-and-selenium) project.
+ 
 It explores `com.tngtech.java.junit.dataprovider` package - a TestNG-like dataprovider runner for JUnit - and Allure.
+Note: The parent  project seems to be deleted by the author.
+
 This runner can be used as alternative to allure runner.
-Two runners cannot be combined and having both would not make much sense anyway.
+Note: Two concurrent runners cannot be combined and having both active would not make much sense anyway.
+
+Regular Junit class does not allow anntating he `@Before` method with `Params` of any kind: Test class can only have one constructor and it has
+to be  public zero-argument constructor.
 
 This junit extension can be used to run Selenium tests over a list of browsers:
 ```java

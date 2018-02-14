@@ -129,7 +129,7 @@ public class AppTest {
 	@UseDataProvider("dataProviderMultiply")
 	public void testMultiply(int a, int b, int c) {
 		System.err.println(
-				String.format("Test: inputs = %d,%d expected result = %d", a, b, c));
+				String.format("Test Multiply: inputs = %d,%d expected result = %d", a, b, c));
 		// Expect:
 		assertThat(a * b, is(c));
 	}

@@ -11,6 +11,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+import com.tngtech.java.junit.dataprovider.DataProvider;
+import com.tngtech.java.junit.dataprovider.UseDataProvider;
+
 @RunWith(Parameterized.class)
 
 // based on:
@@ -18,11 +21,13 @@ import org.junit.runners.Parameterized.Parameters;
 
 public class MultiBrowserTest {
 
-	private String baseUrl;
-	private static String browser;
+	private static String browser = "default browser";
+	private String baseURL = "default URL";
 
-	public MultiBrowserTest(String baseUrl, String browser) {
-		this.baseUrl = baseUrl;
+	// No public static parameters method on class
+	// com.mycompany.app.MultiBrowserTest
+
+	public MultiBrowserTest(String browser) {
 		MultiBrowserTest.browser = browser;
 	}
 
@@ -32,35 +37,38 @@ public class MultiBrowserTest {
 				String.format("Before test: browser = %s", MultiBrowserTest.browser));
 	}
 
-	@BeforeClass
-	public static void beforeClass() {
-		// MultiBrowserTest.browser will be null
-		System.err.println(
-				String.format("Before class: browser = %s", MultiBrowserTest.browser));
+	/* 	@BeforeClass
+		public static void beforeClass() {
+			// MultiBrowserTest.browser will be null
+			System.err.println(
+					String.format("Before class: browser = %s", MultiBrowserTest.browser));
+		}
+	*/
+
+	@DataProvider
+	public static Object[][] testData() {
+		// @formatter:off
+		return new Object[][] { { "https://www.google.com", "" },
+				{ "https://www.linkedin.com", "" },
+				{ "https://stackoverflow.com", "" }, };
+		// @formatter:on
 	}
 
 	@Test
-	public void test1() {
-		System.err.println(String.format("Test1: baseUrl = %s, browser = %s",
-				baseUrl, MultiBrowserTest.browser));
-	}
-
-	@Test
-	public void test2() {
-		System.err.println(String.format("Test2: baseUrl = %s, browser = %s",
-				baseUrl, MultiBrowserTest.browser));
+	@UseDataProvider("testData")
+	//  Method testURL should have no parameters
+	public void testURL(String input) {
+		// Given:
+		System.err.println(String.format("Test1: baseURL = %s, browser = %s",
+				baseURL, MultiBrowserTest.browser));
+		// When:
+		// Then:
 	}
 
 	// inline static disconnected data provider
-	@Parameters(name = "{index}: multibrowser test: url: {0}, browser: {1}")
+	@Parameters(name = "{index}: multibrowser test: browser: {0}")
 	public static Iterable<Object[]> data() {
 		return Arrays
-				.asList(new Object[][] { { "https://www.google.com", "chrome" },
-						{ "https://www.google.com", "firefox" },
-						{ "https://www.linkedin.com", "chrome" },
-						{ "https://www.linkedin.com", "firefox" },
-						{ "https://stackoverflow.com", "chrome" },
-						{ "https://stackoverflow.com", "firefox" } });
+				.asList(new Object[][] { { "chrome" }, { "firefox" }, { "ie" }, });
 	}
-
 }
