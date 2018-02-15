@@ -1,36 +1,26 @@
 package com.github.sergueik.selenium;
 
-import org.openqa.selenium.*;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.interactions.internal.Coordinates;
-import org.openqa.selenium.internal.Locatable;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Test;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
-
+import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.testng.Assert.assertTrue;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Test;
 
 /**
  * Selected test scenarios for Selenium WebDriver
@@ -54,49 +44,67 @@ public class LabelInputFinderTest extends BaseTest {
 	public void testInputByLabel() {
 		List<WebElement> labels = driver.findElements(By.tagName("label"));
 		@SuppressWarnings("unchecked")
-		List<WebElement> inputs = (List<WebElement>) (js
-				.executeScript("var labels = arguments[0],\n" + "inputs = [];\n"
+		List<WebElement> inputs = (List<WebElement>) (js.executeScript(
+				// https://stackoverflow.com/questions/1820908/how-to-turn-off-the-eclipse-code-formatter-for-certain-sections-of-java-code
+				// @formatter:off
+							"var labels = arguments[0],\n" 
+						+ "inputs = [];\n"
 						+ "		for (var i = 0; i < labels.length; i++) {\n"
 						+ "				if (labels[i].getAttribute('for') != null) {\n"
 						+ "						inputs.push(document.getElementById(labels[i].getAttribute('for')));\n"
-						+ "				}\n" + "		}\n" + "return inputs;", labels));
-		inputs.stream().forEach(o -> {
-			System.err.println(o.getAttribute("outerHTML"));
-			scrolltoElement(o);
-			highlight(o);
-			flash(o);
-		});
+						+ "				}\n" 
+						+ "		}\n" 
+						+ "return inputs;",
+				// @formatter:on
+
+				labels));
+
+		Function<WebElement, String> showWebElement = element -> {
+			scrolltoElement(element);
+			highlight(element);
+			flash(element);
+			return element.getAttribute("outerHTML");
+		};
+
+		inputs.stream().map(showWebElement).forEach(System.err::println);
 	}
 
 	@Test(priority = 2, enabled = false)
 	public void testInputByLabelTextOrdered() {
 		List<WebElement> labelElements = driver.findElements(By.tagName("label"));
-		List<Integer> elementOrder = new ArrayList<Integer>();
-		for (int cnt = 0; cnt < labelElements.size(); cnt++) {
-			elementOrder.add(cnt);
-		}
+		// http://www.deadcoderising.com/2015-05-19-java-8-replace-traditional-for-loops-with-intstreams/
+		// https://stackoverflow.com/questions/17640754/zipping-streams-using-jdk8-with-lambda-java-util-stream-streams-zip
+		// see also https://github.com/poetix/protonpack for zip
+		List<Integer> elementOrder = IntStream.range(0, labelElements.size())
+				.boxed().collect(Collectors.toList());
 
 		Map<String, WebElement> elementMap = labelElements.stream()
-				// java.lang.IllegalArgumentException: Cannot find elements with a null
-				// id attribute.
+				// NOTE: java.lang.IllegalArgumentException:
+				// Cannot find elements with a null id attribute.
 				.filter(o -> o.getAttribute("for") != null)
-				// java.lang.IllegalStateException: Duplicate key
+				// NOTE: java.lang.IllegalStateException:
+				// Duplicate key
 				.collect(Collectors.toMap(o -> {
-					// local variables referenced from a lambda expression must be final
-					// or effectively final
-					// return String.format("%d_%s_%d", ++pos, o.getText());
+					// NOTE: local variables referenced from a lambda expression
+					// must be final or effectively final
 					return String.format("%02d_%s", elementOrder.remove(0), o.getText());
 				}, o -> driver.findElement(By.id(o.getAttribute("for")))));
 
-		elementMap.keySet().stream().sorted().forEach(o -> {
-			WebElement input = elementMap.get(o);
-			String text = o.replaceAll("^(?:\\d+_)", "");
-			System.err.println(String.format("Input for %s is\n%s\n", text,
-					input.getAttribute("outerHTML")));
-			scrolltoElement(input);
-			highlight(input);
-			flash(input);
-		});
+		Consumer<WebElement> showElement = element -> {
+			scrolltoElement(element);
+			highlight(element);
+			flash(element);
+		};
+
+		Function<String, WebElement> getWebElement = label -> {
+			WebElement input = elementMap.get(label);
+			System.err.println(String.format("Input for %s is\n%s\n",
+					label.replaceAll("^(?:\\d+_)", ""), input.getAttribute("outerHTML")));
+			return input;
+		};
+
+		elementMap.keySet().stream().sorted().map(getWebElement)
+				.forEach(showElement);
 	}
 
 	@Test(priority = 3, enabled = false)
@@ -104,15 +112,16 @@ public class LabelInputFinderTest extends BaseTest {
 		Random suffix = new Random();
 		List<WebElement> labelElements = driver.findElements(By.tagName("label"));
 		Map<String, WebElement> elementMap = labelElements.stream()
-				// java.lang.IllegalArgumentException: Cannot find elements with a null
-				// id attribute.
+				// NOTE: java.lang.IllegalArgumentException:
+				// Cannot find elements with a null id attribute.
 				.filter(o -> o.getAttribute("for") != null)
-				// java.lang.IllegalStateException: Duplicate key
+				// NOTE: java.lang.IllegalStateException:
+				// Duplicate key
 				.collect(Collectors.toMap(o -> {
 					return String.format("%s_%d", o.getText(), suffix.nextInt());
 				}, o -> driver.findElement(By.id(o.getAttribute("for")))));
 
-		elementMap.entrySet().stream().forEach(o -> {
+		Consumer<Entry<String, WebElement>> showElement = o -> {
 			String text = o.getKey().replaceAll("(?:_[-\\d]+)$", "");
 			WebElement input = o.getValue();
 			System.err.println(String.format("Input for %s is\n%s\n", text,
@@ -120,7 +129,7 @@ public class LabelInputFinderTest extends BaseTest {
 			scrolltoElement(input);
 			highlight(input);
 			flash(input);
-		});
+		};
+		elementMap.entrySet().stream().forEach(showElement);
 	}
-
 }

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -131,6 +132,12 @@ public class SuvianTest extends BaseTest {
 
 		// 3. Alternative wait, functional style, with Optional <WebElement>
 		// http://www.nurkiewicz.com/2013/08/optional-in-java-8-cheat-sheet.html
+		// and capture-loaded Predicate
+		Predicate<WebElement> textCheck = _element -> {
+			String _text = _element.getText();
+			System.err.println("in stream filter (3): Text = " + _text);
+			return (Boolean) (_text.contains("Navigate Back"));
+		};
 		try {
 			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
 
@@ -139,11 +146,7 @@ public class SuvianTest extends BaseTest {
 					Optional<WebElement> e = d
 							.findElements(
 									By.cssSelector("div.container div.row div.intro-message h3"))
-							.stream().filter(o -> {
-								String t = o.getText();
-								System.err.println("in stream filter (3): Text = " + t);
-								return (Boolean) (t.contains("Navigate Back"));
-							}).findFirst();
+							.stream().filter(textCheck).findFirst();
 					return (e.isPresent()) ? e.get() : (WebElement) null;
 				}
 			});
@@ -160,21 +163,22 @@ public class SuvianTest extends BaseTest {
 
 		// http://stackoverflow.com/questions/12858972/how-can-i-ask-the-selenium-webdriver-to-wait-for-few-seconds-in-java
 		// http://stackoverflow.com/questions/31102351/selenium-java-lambda-implementation-for-explicit-waits
+		Predicate<WebElement> textCheck2 = _element -> {
+			String _text = _element.getText();
+			System.err.println("(in filter) Text: " + _text);
+			return (Boolean) (_text.equalsIgnoreCase("Link Successfully clicked"));
+		};
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"));
 		// longer version
 		Stream<WebElement> elementsStream = elements.stream();
-		elements = elementsStream.filter(o -> {
-			String t = o.getText();
-			System.err.println("(in filter) Text: " + t);
-			return (Boolean) (t.equalsIgnoreCase("Link Successfully clicked"));
-		}).collect(Collectors.toList());
+		elements = elementsStream.filter(textCheck2).collect(Collectors.toList());
 
 		// shorter version
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"))
-				.stream()
-				.filter(o -> "Link Successfully clicked".equalsIgnoreCase(o.getText()))
+				.stream().filter(_element -> "Link Successfully clicked"
+						.equalsIgnoreCase(_element.getText()))
 				.collect(Collectors.toList());
 
 		assertThat(elements.size(), equalTo(1));
@@ -182,7 +186,8 @@ public class SuvianTest extends BaseTest {
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"))
 				.stream()
-				.filter(o -> o.getText().equalsIgnoreCase("Link Successfully clicked"))
+				.filter(_element -> _element.getText()
+						.equalsIgnoreCase("Link Successfully clicked"))
 				.collect(Collectors.toList());
 		assertThat(elements.size(), equalTo(1));
 
@@ -413,9 +418,9 @@ public class SuvianTest extends BaseTest {
 		try {
 			wait.until(new ExpectedCondition<Boolean>() {
 				@Override
-				public Boolean apply(WebDriver d) {
-					return (Boolean) d.findElement(By.className("intro-message"))
-							.getText().contains("Link Successfully clicked");
+				public Boolean apply(WebDriver _driver) {
+					return (Boolean) _driver.findElements(By.className("intro-message"))
+							.get(0).getText().contains("Link Successfully clicked");
 				}
 			});
 		} catch (Exception e) {
@@ -425,14 +430,15 @@ public class SuvianTest extends BaseTest {
 		elements = driver
 				.findElements(By.cssSelector(".container .row .intro-message h3"))
 				.stream()
-				.filter(o -> o.getText().equalsIgnoreCase("Link Successfully clicked"))
+				.filter(_element -> _element.getText()
+						.equalsIgnoreCase("Link Successfully clicked"))
 				.collect(Collectors.toList());
 		assertThat(elements.size(), equalTo(1));
 		element = elements.get(0);
 		highlight(element);
 		assertTrue(element.getText().equalsIgnoreCase("Link Successfully clicked"),
 				element.getText());
-		elements.forEach(System.out::println); // output : ??
+		elements.forEach(System.out::println);
 	}
 
 	@Test(enabled = true)
@@ -546,11 +552,11 @@ public class SuvianTest extends BaseTest {
 		try {
 			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
 				@Override
-				public WebElement apply(WebDriver d) {
-					return d
+				public WebElement apply(WebDriver _driver) {
+					return _driver
 							.findElements(
 									By.cssSelector("div.container div.row div.intro-message h3"))
-							.stream().filter(o -> o.getText().toLowerCase()
+							.stream().filter(_element -> _element.getText().toLowerCase()
 									.indexOf("select your hobbies") > -1)
 							.findFirst().get();
 				}
@@ -568,20 +574,23 @@ public class SuvianTest extends BaseTest {
 		highlight(formElement, 1000);
 		List<WebElement> inputElements = formElement
 				.findElements(By.cssSelector("label[for]")).stream()
-				.filter(o -> hobbies.contains(o.getText()))
+				.filter(_element -> hobbies.contains(_element.getText()))
 				.collect(Collectors.toList());
 		// C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x =>
 		// x.Text);
-		Map<String, String> dataMap = inputElements.stream().filter(o -> {
-			System.err.println("input element id: " + o);
-			System.err.println("input element text: " + o.getText());
+		Map<String, String> dataMap = inputElements.stream().map(_element -> {
+			System.err.println("input element id: " + _element);
+			System.err.println("input element text: " + _element.getText());
+			System.err.println(
+					"input element 'for' attribute: " + _element.getAttribute("for"));
 			System.err
-					.println("input element 'for' attribute: " + o.getAttribute("for"));
-			System.err.println("input element HTML: " + o.getAttribute("outerHTML"));
-			System.err.println("input element XPath: " + xpathOfElement(o));
-			System.err.println("input element CSS: " + cssSelectorOfElement(o));
-			return true;
-		}).collect(Collectors.toMap(o -> o.getText(), o -> o.getAttribute("for")));
+					.println("input element HTML: " + _element.getAttribute("outerHTML"));
+			System.err.println("input element XPath: " + xpathOfElement(_element));
+			System.err
+					.println("input element CSS: " + cssSelectorOfElement(_element));
+			return _element;
+		}).collect(Collectors.toMap(_element -> _element.getText(),
+				_element -> _element.getAttribute("for")));
 		List<WebElement> checkboxes = new ArrayList<>();
 		for (String hobby : hobbies) {
 			try {
@@ -601,10 +610,11 @@ public class SuvianTest extends BaseTest {
 			}
 
 		}
-		checkboxes.stream().forEach(o -> {
-			highlight(o);
-			o.click();
-		});
+		Consumer<WebElement> act = _element -> {
+			highlight(_element);
+			_element.click();
+		};
+		checkboxes.stream().forEach(act);
 
 		// Assert
 
@@ -627,11 +637,11 @@ public class SuvianTest extends BaseTest {
 		driver.get("http://suvian.in/selenium/1.6checkbox.html");
 		WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
 			@Override
-			public WebElement apply(WebDriver d) {
-				return d
+			public WebElement apply(WebDriver _driver) {
+				return _driver
 						.findElements(
 								By.cssSelector("div.container div.row div.intro-message h3"))
-						.stream().filter(o -> o.getText().toLowerCase()
+						.stream().filter(_element -> _element.getText().toLowerCase()
 								.indexOf("select your hobbies") > -1)
 						.findFirst().get();
 			}
@@ -640,11 +650,12 @@ public class SuvianTest extends BaseTest {
 		// Act
 		List<WebElement> elements = checkElement
 				.findElements(By.xpath("..//label[@for]")).stream()
-				.filter(o -> hobbies.contains(o.getText()))
+				.filter(_element -> hobbies.contains(_element.getText()))
 				.collect(Collectors.toList());
 		assertTrue(elements.size() > 0);
 		List<WebElement> checkBoxes = elements.stream()
-				.map(o -> o.findElement(By.xpath("preceding-sibling::input")))
+				.map(_element -> _element
+						.findElement(By.xpath("preceding-sibling::input")))
 				.collect(Collectors.toList());
 		assertTrue(checkBoxes.size() > 0);
 
