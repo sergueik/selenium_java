@@ -1,16 +1,16 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
 public class ByAngularExactBinding extends ByAngular.BaseBy {
 
-	private String binding;
-
 	public ByAngularExactBinding(String rootSelector, String exactBinding) {
 		super(rootSelector);
 		this.binding = exactBinding;
 	}
+
+	private String binding;
 
 	protected Object getObject(SearchContext context,
 			JavascriptExecutor javascriptExecutor) {

@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.WebDriverException;
 

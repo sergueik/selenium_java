@@ -1,4 +1,4 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
@@ -12,7 +12,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.mycompany.app.NgWebDriver.DEFAULT_ROOT_SELECTOR;
+import static com.paulhammant.ngwebdriver.NgWebDriver.DEFAULT_ROOT_SELECTOR;
 
 public class ByAngular {
 

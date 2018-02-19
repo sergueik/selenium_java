@@ -1,12 +1,9 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
 public class ByAngularCssContainingText extends ByAngular.BaseBy {
-
-	private String cssSelector;
-	private String searchText;
 
 	public ByAngularCssContainingText(String rootSelector, String cssSelector,
 			String searchText) {
@@ -14,6 +11,8 @@ public class ByAngularCssContainingText extends ByAngular.BaseBy {
 		this.cssSelector = cssSelector;
 		this.searchText = searchText;
 	}
+
+	private String cssSelector, searchText;
 
 	protected Object getObject(SearchContext context,
 			JavascriptExecutor javascriptExecutor) {

@@ -1,16 +1,16 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
 public class ByAngularOptions extends ByAngular.BaseBy {
 
-	private String options;
-
 	public ByAngularOptions(String rootSelector, String options) {
 		super(rootSelector);
 		this.options = options;
 	}
+
+	private String options;
 
 	protected Object getObject(SearchContext context,
 			JavascriptExecutor javascriptExecutor) {

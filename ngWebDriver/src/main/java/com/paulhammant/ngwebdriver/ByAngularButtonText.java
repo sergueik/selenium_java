@@ -1,24 +1,23 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
-public class ByAngularPartialButtonText extends ByAngular.BaseBy {
+public class ByAngularButtonText extends ByAngular.BaseBy {
+
+	public ByAngularButtonText(String rootSelector, String buttonText) {
+		super(rootSelector);
+		this.searchText = buttonText;
+	}
 
 	private String searchText;
-
-	public ByAngularPartialButtonText(String rootSelector,
-			String partialButtonText) {
-		super(rootSelector);
-		this.searchText = partialButtonText;
-	}
 
 	protected Object getObject(SearchContext context,
 			JavascriptExecutor javascriptExecutor) {
 		return javascriptExecutor
 				.executeScript("var using = arguments[0] || document;\n"
 						+ "var searchText = '" + searchText + "';\n" + "\n"
-						+ ByAngular.functions.get("findByPartialButtonText"), context);
+						+ ByAngular.functions.get("findByButtonText"), context);
 	}
 
 	@Override

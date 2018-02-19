@@ -1,20 +1,19 @@
-package com.mycompany.app;
+package com.paulhammant.ngwebdriver;
 
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.SearchContext;
 
 public class ByAngularRepeater extends ByAngular.BaseBy {
 
-
-	private String repeater;
-	private boolean exact;
-	
 	public ByAngularRepeater(String rootSelector, String repeater,
 			boolean exact) {
 		super(rootSelector);
 		this.repeater = repeater;
 		this.exact = exact;
 	}
+
+	private String repeater;
+	private boolean exact;
 
 	public ByAngularRepeaterRow row(int row) {
 		return new ByAngularRepeaterRow(rootSelector, repeater, exact, row);
