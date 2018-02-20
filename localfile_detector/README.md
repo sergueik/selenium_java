@@ -11,7 +11,7 @@ Upload
 - [additional services](http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.remote.LocalFileDetector)
 - [additional services](http://www.programcreek.com/java-api-examples/index.php?source_dir=thucydides-master/thucydides-core/src/main/java/net/thucydides/core/pages/components/FileToUpload.java)
 - [source](https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/remote/LocalFileDetector.html)
-
+- [forum](http://automated-testing.info/t/zagruzka-fajla-cherez-webdriver/3823/13)
 
 Download settings in Firefox profile
 ------------------------------------

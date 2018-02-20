@@ -300,7 +300,9 @@ public class NgDatePickerTest {
 				.findElement(By.cssSelector("div.dropdown.open ul.dropdown-menu"));
 		assertThat(ng_dropdown, notNullValue());
 		highlight(ng_dropdown);
-		String monthDate = "12";
+		// String monthDate = "12";
+		// cssContainingText now supports regular expressions
+		String monthDate = "__REGEXP__/1[23]/";
 		WebElement dateElement = ng_dropdown
 				.findElements(NgBy.cssContainingText("td.ng-binding", monthDate))
 				.get(0);
