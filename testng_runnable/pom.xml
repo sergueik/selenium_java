@@ -18,11 +18,11 @@
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <selenium.version>3.2.0</selenium.version>
-    <selenium.firefox-driver.version>3.2.0</selenium.firefox-driver.version>
-    <testng.version>6.9.10</testng.version>
-    <poi.version>3.14</poi.version>
-    <poiooxml.version>3.14</poiooxml.version>
+    <selenium.version>3.5.1</selenium.version>
+    <selenium.firefox-driver.version>3.5.1</selenium.firefox-driver.version>
+    <testng.version>6.11</testng.version>
+    <poi.version>3.17</poi.version>
+    <poiooxml.version>3.17</poiooxml.version>
     <mainClass>demo.EntryPoint</mainClass>
   </properties>
   <dependencies>

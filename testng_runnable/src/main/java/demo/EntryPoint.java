@@ -4,7 +4,7 @@ import org.testng.TestListenerAdapter;
 import org.testng.TestNG;
 
 public class EntryPoint {
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "deprecation" })
 	public static void main(String[] args) {
 		TestListenerAdapter testListenerAdapter = new TestListenerAdapter();
 		TestNG testng = new TestNG();

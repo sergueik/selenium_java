@@ -4,14 +4,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -26,6 +27,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.Assert;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -56,23 +58,13 @@ public class TestWithData {
 
 	@BeforeSuite
 	public void beforeSuite() {
-		/*
-		DesiredCapabilities caps = new DesiredCapabilities();
-		caps.setCapability("browserName", "Chrome");	// pulls the latest version
-		caps.setCapability("platform", "Windows 10");	// to specify version, add setCapability("version", "desired version")
-		try { 
-		driver = new RemoteWebDriver(new URL("http://" + username + ":" + authkey +"@hub.crossbrowsertesting.com:80/wd/hub"), caps);
-		} catch ( MalformedURLException e) {
-		 // abort
-		}
-		*/
 
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		ChromeOptions options = new ChromeOptions();
 
-		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
+		Map<String, Object> chromePrefs = new HashMap<>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		String downloadFilepath = System.getProperty("user.dir")
 				+ System.getProperty("file.separator") + "target"
@@ -98,7 +90,6 @@ public class TestWithData {
 
 		driver.manage().timeouts().setScriptTimeout(scriptTimeout,
 				TimeUnit.SECONDS);
-		// Declare a wait time
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		screenshot = ((TakesScreenshot) driver);

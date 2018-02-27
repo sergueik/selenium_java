@@ -12,7 +12,8 @@
     <maven.compiler.source>1.7</maven.compiler.source>
     <maven.compiler.target>1.7</maven.compiler.target>
     <java.version>1.7</java.version>
-    <poi.version>3.14</poi.version>
+    <poi.version>3.17</poi.version>
+    <poiooxml.version>3.17</poiooxml.version>
     <junit.version>4.11</junit.version>
     <testng.version>6.9.10</testng.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
@@ -78,12 +79,12 @@ xsdlib-20030807.jar
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
-      <version>${poi.version}</version>
+      <version>${poiooxml.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml-schemas</artifactId>
-      <version>${poi.version}</version>
+      <version>${poiooxml.version}</version>
       <type>jar</type>
     </dependency>
     <dependency>
