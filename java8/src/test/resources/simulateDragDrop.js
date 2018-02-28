@@ -7,6 +7,10 @@
  */
 // https://ynot408.wordpress.com/2011/09/22/drag-and-drop-using-selenium-webdriver/
 // http://stackoverflow.com/questions/35834671/similating-a-javascript-click-event-on-a-specific-page
+// https://ynot408.wordpress.com/2011/09/22/drag-and-drop-using-selenium-webdriver/
+// http://elementalselenium.com/tips/39-drag-and-drop
+// https://gist.github.com/reinaldorossetti/074642e9f954b7119c557748836fcd42
+
 simulate = function(element, eventName) {
 	var options = extend(defaultOptions, arguments[2] || {});
 	var oEvent, eventType = null;
