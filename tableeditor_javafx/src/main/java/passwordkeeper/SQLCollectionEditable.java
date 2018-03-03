@@ -1,8 +1,4 @@
-package sqlite;
-
-import interfaces.Editable;
-import pojo.Website;
-
+package passwordkeeper;
 
 public class SQLCollectionEditable implements Editable {
 

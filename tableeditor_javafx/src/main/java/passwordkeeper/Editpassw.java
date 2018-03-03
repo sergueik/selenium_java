@@ -1,6 +1,5 @@
-package editmodal;
+package passwordkeeper;
 
-import interfaces.AddChangePasswAbstr;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -9,9 +8,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 import org.sqlite.SQLiteConfig;
-import pojo.Website;
-import pswkeeper.Constants;
-import sqlite.db;
 
 import java.sql.*;
 
@@ -205,7 +201,7 @@ public class Editpassw implements AddChangePasswAbstr {
 				+ " sitePass = ? " + "WHERE id = ?";
 		try {
 			SQLiteConfig config = new SQLiteConfig();
-			Connection c = db.getInstance().getConnection();
+			Connection c = DB.getInstance().getConnection();
 			PreparedStatement pstmt = c.prepareStatement(updatesql);
 
 			pstmt.setString(1, site);

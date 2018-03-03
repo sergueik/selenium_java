@@ -1,6 +1,5 @@
-package addmodal;
+package passwordkeeper;
 
-import interfaces.AddChangePasswAbstr;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
@@ -8,9 +7,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.sqlite.SQLiteConfig;
-import pojo.Website;
-import pswkeeper.Constants;
-import sqlite.db;
 
 import java.sql.*;
 
@@ -133,7 +129,7 @@ public class Addpassw implements AddChangePasswAbstr {
 
 		try {
 			SQLiteConfig config = new SQLiteConfig();
-			c = db.getInstance().getConnection();
+			c = DB.getInstance().getConnection();
 
 			PreparedStatement stat = c.prepareStatement(
 					"INSERT INTO data (site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, person, personEmail, personPass, personPhone, dbName, dbUser, dbPass, dbHost, hostingUrl, hostingLogin, hostingPass, providerUrl, providerLogin, providerPass, otherUrl, otherLogin, otherPass, notes) VALUES ('"

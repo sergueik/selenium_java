@@ -1,6 +1,4 @@
-package interfaces;
-
-import pojo.Website;
+package passwordkeeper;
 
 public interface Editable {
 

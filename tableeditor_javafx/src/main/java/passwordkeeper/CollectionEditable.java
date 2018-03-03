@@ -1,11 +1,10 @@
-package interfaces.impl;
+package passwordkeeper;
 
-import interfaces.Editable;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import editmodal.Editpassw.*;
+import passwordkeeper.Editpassw.*;
+
 import org.sqlite.SQLiteConfig;
-import pojo.Website;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

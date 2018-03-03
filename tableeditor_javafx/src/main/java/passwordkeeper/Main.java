@@ -1,4 +1,4 @@
-package pswkeeper;
+package passwordkeeper;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -6,8 +6,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import sqlite.SQLCollectionEditable;
-import sqlite.db;
+
 import java.sql.*;
 
 /**
@@ -23,11 +22,12 @@ public class Main extends Application {
 
 	public static final String DBPATH = "";
 
+	@SuppressWarnings("restriction")
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
-		fxmlLoader.setLocation(getClass().getResource("/pswkeeper/main.fxml"));
+		fxmlLoader.setLocation(getClass().getResource("/main.fxml"));
 		Parent fxmlMain = fxmlLoader.load();
 		Controller controller = fxmlLoader.getController();
 		controller.setMainStage(primaryStage);
@@ -36,16 +36,14 @@ public class Main extends Application {
 		// primaryStage.setResizable(false);
 		CheckConnection();
 		primaryStage.show();
-		primaryStage.getIcons().add(new Image("/pswkeeper/ico.png"));
+		primaryStage.getIcons().add(new Image("/ico.png"));
 
 	}
 
 	public void CheckConnection() {
-		if (db.getInstance().getConnection() == null) {
-			System.out.println("test”");
+		if (DB.getInstance().getConnection() == null) {
+			System.out.println("Connection failure");
 			System.exit(1);
-		} else {
-			System.out.println("test”");
 		}
 	}
 

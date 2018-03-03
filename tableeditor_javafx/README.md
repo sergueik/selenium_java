@@ -6,5 +6,13 @@ SQLite JDBC prepared statement.
 
 This projest will be used as a starting point for SWET Tableview window.
 Original archive: [Yandex disk link](https://yadi.sk/d/VClTsgSI3PpY2j)
+
+
+### Running
+
+```cmd
+mvn clean  install
+java -cp  target\PasswordKeeper-1.0-snapshot.jar;target\lib\* passwordkeeper.Main
+```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
