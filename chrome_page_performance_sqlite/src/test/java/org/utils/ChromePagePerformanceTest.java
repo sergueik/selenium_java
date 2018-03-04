@@ -28,6 +28,7 @@ import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.awt.image.BufferedImage;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -73,6 +74,7 @@ public class ChromePagePerformanceTest {
 
 	private static String sql;
 
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void beforeClass() throws IOException {
 		getOsName();
