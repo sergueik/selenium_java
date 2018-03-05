@@ -28,7 +28,8 @@ public class ExcelTestCase {
 		this.description = desc;
 	}
 
-	public ExcelTestCase(String id, String name, String desc, String params, String config) {
+	public ExcelTestCase(String id, String name, String desc, String params,
+			String config) {
 		this(id, name, desc);
 		this.parameters = params;
 		this.configuration = config;
@@ -127,7 +128,7 @@ public class ExcelTestCase {
 	public XmlTest getTestAsXmlTest(XmlSuite suite, boolean loadClasses) {
 		XmlTest xmltest = new XmlTest(suite);
 		xmltest.setName(this.id + "." + this.name); // set name like
-													// "<id>.<name>"
+		// "<id>.<name>"
 		// add parameters to this test case
 		Properties params = this.getParametersAsProperties();
 		for (Enumeration<?> e = params.keys(); e.hasMoreElements();) {
@@ -146,9 +147,9 @@ public class ExcelTestCase {
 	 */
 	@Override
 	public String toString() {
-		return "ExcelTestCase [Id: " + id + ", Name: " + name
-				+ ", Description: " + description + ", Configuration: "
-				+ configuration + ", Parameters: " + parameters + "]";
+		return "ExcelTestCase [Id: " + id + ", Name: " + name + ", Description: "
+				+ description + ", Configuration: " + configuration + ", Parameters: "
+				+ parameters + "]";
 	}
 
 }

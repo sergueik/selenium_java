@@ -51,11 +51,11 @@ public class ExcelTestNGRunner {
 	public void run() {
 		File srcFile = new File(source);
 		File[] filesList = null; // if source is a directory, this will hold the
-									// list of excel files
+		// list of excel files
 		// make sure the file source exists
 		if (!srcFile.exists()) {
-			throw new IllegalArgumentException("The source for the Excel "
-					+ "file(s) cannot be found.");
+			throw new IllegalArgumentException(
+					"The source for the Excel " + "file(s) cannot be found.");
 		}
 		// if source is a folder, get all excel files within it
 		if (srcFile.isDirectory()) {
@@ -66,7 +66,7 @@ public class ExcelTestNGRunner {
 		if (this.testng == null) {
 			this.testng = new TestNG();
 		}
-		//if no custom parser is specified, use default
+		// if no custom parser is specified, use default
 		if (this.parser == null) {
 			if (this.parserMap == null)
 				this.parser = new ExcelSuiteParser();
@@ -140,5 +140,4 @@ public class ExcelTestNGRunner {
 		}
 
 	}
-
 }

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringReader;
+
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
+
 import org.testng.xml.*;
 
 /**
@@ -97,15 +99,15 @@ public class ExcelSuiteParser implements IExcelFileParser {
 		List<XmlSuite> suites = new ArrayList<XmlSuite>();
 
 		FileInputStream fis = new FileInputStream(file);
-	Workbook wb = null;
-	try {
-	  wb = WorkbookFactory.create(fis);	  
-	} catch (IOException e){
-		throw(e);
-	} catch (InvalidFormatException e){
-    throw(e);
-	} catch (Exception e){    
-  }
+		Workbook wb = null;
+		try {
+			wb = WorkbookFactory.create(fis);
+		} catch (IOException e) {
+			throw (e);
+		} catch (InvalidFormatException e) {
+			throw (e);
+		} catch (Exception e) {
+		}
 
 		for (int i = 0; i < wb.getNumberOfSheets(); i++) {
 			Sheet sheet = wb.getSheetAt(i);
@@ -154,19 +156,14 @@ public class ExcelSuiteParser implements IExcelFileParser {
 			row = sheet.getRow(j);
 			if (row != null) {
 				try {
-					if (!formatter.formatCellValue(row.getCell(testIdCol))
-							.isEmpty()) {
-						testCases.add(new ExcelTestCase(formatter
-								.formatCellValue(row.getCell(testIdCol)), // id
-								formatter.formatCellValue(row
-										.getCell(testNameCol)),// name
-								formatter.formatCellValue(row
-										.getCell(testDescCol)),// desc
-								formatter.formatCellValue(row
-										.getCell(testParamCol)),// params
-								formatter.formatCellValue(row
-										.getCell(testConfigCol))// config
-								));
+					if (!formatter.formatCellValue(row.getCell(testIdCol)).isEmpty()) {
+						testCases.add(new ExcelTestCase(
+								formatter.formatCellValue(row.getCell(testIdCol)), // id
+								formatter.formatCellValue(row.getCell(testNameCol)), // name
+								formatter.formatCellValue(row.getCell(testDescCol)), // desc
+								formatter.formatCellValue(row.getCell(testParamCol)), // params
+								formatter.formatCellValue(row.getCell(testConfigCol))// config
+						));
 					}
 				} catch (Exception e) {
 					// TODO add specific exception handlers
@@ -225,16 +222,14 @@ public class ExcelSuiteParser implements IExcelFileParser {
 				row = sheet.getRow(i);
 				if (row != null) { // skip blank rows
 					for (int j = 0; j <= row.getLastCellNum(); j++) {
-						String cellValue = formatter.formatCellValue(row
-								.getCell(j));
+						String cellValue = formatter.formatCellValue(row.getCell(j));
 						if (SUITE_NAME_STR.equals(cellValue)) {
-							suiteName = formatter.formatCellValue(row
-									.getCell(j + 1));
+							suiteName = formatter.formatCellValue(row.getCell(j + 1));
 							return suiteName;
 						}
 					}
 				}
-			}// end for
+			} // end for
 		}
 		return suiteName;
 	}
@@ -284,11 +279,9 @@ public class ExcelSuiteParser implements IExcelFileParser {
 				row = sheet.getRow(i);
 				if (row != null) { // skip blank rows
 					for (int j = 0; j <= row.getLastCellNum(); j++) {
-						String cellValue = formatter.formatCellValue(row
-								.getCell(j));
+						String cellValue = formatter.formatCellValue(row.getCell(j));
 						if (SUITE_PARAMS_STR.equals(cellValue)) {
-							rawParams = formatter.formatCellValue(row
-									.getCell(j + 1));
+							rawParams = formatter.formatCellValue(row.getCell(j + 1));
 							break;
 						}
 					}

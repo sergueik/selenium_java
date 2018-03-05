@@ -24,5 +24,4 @@ public class HomePage {
 		txtSearch.sendKeys(query);
 		txtSearch.sendKeys(Keys.RETURN);
 	}
-
 }

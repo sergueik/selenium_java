@@ -9,15 +9,17 @@
   <url/>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
     <java.version>1.7</java.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
     <junit.version>4.11</junit.version>
+    <log4j-core.version>2.5</log4j-core.version>
+    <log4j.version>1.2.17</log4j.version>
     <testng.version>6.9.10</testng.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
   </properties>
   <!--
 from ivy build 
@@ -64,8 +66,9 @@ xsdlib-20030807.jar
     <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
-      <version>1.2.17</version>
-    </dependency>
+<!--      <version>1.2.17</version> -->
+         <version>${log4j.version}</version>
+ </dependency>
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>

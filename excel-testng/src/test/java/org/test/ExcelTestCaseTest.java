@@ -22,7 +22,6 @@ public class ExcelTestCaseTest {
 		Assert.assertEquals(p.size(), 2);
 		Assert.assertEquals(p.getProperty("query"), "query 1");
 		Assert.assertEquals(p.getProperty("query2"), "query 2");
-
 	}
 
 	@Test

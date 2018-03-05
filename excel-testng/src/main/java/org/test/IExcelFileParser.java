@@ -9,6 +9,6 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.testng.xml.XmlSuite;
 
 public interface IExcelFileParser {
-
-	List<XmlSuite> getXmlSuites(File file, boolean loadClasses) throws FileNotFoundException, InvalidFormatException, IOException;
+	List<XmlSuite> getXmlSuites(File file, boolean loadClasses)
+			throws FileNotFoundException, InvalidFormatException, IOException;
 }

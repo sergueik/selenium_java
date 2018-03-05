@@ -32,7 +32,7 @@ public class ExcelSuiteParserTest {
 		URL url = this.getClass().getResource("/tests.xlsx");
 		try {
 			fis = new FileInputStream(url.getFile());
-			//fis = new FileInputStream("src\\test\\tests.xlsx");
+			// fis = new FileInputStream("src\\test\\tests.xlsx");
 			wb = WorkbookFactory.create(fis);
 		} catch (Exception e) {
 			Assert.fail("Input Excel file not found");
@@ -154,10 +154,10 @@ public class ExcelSuiteParserTest {
 	public void testGetTestIdCol2() {
 		Map<ParserMapConstants, int[]> map = new HashMap<ParserMapConstants, int[]>();
 		map.put(ParserMapConstants.SUITE_PARAMS_CELL, new int[] { 50 });
-		
+
 		ExcelSuiteParser parser = new ExcelSuiteParser();
 		parser.setParserMap(map);
-		
+
 		int testIdCol = parser.getTestIdCol(sheet);
 		Assert.assertEquals(testIdCol, 0);
 	}
@@ -166,10 +166,10 @@ public class ExcelSuiteParserTest {
 	public void testGetTestIdCol3() {
 		Map<ParserMapConstants, int[]> map = new HashMap<ParserMapConstants, int[]>();
 		map.put(ParserMapConstants.TEST_ID_COL, new int[] { 1 });
-		
+
 		ExcelSuiteParser parser = new ExcelSuiteParser();
 		parser.setParserMap(map);
-		
+
 		int testIdCol = parser.getTestIdCol(sheet);
 		Assert.assertEquals(testIdCol, 1);
 	}
@@ -177,11 +177,11 @@ public class ExcelSuiteParserTest {
 	@Test(description = "Test getTestIdCol with parser map with incomplete key")
 	public void testGetTestIdCol4() {
 		Map<ParserMapConstants, int[]> map = new HashMap<ParserMapConstants, int[]>();
-		map.put(ParserMapConstants.TEST_ID_COL, new int[] { });
-		
+		map.put(ParserMapConstants.TEST_ID_COL, new int[] {});
+
 		ExcelSuiteParser parser = new ExcelSuiteParser();
 		parser.setParserMap(map);
-		
+
 		int testIdCol = parser.getTestIdCol(sheet);
 		Assert.assertEquals(testIdCol, 0);
 	}
@@ -191,8 +191,7 @@ public class ExcelSuiteParserTest {
 		try {
 			fis.close();
 		} catch (IOException e) {
-			System.out
-					.println("IOException when trying to close file input stream");
+			System.out.println("IOException when trying to close file input stream");
 		}
 	}
 

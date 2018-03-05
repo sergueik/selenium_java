@@ -19,10 +19,12 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
 import org.testng.Assert;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
 import org.testng.Reporter;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -76,13 +78,13 @@ public class BaseTest {
 			// concat prefix with current time and return
 
 			String filename = result.getTestClass().getName() + "."
-					+ result.getMethod().getMethodName() + "."
-					+ sf.format(cal.getTime()) + ".png";
+					+ result.getMethod().getMethodName() + "." + sf.format(cal.getTime())
+					+ ".png";
 			WebDriver augmentedDriver = new Augmenter().augment(driver);
 			File scrFile = ((TakesScreenshot) augmentedDriver)
 					.getScreenshotAs(OutputType.FILE);
-			FileUtils.copyFile(scrFile, new File(context.getOutputDirectory()
-					+ separator + filename));
+			FileUtils.copyFile(scrFile,
+					new File(context.getOutputDirectory() + separator + filename));
 			Reporter.setCurrentTestResult(result);
 			Reporter.log("<a href=\"" + filename + "\">Screenshot</a>");
 		}

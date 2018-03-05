@@ -2,18 +2,19 @@
 <suite name="Suite" parallel="false">
   <test name="ExcelSuiteParserTest">
     <classes>
-      <class name="net.randomsync.testng.excel.ExcelSuiteParserTest"/>
-      <class name="net.randomsync.testng.excel.ExcelSuiteParserTest2"/>
+      <class name="org.test.ExcelSuiteParserTest"/>
+      <class name="org.test.ExcelSuiteParserTest2"/>
     </classes>
   </test>
   <test name="ExcelTestCaseTest">
     <classes>
-      <class name="net.randomsync.testng.excel.ExcelTestCaseTest"/>
+      <class name="org.test.ExcelTestCaseTest"/>
     </classes>
   </test>
   <test name="ExcelTestSuiteTest">
     <classes>
-      <class name="net.randomsync.testng.excel.ExcelTestSuiteTest"/>
+    <!--  TODO: restore original namespace, 'net.randomsync.testng.excel' -->
+      <class name="org.test.ExcelTestSuiteTest"/>
     </classes>
   </test>
 </suite>

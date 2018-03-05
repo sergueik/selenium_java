@@ -1,6 +1,8 @@
 package net.randomsync.googlesearch;
 
-import net.randomsync.testng.excel.ExcelTestNGRunner;
+// import net.randomsync.testng.excel.ExcelTestNGRunner;
+
+import org.test.ExcelTestNGRunner;
 
 public class TestRunner {
 
