@@ -6,9 +6,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
 import com.xls.report.exception.InvalidNumberOfArgumentException;
 
-/**
- * @author - rahul.rathore
- */
+//based on: https://github.com/rahulrathore44/ExcelReportGenerator
+
 public class MainClass {
 
 	public static void main(String[] args) throws SAXException, IOException,

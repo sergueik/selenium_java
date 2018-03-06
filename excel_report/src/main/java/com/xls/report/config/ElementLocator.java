@@ -1,10 +1,10 @@
 package com.xls.report.config;
 
-/**
- * @author - rahul.rathore
- */
+// based on: https://github.com/rahulrathore44/ExcelReportGenerator
 public class ElementLocator {
+
 	private String method = "";
+	private String selector = "";
 
 	public String getMethod() {
 		return method;
@@ -22,7 +22,6 @@ public class ElementLocator {
 		this.selector = selector;
 	}
 
-	private String selector = "";
 
 	@Override
 	public String toString() {

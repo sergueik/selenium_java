@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.FillPatternType;
@@ -19,35 +18,31 @@ import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-/**
- * @author - rahul.rathore
- */
+// based on: https://github.com/rahulrathore44/ExcelReportGenerator
+
 public class ExcelConfiguration {
 
 	@SuppressWarnings("deprecation")
 	public static XSSFRow CreateHeader(XSSFWorkbook book, XSSFSheet sheet,
-			String[] aHeader) {
+			String[] headers) {
 		XSSFRow row = sheet.createRow(0);
-		XSSFCell[] headerCell = new XSSFCell[aHeader.length];
-		XSSFCellStyle[] headerStyle = new XSSFCellStyle[aHeader.length];
 
-		for (int i = 0; i < headerCell.length; i++) {
-			headerCell[i] = row.createCell(i);
+		for (int column = 0; column < headers.length; column++) {
+			XSSFCell headerCell = row.createCell(column);
+			XSSFCellStyle headerStyle = book.createCellStyle();
+			headerStyle.setAlignment(HorizontalAlignment.CENTER);
+			headerStyle.setBorderBottom(BorderStyle.THIN);
+			headerStyle.setBorderLeft(BorderStyle.THIN);
+			headerStyle.setBorderRight(BorderStyle.THIN);
+			headerStyle.setBorderTop(BorderStyle.THIN);
+			// headerStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+			headerStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
-			headerStyle[i] = book.createCellStyle();
-			headerStyle[i].setAlignment(HorizontalAlignment.CENTER);
-			headerStyle[i].setBorderBottom(BorderStyle.THIN);
-			headerStyle[i].setBorderLeft(BorderStyle.THIN);
-			headerStyle[i].setBorderRight(BorderStyle.THIN);
-			headerStyle[i].setBorderTop(BorderStyle.THIN);
-			// headerStyle[i].setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-			headerStyle[i].setFillPattern(FillPatternType.SOLID_FOREGROUND);
-			
-			headerStyle[i].setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
-			headerStyle[i].setLocked(true);
+			headerStyle.setFillForegroundColor(HSSFColor.GREY_25_PERCENT.index);
+			headerStyle.setLocked(true);
 
-			headerCell[i].setCellStyle(headerStyle[i]);
-			headerCell[i].setCellValue(aHeader[i]);
+			headerCell.setCellStyle(headerStyle);
+			headerCell.setCellValue(headers[column]);
 		}
 		return row;
 	}
@@ -132,7 +127,7 @@ public class ExcelConfiguration {
 		Map<String, ArrayList<String>> sheetMap = new HashMap<>();
 		int i = xlSheet.getFirstRowNum() + 1;
 		for (; i <= xlSheet.getLastRowNum(); i++) {
-			row = xlSheet.getRow(i);	
+			row = xlSheet.getRow(i);
 			ArrayList<String> newData = addDataToMap(row, new ArrayList<String>());
 			sheetMap.put(
 					row.getCell(Configuration.testNameIndex).getStringCellValue(),

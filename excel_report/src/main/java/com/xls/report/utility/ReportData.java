@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.ss.usermodel.Color;
+import org.apache.poi.ss.usermodel.FillPatternType;
+//import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -36,12 +37,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.xls.report.config.ElementLocator;
 
-/**
- * @author - rahul.rathore
- */
+// based on: https://github.com/rahulrathore44/ExcelReportGenerator
+
 public class ReportData {
 
-	private static NodeList list;
+	private static NodeList nodeList;
 	private static NodeList classNodeList;
 	private static NodeList methodNodeList;
 	private static NodeList exceptionNodeList;
@@ -53,6 +53,12 @@ public class ReportData {
 	private static String exceptionTrace = "";
 	private static String sheetName = "";
 	private static Map<String, Map<String, ArrayList<String>>> testMethodDataMap = null;
+
+	private static boolean debug;
+
+	public static void setDebug(boolean debug) {
+		ReportData.debug = debug;
+	}
 
 	private static DocumentBuilderFactory fact;
 	private static DocumentBuilder build;
@@ -71,15 +77,21 @@ public class ReportData {
 		Map<String, ArrayList<String>> testDetailMap = null;
 		ArrayList<String> testMethodDataList = null;
 		Document doc = getDocument(xmlFile);
+		if (debug) {
+			System.err.println("Reading: " + doc.getDocumentURI());
+		}
 		doc.getDocumentElement().normalize();
-		list = getNodeList(doc, Configuration.testNode); // for getting
-																											// test nodes
-
-		for (int i = 0; i < list.getLength(); i++) {
+		nodeList = getNodeList(doc, Configuration.testNode); // for getting
+		// test nodes
+		for (int i = 0; i < nodeList.getLength(); i++) {
 			testDetailMap = new HashMap<>();
-			classNodeList = getEleListByTagName(list.item(i),
+			// Node node = nodeList.item(i);
+			// System.err.println("Reading: " +
+			// node.getOwnerDocument().getTextContent());
+			classNodeList = getEleListByTagName(nodeList.item(i),
 					Configuration.classNode);
-			sheetName = getNameAttribute(list.item(i), Configuration.nameAttribute);
+			sheetName = getNameAttribute(nodeList.item(i),
+					Configuration.nameAttribute);
 
 			for (int j = 0; j < classNodeList.getLength(); j++) {
 				classNodeName = getNameAttribute(classNodeList.item(j),
@@ -117,11 +129,20 @@ public class ReportData {
 								Configuration.exceptionNode);
 						exceptionTraceNodeList = getEleListByTagName(methodNodeList.item(k),
 								Configuration.messageAttribute);
-						exceptionTrace = exceptionTraceNodeList
-								.item(Configuration.firstIndex).getTextContent();
-						expMessage = getNameAttribute(
-								exceptionNodeList.item(Configuration.firstIndex),
-								Configuration.classNode);
+						if (exceptionTraceNodeList != null && exceptionTraceNodeList
+								.getLength() > Configuration.firstIndex) {
+							exceptionTrace = exceptionTraceNodeList
+									.item(Configuration.firstIndex).getTextContent();
+						} else {
+							exceptionTrace = "";
+						}
+						if (exceptionNodeList != null) {
+							expMessage = getNameAttribute(
+									exceptionNodeList.item(Configuration.firstIndex),
+									Configuration.classNode);
+						} else {
+							expMessage = "";
+						}
 						testMethodDataList.add(Configuration.exceptionMsgIndex, expMessage);
 						testMethodDataList.add(Configuration.exceptionStackTrace,
 								ExcelConfiguration.transformExpMessage(exceptionTrace).trim());
@@ -157,8 +178,16 @@ public class ReportData {
 			for (String testMethod : testMethods.keySet()) {
 				passCelStyle.setFillForegroundColor(HSSFColor.BRIGHT_GREEN.index);
 				failCelStyle.setFillForegroundColor(HSSFColor.RED.index);
-				passCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
-				failCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+
+				// XSSFColor myColor = new XSSFColor(XSSFColor.);
+				// failCelStyle.setFillForegroundColor(myColor);
+
+				// converting to poi 3.17
+				// passCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+				passCelStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+
+				// failCelStyle.setFillPattern(HSSFCellStyle.SOLID_FOREGROUND);
+				failCelStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 				row = sheet.createRow(l++);
 				XSSFCell cellName = row.createCell(Configuration.testNameIndex);
 				cellName.setCellValue(testMethod);

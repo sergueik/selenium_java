@@ -12,12 +12,12 @@
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <gson.version>2.3.1</gson.version>
-    <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <poi.version>3.16</poi.version>
-    <poi-ooxml.version>3.15</poi-ooxml.version>
-    <poi-ooxml-schemas.version>3.15</poi-ooxml-schemas.version>
+    <poi.version>3.17</poi.version>
+    <poi-ooxml.version>3.17</poi-ooxml.version>
+    <poi-ooxml-schemas.version>3.17</poi-ooxml-schemas.version>
   </properties>
   <dependencies>
     <dependency>

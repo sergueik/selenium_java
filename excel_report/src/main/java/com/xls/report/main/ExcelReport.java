@@ -1,11 +1,14 @@
 package com.xls.report.main;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,19 +16,14 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.xml.sax.SAXException;
 
-import com.xls.report.config.Configuration;
 import com.xls.report.config.ExcelConfiguration;
 import com.xls.report.utility.ReportData;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+// based on: https://github.com/rahulrathore44/ExcelReportGenerator
 
-/**
- * @author - rahul.rathore
- */
 public class ExcelReport {
 
 	private static FileOutputStream _reportFile;
