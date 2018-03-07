@@ -91,7 +91,7 @@ public class AppTest {
 	private static long polling = 500;
 	private static long highlight = 100;
 	private static long afterTest = 10000;
-	private static String baseURL = "http://jqueryui.com/datepicker/";
+	private static String baseURL = "http://jqueryui.com/datepicker/#inline"; // "http://jqueryui.com/datepicker/#buttonbar";
 	private static String dateString;
 	private static Calendar calendar;
 	private static final StringBuffer verificationErrors = new StringBuffer();
