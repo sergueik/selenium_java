@@ -258,6 +258,8 @@ public class BaseTest {
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
 
+			// https://developer.mozilla.org/en-US/Firefox/Headless_mode
+			// 3.5.3 and later
 			System.setProperty("webdriver.gecko.driver",
 					osName.toLowerCase().startsWith("windows")
 							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
