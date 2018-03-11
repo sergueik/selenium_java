@@ -7,5 +7,5 @@ intended to convert to switch to [stub mongodb server](https://github.com/bwaldv
 
 ```cmd
 mvn clean install
-java -cp target\mongodb-basic-0.0.1-SNAPSHOT.jar;target\lib\* example.BasicMongoDB
+java -cp target\mongodb-basic-0.0.1-SNAPSHOT.jar;target\lib\* example.BasicMongoDBClient
 ```

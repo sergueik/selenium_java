@@ -8,23 +8,38 @@ import com.mongodb.client.model.Updates;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoCommandException;
 import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
 
+import java.net.InetSocketAddress;
 import java.util.Iterator;
 
 import org.bson.Document;
 
-
+// import de.bwaldvogel.mongo.*;
+import de.bwaldvogel.mongo.MongoServer;
+import de.bwaldvogel.mongo.backend.memory.MemoryBackend;
 // origin: https://www.tutorialspoint.com/mongodb/mongodb_java
 // TODO: switch to stub mongodb server https://github.com/bwaldvogel/mongo-java-server
 
-public class BasicMongoDB {
+public class BasicMongoServerClient {
 
 	private final static String collectionName = "likes";
+	private static MongoCollection<Document> collection;
+	private static MongoClient client;
+	private static MongoDatabase database;
+	private static Document document;
+	private static MongoServer server;
 
 	public static void main(String args[]) {
 
 		// Creating a Mongo client
-		MongoClient mongo = new MongoClient("localhost", 27017);
+		server = new MongoServer(new MemoryBackend());
+
+		// bind on a random local port
+		InetSocketAddress serverAddress = server.bind();
+
+		// Creating a Mongo client
+		client = new MongoClient(new ServerAddress(serverAddress));
 
 		// Creating Credentials
 		MongoCredential credential;
@@ -33,7 +48,7 @@ public class BasicMongoDB {
 		System.out.println("Connected to the database successfully");
 
 		// Accessing the database
-		MongoDatabase database = mongo.getDatabase("dummy");
+		database = client.getDatabase("dummy");
 		System.out.println("Credentials ::" + credential);
 
 		// Creating a collection
@@ -53,8 +68,7 @@ public class BasicMongoDB {
 		}
 
 		// Retrieving a collection
-		MongoCollection<Document> collection = database
-				.getCollection(collectionName);
+		collection = database.getCollection(collectionName);
 		System.out.println(String.format("Collection \"%s\" selected successfully",
 				collectionName));
 
@@ -92,5 +106,8 @@ public class BasicMongoDB {
 		collection.drop();
 		System.out.println(String.format("Collection \"%s\" dropped successfully",
 				collectionName));
+		
+		client.close();
+    server.shutdown();
 	}
 }
