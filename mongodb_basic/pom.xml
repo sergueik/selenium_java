@@ -5,18 +5,97 @@
   <artifactId>mongodb-basic</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <name>mongodb-basic</name>
+  <developers>
+    <developer>
+      <name>Serguei Kouzmine</name>
+      <email>kouzmine_serguei@yahoo.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/sergueik</organizationUrl>
+    </developer>
+  </developers>
+  <properties>
+    <main.class>example.BasicMongoServerClient</main.class>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+    <commons-exec.version>1.3</commons-exec.version>
+    <commons-io.version>2.5</commons-io.version>
+    <commons-lang3.version>3.3.1</commons-lang3.version>
+    <hamcrest-all.version>1.3</hamcrest-all.version>
+    <java.version>1.8</java.version>
+    <json.version>20170516</json.version>
+    <junit.version>4.12</junit.version>
+    <log4j.version>1.2.17</log4j.version>
+    <logback.version>1.2.3</logback.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <mongo-java-driver.version>3.6.3</mongo-java-driver.version>
+    <mongo-java-server.version>1.7.0</mongo-java-server.version>
+    <slf4j.version>1.7.25</slf4j.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mongodb</groupId>
+      <artifactId>mongo-java-driver</artifactId>
+      <version>${mongo-java-driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logback.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>de.bwaldvogel</groupId>
+      <artifactId>mongo-java-server</artifactId>
+      <version>${mongo-java-server.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.version}</version>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.6.1</version>
+        <version>${maven-compiler-plugin.version}</version>
+        <goals>
+          <goal>compile</goal>
+        </goals>
         <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
+          <source>${java.version}</source>
+          <target>${java.version}</target>
+          <encoding>utf-8</encoding>
+          <compilerArgument>-Xlint:all</compilerArgument>
+          <showWarnings>true</showWarnings>
+          <showDeprecation>true</showDeprecation>
+          <!--
+          <compilerArgument>-verbose</compilerArgument>
+          -->
+	  <!-- 
           <compilerArgs>
             <arg>-parameters</arg>
-          </compilerArgs>
+	  </compilerArgs> 
+	  -->
         </configuration>
       </plugin>
       <plugin>
@@ -33,40 +112,21 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>${maven-jar-plugin.version}</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <addClasspath>true</addClasspath>
+              <mainClass>${main.class}</mainClass>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.mongodb</groupId>
-      <artifactId>mongo-java-driver</artifactId>
-      <version>3.6.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.7.25</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-      <!-- not currently used. -->
-    <dependency>
-      <groupId>de.bwaldvogel</groupId>
-      <artifactId>mongo-java-server</artifactId>
-      <version>1.7.0</version>
-    </dependency>
-  </dependencies>
-  <properties>
-    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
-  </properties>
 </project>
