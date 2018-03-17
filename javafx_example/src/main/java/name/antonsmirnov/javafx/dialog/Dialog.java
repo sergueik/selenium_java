@@ -167,8 +167,6 @@ public class Dialog extends Stage {
 											stage.stackTraceLabel.getWidth())
 									: stage.stacktraceButtonsPanel.getWidth()) + 5 * MARGIN);
 
-			System.err.println("set width " + width);
-			stage.setWidth(width);
 			double height = Math.max(stage.icon.getImage().getHeight(),
 					stage.messageLabel.getHeight()
 							+ stage.stacktraceButtonsPanel.getHeight()
@@ -176,9 +174,10 @@ public class Dialog extends Stage {
 									? Math.min(stage.stackTraceLabel.getHeight(),
 											STACKTRACE_LABEL_MAXHEIGHT)
 									: 0))
-
 					+ stage.buttonsPanel.getHeight() + 3 * MARGIN;
-			System.err.println("set height " + height);
+			System.err.println("set height: " + height);
+			System.err.println("set width: " + width);
+			stage.setWidth(width);
 			stage.setHeight(height);
 			if (stage.stacktraceVisible) {
 				stage.scrollPane

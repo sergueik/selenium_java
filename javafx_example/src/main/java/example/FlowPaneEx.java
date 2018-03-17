@@ -2,6 +2,7 @@ package example;
 
 import org.apache.log4j.Category;
 
+import java.io.File;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -16,6 +17,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.Scene;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -35,7 +37,7 @@ public class FlowPaneEx extends Application {
 	@Override
 	public void start(Stage stage) {
 		this.stage = stage;
-		stage.setTitle("SWET");
+		stage.setTitle("SWET/javaFx");
 		stage.setWidth(500);
 		stage.setHeight(160);
 		Scene scene = new Scene(new Group());
@@ -78,7 +80,31 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("open_32.png"));
 		loadButton.setGraphic(new ImageView(loadImage));
 		loadButton.setTooltip(new Tooltip("Load session"));
-
+		loadButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// https://docs.oracle.com/javafx/2/ui_controls/file-chooser.htm
+				FileChooser fileChooser = new FileChooser();
+				fileChooser.setTitle("Open Resource File");
+				File file = fileChooser.showOpenDialog(stage);
+				if (file != null) {
+					logger.info("Load recording " + file.getName());
+					openRecordingFile(file);
+				}
+			}
+		});
+		
+		Button testsuiteButton = new Button();
+		Image testsuiteImage = new Image(
+				getClass().getClassLoader().getResourceAsStream("excel_gen_32.png"));
+		testsuiteButton.setGraphic(new ImageView(testsuiteImage));
+		testsuiteButton.setTooltip(new Tooltip("Generate Excel TestSuite"));
+		testsuiteButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+			}
+		});
+ 
 		Button saveButton = new Button();
 		Image saveImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("save_32.png"));
@@ -88,7 +114,8 @@ public class FlowPaneEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				try {
-					testFunction();
+					System.err.println("Exercise exception");
+					testException();
 				} catch (Exception e) {
 
 					Dialog.showThrowable("Exception", "Exception thrown",
@@ -131,7 +158,7 @@ public class FlowPaneEx extends Application {
 
 		HBox toolbarHbox = new HBox();
 		toolbarHbox.getChildren().addAll(launchButton, injectButton, generateButton,
-				loadButton, saveButton, configButton, quitButton);
+				loadButton, testsuiteButton, saveButton, configButton, quitButton);
 
 		Label statusLabel = new Label();
 		statusLabel.setText("Status");
@@ -180,7 +207,10 @@ public class FlowPaneEx extends Application {
 
 	}
 
-	private static void testFunction() throws Exception {
+	private static void openRecordingFile(File file) {
+	}
+
+	private static void testException() throws Exception {
 		throw new Exception("This is a test exception.");
 	}
 }
