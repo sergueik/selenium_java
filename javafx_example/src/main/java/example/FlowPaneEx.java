@@ -36,6 +36,7 @@ public class FlowPaneEx extends Application {
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(FlowPaneEx.class);
 	static Stage stage = null;
+	Scene scene = null;
 
 	@Override
 	public void start(Stage stage) {
@@ -43,7 +44,7 @@ public class FlowPaneEx extends Application {
 		stage.setTitle("SWET/javaFx");
 		stage.setWidth(500);
 		stage.setHeight(160);
-		Scene scene = new Scene(new Group());
+		scene = new Scene(new Group());
 
 		VBox vbox = new VBox();
 
@@ -195,7 +196,11 @@ public class FlowPaneEx extends Application {
 		choices.put("Exit and save my project", 2);
 		choices.put("Exit and don't save", 1);
 		choices.put("Don't exit", 10);
-		ChoicesDialog choicesDialog = new ChoicesDialog(new Stage(), choices);
+		Map<String, Map<String, Integer>> choicesDialogData = new HashMap<>();
+		choicesDialogData.put("choices", choices); // TODO: JSON
+		scene.setUserData(choicesDialogData);
+
+		ChoicesDialog choicesDialog = new ChoicesDialog(new Stage(), scene);
 		// choicesDialog.initStyle(StageStyle.UNDECORATED);
 		choicesDialog.sizeToScene();
 		// optionally hide self

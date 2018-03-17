@@ -47,9 +47,21 @@ public class ChoicesDialog extends Stage {
 	}
 
 	// https://stackoverflow.com/questions/12830402/javafx-2-buttons-size-fill-width-and-are-each-same-width
-	@SuppressWarnings("restriction")
-	public ChoicesDialog(Stage stage, Map<String, Integer> choicesMap) {
+	@SuppressWarnings({ "restriction", "unchecked" })
+	public ChoicesDialog(Stage stage, Scene scene) {
 		super();
+		this.stage = stage;
+		// Scene scene = stage.getScene();
+		Map<String, Integer> choicesMap = new HashMap<>();
+		try {
+			Map<String, Object> data = (Map<String, Object>) scene.getUserData();
+			choicesMap = (Map<String, Integer>) data.get("choices");
+			logger.info("Loaded " + choicesMap.toString());
+		} catch (ClassCastException e) {
+			logger.info("Exception (ignored) " + e.toString());
+		} catch (Exception e) {
+			throw e;
+		}
 		if (choicesMap.keySet().size() == 0) {
 			throw new IllegalArgumentException(
 					"You must provide at least one choice");
@@ -60,7 +72,6 @@ public class ChoicesDialog extends Stage {
 			Map.Entry<String, Integer> choiceEntry = choiceIterator.next();
 			this.addChoice(choiceEntry.getKey(), choiceEntry.getValue());
 		}
-		this.stage = stage;
 		initOwner(stage);
 		setTitle("title");
 		initModality(Modality.APPLICATION_MODAL);
