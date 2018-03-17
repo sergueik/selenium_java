@@ -1,71 +1,46 @@
 package example;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import javafx.application.Application;
+import org.apache.log4j.Category;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.TextField;
-import javafx.scene.control.Tooltip;
-import javafx.scene.Group;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import org.apache.log4j.Category;
-
 @SuppressWarnings("restriction")
 // see also: https://github.com/4ntoine/JavaFxDialog/wiki
-//
 public class ChoicesDialog extends Stage {
 
-	private Stage stage;
+	public static Stage stage;
+	private Scene scene;
+	private Image image;
+	private String message;
+	private List<ChoiceItem> choices = new ArrayList<>();
 
 	static final Category logger = Category.getInstance(ChoicesDialog.class);
-	public static String result = null;
-	private Scene scene;
-	private static final Map<String, String> sceneData = new HashMap<>();
-	static {
-		sceneData.put("result", result);
-		sceneData.put("dummy", null);
-	}
-	private ChoiceItem[] choices;
 
-	public ChoiceItem[] getChoices() {
-		return choices;
+	public void addChoice(String text, int index) {
+		this.choices.add(new ChoiceItem(text, index));
 	}
-
-	public void setChoices(ChoiceItem... choices) {
-		if (choices.length < 1) {
-			throw new IllegalArgumentException(
-					"You must provide at least one choice");
-		}
-		this.choices = choices;
-	}
-
-	private Image image;
 
 	public Image getImage() {
 		return image;
 	}
-
-	private String message;
 
 	public String getMessage() {
 		return message;
@@ -75,20 +50,21 @@ public class ChoicesDialog extends Stage {
 		this.message = data;
 	}
 
-	// https://stackoverflow.com/questions/34118025/javafx-pass-values-from-child-to-parent
-	public String getResult() {
-		return result;
+	public ChoicesDialog(Stage stage) {
+		super();
+		ChoicesDialog.stage = stage;
 	}
 
 	// https://stackoverflow.com/questions/12830402/javafx-2-buttons-size-fill-width-and-are-each-same-width
-	@SuppressWarnings("restriction")
-	public ChoicesDialog(Stage stage, ChoiceItem... choices) {
-		super();
-		if (choices.length < 1) {
+	@SuppressWarnings({ "restriction", "serial" })
+	// Cannot override the final method from Stage
+	// this revision is broken does not close scene properly
+	public void showDialog() {
+		if (choices.size() < 1) {
 			throw new IllegalArgumentException(
 					"You must provide at least one choice");
 		}
-		this.stage = stage;
+
 		initOwner(stage);
 		setTitle("title");
 		initModality(Modality.APPLICATION_MODAL);
@@ -100,7 +76,15 @@ public class ChoicesDialog extends Stage {
 
 		scene = new Scene(root, 300, 200);
 		setScene(scene);
-		scene.setUserData(sceneData);
+
+		// passing parameters is messy
+		// https://stackoverflow.com/questions/34118025/javafx-pass-values-from-child-to-parent
+		// https://stackoverflow.com/questions/14187963/passing-parameters-javafx-fxml
+		scene.setUserData(new HashMap<String, String>() {
+			{
+				put("result", null);
+			}
+		});
 		VBox outerVBox = new VBox();
 		outerHBox.getChildren().add(outerVBox);
 		outerHBox.setSpacing(12);
@@ -122,7 +106,6 @@ public class ChoicesDialog extends Stage {
 			button.setText(item.getText());
 			button.setMaxWidth(Double.MAX_VALUE);
 			Map<String, String> userData = new HashMap<>();
-			// userData = new HashMap<>();
 			int itemIndex = item.getIndex();
 			userData.put("index",
 					String.format("%d", (itemIndex != 0 ? itemIndex : index)));
@@ -154,6 +137,7 @@ public class ChoicesDialog extends Stage {
 	}
 
 	private static class buttonHandler implements EventHandler<ActionEvent> {
+		@SuppressWarnings("unchecked")
 		public void handle(ActionEvent event) {
 			Button button = (Button) event.getSource();
 
@@ -165,22 +149,21 @@ public class ChoicesDialog extends Stage {
 				System.err.println("Exception (ignored) " + e.toString());
 				eventData = null;
 			}
-			logger.info("Received: "
-					+ (eventData == null ? "no user data was received" : eventData));
-			Stage stage = (Stage) button.getScene().getWindow();
-			result = eventData;
+			logger.info(
+					"Received: " + (eventData == null ? "no user data" : eventData));
 
-			logger.info("Returned: " + result);
+			logger.info("Returned: " + eventData);
 			Map<String, String> sceneData = new HashMap<>();
-			sceneData.put("result", result);
+			sceneData.put("result", eventData);
 			Scene scene = button.getScene();
 			scene.setUserData(sceneData);
 			stage.close();
+			logger.info("Closing stage(*) :" + stage);
 		}
 	}
 
 	// origin: https://github.com/prasser/swtchoices
-	public static class ChoiceItem {
+	private static class ChoiceItem {
 
 		private String text;
 		private int index;

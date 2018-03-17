@@ -190,13 +190,13 @@ public class FlowPaneEx extends Application {
 
 	public void confirmClose() {
 
-		ChoicesDialog.ChoiceItem[] items = new ChoicesDialog.ChoiceItem[] {
-				new ChoicesDialog.ChoiceItem("Exit and save my project", 2),
-				new ChoicesDialog.ChoiceItem("Exit and don't save", 1),
-				new ChoicesDialog.ChoiceItem("Don't exit", 10), };
+		ChoicesDialog choicesDialog = new ChoicesDialog( new Stage());
 
-		ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
-		choicesDialog.setChoices(items);
+		choicesDialog.addChoice("Exit and save my project", 2);
+		choicesDialog.addChoice("Exit and don't save", 1);
+		choicesDialog.addChoice("Don't exit", 10);
+		choicesDialog.showDialog();
+
 		// choicesDialog.initStyle(StageStyle.UNDECORATED);
 		choicesDialog.sizeToScene();
 		// optionally hide self
@@ -207,6 +207,7 @@ public class FlowPaneEx extends Application {
 		}
 		*/
 		choicesDialog.showAndWait();
+
 		Map<String, String> data = (Map<String, String>) choicesDialog.getScene()
 				.getUserData();
 		int code = Integer.parseInt(data.get("result"));
@@ -214,6 +215,7 @@ public class FlowPaneEx extends Application {
 		// code = Integer.parseInt(choicesDialog.getResult());
 		// logger.info("Exit app with code: " + code);
 		if (code == 1 || code == 2) {
+			logger.info("Closing stage :" + stage);
 			stage.close();
 		}
 
