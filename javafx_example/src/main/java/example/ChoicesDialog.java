@@ -1,7 +1,5 @@
 package example;
 
-
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,19 +30,21 @@ import javafx.stage.StageStyle;
 
 import org.apache.log4j.Category;
 
-import example.ChoiceItem;
-
 @SuppressWarnings("restriction")
 // see also: https://github.com/4ntoine/JavaFxDialog/wiki
 //
 public class ChoicesDialog extends Stage {
 
 	private Stage stage;
-	// NOTE: can't do that
-	// private static final Map<String, String> userData = new HashMap<>();
+
 	static final Category logger = Category.getInstance(ChoicesDialog.class);
 	public static String result = null;
 	private Scene scene;
+	private static final Map<String, String> sceneData = new HashMap<>();
+	static {
+		sceneData.put("result", result);
+		sceneData.put("dummy", null);
+	}
 	private ChoiceItem[] choices;
 
 	public ChoiceItem[] getChoices() {
@@ -100,7 +100,7 @@ public class ChoicesDialog extends Stage {
 
 		scene = new Scene(root, 300, 200);
 		setScene(scene);
-
+		scene.setUserData(sceneData);
 		VBox outerVBox = new VBox();
 		outerHBox.getChildren().add(outerVBox);
 		outerHBox.setSpacing(12);
@@ -126,6 +126,19 @@ public class ChoicesDialog extends Stage {
 			int itemIndex = item.getIndex();
 			userData.put("index",
 					String.format("%d", (itemIndex != 0 ? itemIndex : index)));
+			// unlike SWT where supported widget data with every widget and offers
+			// setData / getData methods to supply additional data that can later be
+			// accessed
+			// org.eclipse.swt.widgets.Widget.setData(String key, Object value)
+			//
+			// the almost all JavaFX objects javaFx only "recommends"
+			// to limit it to controls which can be toggled between selected and
+			// non-selected states.
+			// it with stateful widgets
+			// https://stackoverflow.com/questions/24615911/proper-uses-of-javafx-setuserdata
+			//
+			// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/Scene.html
+
 			button.setUserData(userData);
 			button.setOnAction(new buttonHandler());
 			buttonHBox.setHgrow(button, Priority.ALWAYS);
@@ -138,10 +151,6 @@ public class ChoicesDialog extends Stage {
 		}
 
 		outerVBox.setSpacing(12);
-		/*
-		outerVBox.getChildren().addAll(labelHBox, buttonHBox1, buttonHBox2,
-				buttonHBox3);
-				*/
 	}
 
 	private static class buttonHandler implements EventHandler<ActionEvent> {
@@ -160,8 +169,36 @@ public class ChoicesDialog extends Stage {
 					+ (eventData == null ? "no user data was received" : eventData));
 			Stage stage = (Stage) button.getScene().getWindow();
 			result = eventData;
+
+			logger.info("Returned: " + result);
+			Map<String, String> sceneData = new HashMap<>();
+			sceneData.put("result", result);
+			Scene scene = button.getScene();
+			scene.setUserData(sceneData);
 			stage.close();
 		}
+	}
 
+	// origin: https://github.com/prasser/swtchoices
+	public static class ChoiceItem {
+
+		private String text;
+		private int index;
+
+		public ChoiceItem(String text, int index) {
+			if (text == null) {
+				throw new IllegalArgumentException("Null is not a valid argument");
+			}
+			this.text = text;
+			this.index = index;
+		}
+
+		public String getText() {
+			return text;
+		}
+
+		public int getIndex() {
+			return index;
+		}
 	}
 }

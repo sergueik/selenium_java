@@ -3,6 +3,8 @@ package example;
 import org.apache.log4j.Category;
 
 import java.io.File;
+import java.util.Map;
+
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -21,7 +23,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
-import example.ChoiceItem;
+// import example.ChoiceItem;
 import example.ChoicesDialog;
 import example.ConfigFormEx;
 
@@ -188,10 +190,10 @@ public class FlowPaneEx extends Application {
 
 	public void confirmClose() {
 
-		ChoiceItem[] items = new ChoiceItem[] {
-				new ChoiceItem("Exit and save my project", 2),
-				new ChoiceItem("Exit and don't save", 1),
-				new ChoiceItem("Don't exit", 10), };
+		ChoicesDialog.ChoiceItem[] items = new ChoicesDialog.ChoiceItem[] {
+				new ChoicesDialog.ChoiceItem("Exit and save my project", 2),
+				new ChoicesDialog.ChoiceItem("Exit and don't save", 1),
+				new ChoicesDialog.ChoiceItem("Don't exit", 10), };
 
 		ChoicesDialog choicesDialog = new ChoicesDialog(stage, items);
 		choicesDialog.setChoices(items);
@@ -205,8 +207,12 @@ public class FlowPaneEx extends Application {
 		}
 		*/
 		choicesDialog.showAndWait();
-		int code = Integer.parseInt(choicesDialog.getResult());
+		Map<String, String> data = (Map<String, String>) choicesDialog.getScene()
+				.getUserData();
+		int code = Integer.parseInt(data.get("result"));
 		logger.info("Exit app with code: " + code);
+		// code = Integer.parseInt(choicesDialog.getResult());
+		// logger.info("Exit app with code: " + code);
 		if (code == 1 || code == 2) {
 			stage.close();
 		}
