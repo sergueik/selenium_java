@@ -196,7 +196,6 @@ public class FlowPaneEx extends Application {
 		choices.put("Exit and don't save", 1);
 		choices.put("Don't exit", 10);
 		ChoicesDialog choicesDialog = new ChoicesDialog(new Stage(), choices);
-
 		// choicesDialog.initStyle(StageStyle.UNDECORATED);
 		choicesDialog.sizeToScene();
 		// optionally hide self
@@ -207,7 +206,6 @@ public class FlowPaneEx extends Application {
 		}
 		*/
 		choicesDialog.showAndWait();
-
 		Map<String, String> data = (Map<String, String>) choicesDialog.getScene()
 				.getUserData();
 		int code = Integer.parseInt(data.get("result"));
@@ -215,7 +213,6 @@ public class FlowPaneEx extends Application {
 		// code = Integer.parseInt(choicesDialog.getResult());
 		// logger.info("Exit app with code: " + code);
 		if (code == 1 || code == 2) {
-			logger.info("Closing stage :" + stage);
 			stage.close();
 		}
 
