@@ -93,7 +93,7 @@ public class FlowPaneEx extends Application {
 				}
 			}
 		});
-		
+
 		Button testsuiteButton = new Button();
 		Image testsuiteImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("excel_gen_32.png"));
@@ -102,9 +102,15 @@ public class FlowPaneEx extends Application {
 		testsuiteButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
+				Stage stage = new Stage();
+				TableEditorEx s = new TableEditorEx();
+				try {
+					s.start(stage);
+				} catch (Exception e) {
+				}
 			}
 		});
- 
+
 		Button saveButton = new Button();
 		Image saveImage = new Image(
 				getClass().getClassLoader().getResourceAsStream("save_32.png"));
