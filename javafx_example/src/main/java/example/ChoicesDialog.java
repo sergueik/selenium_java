@@ -2,8 +2,10 @@ package example;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Category;
 
@@ -50,21 +52,17 @@ public class ChoicesDialog extends Stage {
 		this.message = data;
 	}
 
-	public ChoicesDialog(Stage stage) {
-		super();
-		ChoicesDialog.stage = stage;
-	}
-
 	// https://stackoverflow.com/questions/12830402/javafx-2-buttons-size-fill-width-and-are-each-same-width
-	@SuppressWarnings({ "restriction", "serial" })
-	// Cannot override the final method from Stage
-	// this revision is broken does not close scene properly
-	public void showDialog() {
-		if (choices.size() < 1) {
-			throw new IllegalArgumentException(
-					"You must provide at least one choice");
+	@SuppressWarnings("serial")
+	public ChoicesDialog(Stage stage, Map<String, Integer> choicesMap) {
+		super();
+		Iterator<Entry<String, Integer>> choiceIterator = choicesMap.entrySet()
+				.iterator();
+		while (choiceIterator.hasNext()) {
+			Map.Entry<String, Integer> choiceEntry = choiceIterator.next();
+			this.addChoice(choiceEntry.getKey(), choiceEntry.getValue());
 		}
-
+		ChoicesDialog.stage = stage;
 		initOwner(stage);
 		setTitle("title");
 		initModality(Modality.APPLICATION_MODAL);
@@ -99,7 +97,7 @@ public class ChoicesDialog extends Stage {
 		outerVBox.getChildren().addAll(labelHBox);
 
 		int index = 0;
-		for (ChoiceItem item : choices) {
+		for (ChoiceItem item : this.choices) {
 			index++;
 			HBox buttonHBox = new HBox();
 			Button button = new Button();

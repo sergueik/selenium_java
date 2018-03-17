@@ -3,6 +3,7 @@ package example;
 import org.apache.log4j.Category;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 
 import javafx.application.Application;
@@ -190,12 +191,11 @@ public class FlowPaneEx extends Application {
 
 	public void confirmClose() {
 
-		ChoicesDialog choicesDialog = new ChoicesDialog( new Stage());
-
-		choicesDialog.addChoice("Exit and save my project", 2);
-		choicesDialog.addChoice("Exit and don't save", 1);
-		choicesDialog.addChoice("Don't exit", 10);
-		choicesDialog.showDialog();
+		Map<String, Integer> choices = new HashMap<>();
+		choices.put("Exit and save my project", 2);
+		choices.put("Exit and don't save", 1);
+		choices.put("Don't exit", 10);
+		ChoicesDialog choicesDialog = new ChoicesDialog(new Stage(), choices);
 
 		// choicesDialog.initStyle(StageStyle.UNDECORATED);
 		choicesDialog.sizeToScene();
