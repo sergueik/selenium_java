@@ -29,14 +29,14 @@ import javafx.stage.StageStyle;
 //
 public class ChoicesDialog extends Stage {
 
-	private Stage stage;
-
+	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(ChoicesDialog.class);
 	public static String result = null;
+	private Stage stage;
 	private Scene scene;
-	private List<ChoiceItem> choices = new ArrayList<>();
 	private Image image;
 	private String message;
+	private List<ChoiceItem> choices = new ArrayList<>();
 
 	public void addChoice(String text, int index) {
 		this.choices.add(new ChoiceItem(text, index));
@@ -52,25 +52,25 @@ public class ChoicesDialog extends Stage {
 		super();
 		this.stage = stage;
 		// Scene scene = stage.getScene();
-		Map<String, Integer> choicesMap = new HashMap<>();
+		Map<String, Integer> inputData = new HashMap<>();
 		try {
-			Map<String, Object> data = (Map<String, Object>) scene.getUserData();
-			choicesMap = (Map<String, Integer>) data.get("choices");
-			logger.info("Loaded " + choicesMap.toString());
+			Map<String, Object> inputs = (Map<String, Object>) scene.getUserData();
+			inputData = (Map<String, Integer>) inputs.get("inputs");
+			logger.info("Loaded " + inputData.toString());
 		} catch (ClassCastException e) {
 			logger.info("Exception (ignored) " + e.toString());
 		} catch (Exception e) {
 			throw e;
 		}
-		if (choicesMap.keySet().size() == 0) {
+		if (inputData.keySet().size() == 0) {
 			throw new IllegalArgumentException(
 					"You must provide at least one choice");
 		}
-		Iterator<Entry<String, Integer>> choiceIterator = choicesMap.entrySet()
+		Iterator<Entry<String, Integer>> inputIterator = inputData.entrySet()
 				.iterator();
-		while (choiceIterator.hasNext()) {
-			Map.Entry<String, Integer> choiceEntry = choiceIterator.next();
-			this.addChoice(choiceEntry.getKey(), choiceEntry.getValue());
+		while (inputIterator.hasNext()) {
+			Map.Entry<String, Integer> inputEntry = inputIterator.next();
+			this.addChoice(inputEntry.getKey(), inputEntry.getValue());
 		}
 		initOwner(stage);
 		setTitle("title");
@@ -172,8 +172,8 @@ public class ChoicesDialog extends Stage {
 	// origin: https://github.com/prasser/swtchoices
 	public static class ChoiceItem {
 
-		private String text;
 		private int index;
+		private String text;
 
 		public ChoiceItem(String text, int index) {
 			if (text == null) {
@@ -183,12 +183,12 @@ public class ChoicesDialog extends Stage {
 			this.index = index;
 		}
 
+		public int getIndex() {
+			return index;
+		}
 		public String getText() {
 			return text;
 		}
 
-		public int getIndex() {
-			return index;
-		}
 	}
 }

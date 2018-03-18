@@ -9,7 +9,9 @@ based on:https://github.com/jesuino/jfx8-app
   <artifactId>javafx_example</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j.version>1.2.17</log4j.version>
+    <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
     <jar.final.name>javafx_example_app</jar.final.name>
     <main.class>example.FlowPaneEx</main.class>
   </properties>
@@ -19,17 +21,10 @@ based on:https://github.com/jesuino/jfx8-app
       <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
     </dependency>
-    <!-- 
-    <dependency>
-      <groupId>{groupId}</groupId>
-      <artifactId>{artifactIT}</artifactId>
-      <version>{version}</version>
-    </dependency>
-   -->
     <dependency>
       <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx-samples</artifactId>
-      <version>8.20.7</version>
+      <version>${controlsfx-samples.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -38,7 +33,7 @@ based on:https://github.com/jesuino/jfx8-app
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.2</version>
+        <version>3.6.1</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>

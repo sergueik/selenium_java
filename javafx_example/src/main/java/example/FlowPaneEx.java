@@ -106,10 +106,19 @@ public class FlowPaneEx extends Application {
 		testsuiteButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Stage stage = new Stage();
+
+				// Stage stage = new Stage();
+				Map<String, String> inputData = new HashMap<>();
+				inputData.put("dummy", "42");
+				inputData.put("title", "Step detail");
+				Map<String, Map> inputs = new HashMap<>();
+				inputs.put("inputs", inputData); // TODO: JSON
+				scene.setUserData(inputs);
+
 				TableEditorEx s = new TableEditorEx();
+				s.setScene(scene);
 				try {
-					s.start(stage);
+					s.start(new Stage());
 				} catch (Exception e) {
 				}
 			}
@@ -192,13 +201,13 @@ public class FlowPaneEx extends Application {
 
 	public void confirmClose() {
 
-		Map<String, Integer> choices = new HashMap<>();
-		choices.put("Exit and save my project", 2);
-		choices.put("Exit and don't save", 1);
-		choices.put("Don't exit", 10);
-		Map<String, Map<String, Integer>> choicesDialogData = new HashMap<>();
-		choicesDialogData.put("choices", choices); // TODO: JSON
-		scene.setUserData(choicesDialogData);
+		Map<String, Integer> inputData = new HashMap<>();
+		inputData.put("Exit and save my project", 2);
+		inputData.put("Exit and don't save", 1);
+		inputData.put("Don't exit", 10);
+		Map<String, Map<String, Integer>> inputs = new HashMap<>();
+		inputs.put("inputs", inputData); // TODO: JSON
+		scene.setUserData(inputs);
 
 		ChoicesDialog choicesDialog = new ChoicesDialog(new Stage(), scene);
 		// choicesDialog.initStyle(StageStyle.UNDECORATED);
@@ -211,6 +220,7 @@ public class FlowPaneEx extends Application {
 		}
 		*/
 		choicesDialog.showAndWait();
+		@SuppressWarnings("unchecked")
 		Map<String, String> data = (Map<String, String>) choicesDialog.getScene()
 				.getUserData();
 		int code = Integer.parseInt(data.get("result"));
