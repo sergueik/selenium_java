@@ -12,6 +12,7 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.scene.control.*;
+
 import org.apache.log4j.Category;
 
 public class TableEditorEx extends Application {

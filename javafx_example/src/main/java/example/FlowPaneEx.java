@@ -69,7 +69,34 @@ public class FlowPaneEx extends Application {
 			public void handle(ActionEvent event) {
 				System.out.println("generate step!");
 				for (int i = 0; i < 20; i++) {
-					flow.getChildren().add(new Button(String.format("Step %d", i)));
+					Button stepButton = new Button(String.format("Step %d", i));
+					stepButton.setOnAction(new EventHandler<ActionEvent>() {
+						@Override
+						public void handle(ActionEvent event) {
+							// ComplexFormEx
+
+							Map<String, String> inputData = new HashMap<>();
+							Button button = (Button) event.getTarget();
+							
+							logger.info("launching complexFormEx for " + button.getText());
+							inputData.put("dummy", "42");
+							inputData.put("title",
+									String.format("Step %s element Locators", button.getText()));
+							Map<String, Map> inputs = new HashMap<>();
+							inputs.put("inputs", inputData); // TODO: JSON
+							scene.setUserData(inputs);
+
+							ComplexFormEx complexFormEx = new ComplexFormEx();
+							complexFormEx.setScene(scene);
+							try {
+								complexFormEx.start(new Stage());
+							} catch (Exception e) {
+							}
+						}
+					});
+
+					flow.getChildren().add(stepButton);
+
 				}
 			}
 		});
@@ -115,10 +142,10 @@ public class FlowPaneEx extends Application {
 				inputs.put("inputs", inputData); // TODO: JSON
 				scene.setUserData(inputs);
 
-				TableEditorEx s = new TableEditorEx();
-				s.setScene(scene);
+				TableEditorEx tableEditorEx = new TableEditorEx();
+				tableEditorEx.setScene(scene);
 				try {
-					s.start(new Stage());
+					tableEditorEx.start(new Stage());
 				} catch (Exception e) {
 				}
 			}

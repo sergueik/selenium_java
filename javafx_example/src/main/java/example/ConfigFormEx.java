@@ -13,23 +13,21 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
-import org.controlsfx.tools.Borders.Border;
-
+@SuppressWarnings("restriction")
 public class ConfigFormEx extends Application {
 
 	private static Map<String, String> configData = new HashMap<>();

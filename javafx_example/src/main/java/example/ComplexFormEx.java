@@ -1,6 +1,5 @@
 package example;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -15,6 +14,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
+import javafx.scene.control.Control;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -24,6 +24,8 @@ import javafx.scene.control.ToggleGroup;
 import javafx.scene.Group;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
+import javafx.scene.layout.RowConstraints;
+
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -31,29 +33,46 @@ import javafx.scene.paint.Color;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import org.apache.log4j.Category;
+import org.apache.log4j.Category;
+
 import org.controlsfx.tools.Borders.Border;
+
 // origin: 
 public class ComplexFormEx extends Application {
 
+	private Map<String, Object> inputs = new HashMap<>();
+	private Map<String, String> inputData = new HashMap<>();
+	@SuppressWarnings("deprecation")
+	static final Category logger = Category.getInstance(TableEditorEx.class);
+
+	private Scene primaryScene = null;
+
+	@SuppressWarnings("restriction")
 	@Override
 	public void start(Stage stage) {
 		BorderPane root = new BorderPane();
+		stage.setTitle(inputData.containsKey("title") ? inputData.get("title")
+				: "Element Locators");
+
 		Scene scene = new Scene(root, 480, 250, Color.WHITE);
+		// stage.setScene(new Scene(root, 480, 250, Color.WHITE));
 		stage.setScene(scene);
-		stage.setTitle("Element Locators");
 
-		GridPane gridpane1 = new GridPane();
+		GridPane gridPane1 = new GridPane();
 
-		GridPane gridpane = new GridPane();
-		GridPane.setRowIndex(gridpane, 0);
-		GridPane.setColumnIndex(gridpane, 0);
+		GridPane gridPane = new GridPane();
+		gridPane.setRowIndex(gridPane, 0);
+		gridPane.setColumnIndex(gridPane, 0);
 
 		HBox buttonbarHbox = new HBox(10);
 		buttonbarHbox.setPadding(new Insets(10));
+		// buttonbarHbox.setSpacing(50);
+		// buttonbarHbox.setPadding(new Insets(10, 10, 10, 10));
 
-		// gridpane.setVgap(5);
-		GridPane.setRowIndex(buttonbarHbox, 1);
-		GridPane.setColumnIndex(buttonbarHbox, 0);
+		// gridPane.setVgap(5);
+		gridPane.setRowIndex(buttonbarHbox, 1);
+		gridPane.setColumnIndex(buttonbarHbox, 0);
 
 		// Save button
 		Button saveButton = new Button("Save");
@@ -66,7 +85,7 @@ public class ComplexFormEx extends Application {
 				stage.close();
 			}
 		});
-		
+
 		saveButton.setDefaultButton(true);
 
 		// Delete button
@@ -95,74 +114,101 @@ public class ComplexFormEx extends Application {
 
 		buttonbarHbox.getChildren().addAll(saveButton, deleteButton, cancelButton);
 
-		gridpane1.getChildren().addAll(gridpane, buttonbarHbox);
-
-		gridpane.setPadding(new Insets(5));
-		gridpane.setHgap(5);
-		gridpane.setVgap(5);
-
-		gridpane.setStyle(
+		gridPane.setPadding(new Insets(20, 10, 10, 20));
+		gridPane.setHgap(5);
+		gridPane.setVgap(5);
+		gridPane.setStyle(
 				"-fx-padding: 10; -fx-border-style: solid inside; -fx-border-width: 2; -fx-border-insets: 5; -fx-border-radius: 0; -fx-border-color: darkgray;");
-		ColumnConstraints column1 = new ColumnConstraints(150);
-		ColumnConstraints column2 = new ColumnConstraints(50, 300, 450);
-		column2.setHgrow(Priority.ALWAYS);
-		gridpane.getColumnConstraints().addAll(column1, column2);
 
 		ToggleGroup group = new ToggleGroup();
 
-		// First name field
-		RadioButton button1 = new RadioButton("css");
-		button1.setToggleGroup(group);
-		button1.setSelected(true);
-		GridPane.setHalignment(button1, HPos.LEFT);
-		gridpane.add(button1, 0, 0);
+		// CSS
+		RadioButton cssButton = new RadioButton("css");
+		cssButton.setToggleGroup(group);
+		cssButton.setSelected(true);
+		gridPane.setHalignment(cssButton, HPos.LEFT);
+		gridPane.add(cssButton, 0, 0);
 
-		// css value field
 		TextField cssFld = new TextField();
-		GridPane.setHalignment(cssFld, HPos.LEFT);
+		gridPane.setHalignment(cssFld, HPos.LEFT);
 		cssFld.setMaxWidth(Double.MAX_VALUE);
-		// cssFld.setHgrow(Priority.ALWAYS);
-		gridpane.add(cssFld, 1, 0);
+		gridPane.add(cssFld, 1, 0);
 
-		RadioButton button2 = new RadioButton("xpath");
-		button2.setToggleGroup(group);
-		GridPane.setHalignment(button2, HPos.LEFT);
-		gridpane.add(button2, 0, 1);
+		// XPath
+		RadioButton xpathButton = new RadioButton("xpath");
+		xpathButton.setToggleGroup(group);
+		gridPane.setHalignment(xpathButton, HPos.LEFT);
+		gridPane.add(xpathButton, 0, 1);
 
-		// xpath value field
 		TextField xpathFld = new TextField();
-		GridPane.setHalignment(xpathFld, HPos.LEFT);
+		gridPane.setHalignment(xpathFld, HPos.LEFT);
 		xpathFld.setMaxWidth(Double.MAX_VALUE);
-		// cssFld.setHgrow(Priority.ALWAYS);
-		gridpane.add(xpathFld, 1, 1);
+		gridPane.add(xpathFld, 1, 1);
 
-		RadioButton button3 = new RadioButton("id");
-		button3.setToggleGroup(group);
-		GridPane.setHalignment(button3, HPos.LEFT);
-		gridpane.add(button3, 0, 2);
-		button3.setDisable(true);
-		// id value field
+		// ID
+		RadioButton idButton = new RadioButton("id");
+		idButton.setToggleGroup(group);
+		gridPane.setHalignment(idButton, HPos.LEFT);
+		gridPane.add(idButton, 0, 2);
+		idButton.setDisable(true);
+
 		TextField idFld = new TextField();
-		GridPane.setHalignment(idFld, HPos.LEFT);
+		gridPane.setHalignment(idFld, HPos.LEFT);
 		idFld.setMaxWidth(Double.MAX_VALUE);
-		// cssFld.setHgrow(Priority.ALWAYS);
-		gridpane.add(idFld, 1, 2);
+		gridPane.add(idFld, 1, 2);
 		idFld.setDisable(true);
 
-		RadioButton button4 = new RadioButton("text");
-		button4.setToggleGroup(group);
-		GridPane.setHalignment(button4, HPos.LEFT);
-		gridpane.add(button4, 0, 3);
-		TextField textFld = new TextField();
-		GridPane.setHalignment(textFld, HPos.LEFT);
-		textFld.setMaxWidth(Double.MAX_VALUE);
-		// cssFld.setHgrow(Priority.ALWAYS);
-		gridpane.add(textFld, 1, 3);
+		RadioButton textButton = new RadioButton("text");
+		textButton.setToggleGroup(group);
+		gridPane.setHalignment(textButton, HPos.LEFT);
+		gridPane.add(textButton, 0, 3);
 
-		root.getChildren().add(gridpane1);
+		TextField textFld = new TextField();
+		gridPane.setHalignment(textFld, HPos.LEFT);
+		textFld.setMaxWidth(Double.MAX_VALUE);
+		gridPane.add(textFld, 1, 3);
+
+		final RowConstraints rowConstraints = new RowConstraints(64); // constant
+																																	// height
+		final ColumnConstraints column1Constraints = new ColumnConstraints(100,
+				Control.USE_COMPUTED_SIZE, Control.USE_COMPUTED_SIZE);
+
+		final ColumnConstraints column2Constraints = new ColumnConstraints(250,
+				Control.USE_COMPUTED_SIZE, Double.MAX_VALUE);
+		gridPane.getRowConstraints().add(rowConstraints);
+		column2Constraints.setHgrow(Priority.ALWAYS);
+		gridPane.getColumnConstraints().addAll(column1Constraints,
+				column2Constraints);
+		gridPane.prefWidthProperty().bind(root.widthProperty());
+
+		gridPane1.getChildren().addAll(gridPane, buttonbarHbox);
+		gridPane1.prefWidthProperty().bind(root.widthProperty());
+
+		root.getChildren().add(gridPane1);
 
 		scene.setRoot(root);
 		stage.show();
+	}
+
+	public void setScene(@SuppressWarnings("restriction") Scene scene) {
+		this.primaryScene = scene;
+
+		if (scene != null) {
+			try {
+				inputs = (Map<String, Object>) primaryScene.getUserData();
+				inputData = (Map<String, String>) inputs.get("inputs");
+				logger.info("Loaded " + inputData.toString());
+			} catch (ClassCastException e) {
+				logger.info("Exception (ignored) " + e.toString());
+			} catch (Exception e) {
+				logger.info("Exception (rethrown) " + e.toString());
+				throw e;
+			}
+		}
+		if (inputData.keySet().size() == 0) {
+			throw new IllegalArgumentException("You must provide data");
+		}
+		logger.info("Loaded " + inputData);
 	}
 
 	public static void main(String[] args) {

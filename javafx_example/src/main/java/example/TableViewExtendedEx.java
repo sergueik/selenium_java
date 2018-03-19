@@ -39,7 +39,18 @@ import javafx.util.Callback;
 * origin: https://gist.github.com/haisi/0a82e17daf586c9bab52
 * @author Hasan Kara <hasan.kara@fhnw.ch>
 */
+// see also: https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTableCell.html
+// https://stackoverflow.com/questions/22665322/change-itemlist-in-a-combobox-depending-from-another-combobox-choice/35590119#35590119
+// https://stackoverflow.com/questions/35131428/combobox-in-a-tableview-cell-in-javafx
+// https://gist.github.com/james-d/bf28c5d5343a8fd79b0e
+// https://o7planning.org/en/11079/javafx-tableview-tutorial
+// https://www.programcreek.com/java-api-examples/index.php?api=javafx.scene.control.cell.ComboBoxTableCell
+// http://code.makery.ch/blog/javafx-8-event-handling-examples/
+// http://spec-zone.ru/RU/Java/FX/8/docs/api/javafx/fxml/doc-files/introduction_to_fxml.html
+// https://vk.com/doc-80984752_367966549?hash=516410f2641275bd32&dl=0b5022d49b8697a09f
+// http://code.makery.ch/library/javafx-8-tutorial/ru/part1/
 @SuppressWarnings("restriction")
+
 public class TableViewExtendedEx extends Application {
 
 	private TableView<Person> table = new TableView<>();
