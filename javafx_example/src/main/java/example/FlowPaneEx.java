@@ -3,6 +3,7 @@ package example;
 import org.apache.log4j.Category;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class FlowPaneEx extends Application {
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(FlowPaneEx.class);
 	static Stage stage = null;
+	String configFilePath = null;
 	Scene scene = null;
 
 	@Override
@@ -74,17 +76,17 @@ public class FlowPaneEx extends Application {
 						@Override
 						public void handle(ActionEvent event) {
 							// ComplexFormEx
-
 							Map<String, String> inputData = new HashMap<>();
 							Button button = (Button) event.getTarget();
-							
-							logger.info("launching complexFormEx for " + button.getText());
+
 							inputData.put("dummy", "42");
 							inputData.put("title",
-									String.format("Step %s element Locators", button.getText()));
+									String.format("%s element Locators", button.getText()));
 							Map<String, Map> inputs = new HashMap<>();
 							inputs.put("inputs", inputData); // TODO: JSON
 							scene.setUserData(inputs);
+							logger.info(
+									"launching complexFormEx for " + inputData.get("title"));
 
 							ComplexFormEx complexFormEx = new ComplexFormEx();
 							complexFormEx.setScene(scene);
@@ -116,10 +118,22 @@ public class FlowPaneEx extends Application {
 			public void handle(ActionEvent event) {
 				// https://docs.oracle.com/javafx/2/ui_controls/file-chooser.htm
 				FileChooser fileChooser = new FileChooser();
-				fileChooser.setTitle("Open Resource File");
+				if (configFilePath != null) {
+					logger.info("Loading recording from: " + configFilePath);
+					try {
+						fileChooser.setInitialDirectory(new File(configFilePath));
+					} catch (IllegalArgumentException e) {
+						logger.info("Exception (ignored): " + e.toString());
+					}
+				}
+				// Set extension filter
+				fileChooser.getExtensionFilters()
+						.add(new FileChooser.ExtensionFilter("YAML file", "*.yaml"));
+				fileChooser.setTitle("Open Recording");
 				File file = fileChooser.showOpenDialog(stage);
 				if (file != null) {
-					logger.info("Load recording " + file.getName());
+					logger.info("Load recording: " + file.getPath());
+					configFilePath = file.getParent();
 					openRecordingFile(file);
 				}
 			}
@@ -163,10 +177,27 @@ public class FlowPaneEx extends Application {
 					System.err.println("Exercise exception");
 					testException();
 				} catch (Exception e) {
-
 					Dialog.showThrowable("Exception", "Exception thrown",
 							(Exception) e /* e.getCause()*/, stage);
 				}
+
+				// save
+
+				// https://docs.oracle.com/javafx/2/ui_controls/file-chooser.htm
+				FileChooser fileChooser = new FileChooser();
+				if (configFilePath != null) {
+					logger.info("Saving recording to: " + configFilePath);
+					try {
+						fileChooser.setInitialDirectory(new File(configFilePath));
+					} catch (IllegalArgumentException e) {
+						logger.info("Exception (ignored): " + e.toString());
+					}
+				}
+				// Set extension filter
+				fileChooser.getExtensionFilters()
+						.add(new FileChooser.ExtensionFilter("YAML file", "*.yaml"));
+				fileChooser.setTitle("Save Recording");
+				File file = fileChooser.showSaveDialog(stage);
 			}
 		});
 
