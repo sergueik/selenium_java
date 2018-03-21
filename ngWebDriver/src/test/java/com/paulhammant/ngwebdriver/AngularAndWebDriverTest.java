@@ -38,6 +38,8 @@ import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -45,7 +47,9 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
+import org.openqa.selenium.support.ui.ExpectedCondition;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.seleniumhq.selenium.fluent.FluentBy;
 import org.seleniumhq.selenium.fluent.FluentExecutionStopped;
 import org.seleniumhq.selenium.fluent.FluentMatcher;
@@ -70,6 +74,7 @@ public class AngularAndWebDriverTest {
 	private Server webServer;
 	private NgWebDriver ngWebDriver;
 
+	@SuppressWarnings("deprecation")
 	private void setupBrowser(String browser) {
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
@@ -150,7 +155,7 @@ public class AngularAndWebDriverTest {
 		driver.get("about:blank");
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_model() {
 
 		// driver.get("http://www.angularjshub.com/code/examples/basics/02_TwoWayDataBinding_HTML/index.demo.php");
@@ -165,7 +170,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_all_for_an_angular_options() {
 
 		driver.get("http://localhost:8080/#/form");
@@ -178,7 +183,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_buttonText() {
 
 		driver.get("http://localhost:8080/#/form");
@@ -190,7 +195,7 @@ public class AngularAndWebDriverTest {
 		alert.accept();
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_partialButtonText() {
 
 		driver.get("http://localhost:8080/#/form");
@@ -202,7 +207,7 @@ public class AngularAndWebDriverTest {
 		alert.accept();
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_cssContainingText() {
 
 		driver.get("http://localhost:8080/#/form");
@@ -214,14 +219,15 @@ public class AngularAndWebDriverTest {
 		assertThat(wes.get(1).getText(), containsString("small dog"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_cssContainingTextRegexp() {
 
 		driver.get("http://localhost:8080/#/form");
 		ngWebDriver.waitForAngularRequestsToFinish();
 
-		List<WebElement> wes = driver.findElements(ByAngular
-				.cssContainingText("#animals ul .pet", "__REGEXP__/(?:BIG|small) *(?:CAT|dog)(something else)*/i"));
+		List<WebElement> wes = driver
+				.findElements(ByAngular.cssContainingText("#animals ul .pet",
+						"__REGEXP__/(?:BIG|small) *(?:CAT|dog)(something else)*/i"));
 		assertThat(wes.size(), is(4));
 		// wes.stream().map(o -> o.getText()).forEach(System.err::println);
 		Object[] results = new Object[] { "big dog", "small dog", "big cat",
@@ -230,7 +236,7 @@ public class AngularAndWebDriverTest {
 				hasItems(results));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_multiple_hits_for_ng_repeat_in_page() {
 
 		driver.get(
@@ -252,7 +258,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_multiple_hits_for_ng_repeat_and_subset_to_first_matching_predicate_for_fluent_selenium_example() {
 
 		// As much as anything, this is a test of FluentSelenium
@@ -285,7 +291,7 @@ public class AngularAndWebDriverTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_second_row_in_ng_repeat() {
 
 		driver.get(
@@ -348,7 +354,7 @@ public class AngularAndWebDriverTest {
 		assertThat(we.get(2).getText(), is("unselected"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_by_angular_binding() {
 
 		driver.get("http://localhost:8080/#/form");
@@ -365,7 +371,7 @@ public class AngularAndWebDriverTest {
 		assertThat(weeb.get(0).getText(), is("Anon"));
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void find_all_for_an_angular_binding() {
 
 		driver.get(
@@ -383,7 +389,8 @@ public class AngularAndWebDriverTest {
 
 	// Model interaction
 
-	@Test(enabled = true)
+	@SuppressWarnings("unchecked")
+	@Test(enabled = false)
 	public void model_mutation_and_query_is_possible() {
 
 		driver.get(
@@ -424,7 +431,8 @@ public class AngularAndWebDriverTest {
 		// WebDriver naturally hands back as a Map if it is not one
 		// variable..
 		Object rv = ngModel.retrieve(wholeForm, "person1");
-		assertThat(((Map) rv).get("firstName").toString(), is("Wilma"));
+		assertThat(((Map<String, String>) rv).get("firstName").toString(),
+				is("Wilma"));
 
 		// If something is numeric, WebDriver hands that back
 		// naturally as a long.
@@ -469,7 +477,7 @@ public class AngularAndWebDriverTest {
 
 	// All the failure tests
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElement_should_barf_with_message_for_bad_repeater() {
 
 		driver.get(
@@ -486,7 +494,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElement_should_barf_with_message_for_bad_repeater_and_row() {
 
 		driver.get(
@@ -504,7 +512,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElements_should_barf_with_message_for_any_repeater_and_row2() {
 
 		driver.get(
@@ -522,7 +530,7 @@ public class AngularAndWebDriverTest {
 
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElement_should_barf_with_message_for_bad_repeater_and_row_and_column() {
 
 		try {
@@ -535,7 +543,7 @@ public class AngularAndWebDriverTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElements_should_barf_with_message_for_any_repeater_and_row_and_column() {
 
 		driver.get(
@@ -552,7 +560,7 @@ public class AngularAndWebDriverTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElement_should_barf_when_element_not_in_the_dom() {
 
 		driver.get(
@@ -569,7 +577,7 @@ public class AngularAndWebDriverTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void findElements_should_barf_with_message_for_bad_repeater_and_column() {
 
 		driver.get(
@@ -586,10 +594,56 @@ public class AngularAndWebDriverTest {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
+	@Test(enabled = true)
+	public void waitTests() {
+
+		driver.get("http://juliemr.github.io/protractor-demo/");
+		ngWebDriver.waitForAngularRequestsToFinish();
+
+		driver.findElement(ByAngular.model("first")).sendKeys("40");
+		driver.findElement(ByAngular.model("second")).sendKeys("2");
+		driver.findElement(ByAngular.buttonText("Go!")).click();
+		By locator = ByAngular.exactBinding("latest");
+		WebDriverWait wait = new WebDriverWait(driver, 120);
+		wait.pollingEvery(1000, TimeUnit.MILLISECONDS);
+		try {
+			// should work
+			wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+			System.err.println("After wait");
+		} catch (TimeoutException e) {
+			System.err.println("Timeout Exception");
+		} catch (Exception e) {
+			System.err.println("Exception (ignored) " + e.toString());
+		}
+
+		try {
+			wait.until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					WebElement e = d.findElement(locator);
+					Boolean result = e.isDisplayed();
+					System.err
+							.println("In apply: Element = " + e.getAttribute("outerHTML")
+									+ "\nresult = " + result.toString());
+					return result;
+				}
+			});
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+			// throw new RuntimeException(e);
+		}
+		try {
+			Thread.sleep(10000);
+
+		} catch (Exception e) {
+		}
+	}
+
 	/*
 	  Ported from protractor/stress/spec.js
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void stress_test() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 		for (int i = 0; i < 20; ++i) {
@@ -610,7 +664,7 @@ public class AngularAndWebDriverTest {
 	/*
 	  Ported from protractor/spec/altRoot/findelements_spec.js
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void altRoot_find_elements() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 		driver.get("http://localhost:8080/alt_root_index.html#/form");
@@ -625,7 +679,7 @@ public class AngularAndWebDriverTest {
 	/*
 	  Ported from protractor/spec/basic/action_spec.js
 	 */
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void basic_actions() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 		driver.get("http://localhost:8080/index.html#/form");
@@ -638,7 +692,7 @@ public class AngularAndWebDriverTest {
 		new Actions(driver).dragAndDropBy(sliderBar.getWebElement(), 400, 20)
 				.build().perform();
 
-		sliderBar.getAttribute("value").shouldBe("5");
+		sliderBar.getAttribute("value").shouldBe("10");
 	}
 
 	/*
@@ -667,7 +721,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/elements_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_elements_chained_call_should_wait_to_grab_the_WebElement_until_a_method_is_called() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -684,7 +738,8 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/elements_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@SuppressWarnings("serial")
+	@Test(enabled = false)
 	public void basic_elements_should_allow_using_repeater_locator_within_map() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -718,7 +773,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/locators_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_locators_by_repeater_should_find_by_partial_match() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -748,7 +803,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/locators_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_locators_by_repeater_should_find_many_rows_by_partial_match() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -783,7 +838,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/locators_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_locators_by_repeater_should_find_one_row_by_partial_match() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -814,7 +869,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/locators_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_locators_by_repeater_should_find_many_rows_by_partial_match2() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -848,7 +903,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/locators_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_locators_by_repeater_should_find_single_rows_by_partial_match() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
@@ -878,7 +933,7 @@ public class AngularAndWebDriverTest {
 	  Ported from protractor/spec/basic/lib_spec.js
 	  TODO - many more specs in here
 	 */
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void basic_lib_getLocationAbsUrl_gets_url() {
 		FluentWebDriver fwd = new FluentWebDriver(driver);
 
