@@ -318,7 +318,7 @@ PhantomJs allows loading Angular samples from `file://` context:
 Certain tests ( e.g. involving `NgBy.selectedOption()` ) currently fail under [travis](https://travis-ci.org/) CI build.
 
 ### Test setup
-The project tested to work on Linux and Windows with Java 1.8, Selenium 2.53, Selenium 3.0.1, Firefox 45 or Chrome 56.
+The project tested to work on Linux and Windows with Java 1.8, Selenium 2.53, Selenium 3.0.1, Firefox 45 or Chrome 56. The __jProtractor__ itself is fully compatible with Selenium  __3.x__ though its test suite might not be  fully compatible. 
 Download desired version of Firefox from
 [ubuntuzilla](https://sourceforge.net/projects/ubuntuzilla/files/mozilla/apt/pool/main/f/firefox-mozilla-build/) or [ftp.mozilla.org](https://ftp.mozilla.org/pub/firefox/)) and `selenium-server-standalone-2.47.1.jar'. Below is the hub setup commands:
 
@@ -339,6 +339,10 @@ export HUB_PORT=4444
 
 java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_JAR_VERSION}.jar -role hub  -port $HUB_PORT
 ```
+### Keyword-Driven Frameworks
+
+For example of [Keyword-Driven Framework](http://toolsqa.com/selenium-webdriver/keyword-driven-framework/introduction/), incorporating the Selenium Protractor methods see [sergueik\SKDF](https://github.com/sergueik/SKDF). It contains both __jProtractor__ and a similar Java-based Protractor Client Library wrapper ptoject, [paul-hammant/ngWebDriver](https://github.com/paul-hammant/ngWebDriver).
+
 ### Related Projects
   - [Protractor-jvm](https://github.com/F1tZ81/Protractor-jvm)
   - [ngWebDriver](https://github.com/paul-hammant/ngWebDriver)
@@ -351,7 +355,7 @@ java $LAUNCHER_OPTS -jar ${SELENIUM_HOME}/selenium-server-standalone-${SELENIUM_
 
 ### Work in progress
 
-Converting the integration tests to Selenium 3.3.x `ExpectedCondition` [deprecation](https://selenium2.ru/blog/187-predicates-in-explicit-waits.html) -  [forum (russian)](http://software-testing.ru/forum/index.php?/topic/34732-selenium-331-java-perestal-rabotat-predikat-kto-pobedil/)
+Converting the integration tests to Selenium 3.3.x `ExpectedCondition` [deprecation](https://selenium2.ru/blog/187-predicates-in-explicit-waits.html) - [forum (russian)](http://software-testing.ru/forum/index.php?/topic/34732-selenium-331-java-perestal-rabotat-predikat-kto-pobedil/)
 
 ### Authors
 [Carlos Alexandro Becker](caarlos0@gmail.com)

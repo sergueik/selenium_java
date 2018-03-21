@@ -46,9 +46,9 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
-import com.jprotractor.NgBy;
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
+import com.github.sergueik.jprotractor.NgBy;
+import com.github.sergueik.jprotractor.NgWebDriver;
+import com.github.sergueik.jprotractor.NgWebElement;
 
 import org.testng.*;
 import org.testng.annotations.*;

@@ -108,7 +108,8 @@ public class CommonFunctions {
 				FirefoxProfile profile = new FirefoxProfile();
 				profile.setAcceptUntrustedCertificates(true);
 				profile.setAssumeUntrustedCertificateIssuer(true);
-				profile.setEnableNativeEvents(false);
+				// no longer supported as of Selenium 3.8.x
+				// profile.setEnableNativeEvents(false);
 
 				System.out.println(System.getProperty("user.dir"));
 				capabilities.setCapability(FirefoxDriver.PROFILE, profile);

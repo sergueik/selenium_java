@@ -2,7 +2,7 @@
 <project name="TestNGTestExample" basedir="." default="test">
   <!-- Comment below to use default location -->
   <property environment="env"/>
-  <property name="testng.version" value="6.8.8"/>
+  <property name="testng.version" value="6.11"/>
   <taskdef name="testng" classname="org.testng.TestNGAntTask">
     <classpath>
       <pathelement location="${env.USERPROFILE}\.m2\repository\org\testng\testng\${testng.version}\testng-${testng.version}.jar"/>
