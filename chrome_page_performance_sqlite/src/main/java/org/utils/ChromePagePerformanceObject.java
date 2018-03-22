@@ -48,35 +48,31 @@ public class ChromePagePerformanceObject {
 
 	private WebDriver driver;
 	private Map<String, Double> pageElementTimers;
+	private Map<String, Double> pageEventTimers;
+	private boolean debug = false;
+	private WebDriverWait wait;
+	private int flexibleWait = 30;
 
 	public Map<String, Double> getPageElementTimers() {
 		return pageElementTimers;
 	}
 
-	private Map<String, Double> pageEventTimers;
-
 	public Map<String, Double> getPageEventTimers() {
 		return pageEventTimers;
 	}
 
-	private boolean debug = false;
-
-	public void setDebug(boolean debug) {
-		this.debug = debug;
+	public void setDebug(boolean value) {
+		this.debug = value;
 	}
-
-	private int flexibleWait = 30;
 
 	public int getFlexibleWait() {
 		return flexibleWait;
 	}
 
-	private WebDriverWait wait;
-
 	public ChromePagePerformanceObject(WebDriver driver, String data,
 			boolean javaScript) {
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, flexibleWait);
+		wait = new WebDriverWait(driver, flexibleWait);
 
 		if (javaScript) {
 			JavascriptExecutor js = (JavascriptExecutor) driver;
@@ -84,32 +80,32 @@ public class ChromePagePerformanceObject {
 		} else {
 			driver.navigate().to(data);
 		}
-		waitPageToLoad(this.driver, this.wait);
+		waitPageToLoad(driver, wait);
 		setTimer(driver);
 	}
 
-	public ChromePagePerformanceObject(WebDriver driver, By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, By by) {
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, flexibleWait);
-
-		this.wait.until(ExpectedConditions.presenceOfElementLocated(navigator))
-				.click();
-
-		waitPageToLoad(this.driver, this.wait);
-
-		setTimer(driver);
+		if (by != null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+			wait.until(ExpectedConditions.presenceOfElementLocated(by)).click();
+			waitPageToLoad(driver, wait);
+			setTimer(driver);
+		}
 	}
 
-	public ChromePagePerformanceObject(WebDriver driver, String startUrl,
-			By navigator) {
+	public ChromePagePerformanceObject(WebDriver driver, String startUrl, By by) {
 		this.driver = driver;
-		this.wait = new WebDriverWait(driver, flexibleWait);
-		driver.navigate().to(startUrl);
-		this.wait.until(ExpectedConditions.presenceOfElementLocated(navigator))
-				.click();
-		waitPageToLoad(this.driver, this.wait);
-		setTimer(driver);
-		setTimerNew(driver);
+		wait = new WebDriverWait(driver, flexibleWait);
+		if (startUrl != null) {
+			driver.navigate().to(startUrl);
+		}
+		if (by != null) {
+			wait.until(ExpectedConditions.presenceOfElementLocated(by)).click();
+			waitPageToLoad(driver, wait);
+			setTimer(driver);
+			setTimerNew(driver);
+		}
 	}
 
 	public ChromePagePerformanceObject(String endUrl) {
@@ -120,13 +116,16 @@ public class ChromePagePerformanceObject {
 		setTimer(driver);
 	}
 
-	public ChromePagePerformanceObject(String startUrl, By navigator) {
-		this.driver = new ChromeDriver();
-		this.wait = new WebDriverWait(driver, flexibleWait);
-		driver.navigate().to(startUrl);
-		this.wait.until(ExpectedConditions.presenceOfElementLocated(navigator))
-				.click();
-		waitPageToLoad(this.driver, this.wait);
+	public ChromePagePerformanceObject(String startUrl, By by) {
+		driver = new ChromeDriver();
+		wait = new WebDriverWait(driver, flexibleWait);
+		if (startUrl != null) {
+			driver.navigate().to(startUrl);
+		}
+		if (by != null) {
+			this.wait.until(ExpectedConditions.presenceOfElementLocated(by)).click();
+		}
+		waitPageToLoad(driver, wait);
 		setTimer(driver);
 	}
 
@@ -151,7 +150,7 @@ public class ChromePagePerformanceObject {
 				.executeScript(performanceNetworkScript).toString());
 	}
 
-	private Map<String, Double> CreateDateMap(String payload) {
+	public Map<String, Double> CreateDateMap(String payload) {
 		Map<String, Double> eventData = new HashMap<>();
 		Date currDate = new Date();
 
@@ -161,12 +160,20 @@ public class ChromePagePerformanceObject {
 		for (String pair : pairs) {
 			String[] values = pair.split("=");
 
-			if (values[0].trim().toLowerCase().compareTo("tojson") != 0) {
+			if (values[0].trim().toLowerCase().compareTo("tojson") != 0
+					&& values[0].trim().toLowerCase().compareTo("initiatortype") != 0
+					&& values[0].trim().toLowerCase().compareTo("type") != 0) {
 				if (debug) {
 					System.err.println("Collecting: " + pair);
 				}
-				eventData.put(values[0].trim(),
-						((currDate.getTime() - Long.valueOf(values[1]))) / 1000.0);
+				try {
+					eventData.put(values[0].trim(),
+							((currDate.getTime() - Double.valueOf(values[1]))) / 1000.0);
+				} catch (NumberFormatException e) {
+					// ignore
+					System.err.println(String.format("Exception (ignored) %s for %s = %s",
+							e.toString(), values[0], values[1]));
+				}
 			}
 		}
 		return eventData;

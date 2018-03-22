@@ -33,6 +33,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -53,6 +54,9 @@ import org.sqlite.SQLiteConnection;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ChromePagePerformanceTest {
 
@@ -203,6 +207,18 @@ public class ChromePagePerformanceTest {
 		double test = new ChromePagePerformanceObject(driver, baseURL,
 				elementSelector).getLoadTime();
 		System.out.println(test);
+	}
+
+	// @Ignore
+	@Test
+	public void testParse() {
+		ChromePagePerformanceObject o = new ChromePagePerformanceObject(driver,
+				null);
+		String payload = "[{redirectCount=0, encodedBodySize=64518, unloadEventEnd=0, responseEnd=4247.699999992619, domainLookupEnd=2852.7999999932945, unloadEventStart=0, domContentLoadedEventStart=4630.699999994249, type=navigate, decodedBodySize=215670, duration=5709.000000002561, redirectStart=0, connectEnd=3203.5000000032596, toJSON={}, requestStart=3205.499999996391, initiatorType=beacon}]";
+		// get rid of array.
+		payload = payload.substring(1, payload.length() - 1);
+		Map<String, Double> data = o.CreateDateMap(payload);
+		data.entrySet().stream().forEach(System.err::println);
 	}
 
 	// @Ignore

@@ -126,12 +126,14 @@ public class ChromePagePerformanceUtil {
 		return calculateLoadTime();
 	}
 
-	public double getLoadTime(String endUrl, By navigator) {
+	public double getLoadTime(String endUrl, By by) {
 		WebDriver driver = new ChromeDriver();
 		WebDriverWait wait = new WebDriverWait(driver, flexibleWait);
 
 		driver.navigate().to(endUrl);
-		wait.until(ExpectedConditions.presenceOfElementLocated(navigator)).click();
+		if (by != null) {
+			wait.until(ExpectedConditions.presenceOfElementLocated(by)).click();
+		}
 		waitPageToLoad(driver, wait);
 		setTimer(driver);
 		return calculateLoadTime();
@@ -166,8 +168,15 @@ public class ChromePagePerformanceUtil {
 		return pageEventTimers.get("unloadEventStart");
 	}
 
+	// Example data:
+	// payload = "[{redirectCount=0, encodedBodySize=64518, unloadEventEnd=0,
+	// responseEnd=4247.699999992619, domainLookupEnd=2852.7999999932945,
+	// unloadEventStart=0, domContentLoadedEventStart=4630.699999994249,
+	// type=navigate, decodedBodySize=215670, duration=5709.000000002561,
+	// redirectStart=0, connectEnd=3203.5000000032596, toJSON={},
+	// requestStart=3205.499999996391, initiatorType=beacon}]";
 	// TODO: use org.json
-	private Map<String, Double> CreateDateMap(String payload) {
+	public Map<String, Double> CreateDateMap(String payload) {
 		Map<String, Double> eventData = new HashMap<>();
 		Date currDate = new Date();
 
