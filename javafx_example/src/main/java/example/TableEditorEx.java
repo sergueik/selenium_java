@@ -33,7 +33,7 @@ public class TableEditorEx extends Application {
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		fxmlLoader.setLocation(getClass().getResource("/main.fxml"));
 		Parent fxmlMain = fxmlLoader.load();
-		Controller controller = fxmlLoader.getController();
+		DataFormControllerEx controller = fxmlLoader.getController();
 		controller.setMainStage(stage);
 		Map<String, Object> inputs = new HashMap<>();
 
