@@ -2668,6 +2668,82 @@ public class SuvianTest extends BaseTest {
 		element.click();
 	}
 
+	// debugging map inspired by the ByChained
+	@Test(enabled = true)
+	public void test41() {
+		// Arrange
+		driver.get("https://www.virtuosoft.eu/code/bootstrap-autohidingnavbar/");
+
+		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
+				.cssSelector("[class = 'table table-striped table-bordered docs']"))));
+
+		WebElement element = driver
+				.findElements(By
+						.cssSelector("[class = 'table table-striped table-bordered docs']"))
+				.get(1);
+
+		actions.moveToElement(element).sendKeys(Keys.ARROW_DOWN)
+				.sendKeys(Keys.ARROW_DOWN).sendKeys(Keys.ARROW_DOWN)
+				.sendKeys(Keys.ARROW_DOWN).build().perform();
+		actions.moveToElement(element).sendKeys(Keys.ARROW_UP)
+				.sendKeys(Keys.ARROW_UP).sendKeys(Keys.ARROW_UP).sendKeys(Keys.ARROW_UP)
+				.build().perform();
+
+		// Act
+		element = driver.findElements(By.cssSelector("li")).get(12);
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		highlight(element);
+		// Assert
+		assertThat(element.getText(), equalTo("BLOG"));
+
+		element = driver
+				.findElements(By.cssSelector(
+						"div.navbar-fixed-top div.navbar-collapse li a[href='/blog/']"))
+				.get(0);
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		highlight(element);
+		// Assert
+		assertThat(element.getText(), equalTo("BLOG"));
+
+		// Assert
+
+		element = driver
+				.findElements(
+						new ByChained(By.cssSelector("body"), By.cssSelector("div.navbar"),
+								By.cssSelector("div.navbar-collapse"), By.cssSelector("li"),
+								By.xpath(String.format(
+										"//a[contains(text()[normalize-space()],'%s')]", "Blog"))))
+				.get(0);
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		highlight(element);
+		// Assert
+		assertThat(element.getText(), equalTo("BLOG"));
+
+		element = driver
+				.findElements(new ByChained(By.cssSelector("body"),
+						By.cssSelector("div.navbar-fixed-top"),
+						By.cssSelector("div.navbar-collapse"), By.cssSelector("li")))
+				.stream().map(o -> {
+					System.err.println(o.getAttribute("innerHTML"));
+					return o;
+				})
+				.filter(o -> o
+						.findElements(By.xpath(String.format(
+								"//a[contains(text()[normalize-space()],'%s')]", "Blog")))
+						.size() > 0)
+				.map(o -> o
+						.findElements(By.xpath(String.format(
+								"//a[contains(text()[normalize-space()],'%s')]", "Blog")))
+						.get(0))
+				.collect(Collectors.toList()).get(0);
+		wait.until(ExpectedConditions.elementToBeClickable(element));
+		highlight(element);
+		// Assert
+		assertThat(element.getText(), equalTo("BLOG"));
+		element.click();
+	}
+
+
 	public boolean isGreaterThen(String a, String b) {
 		return a.compareTo(b) < 0;
 		// usage:
