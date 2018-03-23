@@ -41,6 +41,10 @@ import org.openqa.selenium.interactions.HasInputDevices;
 import org.openqa.selenium.interactions.Mouse;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.ByChained;
+
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -543,6 +547,51 @@ public class SuvianTest extends BaseTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
+	// origin:
+	// https://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.support.pagefactory.ByChained
+	// https://www.javatips.net/api/org.openqa.selenium.support.pagefactory.bychained
+
+	@Test(enabled = true)
+	public void test5_3() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.5married_radio.html");
+		String label = "yes";
+		wait.until(ExpectedConditions.visibilityOf(driver
+				.findElement(By.cssSelector(".container .row .intro-message h3 a"))));
+
+		WebElement formElement = driver.findElement(By.cssSelector(
+				".intro-header .container .row .col-lg-12 .intro-message form"));
+		String elementContents = formElement.getAttribute("outerHTML");
+
+		String line = new ArrayList<String>(
+				Arrays.asList(elementContents.split("<br/?>"))).stream()
+						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
+		String checkboxValue = null;
+		if (matcher.find()) {
+			checkboxValue = matcher.group(1);
+			System.err.println("checkbox value = " + checkboxValue);
+		} else {
+			System.err.println("checkbox value not found");
+		}
+		WebElement checkBoxElement = null;
+		if (checkboxValue != null) {
+			ByChained byChained = new ByChained(By.xpath("//body/*"),
+					By.cssSelector(
+							".intro-header .container .row .col-lg-12 .intro-message form"),
+					By.cssSelector(String.format("input[name='married'][value='%s']",
+							checkboxValue)));
+			checkBoxElement = driver.findElements(byChained).get(0);
+		}
+		// Act
+		assertThat(checkBoxElement, notNullValue());
+		highlight(checkBoxElement);
+		checkBoxElement.click();
+		sleep(500);
+		// Assert
+		assertTrue(checkBoxElement.isSelected());
+	}
+
 	// Selecting check boxes by their sibling labels
 	@Test(enabled = true)
 	public void test6_1() {
@@ -598,6 +647,90 @@ public class SuvianTest extends BaseTest {
 				checkboxes.add(formElement.findElement(
 						// will throw exception
 						By.cssSelector(String.format("input#%s", dataMap.get(hobby)))));
+
+			} catch (InvalidSelectorException e) {
+				System.err.println("ignored: " + e.toString());
+			}
+			try {
+				checkboxes.add(formElement.findElement(
+						// will not throw exception
+						By.xpath(String.format("input[@id='%s']", dataMap.get(hobby)))));
+			} catch (Exception e) {
+				System.err.println("ignored: " + e.toString());
+			}
+
+		}
+		Consumer<WebElement> act = _element -> {
+			highlight(_element);
+			_element.click();
+		};
+		checkboxes.stream().forEach(act);
+
+		// Assert
+
+		assertTrue(
+				formElement.findElements(By.cssSelector("input[type='checkbox']"))
+						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
+	}
+
+	// Selecting check boxes by their sibling labels, ByChained
+	@Test(enabled = true)
+	public void test6_4() {
+		// Arrange
+		List<String> hobbies = new ArrayList<>(Arrays.asList("Singing", "Dancing"));
+		driver.get("http://suvian.in/selenium/1.6checkbox.html");
+		try {
+			WebElement checkElement = wait.until(new ExpectedCondition<WebElement>() {
+				@Override
+				public WebElement apply(WebDriver _driver) {
+					return _driver
+							.findElements(
+									By.cssSelector("div.container div.row div.intro-message h3"))
+							.stream().filter(_element -> _element.getText().toLowerCase()
+									.indexOf("select your hobbies") > -1)
+							.findFirst().get();
+				}
+			});
+			System.err
+					.println("element check: " + checkElement.getAttribute("innerHTML"));
+		} catch (Exception e) {
+			System.err.println("Exception: " + e.toString());
+		}
+
+		// Act
+		WebElement formElement = driver.findElement(By.cssSelector("input[id]"))
+				.findElement(By.xpath(".."));
+		assertThat(formElement, notNullValue());
+		highlight(formElement, 1000);
+		List<WebElement> inputElements = formElement
+				.findElements(By.cssSelector("label[for]")).stream()
+				.filter(_element -> hobbies.contains(_element.getText()))
+				.collect(Collectors.toList());
+		// C#: dataMap = elements.ToDictionary(x => x.GetAttribute("for"), x =>
+		// x.Text);
+		Map<String, String> dataMap = inputElements.stream().map(_element -> {
+			System.err.println("input element id: " + _element);
+			System.err.println("input element text: " + _element.getText());
+			System.err.println(
+					"input element 'for' attribute: " + _element.getAttribute("for"));
+			System.err
+					.println("input element HTML: " + _element.getAttribute("outerHTML"));
+			System.err.println("input element XPath: " + xpathOfElement(_element));
+			System.err
+					.println("input element CSS: " + cssSelectorOfElement(_element));
+			return _element;
+		}).collect(Collectors.toMap(_element -> _element.getText(),
+				_element -> _element.getAttribute("for")));
+		List<WebElement> checkboxes = new ArrayList<>();
+		for (String hobby : hobbies) {
+			try {
+				System.err.println("finding: " + dataMap.get(hobby));
+				checkboxes.add(driver
+						.findElements(
+								new ByChained(By.cssSelector("input[id]"), By.xpath(".."),
+										By.cssSelector(
+												String.format("input#%s", dataMap.get(hobby)))))
+						.get(0));
 			} catch (InvalidSelectorException e) {
 				System.err.println("ignored: " + e.toString());
 			}
