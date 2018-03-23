@@ -46,6 +46,8 @@
                 <Label text="CSS" GridPane.columnIndex="1" GridPane.rowIndex="1"/>
                 <Label text="XPath" GridPane.columnIndex="1" GridPane.rowIndex="2"/>
                 <Label text="Text" GridPane.columnIndex="1" GridPane.rowIndex="3"/>
+                <TextField fx:id="textFieldID" editable="false" prefHeight="31.0" prefWidth="314.0" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
+                <!-- TODO: cleanup -->
                 <GridPane GridPane.columnIndex="2" GridPane.rowIndex="1">
                   <columnConstraints>
                     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
@@ -54,12 +56,11 @@
                     <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES"/>
                   </rowConstraints>
                   <children>
-                    <TextField/>
+                    <TextField fx:id="textFieldCSS"/>
                   </children>
                 </GridPane>
-                <TextField editable="false" prefHeight="31.0" prefWidth="314.0" GridPane.columnIndex="2" GridPane.rowIndex="0"/>
-                <TextField GridPane.columnIndex="2" GridPane.rowIndex="2"/>
-                <TextField GridPane.columnIndex="2" GridPane.rowIndex="3"/>
+                <TextField fx:id="textFieldXPath" GridPane.columnIndex="2" GridPane.rowIndex="2"/>
+                <TextField fx:id="textFieldText" GridPane.columnIndex="2" GridPane.rowIndex="3"/>
                 <RadioButton fx:id="radioButtonID" mnemonicParsing="false" selected="true" GridPane.columnIndex="0" GridPane.rowIndex="0">
                   <toggleGroup>
                     <ToggleGroup fx:id="toggleGroup"/>
