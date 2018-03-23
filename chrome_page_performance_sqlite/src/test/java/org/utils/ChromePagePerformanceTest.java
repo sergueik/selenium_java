@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -232,6 +233,38 @@ public class ChromePagePerformanceTest {
 
 		}
 
+	}
+
+	// NOTE: this test is failing
+	@Ignore
+	@Test
+	public void testRecordNativeSplitter() {
+		String payloadsArray = "[{stuff} , {redirectCount=0, encodedBodySize=64518, unloadEventEnd=0, responseEnd=4247.699999992619, domainLookupEnd=2852.7999999932945, unloadEventStart=0, domContentLoadedEventStart=4630.699999994249, type=navigate, decodedBodySize=215670, duration=5709.000000002561, redirectStart=0, connectEnd=3203.5000000032596, toJSON={}, requestStart=3205.499999996391, initiatorType=beacon}, {some other stuff}]";
+		String splitter = "(?<=\\}) *, *(?=\\{)";
+
+		List<Object> objectList = new ArrayList<Object>();
+		try {
+			objectList = (List<Object>) ((Object) payloadsArray);
+			System.err.println("First object: " + objectList.get(0));
+		} catch (ClassCastException e) {
+			System.err.println("Exception (ignored) " + e.toString());
+			// Exception (ignored) java.lang.ClassCastException: java.lang.String
+			// cannot be cast to java.util.List
+		} catch (Exception e) {
+			System.err.println("Exception (rethrown) " + e.toString());
+			throw e;
+		}
+		if (objectList.size() > 0) {
+			System.err.println("First object: " + objectList.get(0));
+			String payload = objectList.get(0).toString();
+			Pattern pattern = Pattern.compile(splitter);
+			Matcher matcher = pattern.matcher(payload);
+			if (matcher.find()) {
+				new ArrayList<String>(Arrays.asList(payload.split(splitter))).stream()
+						.forEach(System.err::println);
+
+			}
+		}	
 	}
 
 	// @Ignore
