@@ -2723,7 +2723,8 @@ public class SuvianTest extends BaseTest {
 				.findElements(new ByChained(By.cssSelector("body"),
 						By.cssSelector("div.navbar-fixed-top"),
 						By.cssSelector("div.navbar-collapse"), By.cssSelector("li")))
-				.stream().map(o -> {
+				.stream().filter(o -> o.findElements(By.cssSelector("a")).size() > 0)
+				.map(o -> {
 					System.err.println(o.getAttribute("innerHTML"));
 					return o;
 				})
@@ -2742,7 +2743,6 @@ public class SuvianTest extends BaseTest {
 		assertThat(element.getText(), equalTo("BLOG"));
 		element.click();
 	}
-
 
 	public boolean isGreaterThen(String a, String b) {
 		return a.compareTo(b) < 0;
