@@ -32,11 +32,13 @@ public class NgMultiSelectTest {
 
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private String baseUrl;
-
-	// change this boolean flag to true to run on chrome emulator
+	private final String baseUrl = "http://amitava82.github.io/angular-multiselect/";;
+	
+	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
+	private final Channel channel = isMobile ? Channel.MOBILE : Channel.WEB;
 
+	// strongly-typed Page object
 	private NgMultiSelectPage page;
 
 	@Before
@@ -71,15 +73,12 @@ public class NgMultiSelectTest {
 
 		}
 
-		baseUrl = "http://amitava82.github.io/angular-multiselect/";
+		
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		page = new NgMultiSelectPage();
 		page.setDriver(ngDriver);
-		Channel channel = Channel.WEB;
-		if (isMobile) {
-			channel = Channel.MOBILE;
-		}
+
 		JPageFactory.initElements(ngDriver, channel, page);
 
 	}

@@ -28,10 +28,6 @@ public class NgMultiSelectPage {
 		this._driver = driver;
 	}
 
-	public NgWebDriver getDriver() {
-		return _driver;
-	}
-
 	// the @FindBy annotation below gives an example of defining different
 	// locators
 

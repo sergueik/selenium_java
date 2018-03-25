@@ -1,5 +1,13 @@
 package org.henrrich.jpagefactory.example.ngqualityshepherd;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -32,11 +40,13 @@ public class NgQualityShepherdTest {
 
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private String baseUrl;
+	private static final String baseUrl = "http://qualityshepherd.com/angular/friends/";
 
-	// change this boolean flag to true to run on chrome emulator
+	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
+	private final Channel channel = isMobile ? Channel.MOBILE : Channel.WEB;
 
+	// strongly-typed Page object
 	private NgQualityShepherdPage page;
 
 	@Before
@@ -71,29 +81,31 @@ public class NgQualityShepherdTest {
 
 		}
 
-		baseUrl = "http://qualityshepherd.com/angular/friends/";
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		page = new NgQualityShepherdPage();
+		page.setDriver(ngDriver);
 
-		Channel channel = Channel.WEB;
-		if (isMobile) {
-			channel = Channel.MOBILE;
-		}
 		JPageFactory.initElements(ngDriver, channel, page);
+	}
+
+	@Test
+	public void testShouldCountFriendRows() throws Exception {
+		assertThat("number of friends rows is incorrect", page.countFriendRows(),
+				is(3));
 	}
 
 	// @Ignore
 	@Test
 	public void testShouldSearchFriend() throws Exception {
-		Assert.assertTrue("Number of friends is not 3!",
-				page.getNumberOfFriendNames() == 3);
+		assertThat("unexpected friend #2 name", page.getFriendName(2), is("Lucie"));
 	}
 
+	// can use repeaterColumn
 	@Test
 	public void testShouldHaveFriendNamedJohn() throws Exception {
-		Assert.assertTrue("Unexpected name of the friend!",
-				page.getFriendName().equals("John"));
+		assertThat("unexpected friend #1 name", page.getFirstFriendName(),
+				containsString("John"));
 	}
 
 	@After

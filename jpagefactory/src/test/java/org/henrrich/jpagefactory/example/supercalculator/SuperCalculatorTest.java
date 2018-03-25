@@ -32,10 +32,11 @@ public class SuperCalculatorTest {
 
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private String baseUrl;
+	private final String baseUrl = "http://juliemr.github.io/protractor-demo/";
 
-	// change this boolean flag to true to run on chrome emulator
+	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
+	private final Channel channel = isMobile ? Channel.MOBILE : Channel.WEB;
 
 	private SuperCalculatorPage superCalculatorPage;
 
@@ -70,15 +71,10 @@ public class SuperCalculatorTest {
 
 		}
 
-		baseUrl = "http://juliemr.github.io/protractor-demo/";
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		superCalculatorPage = new SuperCalculatorPage();
 
-		Channel channel = Channel.WEB;
-		if (isMobile) {
-			channel = Channel.MOBILE;
-		}
 		JPageFactory.initElements(ngDriver, channel, superCalculatorPage);
 	}
 

@@ -7,10 +7,19 @@ import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
 import org.openqa.selenium.WebElement;
 
+import com.jprotractor.NgWebDriver;
+
 /**
- * Created by sergueik on 31/07/2016.
+ * Created by sergueik on 31/07/2016. 
+ * Changed on 3/24/2018 
  */
 public class NgQualityShepherdPage {
+
+	private NgWebDriver _driver;
+
+	public void setDriver(NgWebDriver driver) {
+		this._driver = driver;
+	}
 
 	// the @FindBy annotation below gives an example of defining different
 	// locators
@@ -18,18 +27,26 @@ public class NgQualityShepherdPage {
 			@FindBy(how = How.REPEATER_COLUMN, using = "row in rows", column = "row") })
 	private List<WebElement> friendNames;
 
+	@FindAll({ @FindBy(how = How.REPEATER, using = "row in rows") })
+	private List<WebElement> friendRows;
+
 	@FindBy(how = How.REPEATER_ELEMENT, using = "row in rows", column = "row", row = 1)
 	private WebElement friendNameElement;
 
-	public int getNumberOfFriendNames() {
+	public int countFriendNames() {
 		return friendNames.size();
 	}
 
-	// public String getFriendName(int index) {
-	// WebElement friendName = friendNames.get(index);
-	// return friendName.getText();
-	// }
-	public String getFriendName() {
+	public int countFriendRows() {
+		return friendRows.size();
+	}
+
+	public String getFriendName(int index) {
+		WebElement friendName = friendNames.get(index);
+		return friendName.getText();
+	}
+
+	public String getFirstFriendName() {
 		return friendNameElement.getText();
 	}
 
