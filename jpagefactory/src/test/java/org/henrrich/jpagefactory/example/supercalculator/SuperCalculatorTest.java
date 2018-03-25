@@ -1,5 +1,6 @@
 package org.henrrich.jpagefactory.example.supercalculator;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -7,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
 
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
-import com.jprotractor.NgBy;
+import com.github.sergueik.jprotractor.NgWebDriver;
+import com.github.sergueik.jprotractor.NgWebElement;
+import com.github.sergueik.jprotractor.NgBy;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -33,6 +34,7 @@ public class SuperCalculatorTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	private final String baseUrl = "http://juliemr.github.io/protractor-demo/";
+	private static String osName = getOsName();
 
 	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
@@ -58,13 +60,22 @@ public class SuperCalculatorTest {
 			// ourselves instead of using waitForAngular call in JProtractor
 			ngDriver = new NgWebDriver(new ChromeDriver(capabilities), true);
 		} else {
-
+			/*
 			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
 					Platform.ANY);
 			FirefoxProfile profile = new ProfilesIni().getProfile("default");
 			profile.setEnableNativeEvents(false);
 			capabilities.setCapability("firefox_profile", profile);
 			seleniumDriver = new FirefoxDriver(capabilities);
+			*/
+
+			System.setProperty("webdriver.chrome.driver",
+					osName.toLowerCase().startsWith("windows")
+							? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
+							: "/var/run/chromedriver");
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+
+			seleniumDriver = new ChromeDriver(capabilities);
 			ngDriver = new NgWebDriver(seleniumDriver, true);
 
 			// ngDriver = new NgWebDriver(new ChromeDriver(), true);
@@ -110,4 +121,11 @@ public class SuperCalculatorTest {
 		ngDriver.quit();
 	}
 
+	// Utilities
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
 }

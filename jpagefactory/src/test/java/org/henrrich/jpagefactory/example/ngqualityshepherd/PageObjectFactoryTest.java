@@ -31,9 +31,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 // import org.openqa.selenium.support.FindAll;
 import org.openqa.selenium.support.PageFactory;
 
-import com.jprotractor.NgWebDriver;
-
-import org.openqa.selenium.WebElement;
+import com.github.sergueik.jprotractor.NgWebDriver;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +40,7 @@ public class PageObjectFactoryTest {
 	WebDriver driver;
 	private NgWebDriver ngDriver;
 	private static final String baseUrl = "http://qualityshepherd.com/angular/friends/";
+	private static String osName = getOsName();
 
 	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
@@ -51,7 +50,9 @@ public class PageObjectFactoryTest {
 	public void setUp() {
 		// Create a new instance of a driver
 		System.setProperty("webdriver.chrome.driver",
-				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+				osName.toLowerCase().startsWith("windows")
+						? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
+						: "/var/run/chromedriver");
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		driver = new ChromeDriver(capabilities);
@@ -123,4 +124,11 @@ public class PageObjectFactoryTest {
 
 	}
 
+	// Utilities
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name");
+		}
+		return osName;
+	}
 }

@@ -1,6 +1,6 @@
 package org.henrrich.jpagefactory;
 
-import com.jprotractor.NgWebElement;
+import com.github.sergueik.jprotractor.NgWebElement;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.AbstractAnnotations;

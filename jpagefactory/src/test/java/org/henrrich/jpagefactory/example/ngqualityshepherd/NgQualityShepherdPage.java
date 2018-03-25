@@ -7,7 +7,7 @@ import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
 import org.openqa.selenium.WebElement;
 
-import com.jprotractor.NgWebDriver;
+import com.github.sergueik.jprotractor.NgWebDriver;
 
 /**
  * Created by sergueik on 31/07/2016. 

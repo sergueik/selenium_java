@@ -16,14 +16,14 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <jprotractor.version>1.2-SNAPSHOT</jprotractor.version>
+    <jprotractor.version>1.3-SNAPSHOT</jprotractor.version>
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <selenium.version>2.53.0</selenium.version>
-    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
+    <selenium.version>2.53.1</selenium.version>
+    <selenium-firefox-driver.version>2.53.1</selenium-firefox-driver.version>
     <selenium-chrome-driver.version>2.53.1</selenium-chrome-driver.version>
   </properties>
   <developers>
@@ -48,17 +48,34 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.jprotractor</groupId>
+      <groupId>com.github.sergueik.jprotractor</groupId>
       <artifactId>jprotractor</artifactId>
       <version>${jprotractor.version}</version>
+      <!-- 
       <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath>
+      <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath> 
+      -->
       <exclusions>
         <exclusion>
           <artifactId>selenium-server</artifactId>
           <groupId>org.seleniumhq.selenium</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-api</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-server</artifactId>
+      <version>${selenium.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -117,4 +134,14 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <url>http://central.maven.org/maven2/</url>
+    </repository>
+  </repositories>
 </project>

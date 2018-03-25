@@ -1,9 +1,11 @@
 package org.henrrich.jpagefactory;
 
-import com.jprotractor.NgBy;
+import com.github.sergueik.jprotractor.NgBy;
+
 import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
 import org.henrrich.jpagefactory.annotations.FindBys;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.support.ByIdOrName;
 import org.openqa.selenium.support.pagefactory.Annotations;

@@ -3,6 +3,7 @@ package org.henrrich.jpagefactory.example.supercalculator;
 import org.henrrich.jpagefactory.How;
 import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
+
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 
