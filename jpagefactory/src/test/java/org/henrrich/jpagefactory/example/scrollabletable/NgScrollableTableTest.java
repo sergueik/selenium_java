@@ -1,4 +1,6 @@
-package org.henrrich.jpagefactory.example.supercalculator;
+package org.henrrich.jpagefactory.example.scrollabletable;
+
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.io.File;
 import java.util.HashMap;
@@ -7,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
+import org.henrrich.jpagefactory.example.todolist.TodoListPage;
 
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
@@ -26,28 +29,26 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-/**
- * Created by henrrich on 23/05/2016.
- */
-public class SuperCalculatorTest {
-
+public class NgScrollableTableTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private final String baseUrl = "http://juliemr.github.io/protractor-demo/";
+	private static String baseUrl = "http://www.globalsqa.com/angularJs-protractor/Scrollable/";
 	private static String osName = getOsName();
 
 	// change to true to run on Chrome emulator
 	private boolean isMobile = false;
 	private final Channel channel = isMobile ? Channel.MOBILE : Channel.WEB;
 
-	private SuperCalculatorPage superCalculatorPage;
+	// strongly-typed Page object
+	private NgScrollableTablePage page;
 
 	@Before
 	public void setUp() throws Exception {
 
-		// change according to platformm
+		// change according to platform
 		System.setProperty("webdriver.chrome.driver",
 				"C:\\java\\selenium\\chromedriver.exe");
+
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");
@@ -60,6 +61,7 @@ public class SuperCalculatorTest {
 			// ourselves instead of using waitForAngular call in JProtractor
 			ngDriver = new NgWebDriver(new ChromeDriver(capabilities), true);
 		} else {
+
 			/*
 			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
 					Platform.ANY);
@@ -77,40 +79,41 @@ public class SuperCalculatorTest {
 
 			seleniumDriver = new ChromeDriver(capabilities);
 			ngDriver = new NgWebDriver(seleniumDriver, true);
+
 		}
 
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-		superCalculatorPage = new SuperCalculatorPage();
 
-		JPageFactory.initElements(ngDriver, channel, superCalculatorPage);
+		page = new NgScrollableTablePage();
+		page.setDriver(ngDriver);
+
+		JPageFactory.initElements(ngDriver, channel, page);
+
+	}
+
+	// @Ignore
+	@Test
+	public void testRowColumns() throws Exception {
+		int expectNumRows = 20;
+		Assert.assertThat(
+				String.format("Should be able to find %d rows", expectNumRows),
+				page.countRows(), equalTo(expectNumRows));
+		Assert.assertThat(
+				String.format("Should be able to find %d counting first names",
+						expectNumRows),
+				page.countFirstNames(), equalTo(expectNumRows));
+		Assert.assertThat(
+				String.format("Should be able to find %d counting first names",
+						expectNumRows),
+				page.countFirstNames(), equalTo(expectNumRows));
 	}
 
 	@Test
-	public void testShouldAddOneAndTwo() throws Exception {
-		superCalculatorPage.add("1", "2");
-		Assert.assertTrue("Result is not 3!",
-				superCalculatorPage.getLatestResult().equals("3"));
-	}
-
-	@Test
-	public void testShouldTwoTimesThree() throws Exception {
-		superCalculatorPage.times("2", "3");
-		Assert.assertTrue("Result is not 6!",
-				superCalculatorPage.getLatestResult().equals("6"));
-	}
-
-	@Test
-	public void testShouldHaveAHistory() throws Exception {
-		superCalculatorPage.add("1", "2");
-		superCalculatorPage.add("3", "4");
-		Assert.assertTrue("Should have 2 history!",
-				superCalculatorPage.getNumberOfHistoryEntries() == 2);
-
-		superCalculatorPage.add("5", "6");
-		Assert.assertTrue("Should have 2 history!",
-				superCalculatorPage.getNumberOfHistoryEntries() == 3);
-
+	public void testNames() throws Exception {
+		int row = 1;
+		Assert.assertThat("Should be named", page.getFullName(row), equalTo(
+				String.format("%s %s", page.getFirstName(row), page.getLastName(row))));
 	}
 
 	@After
@@ -125,4 +128,5 @@ public class SuperCalculatorTest {
 		}
 		return osName;
 	}
+
 }

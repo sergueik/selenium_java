@@ -80,8 +80,6 @@ public class NgMultiSelectTest {
 			seleniumDriver = new ChromeDriver(capabilities);
 			ngDriver = new NgWebDriver(seleniumDriver, true);
 
-			// ngDriver = new NgWebDriver(new ChromeDriver(), true);
-
 		}
 
 		ngDriver.get(baseUrl);

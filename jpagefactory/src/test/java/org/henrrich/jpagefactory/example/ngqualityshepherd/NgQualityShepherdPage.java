@@ -15,10 +15,10 @@ import com.github.sergueik.jprotractor.NgWebDriver;
  */
 public class NgQualityShepherdPage {
 
-	private NgWebDriver _driver;
+	private NgWebDriver ngDriver;
 
-	public void setDriver(NgWebDriver driver) {
-		this._driver = driver;
+	public void setDriver(NgWebDriver ngDriver) {
+		this.ngDriver = ngDriver;
 	}
 
 	// the @FindBy annotation below gives an example of defining different

@@ -22,53 +22,53 @@ import org.openqa.selenium.WebElement;
  */
 public class NgMultiSelectPage {
 
-	private NgWebDriver _driver;
+	private NgWebDriver ngDriver;
 
-	public void setDriver(NgWebDriver driver) {
-		this._driver = driver;
+	public void setDriver(NgWebDriver ngDriver) {
+		this.ngDriver = ngDriver;
 	}
 
 	// the @FindBy annotation below gives an example of defining different
 	// locators
 
 	@FindBy(how = How.MODEL, using = "selectedCar")
-	private WebElement _directive;
+	private WebElement directive;
 
 	@FindBy(how = How.BUTTON_TEXT, using = "Select Some Cars")
-	private WebElement _toggleSelect;
+	private WebElement toggleSelect;
 
 	@FindAll({ @FindBy(how = How.REPEATER, using = "i in items") })
-	private List<WebElement> _cars;
+	private List<WebElement> cars;
 
 	@FindBy(how = How.CSS, using = "am-multiselect > div > button")
-	private WebElement _button;
+	private WebElement button;
 
 	public void openSelect() {
-		Assert.assertThat("Should be able to select cars", _directive.getTagName(),
+		Assert.assertThat("Should be able to select cars", directive.getTagName(),
 				equalTo("am-multiselect"));
 
 		Assert.assertTrue("Should be able to select cars",
-				_toggleSelect.isDisplayed());
-		_toggleSelect.click();
+				toggleSelect.isDisplayed());
+		toggleSelect.click();
 	}
 
 	public int countCars() {
-		return _cars.size();
+		return cars.size();
 	}
 
 	public void selectAllCars() {
 		for (int rowNum = 0; rowNum != countCars(); rowNum++) {
 			// For every row, click on the car name
-			NgWebElement _ng_car = new NgWebElement(_driver, _directive)
+			NgWebElement ngCar = new NgWebElement(ngDriver, directive)
 					.findElement(NgBy.repeaterElement("i in items", rowNum, "i.label"));
 			try {
-				System.err.println(_ng_car.getAttribute("innerHTML"));
+				System.err.println(ngCar.getAttribute("innerHTML"));
 			} catch (NullPointerException e) {
 				// ignore
 			}
 			try {
-				System.err.println("* " + _ng_car.evaluate("i.label").toString());
-				_ng_car.click();
+				System.err.println("* " + ngCar.evaluate("i.label").toString());
+				ngCar.click();
 			} catch (WebDriverException e) {
 				// ignore
 			}
@@ -76,7 +76,7 @@ public class NgMultiSelectPage {
 	}
 
 	public String getStatus() {
-		return _button.getText();
+		return button.getText();
 		// return _directive.getText();
 	}
 }

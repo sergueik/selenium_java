@@ -29,7 +29,6 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-
 // NOTE: http://jaykanakiya.com/demos/angular-js-todolist/ is down
 // need to integrate https://github.com/kanakiyajay/Angular-js-todolist
 public class TodoListTest {
@@ -82,9 +81,6 @@ public class TodoListTest {
 
 			seleniumDriver = new ChromeDriver(capabilities);
 			ngDriver = new NgWebDriver(seleniumDriver, true);
-
-			// ngDriver = new NgWebDriver(new ChromeDriver(), true);
-
 		}
 
 		ngDriver.get(baseUrl);
