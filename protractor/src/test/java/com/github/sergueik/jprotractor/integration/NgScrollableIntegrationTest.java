@@ -135,6 +135,27 @@ public class NgScrollableIntegrationTest {
 		//
 	}
 
+	// @Ignore
+	@Test
+	public void testEvaluateRowData() {
+
+		// Wait page to load
+		wait.until(ExpectedConditions
+				.visibilityOf(ngDriver.findElement(By.className("table-container"))));
+		List<WebElement> nameRows = ngDriver.findElements(new ByChained(
+				NgBy.repeater("row in rowCollection"), NgBy.binding("row.firstName")));
+		rowCnt = 0;
+		for (WebElement rowElement : nameRows) {
+			if (rowCnt++ > maxRows) {
+				break;
+			}
+			NgWebElement ngRowElement = new NgWebElement(ngDriver, rowElement);
+			System.err.println(String.format("Row %d Name: %s %s", rowCnt,
+					(String) ngRowElement.evaluate("row.firstName"),
+					(String) ngRowElement.evaluate("row.lastName")));
+		}
+	}
+
 	@Ignore
 	@Test
 	public void testRowColumnsWithByChained() {
@@ -188,6 +209,7 @@ public class NgScrollableIntegrationTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testRowsAndColumns() {
 		// Wait page to load
