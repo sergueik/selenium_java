@@ -40,6 +40,7 @@ public class PageObjectFactoryTest {
 	WebDriver driver;
 	private NgWebDriver ngDriver;
 	private static final String baseUrl = "http://qualityshepherd.com/angular/friends/";
+	private static final String chromeDriverPath = "${HOME}/Downloads/chromedriver";
 	private static String osName = getOsName();
 
 	// change to true to run on Chrome emulator
@@ -49,17 +50,15 @@ public class PageObjectFactoryTest {
 	@Before
 	public void setUp() {
 		// Create a new instance of a driver
-		System.setProperty("webdriver.chrome.driver",
-				osName.toLowerCase().startsWith("windows")
-						? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
-						: "/var/run/chromedriver");
+		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
+				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		driver = new ChromeDriver(capabilities);
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-		ngDriver = new NgWebDriver(driver, true);
-		// Navigate to the pag
+		ngDriver = new NgWebDriver(driver);
+		// Navigate to the page
 		ngDriver.get(baseUrl);
 		ngDriver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
@@ -82,8 +81,7 @@ public class PageObjectFactoryTest {
 		JPageFactory.initElements(ngDriver, channel, page);
 
 		// And could the friends.
-		assertThat("it will have more tnan 2 friends", page.countNgFriends(),
-				greaterThan(2));
+		assertThat("it will have more tnan 2 friends", page.countNgFriends(), greaterThan(2));
 	}
 
 	@Test
@@ -91,11 +89,9 @@ public class PageObjectFactoryTest {
 		// Create a new core org.openqa.selenium.support strongly typed
 		// instance of the search page class
 		// with regular WebElement fields in the page.
-		QualityshepherdPage page = PageFactory.initElements(driver,
-				QualityshepherdPage.class);
+		QualityshepherdPage page = PageFactory.initElements(driver, QualityshepherdPage.class);
 		// And could the friends.
-		assertThat("it will have more tnan 2 friends", page.countFriends(),
-				greaterThan(2));
+		assertThat("it will have more tnan 2 friends", page.countFriends(), greaterThan(2));
 	}
 
 	public static class QualityshepherdPage {
@@ -110,8 +106,7 @@ public class PageObjectFactoryTest {
 		@FindAll({ @FindBy(how = How.REPEATER, using = "row in rows") })
 		public List<WebElement> ngFriends;
 
-		@org.openqa.selenium.support.FindAll({
-				@org.openqa.selenium.support.FindBy(css = "table tbody td.ng-binding") })
+		@org.openqa.selenium.support.FindAll({ @org.openqa.selenium.support.FindBy(css = "table tbody td.ng-binding") })
 		public List<WebElement> friends;
 
 		public int countFriends() {
@@ -130,5 +125,32 @@ public class PageObjectFactoryTest {
 			osName = System.getProperty("os.name");
 		}
 		return osName;
+	}
+
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{([\\.\\w]+)\\}|(\\w+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = getPropertyEnv(envVarName, "");
+			m.appendReplacement(sb, null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 }

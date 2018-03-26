@@ -6,6 +6,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.henrrich.jpagefactory.Channel;
 import org.henrrich.jpagefactory.JPageFactory;
@@ -35,6 +37,7 @@ public class TodoListTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
 	private final String baseUrl = "http://jaykanakiya.com/demos/angular-js-todolist/";
+	private static final String chromeDriverPath = "${HOME}/Downloads/chromedriver";
 	private static String osName = getOsName();
 
 	// change to true to run on Chrome emulator
@@ -47,40 +50,33 @@ public class TodoListTest {
 	@Before
 	public void setUp() throws Exception {
 
-		// change according to platform
-		System.setProperty("webdriver.chrome.driver",
-				"C:\\java\\selenium\\chromedriver.exe");
+		// change according to platformm
+		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
+				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
 
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");
 			Map<String, Object> chromeOptions = new HashMap<>();
 			chromeOptions.put("mobileEmulation", mobileEmulation);
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			capabilities.setCapability(ChromeOptions.CAPABILITY, chromeOptions);
 
-			// set ignoreSynchronization to true to be able to handle the page sync by
-			// ourselves instead of using waitForAngular call in JProtractor
-			ngDriver = new NgWebDriver(new ChromeDriver(capabilities), true);
-		} else {
-
-			/*
-			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
-					Platform.ANY);
-			FirefoxProfile profile = new ProfilesIni().getProfile("default");
-			profile.setEnableNativeEvents(false);
-			capabilities.setCapability("firefox_profile", profile);
-			seleniumDriver = new FirefoxDriver(capabilities);
-			*/
-
-			System.setProperty("webdriver.chrome.driver",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
-							: "/var/run/chromedriver");
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-
 			seleniumDriver = new ChromeDriver(capabilities);
+			// set ignoreSynchronization to true to handle page sync ourselves
+			// instead of using waitForAngular call in JProtractor
 			ngDriver = new NgWebDriver(seleniumDriver, true);
+		} else {
+			/*
+			 * DesiredCapabilities capabilities = new
+			 * DesiredCapabilities("firefox", "", Platform.ANY); FirefoxProfile
+			 * profile = new ProfilesIni().getProfile("default");
+			 * profile.setEnableNativeEvents(false);
+			 * capabilities.setCapability("firefox_profile", profile);
+			 * seleniumDriver = new FirefoxDriver(capabilities);
+			 */
+			seleniumDriver = new ChromeDriver(capabilities);
+			ngDriver = new NgWebDriver(seleniumDriver);
 		}
 
 		ngDriver.get(baseUrl);
@@ -96,8 +92,7 @@ public class TodoListTest {
 	// @Ignore
 	@Test
 	public void testSelectCarsOneByOne() throws Exception {
-		Assert.assertThat("Should be able to find two rows", page.countRows(),
-				equalTo(2));
+		Assert.assertThat("Should be able to find two rows", page.countRows(), equalTo(2));
 	}
 
 	@After
@@ -112,4 +107,32 @@ public class TodoListTest {
 		}
 		return osName;
 	}
+
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{([\\.\\w]+)\\}|(\\w+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = getPropertyEnv(envVarName, "");
+			m.appendReplacement(sb, null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+
 }
