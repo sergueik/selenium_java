@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.henrrich.jpagefactory.How;
 import org.henrrich.jpagefactory.annotations.FindAll;
 import org.henrrich.jpagefactory.annotations.FindBy;
+import org.henrrich.jpagefactory.annotations.FindBys;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -38,8 +39,8 @@ public class NgScrollableTablePage {
 			@FindBy(how = How.REPEATER_COLUMN, using = "row in rowCollection", column = "row.firstName") })
 	private List<WebElement> firstNames;
 
-	@FindAll({ @FindBy(how = How.REPEATER, using = "row in rowCollection"),
-			@FindBy(how = How.BINDING, column = "row.lastName") })
+	@FindBys({ @FindBy(how = How.REPEATER, using = "row in rowCollection"),
+			@FindBy(how = How.BINDING, using = "row.lastName") })
 	private List<WebElement> lastNames;
 
 	public int countRows() {
@@ -85,5 +86,11 @@ public class NgScrollableTablePage {
 		return String.format("%s %s",
 				(String) ngRowElement.evaluate("row.firstName"),
 				(String) ngRowElement.evaluate("row.lastName"));
+	}
+
+	public String getRow(int index) {
+		waitPageLoad();
+		WebElement row = rows.get(index);
+		return row.getText();
 	}
 }

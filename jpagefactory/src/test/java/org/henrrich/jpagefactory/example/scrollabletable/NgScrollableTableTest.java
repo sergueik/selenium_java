@@ -20,6 +20,7 @@ import com.github.sergueik.jprotractor.NgBy;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.openqa.selenium.Platform;
@@ -49,8 +50,10 @@ public class NgScrollableTableTest {
 	public void setUp() throws Exception {
 
 		// change according to platform
-		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
-				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
+		System.setProperty("webdriver.chrome.driver",
+				osName.toLowerCase().startsWith("windows")
+						? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
+						: resolveEnvVars(chromeDriverPath));
 
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		if (isMobile) {
@@ -66,7 +69,7 @@ public class NgScrollableTableTest {
 			ngDriver = new NgWebDriver(seleniumDriver, true);
 		} else {
 			seleniumDriver = new ChromeDriver(capabilities);
-			ngDriver = new NgWebDriver(seleniumDriver);
+			ngDriver = new NgWebDriver(seleniumDriver, true);
 		}
 
 		ngDriver.get(baseUrl);
@@ -83,19 +86,73 @@ public class NgScrollableTableTest {
 	@Test
 	public void testRowColumns() throws Exception {
 		int expectNumRows = 20;
-		Assert.assertThat(String.format("Should be able to find %d rows", expectNumRows), page.countRows(),
-				equalTo(expectNumRows));
-		Assert.assertThat(String.format("Should be able to find %d counting first names", expectNumRows),
-				page.countFirstNames(), equalTo(expectNumRows));
-		Assert.assertThat(String.format("Should be able to find %d counting first names", expectNumRows),
+		Assert.assertThat(
+				String.format("Should be able to find %d rows", expectNumRows),
+				page.countRows(), equalTo(expectNumRows));
+	}
+
+	// @Ignore
+	@Test
+	public void testFirstNameColumns() throws Exception {
+		int expectNumRows = page.countRows();
+		for (int cnt = 0; cnt != expectNumRows; cnt++) {
+			System.err.println(String.format("row[%d]: %s", cnt, page.getRow(cnt)));
+			System.err.println(
+					String.format("first name[%d]: %s", cnt, page.getFirstName(cnt)));
+		}
+
+		Assert.assertThat(
+				String.format("Should be able to find %d rows counting first names",
+						expectNumRows),
 				page.countFirstNames(), equalTo(expectNumRows));
 	}
 
+	// @Ignore
+	// broken possibly due to implementation
+	// expected 20, but get 400
+	@Test
+	public void testLastNameColumns() throws Exception {
+		int expectNumRows = page.countRows();
+
+		for (int cnt = 0; cnt != expectNumRows; cnt++) {
+			System.err.println(String.format("row[%d]: %s", cnt, page.getRow(cnt)));
+			System.err.println(
+					String.format("last name[%d]: %s", cnt, page.getLastName(cnt)));
+		}
+		/*
+				if (page.countLastNames() > expectNumRows) {
+					System.err.println("Exta rows:");
+					for (int cnt = expectNumRows; cnt != page.countLastNames(); cnt++) {
+						System.err.println(
+								String.format("last name[%d]: %s", cnt, page.getLastName(cnt)));
+					}
+				}
+				*/
+		Assert.assertThat(
+				String.format("Should be able to find %d rows counting last names",
+						expectNumRows),
+				page.countLastNames(), equalTo(expectNumRows));
+	}
+
+	// @Ignore
 	@Test
 	public void testNames() throws Exception {
-		int row = 1;
-		Assert.assertThat("Should be named", page.getFullName(row),
-				equalTo(String.format("%s %s", page.getFirstName(row), page.getLastName(row))));
+		int row = 5;
+		try {
+			System.err.println("First name: " + page.getFirstName(row));
+		} catch (NullPointerException e) {
+		}
+		try {
+			System.err.println("Last name: " + page.getLastName(row));
+		} catch (NullPointerException e) {
+		}
+		try {
+			System.err.println("Full name: " + page.getFullName(row));
+		} catch (NullPointerException e) {
+		}
+		Assert.assertThat("Should be named", page.getFullName(row).toLowerCase(),
+				equalTo(String.format("%s %s", page.getFirstName(row).toLowerCase(),
+						page.getLastName(row).toLowerCase())));
 	}
 
 	@After
@@ -134,7 +191,8 @@ public class NgScrollableTableTest {
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
 			String envVarValue = getPropertyEnv(envVarName, "");
-			m.appendReplacement(sb, null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
 		}
 		m.appendTail(sb);
 		return sb.toString();

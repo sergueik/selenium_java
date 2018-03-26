@@ -27,6 +27,7 @@ public class JPageFactoryAnnotations extends Annotations {
 		this.isWebChannel = Channel.WEB.equals(channel);
 	}
 
+	// see:https://stackoverflow.com/questions/25914156/difference-between-findall-and-findbys-annotations-in-webdriver-page-factory
 	public By buildBy() {
 		this.assertValidAnnotations();
 		By ans = null;
@@ -37,11 +38,13 @@ public class JPageFactoryAnnotations extends Annotations {
 
 		FindAll findAll = this.getField().getAnnotation(FindAll.class);
 		if (ans == null && findAll != null) {
+			// System.err.println("Building from buildBysFromFindByOneOf");
 			ans = this.buildBysFromFindByOneOf(findAll);
 		}
 
 		FindBy findBy = this.getField().getAnnotation(FindBy.class);
 		if (ans == null && findBy != null) {
+			// System.err.println("Building from buildByFromFindBy");
 			ans = this.buildByFromFindBy(findBy);
 		}
 		return ans;
@@ -51,7 +54,7 @@ public class JPageFactoryAnnotations extends Annotations {
 		FindBy[] findByArray = findBys.value();
 		By[] byArray = new By[findByArray.length];
 
-		for (int i = 0; i < findByArray.length; ++i) {
+		for (int i = 0; i < findByArray.length; i++) {
 			byArray[i] = this.buildByFromFindBy(findByArray[i]);
 		}
 		return new ByChained(byArray);
@@ -61,7 +64,12 @@ public class JPageFactoryAnnotations extends Annotations {
 		FindBy[] findByArray = findBys.value();
 		By[] byArray = new By[findByArray.length];
 
-		for (int i = 0; i < findByArray.length; ++i) {
+		// System.err.println("Combining " + findByArray.length + " Bys");
+		for (int i = 0; i < findByArray.length; i++) {
+			// System.err.println(
+			// "Converting using: " + findByArray[i].using() + " how: " +
+			// findByArray[i].how());
+
 			byArray[i] = this.buildByFromFindBy(findByArray[i]);
 		}
 		return new ByAll(byArray);
@@ -78,6 +86,7 @@ public class JPageFactoryAnnotations extends Annotations {
 			return null;
 		}
 
+		// System.err.println("Building From: " + how);
 		switch (how) {
 		case CLASS_NAME:
 			return By.className(using);

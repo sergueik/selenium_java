@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.henrrich</groupId>
   <artifactId>jpagefactory</artifactId>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>JPageFactory is a set of Selenium Java FindBy annotations that eases the usage of Selenium page factory pattern for automating Angular based web application.</description>
@@ -51,10 +51,6 @@
       <groupId>com.github.sergueik.jprotractor</groupId>
       <artifactId>jprotractor</artifactId>
       <version>${jprotractor.version}</version>
-      <!-- 
-      <scope>system</scope>
-      <systemPath>${project.basedir}/src/main/resources/jprotractor-${jprotractor.version}.jar</systemPath> 
-      -->
       <exclusions>
         <exclusion>
           <artifactId>selenium-server</artifactId>

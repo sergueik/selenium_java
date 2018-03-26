@@ -21,6 +21,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Ignore;
 
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
@@ -89,9 +90,9 @@ public class TodoListTest {
 
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
-	public void testSelectCarsOneByOne() throws Exception {
+	public void testTwoRows() throws Exception {
 		Assert.assertThat("Should be able to find two rows", page.countRows(), equalTo(2));
 	}
 
