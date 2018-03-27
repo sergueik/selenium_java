@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -136,6 +137,22 @@ public class NgScrollableIntegrationTest {
 	}
 
 	// @Ignore
+	@Test
+	public void testCountRows() {
+
+		// Wait page to load
+		wait.until(ExpectedConditions
+				.visibilityOf(ngDriver.findElement(By.className("table-container"))));
+		List<WebElement> rows = ngDriver
+				.findElements(NgBy.repeater("row in rowCollection"));
+		List<WebElement> lastNameRows = ngDriver.findElements(new ByChained(
+				By.className("table-container"), NgBy.repeater("row in rowCollection"),
+				NgBy.binding("row.lastName")));
+		System.err.println("Rows: " + rows.size());
+		System.err.println("Last names: " + lastNameRows.size());
+	}
+
+	@Ignore
 	@Test
 	public void testEvaluateRowData() {
 
