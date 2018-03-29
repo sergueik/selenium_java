@@ -1,26 +1,35 @@
 package example;
 
 import org.apache.log4j.Category;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
-import javafx.scene.Group;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.Scene;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -37,8 +46,11 @@ public class FlowPaneEx extends Application {
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(FlowPaneEx.class);
 	static Stage stage = null;
+	private Label statusLabel;
 	String configFilePath = null;
 	Scene scene = null;
+	private static String osName = getOsName();
+	public static WebDriver driver;
 
 	@Override
 	public void start(Stage stage) {
@@ -60,6 +72,12 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("browsers_32.png"));
 		launchButton.setGraphic(new ImageView(launchImage));
 		launchButton.setTooltip(new Tooltip("Launch browser"));
+		// https://examples.javacodegeeks.com/desktop-java/javafx/javafx-concurrency-example/
+		launchButton.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent event) {
+				startAsyncTask();
+			}
+		});
 
 		Button injectButton = new Button();
 		Image injectImage = new Image(
@@ -156,6 +174,8 @@ public class FlowPaneEx extends Application {
 				inputs.put("inputs", inputData); // TODO: JSON
 				scene.setUserData(inputs);
 
+				// See also:
+				// http://java-buddy.blogspot.com/2016/06/read-csv-run-in-background-thread-and.html
 				TableEditorEx tableEditorEx = new TableEditorEx();
 				tableEditorEx.setScene(scene);
 				try {
@@ -230,6 +250,8 @@ public class FlowPaneEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				confirmClose();
+				// TODO: refactor
+				// does not return
 			}
 		});
 
@@ -237,7 +259,7 @@ public class FlowPaneEx extends Application {
 		toolbarHbox.getChildren().addAll(launchButton, injectButton, generateButton,
 				loadButton, testsuiteButton, saveButton, configButton, quitButton);
 
-		Label statusLabel = new Label();
+		statusLabel = new Label();
 		statusLabel.setText("Status");
 		HBox statusbarHbox = new HBox();
 		statusbarHbox.getChildren().addAll(statusLabel);
@@ -251,6 +273,62 @@ public class FlowPaneEx extends Application {
 		scene.setRoot(vbox);
 		stage.setScene(scene);
 		stage.show();
+	}
+
+	public void runTask() {
+		updateStatus("Launching");
+		// sleep(10000);
+		setUpSeleniumDriver();
+		updateStatus("Launched");
+		return; // TODO: JavaFX concurrency framework
+	}
+
+	public void sleep(Integer seconds) {
+		long secondsLong = (long) seconds;
+		try {
+			Thread.sleep(secondsLong);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
+	}
+
+	private void updateStatus(String status) {
+		// NOTE: there is no `HORIZONTAL ELLIPSIS` in default console code page 437
+		logger.info(String.format("%s%s", status,
+				osName.startsWith("windows") ? "..." : "\u2026"));
+		// Update the Label on the JavaFx Application Thread
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				statusLabel.setText(status);
+			}
+		});
+	}
+
+	public void startAsyncTask() {
+		// Create instance of Runnable
+		Runnable task = new Runnable() {
+			public void run() {
+				runTask();
+			}
+		};
+
+		// Create background thread
+		Thread backgroundThread = new Thread(task);
+		// Terminate the running thread if the application exits
+		backgroundThread.setDaemon(true);
+		// Launch the thread
+		backgroundThread.start();
 	}
 
 	public static void main(String[] args) {
@@ -286,9 +364,14 @@ public class FlowPaneEx extends Application {
 		// code = Integer.parseInt(choicesDialog.getResult());
 		// logger.info("Exit app with code: " + code);
 		if (code == 1 || code == 2) {
+			tearDownSeleniumBrowswer();
 			stage.close();
 		}
+	}
 
+	public void tearDownSeleniumBrowswer() {
+		// Close the browser
+		driver.quit();
 	}
 
 	private static void openRecordingFile(File file) {
@@ -296,5 +379,17 @@ public class FlowPaneEx extends Application {
 
 	private static void testException() throws Exception {
 		throw new Exception("This is a test exception.");
+	}
+
+	public void setUpSeleniumDriver() {
+		// Create a new instance of a driver
+		System.setProperty("webdriver.chrome.driver",
+				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+
+		driver = new ChromeDriver(capabilities);
+		// Navigate to the right place
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		driver.get("http://www.google.ca/");
 	}
 }
