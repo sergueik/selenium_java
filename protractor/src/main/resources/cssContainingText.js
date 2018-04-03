@@ -18,7 +18,7 @@ var findByCssContainingText = function(cssSelector, searchText, using) {
   var matches = [];
   for (var i = 0; i < elements.length; ++i) {
     var element = elements[i];
-    var elementText = element.textContent || element.innerText || '';
+    var elementText = element.textContent || element.innerText || element.getAttribute('placeholder') || '';
     var elementMatches = searchText instanceof RegExp ?
       searchText.test(elementText) :
       elementText.indexOf(searchText) > -1;
