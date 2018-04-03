@@ -50,7 +50,7 @@ public class FlowPaneEx extends Application {
 	String configFilePath = null;
 	Scene scene = null;
 	private static String osName = getOsName();
-	public static WebDriver driver;
+	public static WebDriver driver = null;
 
 	@Override
 	public void start(Stage stage) {
@@ -304,8 +304,8 @@ public class FlowPaneEx extends Application {
 
 	private void updateStatus(String status) {
 		// NOTE: there is no `HORIZONTAL ELLIPSIS` in default console code page 437
-		logger.info(String.format("%s%s", status,
-				osName.startsWith("windows") ? "..." : "\u2026"));
+		logger.info(
+				String.format("%s%s", status, osName == "windows" ? "..." : "\u2026"));
 		// Update the Label on the JavaFx Application Thread
 		Platform.runLater(new Runnable() {
 			@Override
@@ -364,7 +364,9 @@ public class FlowPaneEx extends Application {
 		// code = Integer.parseInt(choicesDialog.getResult());
 		// logger.info("Exit app with code: " + code);
 		if (code == 1 || code == 2) {
-			tearDownSeleniumBrowswer();
+			if (driver != null) {
+				tearDownSeleniumBrowswer();
+			}
 			stage.close();
 		}
 	}
@@ -384,12 +386,13 @@ public class FlowPaneEx extends Application {
 	public void setUpSeleniumDriver() {
 		// Create a new instance of a driver
 		System.setProperty("webdriver.chrome.driver",
-				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+				(new File(osName == "windows" ? "c:/java/selenium/chromedriver.exe"
+						: "/home/sergueik/Downloads/chromedriver")).getAbsolutePath());
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 
 		driver = new ChromeDriver(capabilities);
 		// Navigate to the right place
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		driver.get("http://www.google.ca/");
+		driver.get("https://www.google.com/");
 	}
 }
