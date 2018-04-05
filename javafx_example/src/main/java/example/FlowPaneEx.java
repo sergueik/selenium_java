@@ -125,6 +125,29 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("codegen_32.png"));
 		generateButton.setGraphic(new ImageView(generateImage));
 		generateButton.setTooltip(new Tooltip("Generate program"));
+		
+		generateButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+
+				// Stage stage = new Stage();
+				Map<String, String> inputData = new HashMap<>();
+				inputData.put("dummy", "42");
+				inputData.put("title", "Step detail");
+				Map<String, Map> inputs = new HashMap<>();
+				inputs.put("inputs", inputData); // TODO: JSON
+				scene.setUserData(inputs);
+
+				// See also:
+				// http://java-buddy.blogspot.com/2016/06/read-csv-run-in-background-thread-and.html
+				DataFormEx dataFormEx =  new DataFormEx();
+				// dataFormEx.setScene(scene);
+				try {
+					dataFormEx.start(new Stage());
+				} catch (Exception e) {
+				}
+			}
+		});
 
 		Button loadButton = new Button();
 		Image loadImage = new Image(

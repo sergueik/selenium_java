@@ -53,51 +53,73 @@ public class DataFormControllerEx {
 		mapSWD2CoreSelenium.put("ElementTagName", "tagName");
 	}
 
+	@SuppressWarnings("unused")
 	private Stage mainStage;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private Button buttonSave;
+
+	@SuppressWarnings("restriction")
 	@FXML
 	private Button buttonDelete;
+
+	@SuppressWarnings("restriction")
 	@FXML
 	private Button buttonCancel;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static RadioButton radioButtonID;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static RadioButton radioButtonCSS;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static RadioButton radioButtonXPath;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static RadioButton radioButtonText;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private ToggleGroup toggleGroup;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static TextField textFieldID;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static TextField textFieldCSS;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static TextField textFieldXPath;
 
+	@SuppressWarnings("restriction")
 	@FXML
 	private static TextField textFieldText;
 
 	// https://github.com/jfoenixadmin/JFoenix/blob/master/demo/src/main/resources/fxml/ui/RadioButton.fxml
+	@SuppressWarnings("restriction")
 	@FXML
 	private TableView tablePassBook;
+
+	@SuppressWarnings("restriction")
 	@FXML
 	private TextField filterField;
 
 	private Parent fxmlEdit;
 	private Parent fxmlEdit1;
+	
+	@SuppressWarnings("restriction")
 	private FXMLLoader fxmlLoader = new FXMLLoader();
+	
+	@SuppressWarnings("restriction")
 	private FXMLLoader fxmlLoader1 = new FXMLLoader();
 
 	private Stage stage;
@@ -118,31 +140,50 @@ public class DataFormControllerEx {
 		locatorValues.put(textFieldXPath, "XPath");
 	}
 
-	public void setMainStage(Stage mainStage) {
+	public void setMainStage(@SuppressWarnings("restriction") Stage mainStage) {
 		this.mainStage = mainStage;
 	}
+
+	public Map<String, String> radioButtonUserData = new HashMap<>();
 
 	@SuppressWarnings("restriction")
 	@FXML
 	private void initialize() {
 
 		logger.info("Start.");
-		Map<String, String> radioButtonUserData = new HashMap<>();
-		// TODO: can not do from initialize ?
-		radioButtonXPath.setUserData(radioButtonUserData);
+		// TODO: while @FX elements null in initialize ?
+		if (radioButtonXPath != null) {
+			radioButtonXPath.setUserData(radioButtonUserData);
+		} else {
+			logger.info("radioButtonXPath is null");
+		}
 		for (RadioButton radioButton : radioButtons.keySet()) {
 			radioButtonUserData = new HashMap<>();
-			logger.info("Loading into user data: " + radioButtons.get(radioButton));
+			if (radioButton != null) {
+				logger.info("Loading into user data: " + radioButtons.get(radioButton)
+						+ " id: " + radioButton.getId());
+			} else {
+				logger.info("Loading into user data: " + radioButtons.get(radioButton)
+						+ " null ");
+			}
 
 			radioButtonUserData.put("key", radioButtons.get(radioButton));
-			radioButton.setUserData(radioButtonUserData);
+			if (radioButton != null) {
+				radioButton.setUserData(radioButtonUserData);
+			} else {
+				logger.info("radioButton is null");
+			}
 			radioButtonUserData.clear();
 		}
 
 		for (TextField textField : locatorValues.keySet()) {
 			Map<String, String> textFieldUserData = new HashMap<>();
 			textFieldUserData.put("key", locatorValues.get(textField));
-			textField.setUserData(textFieldUserData);
+			if (textField != null) {
+				textField.setUserData(textFieldUserData);
+			} else {
+				logger.info("textField is null");
+			}
 		}
 
 		toggleGroup.selectedToggleProperty()
@@ -163,38 +204,43 @@ public class DataFormControllerEx {
 							} catch (Exception e) {
 								throw e;
 							}
-							if (radioButtonUserData.containsKey("key")) {
-								String key = radioButtonUserData.get("key");
-								for (TextField textField : locatorValues.keySet()) {
-									Map<String, String> textFieldUserData = new HashMap<>();
-									try {
-										textFieldUserData = (Map<String, String>) textField
-												.getUserData();
-										if (textFieldUserData.containsKey("key")) {
-											if (textFieldUserData.get("key") == key) {
-												textField.setDisable(false);
-											} else {
-												textField.setDisable(true);
+							if (radioButtonUserData != null) {
+								if (radioButtonUserData.containsKey("key")) {
+									String key = radioButtonUserData.get("key");
+									for (TextField textField : locatorValues.keySet()) {
+										Map<String, String> textFieldUserData = new HashMap<>();
+										try {
+											textFieldUserData = (Map<String, String>) textField
+													.getUserData();
+											if (textFieldUserData.containsKey("key")) {
+												if (textFieldUserData.get("key") == key) {
+													textField.setDisable(false);
+												} else {
+													textField.setDisable(true);
+												}
 											}
+										} catch (ClassCastException e) {
+											logger.info("Exception (ignored) " + e.toString());
+										} catch (Exception e) {
+											throw e;
 										}
-									} catch (ClassCastException e) {
-										logger.info("Exception (ignored) " + e.toString());
-									} catch (Exception e) {
-										throw e;
-									}
 
+									}
 								}
 							}
 						}
 					}
 				});
-
-		textFieldText.focusedProperty().addListener((o, oldVal, newVal) -> {
-			if (!newVal) {
-				textFieldText.setUserData(oldVal);
-				logger.info("Value " + textFieldText.getText());
-			}
-		});
+		if (textFieldText != null) {
+			textFieldText.focusedProperty().addListener((o, oldVal, newVal) -> {
+				if (!newVal) {
+					textFieldText.setUserData(oldVal);
+					logger.info("Value " + textFieldText.getText());
+				}
+			});
+		} else {
+			logger.info("textFieldText is null");
+		}
 	}
 
 	@SuppressWarnings("restriction")
