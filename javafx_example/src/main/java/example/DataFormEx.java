@@ -87,6 +87,7 @@ public class DataFormEx extends Application {
 		loader.setLocation(getClass().getResource("/view/RootLayout.fxml"));
 		rootLayout = (BorderPane) loader.load();
 		primaryStage.setScene(new Scene(rootLayout));
+		primaryStage.getScene().setUserData(inputs);
 		primaryStage.show();
 
 	}
@@ -96,6 +97,11 @@ public class DataFormEx extends Application {
 		// Exception: javafx.fxml.LoadException: Root value already specified.
 		loader.setLocation(getClass().getResource("/view/UserDataView.fxml"));
 		rootLayout.setCenter((AnchorPane) loader.load());
+
+		DataFormControllerEx controller = (DataFormControllerEx) loader
+				.getController();
+		controller.setMainStage(primaryStage); // or what you want to do
+		controller.setInputData(inputData);
 	}
 
 	public Stage getPrimaryStage() {

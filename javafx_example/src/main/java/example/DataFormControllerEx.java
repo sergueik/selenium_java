@@ -9,6 +9,8 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -17,6 +19,7 @@ import javafx.scene.input.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,11 +36,27 @@ import javafx.stage.Window;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+// NOTE: `Initializable` has been superseded by automatic injection 
+// https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/Initializable.html
 public class DataFormControllerEx {
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category
 			.getInstance(DataFormControllerEx.class);
+
+	// can not easily access stage ane perform getUserData() on it from
+	// predefined methods
+	// private Map<String, Object> inputs = new HashMap<>();
+	private Map<String, String> inputData = new HashMap<>();
+
+	public void setInputData(Map<String, String> inputData) {
+		this.inputData = inputData;
+		this.textFieldID.textProperty().set("xxx");
+	}
+
+	public Map<String, String> getInputData() {
+		return this.inputData;
+	}
 
 	private static final List<String> locators = Arrays
 			.asList("ElementCssSelector", "ElementXPath", "ElementId", "ElementText");
@@ -62,6 +81,12 @@ public class DataFormControllerEx {
 
 	@SuppressWarnings("restriction")
 	@FXML
+	private AnchorPane topAnchorPane;
+	// Can not set example.DataFormControllerEx$TopAnchorPane field
+	// example.DataFormControllerEx.topAnchorPane to
+	// javafx.scene.layout.AnchorPane
+	@SuppressWarnings("restriction")
+	@FXML
 	private Button buttonDelete;
 
 	@SuppressWarnings("restriction")
@@ -70,19 +95,19 @@ public class DataFormControllerEx {
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static RadioButton radioButtonID;
+	private RadioButton radioButtonID;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static RadioButton radioButtonCSS;
+	private RadioButton radioButtonCSS;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static RadioButton radioButtonXPath;
+	private RadioButton radioButtonXPath;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static RadioButton radioButtonText;
+	private RadioButton radioButtonText;
 
 	@SuppressWarnings("restriction")
 	@FXML
@@ -90,19 +115,19 @@ public class DataFormControllerEx {
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static TextField textFieldID;
+	private TextField textFieldID;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static TextField textFieldCSS;
+	private TextField textFieldCSS;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static TextField textFieldXPath;
+	private TextField textFieldXPath;
 
 	@SuppressWarnings("restriction")
 	@FXML
-	private static TextField textFieldText;
+	private TextField textFieldText;
 
 	// https://github.com/jfoenixadmin/JFoenix/blob/master/demo/src/main/resources/fxml/ui/RadioButton.fxml
 	@SuppressWarnings("restriction")
@@ -115,30 +140,18 @@ public class DataFormControllerEx {
 
 	private Parent fxmlEdit;
 	private Parent fxmlEdit1;
-	
+
 	@SuppressWarnings("restriction")
 	private FXMLLoader fxmlLoader = new FXMLLoader();
-	
+
 	@SuppressWarnings("restriction")
 	private FXMLLoader fxmlLoader1 = new FXMLLoader();
 
 	private Stage stage;
 	private Stage changestage;
-	private static Map<RadioButton, String> radioButtons = new HashMap<>();
-	static {
-		radioButtons.put(radioButtonID, "ID");
-		radioButtons.put(radioButtonCSS, "CSS");
-		radioButtons.put(radioButtonText, "Text");
-		radioButtons.put(radioButtonXPath, "XPath");
-	}
+	private Map<RadioButton, String> radioButtons = new HashMap<>();
 
-	private static Map<TextField, String> locatorValues = new HashMap<>();
-	static {
-		locatorValues.put(textFieldID, "ID");
-		locatorValues.put(textFieldCSS, "CSS");
-		locatorValues.put(textFieldText, "Text");
-		locatorValues.put(textFieldXPath, "XPath");
-	}
+	private Map<TextField, String> locatorValues = new HashMap<>();
 
 	public void setMainStage(@SuppressWarnings("restriction") Stage mainStage) {
 		this.mainStage = mainStage;
@@ -146,14 +159,50 @@ public class DataFormControllerEx {
 
 	public Map<String, String> radioButtonUserData = new HashMap<>();
 
-	@SuppressWarnings("restriction")
+	// public void initialize(URL url, ResourceBundle rb){
+
+	@SuppressWarnings({ "restriction", "unchecked" })
 	@FXML
 	private void initialize() {
 
 		logger.info("Start.");
-		// TODO: while @FX elements null in initialize ?
-		if (radioButtonXPath != null) {
-			radioButtonXPath.setUserData(radioButtonUserData);
+		// https://findusages.com/search/javafx.scene.layout.AnchorPane/addEventHandler$2
+		/*
+		topAnchorPane.addEventHandler(WindowEvent.WINDOW_ACTIVATED,
+				new EventHandler<WindowEvent>() {
+					@Override
+					public void handle(WindowEvent event) {
+		
+						mouseClicked(event.getX(), event.getY());
+					}
+				});
+		*/
+		// topAnchorPane.layoutChildren();
+		// Use any of the controls that is bound in the Controller and use
+		// getScene() on it.
+		// Remember *not* to use it in initialize() as the root element(though
+		// completely processed) is still not placed on the scene when initialize()
+		// is called for the controller
+		// which gives?
+		// https://stackoverflow.com/questions/26060859/javafx-getting-scene-from-a-controller
+
+		/*
+		Scene scene = // this.fxmlEdit.getScene();
+				this.mainStage.getScene();
+		inputs = (Map<String, Object>) scene.getUserData();
+		inputData = (Map<String, String>) inputs.get("inputs");
+		logger.info("Controller loaded " + inputData.toString());
+		*/
+		logger.info("Controller loaded " + inputData.toString());
+		// https://stackoverflow.com/questions/19785130/javafx-event-when-objects-are-rendered
+		// NOTE: effectively shadow the ID
+		this.radioButtons.put(this.radioButtonID, "ID");
+		this.radioButtons.put(this.radioButtonCSS, "CSS");
+		this.radioButtons.put(this.radioButtonText, "Text");
+		this.radioButtons.put(this.radioButtonXPath, "XPath");
+		// https://stackoverflow.com/questions/13246211/javafx-how-to-get-stage-from-controller-during-initialization/30910015
+		if (this.radioButtonXPath != null) {
+			this.radioButtonXPath.setUserData(radioButtonUserData);
 		} else {
 			logger.info("radioButtonXPath is null");
 		}
@@ -175,8 +224,12 @@ public class DataFormControllerEx {
 			}
 			radioButtonUserData.clear();
 		}
+		this.locatorValues.put(this.textFieldID, "ID");
+		this.locatorValues.put(this.textFieldCSS, "CSS");
+		this.locatorValues.put(this.textFieldText, "Text");
+		this.locatorValues.put(this.textFieldXPath, "XPath");
 
-		for (TextField textField : locatorValues.keySet()) {
+		for (TextField textField : this.locatorValues.keySet()) {
 			Map<String, String> textFieldUserData = new HashMap<>();
 			textFieldUserData.put("key", locatorValues.get(textField));
 			if (textField != null) {
@@ -241,6 +294,7 @@ public class DataFormControllerEx {
 		} else {
 			logger.info("textFieldText is null");
 		}
+
 	}
 
 	@SuppressWarnings("restriction")
