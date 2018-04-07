@@ -20,7 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +35,7 @@ import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -48,7 +51,9 @@ import org.openqa.selenium.support.pagefactory.ByChained;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
 import org.openqa.selenium.support.ui.Select;
+import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.ITestResult;
 import org.testng.annotations.AfterMethod;
@@ -543,6 +548,115 @@ public class SuvianTest extends BaseTest {
 		highlight(checkBoxElement);
 		checkBoxElement.click();
 		sleep(500);
+		// Assert
+		assertTrue(checkBoxElement.isSelected());
+	}
+
+	// WebDriverWait constructor with WebElement
+	// http://automated-testing.info/t/kak-v-ec-presence-of-element-located-ukazat-chto-by-iskal-u-roditelya/19631/4
+	// https://sqa.stackexchange.com/questions/12866/how-fluentwait-is-different-from-webdriverwait?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+	@Test(enabled = true)
+	public void test5_2_1() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.5married_radio.html");
+
+		String label = "no";
+		WebElement formElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".intro-header .container .row .col-lg-12 .intro-message form"))));
+
+		String elementContents = formElement.getAttribute("outerHTML");
+
+		String line = new ArrayList<String>(
+				Arrays.asList(elementContents.split("<br/?>"))).stream()
+						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
+		String data = null;
+		if (matcher.find()) {
+			data = matcher.group(1);
+			System.err.println("Found checkbox value = " + data);
+		} else {
+			System.err.println("checkbox value not found");
+		}
+		final String checkboxValue = data;
+		assertThat(checkboxValue, notNullValue());
+
+		WebElement checkBoxElement = null;
+		// using flexible wait with a lambda is possible
+		// at a cost of giving up all Selenium ExpectedConditions
+		Wait<WebElement> waitElementChildren = new FluentWait<WebElement>(
+				formElement).withTimeout(flexibleWait, TimeUnit.SECONDS)
+						.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS)
+						.ignoring(NoSuchElementException.class);
+		checkBoxElement = waitElementChildren
+				.until(new Function<WebElement, WebElement>() {
+					public WebElement apply(WebElement parentElement) {
+						return parentElement
+								.findElements(By.cssSelector(String.format(
+										"input[name='married'][value='%s']", checkboxValue)))
+								.get(0);
+					}
+				});
+		// Assert
+		assertThat(checkBoxElement, notNullValue());
+		highlight(checkBoxElement);
+		checkBoxElement.click();
+		sleep(500);
+		// Assert
+		assertTrue(checkBoxElement.isSelected());
+	}
+
+	@Test(enabled = false)
+	public void test5_2_2() {
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.5married_radio.html");
+
+		String label = "no";
+		WebElement formElement = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".intro-header .container .row .col-lg-12 .intro-message form"))));
+
+		String elementContents = formElement.getAttribute("outerHTML");
+
+		String line = new ArrayList<String>(
+				Arrays.asList(elementContents.split("<br/?>"))).stream()
+						.filter(o -> o.toLowerCase().indexOf(label) > -1).findFirst().get();
+		Matcher matcher = Pattern.compile("value=\\\"([^\"]*)\\\"").matcher(line);
+		String checkboxValue = null;
+		if (matcher.find()) {
+			checkboxValue = matcher.group(1);
+			System.err.println("Found checkbox value = " + checkboxValue);
+		} else {
+			System.err.println("checkbox value not found");
+		}
+		WebElement checkBoxElement = null;
+		assertThat(checkboxValue, notNullValue());
+		try {
+			WebDriverWait waitElementChildrenBroken = new WebDriverWait(
+					(WebDriver) formElement, flexibleWait);
+			waitElementChildrenBroken.pollingEvery(pollingInterval,
+					TimeUnit.MILLISECONDS);
+			// act
+			checkBoxElement = waitElementChildrenBroken.until(ExpectedConditions
+					.visibilityOf(formElement.findElement(By.cssSelector(String
+							.format("input[name='married'][value='%s']", checkboxValue)))));
+			// act
+			checkBoxElement = waitElementChildrenBroken
+					.until(ExpectedConditions
+							.visibilityOfAllElementsLocatedBy(By.cssSelector(String
+									.format("input[name='married'][value='%s']", checkboxValue))))
+					.get(0);
+		} catch (ClassCastException e) {
+			// java.lang.ClassCastException:
+			// org.openqa.selenium.remote.RemoteWebElement cannot be cast to
+			// org.openqa.selenium.WebDriver
+			throw e;
+		}
+		// Assert
+		assertThat(checkBoxElement, notNullValue());
+		highlight(checkBoxElement);
+		checkBoxElement.click();
+		sleep(50000);
 		// Assert
 		assertTrue(checkBoxElement.isSelected());
 	}
