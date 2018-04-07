@@ -36,17 +36,12 @@ import javafx.stage.Window;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
-// NOTE: `Initializable` has been superseded by automatic injection 
-// https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/Initializable.html
 public class DataFormControllerEx {
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category
 			.getInstance(DataFormControllerEx.class);
 
-	// can not easily access stage ane perform getUserData() on it from
-	// predefined methods
-	// private Map<String, Object> inputs = new HashMap<>();
 	private Map<String, String> inputData = new HashMap<>();
 
 	public void setInputData(Map<String, String> inputData) {
@@ -82,9 +77,7 @@ public class DataFormControllerEx {
 	@SuppressWarnings("restriction")
 	@FXML
 	private AnchorPane topAnchorPane;
-	// Can not set example.DataFormControllerEx$TopAnchorPane field
-	// example.DataFormControllerEx.topAnchorPane to
-	// javafx.scene.layout.AnchorPane
+
 	@SuppressWarnings("restriction")
 	@FXML
 	private Button buttonDelete;
@@ -326,6 +319,21 @@ public class DataFormControllerEx {
 			logger.info("Nothing is selected");
 		}
 
+		Scene scene = mainStage.getScene();
+		logger
+				.info("Controller about to access main stage " + mainStage.toString());
+		@SuppressWarnings("unchecked")
+		Map<String, Object> results = (Map<String, Object>) scene.getUserData();
+		if (results != null) {
+			logger.info("Controller about to update " + results.toString());
+			Map<String, String> resultData = (Map<String, String>) results
+					.get("results");
+			// logger.info("Controller about to update " + inputData.toString());
+		} else {
+
+			logger.info("Controller see no inputs to update.");
+
+		}
 		switch (button.getId()) {
 		case "buttonSave":
 			break;

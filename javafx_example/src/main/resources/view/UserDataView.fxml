@@ -4,12 +4,9 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.layout.AnchorPane?>
-<!-- 
-<TopAnchorPane fx:id="topAnchorPane"  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" prefHeight="372.0" prefWidth="640.0" fx:controller="example.DataFormControllerEx">
--->
 <AnchorPane fx:id="topAnchorPane"  xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" prefHeight="372.0" prefWidth="640.0" fx:controller="example.DataFormControllerEx">
   <children>
-    <SplitPane dividerPositions="0.29797979797979796" layoutX="131.0" layoutY="60.0" prefHeight="313.0" prefWidth="640.0" AnchorPane.bottomAnchor="102.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <SplitPane dividerPositions="0.3" layoutX="131.0" layoutY="60.0" prefHeight="313.0" prefWidth="640.0" AnchorPane.bottomAnchor="102.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
       <items>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
           <children>

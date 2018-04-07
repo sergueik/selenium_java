@@ -125,7 +125,7 @@ public class FlowPaneEx extends Application {
 				getClass().getClassLoader().getResourceAsStream("codegen_32.png"));
 		generateButton.setGraphic(new ImageView(generateImage));
 		generateButton.setTooltip(new Tooltip("Generate program"));
-		
+
 		generateButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -140,10 +140,21 @@ public class FlowPaneEx extends Application {
 
 				// See also:
 				// http://java-buddy.blogspot.com/2016/06/read-csv-run-in-background-thread-and.html
-				DataFormEx dataFormEx =  new DataFormEx();
+				DataFormEx dataFormEx = new DataFormEx();
 				// dataFormEx.setScene(scene);
 				try {
 					dataFormEx.start(new Stage());
+					// TODO: block in a SWT fashion?
+					// https://docs.oracle.com/javafx/2/swt_interoperability/jfxpub-swt_interoperability.htm
+					/*
+					 while (!shell.isDisposed()) {
+					if (!display.readAndDispatch())
+					display.sleep();
+					}
+					 */
+					Map<String, String> data = dataFormEx.getInputData();
+					logger.info("Get data from dataFormEx " + data.toString());
+
 				} catch (Exception e) {
 				}
 			}

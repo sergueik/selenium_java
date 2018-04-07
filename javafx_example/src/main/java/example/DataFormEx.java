@@ -38,6 +38,7 @@ public class DataFormEx extends Application {
 		this.callerScene = callerScene;
 	}
 
+	@SuppressWarnings("restriction")
 	ToggleGroup group;
 
 	@Override
@@ -73,7 +74,6 @@ public class DataFormEx extends Application {
 			inputData = new HashMap<>();
 			inputData.put("dummy", "42");
 			inputData.put("title", "Element details");
-
 		}
 		if (inputData.keySet().size() == 0) {
 			throw new IllegalArgumentException("You must provide data");
@@ -92,6 +92,7 @@ public class DataFormEx extends Application {
 
 	}
 
+	@SuppressWarnings("restriction")
 	public void showUserDataView() throws IOException {
 		loader = new FXMLLoader();
 		// Exception: javafx.fxml.LoadException: Root value already specified.
@@ -100,11 +101,29 @@ public class DataFormEx extends Application {
 
 		DataFormControllerEx controller = (DataFormControllerEx) loader
 				.getController();
+		logger.info("Setting main stage " + primaryStage.toString());
 		controller.setMainStage(primaryStage); // or what you want to do
+		Map<String, String> resultData = new HashMap<>();
+		resultData.put("field1", "value1");
+		resultData.put("dummy", "42");
+		resultData.put("title", "placeholder");
+		Map<String, Map> results = new HashMap<>();
+		results.put("results", resultData); // TODO: JSON
+
+		logger.info("Set data for Controller to update " + resultData.toString());
+		primaryStage.getScene().setUserData(results);
 		controller.setInputData(inputData);
 	}
 
 	public Stage getPrimaryStage() {
 		return primaryStage;
+	}
+
+	public void setInputData(Map<String, String> inputData) {
+		this.inputData = inputData;
+	}
+
+	public Map<String, String> getInputData() {
+		return this.inputData;
 	}
 }
