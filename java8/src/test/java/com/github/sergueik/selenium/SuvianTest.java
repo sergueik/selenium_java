@@ -552,8 +552,7 @@ public class SuvianTest extends BaseTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	// WebDriverWait constructor with WebElement
-	// http://automated-testing.info/t/kak-v-ec-presence-of-element-located-ukazat-chto-by-iskal-u-roditelya/19631/4
+	// FluentWait constructor with parent / child WebElement
 	// https://sqa.stackexchange.com/questions/12866/how-fluentwait-is-different-from-webdriverwait?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
 	@Test(enabled = true)
 	public void test5_2_1() {
@@ -606,7 +605,8 @@ public class SuvianTest extends BaseTest {
 		assertTrue(checkBoxElement.isSelected());
 	}
 
-	@Test(enabled = false)
+	// http://automated-testing.info/t/kak-v-ec-presence-of-element-located-ukazat-chto-by-iskal-u-roditelya/19631/7
+	@Test(enabled = true)
 	public void test5_2_2() {
 		// Arrange
 		driver.get("http://suvian.in/selenium/1.5married_radio.html");
@@ -631,32 +631,37 @@ public class SuvianTest extends BaseTest {
 		}
 		WebElement checkBoxElement = null;
 		assertThat(checkboxValue, notNullValue());
-		try {
-			WebDriverWait waitElementChildrenBroken = new WebDriverWait(
-					(WebDriver) formElement, flexibleWait);
-			waitElementChildrenBroken.pollingEvery(pollingInterval,
-					TimeUnit.MILLISECONDS);
-			// act
-			checkBoxElement = waitElementChildrenBroken.until(ExpectedConditions
-					.visibilityOf(formElement.findElement(By.cssSelector(String
-							.format("input[name='married'][value='%s']", checkboxValue)))));
-			// act
-			checkBoxElement = waitElementChildrenBroken
-					.until(ExpectedConditions
-							.visibilityOfAllElementsLocatedBy(By.cssSelector(String
-									.format("input[name='married'][value='%s']", checkboxValue))))
-					.get(0);
-		} catch (ClassCastException e) {
-			// java.lang.ClassCastException:
-			// org.openqa.selenium.remote.RemoteWebElement cannot be cast to
-			// org.openqa.selenium.WebDriver
-			throw e;
-		}
+		// Selenium ExpectedConditions has all likes of weird named static methods,
+		// few of which may be used for our purposes
+		// http://javadox.com/org.seleniumhq.selenium/selenium-support/2.53.0/org/openqa/selenium/support/ui/ExpectedConditions.html
+		// act
+		// pass form element and checkbox selector
+		checkBoxElement = wait
+				.until(
+						ExpectedConditions.visibilityOfNestedElementsLocatedBy(formElement,
+								By.cssSelector(String.format(
+										"input[name='married'][value='%s']", checkboxValue))))
+				.get(0);
+		assertThat(checkBoxElement, notNullValue());
+		System.err.println(
+				"Found checkbox value : " + checkBoxElement.getAttribute("value"));
+		highlight(checkBoxElement);
+		// act
+		// pass the form selector and check box selector
+		checkBoxElement = wait
+				.until(ExpectedConditions.visibilityOfNestedElementsLocatedBy(
+						By.cssSelector(
+								".intro-header .container .row .col-lg-12 .intro-message form"),
+						By.cssSelector(String.format("input[name='married'][value='%s']",
+								checkboxValue))))
+				.get(0);
 		// Assert
 		assertThat(checkBoxElement, notNullValue());
+		System.err.println(
+				"Found checkbox value : " + checkBoxElement.getAttribute("value"));
 		highlight(checkBoxElement);
 		checkBoxElement.click();
-		sleep(50000);
+		sleep(500);
 		// Assert
 		assertTrue(checkBoxElement.isSelected());
 	}
