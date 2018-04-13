@@ -1,16 +1,17 @@
 @Grapes([
     @Grab(group = 'com.google.code.gson', module = 'gson', version = '2.4'),
-    @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.3.2'),
+    @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.4'),
+    // java.lang.ClassNotFoundException: org.apache.http.ssl.SSLContexts
     @Grab(group = 'org.gebish', module = 'geb-core', version = '0.9.3'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-chrome-driver', version = '[2.43.0,2.44.0)'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-firefox-driver', version = '[2.43.0,2.44.0)'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-remote-driver', version = '[2.43.0,2.44.0)'),
-    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-support', version = '[2.43.0,2.44.0)'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-chrome-driver', version = '2.53.1'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-firefox-driver', version = '2.53.1'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-remote-driver', version = '2.53.1'),
+    @Grab(group = 'org.seleniumhq.selenium', module = 'selenium-support', version = '2.53.1'),
     @GrabExclude('xerces:xercesImpl'),
     @GrabExclude('xml-apis:xml-apis'),
 ])
 
-// default 
+// default
 // ~/.groovy/grapes/org.gebish/geb-core/jars/geb-core-0.9.3.jar
 
 import groovy.grape.Grape
