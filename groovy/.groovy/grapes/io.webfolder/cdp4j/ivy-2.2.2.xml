@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
+	<info organisation="io.webfolder" module="cdp4j" revision="2.2.2" status="release" publication="20180221112809">
+		<license name="GNU Affero General Public License" url="https://github.com/webfolderio/cdp4j/blob/master/LICENSE"/>
+		<description homepage="https://webfolder.io">
+		cdp4j - Chrome DevTools Protocol for Java
+		</description>
+		<m:properties__project.build.sourceEncoding>utf-8</m:properties__project.build.sourceEncoding>
+		<m:maven.plugins>null__maven-compiler-plugin__3.7.0|null__maven-shade-plugin__3.0.0|com.mycila__license-maven-plugin__3.0|null__maven-source-plugin__3.0.1|null__maven-javadoc-plugin__2.10.4|org.jacoco__jacoco-maven-plugin__0.7.9|org.sonatype.plugins__nexus-staging-maven-plugin__1.6.7|null__maven-gpg-plugin__1.5</m:maven.plugins>
+	</info>
+	<configurations>
+		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
+		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
+		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
+		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
+		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
+		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
+		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
+		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
+		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
+		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
+	</configurations>
+	<publications>
+		<artifact name="cdp4j" type="jar" ext="jar" conf="master"/>
+		<artifact name="cdp4j" type="source" ext="jar" conf="sources" m:classifier="sources"/>
+		<artifact name="cdp4j" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
+	</publications>
+	<dependencies>
+		<dependency org="org.jvnet.winp" name="winp" rev="1.25" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="com.squareup" name="javapoet" rev="1.9.0" force="true" conf="test->runtime(*),master(*)"/>
+		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.25" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
+		<dependency org="com.jcabi" name="jcabi-ssh" rev="1.6" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)">
+			<exclude org="com.jcabi" module="jcabi-aspects" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.jcabi" module="jcabi-log" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="org.apache.commons" module="commons-lang3" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="org.cactoos" module="cactoos" name="*" type="*" ext="*" conf="" matcher="exact"/>
+			<exclude org="com.jcraft" module="jsch" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="ch.qos.logback" name="logback-classic" rev="1.2.3" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="ch.qos.logback" module="logback-core" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="junit" name="junit" rev="4.12" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="org.hamcrest" module="hamcrest-core" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+		<dependency org="uk.com.robust-it" name="cloning" rev="1.9.5" force="true" conf="test->runtime(*),master(*)">
+			<exclude org="org.objenesis" module="objenesis" name="*" type="*" ext="*" conf="" matcher="exact"/>
+		</dependency>
+	</dependencies>
+</ivy-module>
