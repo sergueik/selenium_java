@@ -36,9 +36,8 @@ public class HeadlessFirefoxSeleniumExample {
 	private static Map<String, String> propertiesMap = new HashMap<>();
 
 	public static void main(String[] args) {
-		propertiesMap = PropertiesParser
-				.getProperties(String.format("%s/src/main/resources/%s",
-						System.getProperty("user.dir"), propertiesFileName));
+		propertiesMap = PropertiesParser.getProperties(
+				String.format("%s/src/main/resources/%s", System.getProperty("user.dir"), propertiesFileName));
 
 		// https://www.programcreek.com/java-api-examples/?api=org.openqa.selenium.firefox.FirefoxBinary
 		FirefoxProfile firefoxProfile = new FirefoxProfile();
@@ -51,12 +50,10 @@ public class HeadlessFirefoxSeleniumExample {
 		 * File(firefoxBrowserProfile.getFirefoxBinInstallPath())); } catch
 		 * (Exception e) { }
 		 */
-		// TODO: convert to cmdline parameter
+		// TODO: convert to command line parameter
 		firefoxBinary.addCommandLineOptions("--headless");
-		String browserDriver = (propertiesMap
-				.get(browserDrivers.get("browser")) != null)
-						? propertiesMap.get(browserDrivers.get("browser"))
-						: "/home/sergueik/Downloads/geckodriver";
+		String browserDriver = (propertiesMap.get(browserDrivers.get("browser")) != null)
+				? propertiesMap.get(browserDrivers.get("browser")) : "/home/sergueik/Downloads/geckodriver";
 		System.setProperty("webdriver.gecko.driver", browserDriver);
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setBinary(firefoxBinary);
@@ -66,32 +63,41 @@ public class HeadlessFirefoxSeleniumExample {
 			driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 			WebElement queryBox = driver.findElement(By.name("q"));
 			queryBox.sendKeys("headless firefox");
-			WebElement searchBtn = driver.findElement(By.name("btnK"));
+			WebElement searchButtonnStatic = driver.findElement(By.name("btnK"));
+
 			try {
-				searchBtn.click();
+				// if the script performing Google search is running slowly
+				// enough search suggestions are found to pupulate the dropdown
+				// and the page renders a new search button inside the dropdown
+				// and hides the original search button
+				WebElement searchButtonnDynamic = driver
+						.findElement(By.cssSelector("span.ds:nth-child(1) > span.lsbb:nth-child(1) > input.lsb"));
+				if (searchButtonnDynamic != null) {
+					System.err.println("clicking the dynamic search button");
+					searchButtonnDynamic.click();
+				} else {
+					System.err.println("clicking the static search button");
+					searchButtonnStatic.click();
+				}
 				WebElement iresDiv = driver.findElement(By.id("ires"));
 				iresDiv.findElements(By.tagName("a")).get(0).click();
-				System.out.println("Response: " + driver.getPageSource());
+				System.err.println("Response: " + driver.getPageSource().substring(0, 120) + "...");
 			} catch (WebDriverException e) {
 				System.err.println("Excepion (ignored) " + e.toString());
-				// sporadic exceptions, in headless mode when there is avisible Firefox browser opened on the same desktop and has got focus whle test is run
+				// Without using dynamic search button,
+				// approximately 1/3 (in headless mode, at least )
+				// of the test runs result in exception
 				// Element <input name="btnK" type="submit"> is not clickable at
-				// point (607,411) because another element <b> obscures it
-				// ExceptionHandler::GenerateDump cloned child 4157
-				// ExceptionHandler::SendContinueSignalToChild sent continue signal to child
-				// ExceptionHandler::WaitForContinueSignal waiting for continue signal...
-// take screenshot in catch block.
+				// point (607,411) because another element <div class="sbqs_c">
+				// obscures it (the name of obscuring element varies)
 				try {
+					// take screenshot in catch block.
 					System.err.println("Taking a screenshot");
-					// take a screenshot
-					File scrFile = ((TakesScreenshot) driver)
-							.getScreenshotAs(OutputType.FILE);
+					File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 					String currentDir = System.getProperty("user.dir");
-					// save the screenshot in png format on the disk.
-					FileUtils.copyFile(scrFile,
-							new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+					FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
 				} catch (IOException ex) {
-				System.err.println("Excepion when taking the screenshot (ignored) " + ex.toString());
+					System.err.println("Excepion when taking the screenshot (ignored) " + ex.toString());
 					// ignore
 				}
 			}
