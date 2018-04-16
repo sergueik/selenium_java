@@ -64,7 +64,8 @@ public class FirefoxBrowserProfile {
 				line = line.trim();
 				if (!"".equals(line)) {
 					if ((line.startsWith("[")) && (line.endsWith("]"))) {
-						if ((this.itemsMap.size() > 0) && (!"".equals(this.currentSection.trim()))) {
+						if ((this.itemsMap.size() > 0)
+								&& (!"".equals(this.currentSection.trim()))) {
 							this.sectionsMap.put(this.currentSection, this.itemsMap);
 						}
 						this.currentSection = "";
@@ -102,11 +103,12 @@ public class FirefoxBrowserProfile {
 		if (this.sectionsMap.isEmpty()) {
 			return null;
 		}
-		Map<String, String> map = (Map<String, String>) this.sectionsMap.get(section);
+		Map<String, String> map = (Map<String, String>) this.sectionsMap
+				.get(section);
 		if (map == null) {
 			return "No such section:" + section;
 		}
-		String value = (String) map.get(item);
+		String value = map.get(item);
 		if (value == null) {
 			return "No such item:" + item;
 		}
@@ -119,11 +121,11 @@ public class FirefoxBrowserProfile {
 		}
 		for (String itr : this.sectionsMap.keySet()) {
 			if (itr.contains("Profile")) {
-				HashMap<String, String> item = (HashMap<String, String>) this.sectionsMap.get(itr);
+				HashMap<String, String> item = this.sectionsMap.get(itr);
 				if (item.containsKey("Default")) {
-					String strDefault = (String) item.get("Default");
-					String isRelative = (String) item.get("IsRelative");
-					String path = (String) item.get("Path");
+					String strDefault = item.get("Default");
+					String isRelative = item.get("IsRelative");
+					String path = item.get("Path");
 					if (strDefault.equals("1")) {
 						if (isRelative.equals("1")) {
 							this.strDefaultProfilePath = (this.strFirefoxPath + "/" + path);
@@ -132,8 +134,8 @@ public class FirefoxBrowserProfile {
 						}
 					}
 				} else if (item.containsKey("IsRelative")) {
-					String isRelative = (String) item.get("IsRelative");
-					String path = (String) item.get("Path");
+					String isRelative = item.get("IsRelative");
+					String path = item.get("Path");
 					if (isRelative.equals("1")) {
 						this.strDefaultProfilePath = (this.strFirefoxPath + "/" + path);
 					} else {
@@ -151,12 +153,14 @@ public class FirefoxBrowserProfile {
 			loadData(this.strProfilesIniPath);
 		}
 		String sParentPath = getDefaultProfilesPath();
-		File compatibilityFile = new File(new File(sParentPath), "compatibility.ini");
+		File compatibilityFile = new File(new File(sParentPath),
+				"compatibility.ini");
 
 		String firefoxPath = null;
 		try {
 			if ((compatibilityFile.isFile())) {
-				BufferedReader br = new BufferedReader(new FileReader(compatibilityFile));
+				BufferedReader br = new BufferedReader(
+						new FileReader(compatibilityFile));
 
 				String s = null;
 				while ((s = br.readLine()) != null) {
