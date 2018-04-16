@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="io.webfolder" module="cdp4j" revision="2.2.2" status="release" publication="20180221112809">
-		<license name="GNU Affero General Public License" url="https://github.com/webfolderio/cdp4j/blob/master/LICENSE"/>
+	<info organisation="io.webfolder"
+		module="cdp4j"
+		revision="2.2.2"
+		status="release"
+		publication="20180220115325"
+	>
+		<license name="GNU Affero General Public License" url="https://github.com/webfolderio/cdp4j/blob/master/LICENSE" />
 		<description homepage="https://webfolder.io">
 		cdp4j - Chrome DevTools Protocol for Java
 		</description>

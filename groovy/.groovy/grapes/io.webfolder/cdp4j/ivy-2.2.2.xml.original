@@ -1,54 +1,293 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ivy-module version="2.0" xmlns:m="http://ant.apache.org/ivy/maven">
-	<info organisation="io.webfolder"
-		module="cdp4j"
-		revision="2.2.2"
-		status="release"
-		publication="20180221112809"
-	>
-		<license name="GNU Affero General Public License" url="https://github.com/webfolderio/cdp4j/blob/master/LICENSE" />
-		<description homepage="https://webfolder.io">
-		cdp4j - Chrome DevTools Protocol for Java
-		</description>
-		<m:properties__project.build.sourceEncoding>utf-8</m:properties__project.build.sourceEncoding>
-		<m:maven.plugins>null__maven-compiler-plugin__3.7.0|null__maven-shade-plugin__3.0.0|com.mycila__license-maven-plugin__3.0|null__maven-source-plugin__3.0.1|null__maven-javadoc-plugin__2.10.4|org.jacoco__jacoco-maven-plugin__0.7.9|org.sonatype.plugins__nexus-staging-maven-plugin__1.6.7|null__maven-gpg-plugin__1.5</m:maven.plugins>
-	</info>
-	<configurations>
-		<conf name="default" visibility="public" description="runtime dependencies and master artifact can be used with this conf" extends="runtime,master"/>
-		<conf name="master" visibility="public" description="contains only the artifact published by this module itself, with no transitive dependencies"/>
-		<conf name="compile" visibility="public" description="this is the default scope, used if none is specified. Compile dependencies are available in all classpaths."/>
-		<conf name="provided" visibility="public" description="this is much like compile, but indicates you expect the JDK or a container to provide it. It is only available on the compilation classpath, and is not transitive."/>
-		<conf name="runtime" visibility="public" description="this scope indicates that the dependency is not required for compilation, but is for execution. It is in the runtime and test classpaths, but not the compile classpath." extends="compile"/>
-		<conf name="test" visibility="private" description="this scope indicates that the dependency is not required for normal use of the application, and is only available for the test compilation and execution phases." extends="runtime"/>
-		<conf name="system" visibility="public" description="this scope is similar to provided except that you have to provide the JAR which contains it explicitly. The artifact is always available and is not looked up in a repository."/>
-		<conf name="sources" visibility="public" description="this configuration contains the source artifact of this module, if any."/>
-		<conf name="javadoc" visibility="public" description="this configuration contains the javadoc artifact of this module, if any."/>
-		<conf name="optional" visibility="public" description="contains all optional dependencies"/>
-	</configurations>
-	<publications>
-		<artifact name="cdp4j" type="jar" ext="jar" conf="master"/>
-		<artifact name="cdp4j" type="source" ext="jar" conf="sources" m:classifier="sources"/>
-		<artifact name="cdp4j" type="javadoc" ext="jar" conf="javadoc" m:classifier="javadoc"/>
-	</publications>
-	<dependencies>
-		<dependency org="org.jvnet.winp" name="winp" rev="1.25" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
-		<dependency org="com.squareup" name="javapoet" rev="1.9.0" force="true" conf="test->runtime(*),master(*)"/>
-		<dependency org="org.slf4j" name="slf4j-api" rev="1.7.25" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)"/>
-		<dependency org="com.jcabi" name="jcabi-ssh" rev="1.6" force="true" conf="provided->compile(*),provided(*),runtime(*),master(*)">
-			<exclude org="com.jcabi" module="jcabi-aspects" name="*" type="*" ext="*" conf="" matcher="exact"/>
-			<exclude org="com.jcabi" module="jcabi-log" name="*" type="*" ext="*" conf="" matcher="exact"/>
-			<exclude org="org.apache.commons" module="commons-lang3" name="*" type="*" ext="*" conf="" matcher="exact"/>
-			<exclude org="org.cactoos" module="cactoos" name="*" type="*" ext="*" conf="" matcher="exact"/>
-			<exclude org="com.jcraft" module="jsch" name="*" type="*" ext="*" conf="" matcher="exact"/>
-		</dependency>
-		<dependency org="ch.qos.logback" name="logback-classic" rev="1.2.3" force="true" conf="test->runtime(*),master(*)">
-			<exclude org="ch.qos.logback" module="logback-core" name="*" type="*" ext="*" conf="" matcher="exact"/>
-		</dependency>
-		<dependency org="junit" name="junit" rev="4.12" force="true" conf="test->runtime(*),master(*)">
-			<exclude org="org.hamcrest" module="hamcrest-core" name="*" type="*" ext="*" conf="" matcher="exact"/>
-		</dependency>
-		<dependency org="uk.com.robust-it" name="cloning" rev="1.9.5" force="true" conf="test->runtime(*),master(*)">
-			<exclude org="org.objenesis" module="objenesis" name="*" type="*" ext="*" conf="" matcher="exact"/>
-		</dependency>
-	</dependencies>
-</ivy-module>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>io.webfolder</groupId>
+  <artifactId>cdp4j</artifactId>
+  <name>cdp4j</name>
+  <version>2.2.2</version>
+  <description>cdp4j - Chrome DevTools Protocol for Java</description>
+  <url>https://webfolder.io</url>
+  <inceptionYear>2017</inceptionYear>
+  <developers>
+    <developer>
+      <name>WebFolder</name>
+      <email>support@webfolder.io</email>
+      <url>https://webfolder.io</url>
+      <organization>WebFolder OÜ</organization>
+      <organizationUrl>https://webfolder.io</organizationUrl>
+      <timezone>GMT+2</timezone>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU Affero General Public License</name>
+      <url>https://github.com/webfolderio/cdp4j/blob/master/LICENSE</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://github.com/webfolderio/cdp4j.git</url>
+  </scm>
+  <organization>
+    <name>WebFolder OÜ</name>
+    <url>https://webfolder.io</url>
+  </organization>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.7.0</version>
+        <configuration>
+          <source>1.8</source>
+          <target>1.8</target>
+          <compilerArgs>
+            <arg>-parameters</arg>
+          </compilerArgs>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.0.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <createSourcesJar>true</createSourcesJar>
+          <filters>
+            <filter>
+              <artifact>com.neovisionaries:nv-websocket-client</artifact>
+              <excludes>
+                <exclude>com/neovisionaries/ws/client/WebSocketOutputStream.class</exclude>
+                <exclude>com/neovisionaries/ws/client/WebSocketInputStream.class</exclude>
+              </excludes>
+            </filter>
+          </filters>
+          <transformers>
+            <transformer />
+            <transformer>
+              <manifestEntries>
+                <Automatic-Module-Name>io.webfolder.cdp4j</Automatic-Module-Name>
+                <Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+                <Bundle-Name>${project.name}</Bundle-Name>
+                <Bundle-Description>cdp4j - Chrome DevTools Protocol for Java</Bundle-Description>
+                <Bundle-Version>${project.version}</Bundle-Version>
+                <Built-By>WebFolder OÜ</Built-By>
+              </manifestEntries>
+            </transformer>
+          </transformers>
+          <relocations>
+            <relocation>
+              <pattern>com.google.gson</pattern>
+              <shadedPattern>io.webfolder.cdp.internal.gson</shadedPattern>
+            </relocation>
+            <relocation>
+              <pattern>com.neovisionaries.ws.client</pattern>
+              <shadedPattern>io.webfolder.cdp.internal.ws</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mycila</groupId>
+        <artifactId>license-maven-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <header>com/mycila/maven/plugin/license/templates/AGPL-3.txt</header>
+          <properties>
+            <owner>WebFolder OÜ</owner>
+            <email>support@webfolder.io</email>
+          </properties>
+          <excludes>
+            <exclude>README</exclude>
+            <exclude>COPYING.md</exclude>
+            <exclude>LICENSE</exclude>
+            <exclude>pom.xml</exclude>
+            <exclude>circle.yml</exclude>
+            <exclude>_config.yml</exclude>
+            <exclude>src/test/resources/**</exclude>
+            <exclude>src/main/resources/**</exclude>
+            <exclude>appveyor.yml</exclude>
+            <exclude>src/main/java/com/neovisionaries/ws/client/WebSocketInputStream.java</exclude>
+            <exclude>src/main/java/com/neovisionaries/ws/client/WebSocketOutputStream.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.0.1</version>
+        <executions>
+          <execution>
+            <id>generate-sources-for-shade-plugin</id>
+            <phase>package</phase>
+            <goals>
+              <goal>jar-no-fork</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <configuration>
+              <failOnError>false</failOnError>
+              <additionalparam>-Xdoclint:none</additionalparam>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.9</version>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.7</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>1.5</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.jvnet.winp</groupId>
+      <artifactId>winp</artifactId>
+      <version>1.25</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.squareup</groupId>
+      <artifactId>javapoet</artifactId>
+      <version>1.9.0</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.7.25</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.jcabi</groupId>
+      <artifactId>jcabi-ssh</artifactId>
+      <version>1.6</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jcabi-aspects</artifactId>
+          <groupId>com.jcabi</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jcabi-log</artifactId>
+          <groupId>com.jcabi</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-lang3</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>cactoos</artifactId>
+          <groupId>org.cactoos</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>jsch</artifactId>
+          <groupId>com.jcraft</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>1.2.3</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>logback-core</artifactId>
+          <groupId>ch.qos.logback</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>hamcrest-core</artifactId>
+          <groupId>org.hamcrest</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>uk.com.robust-it</groupId>
+      <artifactId>cloning</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>objenesis</artifactId>
+          <groupId>org.objenesis</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+  <distributionManagement>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+    </repository>
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+  <properties>
+    <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+  </properties>
+</project>
+
