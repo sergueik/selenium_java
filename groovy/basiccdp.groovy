@@ -1,11 +1,11 @@
 @Grapes([
-  @Grab(group = 'com.google.code.gson', module = 'gson', version = '2.7'),
-  @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.4'),
+  // @Grab(group = 'com.google.code.gson', module = 'gson', version = '2.7'),
+  //  @Grab(group = 'org.apache.httpcomponents', module = 'httpcore', version = '4.4'),
   // java.lang.ClassNotFoundException: org.apache.http.ssl.SSLContexts
-  @Grab(group = 'org.gebish', module = 'geb-core', version = '0.9.3'),
+  // @Grab(group = 'org.gebish', module = 'geb-core', version = '0.9.3'),
   @Grab(group = 'io.webfolder', module = 'cdp4j', version = '2.2.2'), // 2.1.5
-  @GrabExclude('xerces:xercesImpl'),
-  @GrabExclude('xml-apis:xml-apis'),
+  // @GrabExclude('xerces:xercesImpl'),
+  // @GrabExclude('xml-apis:xml-apis'),
 ])
 
 import groovy.grape.Grape

@@ -59,3 +59,21 @@ with the following file layout for each jar directory:
 
 ```
 (total or 88 jars).
+
+
+### CDP Project
+
+Instead of Selenium one may use [Java client of Chrome DevTools Protocol](https://github.com/webfolderio/cdp4j).
+
+This leads to significant reduction in the number of depenencies;
+```shell
+~/.groovy/grapes
+~/.groovy/grapes/io.webfolder
+~/.groovy/grapes/io.webfolder/cdp4j
+~/.groovy/grapes/io.webfolder/cdp4j/ivy-2.2.2.xml
+~/.groovy/grapes/io.webfolder/cdp4j/ivy-2.2.2.xml.original
+~/.groovy/grapes/io.webfolder/cdp4j/ivydata-2.2.2.properties
+~/.groovy/grapes/io.webfolder/cdp4j/jars
+~/.groovy/grapes/io.webfolder/cdp4j/jars/cdp4j-2.2.2.jar
+
+```
