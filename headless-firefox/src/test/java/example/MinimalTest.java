@@ -50,7 +50,7 @@ import com.mozilla.example.PropertiesParser;
 
 public class MinimalTest {
 
-	public static WebDriver driver;
+	public static FirefoxDriver driver;
 	private static String osName = getOsName();
 	static Map<String, String> browserDrivers = new HashMap<>();
 	static {
@@ -67,9 +67,8 @@ public class MinimalTest {
 	public static void setup() throws IOException {
 		getOsName();
 
-		propertiesMap = PropertiesParser
-				.getProperties(String.format("%s/src/main/resources/%s",
-						System.getProperty("user.dir"), propertiesFileName));
+		propertiesMap = PropertiesParser.getProperties(
+				String.format("%s/src/main/resources/%s", System.getProperty("user.dir"), propertiesFileName));
 
 		// https://www.programcreek.com/java-api-examples/?api=org.openqa.selenium.firefox.FirefoxBinary
 		FirefoxProfile firefoxProfile = new FirefoxProfile();
@@ -87,23 +86,20 @@ public class MinimalTest {
 		// size argument appears to be ignored
 		firefoxBinary.addCommandLineOptions("--window-size=320,200");
 
-		String browserDriver = (propertiesMap
-				.get(browserDrivers.get("browser")) != null)
-						? propertiesMap.get(browserDrivers.get("browser")) :
-						// assuming browser is firefox
-						osName.equals("windows")
-								? (new File("c:/java/selenium/geckodriver.exe"))
-										.getAbsolutePath()
-								: "/home/sergueik/Downloads/geckodriver";
+		String browserDriver = (propertiesMap.get(browserDrivers.get("browser")) != null)
+				? propertiesMap.get(browserDrivers.get("browser")) :
+				// assuming browser is firefox
+				osName.equals("windows") ? (new File("c:/java/selenium/geckodriver.exe")).getAbsolutePath()
+						: "/home/sergueik/Downloads/geckodriver";
 		System.setProperty("webdriver.gecko.driver", browserDriver);
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setBinary(firefoxBinary);
-		FirefoxDriver driver = new FirefoxDriver(firefoxOptions);
+		driver = new FirefoxDriver(firefoxOptions);
 		// dynamicSearchButtonTest
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChromeDriver() throws Exception {
 		assertThat(driver, notNullValue());
@@ -111,7 +107,6 @@ public class MinimalTest {
 
 	@Test
 	public void dynamicSearchButtonTest() {
-
 		try {
 			driver.get("http://www.google.com");
 			WebElement queryBox = driver.findElement(By.name("q"));
@@ -122,8 +117,8 @@ public class MinimalTest {
 			// enough search suggestions are found and the dropdown is pupulated
 			// and hides the original search button
 			// the page renders a new search button inside the dropdown
-			WebElement searchButtonnDynamic = driver.findElement(By.cssSelector(
-					"span.ds:nth-child(1) > span.lsbb:nth-child(1) > input.lsb"));
+			WebElement searchButtonnDynamic = driver
+					.findElement(By.cssSelector("span.ds:nth-child(1) > span.lsbb:nth-child(1) > input.lsb"));
 			if (searchButtonnDynamic != null) {
 				System.err.println("clicking the dynamic search button");
 				searchButtonnDynamic.click();
@@ -133,8 +128,7 @@ public class MinimalTest {
 			}
 			WebElement iresDiv = driver.findElement(By.id("ires"));
 			iresDiv.findElements(By.tagName("a")).get(0).click();
-			System.err.println(
-					"Response: " + driver.getPageSource().substring(0, 120) + "...");
+			System.err.println("Response: " + driver.getPageSource().substring(0, 120) + "...");
 		} catch (WebDriverException e) {
 			System.err.println("Excepion (ignored) " + e.toString());
 			// Without using dynamic search button,
@@ -146,26 +140,21 @@ public class MinimalTest {
 			try {
 				// take screenshot in catch block.
 				System.err.println("Taking a screenshot");
-				File scrFile = ((TakesScreenshot) driver)
-						.getScreenshotAs(OutputType.FILE);
+				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
 			} catch (IOException ex) {
-				System.err.println(
-						"Excepion when taking the screenshot (ignored) " + ex.toString());
+				System.err.println("Excepion when taking the screenshot (ignored) " + ex.toString());
 				// ignore
 			}
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void Test() {
 		driver.navigate().to("https://ya.ru/");
-		WebElement element = driver
-				.findElements(
-						By.cssSelector("div.search2__button > button > span.button__text"))
+		WebElement element = driver.findElements(By.cssSelector("div.search2__button > button > span.button__text"))
 				.get(0);
 		final String text = element.getAttribute("outerHTML");
 		System.err.println("Text: " + text);
@@ -179,14 +168,11 @@ public class MinimalTest {
 			try {
 				// take screenshot in teardown.
 				System.err.println("Taking a screenshot");
-				File scrFile = ((TakesScreenshot) driver)
-						.getScreenshotAs(OutputType.FILE);
+				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
 			} catch (IOException ex) {
-				System.err.println(
-						"Excepion when taking the screenshot (ignored) " + ex.toString());
+				System.err.println("Excepion when taking the screenshot (ignored) " + ex.toString());
 				// ignore
 			}
 			driver.quit();
