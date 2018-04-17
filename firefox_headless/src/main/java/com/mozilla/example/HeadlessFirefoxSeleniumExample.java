@@ -25,6 +25,8 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 // https://blog.mozilla.org/firefox/profiles-shmofiles-whats-browser-profile-anyway/
 public class HeadlessFirefoxSeleniumExample {
 	static Map<String, String> browserDrivers = new HashMap<>();
+	private static String osName = getOsName();
+
 	static {
 		browserDrivers.put("chrome", "chromeDriverPath");
 		browserDrivers.put("firefox", "geckoDriverPath");
@@ -36,8 +38,9 @@ public class HeadlessFirefoxSeleniumExample {
 	private static Map<String, String> propertiesMap = new HashMap<>();
 
 	public static void main(String[] args) {
-		propertiesMap = PropertiesParser.getProperties(
-				String.format("%s/src/main/resources/%s", System.getProperty("user.dir"), propertiesFileName));
+		propertiesMap = PropertiesParser
+				.getProperties(String.format("%s/src/main/resources/%s",
+						System.getProperty("user.dir"), propertiesFileName));
 
 		// https://www.programcreek.com/java-api-examples/?api=org.openqa.selenium.firefox.FirefoxBinary
 		FirefoxProfile firefoxProfile = new FirefoxProfile();
@@ -52,12 +55,22 @@ public class HeadlessFirefoxSeleniumExample {
 		 */
 		// TODO: convert to command line parameter
 		firefoxBinary.addCommandLineOptions("--headless");
-		String browserDriver = (propertiesMap.get(browserDrivers.get("browser")) != null)
-				? propertiesMap.get(browserDrivers.get("browser")) : "/home/sergueik/Downloads/geckodriver";
+		// size argument appears to be ignored
+		firefoxBinary.addCommandLineOptions("--window-size=320,200");
+
+		String browserDriver = (propertiesMap
+				.get(browserDrivers.get("browser")) != null)
+						? propertiesMap.get(browserDrivers.get("browser")) :
+						// assuming browser is firefox
+						osName.equals("windows")
+								? (new File("c:/java/selenium/geckodriver.exe"))
+										.getAbsolutePath()
+								: "/home/sergueik/Downloads/geckodriver";
 		System.setProperty("webdriver.gecko.driver", browserDriver);
 		FirefoxOptions firefoxOptions = new FirefoxOptions();
 		firefoxOptions.setBinary(firefoxBinary);
 		FirefoxDriver driver = new FirefoxDriver(firefoxOptions);
+		// dynamicSearchButtonTest
 		try {
 			driver.get("http://www.google.com");
 			driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
@@ -70,8 +83,8 @@ public class HeadlessFirefoxSeleniumExample {
 				// enough search suggestions are found to pupulate the dropdown
 				// and the page renders a new search button inside the dropdown
 				// and hides the original search button
-				WebElement searchButtonnDynamic = driver
-						.findElement(By.cssSelector("span.ds:nth-child(1) > span.lsbb:nth-child(1) > input.lsb"));
+				WebElement searchButtonnDynamic = driver.findElement(By.cssSelector(
+						"span.ds:nth-child(1) > span.lsbb:nth-child(1) > input.lsb"));
 				if (searchButtonnDynamic != null) {
 					System.err.println("clicking the dynamic search button");
 					searchButtonnDynamic.click();
@@ -81,7 +94,8 @@ public class HeadlessFirefoxSeleniumExample {
 				}
 				WebElement iresDiv = driver.findElement(By.id("ires"));
 				iresDiv.findElements(By.tagName("a")).get(0).click();
-				System.err.println("Response: " + driver.getPageSource().substring(0, 120) + "...");
+				System.err.println(
+						"Response: " + driver.getPageSource().substring(0, 120) + "...");
 			} catch (WebDriverException e) {
 				System.err.println("Excepion (ignored) " + e.toString());
 				// Without using dynamic search button,
@@ -93,16 +107,32 @@ public class HeadlessFirefoxSeleniumExample {
 				try {
 					// take screenshot in catch block.
 					System.err.println("Taking a screenshot");
-					File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+					File scrFile = ((TakesScreenshot) driver)
+							.getScreenshotAs(OutputType.FILE);
 					String currentDir = System.getProperty("user.dir");
-					FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+					FileUtils.copyFile(scrFile,
+							new File(FilenameUtils.concat(currentDir, "screenshot.png")));
 				} catch (IOException ex) {
-					System.err.println("Excepion when taking the screenshot (ignored) " + ex.toString());
+					System.err.println(
+							"Excepion when taking the screenshot (ignored) " + ex.toString());
 					// ignore
 				}
 			}
 		} finally {
 			if (driver != null) {
+				try {
+					// take screenshot in teardown.
+					System.err.println("Taking a screenshot");
+					File scrFile = ((TakesScreenshot) driver)
+							.getScreenshotAs(OutputType.FILE);
+					String currentDir = System.getProperty("user.dir");
+					FileUtils.copyFile(scrFile,
+							new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				} catch (IOException ex) {
+					System.err.println(
+							"Excepion when taking the screenshot (ignored) " + ex.toString());
+					// ignore
+				}
 				driver.close();
 				try {
 					driver.quit();
@@ -111,5 +141,16 @@ public class HeadlessFirefoxSeleniumExample {
 				}
 			}
 		}
+	}
+
+	// Utilities
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
 	}
 }
