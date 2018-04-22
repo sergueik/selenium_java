@@ -16,7 +16,7 @@
     <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
     <!-- Framework Core Dependencies -->
     <selenium.version>3.11.0</selenium.version>
-    <ngwebdriver.version>1.1.2</ngwebdriver.version>
+    <ngwebdriver.version>1.1.3</ngwebdriver.version>
     <cucumber.version>2.4.0</cucumber.version>
     <java.version>1.8</java.version>
   </properties>
