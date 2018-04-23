@@ -32,18 +32,18 @@
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>3.4.0</selenium.version>
     <selenium.firefox-driver.version>3.4.0</selenium.firefox-driver.version>
-    <testng.version>6.9.10</testng.version>
+    <testng.version>6.11</testng.version>
     <guava.version>21.0</guava.version>
     <browser.name>chrome</browser.name>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <sikulixapi.version>1.1.0</sikulixapi.version>
   </properties>
   <dependencies>
-<dependency>
-    <groupId>org.exparity</groupId>
-    <artifactId>hamcrest-date</artifactId>
-    <version>${hamcrest-date.version}</version>
-</dependency>
+    <dependency>
+      <groupId>org.exparity</groupId>
+      <artifactId>hamcrest-date</artifactId>
+      <version>${hamcrest-date.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongo-java-driver</artifactId>
@@ -54,6 +54,11 @@
       <artifactId>hamcrest-all</artifactId>
       <version>${hamcrest-all.version}</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>1.10.2</version>
     </dependency>
     <dependency>
       <groupId>com.sikulix</groupId>

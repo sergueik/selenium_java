@@ -65,7 +65,7 @@ public class CodeMirrorTest extends BaseTest {
 		assertTrue(codeLines.size() > 0);
 		System.err.println(String.format("%d Lines of code:", codeLines.size()));
 		UnaryOperator<WebElement> scrollInfoView = (e) -> {
-			executeScript("arguments[0].scrollIntoView(true);", e);
+			executeScript("arguments[0].scrollIntoView({ behavior: \"smooth\" });", e);
 			highlight(e);
 			return e;
 		};
