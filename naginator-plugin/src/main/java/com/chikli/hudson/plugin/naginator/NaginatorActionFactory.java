@@ -13,17 +13,21 @@ import java.util.Collections;
 /**
  * @author <a href="mailto:nicolas.deloof@gmail.com">Nicolas De Loof</a>
  */
+@SuppressWarnings("deprecation")
 @Extension
 public class NaginatorActionFactory extends TransientBuildActionFactory {
 
-    @SuppressWarnings("rawtypes")
-    @Override
-    public Collection<? extends Action> createFor(Run target) {
-        Result result = target.getResult();
-        if ((target instanceof AbstractBuild) && result != null && result.isWorseThan(Result.SUCCESS)) {
-            NaginatorOptOutProperty p = (NaginatorOptOutProperty) target.getParent().getProperty(NaginatorOptOutProperty.class);
-            if (p == null || !p.isOptOut()) return Collections.singleton(new NaginatorRetryAction());
-        }
-        return Collections.emptyList();
-    }
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public Collection<? extends Action> createFor(Run target) {
+		Result result = target.getResult();
+		if ((target instanceof AbstractBuild) && result != null
+				&& result.isWorseThan(Result.SUCCESS)) {
+			NaginatorOptOutProperty p = (NaginatorOptOutProperty) target.getParent()
+					.getProperty(NaginatorOptOutProperty.class);
+			if (p == null || !p.isOptOut())
+				return Collections.singleton(new NaginatorRetryAction());
+		}
+		return Collections.emptyList();
+	}
 }

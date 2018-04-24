@@ -12,38 +12,44 @@ import javax.annotation.Nonnull;
  */
 public class NaginatorCause extends Cause {
 
-    private final String summary;
-    private final Integer sourceBuildNumber;
-    private transient Job project;
+	private final String summary;
+	private final Integer sourceBuildNumber;
+	private transient Job project;
 
-    public NaginatorCause(AbstractBuild<?, ?> build) {
-        this.summary = build.getDisplayName();
-        this.sourceBuildNumber = build.getNumber();
-    }
+	public NaginatorCause(AbstractBuild<?, ?> build) {
+		this.summary = build.getDisplayName();
+		this.sourceBuildNumber = build.getNumber();
+	}
 
-    @Override
-    public String getShortDescription() {
-        return Messages.NaginatorCause_Description(summary);
-    }
+	@Override
+	public String getShortDescription() {
+		return Messages.NaginatorCause_Description(summary);
+	}
 
-    @Override
-    public void onAddedTo(AbstractBuild build) {
-        this.project = build.getParent();
-    }
+	@Override
+	public void onAddedTo(AbstractBuild build) {
+		this.project = build.getParent();
+	}
 
-    @Override
-    public void onLoad(@Nonnull AbstractBuild<?,?> build) {
-        this.project = build.getParent();
-    }
+	@Override
+	public void onLoad(@Nonnull AbstractBuild<?, ?> build) {
+		this.project = build.getParent();
+	}
 
-    public String getSummary() { return this.summary; }
+	public String getSummary() {
+		return this.summary;
+	}
 
-    public Job getProject() { return this.project; }
+	public Job getProject() {
+		return this.project;
+	}
 
-    public String getJobUrl() {
-        return this.project.getUrl();
-    }
+	public String getJobUrl() {
+		return this.project.getUrl();
+	}
 
-    public Integer getSourceBuildNumber() { return this.sourceBuildNumber; }
+	public Integer getSourceBuildNumber() {
+		return this.sourceBuildNumber;
+	}
 
 }

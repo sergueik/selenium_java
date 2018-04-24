@@ -23,62 +23,66 @@ import hudson.model.Run;
  */
 public class NaginatorRetryAction implements Action {
 
-    private boolean hasPermission() {
-        Run<?, ?> run = Stapler.getCurrentRequest().findAncestorObject(Run.class);
-        if (run == null) {
-            // this page should be shown only when
-            // there's a valid build in the path hierarchy.
-            // (otherwise, we can't get what to retry)
-            return false;
-        }
+	private boolean hasPermission() {
+		Run<?, ?> run = Stapler.getCurrentRequest().findAncestorObject(Run.class);
+		if (run == null) {
+			// this page should be shown only when
+			// there's a valid build in the path hierarchy.
+			// (otherwise, we can't get what to retry)
+			return false;
+		}
 
-        if (!(run instanceof AbstractBuild)) {
-            // retry is applicable only to AbstractBuild
-            // (Run such as WorkflowRun is not supported)
-            return false;
-        }
+		if (!(run instanceof AbstractBuild)) {
+			// retry is applicable only to AbstractBuild
+			// (Run such as WorkflowRun is not supported)
+			return false;
+		}
 
-        return run.getParent().hasPermission(Item.BUILD);
-    }
+		return run.getParent().hasPermission(Item.BUILD);
+	}
 
-    public String getIconFileName() {
-        return hasPermission() ?
-            "refresh.png" : null;
-    }
+	public String getIconFileName() {
+		return hasPermission() ? "refresh.png" : null;
+	}
 
-    public String getDisplayName() {
-        return hasPermission() ?
-            "Retry" : null;
-    }
+	public String getDisplayName() {
+		return hasPermission() ? "Retry" : null;
+	}
 
-    public String getUrlName() {
-        return hasPermission() ?
-            "retry" : null;
-    }
+	public String getUrlName() {
+		return hasPermission() ? "retry" : null;
+	}
 
-    public void doIndex(StaplerResponse res, @CheckForNull @AncestorInPath AbstractBuild<?, ?> build) throws IOException {
-        if (build == null) {
-            // This should not happen as
-            // this page is displayed only for AbstractBuild.
-            res.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
-        build.getParent().checkPermission(Item.BUILD);
-        NaginatorRetryAction.scheduleBuild(build, 0, NaginatorListener.calculateRetryCount(build), 0);
-        res.sendRedirect2(build.getUpUrl());
-    }
+	public void doIndex(StaplerResponse res,
+			@CheckForNull @AncestorInPath AbstractBuild<?, ?> build)
+			throws IOException {
+		if (build == null) {
+			// This should not happen as
+			// this page is displayed only for AbstractBuild.
+			res.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
+		build.getParent().checkPermission(Item.BUILD);
+		NaginatorRetryAction.scheduleBuild(build, 0,
+				NaginatorListener.calculateRetryCount(build), 0);
+		res.sendRedirect2(build.getUpUrl());
+	}
 
-    static boolean scheduleBuild(final AbstractBuild<?, ?> build, final int delay, int retryCount, int maxRetryCount) {
-        return scheduleBuild(build, delay, new NaginatorAction(build, retryCount, maxRetryCount));
-    }
+	static boolean scheduleBuild(final AbstractBuild<?, ?> build, final int delay,
+			int retryCount, int maxRetryCount) {
+		return scheduleBuild(build, delay,
+				new NaginatorAction(build, retryCount, maxRetryCount));
+	}
 
-    static boolean scheduleBuild(final AbstractBuild<?, ?> build, final int delay, final NaginatorAction action) {
-        final List<Action> actions = new ArrayList<Action>();
-        actions.add(action);
-        actions.add(build.getAction(ParametersAction.class));
-        actions.add(build.getAction(CauseAction.class));
+	static boolean scheduleBuild(final AbstractBuild<?, ?> build, final int delay,
+			final NaginatorAction action) {
+		final List<Action> actions = new ArrayList<Action>();
+		actions.add(action);
+		actions.add(build.getAction(ParametersAction.class));
+		actions.add(build.getAction(CauseAction.class));
 
-        return build.getProject().scheduleBuild(delay, new NaginatorCause(build), actions.toArray(new Action[actions.size()]));
-    }
+		return build.getProject().scheduleBuild(delay, new NaginatorCause(build),
+				actions.toArray(new Action[actions.size()]));
+	}
 
 }

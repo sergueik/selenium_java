@@ -32,22 +32,23 @@ import org.jvnet.localizer.Localizable;
  * How to apply regexp to matrix builds.
  */
 public enum RegexpForMatrixStrategy {
-    TestChildrenRetriggerAll(Messages._RegexpForMatrixStrategy_TestChildrenRetriggerAll()),
-    TestChildrenRetriggerMatched(Messages._RegexpForMatrixStrategy_TestChildrenRetriggerMatched()),
-    TestParent(Messages._RegexpForMatrixStrategy_TestParent()),
-    ;
-    private final Localizable displayName;
-    
-    private RegexpForMatrixStrategy(Localizable displayName) {
-        this.displayName = displayName;
-    }
-    
-    public String getDisplayName() {
-        return displayName.toString();
-    }
-    
-    @Nonnull
-    public static RegexpForMatrixStrategy getDefault() {
-        return TestChildrenRetriggerAll;
-    }
+	TestChildrenRetriggerAll(Messages
+			._RegexpForMatrixStrategy_TestChildrenRetriggerAll()), TestChildrenRetriggerMatched(
+					Messages
+							._RegexpForMatrixStrategy_TestChildrenRetriggerMatched()), TestParent(
+									Messages._RegexpForMatrixStrategy_TestParent()),;
+	private final Localizable displayName;
+
+	private RegexpForMatrixStrategy(Localizable displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getDisplayName() {
+		return displayName.toString();
+	}
+
+	@Nonnull
+	public static RegexpForMatrixStrategy getDefault() {
+		return TestChildrenRetriggerAll;
+	}
 }

@@ -39,97 +39,83 @@ import hudson.model.TaskListener;
  * if the build is the child of another build (e.g. multi-configuration projects).
  */
 public class NaginatorScheduleAction extends InvisibleAction {
-    private final int maxSchedule;
-    private final ScheduleDelay delay;
-    private final boolean rerunMatrixPart;
-    
-    /**
-     * Should always reschedule the build.
-     */
-    public NaginatorScheduleAction() {
-        this(0);
-    }
-    
-    /**
-     * Should reschedule the build for specified times.
-     * 
-     * @param maxSchedule max times to reschedule the build. Less or equal to 0 indicates "always".
-     */
-    public NaginatorScheduleAction(int maxSchedule) {
-        this(maxSchedule, null, false);
-    }
-    
-    /**
-     * Should reschedule the build for specified times.
-     * 
-     * @param maxSchedule max times to reschedule the build. Less or equal to 0 indicates "always".
-     * @param delay A scheduling policy to trigger a new build.
-     * @param rerunMatrixPart tests matrix child builds and triggers only failed parts.
-     */
-    public NaginatorScheduleAction(int maxSchedule, @CheckForNull ScheduleDelay delay, boolean rerunMatrixPart) {
-        this.maxSchedule = maxSchedule;
-        this.delay = (delay != null) ? delay : new ProgressiveDelay(5 * 60, 3 * 60 * 60);
-        this.rerunMatrixPart = rerunMatrixPart;
-    }
-    
-    /**
-     * The max times to reschedule the build.
-     * Less or equal to 0 indicates "always".
-     * 
-     * @return the max times to reschedule the build.
-     */
-    public int getMaxSchedule() {
-        return maxSchedule;
-    }
-    
-    /**
-     * @return A scheduling policy to trigger a new build
-     */
-    @Nonnull
-    public ScheduleDelay getDelay() {
-        return delay;
-    }
-    
-    /**
-     * @return whether to test each child builds to reschedule for multi-configuration builds.
-     */
-    public boolean isRerunMatrixPart() {
-        return rerunMatrixPart;
-    }
-    
-    /**
-     * Tests whether {@link NaginatorListener} should reschedule the build.
-     * You can override this method to reschedule the build conditionally.
-     * <code>retryCount</code> is passed with 0 when this is the first time
-     * to reschedule the build.
-     * 
-     * @param run a build to test. never be a {@link MatrixRun}
-     * @param listener The listener for this build. This can be used to produce log messages, for example, which becomes a part of the "console output" of this build. But when this method runs, the build is considered completed, so its status cannot be changed anymore.
-     * @param retryCount the count the build is rescheduled.
-     * @return whether to reschedule the build.
-     */
-    public boolean shouldSchedule(@Nonnull Run<?, ?> run, @Nonnull TaskListener listener, int retryCount) {
-        return getMaxSchedule() <= 0 || retryCount < getMaxSchedule();
-    }
-    
-    /**
-     * A test for each child builds of multi-configuration builds.
-     * You can filter child builds to reschedule.
-     * 
-     * @param run
-     * @return
-     */
-    public boolean shouldScheduleForMatrixRun(@Nonnull MatrixRun run, @Nonnull TaskListener listener) {
-        return true;
-    }
-    
-    /**
-     * @return how to do when no children to rerun for a matrix project.
-     * 
-     * @since 1.17
-     */
-    @Nonnull
-    public NoChildStrategy getNoChildStrategy() {
-        return NoChildStrategy.getDefault();
-    }
+	private final int maxSchedule;
+	private final ScheduleDelay delay;
+	private final boolean rerunMatrixPart;
+
+	/**
+	 * Should always reschedule the build.
+	 */
+	public NaginatorScheduleAction() {
+		this(0);
+	}
+
+	/**
+	 * Should reschedule the build for specified times.
+	 * 
+	 * @param maxSchedule max times to reschedule the build. Less or equal to 0 indicates "always".
+	 */
+	public NaginatorScheduleAction(int maxSchedule) {
+		this(maxSchedule, null, false);
+	}
+
+	/**
+	 * Should reschedule the build for specified times.
+	 * 
+	 * @param maxSchedule max times to reschedule the build. Less or equal to 0 indicates "always".
+	 * @param delay A scheduling policy to trigger a new build.
+	 * @param rerunMatrixPart tests matrix child builds and triggers only failed parts.
+	 */
+	public NaginatorScheduleAction(int maxSchedule,
+			@CheckForNull ScheduleDelay delay, boolean rerunMatrixPart) {
+		this.maxSchedule = maxSchedule;
+		this.delay = (delay != null) ? delay
+				: new ProgressiveDelay(5 * 60, 3 * 60 * 60);
+		this.rerunMatrixPart = rerunMatrixPart;
+	}
+
+	/**
+	 * The max times to reschedule the build.
+	 * Less or equal to 0 indicates "always".
+	 * 
+	 * @return the max times to reschedule the build.
+	 */
+	public int getMaxSchedule() {
+		return maxSchedule;
+	}
+
+	@Nonnull
+	public ScheduleDelay getDelay() {
+		return delay;
+	}
+
+	public boolean isRerunMatrixPart() {
+		return rerunMatrixPart;
+	}
+
+	/**
+	 * Tests whether {@link NaginatorListener} should reschedule the build.
+	 * You can override this method to reschedule the build conditionally.
+	 * <code>retryCount</code> is passed with 0 when this is the first time
+	 * to reschedule the build.
+	 * 
+	 * @param run a build to test. never be a {@link MatrixRun}
+	 * @param listener The listener for this build. This can be used to produce log messages, for example, which becomes a part of the "console output" of this build. But when this method runs, the build is considered completed, so its status cannot be changed anymore.
+	 * @param retryCount the count the build is rescheduled.
+	 * @return whether to reschedule the build.
+	 */
+	public boolean shouldSchedule(@Nonnull Run<?, ?> run,
+			@Nonnull TaskListener listener, int retryCount) {
+		return getMaxSchedule() <= 0 || retryCount < getMaxSchedule();
+	}
+
+	public boolean shouldScheduleForMatrixRun(@Nonnull MatrixRun run,
+			@Nonnull TaskListener listener) {
+		return true;
+	}
+
+	@Nonnull
+	public NoChildStrategy getNoChildStrategy() {
+		return NoChildStrategy.getDefault();
+	}
 }

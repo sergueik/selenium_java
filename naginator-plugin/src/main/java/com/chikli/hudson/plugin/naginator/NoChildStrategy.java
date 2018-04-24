@@ -34,22 +34,21 @@ import org.jvnet.localizer.Localizable;
  * @since 1.17
  */
 public enum NoChildStrategy {
-    RerunWhole(Messages._NoChildStrategy_RerunWhole_DisplayName()),
-    RerunEmpty(Messages._NoChildStrategy_RerunEmpty_DisplayName()),
-    DontRun(Messages._NoChildStrategy_DontRerun_DisplayName()),
-    ;
-    private final Localizable displayName;
-    
-    private NoChildStrategy(Localizable displayName) {
-        this.displayName = displayName;
-    }
-    
-    public String getDisplayName() {
-        return displayName.toString();
-    }
-    
-    @Nonnull
-    public static NoChildStrategy getDefault() {
-        return RerunWhole;
-    }
+	RerunWhole(Messages._NoChildStrategy_RerunWhole_DisplayName()), RerunEmpty(
+			Messages._NoChildStrategy_RerunEmpty_DisplayName()), DontRun(
+					Messages._NoChildStrategy_DontRerun_DisplayName()),;
+	private final Localizable displayName;
+
+	private NoChildStrategy(Localizable displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getDisplayName() {
+		return displayName.toString();
+	}
+
+	@Nonnull
+	public static NoChildStrategy getDefault() {
+		return RerunWhole;
+	}
 }
