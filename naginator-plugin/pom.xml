@@ -1,0 +1,109 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.jenkins-ci.plugins</groupId>
+    <artifactId>plugin</artifactId>
+    <version>2.9</version>
+  </parent>
+  <name>Naginator</name>
+  <description>
+    Naginator is a plugin for Hudson that schedules a new build
+    immediately following a build failure, thereby nagging the
+    project members that the build is failing. 
+  </description>
+  <artifactId>naginator</artifactId>
+  <packaging>hpi</packaging>
+  <version>1.17.3-SNAPSHOT</version>
+  <url>
+    http://wiki.jenkins-ci.org/display/JENKINS/Naginator+Plugin
+  </url>
+  <scm>
+    <connection>scm:git:git://github.com/jenkinsci/naginator-plugin.git</connection>
+    <developerConnection>scm:git:git@github.com:jenkinsci/naginator-plugin.git</developerConnection>
+    <url>https://github.com/jenkinsci/naginator-plugin</url>
+    <tag>HEAD</tag>
+  </scm>
+  <properties>
+    <jenkins.version>1.554</jenkins.version>
+    <java.level>6</java.level>
+  </properties>
+  <licenses>
+    <license>
+      <name>MIT license</name>
+      <comments>All source code is under the MIT license.</comments>
+    </license>
+  </licenses>
+  <developers>
+    <developer>
+      <id>abayer</id>
+      <name>Andrew Bayer</name>
+      <email>andrew.bayer@gmail.com</email>
+      <timezone>-8</timezone>
+    </developer>
+    <developer>
+      <id>ndeloof</id>
+      <name>Nicolas De Loof</name>
+      <email>nicolas.deloof@gmail.com</email>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>galunto</id>
+      <name>Tomer Galun</name>
+      <email>tomer4@gmail.com</email>
+      <timezone>+2</timezone>
+    </developer>
+  </developers>
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>http://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+  <dependencies>
+    <dependency>
+      <groupId>org.mockito</groupId>
+      <artifactId>mockito-all</artifactId>
+      <version>1.9.5</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.plugins</groupId>
+      <artifactId>matrix-auth</artifactId>
+      <version>1.1</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>maven-plugin</artifactId>
+      <version>2.1</version>
+      <scope>test</scope>
+      <exclusions>
+        <!--
+                  To pick up http component classes from jenkins-test-harness dependencies
+                  in test executions.
+              -->
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpcore</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jenkins-ci.main</groupId>
+      <artifactId>jenkins-test-harness-tools</artifactId>
+      <version>2.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
