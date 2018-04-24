@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -22,20 +21,18 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.github.sergueik.jprotractor.NgBy;
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
-
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
-import org.openqa.selenium.support.pagefactory.ByAll;
-import org.openqa.selenium.support.pagefactory.ByChained;
-
 /**
- * Tests of Javascript scrroll
+ * Tests of Javascript scroll
  * http://www.globalsqa.com/angularJs-protractor/Scrollable/ based on
  * https://github.com/PiotrWysocki/globalsqa.com/blob/master/src/main/java/
  * scrollablepages/ScrollablePage.java

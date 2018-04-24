@@ -40,6 +40,8 @@ import hudson.model.TaskListener;
  */
 public class NaginatorScheduleAction extends InvisibleAction {
 	private final int maxSchedule;
+	// no need for the extra field.
+	private int maxScheduleOverride; // from regexpForRerun
 	private final ScheduleDelay delay;
 	private final boolean rerunMatrixPart;
 
@@ -82,6 +84,7 @@ public class NaginatorScheduleAction extends InvisibleAction {
 	 */
 	public int getMaxSchedule() {
 		return maxSchedule;
+		// return (maxScheduleOverride != 0) ? maxScheduleOverride : maxSchedule;
 	}
 
 	@Nonnull

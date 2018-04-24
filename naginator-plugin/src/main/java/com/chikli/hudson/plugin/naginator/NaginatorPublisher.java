@@ -21,10 +21,23 @@ import org.kohsuke.stapler.DataBoundSetter;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.IOException;
 import java.util.logging.Logger;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static java.lang.Boolean.parseBoolean;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 import javax.annotation.Nonnull;
 
@@ -43,6 +56,7 @@ public class NaginatorPublisher extends Notifier {
 	private ScheduleDelay delay;
 
 	private int maxSchedule;
+	private int maxScheduleOverride; // from regexpForRerun
 
 	// backward compatible constructor
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
@@ -56,14 +70,20 @@ public class NaginatorPublisher extends Notifier {
 			boolean rerunMatrixPart, boolean checkRegexp, int maxSchedule,
 			ScheduleDelay delay) {
 		this.regexpForRerun = regexpForRerun;
+		// extract from regexpForRerun
+		// TODO: defer to testRegexp()
+		Pattern pattern = Pattern.compile(this.regexpForRerun);
+		// dummy
+		java.util.regex.Matcher matcher = pattern.matcher("");
+		assertFalse(matcher.find());
+
+		this.maxScheduleOverride = 0;
 		this.rerunIfUnstable = rerunIfUnstable;
 		this.rerunMatrixPart = rerunMatrixPart;
 		this.checkRegexp = checkRegexp;
 		this.maxSchedule = maxSchedule;
 		this.delay = delay;
 		setRegexpForMatrixStrategy(RegexpForMatrixStrategy.TestParent); // backward
-																																		// compatibility
-																																		// with <
 																																		// 1.16
 	}
 
@@ -140,6 +160,10 @@ public class NaginatorPublisher extends Notifier {
 		return regexpForRerun;
 	}
 
+	public int getMaxScheduleOverride() {
+		return maxScheduleOverride;
+	}
+
 	@DataBoundSetter
 	public void setRegexpForMatrixStrategy(
 			@Nonnull RegexpForMatrixStrategy regexpForMatrixStrategy) {
@@ -156,7 +180,7 @@ public class NaginatorPublisher extends Notifier {
 	}
 
 	public int getMaxSchedule() {
-		return maxSchedule;
+		return (maxScheduleOverride != 0) ? maxScheduleOverride : maxSchedule;
 	}
 
 	@Override
