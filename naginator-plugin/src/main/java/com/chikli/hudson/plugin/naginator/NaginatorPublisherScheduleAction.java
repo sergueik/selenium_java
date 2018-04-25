@@ -6,6 +6,8 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import static org.junit.Assert.assertFalse;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -26,6 +28,14 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import jenkins.model.Jenkins;
+import static java.lang.Boolean.parseBoolean;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeFalse;
 
 /**
  * Used from {@link NaginatorPublisher} to mark a build to be reshceduled.
@@ -42,10 +52,12 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	private transient Boolean regexpForMatrixParent; // for backward compatibility
 	private /* almost final */ RegexpForMatrixStrategy regexpForMatrixStrategy;
 	private final NoChildStrategy noChildStrategy;
+	private NaginatorPublisher naginatorPublisher;
 
 	public NaginatorPublisherScheduleAction(NaginatorPublisher publisher) {
 		super(publisher.getMaxSchedule(), publisher.getDelay(),
 				publisher.isRerunMatrixPart());
+		this.naginatorPublisher = publisher;
 		this.regexpForRerun = publisher.getRegexpForRerun();
 		this.rerunIfUnstable = publisher.isRerunIfUnstable();
 		this.checkRegexp = publisher.isCheckRegexp();
@@ -116,7 +128,6 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 				return false;
 			}
 		}
-
 		return super.shouldSchedule(run, listener, retryCount);
 	}
 
@@ -182,6 +193,16 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 						"error while parsing logs for naginator - forcing rebuild."));
 			}
 		}
+		// TODO: override maxScheduleOverride
+		Pattern pattern = Pattern.compile(regexpForRerun);
+		// dummy
+		int maxScheduleOverride = 0;
+		java.util.regex.Matcher matcher = pattern
+				.matcher(regexpForRerun.replaceAll("(\\d)", "42"));
+		assertTrue(matcher.find());
+		LOGGER.log(Level.FINEST,
+				"Got maxScheduleOverride = " + maxScheduleOverride);
+		naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
 		return true;
 	}
 

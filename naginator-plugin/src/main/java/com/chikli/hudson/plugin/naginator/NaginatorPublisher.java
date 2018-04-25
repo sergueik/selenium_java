@@ -160,6 +160,10 @@ public class NaginatorPublisher extends Notifier {
 		return regexpForRerun;
 	}
 
+	public void setMaxScheduleOverride(int value) {
+		this.maxScheduleOverride = value;
+	}
+
 	public int getMaxScheduleOverride() {
 		return maxScheduleOverride;
 	}
