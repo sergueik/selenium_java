@@ -29,6 +29,8 @@ import javax.annotation.Nonnull;
 
 import jenkins.model.Jenkins;
 import static java.lang.Boolean.parseBoolean;
+import static org.hamcrest.Matchers.greaterThan;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -49,6 +51,8 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	private final String regexpForRerun;
 	private final boolean rerunIfUnstable;
 	private final boolean checkRegexp;
+	private Pattern pattern;
+	private Matcher matcher;
 	private transient Boolean regexpForMatrixParent; // for backward compatibility
 	private /* almost final */ RegexpForMatrixStrategy regexpForMatrixStrategy;
 	private final NoChildStrategy noChildStrategy;
@@ -193,16 +197,6 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 						"error while parsing logs for naginator - forcing rebuild."));
 			}
 		}
-		// TODO: override maxScheduleOverride
-		Pattern pattern = Pattern.compile(regexpForRerun);
-		// dummy
-		int maxScheduleOverride = 0;
-		java.util.regex.Matcher matcher = pattern
-				.matcher(regexpForRerun.replaceAll("(\\d)", "42"));
-		assertTrue(matcher.find());
-		LOGGER.log(Level.FINEST,
-				"Got maxScheduleOverride = " + maxScheduleOverride);
-		naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
 		return true;
 	}
 
@@ -289,15 +283,24 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 
 		// Assume default encoding and text files
 		String line;
-		Pattern pattern = Pattern.compile(regexp);
+		pattern = Pattern.compile(regexp);
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(
 					new InputStreamReader(new FileInputStream(logFile), charset));
 			while ((line = reader.readLine()) != null) {
-				Matcher matcher = pattern.matcher(new InterruptibleCharSequence(line));
+				matcher = pattern.matcher(new InterruptibleCharSequence(line));
 				if (matcher.find()) {
+
+					// TODO: safety with override maxScheduleOverride
+					int maxScheduleOverride = 0;
+					maxScheduleOverride = Integer.parseInt(matcher.group(1));
+					assertThat(maxScheduleOverride, greaterThan(0));
+					LOGGER.log(Level.FINEST,
+							"Got maxScheduleOverride = " + maxScheduleOverride);
+					naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
 					return true;
+
 				}
 			}
 			return false;
