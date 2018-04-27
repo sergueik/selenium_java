@@ -292,13 +292,12 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 				matcher = pattern.matcher(new InterruptibleCharSequence(line));
 				if (matcher.find()) {
 
-					// TODO: safety with override maxScheduleOverride
-					int maxScheduleOverride = 0;
-					maxScheduleOverride = Integer.parseInt(matcher.group(1));
-					assertThat(maxScheduleOverride, greaterThan(0));
-					LOGGER.log(Level.FINEST,
-							"Got maxScheduleOverride = " + maxScheduleOverride);
 					if (naginatorPublisher.isMaxScheduleOverrideAllowed()) {
+						int maxScheduleOverride = 0;
+						maxScheduleOverride = Integer.parseInt(matcher.group(1));
+						assertThat(maxScheduleOverride, greaterThan(0));
+						LOGGER.log(Level.FINEST,
+								"Extracted maxScheduleOverride = " + maxScheduleOverride);
 						naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
 					}
 					return true;

@@ -113,6 +113,12 @@ if (naginatorPublisher.isMaxScheduleOverrideAllowed()) {
 ```
 This allows for a more granular control of the rebuild policies from the build side.
 
+### Run application
+
+Ruild and install the package into the  Jenkins instance
+```cmd
+mvn clean compile hpi:hpi
+```
 ### License
 This project is licensed under the terms of the MIT license.
 
