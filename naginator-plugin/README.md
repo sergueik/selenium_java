@@ -1,5 +1,5 @@
-### Info 
-This directory contains a replica of 
+### Info
+This directory contains a replica of
 [Naginator Plugin for Jenkins]() projet intended to be a fork and feature development of the same.
 
 The __Naginator__ plugin allows one to automatically reschedule a build after a build failure, by adding a certain post-build action (Publisher subclass) to the job configuration:
@@ -100,7 +100,7 @@ exit 1
 
 ![Updated Usage](https://github.com/sergueik/selenium_java/blob/master/naginator-plugin/screenshots/updated.png)
 
-One can enable or suppress overriding the Maximum number of successive failed build retries (`maxSchedule`) through the checkbox (`maxScheduleOverrideAllowed`). When allowed the value of `maxSchedule` is computed from the  trigger message in the failed build log:
+One can enable or suppress overriding the Maximum number of successive failed build retries (`maxSchedule`) through the checkbox (`maxScheduleOverrideAllowed`). When allowed the value of `maxSchedule` is computed from the  trigger message in the failed build log and updated in the `NaginatorPublisher`:
 ```java
 int maxScheduleOverride = 0;
 maxScheduleOverride = Integer.parseInt(matcher.group(1));
@@ -111,8 +111,7 @@ if (naginatorPublisher.isMaxScheduleOverrideAllowed()) {
 	naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
 }
 ```
-and updated in the `NaginatorPublisher`. This allows for a more granular control of the rebuild policies from the build side.
-
+This allows for a more granular control of the rebuild policies from the build side.
 
 ### License
 This project is licensed under the terms of the MIT license.
