@@ -298,7 +298,9 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 					assertThat(maxScheduleOverride, greaterThan(0));
 					LOGGER.log(Level.FINEST,
 							"Got maxScheduleOverride = " + maxScheduleOverride);
-					naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
+					if (naginatorPublisher.isMaxScheduleOverrideAllowed()) {
+						naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
+					}
 					return true;
 
 				}

@@ -48,6 +48,7 @@ public class NaginatorPublisher extends Notifier {
 	private final boolean rerunIfUnstable;
 	private final boolean rerunMatrixPart;
 	private final boolean checkRegexp;
+	private final boolean maxScheduleOverrideAllowed;
 	@Deprecated
 	private transient Boolean regexpForMatrixParent;
 	private RegexpForMatrixStrategy regexpForMatrixStrategy; /* almost final */
@@ -61,13 +62,14 @@ public class NaginatorPublisher extends Notifier {
 	// backward compatible constructor
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
 			boolean checkRegexp) {
-		this(regexpForRerun, rerunIfUnstable, false, checkRegexp, 0,
+		this(regexpForRerun, rerunIfUnstable, false, checkRegexp, false, 0,
 				new ProgressiveDelay(5 * 60, 3 * 60 * 60));
 	}
 
 	@DataBoundConstructor
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
-			boolean rerunMatrixPart, boolean checkRegexp, int maxSchedule,
+			boolean rerunMatrixPart, boolean checkRegexp,
+			boolean maxScheduleOverrideAllowed, int maxSchedule,
 			ScheduleDelay delay) {
 		this.regexpForRerun = regexpForRerun;
 		// extract from regexpForRerun
@@ -82,6 +84,7 @@ public class NaginatorPublisher extends Notifier {
 		this.rerunMatrixPart = rerunMatrixPart;
 		this.checkRegexp = checkRegexp;
 		this.maxSchedule = maxSchedule;
+		this.maxScheduleOverrideAllowed = maxScheduleOverrideAllowed;
 		this.delay = delay;
 		setRegexpForMatrixStrategy(RegexpForMatrixStrategy.TestParent); // backward
 																																		// 1.16
@@ -90,12 +93,14 @@ public class NaginatorPublisher extends Notifier {
 	@Deprecated
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
 			boolean rerunMatrixPart, boolean checkRegexp,
-			boolean regexpForMatrixParent, int maxSchedule, ScheduleDelay delay) {
+			boolean maxScheduleOverrideAllowed, boolean regexpForMatrixParent,
+			int maxSchedule, ScheduleDelay delay) {
 		this(regexpForRerun, rerunIfUnstable, rerunMatrixPart, checkRegexp,
-				maxSchedule, delay);
+				maxScheduleOverrideAllowed, maxSchedule, delay);
 		setRegexpForMatrixParent(regexpForMatrixParent);
 	}
 
+	//
 	public Object readResolve() {
 		if (this.delay == null) {
 			// Backward compatibility : progressive 5 minutes up to 3 hours
@@ -112,6 +117,10 @@ public class NaginatorPublisher extends Notifier {
 			}
 		}
 		return this;
+	}
+
+	public boolean isMaxScheduleOverrideAllowed() {
+		return maxScheduleOverrideAllowed;
 	}
 
 	public boolean isRerunIfUnstable() {
