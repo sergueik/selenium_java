@@ -57,128 +57,138 @@ import com.google.common.collect.Sets;
  *
  */
 public class NaginatorActionFactoryTest {
-    @ClassRule
-    public static JenkinsRule r = new JenkinsRule();
-    
-    @After
-    public void tearDown() {
-        r.jenkins.setSecurityRealm(null);
-        r.jenkins.setAuthorizationStrategy(null);
-    }
-    
-    private String getRetryLinkFor(AbstractBuild<?, ?> b) throws Exception {
-        return Functions.joinPath(r.contextPath, b.getUrl(), "retry");
-    }
-    
-    private void assertRetryLinkExists(AbstractBuild<?, ?> b, WebClient wc) throws Exception {
-        wc.getPage(b).getAnchorByHref(getRetryLinkFor(b));
-    }
-    
-    private void assertRetryLinkNotExists(AbstractBuild<?, ?> b, WebClient wc) throws Exception {
-        try {
-            HtmlAnchor a = wc.getPage(b).getAnchorByHref(getRetryLinkFor(b));
-            fail("Should not exist: " + a);
-        } catch (ElementNotFoundException e) {
-            // pass
-        }
-    }
-    
-    private void assertRetryLinkExists(AbstractBuild<?, ?> b) throws Exception {
-        assertRetryLinkExists(b, r.createWebClient());
-    }
-    
-    private void assertRetryLinkNotExists(AbstractBuild<?, ?> b) throws Exception {
-        assertRetryLinkNotExists(b, r.createWebClient());
-    }
-    
-    private void assertRetryLinkExists(AbstractBuild<?, ?> b, User u) throws Exception {
-        assertRetryLinkExists(b, r.createWebClient().login(u.getId()));
-    }
-    
-    private void assertRetryLinkNotExists(AbstractBuild<?, ?> b, User u) throws Exception {
-        assertRetryLinkNotExists(b, r.createWebClient().login(u.getId()));
-    }
-    
-    @Test
-    public void testRetrylinkNotInSuccessBuild() throws Exception {
-        FreeStyleProject p = r.createFreeStyleProject();
-        FreeStyleBuild b = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
-        assertRetryLinkNotExists(b);
-    }
-    
-    @Test
-    public void testRetrylinkInFailureBuild() throws Exception {
-        FreeStyleProject p = r.createFreeStyleProject();
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkExists(b);
-    }
-    
-    @Test
-    public void testRetrylinkInOptInProject() throws Exception {
-        FreeStyleProject p = r.createFreeStyleProject();
-        p.addProperty(new NaginatorOptOutProperty(false));
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkExists(b);
-    }
-    
-    @Test
-    public void testRetrylinkNotInOptOutProject() throws Exception {
-        FreeStyleProject p = r.createFreeStyleProject();
-        p.addProperty(new NaginatorOptOutProperty(true));
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkNotExists(b);
-    }
-    
-    @Test
-    public void testRetrylinkForPermittedUser() throws Exception {
-        r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
-        ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
-        pmas.add(Jenkins.READ, "user1");
-        pmas.add(Item.READ, "user1");
-        pmas.add(Item.BUILD, "user1");
-        r.jenkins.setAuthorizationStrategy(pmas);
-        
-        FreeStyleProject p = r.createFreeStyleProject();
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkExists(b, User.get("user1"));
-    }
-    
-    
-    @Test
-    public void testRetrylinkNotForNonPermittedUser() throws Exception {
-        r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
-        ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
-        pmas.add(Jenkins.READ, "user1");
-        pmas.add(Item.READ, "user1");
-        //pmas.add(Item.BUILD, "user1");
-        r.jenkins.setAuthorizationStrategy(pmas);
-        
-        FreeStyleProject p = r.createFreeStyleProject();
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkNotExists(b, User.get("user1"));
-    }
-    
-    @Test
-    public void testRetrylinkForPermittedUserByProject() throws Exception {
-        r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
-        ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
-        pmas.add(Jenkins.READ, "user1");
-        r.jenkins.setAuthorizationStrategy(pmas);
-        
-        FreeStyleProject p = r.createFreeStyleProject();
-        
-        Map<Permission, Set<String>> authMap = new HashMap<Permission, Set<String>>();
-        authMap.put(Item.READ, Sets.newHashSet("user1"));
-        authMap.put(Item.BUILD, Sets.newHashSet("user1"));
-        p.addProperty(new AuthorizationMatrixProperty(authMap));
-        
-        p.getBuildersList().add(new FailureBuilder());
-        FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE, p.scheduleBuild2(0).get());
-        assertRetryLinkExists(b, User.get("user1"));
-    }
+	@ClassRule
+	public static JenkinsRule r = new JenkinsRule();
+
+	@After
+	public void tearDown() {
+		r.jenkins.setSecurityRealm(null);
+		r.jenkins.setAuthorizationStrategy(null);
+	}
+
+	private String getRetryLinkFor(AbstractBuild<?, ?> b) throws Exception {
+		return Functions.joinPath(r.contextPath, b.getUrl(), "retry");
+	}
+
+	private void assertRetryLinkExists(AbstractBuild<?, ?> b, WebClient wc)
+			throws Exception {
+		wc.getPage(b).getAnchorByHref(getRetryLinkFor(b));
+	}
+
+	private void assertRetryLinkNotExists(AbstractBuild<?, ?> b, WebClient wc)
+			throws Exception {
+		try {
+			HtmlAnchor a = wc.getPage(b).getAnchorByHref(getRetryLinkFor(b));
+			fail("Should not exist: " + a);
+		} catch (ElementNotFoundException e) {
+			// pass
+		}
+	}
+
+	private void assertRetryLinkExists(AbstractBuild<?, ?> b) throws Exception {
+		assertRetryLinkExists(b, r.createWebClient());
+	}
+
+	private void assertRetryLinkNotExists(AbstractBuild<?, ?> b)
+			throws Exception {
+		assertRetryLinkNotExists(b, r.createWebClient());
+	}
+
+	private void assertRetryLinkExists(AbstractBuild<?, ?> b, User u)
+			throws Exception {
+		assertRetryLinkExists(b, r.createWebClient().login(u.getId()));
+	}
+
+	private void assertRetryLinkNotExists(AbstractBuild<?, ?> b, User u)
+			throws Exception {
+		assertRetryLinkNotExists(b, r.createWebClient().login(u.getId()));
+	}
+
+	@Test
+	public void testRetrylinkNotInSuccessBuild() throws Exception {
+		FreeStyleProject p = r.createFreeStyleProject();
+		FreeStyleBuild b = r.assertBuildStatusSuccess(p.scheduleBuild2(0));
+		assertRetryLinkNotExists(b);
+	}
+
+	@Test
+	public void testRetrylinkInFailureBuild() throws Exception {
+		FreeStyleProject p = r.createFreeStyleProject();
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkExists(b);
+	}
+
+	@Test
+	public void testRetrylinkInOptInProject() throws Exception {
+		FreeStyleProject p = r.createFreeStyleProject();
+		p.addProperty(new NaginatorOptOutProperty(false));
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkExists(b);
+	}
+
+	@Test
+	public void testRetrylinkNotInOptOutProject() throws Exception {
+		FreeStyleProject p = r.createFreeStyleProject();
+		p.addProperty(new NaginatorOptOutProperty(true));
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkNotExists(b);
+	}
+
+	@Test
+	public void testRetrylinkForPermittedUser() throws Exception {
+		r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
+		ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
+		pmas.add(Jenkins.READ, "user1");
+		pmas.add(Item.READ, "user1");
+		pmas.add(Item.BUILD, "user1");
+		r.jenkins.setAuthorizationStrategy(pmas);
+
+		FreeStyleProject p = r.createFreeStyleProject();
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkExists(b, User.get("user1"));
+	}
+
+	@Test
+	public void testRetrylinkNotForNonPermittedUser() throws Exception {
+		r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
+		ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
+		pmas.add(Jenkins.READ, "user1");
+		pmas.add(Item.READ, "user1");
+		// pmas.add(Item.BUILD, "user1");
+		r.jenkins.setAuthorizationStrategy(pmas);
+
+		FreeStyleProject p = r.createFreeStyleProject();
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkNotExists(b, User.get("user1"));
+	}
+
+	@Test
+	public void testRetrylinkForPermittedUserByProject() throws Exception {
+		r.jenkins.setSecurityRealm(r.createDummySecurityRealm());
+		ProjectMatrixAuthorizationStrategy pmas = new ProjectMatrixAuthorizationStrategy();
+		pmas.add(Jenkins.READ, "user1");
+		r.jenkins.setAuthorizationStrategy(pmas);
+
+		FreeStyleProject p = r.createFreeStyleProject();
+
+		Map<Permission, Set<String>> authMap = new HashMap<Permission, Set<String>>();
+		authMap.put(Item.READ, Sets.newHashSet("user1"));
+		authMap.put(Item.BUILD, Sets.newHashSet("user1"));
+		p.addProperty(new AuthorizationMatrixProperty(authMap));
+
+		p.getBuildersList().add(new FailureBuilder());
+		FreeStyleBuild b = r.assertBuildStatus(Result.FAILURE,
+				p.scheduleBuild2(0).get());
+		assertRetryLinkExists(b, User.get("user1"));
+	}
 }
