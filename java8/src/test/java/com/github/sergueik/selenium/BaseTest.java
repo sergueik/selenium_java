@@ -103,8 +103,12 @@ public class BaseTest {
 
 	private static final Map<String, String> browserDrivers = new HashMap<>();
 	static {
-		browserDrivers.put("chrome", "chromedriver.exe");
-		browserDrivers.put("firefox", "geckodriver.exe");
+		browserDrivers.put("chrome", osName.toLowerCase().startsWith("windows")
+				? "chromedriver.exe" : "chromedriver");
+		browserDrivers.put("firefox", osName.toLowerCase().startsWith("windows")
+				? "geckodriver.exe" : "geckodriver"
+
+		);
 	}
 
 	public void setExtensionDir(String value) {
@@ -200,7 +204,11 @@ public class BaseTest {
 		System.err.println("Launching " + browser);
 		if (browser.equals("chrome")) {
 			System.setProperty("webdriver.chrome.driver",
-					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+					osName.toLowerCase().startsWith("windows")
+							? (new File("c:/java/selenium/chromedriver.exe"))
+									.getAbsolutePath()
+							: String.format("%s/Downloads/chromedriver",
+									System.getenv("HOME")));
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions chromeOptions = new ChromeOptions();
 
@@ -263,7 +271,8 @@ public class BaseTest {
 			System.setProperty("webdriver.gecko.driver",
 					osName.toLowerCase().startsWith("windows")
 							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: "/tmp/geckodriver");
+							: String.format("%s/Downloads/geckodriver",
+									System.getenv("HOME")));
 			System
 					.setProperty("webdriver.firefox.bin",
 							osName.toLowerCase().startsWith("windows") ? new File(
@@ -273,7 +282,8 @@ public class BaseTest {
 			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 			// use legacy FirefoxDriver
-			capabilities.setCapability("marionette", false);
+			// for Firefox v.59 no longer possible ?
+			// capabilities.setCapability("marionette", false);
 			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
 			capabilities.setCapability("locationContextEnabled", false);
 			capabilities.setCapability("acceptSslCerts", true);
@@ -293,7 +303,8 @@ public class BaseTest {
 				driver = new FirefoxDriver(capabilities);
 			} catch (WebDriverException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Cannot initialize Firefox driver");
+				throw new RuntimeException(
+						"Cannot initialize Firefox driver: " + e.toString());
 			}
 		}
 		actions = new Actions(driver);
