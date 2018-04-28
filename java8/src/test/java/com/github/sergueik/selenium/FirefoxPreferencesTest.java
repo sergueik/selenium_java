@@ -22,11 +22,12 @@ import com.github.sergueik.selenium.BaseTest;
 import net.sourceforge.htmlunit.corejs.javascript.JavaScriptException;
 
 /**
- * Interacting with Firefox Preferences pages using Selenium WebDriver based on
- * https://github.com/intoli/intoli-article-materials/blob/master/articles/clear
- * -the-firefox-browser-cache/clear_firefox_cache.py for several releases of
- * Firefox browser the Preferences pages layout varies with browser version
- * (v.40 vs. v.59)
+ * Interacting with Firefox Preferences pages using Selenium WebDriver 
+ * based on https://github.com/intoli/intoli-article-materials/blob/master/articles/clear
+ * https://github.com/intoli/intoli-article-materials/tree/master/articles/clear-the-firefox-browser-cache
+ * added tests reflecting for Firefox browser version-specific
+ * Preferences pages layouts
+ * version 40 and 59
  * 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
@@ -54,7 +55,7 @@ public class FirefoxPreferencesTest extends BaseTest {
 	}
 
 	// the Preferences pages layout varies with browser version (v.40 vs. v.59)
-	// for Firefox Browsser version 59
+	// for Firefox version 59
 	@Test(enabled = true, priority = 10)
 	public void testClearCacheNew() {
 
@@ -63,18 +64,19 @@ public class FirefoxPreferencesTest extends BaseTest {
 		// Wait page to load
 		wait.until(ExpectedConditions.urlToBe("about:preferences#privacy"));
 		System.err.println("Waited URL to be: " + driver.getCurrentUrl());
-		WebElement clearCacheButtonElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("clearCacheButton"))));
+		WebElement clearCacheButtonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("clearCacheButton"))));
 		assertThat(clearCacheButtonElement, notNullValue());
-		System.err.println("Clicking on button: " + clearCacheButtonElement.getAttribute("outerHTML"));
+		System.err.println("Clicking on button: "
+				+ clearCacheButtonElement.getAttribute("outerHTML"));
 		clearCacheButtonElement.click();
 
 		// Click the "Clear All Data" button under "Site Data"
 		// this button is no longer shown in preferences, keep the code
 		WebElement clearSiteDataButtonElement = null;
 		try {
-			clearSiteDataButtonElement = wait
-					.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("clearSiteDataButton"))));
+			clearSiteDataButtonElement = wait.until(ExpectedConditions
+					.visibilityOf(driver.findElement(By.id("clearSiteDataButton"))));
 		} catch (NoSuchElementException e) {
 			return;
 		}
@@ -87,13 +89,15 @@ public class FirefoxPreferencesTest extends BaseTest {
 			alert = driver.switchTo().alert();
 			String alertText = alert.getText();
 			// System.err.println("alert Text: " + alertText);
-			assertThat(alertText, containsString("clear all cookies and site data stored by Firefox"));
+			assertThat(alertText,
+					containsString("clear all cookies and site data stored by Firefox"));
 			// confirm alert
 			alert.accept();
 		} catch (NoAlertPresentException e) {
 			// Alert not present - ignore
 		} catch (WebDriverException e) {
-			System.err.println("Alert was not handled : " + e.getStackTrace().toString());
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
 			return;
 		}
 
@@ -108,8 +112,8 @@ public class FirefoxPreferencesTest extends BaseTest {
 		wait.until(ExpectedConditions.urlContains("#advanced"));
 		System.err.println("Waited on URL contains: " + driver.getCurrentUrl());
 		// Click the "Clear Now" button under "Cached Web Content"
-		WebElement networkTabElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("networkTab"))));
+		WebElement networkTabElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("networkTab"))));
 		assertThat(networkTabElement, notNullValue());
 		try {
 			highlight(networkTabElement);
@@ -119,30 +123,33 @@ public class FirefoxPreferencesTest extends BaseTest {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
 
-		System.err.println("Clicking on tab: " + networkTabElement.getAttribute("outerHTML"));
+		System.err.println(
+				"Clicking on tab: " + networkTabElement.getAttribute("outerHTML"));
 
 		// TODO: figure which method is working
 		networkTabElement.click();
 		networkTabElement.sendKeys(Keys.SPACE);
 		actions.moveToElement(networkTabElement).click().build().perform();
-		WebElement clearCacheButtonElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("clearCacheButton"))));
+		WebElement clearCacheButtonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("clearCacheButton"))));
 		assertThat(clearCacheButtonElement, notNullValue());
-		System.err.println("Clicking on button: " + clearCacheButtonElement.getAttribute("outerHTML"));
+		System.err.println("Clicking on button: "
+				+ clearCacheButtonElement.getAttribute("outerHTML"));
 		clearCacheButtonElement.click();
 
-		WebElement clearOfflineAppCacheButtonElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("clearOfflineAppCacheButton"))));
+		WebElement clearOfflineAppCacheButtonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("clearOfflineAppCacheButton"))));
 		assertThat(clearOfflineAppCacheButtonElement, notNullValue());
-		System.err.println("Clicking on button: " + clearOfflineAppCacheButtonElement.getAttribute("outerHTML"));
+		System.err.println("Clicking on button: "
+				+ clearOfflineAppCacheButtonElement.getAttribute("outerHTML"));
 		clearOfflineAppCacheButtonElement.click();
 
 		// Click the "Clear All Data" button under "Site Data"
 		// this button is no longer shown in preferences, keep the code
 		WebElement clearSiteDataButtonElement = null;
 		try {
-			clearSiteDataButtonElement = wait
-					.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("clearSiteDataButton"))));
+			clearSiteDataButtonElement = wait.until(ExpectedConditions
+					.visibilityOf(driver.findElement(By.id("clearSiteDataButton"))));
 		} catch (NoSuchElementException e) {
 			return;
 		}
@@ -153,18 +160,17 @@ public class FirefoxPreferencesTest extends BaseTest {
 		wait.until(ExpectedConditions.alertIsPresent());
 		try {
 			alert = driver.switchTo().alert();
-			String alertText = alert.getText();
-			// assertTrue(alertText.contains("..."));
-			// confirm alert
 			alert.accept();
 		} catch (NoAlertPresentException e) {
 			// Alert not present - ignore
 		} catch (WebDriverException e) {
-			System.err.println("Alert was not handled : " + e.getStackTrace().toString());
+			System.err
+					.println("Alert was not handled : " + e.getStackTrace().toString());
 			return;
 		}
 	}
 
+	// for Firefox version 40
 	@Test(enabled = false, priority = 30)
 	public void testClearHistoryld() {
 
@@ -174,26 +180,14 @@ public class FirefoxPreferencesTest extends BaseTest {
 		wait.until(ExpectedConditions.urlToBe("about:preferences#privacy"));
 		System.err.println("Waited URL to be: " + driver.getCurrentUrl());
 
-		WebElement historyRememberClearButtonElement = wait
-				.until(ExpectedConditions.visibilityOf(driver.findElement(By.id("historyRememberClear"))));
+		WebElement historyRememberClearButtonElement = wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.id("historyRememberClear"))));
 		assertThat(historyRememberClearButtonElement, notNullValue());
-		System.err.println("Clicking on button: " + historyRememberClearButtonElement.getAttribute("outerHTML"));
+		System.err.println("Clicking on button: "
+				+ historyRememberClearButtonElement.getAttribute("outerHTML"));
 
 		historyRememberClearButtonElement.click();
 		// TODO: handle "Clear Recent History" dialog
-		try {
-			alert = driver.switchTo().alert();
-			String alertText = alert.getText();
-			// assertTrue(alertText.contains("You clicked a button within a
-			// frame"));
-			// confirm alert
-			alert.accept();
-		} catch (NoAlertPresentException e) {
-			// Alert not present - ignore
-		} catch (WebDriverException e) {
-			System.err.println("Alert was not handled : " + e.getStackTrace().toString());
-			return;
-		}
 	}
 
 }
