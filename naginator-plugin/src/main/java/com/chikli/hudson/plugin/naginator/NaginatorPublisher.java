@@ -41,6 +41,7 @@ import static org.junit.Assume.assumeFalse;
 
 import javax.annotation.Nonnull;
 
+@SuppressWarnings("unused")
 public class NaginatorPublisher extends Notifier {
 	public final static long DEFAULT_REGEXP_TIMEOUT_MS = 30000;
 
@@ -66,6 +67,18 @@ public class NaginatorPublisher extends Notifier {
 				new ProgressiveDelay(5 * 60, 3 * 60 * 60));
 	}
 
+	/**
+	 * Constructor
+	 *
+	 * @param regexpForRerun regular expression to scan build log
+	 * @param rerunIfUnstable whether to rerun unstable builds
+	 * @param rerunMatrixPart whether to rerun matrix build
+	 * @param checkRegexp use the regexpForRerun to determine whether to rerun the failing build
+	 * @param maxScheduleOverrideAllowed extract the maxSchedule with the help of the regexpForRerun
+	 * @param maxSchedule maximum number of consecutive reruns
+	 * @param delay delay between reruns
+	 */
+
 	@DataBoundConstructor
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
 			boolean rerunMatrixPart, boolean checkRegexp,
@@ -90,6 +103,18 @@ public class NaginatorPublisher extends Notifier {
 																																		// 1.16
 	}
 
+	/**
+	 * Constructor
+	 *
+	 * @param regexpForRerun regular expression to scan build log
+	 * @param rerunIfUnstable whether to rerun unstable builds
+	 * @param rerunMatrixPart whether to rerun matrix build
+	 * @param checkRegexp use the regexpForRerun to determine whether to rerun the failing build
+	 * @param regexpForMatrixParent analog of regexpForRerun provided for the parent build
+	 * @param maxScheduleOverrideAllowed extract the maxSchedule with the help of the regexpForRerun
+	 * @param maxSchedule maximum number of consecutive reruns
+	 * @param delay delay between reruns
+	 */
 	@Deprecated
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
 			boolean rerunMatrixPart, boolean checkRegexp,
@@ -131,6 +156,7 @@ public class NaginatorPublisher extends Notifier {
 		return rerunMatrixPart;
 	}
 
+	// https://www.programcreek.com/java-api-examples/index.php?api=org.kohsuke.stapler.DataBoundSetter
 	@DataBoundSetter
 	public void setNoChildStrategy(@Nonnull NoChildStrategy noChildStrategy) {
 		this.noChildStrategy = noChildStrategy;
@@ -138,7 +164,7 @@ public class NaginatorPublisher extends Notifier {
 
 	/**
 	 * @return the strategy for no children to rerun for a matrix project.
-	 * 
+	 *
 	 * @since 1.17
 	 */
 	@Nonnull
@@ -169,6 +195,12 @@ public class NaginatorPublisher extends Notifier {
 		return regexpForRerun;
 	}
 
+	/**
+	 * Sets the value internal maxScheduleOverride property, e.g. from the matched build log message.
+	 *
+	 * @param value new maxScheduleOverride
+	 * @see getMaxSchedule
+	 */
 	public void setMaxScheduleOverride(int value) {
 		this.maxScheduleOverride = value;
 	}

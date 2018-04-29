@@ -41,7 +41,7 @@ import static org.junit.Assume.assumeFalse;
 
 /**
  * Used from {@link NaginatorPublisher} to mark a build to be reshceduled.
- * 
+ *
  * @since 1.16
  */
 public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
@@ -213,6 +213,13 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 		return d.getRegexpTimeoutMs();
 	}
 
+	/**
+	 * Finds out whether the build is to be rescheduled.
+	 *
+	 * @param logFile the build log to examine
+	 * @param charset the charset used by the build.
+	 * @return whether to reschedule the build.
+	 */
 	private boolean parseLog(final File logFile, final Charset charset,
 			@Nonnull final String regexp) throws IOException {
 		// TODO annotate `logFile` with `@Nonnull`
@@ -276,6 +283,39 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 		}
 	}
 
+	/**
+	 * Extracts the maxScheduleOverride from build log message against the "Search for Log message" regexp.
+	 *
+	 * @param message build log message to examine
+	 * @param regexp string containing regular expression to locate. The data is expected to be in the capture group 1
+	 * @return the matched integer value
+	 */
+	private int getMessageData(@Nonnull final String message,
+			@Nonnull final String regexp) {
+
+		pattern = Pattern.compile(regexp);
+		int data = 0;
+		LOGGER.log(Level.FINEST, "Processing message: " + message);
+		matcher = pattern.matcher(message);
+		if (matcher.find()) {
+			data = Integer.parseInt(matcher.group(1));
+			assertThat(data, greaterThan(0));
+			LOGGER.log(Level.FINEST, "Extracted data: " + data);
+		} else {
+			LOGGER.log(Level.FINEST, "Failed to find data in the message: " + message);
+
+		}
+		return data;
+	}
+
+	/**
+	 * Finds the "Search for Log message" regexp in the build console output
+	 * @param logFile build log to examine
+	 * @param charset charset used to load the log
+	 * @param regexp string to find
+	 * @return whether to reschedule the build
+	 * see getMaxScheduleOverride
+	 */
 	private boolean parseLogImpl(File logFile, Charset charset,
 			@Nonnull final String regexp) throws IOException {
 		// TODO annotate `logFile` and 'charset' with `@Nonnull`
@@ -291,17 +331,18 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 			while ((line = reader.readLine()) != null) {
 				matcher = pattern.matcher(new InterruptibleCharSequence(line));
 				if (matcher.find()) {
+					String message = matcher.group(0);
+					LOGGER.log(Level.FINEST, "Found Log message: " + message);
 
 					if (naginatorPublisher.isMaxScheduleOverrideAllowed()) {
-						int maxScheduleOverride = 0;
-						maxScheduleOverride = Integer.parseInt(matcher.group(1));
-						assertThat(maxScheduleOverride, greaterThan(0));
-						LOGGER.log(Level.FINEST,
-								"Extracted maxScheduleOverride = " + maxScheduleOverride);
-						naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
+						int maxScheduleOverride = getMessageData(message, regexp);
+						if (maxScheduleOverride != 0) {
+							LOGGER.log(Level.FINEST,
+									"Updating maxScheduleOverride: " + maxScheduleOverride);
+							naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
+						}
 					}
 					return true;
-
 				}
 			}
 			return false;
