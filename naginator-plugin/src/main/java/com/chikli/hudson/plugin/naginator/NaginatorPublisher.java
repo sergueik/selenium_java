@@ -57,8 +57,7 @@ public class NaginatorPublisher extends Notifier {
 
 	private ScheduleDelay delay;
 
-	private int maxSchedule;
-	private int maxScheduleOverride; // from regexpForRerun
+	private int maxSchedule; // possibly gets overriden after the build run
 
 	// backward compatible constructor
 	public NaginatorPublisher(String regexpForRerun, boolean rerunIfUnstable,
@@ -92,7 +91,6 @@ public class NaginatorPublisher extends Notifier {
 		java.util.regex.Matcher matcher = pattern.matcher("");
 		assertFalse(matcher.find());
 
-		this.maxScheduleOverride = 0;
 		this.rerunIfUnstable = rerunIfUnstable;
 		this.rerunMatrixPart = rerunMatrixPart;
 		this.checkRegexp = checkRegexp;
@@ -196,17 +194,13 @@ public class NaginatorPublisher extends Notifier {
 	}
 
 	/**
-	 * Sets the value internal maxScheduleOverride property, e.g. from the matched build log message.
+	 * Sets the maxSchedule property, initially filled from data bound comstructor e.g. from the matched build log message.
 	 *
-	 * @param value new maxScheduleOverride
+	 * @param value new maxSchedule
 	 * @see getMaxSchedule
 	 */
-	public void setMaxScheduleOverride(int value) {
-		this.maxScheduleOverride = value;
-	}
-
-	public int getMaxScheduleOverride() {
-		return maxScheduleOverride;
+	public void setMaxSchedule(int value) {
+		this.maxSchedule = value;
 	}
 
 	@DataBoundSetter
@@ -225,7 +219,7 @@ public class NaginatorPublisher extends Notifier {
 	}
 
 	public int getMaxSchedule() {
-		return (maxScheduleOverride != 0) ? maxScheduleOverride : maxSchedule;
+		return maxSchedule;
 	}
 
 	@Override

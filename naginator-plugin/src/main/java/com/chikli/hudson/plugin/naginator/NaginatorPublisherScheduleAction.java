@@ -284,7 +284,7 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	}
 
 	/**
-	 * Extracts the maxScheduleOverride from build log message against the "Search for Log message" regexp.
+	 * Extracts the maxSchedule from build log message against the "Search for Log message" regexp.
 	 *
 	 * @param message build log message to examine
 	 * @param regexp string containing regular expression to locate. The data is expected to be in the capture group 1
@@ -314,7 +314,7 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	 * @param charset charset used to load the log
 	 * @param regexp string to find
 	 * @return whether to reschedule the build
-	 * see getMaxScheduleOverride
+	 * @see getMaxSchedule
 	 */
 	private boolean parseLogImpl(File logFile, Charset charset,
 			@Nonnull final String regexp) throws IOException {
@@ -339,7 +339,7 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 						if (maxScheduleOverride != 0) {
 							LOGGER.log(Level.FINEST,
 									"Updating maxScheduleOverride: " + maxScheduleOverride);
-							naginatorPublisher.setMaxScheduleOverride(maxScheduleOverride);
+							naginatorPublisher.setMaxSchedule(maxScheduleOverride);
 						}
 					}
 					return true;
