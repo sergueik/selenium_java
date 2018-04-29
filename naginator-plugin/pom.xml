@@ -39,10 +39,6 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
-    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
-    <!-- http://stackoverflow.com/questions/39310090/selenium-upgrade-error -->
-    <selenium.version>3.8.0</selenium.version>
-    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <jenkins.version>1.554</jenkins.version>
     <java.level>6</java.level>
   </properties>
@@ -76,6 +72,7 @@
       <email>kouzmine_serguei@yahoo.com</email>
       <organization/>
       <organizationUrl>https://github.com/sergueik</organizationUrl>
+      <timezone>-5</timezone>
     </developer>
   </developers>
   <repositories>
@@ -88,6 +85,10 @@
     <pluginRepository>
       <id>repo.jenkins-ci.org</id>
       <url>http://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>spring</id>
+      <url>http://repo.spring.io/plugins-release/</url>
     </pluginRepository>
   </pluginRepositories>
   <dependencies>
