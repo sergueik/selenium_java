@@ -145,6 +145,16 @@ Ruild and install the package into the  Jenkins instance
 ```cmd
 mvn clean compile hpi:hpi
 ```
+
+### Note:
+
+The `naginator` plugin is not very co-operative with `jenkins-multijob-plugin`: only the very first (failed)
+build is recorded in the parent configuration, the rest is invisible to the parent.
+
+Note: one has to install `jenkins-multijob-plugin` plugin has quite a few dependencies:
+`token-macro`,`parameterized-trigger`,`conditional-buildstep`,`envinject`,
+`envinject-api`,`script-security`,`built-on-column`,`run-condition`,`workflow-step-api`
+
 ### License
 This project is licensed under the terms of the MIT license.
 
