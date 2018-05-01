@@ -42,6 +42,7 @@
     <java.level>6</java.level>
     <java.version>1.6</java.version>
     <!-- java.level 7 and 8 is supported -->
+    <maven.javadoc.skip>true</maven.javadoc.skip>
   </properties>
   <licenses>
     <license>
@@ -170,4 +171,21 @@
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <id>chrome</id>
+      <properties>
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>release</id>
+      <properties>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+      </properties>
+    </profile>
+  </profiles>
 </project>
