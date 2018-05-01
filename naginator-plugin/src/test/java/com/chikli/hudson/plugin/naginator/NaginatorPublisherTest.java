@@ -1,18 +1,18 @@
 /*
  * The MIT License
- * 
+ *
  * Copyright (c) 2015 IKEDA Yasuyuki
- * 
+ *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
  * in the Software without restriction, including without limitation the rights
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -87,7 +87,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Disabling {@link NaginatorPublisher#isRerunIfUnstable()}
 	 * should trigger all children.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -124,7 +124,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Enabling {@link NaginatorPublisher#isRerunIfUnstable()}
 	 * should trigger only failed children.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -161,7 +161,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestParent</code>
 	 * and the log match the regular expression.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -193,7 +193,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestParent</code>
 	 * but the log doesn't match the regular expression.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -224,7 +224,7 @@ public class NaginatorPublisherTest {
 
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestChildrenRetriggerMatched</code>.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -264,7 +264,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestChildrenRetriggerMatched</code>
 	 * and <code>retunMatrixPart</code> is <code>false</code>.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -297,7 +297,7 @@ public class NaginatorPublisherTest {
 
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestChildrenRetriggerAll</code>.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -336,7 +336,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestChildrenRetriggerAll</code>
 	 * and <code>retunMatrixPart</code> is <code>false</code>.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -376,7 +376,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Tests the behavior when <code>regexpForMatrixStrategy</code> is <code>TestChildrenRetriggerAll</code>
 	 * and <code>retunMatrixPart</code> is <code>false</code>.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
@@ -407,7 +407,7 @@ public class NaginatorPublisherTest {
 
 	/**
 	 * Test the regexp configuration is preserved for a matrix project.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Ignore
@@ -442,7 +442,7 @@ public class NaginatorPublisherTest {
 	/**
 	 * Test the regexp configuration for a freestyle project.
 	 * <code>regexpForMatrixParent</code> is not preserved as not displayed.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Ignore
@@ -459,11 +459,13 @@ public class NaginatorPublisherTest {
 		p.getPublishersList().add(naginator);
 
 		NaginatorPublisher expected = new NaginatorPublisher(
-				naginator.getRegexpForRerun(), naginator.isRerunIfUnstable(), false, // retunMatrixPart
-																																							// (not
-																																							// preserved)
-				naginator.isCheckRegexp(), naginator.isMaxScheduleOverrideAllowed(),
-				naginator.getMaxSchedule(), naginator.getDelay());
+				naginator.getRegexpForRerun(),
+				naginator.isRerunIfUnstable(),
+				false, // retunMatrixPart is not preserved
+				naginator.isCheckRegexp(),
+				naginator.isMaxScheduleOverrideAllowed(),
+				naginator.getMaxSchedule(),
+				naginator.getDelay());
 
 		j.configRoundtrip(p);
 
@@ -551,7 +553,8 @@ public class NaginatorPublisherTest {
 	@Test
 	public void testReadResolveFor1_16WithTestChild() throws Exception {
 		// for the case regexpForMatrixParent and regexpForMatrixStrategy is not set
-		NaginatorPublisher target = new NaginatorPublisher("", // regexpForRerun
+		NaginatorPublisher target = new NaginatorPublisher(
+				"", // regexpForRerun
 				false, // rerunIfUnstable
 				true, // rerunMatrixPart
 				true, // checkRegexp

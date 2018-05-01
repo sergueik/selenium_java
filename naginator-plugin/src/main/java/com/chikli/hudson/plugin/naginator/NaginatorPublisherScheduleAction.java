@@ -28,7 +28,6 @@ import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 
 import jenkins.model.Jenkins;
-import static java.lang.Boolean.parseBoolean;
 import static org.hamcrest.Matchers.greaterThan;
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -51,8 +50,6 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	private final String regexpForRerun;
 	private final boolean rerunIfUnstable;
 	private final boolean checkRegexp;
-	private Pattern pattern;
-	private Matcher matcher;
 	private transient Boolean regexpForMatrixParent; // for backward compatibility
 	private /* almost final */ RegexpForMatrixStrategy regexpForMatrixStrategy;
 	private final NoChildStrategy noChildStrategy;
@@ -292,18 +289,17 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	 */
 	private int getMessageData(@Nonnull final String message,
 			@Nonnull final String regexp) {
-
-		pattern = Pattern.compile(regexp);
+		Pattern pattern = Pattern.compile(regexp);
 		int data = 0;
 		LOGGER.log(Level.FINEST, "Processing message: " + message);
-		matcher = pattern.matcher(message);
+		Matcher matcher = pattern.matcher(message);
 		if (matcher.find()) {
 			data = Integer.parseInt(matcher.group(1));
-			assertThat(data, greaterThan(0));
+			// assertThat(data, greaterThan(0));
 			LOGGER.log(Level.FINEST, "Extracted data: " + data);
 		} else {
-			LOGGER.log(Level.FINEST, "Failed to find data in the message: " + message);
-
+			LOGGER.log(Level.FINEST,
+					"Failed to find data in the message: " + message);
 		}
 		return data;
 	}
@@ -323,13 +319,13 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 
 		// Assume default encoding and text files
 		String line;
-		pattern = Pattern.compile(regexp);
+		Pattern pattern = Pattern.compile(regexp);
 		BufferedReader reader = null;
 		try {
 			reader = new BufferedReader(
 					new InputStreamReader(new FileInputStream(logFile), charset));
 			while ((line = reader.readLine()) != null) {
-				matcher = pattern.matcher(new InterruptibleCharSequence(line));
+				Matcher matcher = pattern.matcher(new InterruptibleCharSequence(line));
 				if (matcher.find()) {
 					String message = matcher.group(0);
 					LOGGER.log(Level.FINEST, "Found Log message: " + message);
