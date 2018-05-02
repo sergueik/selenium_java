@@ -13,27 +13,27 @@ import org.junit.Test;
  */
 public class WhenAccessingJobHistoryReport extends WhenAccessingReportPages {
 
-	@Ignore
 	@SuppressWarnings("deprecation")
 	@Override
+	@Ignore
 	@Test
 	public void testShouldGenerateErrorForAnonymousUser() {
 		shouldGenerateErrorForAnonymousUser(
 				new JobHistoryReportPage(createWebClient()));
 	}
 
-	@Ignore
 	@SuppressWarnings("deprecation")
 	@Override
+	@Ignore
 	@Test
 	public void testShouldGenerateErrorForNonAuditorUser() {
 		shouldGenerateErrorForNonAuditorUser(
 				new JobHistoryReportPage(createWebClient()));
 	}
 
-	@Ignore
 	@SuppressWarnings("deprecation")
 	@Override
+	@Ignore
 	@Test
 	public void testShouldAllowAccessForValidAuditor() {
 		shouldAllowAccessForValidAuditor(
