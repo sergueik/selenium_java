@@ -1,0 +1,53 @@
+<?jelly escape-by-default='true'?>
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define"
+	xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form"
+	xmlns:p="/lib/hudson/project">
+
+	<style>
+		.customtable tr {
+		  border: 1px solid #bbb;
+		  padding: 3px 4px 3px 4px;
+		}
+
+		table.customtable.pane > tbody > tr > td:last-child {
+		  border-right: none;
+		}
+		.customtable tr {
+		  border: none; /* Border will be provided by the pane-frame */
+		}
+
+		.customtable th {
+		  font-weight: bold;
+		  border: none;
+		  background-color: #f0f0f0;
+		  padding: 6px 4px;
+		  white-space: nowrap;
+		}
+		.customtable td {
+		  vertical-align: middle;
+		  padding: 3px 4px 3px 4px;
+		}
+	</style>
+
+	<div>
+		<table width="70%" style="margin-top: 1em; margin-left:1em; border-collapse: collapse;" class="customtable stripped-odd">
+			<tr class="header">
+				<th align="center">S</th>
+				<th align="left">R</th>
+				<th align="left">Job</th>
+				<th align="left">Build #</th>
+				<th align="left">Duration</th>
+				<th align="left">Console</th>
+            </tr>
+
+			<j:set var="lastPhase" value=""/>
+			<j:set var="builders" value="${it.getBuilders()}"/>
+			<j:set var="indent" value="1"/>
+
+			<st:include page="table.jelly" />
+
+			</table>
+	</div>
+
+	<p:upstream-downstream />
+</j:jelly>
