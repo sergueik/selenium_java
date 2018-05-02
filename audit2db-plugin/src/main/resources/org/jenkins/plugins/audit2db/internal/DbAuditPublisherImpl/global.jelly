@@ -1,0 +1,60 @@
+<!--
+  Edit View Page
+-->
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:d="jelly:define" xmlns:l="/lib/layout" xmlns:t="/lib/hudson" xmlns:f="/lib/form" xmlns:i="jelly:fmt">
+	<f:section title="Audit to Database Plugin">
+	   <!-- 
+	    <f:radioBlock title="${%Use JNDI Datasource}" name="audit2db.datasource" value="true" checked="${it.useJndi}" field="useJndi">
+			<f:entry title="${%Datasource name}" field="jndiName" help="${rootURL}/plugin/dbaudit/help/jndiDatasource.html">
+				<f:textbox name="audit2db.jndiName" value="${it.jndiName}"/> 
+		  	</f:entry>
+            <f:entry title="${%User}" field="jndiUser">
+                <f:textbox name="audit2db.jndiUser" value="${it.jndiUser}" />
+            </f:entry>
+            <f:entry title="${%Password}" field="jndiPassword">
+                <f:password name="audit2db.jndiPassword" value="${it.jndiPassword}" />
+            </f:entry>
+			<f:validateButton title="${%Test Connection}" progress="${%Connecting...}"
+				method="testJndiConnection" with="jndiName,jndiUser,jndiPassword" />
+		</f:radioBlock>
+		<f:radioBlock title="${%Use JDBC Datasource}" name="audit2db.datasource" value="false" checked="${!it.useJndi}" field="useJndi">
+			<f:entry title="${%Driver class}" field="jdbcDriver" help="${rootURL}/plugin/dbaudit/help/jdbcDriver.html">
+				<f:textbox name="audit2db.jdbcDriver" value="${it.jdbcDriver}"/> 
+		  	</f:entry>
+			<f:entry title="${%Url}" field="jdbcUrl" help="${rootURL}/plugin/dbaudit/help/jdbcUrl.html">
+                <f:textbox name="audit2db.jdbcUrl" value="${it.jdbcUrl}"/> 
+		  	</f:entry>
+	        <f:entry title="${%User}" field="jdbcUser">
+	            <f:textbox name="audit2db.jdbcUser" value="${it.jdbcUser}" />
+	        </f:entry>
+	        <f:entry title="${%Password}" field="jdbcPassword">
+	            <f:password name="audit2db.jdbcPassword" value="${it.jdbcPassword}" />
+	        </f:entry>
+			<f:validateButton title="${%Test Connection}" progress="${%Connecting...}"
+				method="testJdbcConnection" with="jdbcDriver,jdbcUrl,jdbcUser,jdbcPassword" />
+		</f:radioBlock>
+	    -->
+	    <f:invisibleEntry>
+	       <f:textbox name="audit2db.useJndi" value="false"/>
+	    </f:invisibleEntry>
+        <f:entry title="${%JDBC Driver class}" field="jdbcDriver" help="${rootURL}/plugin/audit2db/help/jdbcDriver.html">
+            <f:textbox name="audit2db.jdbcDriver" value="${it.jdbcDriver}"/> 
+        </f:entry>
+        <f:entry title="${%JDBC Url}" field="jdbcUrl" help="${rootURL}/plugin/audit2db/help/jdbcUrl.html">
+            <f:textbox name="audit2db.jdbcUrl" value="${it.jdbcUrl}"/> 
+        </f:entry>
+        <f:entry title="${%User}" field="jdbcUser">
+            <f:textbox name="audit2db.jdbcUser" value="${it.jdbcUser}" />
+        </f:entry>
+        <f:entry title="${%Password}" field="jdbcPassword">
+            <f:password name="audit2db.jdbcPassword" value="${it.jdbcPassword}" />
+        </f:entry>
+        <f:validateButton title="${%Test Connection}" progress="${%Connecting...}"
+               method="testJdbcConnection" with="audit2db.jdbcDriver,audit2db.jdbcUrl,audit2db.jdbcUser,audit2db.jdbcPassword" />
+        <f:advanced>
+            <f:description>${%GenerateDdlDescription}</f:description>
+            <f:validateButton title="${%Generate DDL}" progress="${%Processing...}"
+                method="generateDdl" with="audit2db.jdbcDriver,audit2db.jdbcUrl,audit2db.jdbcUser,audit2db.jdbcPassword" />
+        </f:advanced>
+	</f:section>
+</j:jelly>
