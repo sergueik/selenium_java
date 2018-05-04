@@ -142,11 +142,13 @@ public class BaseTest {
 	public void beforeSuite() {
 	}
 
+	// https://intoli.com/blog/firefox-extensions-with-selenium/
 	// without .crx extension
 	public void addChromeExtension(String value) {
 		this.chromeExtensions.add(value);
 	}
 
+	// https://intoli.com/blog/chrome-extensions-with-selenium/
 	// https://stackoverflow.com/questions/35858679/adding-extension-to-selenium2webdriver-chrome-driver
 	// https://productforums.google.com/forum/#!topic/chrome/g02KlhK12fU
 	// NOTE: simpler solution for local driver exist
@@ -227,11 +229,17 @@ public class BaseTest {
 
 			for (String optionAgrument : (new String[] {
 					"--user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0",
-					"--allow-running-insecure-content", "--allow-insecure-localhost",
-					"--enable-local-file-accesses", "--disable-notifications",
+					"--allow-running-insecure-content",
+					"--allow-insecure-localhost",
+					"--enable-local-file-accesses",
+					"--disable-notifications",
 					"--disable-save-password-bubble",
 					/* "start-maximized" , */
-					"--browser.download.folderList=2", "--disable-web-security",
+					"--disable-default-app",
+					"disable-infobars",
+					"--no-sandbox ",
+					"--browser.download.folderList=2",
+					"--disable-web-security",
 					"--no-proxy-server",
 					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
 					String.format("--browser.download.dir=%s", downloadFilepath)
@@ -293,7 +301,7 @@ public class BaseTest {
 			profile.setAssumeUntrustedCertificateIssuer(true);
 			profile.setEnableNativeEvents(false);
 			// optional
-			/* 
+			/*
 			 profile.setPreference("general.useragent.override",
 			 		"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
 			*/
