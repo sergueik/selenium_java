@@ -1,9 +1,5 @@
 package example;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
-
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -28,8 +24,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -78,7 +72,7 @@ public class ConfigFormEx {
 	// NOTE: use the same DOM for Browser config options to simplify code
 	// the values for "Browser" hash are not used
 	private static Map<String, Map<String, String>> configOptions = new HashMap<>();
-	private static Map<String, String> templates = new HashMap<>();
+	private static Map<String, String> roles = new HashMap<>();
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(ConfigFormEx.class);
@@ -99,8 +93,8 @@ public class ConfigFormEx {
 
 		// TODO: dynamic
 		Map<String, String> dataCenterOptions = new HashMap<>();
-		for (String value : new ArrayList<String>(
-				Arrays.asList(new String[] { "st.lois", "oxmoor", "wec" }))) {
+		for (String value : new ArrayList<String>(Arrays
+				.asList(new String[] { "st.louis", "oxmoor", "shoreview", "wec" }))) {
 			dataCenterOptions.put(value, "unused");
 		}
 		configOptions.put("Datacenter", dataCenterOptions);
@@ -113,15 +107,14 @@ public class ConfigFormEx {
 		}
 		configOptions.put("Environment", environmentOptions);
 
-		// offer templates embedded in the application jar and
-		// make rest up to customer
-		configData.put("Template", "Core Selenium Java (embedded)");
+		// offer consul the default
+		// configData.put("Role", "discovery server");
 
-		configOptions.put("Template", new HashMap<String, String>());
-		templates = configOptions.get("Template");
-		// Scan the template directory and build the hash of template name / path
+		configOptions.put("Role", new HashMap<String, String>());
+		roles = configOptions.get("Role");
+		// Scan the template directory and build the hash of role name / ""
 		// options.
-		configOptions.replace("Template", templates);
+		configOptions.replace("Role", roles);
 
 		display = (parentDisplay != null) ? parentDisplay : new Display();
 		// shell = new Shell(display);
@@ -131,12 +124,15 @@ public class ConfigFormEx {
 		}
 		// http://stackoverflow.com/questions/585534/what-is-the-best-way-to-find-the-users-home-directory-in-java
 		String dirPath = null;
-		dirPath = osName.startsWith("windows") ? getDesktopPath()
-				: System.getProperty("user.home");
 
+		dirPath = "c:\\developer\\sergueik\\powershell_ui_samples";
+		if (dirPath.isEmpty()) {
+			dirPath = osName.startsWith("windows") ? getDesktopPath()
+					: System.getProperty("user.home");
+		}
 		readData(parent != null ? parentShell.getData("CurrentConfig").toString()
-				: "{ \"Browser\": \"Chrome\", "
-						+ "\"Template\": \"Core Selenium Java (embedded)\", "
+				: "{ \"Browser\": \"Chrome\", " + "\"Role\": \"discovery server\", "
+						+ "\"Environment\": \"prod\", " + "\"Datacenter\": \"wec\", "
 						+ String.format("\"Template Directory\": \"%s\", ",
 								dirPath.replace("/", "\\").replace("\\", "\\\\"))
 						+ "\"Template Path\": \"\"}",
@@ -144,108 +140,14 @@ public class ConfigFormEx {
 		if (configData.containsKey("Template Directory")) {
 			dirPath = configData.get("Template Directory");
 			if (dirPath != "") {
-				templates = configOptions.get("Template");
-				// Scan the template directory and build the options hash with template
+				logger.info("Loading enc from: " + dirPath);
+				roles = configOptions.get("Role");
+				// TODO: Scan the template directory and rebuild the options hash with
+				// template
 				// name / absolute path
-				configOptions.replace("Template", templates);
+				configOptions.replace("Role", roles);
 			}
 		}
-	}
-
-	public void initializeLogger() {
-		Properties logProperties = new Properties();
-		String log4J_properties = String.format("%s/%s/%s",
-				System.getProperty("user.dir"), "src/main/resources", "log4j.xml");
-		try {
-			logProperties.load(new FileInputStream(log4J_properties));
-			PropertyConfigurator.configure(logProperties);
-		} catch (IOException e) {
-			throw new RuntimeException("Fail to load: " + log4J_properties);
-		}
-	}
-
-	public String readData(Optional<Map<String, String>> parameters) {
-		return readData(null, parameters);
-	}
-
-	public String readData(String payload,
-			Optional<Map<String, String>> parameters) {
-
-		Map<String, String> collector = (parameters.isPresent()) ? parameters.get()
-				: new HashMap<>();
-
-		String data = (payload == null)
-				? "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"\", \"ElementXPath\": \"/html//img[1]\" }"
-				: payload;
-		try {
-			JSONObject elementObj = new JSONObject(data);
-			@SuppressWarnings("unchecked")
-			Iterator<String> propIterator = elementObj.keys();
-			while (propIterator.hasNext()) {
-				String propertyKey = propIterator.next();
-				String propertyVal = elementObj.getString(propertyKey);
-				// logger.info(propertyKey + ": " + propertyVal);
-				System.err.println("readData: " + propertyKey + ": " + propertyVal);
-				collector.put(propertyKey, propertyVal);
-			}
-		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e.toString());
-			return null;
-		}
-		return collector.get("ElementCodeName");
-	}
-
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
-	}
-
-	static class HANDLE extends PointerType implements NativeMapped {
-	}
-
-	static class HWND extends HANDLE {
-	}
-
-	public static String getDesktopPath() {
-		HWND hwndOwner = null;
-		int nFolder = Shell32.CSIDL_DESKTOPDIRECTORY;
-		HANDLE hToken = null;
-		int dwFlags = Shell32.SHGFP_TYPE_CURRENT;
-		char[] pszPath = new char[Shell32.MAX_PATH];
-		int hResult = Shell32.INSTANCE.SHGetFolderPath(hwndOwner, nFolder, hToken,
-				dwFlags, pszPath);
-		if (Shell32.S_OK == hResult) {
-			String path = new String(pszPath);
-			return (path.substring(0, path.indexOf('\0')));
-		} else {
-			return String.format("%s\\Desktop", System.getProperty("user.home"));
-		}
-	}
-
-	private static Map<String, Object> OPTIONS = new HashMap<>();
-	static {
-		OPTIONS.put(Library.OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
-		OPTIONS.put(Library.OPTION_FUNCTION_MAPPER, W32APIFunctionMapper.UNICODE);
-	}
-
-	static interface Shell32 extends Library {
-
-		public static final int MAX_PATH = 260;
-		// https://sourceforge.net/u/cstrauss/w32api/ci/7805df8efec130f582b131b8c0d75e1b6ce0993b/tree/include/shlobj.h?format=raw
-		public static final int CSIDL_DESKTOPDIRECTORY = 0x0010;
-		public static final int SHGFP_TYPE_CURRENT = 0;
-		public static final int SHGFP_TYPE_DEFAULT = 1;
-		public static final int S_OK = 0;
-		static Shell32 INSTANCE = Native.loadLibrary("shell32", Shell32.class,
-				OPTIONS);
-
-		public int SHGetFolderPath(HWND hwndOwner, int nFolder, HANDLE hToken,
-				int dwFlags, char[] pszPath);
 	}
 
 	public void render() {
@@ -267,38 +169,42 @@ public class ConfigFormEx {
 		GridLayoutFactory.swtDefaults().margins(2, 2).equalWidth(false)
 				.numColumns(2).applyTo(rowComposite);
 
-		Button buttonSave = new Button(rowComposite, SWT.BORDER | SWT.PUSH);
-		buttonSave.setText("Save");
+		Button launchButton = new Button(rowComposite, SWT.BORDER | SWT.PUSH);
+		launchButton.setText("Launch");
 
 		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER)
-				.hint(buttonWidth, buttonHeight).grab(false, false).applyTo(buttonSave);
+				.hint(buttonWidth, buttonHeight).grab(false, false)
+				.applyTo(launchButton);
 
-		buttonSave.addListener(SWT.Selection, new Listener() {
+		launchButton.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				String templateLabel = configData.get("Template");
+				String templateLabel = configData.get("Role");
 				String configKey = null;
-				String data = null;
+				String data = templateLabel;
+				/*
 				if (templateLabel != ""
 						&& !(templateLabel.matches(".*\\(embedded\\)"))) {
-					data = configOptions.get("Template").get(templateLabel);
+					data = configOptions.get("Role").get(templateLabel);
 					configKey = "Template Path";
 					logger.info(String.format(
 							"Saving the selected user template path \"%s\": \"%s\"",
 							templateLabel, data));
 				} else {
-					configKey = "Template";
+					configKey = "Role";
 					data = templateLabel;
 					logger.info(String.format(
 							"Saving the selected embedded template name: \"%s\"",
 							templateLabel));
-
+				
 				}
 				if (configData.containsKey(configKey)) {
 					configData.replace(configKey, data);
 				} else {
 					configData.put(configKey, data);
 				}
+				*/
+				logger.info("Saving the selections: " + configData);
 				String result = writeDataJSON(configData, "{}");
 				if (parentShell != null) {
 					parentShell.setData("CurrentConfig", result);
@@ -307,14 +213,14 @@ public class ConfigFormEx {
 			}
 		});
 
-		Button buttonCancel = new Button(rowComposite, SWT.PUSH);
-		buttonCancel.setText("Cancel");
+		Button closeButton = new Button(rowComposite, SWT.PUSH);
+		closeButton.setText("Close");
 
 		GridDataFactory.swtDefaults().align(SWT.BEGINNING, SWT.CENTER)
 				.hint(buttonWidth, buttonHeight).grab(false, false)
-				.applyTo(buttonCancel);
+				.applyTo(closeButton);
 
-		buttonCancel.addSelectionListener(new SelectionAdapter() {
+		closeButton.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
 				rowComposite.dispose();
 				shell.dispose();
@@ -331,20 +237,102 @@ public class ConfigFormEx {
 		}
 	}
 
-	public String writeDataJSON(Map<String, String> data, String defaultPayload) {
-		String payload = defaultPayload;
-		JSONObject json = new JSONObject();
-		try {
-			for (String key : data.keySet()) {
-				json.put(key, data.get(key));
-			}
-			StringWriter wr = new StringWriter();
-			json.write(wr);
-			payload = wr.toString();
-		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e);
+	private static class GridComposite extends Composite {
+
+		public GridComposite(Composite composite) {
+			super(composite, SWT.BORDER);
+			GridLayout gridLayout = new GridLayout();
+			gridLayout.numColumns = 2;
+			this.setLayout(gridLayout);
 		}
-		return payload;
+
+		public void renderData(Map<String, String> data) {
+			for (String configKey : Arrays.asList("Datacenter", "Environment", "Role",
+					"Template Directory", "Browser")) {
+				if (configOptions.containsKey(configKey)) {
+					logger.info("Processing " + configKey);
+					final Label configLabel = new Label(this, SWT.NONE);
+					configLabel.setText(configKey);
+					// http://www.codejava.net/java-se/swing/jcombobox-basic-tutorial-and-examples
+					// http://stackoverflow.com/questions/19800033/java-swt-list-make-it-unselectable
+					final Combo configValue = new Combo(this, SWT.READ_ONLY);
+					String[] items = configOptions.get(configKey).keySet()
+							.toArray(new String[0]);
+					configValue.setItems(items);
+					logger.info(new ArrayList<String>(configData.keySet()));
+					logger.info(String.format("Setting index of %s to %d",
+							configData.get(configKey),
+							Arrays.asList(items).indexOf(configData.get(configKey))));
+					configValue
+							.select(Arrays.asList(items).indexOf(configData.get(configKey)));
+					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+					configValue.setData("key", configKey);
+
+					configValue.addSelectionListener(new SelectionAdapter() {
+						public void widgetSelected(SelectionEvent event) {
+							Combo o = (Combo) event.widget;
+							data.replace((String) o.getData("key"), o.getText());
+							// TODO: validation process
+							if (configValue.getText().equals("Safari")) {
+							} else {
+								/*
+								configValue.add("Not Applicable");
+								configValue.setText("Not Applicable");
+								*/
+							}
+						}
+					});
+				} else {
+
+					if (configKey.indexOf("Directory") >= 0) {
+
+						DirBrowseComposite dirBrowseComposite3 = new DirBrowseComposite(
+								this);
+						GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
+								true);
+						gridData.horizontalSpan = 2;
+						dirBrowseComposite3.setLayoutData(gridData);
+						dirBrowseComposite3.renderData(data, configKey);
+						dirBrowseComposite3.pack();
+					} else {
+
+						final Label configLabel = new Label(this, SWT.NONE);
+						configLabel.setText(configKey);
+						final Text configValue;
+						configValue = new Text(this, SWT.SINGLE | SWT.BORDER);
+						configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+						if (data.containsKey(configKey)) {
+							configValue.setText(data.get(configKey));
+						} else {
+							// configValue.setText(String.format("%s...", configKey));
+						}
+						configValue.setData("key", configKey);
+						// see also:
+						// http://gamedev.sleptlate.org/blog/107-swt-listeners-are-incompatible-with-java-lambdas/
+						configValue.addListener(SWT.FocusOut, event -> {
+							Text text = (Text) event.widget;
+							logger.info(String.format("%s = %s", (String) text.getData("key"),
+									text.getText()));
+						});
+						// TODO: defer to FocusEvent
+						configValue.addModifyListener(new ModifyListener() {
+							@Override
+							public void modifyText(ModifyEvent event) {
+								Text text = (Text) event.widget;
+								String key = (String) text.getData("key");
+								String value = text.getText();
+								if (data.containsKey(key)) {
+									data.replace(key, value);
+								} else {
+									data.put(key, value);
+								}
+							}
+						});
+
+					}
+				}
+			}
+		}
 	}
 
 	private static class DirBrowseComposite extends Composite {
@@ -427,6 +415,8 @@ public class ConfigFormEx {
 					Text text = directory;
 					if (dir != null) {
 						text.setText(dir);
+						// dataCenterOptions = new HashMap<>();
+
 						logger.info(String.format("Browser: %s = %s",
 								(String) text.getData("key"), text.getText()));
 					}
@@ -435,111 +425,126 @@ public class ConfigFormEx {
 		}
 	}
 
-	private static class GridComposite extends Composite {
-
-		public GridComposite(Composite composite) {
-			super(composite, SWT.BORDER);
-			GridLayout gridLayout = new GridLayout();
-			gridLayout.numColumns = 2;
-			this.setLayout(gridLayout);
-		}
-
-		public void renderData(Map<String, String> data) {
-			for (String configKey : Arrays.asList("Browser", "Datacenter", "Environment", "Base URL",
-					"Template Directory", "Template")) {
-				if (configOptions.containsKey(configKey)) {
-					logger.info("Processing " + configKey);
-					final Label configLabel = new Label(this, SWT.NONE);
-					configLabel.setText(configKey);
-					// http://www.codejava.net/java-se/swing/jcombobox-basic-tutorial-and-examples
-					// http://stackoverflow.com/questions/19800033/java-swt-list-make-it-unselectable
-					final Combo configValue = new Combo(this, SWT.READ_ONLY);
-					String[] items = configOptions.get(configKey).keySet()
-							.toArray(new String[0]);
-					configValue.setItems(items);
-					logger.info(String.format("Setting index of %s to %d",
-							configData.get(configKey),
-							Arrays.asList(items).indexOf(configData.get(configKey))));
-					configValue
-							.select(Arrays.asList(items).indexOf(configData.get(configKey)));
-					configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-					configValue.setData("key", configKey);
-
-					configValue.addSelectionListener(new SelectionAdapter() {
-						public void widgetSelected(SelectionEvent event) {
-							Combo o = (Combo) event.widget;
-							data.replace((String) o.getData("key"), o.getText());
-							// TODO: validation process
-							if (configValue.getText().equals("Safari")) {
-							} else {
-								/*
-								configValue.add("Not Applicable");
-								configValue.setText("Not Applicable");
-								*/
-							}
-						}
-					});
-				} else {
-
-					if (configKey.indexOf("Directory") >= 0) {
-
-						DirBrowseComposite dirBrowseComposite3 = new DirBrowseComposite(
-								this);
-						GridData gridData = new GridData(GridData.FILL, GridData.FILL, true,
-								true);
-						gridData.horizontalSpan = 2;
-						dirBrowseComposite3.setLayoutData(gridData);
-						dirBrowseComposite3.renderData(data, configKey);
-						dirBrowseComposite3.pack();
-					} else {
-
-						final Label configLabel = new Label(this, SWT.NONE);
-						configLabel.setText(configKey);
-						final Text configValue;
-						configValue = new Text(this, SWT.SINGLE | SWT.BORDER);
-						configValue.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-						if (data.containsKey(configKey)) {
-							configValue.setText(data.get(configKey));
-						} else {
-							// configValue.setText(String.format("%s...", configKey));
-						}
-						configValue.setData("key", configKey);
-						// see also:
-						// http://gamedev.sleptlate.org/blog/107-swt-listeners-are-incompatible-with-java-lambdas/
-						configValue.addListener(SWT.FocusOut, event -> {
-							Text text = (Text) event.widget;
-							logger.info(String.format("%s = %s", (String) text.getData("key"),
-									text.getText()));
-						});
-						// TODO: defer to FocusEvent
-						configValue.addModifyListener(new ModifyListener() {
-							@Override
-							public void modifyText(ModifyEvent event) {
-								Text text = (Text) event.widget;
-								String key = (String) text.getData("key");
-								String value = text.getText();
-								if (data.containsKey(key)) {
-									data.replace(key, value);
-								} else {
-									data.put(key, value);
-								}
-							}
-						});
-
-					}
-				}
-			}
-		}
-	}
-
 	public void setData(String key, String value) {
 		configData.put(key, value);
 	}
 
-	@SuppressWarnings("unused")
 	public static void main(String[] arg) {
 		ConfigFormEx configFormEx = new ConfigFormEx(null, null);
 		ConfigFormEx.debug = true;
 		configFormEx.render();
 	}
+
+	public void initializeLogger() {
+		Properties logProperties = new Properties();
+		String log4J_properties = String.format("%s/%s/%s",
+				System.getProperty("user.dir"), "src/main/resources", "log4j.xml");
+		try {
+			logProperties.load(new FileInputStream(log4J_properties));
+			PropertyConfigurator.configure(logProperties);
+		} catch (IOException e) {
+			throw new RuntimeException("Fail to load: " + log4J_properties);
+		}
+	}
+
+	public String readData(Optional<Map<String, String>> parameters) {
+		return readData(null, parameters);
+	}
+
+	public String readData(String payload,
+			Optional<Map<String, String>> parameters) {
+
+		logger.info("Reading data: " + payload);
+		Map<String, String> collector = (parameters.isPresent()) ? parameters.get()
+				: new HashMap<>();
+
+		String data = (payload == null)
+				? "{ \"Url\": \"http://www.google.com\", \"ElementCodeName\": \"Name of the element\", \"CommandId\": \"d5be4ea9-c51f-4e61-aefc-e5c83ba00be8\", \"ElementCssSelector\": \"html div.home-logo_custom > img\", \"ElementId\": \"\", \"ElementXPath\": \"/html//img[1]\" }"
+				: payload;
+		try {
+			JSONObject elementObj = new JSONObject(data);
+			Iterator<String> propIterator = elementObj.keys();
+			while (propIterator.hasNext()) {
+				String propertyKey = propIterator.next();
+				String propertyVal = elementObj.getString(propertyKey);
+				// logger.info(propertyKey + ": " + propertyVal);
+				System.err.println("readData: " + propertyKey + ": " + propertyVal);
+				collector.put(propertyKey, propertyVal);
+			}
+		} catch (JSONException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			return null;
+		}
+		return collector.get("ElementCodeName");
+	}
+
+	public static String getOsName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
+	}
+
+	static class HANDLE extends PointerType implements NativeMapped {
+	}
+
+	static class HWND extends HANDLE {
+	}
+
+	public static String getDesktopPath() {
+		HWND hwndOwner = null;
+		int nFolder = Shell32.CSIDL_DESKTOPDIRECTORY;
+		HANDLE hToken = null;
+		int dwFlags = Shell32.SHGFP_TYPE_CURRENT;
+		char[] pszPath = new char[Shell32.MAX_PATH];
+		int hResult = Shell32.INSTANCE.SHGetFolderPath(hwndOwner, nFolder, hToken,
+				dwFlags, pszPath);
+		if (Shell32.S_OK == hResult) {
+			String path = new String(pszPath);
+			return (path.substring(0, path.indexOf('\0')));
+		} else {
+			return String.format("%s\\Desktop", System.getProperty("user.home"));
+		}
+	}
+
+	private static Map<String, Object> OPTIONS = new HashMap<>();
+	static {
+		OPTIONS.put(Library.OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
+		OPTIONS.put(Library.OPTION_FUNCTION_MAPPER, W32APIFunctionMapper.UNICODE);
+	}
+
+	static interface Shell32 extends Library {
+
+		public static final int MAX_PATH = 260;
+		// https://sourceforge.net/u/cstrauss/w32api/ci/7805df8efec130f582b131b8c0d75e1b6ce0993b/tree/include/shlobj.h?format=raw
+		public static final int CSIDL_DESKTOPDIRECTORY = 0x0010;
+		public static final int SHGFP_TYPE_CURRENT = 0;
+		public static final int SHGFP_TYPE_DEFAULT = 1;
+		public static final int S_OK = 0;
+		static Shell32 INSTANCE = Native.loadLibrary("shell32", Shell32.class,
+				OPTIONS);
+
+		public int SHGetFolderPath(HWND hwndOwner, int nFolder, HANDLE hToken,
+				int dwFlags, char[] pszPath);
+	}
+
+	public String writeDataJSON(Map<String, String> data, String defaultPayload) {
+		String payload = defaultPayload;
+		JSONObject json = new JSONObject();
+		try {
+			for (String key : data.keySet()) {
+				json.put(key, data.get(key));
+			}
+			StringWriter wr = new StringWriter();
+			json.write(wr);
+			payload = wr.toString();
+		} catch (JSONException e) {
+			System.err.println("Exception (ignored): " + e);
+		}
+		return payload;
+	}
+
 }
