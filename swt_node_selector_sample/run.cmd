@@ -25,10 +25,10 @@ if "%SKIP_TEST%"=="" (
 REM Test
 call mvn test
 REM Compile
-call mvn package install
+call mvn clean package install
 ) else (
 REM compile
-call mvn -Dmaven.test.skip=true package install
+call mvn -Dmaven.test.skip=true clean package install
 )
 
 REM Run
