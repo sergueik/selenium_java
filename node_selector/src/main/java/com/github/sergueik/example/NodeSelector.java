@@ -1,6 +1,7 @@
 package com.github.sergueik.example;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -10,6 +11,7 @@ import java.util.Arrays;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -49,7 +51,7 @@ import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
 
 /**
- * YAML Configuration browser  
+ * Node Selector: PAAS cloud YAML Configuration browser  
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * 
  */
@@ -71,11 +73,19 @@ public class NodeSelector {
 	private static String osName = getOsName();
 	static Map<String, String> browserApps = new HashMap<>();
 	static {
-		browserApps.put("Chrome", "Google Chrome");
-		browserApps.put("Firefox", "Firefox");
-		browserApps.put("Safari", "Safari");
-	}
 
+		if (osName.toLowerCase().matches("mac os x")) {
+			browserApps.put("Chrome", "Google Chrome");
+			browserApps.put("Firefox", "Firefox");
+			browserApps.put("Safari", "Safari");
+		} else if (osName.startsWith("windows")) {
+			browserApps.put("Chrome", "chrome");
+			browserApps.put("Firefox", "firefox");
+			browserApps.put("Internet Explorer", "iexplore");
+			browserApps.put("Safari", "safari");
+		}
+
+	}
 	private static Map<String, String> configData = new HashMap<>();
 
 	// NOTE: use the same DOM for Browser config options to simplify code
@@ -94,10 +104,24 @@ public class NodeSelector {
 		logger.info("Initialized logger.");
 
 		Map<String, String> browserOptions = new HashMap<>();
-		for (String value : new ArrayList<String>(Arrays.asList(
-				new String[] { "Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
-			browserOptions.put(value, "unused");
+
+		if (osName.startsWith("windows")) {
+			List<String> foundBrowsers = findBrowsersInProgramFiles();
+			System.err.println("found Browsers: " + foundBrowsers);
+			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
+					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
+				if (foundBrowsers.contains((Object) browserApps.get(value))) {
+					browserOptions.put(value, "unused");
+				}
+			}
+		} else {
+			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
+					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
+				browserOptions.put(value, "unused");
+			}
 		}
+		System.err.println("Broswer Apps: " + browserApps);
+
 		configOptions.put("Browser", browserOptions);
 
 		// TODO: dynamic
@@ -160,6 +184,7 @@ public class NodeSelector {
 	}
 
 	public void render() {
+
 		shell.open();
 		shell.setText("Session Configuration");
 
@@ -216,13 +241,15 @@ public class NodeSelector {
 				logger.info("Saving the selections: " + configData);
 				String result = writeDataJSON(configData, "{}");
 
-
 				System.err.println("osName: " + osName);
-				if (osName.toLowerCase().matches("mac os x")) {
-					String browser = configData.get("Browser");// "safari";
+				if (osName.toLowerCase().matches("mac os x")
+						|| osName.startsWith("windows")) {
+					String browser = configData.get("Browser");
 					String url = "http://ya.ru";
-					System.err.println(
-							getAppPath(String.format("%s.app", browserApps.get(browser))));
+					if (osName.toLowerCase().matches("mac os x")) {
+						System.err.println(
+								getAppPath(String.format("%s.app", browserApps.get(browser))));
+					}
 					runAppCommand(browserApps.get(browser), url);
 				}
 				if (parentShell != null) {
@@ -536,24 +563,6 @@ public class NodeSelector {
 		OPTIONS.put(Library.OPTION_TYPE_MAPPER, W32APITypeMapper.UNICODE);
 		OPTIONS.put(Library.OPTION_FUNCTION_MAPPER, W32APIFunctionMapper.UNICODE);
 	}
-	// on osx to open the url in selected browser, use
-	//
-	// /usr/bin/open -a Safari https://www.ya.ru
-	// /usr/bin/open -a 'Google Chrome' https://www.ya.ru
-	// one can find the absolyute path to the application via sotlight
-	// /usr/bin/mdfind "kMDItemFSName = Firefox.app"
-	// but running application directly
-	// /Applications/Firefox.app/Contents/MacOS/firefox http://ya.ru
-
-	// would possibly lead to the
-	// "A copy of Firefox is already open. Only one copy of Firefox can be open at
-	// a time."
-	// error
-	// String url ="http://ya.ru";
-	// String safariLocation = "/Applications/Safari.app/Contents/MacOS/";
-	// String browserAppName = "Google Chrome"; // "Firefox" // "Safari"
-	// Runtime.getRuntime().exec(new String[] { "open", "-a " + browserAppName + "
-	// " + url });
 
 	static interface Shell32 extends Library {
 
@@ -590,30 +599,36 @@ public class NodeSelector {
 	// https://coderanch.com/t/111494/os/launching-Safari-Java-App
 	// one can find the absolute path to the application via spotlight
 	// /usr/bin/mdfind "kMDItemFSName = Firefox.app"
-	// running application directly via 
+	// running application directly via
 	// /Applications/Firefox.app/Contents/MacOS/firefox http://ya.ru
 
 	// would lead to the error:
-	// "A copy of Firefox is already open. 
+	// "A copy of Firefox is already open.
 	// Only one copy of Firefox can be open at a time."
 	public static void runAppCommand(String browserAppName, String url) {
 		try {
 
 			Runtime runtime = Runtime.getRuntime();
-			String processName = "/usr/bin/open";
-			String[] processArgs = new String[] { "open", "-a ",
-					/* String.format("\\\"%s\\\"", browserAppName) */
-					browserAppName, url };
+			String processName = null;
+			String[] processArgs = new String[] {};
+			if (osName.toLowerCase().matches("mac os x")) {
+
+				processName = "/usr/bin/open";
+				processArgs = new String[] { processName, "-a", browserAppName, url };
+				/* String.format("\\\"%s\\\"", browserAppName) */
+				// TODO: quote handling
+				// Running: open -a "Firefox" http://ya.ru
+				// Unable to find application named '"Firefox"'
+				// Running: open -a \"Google Chrome\" http://ya.ru
+				// The file /Users/sergueik/src/Chrome\" does not exist.
+			} else if (osName.startsWith("windows")) {
+				processName = "C:\\Windows\\System32\\cmd.exe";
+				processArgs = new String[] { processName, "/c", "start", browserAppName,
+						url };
+			}
 			System.err.println("Running: " + String.join(" ", processArgs));
-			// Running: open -a "Firefox" http://ya.ru
-			// Process exit code: 1
-			// <ERROR>Unable to find application named '"Firefox"'</ERROR>
-			//
-			// Running: open -a \"Google Chrome\" http://ya.ru
-			// Process exit code: 1
-			// <ERROR>The file /Users/sergueik/src/selenium_java/swt_node_selector_sample/Chrome\"
-			// does not exist.</ERROR>
 			Process process = runtime.exec(String.join(" ", processArgs));
+
 			int exitCode = process.waitFor();
 			BufferedReader stdoutBufferedReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
@@ -694,5 +709,32 @@ public class NodeSelector {
 			System.err.println("Exception (ignored): " + e.getMessage());
 		}
 		return status;
+	}
+
+	private static List<String> findBrowsersInProgramFiles() {
+		// find possible root
+		File[] rootPaths = File.listRoots();
+		List<String> browsers = new ArrayList<>();
+		String[] defaultPath = (System.getProperty("os.arch").contains("64"))
+				? new String[] {
+						"Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+						"Program Files (x86)\\Internet Explorer\\iexplore.exe",
+						"Program Files (x86)\\Mozilla Firefox\\firefox.exe" }
+				: new String[] {
+						"Program Files\\Google\\Chrome\\Application\\chrome.exe",
+						"Program Files\\Internet Explorer\\iexplore.exe",
+						"Program Files\\Mozilla Firefox\\firefox.exe" };
+
+		// check file existence
+		for (File rootPath : rootPaths) {
+			for (String defPath : defaultPath) {
+				File exe = new File(rootPath + defPath);
+				if (exe.exists()) {
+					browsers.add(exe.toString().replaceAll("\\\\", "/")
+							.replaceAll("^(?:.+)/([^/]+).exe$", "$1"));
+				}
+			}
+		}
+		return browsers;
 	}
 }
