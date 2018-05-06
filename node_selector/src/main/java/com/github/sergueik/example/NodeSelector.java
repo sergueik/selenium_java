@@ -1,4 +1,4 @@
-package example;
+package com.github.sergueik.example;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -54,7 +54,7 @@ import com.sun.jna.win32.W32APITypeMapper;
  * 
  */
 
-public class ConfigFormEx {
+public class NodeSelector {
 
 	private static Shell shell;
 	private static Shell parentShell = null;
@@ -84,11 +84,11 @@ public class ConfigFormEx {
 	private static Map<String, String> roles = new HashMap<>();
 
 	@SuppressWarnings("deprecation")
-	static final Category logger = Category.getInstance(ConfigFormEx.class);
+	static final Category logger = Category.getInstance(NodeSelector.class);
 	private static StringBuilder loggingSb = new StringBuilder();
 	private static Formatter formatter = new Formatter(loggingSb, Locale.US);
 
-	ConfigFormEx(Display parentDisplay, Shell parent) {
+	NodeSelector(Display parentDisplay, Shell parent) {
 
 		initializeLogger();
 		logger.info("Initialized logger.");
@@ -451,9 +451,9 @@ public class ConfigFormEx {
 	}
 
 	public static void main(String[] arg) {
-		ConfigFormEx configFormEx = new ConfigFormEx(null, null);
-		ConfigFormEx.debug = true;
-		configFormEx.render();
+		NodeSelector form = new NodeSelector(null, null);
+		NodeSelector.debug = true;
+		form.render();
 	}
 
 	public void initializeLogger() {
