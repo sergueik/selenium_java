@@ -248,7 +248,7 @@ public class NodeSelector {
 					String url = "http://ya.ru";
 					if (osName.toLowerCase().matches("mac os x")) {
 						System.err.println(
-								getAppPath(String.format("%s.app", browserApps.get(browser))));
+								findAppInPath(String.format("%s.app", browserApps.get(browser))));
 					}
 					runAppCommand(browserApps.get(browser), url);
 				}
@@ -599,10 +599,10 @@ public class NodeSelector {
 	// https://coderanch.com/t/111494/os/launching-Safari-Java-App
 	// one can find the absolute path to the application via spotlight
 	// /usr/bin/mdfind "kMDItemFSName = Firefox.app"
-	// running application directly via
+	// but running application directly via like
 	// /Applications/Firefox.app/Contents/MacOS/firefox http://ya.ru
 
-	// would lead to the error:
+	// would lead to an error:
 	// "A copy of Firefox is already open.
 	// Only one copy of Firefox can be open at a time."
 	public static void runAppCommand(String browserAppName, String url) {
@@ -625,6 +625,12 @@ public class NodeSelector {
 				processName = "C:\\Windows\\System32\\cmd.exe";
 				processArgs = new String[] { processName, "/c", "start", browserAppName,
 						url };
+			} else {
+				// TODO: on Linux need to compose the command with bash 
+				// to launch browser in the background
+				// or make event handler operate on separate thread
+				processName = "/usr/bin/env";
+				processArgs = new String[] { processName, browserAppName, url };
 			}
 			System.err.println("Running: " + String.join(" ", processArgs));
 			Process process = runtime.exec(String.join(" ", processArgs));
@@ -658,11 +664,18 @@ public class NodeSelector {
 		}
 	}
 
-	public static boolean getAppPath(String appName) {
+	// TODO:
+	public static boolean findAppInPath(String appName) {
 		boolean status = false;
-		String findCommand = String.format("'kMDItemFSName = %s'", appName);
-
-		String processName = "/usr/bin/mdfind";
+		String processName = null;
+		String findCommand = null;
+		if (osName.toLowerCase().matches("mac os x")) {
+			findCommand = String.format("'kMDItemFSName = %s'", appName);
+			processName = "/usr/bin/mdfind";
+		} else if (!(osName.startsWith("windows"))) {
+			processName = "/usr/bin/which";
+			findCommand = appName;
+		}
 		String[] processArgs = new String[] { processName, findCommand };
 		System.err.println("Running: " + String.join(" ", processArgs));
 		try {
