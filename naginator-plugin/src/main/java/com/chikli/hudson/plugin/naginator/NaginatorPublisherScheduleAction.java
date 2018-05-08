@@ -289,12 +289,20 @@ public class NaginatorPublisherScheduleAction extends NaginatorScheduleAction {
 	 */
 	private int getMessageData(@Nonnull final String message,
 			@Nonnull final String regexp) {
+		// already compiled
 		Pattern pattern = Pattern.compile(regexp);
 		int data = 0;
 		LOGGER.log(Level.FINEST, "Processing message: " + message);
 		Matcher matcher = pattern.matcher(message);
 		if (matcher.find()) {
-			data = Integer.parseInt(matcher.group(1));
+			String matchedGroup = null;
+			try {
+				matchedGroup = matcher.group(1);
+				data = Integer.parseInt(matchedGroup);
+			} catch (NumberFormatException e) {
+				LOGGER.log(Level.FINEST,
+						"Failed to parse captured data: " + matchedGroup);
+			}
 			// assertThat(data, greaterThan(0));
 			LOGGER.log(Level.FINEST, "Extracted data: " + data);
 		} else {

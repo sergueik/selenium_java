@@ -69,13 +69,6 @@
       <email>tomer4@gmail.com</email>
       <timezone>+2</timezone>
     </developer>
-    <developer>
-      <name>Serguei Kouzmine</name>
-      <email>kouzmine_serguei@yahoo.com</email>
-      <organization/>
-      <organizationUrl>https://github.com/sergueik</organizationUrl>
-      <timezone>-5</timezone>
-    </developer>
   </developers>
   <repositories>
     <repository>
@@ -148,32 +141,9 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>${maven-compiler-plugin.version}</version>
-        <goals>
-          <goal>compile</goal>
-        </goals>
-        <configuration>
-          <source>${java.version}</source>
-          <target>${java.version}</target>
-          <encoding>utf-8</encoding>
-          <compilerArgument>-Xlint:all</compilerArgument>
-          <showWarnings>true</showWarnings>
-          <showDeprecation>true</showDeprecation>
-          <!--
-          <compilerArgument>-verbose</compilerArgument>
-          -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
   <profiles>
     <profile>
-      <id>chrome</id>
+      <id>default</id>
       <properties>
         <maven.javadoc.skip>true</maven.javadoc.skip>
       </properties>
