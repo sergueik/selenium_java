@@ -74,11 +74,11 @@ public class NodeSelector {
 	static Map<String, String> browserApps = new HashMap<>();
 	static {
 
-		if (osName.toLowerCase().matches("mac os x")) {
+		if (osName.matches("mac os x")) {
 			browserApps.put("Chrome", "Google Chrome");
 			browserApps.put("Firefox", "Firefox");
 			browserApps.put("Safari", "Safari");
-		} else if (osName.startsWith("windows")) {
+		} else if (osName.matches("windows")) {
 			browserApps.put("Chrome", "chrome");
 			browserApps.put("Firefox", "firefox");
 			browserApps.put("Internet Explorer", "iexplore");
@@ -115,6 +115,7 @@ public class NodeSelector {
 				}
 			}
 		} else {
+			// os x, Linux
 			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
 					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
 				browserOptions.put(value, "unused");
@@ -241,14 +242,17 @@ public class NodeSelector {
 				logger.info("Saving the selections: " + configData);
 				String result = writeDataJSON(configData, "{}");
 
-				System.err.println("osName: " + osName);
-				if (osName.toLowerCase().matches("mac os x")
-						|| osName.startsWith("windows")) {
+				logger.debug("osName: " + osName);
+
+				String url = "http://ya.ru";
+
+				if (osName.matches("(?:mac os x|windows)")) {
 					String browser = configData.get("Browser");
-					String url = "http://ya.ru";
-					if (osName.toLowerCase().matches("mac os x")) {
-						System.err.println(
-								findAppInPath(String.format("%s.app", browserApps.get(browser))));
+					if (osName.matches("mac os x")) {
+						System.err.println(findAppInPath(
+								String.format("%s.app", browserApps.get(browser))));
+					}
+					if (osName.matches("windows")) {
 					}
 					runAppCommand(browserApps.get(browser), url);
 				}
@@ -611,7 +615,7 @@ public class NodeSelector {
 			Runtime runtime = Runtime.getRuntime();
 			String processName = null;
 			String[] processArgs = new String[] {};
-			if (osName.toLowerCase().matches("mac os x")) {
+			if (osName.matches("mac os x")) {
 
 				processName = "/usr/bin/open";
 				processArgs = new String[] { processName, "-a", browserAppName, url };
@@ -621,19 +625,20 @@ public class NodeSelector {
 				// Unable to find application named '"Firefox"'
 				// Running: open -a \"Google Chrome\" http://ya.ru
 				// The file /Users/sergueik/src/Chrome\" does not exist.
-			} else if (osName.startsWith("windows")) {
+			} else if (osName.matches("windows")) {
 				processName = "C:\\Windows\\System32\\cmd.exe";
 				processArgs = new String[] { processName, "/c", "start", browserAppName,
 						url };
 			} else {
-				// TODO: on Linux need to compose the command with bash 
+				// TODO: on Linux need to compose the command with bash
 				// to launch browser in the background
 				// or make event handler operate on separate thread
 				processName = "/usr/bin/env";
 				processArgs = new String[] { processName, browserAppName, url };
 			}
 			System.err.println("Running: " + String.join(" ", processArgs));
-			Process process = runtime.exec(String.join(" ", processArgs));
+			// Process process = runtime.exec(String.join(" ", processArgs));
+			Process process = runtime.exec(processArgs);
 
 			int exitCode = process.waitFor();
 			BufferedReader stdoutBufferedReader = new BufferedReader(
