@@ -122,7 +122,7 @@ public class NodeSelector {
 			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
 					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
 				if (osName.matches("mac os x")) {
-					// TODO: fix
+					// TODO: findApp does not work
 					// if (findAppInPath(browserApps.get(value) + ".app")) {
 					browserOptions.put(value, "");
 					// }
@@ -690,7 +690,9 @@ public class NodeSelector {
 		String processName = null;
 		String findCommand = null;
 		if (osName.toLowerCase().matches("mac os x")) {
-			findCommand = String.format("\"kMDItemFSName == '%s'\"", appName);
+			// TODO: fix customEscapeQuote
+			findCommand = String.format(
+					/* "\"kMDItemFSName == '%s'\"" */ "\"kMDItemFSName == %s\"", appName);
 			processName = "/usr/bin/mdfind";
 		} else if (!(osName.matches("windows"))) {
 			processName = "/usr/bin/which";
@@ -698,12 +700,19 @@ public class NodeSelector {
 		}
 		String[] processArgs = new String[] { processName, findCommand };
 		System.err.println("Running: " + String.join(" ", processArgs));
+		boolean useShell = true;
+		Process process = null;
 		try {
-			Runtime runtime = Runtime.getRuntime();
 
-			Process process = runtime.exec(String.join(" ", processArgs));
-			// process.redirectErrorStream( true);
-
+			if (useShell) {
+				process = execWithShell(processArgs);
+				status = false;
+			} else {
+				Runtime runtime = Runtime.getRuntime();
+				process = runtime.exec(processArgs);
+				// process = runtime.exec(String.join(" ", processArgs));
+				// process.redirectErrorStream( true);
+			}
 			BufferedReader stdoutBufferedReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
 
@@ -741,6 +750,7 @@ public class NodeSelector {
 		} catch (Exception e) {
 			System.err.println("Exception (ignored): " + e.getMessage());
 		}
+
 		return status;
 	}
 
@@ -770,4 +780,96 @@ public class NodeSelector {
 		}
 		return browsers;
 	}
+
+	public static Process execWithShell(String[] commandArray)
+			throws IOException {
+		return execWithShell(commandArray, null, null);
+	}
+
+	public static Process execWithShell(String[] commandArray, String[] envp)
+			throws IOException {
+		return execWithShell(commandArray, envp, null);
+	}
+
+	static Process execWithShell(String[] commandArray, String[] envp,
+			File directory) throws IOException {
+		// based on:
+		// http://www.java2s.com/Code/Java/Development-Class/Helpermethodtoexecuteshellcommand.htm
+		// instead of calling command directly, we'll call the shell to change
+		// directory and set environment variables.
+
+		// start constructing the shell command line.
+		StringBuffer buf = new StringBuffer();
+
+		if (directory != null) {
+			// change to directory
+			buf.append("cd '");
+			buf.append(customEscapeQuote(directory.toString()));
+			buf.append("'; ");
+		}
+
+		if (envp != null) {
+			// set environment variables. Quote the value (but not the name).
+			for (int i = 0; i < envp.length; ++i) {
+				String nameval = envp[i];
+				int equals = nameval.indexOf('=');
+				if (equals == -1)
+					throw new IOException("environment variable '" + nameval
+							+ "' should have form NAME=VALUE");
+				buf.append(nameval.substring(0, equals + 1));
+				buf.append('\'');
+				buf.append(customEscapeQuote(nameval.substring(equals + 1)));
+				buf.append("\' ");
+			}
+		}
+
+		// now that we have the directory and environment, run "which"
+		// to test if the command name is found somewhere in the path.
+		// If "which" fails, throw an IOException.
+		String cmdname = customEscapeQuote(commandArray[0]);
+		String[] sharray = new String[] { "sh", "-c",
+				buf.toString() + " which \'" + cmdname + "\'" };
+		logger.info("Executing: " + Arrays.asList(sharray));
+		Runtime runtime = Runtime.getRuntime();
+		Process process1 = runtime.exec(sharray);
+		try {
+			process1.waitFor();
+		} catch (InterruptedException e) {
+			throw new IOException("interrupted");
+		}
+
+		if (process1.exitValue() != 0)
+			throw new IOException(
+					"Couldn't execute " + cmdname + ": bad command or filename");
+
+		// finish in
+		buf.append("exec \'");
+		buf.append(cmdname);
+		buf.append("\' ");
+
+		// quote each argument in the command
+		for (int i = 1; i < commandArray.length; ++i) {
+			buf.append('\'');
+			buf.append(customEscapeQuote(commandArray[i]));
+			buf.append("\' ");
+		}
+
+		sharray[2] = buf.toString();
+		logger.info("Executing: " + Arrays.asList(sharray));
+		return runtime.exec(sharray);
+	}
+
+	// TODO: confirm that it works
+	static String customEscapeQuote(String s) {
+		// replace single quotes with a bit of magic (end-quote, escaped-quote,
+		// start-quote)
+		// that works in a single-quoted string in the Unix shell
+		if (s.indexOf('\'') != -1) {
+			System.out.println("replacing single-quotes in " + s);
+			s = s.replace("'", "'\\''");
+			System.out.println("to get " + s);
+		}
+		return s;
+	}
+
 }
