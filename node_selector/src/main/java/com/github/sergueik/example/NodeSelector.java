@@ -259,15 +259,10 @@ public class NodeSelector {
 				String url = "http://ya.ru";
 
 				String browser = configData.get("Browser");
-				if (osName.matches("(?:mac os x|windows)")) {
-					if (osName.matches("mac os x")) {
-						System.err.println(findAppInPath(
-								String.format("%s.app", browserApps.get(browser))));
-					}
-					if (osName.matches("windows")) {
-					}
-				} else {
-					// runCommand(browserApps.get(browser), url);
+				if (osName.matches("mac os x")) {
+					// temporarily placed here, to run on selection
+					logger.info(
+							findAppInPath(String.format("%s.app", browserApps.get(browser))));
 				}
 				runAppCommand(browserApps.get(browser), url);
 				if (parentShell != null) {
@@ -534,11 +529,11 @@ public class NodeSelector {
 				String propertyKey = propIterator.next();
 				String propertyVal = elementObj.getString(propertyKey);
 				// logger.info(propertyKey + ": " + propertyVal);
-				System.err.println("readData: " + propertyKey + ": " + propertyVal);
+				// System.err.println("readData: " + propertyKey + ": " + propertyVal);
 				collector.put(propertyKey, propertyVal);
 			}
 		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e.toString());
+			logger.debug("Exception (ignored): " + e.toString());
 			return null;
 		}
 		return collector.get("ElementCodeName");
@@ -609,7 +604,7 @@ public class NodeSelector {
 			json.write(wr);
 			payload = wr.toString();
 		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e);
+			logger.debug("Exception (ignored): " + e);
 		}
 		return payload;
 	}
@@ -645,13 +640,14 @@ public class NodeSelector {
 				processArgs = new String[] { processName, "/c", "start", browserAppName,
 						url };
 			} else {
-				// TODO: on Linux need to compose the command with bash
+				// TODO: on Linux need to amend the shell command
 				// to launch browser in the background
 				// or make event handler operate on separate thread
 				processName = "/usr/bin/env";
 				processArgs = new String[] { processName, browserAppName, url };
 			}
-			System.err.println("Running: " + String.join(" ", processArgs));
+			logger.info("Running: " + String.join(" ", processArgs));
+
 			// Process process = runtime.exec(String.join(" ", processArgs));
 			Process process = runtime.exec(processArgs);
 
@@ -686,10 +682,12 @@ public class NodeSelector {
 
 	// TODO:
 	public static boolean findAppInPath(String appName) {
+		boolean useShell = false;
 		boolean status = false;
 		String processName = null;
 		String findCommand = null;
 		if (osName.toLowerCase().matches("mac os x")) {
+			useShell = true;
 			// TODO: fix customEscapeQuote
 			findCommand = String.format(
 					/* "\"kMDItemFSName == '%s'\"" */ "\"kMDItemFSName == %s\"", appName);
@@ -700,18 +698,25 @@ public class NodeSelector {
 		}
 		String[] processArgs = new String[] { processName, findCommand };
 		System.err.println("Running: " + String.join(" ", processArgs));
-		boolean useShell = true;
+
 		Process process = null;
 		try {
-
 			if (useShell) {
 				process = execWithShell(processArgs);
 				status = false;
 			} else {
-				Runtime runtime = Runtime.getRuntime();
-				process = runtime.exec(processArgs);
+				// Runtime runtime = Runtime.getRuntime();
+				// process = runtime.exec(processArgs);
+
 				// process = runtime.exec(String.join(" ", processArgs));
 				// process.redirectErrorStream( true);
+
+				// see also:
+				// https://docs.oracle.com/javase/1.5.0/docs/api/java/lang/ProcessBuilder.html
+				// and
+				// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html
+				ProcessBuilder pb = new ProcessBuilder(Arrays.asList(processArgs));
+				process = pb.start();
 			}
 			BufferedReader stdoutBufferedReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));
