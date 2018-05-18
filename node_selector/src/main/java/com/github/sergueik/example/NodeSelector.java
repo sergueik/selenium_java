@@ -71,6 +71,9 @@ public class NodeSelector {
 	private static Boolean debug = false;
 
 	private static String osName = getOsName();
+	private static List<String> standardBrowsers = new ArrayList<String>(
+			Arrays.asList(
+					new String[] { "Chrome", "Firefox", "Internet Explorer", "Safari" }));
 	static Map<String, String> browserApps = new HashMap<>();
 
 	static {
@@ -111,25 +114,17 @@ public class NodeSelector {
 		if (osName.matches("windows")) {
 			List<String> foundBrowsers = findBrowsersInProgramFiles();
 			logger.info("Found Browsers: " + foundBrowsers);
-			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
-					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
+			for (String value : standardBrowsers) {
 				if (foundBrowsers.contains((Object) browserApps.get(value))) {
 					browserOptions.put(value, "");
 				}
 			}
 		} else {
 			// os x, Linux
-			for (String value : new ArrayList<String>(Arrays.asList(new String[] {
-					"Chrome", "Firefox", "Internet Explorer", "Safari" }))) {
-				if (osName.matches("mac os x")) {
-					// TODO: findApp does not work
-					// if (findAppInPath(browserApps.get(value) + ".app")) {
+			for (String value : standardBrowsers) {
+				if (findAppInPath(osName.matches("mac os x")
+						? browserApps.get(value) + ".app" : browserApps.get(value))) {
 					browserOptions.put(value, "");
-					// }
-				} else {
-					if (findAppInPath(browserApps.get(value))) {
-						browserOptions.put(value, "");
-					}
 				}
 			}
 		}
@@ -259,11 +254,6 @@ public class NodeSelector {
 				String url = "http://ya.ru";
 
 				String browser = configData.get("Browser");
-				if (osName.matches("mac os x")) {
-					// temporarily placed here, to run on selection
-					logger.info(
-							findAppInPath(String.format("%s.app", browserApps.get(browser))));
-				}
 				runAppCommand(browserApps.get(browser), url);
 				if (parentShell != null) {
 					parentShell.setData("CurrentConfig", result);
@@ -687,11 +677,18 @@ public class NodeSelector {
 		String processName = null;
 		String findCommand = null;
 		if (osName.toLowerCase().matches("mac os x")) {
+			// the mdfind call does not work and is kept for future investigation
 			useShell = true;
 			// TODO: fix customEscapeQuote
 			findCommand = String.format(
 					/* "\"kMDItemFSName == '%s'\"" */ "\"kMDItemFSName == %s\"", appName);
 			processName = "/usr/bin/mdfind";
+			if ((new File("/Applications/" + appName).exists())
+					|| (new File("/Applications/" + appName + ".app").exists())) {
+				return true;
+			} else {
+				return false;
+			}
 		} else if (!(osName.matches("windows"))) {
 			processName = "/usr/bin/which";
 			findCommand = appName;
