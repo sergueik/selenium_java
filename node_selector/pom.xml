@@ -32,7 +32,6 @@
     <junit.version>4.12</junit.version>
     <log4j.version>1.2.17</log4j.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <snakeyaml.version>1.19</snakeyaml.version>

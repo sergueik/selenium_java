@@ -1,0 +1,33 @@
+---
+ad8c3125:
+  datacenter: wec
+  consul_node_name: service-discovery-server-0
+  branch_name: cert
+  environment: prod
+e530095c:
+  datacenter: wec
+  consul_node_name: service-discovery-server-1
+  branch_name: cert
+  environment: prod
+  unused1:
+e577775c:
+  datacenter: oxdc
+  consul_node_name: apim-ap-manager-publisher-0
+  branch_name: sand
+  environment: test
+  unused2:
+node1_to_ignore:
+  datacenter: wec
+  branch_name: cert
+  environment: prod
+  server_role: 'internal'
+  unused3:
+  unused4:
+node2_to_ignore:
+  datacenter: wec
+  branch_name: cert
+  environment: prod
+  server_role: 'internal'
+  unused4:
+   - a
+   - b

@@ -6,6 +6,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
@@ -49,6 +51,12 @@ import com.sun.jna.NativeMapped;
 import com.sun.jna.PointerType;
 import com.sun.jna.win32.W32APIFunctionMapper;
 import com.sun.jna.win32.W32APITypeMapper;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Node Selector: PAAS cloud YAML Configuration browser
@@ -480,10 +488,63 @@ public class NodeSelector {
 		configData.put(key, value);
 	}
 
-	public static void main(String[] arg) {
+	public static void main(String[] args) throws IOException {
+		String dataPath = String.format("%s/src/main/resources/%s",
+				System.getProperty("user.dir"), "data.yaml");
+		logger.info("Loading from %s" + dataPath);
+		Map<String, Map<String, String>> environmentObj = loadData(dataPath);
+
+		System.out.println("Loaded object type:" + environmentObj.getClass());
+		for (String node : environmentObj.keySet()) {
+			Map<String, String> nodeObj = environmentObj.get((Object) node);
+			logger.info(String.format("Key: %s, Data: %s", node, nodeObj));
+		}
+
 		NodeSelector form = new NodeSelector(null, null);
 		NodeSelector.debug = true;
 		form.render();
+	}
+
+	private static DumperOptions options = new DumperOptions();
+	private static Yaml yaml = null;
+
+	@SuppressWarnings("unchecked")
+	public static Map<String, Map<String, String>> loadData(String fileName) {
+		if (yaml == null) {
+			options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+			yaml = new Yaml(options);
+		}
+
+		Map<String, Map<String, String>> data = new HashMap<String, Map<String, String>>();
+		try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
+			// NOTE: unchecked conversion
+			// required: Map<String,Map<String,String>>
+			// found: capture#1 of ? extends java.util.Map
+			data = yaml.loadAs(in, data.getClass());
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+
+	// NOTE: examples in
+	// https://www.logicbig.com/tutorials/misc/yaml/snake-yaml-loading.html
+	// do not work.
+	private static void loadFromFile(String path) throws IOException {
+		System.err.printf("-- loading from %s --%n", path);
+
+		Yaml yaml = new Yaml();
+		try (InputStream in = NodeSelector.class.getResourceAsStream(path)) {
+			// does not work:
+			// Exception in thread "main" org.yaml.snakeyaml.error.YAMLException:
+			// java.io.IOException: Stream closed
+			Iterable<Object> itr = yaml.loadAll(in);
+			System.err.println("-- iterating loaded Iterable --");
+			for (Object o : itr) {
+				System.err.println("element type: " + o.getClass());
+				System.err.println(o);
+			}
+		}
 	}
 
 	public void initializeLogger() {
