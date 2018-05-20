@@ -297,9 +297,15 @@ public class BaseTest {
 			capabilities.setCapability("acceptSslCerts", true);
 			capabilities.setCapability("elementScrollBehavior", 1);
 			FirefoxProfile profile = new FirefoxProfile();
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk","application/octet-stream,text/csv");
+			profile.addPreference("browser.helperApps.neverAsk.openFile","text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+			profile.addPreference("browser.helperApps.neverAsk.saveToDisk","text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+			profile.addPreference("browser.helperApps.alwaysAsk.force", false);
+			profile.addPreference("browser.download.manager.alertOnEXEOpen", false);
 			profile.setAcceptUntrustedCertificates(true);
 			profile.setAssumeUntrustedCertificateIssuer(true);
 			profile.setEnableNativeEvents(false);
+			profile.setPreference("dom.webnotifications.enabled", false);
 			// optional
 			/*
 			 profile.setPreference("general.useragent.override",
