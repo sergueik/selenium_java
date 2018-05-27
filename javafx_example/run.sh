@@ -1,21 +1,30 @@
 #!/bin/bash
 # set -x
 
-PACKAGE_NAME='javafx_example_app'
+PACKAGE='javafx_example_app'
 SKIP_PACKAGE_VERSION=true
-
-# TODO: xmllint the `pom.xml`
+PACKAGE='example'
 if [[ $SKIP_PACKAGE_VERSION ]] ; then
-  PACKAGE_NAME='javafx_example_app'
+  PACKAGE='javafx_example_app'
   APP_JAR="$PACKAGE_NAME.jar"
 else
-  PACKAGE_NAME='javafx_example'
-  PACKAGE_VERSION='0.0.1-SNAPSHOT'
-  APP_JAR="$PACKAGE_NAME-$PACKAGE_VERSION.jar"
+  PACKAGE='javafx_example'
+  APP_VERSION='0.0.1-SNAPSHOT'
+  APP_JAR="$PACKAGE-$APP_VERSION.jar"
 fi
 
-MAIN_APP_PACKAGE='example'
-MAIN_APP_CLASS=${1:-FlowPaneEx}
+DEFAULT_MAIN_CLASS='FlowPaneEx'
+
+which xmllint > /dev/null
+
+if [  $? -eq  0 ] ; then
+  APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
+  PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
+  APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
+  DEFAULT_MAIN_APP_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml)
+fi
+
+MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_APP_CLASS}
 
 if $(uname -s | grep -qi Darwin)
 then
