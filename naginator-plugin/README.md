@@ -11,8 +11,8 @@ More info is available on the plugin's [Wiki page](https://wiki.jenkins-ci.org/d
 ### Objective
 
 To implement a complex retry policy for different errors (e.g. a networking errors with artifactory may be flagged error and qualify for a bigger number of retries than e.g. a provision error due to incorrect resource ordering (often happen during new module or profile development, and recovered in the second and subsequent provision , hence one retry is sufficient while the Puppet code error is to be flagged as an error and stop the build without any retries) one may
-add a few `com.chikli.hudson.plugin.naginator.NaginatorPublisher`
-XML nodes to the job `publishers` configuration like in the example below:
+add multiple `com.chikli.hudson.plugin.naginator.NaginatorPublisher`
+XML nodes each representing a vaild job `publisher` class intance configuration like in the example shown below:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -71,8 +71,9 @@ exit 1</command>
   <buildWrappers/>
 </project>
 ```
+However creating of such configuration seems not be allowd in Jenkins UI, though if the job `congif.xml` is edited manually, all added publishers will bei visible in the UI but option to add more will bre greyed: 
 
-Note constructing the configuration seems to not be possible in Jenkins UI, only manually editing  the `congif.xml`.
+![Default Usage](https://github.com/sergueik/selenium_java/blob/master/naginator-plugin/screenshots/new_retry_greyed.png)
 
 The other option is to fork and extend the project code and
 allow the `NaginatorPublisherScheduleAction` class to set the `maxScheduleOverride`
