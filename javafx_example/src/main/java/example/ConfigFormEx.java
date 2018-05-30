@@ -17,6 +17,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -186,15 +192,25 @@ public class ConfigFormEx extends Application {
 		ComboBox templateChoice = new ComboBox();
 		templateChoice.getItems().addAll(Arrays.asList(templates));
 		templateChoice.setPromptText("template");
-		templateChoice.setEditable(true);
 		templateChoice.setOnAction(e -> {
 			String dummy = templateChoice.getSelectionModel().getSelectedItem()
 					.toString();
+
 		});
+
 		GridPane.setHalignment(templateChoice, HPos.RIGHT);
-		templateChoice.setValue("mockup 1");
+
 		templateChoice.setEditable(true);
-		templateChoice.getEditor().setEditable(false);
+		templateChoice.getEditor().setEditable(true);
+		System.out.println("New value " + templates[0]);
+		templateChoice.valueProperty().setValue(templates[0]);
+		templateChoice.valueProperty().addListener(new ChangeListener<String>() {
+			@Override
+			public void changed(ObservableValue ov, String t, String t1) {
+				System.out.println("New value " + t1);
+
+			}
+		});
 
 		templateChoice.setStyle("-fx-background-color: gray");
 		templateChoice.setMaxWidth(Double.MAX_VALUE);
