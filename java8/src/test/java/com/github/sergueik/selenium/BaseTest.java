@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -229,17 +230,12 @@ public class BaseTest {
 
 			for (String optionAgrument : (new String[] {
 					"--user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0",
-					"--allow-running-insecure-content",
-					"--allow-insecure-localhost",
-					"--enable-local-file-accesses",
-					"--disable-notifications",
+					"--allow-running-insecure-content", "--allow-insecure-localhost",
+					"--enable-local-file-accesses", "--disable-notifications",
 					"--disable-save-password-bubble",
 					/* "start-maximized" , */
-					"--disable-default-app",
-					"disable-infobars",
-					"--no-sandbox ",
-					"--browser.download.folderList=2",
-					"--disable-web-security",
+					"--disable-default-app", "disable-infobars", "--no-sandbox ",
+					"--browser.download.folderList=2", "--disable-web-security",
 					"--no-proxy-server",
 					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
 					String.format("--browser.download.dir=%s", downloadFilepath)
@@ -297,11 +293,17 @@ public class BaseTest {
 			capabilities.setCapability("acceptSslCerts", true);
 			capabilities.setCapability("elementScrollBehavior", 1);
 			FirefoxProfile profile = new FirefoxProfile();
-			profile.setPreference("browser.helperApps.neverAsk.saveToDisk","application/octet-stream,text/csv");
-			profile.addPreference("browser.helperApps.neverAsk.openFile","text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
-			profile.addPreference("browser.helperApps.neverAsk.saveToDisk","text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
-			profile.addPreference("browser.helperApps.alwaysAsk.force", false);
-			profile.addPreference("browser.download.manager.alertOnEXEOpen", false);
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+					"application/octet-stream,text/csv");
+			profile.setPreference("browser.helperApps.neverAsk.openFile",
+					"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+			// TODO: cannot find symbol: method
+			// addPreference(java.lang.String,java.lang.String)location: variable
+			// profile of type org.openqa.selenium.firefox.FirefoxProfile
+			profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+					"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+			profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+			profile.setPreference("browser.download.manager.alertOnEXEOpen", false);
 			profile.setAcceptUntrustedCertificates(true);
 			profile.setAssumeUntrustedCertificateIssuer(true);
 			profile.setEnableNativeEvents(false);
@@ -700,4 +702,119 @@ public class BaseTest {
 		confirmHanldeNotClosed(handle);
 		return driver.switchTo().window(parentHandle);
 	}
+
+	// origin: https://github.com/RomanIovlev/Css-to-XPath-Java
+	// see also: https://github.com/featurist/css-to-xpath
+	// https://gist.github.com/hguiney/3320053
+	//
+	public static class CssToXPath {
+		public static String cssToXPath(String css) {
+			if (css == null || css.isEmpty())
+				return "";
+			int i = 0;
+			int start;
+			int length = css.length();
+			String result = "//";
+			while (i < length) {
+				char symbol = css.charAt(i);
+				if (isTagLetter(symbol)) {
+					start = i;
+					while (i < length && isTagLetter(css.charAt(i)))
+						i++;
+					if (i == length)
+						return result + css.substring(start);
+					result += css.substring(start, i);
+					continue;
+				}
+				if (symbol == ' ') {
+					result += "//";
+					i++;
+					continue;
+				}
+				if (Arrays.asList('.', '#', '[').contains(symbol)) {
+					List<String> attributes = new ArrayList<>();
+					while (i < length && css.charAt(i) != ' ') {
+						switch (css.charAt(i)) {
+						case '.':
+							i++;
+							start = i;
+							while (i < length && isAttrLetter(css.charAt(i)))
+								i++;
+							attributes.add(convertToClass(i == length ? css.substring(start)
+									: css.substring(start, i)));
+							break;
+						case '#':
+							i++;
+							start = i;
+							while (i < length && isAttrLetter(css.charAt(i)))
+								i++;
+							attributes.add(convertToId(i == length ? css.substring(start)
+									: css.substring(start, i)));
+							break;
+						case '[':
+							i++;
+							String attribute = "@";
+							while (i < length
+									&& (!Arrays.asList('=', ']').contains(css.charAt(i)))) {
+								attribute += css.charAt(i);
+								i++;
+							}
+							if (css.charAt(i) == '=') {
+								attribute += "=";
+								i++;
+								if (css.charAt(i) != '\'')
+									attribute += "'";
+								while (i < length && css.charAt(i) != ']') {
+									attribute += css.charAt(i);
+									i++;
+								}
+								if (i == length)
+									throw new RuntimeException("Incorrect Css. No ']' symbol");
+								if (attribute.charAt(attribute.length() - 1) != '\'')
+									attribute += "'";
+							}
+							attributes.add(attribute);
+							i++;
+							break;
+						default:
+							throw new RuntimeException(String.format(
+									"Can't process Css. Unexpected symbol %s in attributes",
+									css.charAt(i)));
+						}
+					}
+					if (result.charAt(result.length() - 1) == '/')
+						result += "*";
+					result += "[" + String.join(" and ", attributes) + "]";
+					continue;
+				}
+				throw new RuntimeException(
+						String.format("Can't process Css. Unexpected symbol '%s'", symbol));
+			}
+			return result;
+		}
+
+		private static String convertToClass(String value) {
+			return "contains(@class,'" + value + "')";
+		}
+
+		private static String convertToId(String value) {
+			return convertToAtribute("id", value);
+		}
+
+		private static String convertToAtribute(String attr, String value) {
+			return "@" + attr + "='" + value + "'";
+		}
+
+		private static boolean isAttrLetter(char symbol) {
+			return symbol >= 'a' && symbol <= 'z' || symbol >= 'A' && symbol <= 'Z'
+					|| symbol >= '0' && symbol <= '9' || symbol == '-' || symbol == '_'
+					|| symbol == '.' || symbol == ':';
+		}
+
+		private static boolean isTagLetter(char symbol) {
+			return symbol >= 'a' && symbol <= 'z';
+		}
+
+	}
+
 }
