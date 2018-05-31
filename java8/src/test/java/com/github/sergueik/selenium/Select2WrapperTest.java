@@ -52,37 +52,32 @@ import org.testng.annotations.Test;
  * https://qa-automation-notes.blogspot.com/2015/11/webdriver-vs-select2.html
 */
 
-public class Select2WrapperTest {
+public class Select2WrapperTest extends BaseTest {
 
-	private WebDriver driver;
-	private WebDriverWait wait;
-	private static Actions actions;
-	private int flexibleWait = 5;
-	private long pollingInterval = 500;
 	private static String baseURL = "https://select2.github.io/examples.html";
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static final String browser = "chrome";
-	private static String osName;
 
 	private static final String selectOptionScript = "var selector = arguments[0]; var o_val = arguments[1]; var s2_obj = $(selector).select2(); option = s2_obj.val(o_val); option.trigger('select');";
 	private static final String querySelectedValueScript = "var selector = arguments[0]; var s2_obj = $(selector).select2(); return s2_obj.val();";
 	private static final String selectByVisibleTextScript = "var selector = arguments[0]; var s2_obj = $(selector).select2(); var text = arguments[1]; var found_opt = s2_obj.find('option:contains(\"' + text + '\")').val(); return found_opt";
 	private static final String selectMultiOptionClearScript = "var selector = arguments[0]; $(selector).select2().val(null).trigger('change');";
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void selectByOptionValueTest() {
 		String selectOption = "FL";
-
+		String select2Locator = "select.js-states";
 		// Arrange
 		wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
+				.visibilityOf(driver.findElement(By.cssSelector(select2Locator))));
 		// Act
 
-		executeScript(selectOptionScript, "select.js-states", selectOption);
+		executeScript(selectOptionScript, select2Locator, selectOption);
 		// TODO: appears without running the second script the result is not updated
 		String result = (String) executeScript(querySelectedValueScript,
-				"select.js-states");
-		System.err.println("Selected via Javascript: " + result);
+				select2Locator);
+		System.err.println(
+				String.format("Result of selecting by the option value (%s): %s",
+						selectOption, result));
 
 		sleep(150);
 		// Assert
@@ -95,15 +90,18 @@ public class Select2WrapperTest {
 		System.err.println("Selection: " + selectionElement.getText());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void selectByVisibleOptionTextTest() {
 		// Arrange
+		String select2Locator = "select.js-states";
+		String selectVisible = "Florida";
 		wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("select.js-states"))));
+				.visibilityOf(driver.findElement(By.cssSelector(select2Locator))));
 		// Act
 		String result = (String) executeScript(selectByVisibleTextScript,
-				"select.js-states", "Florida");
-		System.err.println("Selected via Javascript: " + result);
+				select2Locator, selectVisible);
+		System.err.println(String.format(
+				"Result of selecting via visible text(%s): %s", selectVisible, result));
 
 		sleep(150);
 		// Assert
@@ -117,11 +115,11 @@ public class Select2WrapperTest {
 	}
 
 	// multiple
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void selectBySelectWrapperObjectMultipleOptionsTest() {
 		// Arrange
-		Select2 element = new Select2(driver,
-				"select.js-example-basic-multiple.js-states");
+		String select2Locator = "select.js-example-basic-multiple.js-states";
+		Select2Object element = new Select2Object(driver, select2Locator);
 		// Act
 		highlight(element.getWrappedElement());
 		// Assert
@@ -144,10 +142,11 @@ public class Select2WrapperTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void selectBySelectWrapperObjectTest() {
 		// Arrange
-		Select2 element = new Select2(driver, "select.js-states");
+		String select2Locator = "select.js-states";
+		Select2Object element = new Select2Object(driver, select2Locator);
 		// Act
 		highlight(element.getWrappedElement());
 		// Assert
@@ -170,7 +169,7 @@ public class Select2WrapperTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void select2VisualVerifyTest1() {
 		String selectOption = "FL";
 		String select2Selector = "select.js-example-basic-single.js-states";
@@ -220,7 +219,8 @@ public class Select2WrapperTest {
 		System.err.println("Selection rendered: " + selectionElement.getText());
 	}
 
-	@Test(enabled = true)
+	// temporarily broken
+	@Test(enabled = false)
 	public void select2VisualVerifyTest2() {
 		List<String> selectOptions = new ArrayList<>(
 				Arrays.asList(new String[] { "FL", "NC", "MN" }));
@@ -269,12 +269,12 @@ public class Select2WrapperTest {
 		WebElement resultsElement = wait
 				.until(ExpectedConditions.visibilityOf(driver.findElement(
 						By.cssSelector("span.select2-container span.select2-results"))));
-		List<WebElement> options = resultsElement
+		List<WebElement> optionElements = resultsElement
 				.findElements(By.cssSelector("li.select2-results__option"));
-		// available options
-		// options.stream().forEach(o ->
+		// available option Elements
+		// optionElements.stream().forEach(o ->
 		// System.err.println(o.getText()));
-		WebElement highlightedOption = options.stream()
+		WebElement highlightedOption = optionElements.stream()
 				.filter(o -> o.getAttribute("class").contains("highlighted"))
 				.findFirst().get();
 		System.err.println(
@@ -293,7 +293,7 @@ public class Select2WrapperTest {
 	}
 
 	// TODO: refactor
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void select2VisualActionVerify2Test() {
 		String selectOption = "FL";
 
@@ -397,97 +397,22 @@ public class Select2WrapperTest {
 		System.err.println("Selection: " + selectionElement.getAttribute("title"));
 	}
 
-	@BeforeSuite
-	@SuppressWarnings("deprecation")
-	public void beforeSuite() throws Exception {
-		getOsName();
-		if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver",
-					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			ChromeOptions options = new ChromeOptions();
-
-			HashMap<String, Object> chromePrefs = new HashMap<>();
-			chromePrefs.put("profile.default_content_settings.popups", 0);
-			String downloadFilepath = System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + "target"
-					+ System.getProperty("file.separator");
-			chromePrefs.put("download.default_directory", downloadFilepath);
-			chromePrefs.put("enableNetwork", "true");
-			options.setExperimentalOption("prefs", chromePrefs);
-
-			for (String optionAgrument : (new String[] {
-					"allow-running-insecure-content", "allow-insecure-localhost",
-					"enable-local-file-accesses", "disable-notifications",
-					/* "start-maximized" , */
-					"browser.download.folderList=2",
-					"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf",
-					String.format("browser.download.dir=%s", downloadFilepath)
-					/* "user-data-dir=/path/to/your/custom/profile"  , */
-			})) {
-				options.addArguments(optionAgrument);
-			}
-
-			// options for headless
-			/*
-			for (String optionAgrument : (new String[] { "headless",
-					"window-size=1200x600", })) {
-				options.addArguments(optionAgrument);
-			}
-			*/
-			capabilities
-					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-
-			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-			driver = new ChromeDriver(capabilities);
-		} else if (browser.equals("firefox")) {
-			System.setProperty("webdriver.gecko.driver",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: "/tmp/geckodriver");
-			System
-					.setProperty("webdriver.firefox.bin",
-							osName.toLowerCase().startsWith("windows") ? new File(
-									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-											.getAbsolutePath()
-									: "/usr/bin/firefox");
-			DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-			// use legacy FirefoxDriver
-			capabilities.setCapability("marionette", false);
-			// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
-			capabilities.setCapability("locationContextEnabled", false);
-			capabilities.setCapability("acceptSslCerts", true);
-			capabilities.setCapability("elementScrollBehavior", 1);
-			FirefoxProfile profile = new FirefoxProfile();
-			profile.setAcceptUntrustedCertificates(true);
-			profile.setAssumeUntrustedCertificateIssuer(true);
-			profile.setEnableNativeEvents(false);
-
-			System.out.println(System.getProperty("user.dir"));
-			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-			try {
-				driver = new FirefoxDriver(capabilities);
-			} catch (WebDriverException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Cannot initialize Firefox driver");
-			}
-		}
-		actions = new Actions(driver);
-		/*
-		System.setProperty("webdriver.chrome.driver",
-				"c:/java/selenium/chromedriver.exe");
-		driver = new ChromeDriver();
-		*/
-		driver.manage().timeouts().setScriptTimeout(30, TimeUnit.SECONDS);
-		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		actions = new Actions(driver);
-	}
-
 	@AfterSuite
-	public void afterSuite() throws Exception {
-		driver.quit();
+	public void afterTest() {
+		try {
+			driver.close();
+		} catch (WebDriverException e) {
+			// NOTE: the inner
+			// exception java.net.ConnectException is never thrown by driver
+			System.err.println("Exception (ignored) " + e.toString());
+		}
+		try {
+			driver.quit();
+		} catch (WebDriverException e) {
+			// NOTE: the inner
+			// exception java.net.ConnectException is never thrown by driver
+			System.err.println("Exception (ignored) " + e.toString());
+		}
 	}
 
 	@BeforeMethod
@@ -504,85 +429,10 @@ public class Select2WrapperTest {
 		driver.get("about:blank");
 	}
 
-	// utilities
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name");
-		}
-		return osName;
-	}
-
-	private void highlightNew(WebElement element, long highlight_interval) {
-		Rectangle elementRect = element.getRect();
-		String highlightScript = getScriptContent("highlight.js");
-		// append calling
-
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format(
-								"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
-								highlightScript),
-						elementRect.y, elementRect.x, elementRect.width,
-						elementRect.height);
-			}
-			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format("%s\nhighlight_remove();", highlightScript));
-			}
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-
-	}
-
-	private void highlight(WebElement element) {
-		highlight(element, 100);
-	}
-
-	private void highlight(WebElement element, long highlight_interval) {
-		if (wait == null) {
-			wait = new WebDriverWait(driver, flexibleWait);
-		}
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
-		try {
-			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'", element);
-			Thread.sleep(highlight_interval);
-			executeScript("arguments[0].style.border=''", element);
-		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
-		}
-	}
-
-	private Object executeScript(String script, Object... arguments) {
-		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver);
-			return javascriptExecutor.executeScript(script, arguments);
-		} else {
-			throw new RuntimeException("Script execution failed.");
-		}
-	}
-
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = Select2WrapperTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
-	}
-
 	// inspired by:
 	// https://github.com/sskorol/select2-wrapper/blob/master/src/main/java/com/tools/qaa/elements/Select2.java
 	// https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/support/ui/Select.java
-	public static class Select2 {
+	public static class Select2Object {
 
 		private WebDriver driver = null;
 		private WebElement element;
@@ -596,7 +446,7 @@ public class Select2WrapperTest {
 			return this.element;
 		}
 
-		public Select2(WebDriver driver, String elementCssSelector) {
+		public Select2Object(WebDriver driver, String elementCssSelector) {
 			this.elementCssSelector = elementCssSelector;
 			this.driver = driver;
 			this.wait = new WebDriverWait(driver, this.flexibleWait);
@@ -632,15 +482,6 @@ public class Select2WrapperTest {
 			} else {
 				throw new RuntimeException("Script execution failed.");
 			}
-		}
-	}
-
-	public void sleep(Integer seconds) {
-		long secondsLong = (long) seconds;
-		try {
-			Thread.sleep(secondsLong);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
 		}
 	}
 }
