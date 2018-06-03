@@ -10,6 +10,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -25,6 +26,8 @@ import javafx.event.EventHandler;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
@@ -143,6 +146,23 @@ public class ConfigFormEx extends Application {
 
 		// base URL field
 		TextField baseURLFld = new TextField();
+		// https://docs.oracle.com/javafx/2/ui_controls/combo-box.htm
+		// https://docs.oracle.com/javafx/2/events/convenience_methods.htm
+		// https://stackoverflow.com/questions/23968162/javafx-editable-combo-box
+		baseURLFld.addEventFilter(KeyEvent.KEY_PRESSED,
+				new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							System.out.println("Entered");
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							System.out.println("Entered");
+						} else {
+
+						}
+					}
+				});
+
 		GridPane.setHalignment(baseURLFld, HPos.LEFT);
 		gridpane.add(baseURLFld, 1, 0);
 
@@ -195,7 +215,6 @@ public class ConfigFormEx extends Application {
 		templateChoice.setOnAction(e -> {
 			String dummy = templateChoice.getSelectionModel().getSelectedItem()
 					.toString();
-
 		});
 
 		GridPane.setHalignment(templateChoice, HPos.RIGHT);
