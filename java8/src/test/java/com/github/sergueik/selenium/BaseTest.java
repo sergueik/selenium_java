@@ -52,6 +52,7 @@ import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
+import org.testng.internal.Nullable;
 
 /**
  * Selected test scenarios for Selenium WebDriver
@@ -703,8 +704,20 @@ public class BaseTest {
 		return driver.switchTo().window(parentHandle);
 	}
 
+	protected String xPathToCSS(String xpath /*, @Nullable WebElement element*/) {
+		String result = null;
+		try {
+			result = (String) executeScript(getScriptContent("cssify.js"),
+					new Object[] { xpath });
+		} catch (WebDriverException e) {
+		}
+		return result;
+	}
+
 	// origin: https://github.com/RomanIovlev/Css-to-XPath-Java
 	// see also: https://github.com/featurist/css-to-xpath
+	// for Convert XPath to CSS selector
+	// hguiney / cssify.js
 	// https://gist.github.com/hguiney/3320053
 	//
 	public static class CssToXPath {

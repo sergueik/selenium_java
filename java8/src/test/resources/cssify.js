@@ -148,3 +148,5 @@ function cssify(xpath) {
 
     return csses.join(', ');
 }
+
+return cssify(arguments[0]);
