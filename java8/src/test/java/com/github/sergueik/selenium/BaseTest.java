@@ -341,27 +341,21 @@ public class BaseTest {
 	}
 
 	@AfterClass
-	public void afterClass() throws Exception {
+	public void afterClass() {
 		driver.get("about:blank");
 		if (driver != null) {
-			driver.quit();
+			try {
+				driver.quit();
+			} catch (Exception e) {
+				/*
+				 * 		org.apache.commons.exec.ExecuteException: The stop timeout of 2000 ms was exceeded (Exit value: -559038737)
+				...
+				at org.openqa.selenium.os.OsProcess.destroy(OsProcess.java:135)
+				at org.openqa.selenium.os.CommandLine.destroy(CommandLine.java:153)
+				...
+				 */
+			}
 		}
-	}
-
-	@BeforeMethod
-	public void beforeMethod(Method method) {
-		String methodName = method.getName();
-		System.out.println("Test Name: " + methodName + "\n");
-	}
-
-	@AfterMethod
-	public void afterMethod() {
-		// driver.get("about:blank");
-	}
-
-	@AfterTest(alwaysRun = true)
-	public void afterTest() {
-		killProcess(browserDrivers.get(browser));
 	}
 
 	public void highlight(WebElement element) {
