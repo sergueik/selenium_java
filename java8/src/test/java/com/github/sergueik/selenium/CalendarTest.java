@@ -26,10 +26,17 @@ public class CalendarTest extends BaseTest {
 		driver.get(baseURL);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void selectDateTest() {
 		// Locating departure date calendar
 		WebElement calendarElement = driver.findElement(By.id("hp-widget__depart"));
+		System.err
+				.println("Calendar element: " + cssSelectorOfElement(calendarElement));
+
+		// NOTE: not optimal: Calendar element: input[id="hp-widget__depart"]
+		// Do we need input#hp-widget__depart ? Probably selected so because of the
+		// dash
+		highlight(calendarElement, 1000);
 		try {
 			// NOTE: the site does not allow too far into the future
 			// TODO: compute
@@ -64,6 +71,7 @@ public class CalendarTest extends BaseTest {
 
 		String yearElementXpath = "//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-year']";
 		WebElement yearElement = driver.findElement(By.xpath(yearElementXpath));
+		System.err.println("Year element: " + cssSelectorOfElement(yearElement));
 		highlight(yearElement);
 		String currentYear = yearElement.getText();
 
@@ -72,6 +80,8 @@ public class CalendarTest extends BaseTest {
 			do {
 				WebElement nextYearElement = driver
 						.findElement(By.xpath("(//span[text()='Next'])[1]"));
+				System.err.println(
+						"Next Year element: " + cssSelectorOfElement(nextYearElement));
 				highlight(nextYearElement);
 				nextYearElement.click();
 				yearElement = driver.findElement(By.xpath(yearElementXpath));
@@ -83,12 +93,15 @@ public class CalendarTest extends BaseTest {
 
 		String monthElementXpath = "(//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-month'])[1]";
 		WebElement monthElement = driver.findElement(By.xpath(monthElementXpath));
+		System.err.println("Month element: " + cssSelectorOfElement(monthElement));
 		highlight(monthElement);
 		String currentMonth = monthElement.getText().trim();
 		if (!currentMonth.equalsIgnoreCase(monthName)) {
 			do {
 				WebElement nextMonthElement = driver
 						.findElement(By.xpath("(//span[text()='Next'])[1]"));
+				System.err.println(
+						"Next Month element: " + cssSelectorOfElement(nextMonthElement));
 				nextMonthElement.click();
 				monthElement = driver.findElement(By.xpath(monthElementXpath));
 				highlight(monthElement);
@@ -111,6 +124,7 @@ public class CalendarTest extends BaseTest {
 		List<WebElement> dateElements = driver
 				.findElements(By.xpath(dateElementXpath));
 		for (WebElement dayElement : dateElements) {
+			System.err.println("Day element: " + cssSelectorOfElement(dayElement));
 			if (dayElement.getText().trim().equals(day)) {
 				flash(dayElement);
 				dayElement.click();
