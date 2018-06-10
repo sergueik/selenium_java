@@ -176,7 +176,6 @@
         <pluginManagement>
       <plugins>
         <plugin>
-          <!--            <groupId>com.adsingh.plugin</groupId> -->
           <groupId>com.github.abhishek8908</groupId>
           <artifactId>selenium-drivers-download-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>

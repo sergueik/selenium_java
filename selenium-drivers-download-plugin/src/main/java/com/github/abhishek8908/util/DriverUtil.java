@@ -20,6 +20,16 @@ import java.util.Arrays;
 
 public class DriverUtil extends Logger {
 
+	private static boolean renameDriver = true;
+
+	public static boolean isRenameDriver() {
+		return renameDriver;
+	}
+
+	public static void setRenameDriver(boolean renameDriver) {
+		DriverUtil.renameDriver = renameDriver;
+	}
+
 	private static Log log = new Logger().getLog();
 
 	public DriverUtil() {
@@ -32,8 +42,11 @@ public class DriverUtil extends Logger {
 		String toFile = targetDirectory + File.separator + fileName;
 		FileUtils.copyURLToFile(new URL(sourceURL), new File(toFile), 10000, 10000);
 		unzipFile(targetDirectory + File.separator + fileName, targetDirectory);
-		changeFileName(targetDirectory + File.separator + driverName,
-				targetDirectory + File.separator + driverName + "-" + version);
+		// TODO: make configurable to prevent modifications to test
+		if (renameDriver) {
+			changeFileName(targetDirectory + File.separator + driverName,
+					targetDirectory + File.separator + driverName + "-" + version);
+		}
 		cleanDir(targetDirectory);
 	}
 

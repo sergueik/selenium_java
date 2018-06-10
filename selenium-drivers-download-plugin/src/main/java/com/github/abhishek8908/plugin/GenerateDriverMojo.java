@@ -89,12 +89,12 @@ public class GenerateDriverMojo extends AbstractMojo {
 		return driverPath;
 	}
 
-	public void setDriverPath(String driverPath) {
-		this.driverPath = driverPath;
-	}
-
 	public MavenProject getProject() {
 		return project;
+	}
+
+	public void setDriverPath(String driverPath) {
+		this.driverPath = driverPath;
 	}
 
 	public void setProject(MavenProject project) {

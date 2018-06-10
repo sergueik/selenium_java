@@ -114,7 +114,7 @@ public void setupBeforeSuite( ITestContext context ) throws InterruptedException
 	// standalone
 	else { 
 		if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
-			System.setProperty("webdriver.chrome.driver", "c:/tmp/chromedriver-2.40-win32.exe");
+			System.setProperty("webdriver.chrome.driver", /* "c:/tmp/chromedriver.exe" */ "c:/tmp/chromedriver-2.40-win32.exe");
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			LoggingPreferences logging_preferences = new LoggingPreferences();
 			logging_preferences.enable(LogType.BROWSER, Level.ALL);
@@ -157,22 +157,7 @@ public void LoggingTest() throws InterruptedException {
 	WebDriverWait wait = new WebDriverWait(driver, 30);
 	String value1 = null;
 
-	wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("ccl-logo")));
-	value1 = "ddlDestinations";
-
-	String xpath_selector1 = String.format("//select[@id='%s']", value1);
-	wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath_selector1)));
-	WebElement element = driver.findElement(By.xpath(xpath_selector1));
-
-	System.out.println( element.getAttribute("id"));
-	Actions builder = new Actions(driver);
-	builder.moveToElement(element).build().perform();
-
-	String csspath_selector2 = "div.find-cruise-submit > a";
-	WebElement element2 = driver.findElement(By.cssSelector(csspath_selector2));
-	System.out.println( element2.getText());
-	new Actions(driver).moveToElement(element2).click().build().perform();
-	Thread.sleep(10000);
+	wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("logo")));
 	analyzeLog();
 	//print the node information
 	//String result = getIPOfNode(driver);
