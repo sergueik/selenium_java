@@ -117,25 +117,28 @@ public class CalendarTest extends BaseTest {
 		// get java month number for desired month
 		int month = getMonthJavaInt(monthName);
 
-		// Filter dates that belong to desired month by the ui-datepicker
-		// @data-month
-		// attribute
+		// Filter selectable dates that belong to desired month by the presence of 
+		// @ui-datepicker and @data-month attributes
+
 		/*
-				String dateElementXpath = String.format(
-						"//div[@class='ui-datepicker-group ui-datepicker-group-first']//table/tbody[1]//td[(@class=' ' or @class=' ui-datepicker-week-end ' ) and @data-month = '%d']",
+		String dateElementXpath = "//div[@class='ui-datepicker-group ui-datepicker-group-first']//table/tbody[1]//"
+				+ String.format(
+						"td[(@class=' ' or @class=' ui-datepicker-week-end ' ) and @data-month = '%d']",
 						month);
-				List<WebElement> dateElements = driver
-						.findElements(By.xpath(dateElementXpath));
-						*/
+		List<WebElement> dateElements = driver
+				.findElements(By.xpath(dateElementXpath));
+				*/
 		String dateElementSelector = String.format(
-				"div.ui-datepicker-group-first table > tbody > td[data-month = '%d']",
+				"table.ui-datepicker-calendar tbody td[data-handler='selectDay'][data-month='%d'] a",
 				month);
 		List<WebElement> dateElements = driver
 				.findElements(By.cssSelector(dateElementSelector));
-		// org.openqa.selenium.InvalidSelectorException
 		for (WebElement dayElement : dateElements) {
-			System.err.println("Day element: " + cssSelectorOfElement(dayElement));
-			if (dayElement.getText().trim().equals(day)) {
+			// highlight(dayElement);
+			System.err
+					.println("Day element: " + dayElement.getAttribute("innerHTML"));
+			// if (dayElement.getText().trim().equals(day)) {
+			if (dayElement.getAttribute("innerHTML").trim().equals(day)) {
 				flash(dayElement);
 				dayElement.click();
 				break;
