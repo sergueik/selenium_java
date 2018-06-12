@@ -30,8 +30,6 @@ public class CalendarTest extends BaseTest {
 	public void selectDateTest() {
 		// Locating departure date calendar
 		WebElement calendarElement = driver.findElement(By.id("hp-widget__depart"));
-		System.err
-				.println("Calendar element: " + cssSelectorOfElement(calendarElement));
 
 		// NOTE: not optimal: Calendar element: input[id="hp-widget__depart"]
 		// Do we need input#hp-widget__depart ? Probably selected so because of the
@@ -46,7 +44,7 @@ public class CalendarTest extends BaseTest {
 		}
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void selectCssToXPathTest() {
 		// Locating departure date calendar
 		WebElement calendarElement = driver.findElement(By.id("hp-widget__depart"));
@@ -69,41 +67,46 @@ public class CalendarTest extends BaseTest {
 			String day, WebDriver driver) throws ParseException {
 		calendar.click();
 
-		String yearElementXpath = "//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-year']";
+		/* String yearElementXpath = "//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-year']";
 		WebElement yearElement = driver.findElement(By.xpath(yearElementXpath));
-		System.err.println("Year element: " + cssSelectorOfElement(yearElement));
+		*/
+		String yearElementSelector = "div.ui-datepicker-title span.ui-datepicker-year";
+		WebElement yearElement = driver
+				.findElement(By.cssSelector(yearElementSelector));
 		highlight(yearElement);
 		String currentYear = yearElement.getText();
 
-		// Advance via Next arrow till we reach desired year
+		// Advance via Next arrow till we see desired year
 		if (!currentYear.equals(year)) {
 			do {
+				// WebElement nextYearElement = driver
+				// .findElement(By.xpath("(//span[text()='Next'])[1]"));
 				WebElement nextYearElement = driver
-						.findElement(By.xpath("(//span[text()='Next'])[1]"));
-				System.err.println(
-						"Next Year element: " + cssSelectorOfElement(nextYearElement));
+						.findElement(By.cssSelector("a.ui-datepicker-next"));
+
 				highlight(nextYearElement);
 				nextYearElement.click();
-				yearElement = driver.findElement(By.xpath(yearElementXpath));
+				yearElement = driver.findElement(By.cssSelector(yearElementSelector));
 				currentYear = yearElement.getText();
 			} while (!currentYear.equals(year));
 
 		}
 		flash(yearElement);
-
-		String monthElementXpath = "(//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-month'])[1]";
-		WebElement monthElement = driver.findElement(By.xpath(monthElementXpath));
-		System.err.println("Month element: " + cssSelectorOfElement(monthElement));
+		/*
+				String monthElementXpath = "(//div[@class='ui-datepicker-title']/span[@class='ui-datepicker-month'])[1]";
+				WebElement monthElement = driver.findElement(By.xpath(monthElementXpath));
+				*/
+		String monthElementSelector = "div.ui-datepicker-title span.ui-datepicker-month:nth-of-type(1)";
+		WebElement monthElement = driver
+				.findElement(By.cssSelector(monthElementSelector));
 		highlight(monthElement);
 		String currentMonth = monthElement.getText().trim();
 		if (!currentMonth.equalsIgnoreCase(monthName)) {
 			do {
 				WebElement nextMonthElement = driver
-						.findElement(By.xpath("(//span[text()='Next'])[1]"));
-				System.err.println(
-						"Next Month element: " + cssSelectorOfElement(nextMonthElement));
+						.findElement(By.cssSelector("a.ui-datepicker-next"));
 				nextMonthElement.click();
-				monthElement = driver.findElement(By.xpath(monthElementXpath));
+				monthElement = driver.findElement(By.cssSelector(monthElementSelector));
 				highlight(monthElement);
 				currentMonth = monthElement.getText();
 			} while (!currentMonth.equalsIgnoreCase(monthName));
@@ -117,12 +120,19 @@ public class CalendarTest extends BaseTest {
 		// Filter dates that belong to desired month by the ui-datepicker
 		// @data-month
 		// attribute
-		String dateElementXpath = String.format(
-				"//div[@class='ui-datepicker-group ui-datepicker-group-first']//table/tbody[1]//td[(@class=' ' or @class=' ui-datepicker-week-end ' ) and @data-month = '%d']",
+		/*
+				String dateElementXpath = String.format(
+						"//div[@class='ui-datepicker-group ui-datepicker-group-first']//table/tbody[1]//td[(@class=' ' or @class=' ui-datepicker-week-end ' ) and @data-month = '%d']",
+						month);
+				List<WebElement> dateElements = driver
+						.findElements(By.xpath(dateElementXpath));
+						*/
+		String dateElementSelector = String.format(
+				"div.ui-datepicker-group-first table > tbody > td[data-month = '%d']",
 				month);
-
 		List<WebElement> dateElements = driver
-				.findElements(By.xpath(dateElementXpath));
+				.findElements(By.cssSelector(dateElementSelector));
+		// org.openqa.selenium.InvalidSelectorException
 		for (WebElement dayElement : dateElements) {
 			System.err.println("Day element: " + cssSelectorOfElement(dayElement));
 			if (dayElement.getText().trim().equals(day)) {
