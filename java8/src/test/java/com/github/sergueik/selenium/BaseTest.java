@@ -358,6 +358,22 @@ public class BaseTest {
 		}
 	}
 
+	@BeforeMethod
+	public void beforeMethod(Method method) {
+		String methodName = method.getName();
+		System.out.println("Test Name: " + methodName + "\n");
+	}
+
+	@AfterMethod
+	public void afterMethod() {
+		// driver.get("about:blank");
+	}
+
+	@AfterTest(alwaysRun = true)
+	public void afterTest() {
+		killProcess(browserDrivers.get(browser));
+	}
+
 	public void highlight(WebElement element) {
 		highlight(element, 100);
 	}

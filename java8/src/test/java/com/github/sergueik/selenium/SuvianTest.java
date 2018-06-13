@@ -1041,6 +1041,50 @@ public class SuvianTest extends BaseTest {
 						.stream().filter(o -> o.isSelected()).count() == hobbies.size());
 	}
 
+		@Test(enabled = true)
+	public void test10_1() {
+		// Arrange
+		// Arrange
+		driver.get("http://suvian.in/selenium/1.10selectElementFromDD.html");
+		WebElement buttonDropDown = wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message div.dropdown button.dropbtn"))));
+		assertThat(buttonDropDown, notNullValue());
+
+		// Act
+		buttonDropDown.click();
+		wait.until(
+				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
+						".container .row .intro-message div.dropdown div#myDropdown"))));
+		List<WebElement> optionElements = driver
+				.findElements(By.cssSelector(
+						".container .row .intro-message div.dropdown div#myDropdown"))
+				.stream().filter(o -> o.getText().contains("Option 2"))
+				.collect(Collectors.toList());
+		assertTrue(optionElements.size() > 0);
+		final String currentHandle = driver.getWindowHandle();
+		final String text = "Congratulations.. You Selected option 2. Close this browser tab and proceed to end of Level 1.";
+		optionElements.get(0).click();
+		// origin:
+		// https://github.com/kathyrollo/jcucumberng-framework/commit/7fa7e99476da681e1c624042819038bad414951a
+
+		String parentHandle = driver.getWindowHandle(); // Save parent window
+		boolean isChildWindowOpen = wait
+				.until(ExpectedConditions.numberOfWindowsToBe(2));
+		if (isChildWindowOpen) {
+			Set<String> handles = driver.getWindowHandles();
+			// Switch to child window
+			for (String handle : handles) {
+				driver.switchTo().window(handle);
+				if (!parentHandle.equals(handle)) {
+					break;
+				}
+			}
+			driver.manage().window().maximize();
+		}
+
+	}
+
 	@Test(enabled = true)
 	public void test10() {
 		// Arrange

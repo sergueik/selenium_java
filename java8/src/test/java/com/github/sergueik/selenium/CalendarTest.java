@@ -114,10 +114,10 @@ public class CalendarTest extends BaseTest {
 		}
 		flash(monthElement);
 
-		// get java month number for desired month
+		// compute the month number for desired month
 		int month = getMonthJavaInt(monthName);
 
-		// Filter selectable dates that belong to desired month by the presence of 
+		// Filter selectable dates that belong to desired month by the presence of
 		// @ui-datepicker and @data-month attributes
 
 		/*
@@ -125,9 +125,7 @@ public class CalendarTest extends BaseTest {
 				+ String.format(
 						"td[(@class=' ' or @class=' ui-datepicker-week-end ' ) and @data-month = '%d']",
 						month);
-		List<WebElement> dateElements = driver
-				.findElements(By.xpath(dateElementXpath));
-				*/
+						*/
 		String dateElementSelector = String.format(
 				"table.ui-datepicker-calendar tbody td[data-handler='selectDay'][data-month='%d'] a",
 				month);
@@ -137,6 +135,8 @@ public class CalendarTest extends BaseTest {
 			// highlight(dayElement);
 			System.err
 					.println("Day element: " + dayElement.getAttribute("innerHTML"));
+			System.err.println("Day element: " + dayElement.getText());
+			// equivalent of:
 			// if (dayElement.getText().trim().equals(day)) {
 			if (dayElement.getAttribute("innerHTML").trim().equals(day)) {
 				flash(dayElement);
