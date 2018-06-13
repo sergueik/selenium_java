@@ -66,11 +66,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-// http://www.softwaretestingmaterial.com/soft-assert/
 
 /**
  * Selected test scenarios for Selenium WebDriver
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ * NOTE: as of may 2018 the domain http://suvian.in is parked
  */
 
 public class SuvianTest extends BaseTest {
