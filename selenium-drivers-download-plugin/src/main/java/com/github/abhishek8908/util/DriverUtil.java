@@ -1,22 +1,29 @@
 package com.github.abhishek8908.util;
 
 import com.github.abhishek8908.driver.logger.Logger;
+
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.io.FileUtils;
+
 import org.apache.maven.plugin.logging.Log;
+// TODO: get rid of
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.net.URL;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import java.util.Arrays;
+import java.util.Properties;
 
 public class DriverUtil extends Logger {
 
@@ -83,6 +90,8 @@ public class DriverUtil extends Logger {
 
 	}
 
+	// currently uses filename to figure out the os and version of the driver
+	// alternatively one can make a soft link to the same
 	public static boolean checkDriverVersionExists(String driverName,
 			String version, String dir) throws IOException {
 		boolean fileExists = false;
@@ -109,12 +118,16 @@ public class DriverUtil extends Logger {
 
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
+		// may need fixing ?
+		// uses the caller resource path ?
 		String resourcePath = "";
 		try {
 			resourcePath = Thread.currentThread().getContextClassLoader()
 					.getResource("").getPath();
+			log.info("Loading properties file from " + resourcePath);
 		} catch (NullPointerException e) {
-			System.out.println(resourcePath + e.getMessage());
+			System.err.println("Error loading properties file from " + resourcePath
+					+ e.getMessage());
 		}
 		Configuration config = new PropertiesConfiguration(
 				resourcePath + "driver.properties");
