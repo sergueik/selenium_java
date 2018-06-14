@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Properties;
 
 public class DriverUtil extends Logger {
@@ -118,6 +119,10 @@ public class DriverUtil extends Logger {
 
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
+		Map<String, String> properties = PropertiesParser
+				.getProperties("driver.properties");
+		return properties.get(propertyName);
+		/*
 		// may need fixing ?
 		// uses the caller resource path ?
 		String resourcePath = "";
@@ -134,7 +139,7 @@ public class DriverUtil extends Logger {
 		Configuration extConfig = ((PropertiesConfiguration) config)
 				.interpolatedConfiguration();
 		return extConfig.getProperty(propertyName).toString();
-
+		*/
 	}
 
 	public static String getSourceUrl(String browser)
