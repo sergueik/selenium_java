@@ -9,7 +9,7 @@ import java.net.URL;
 
 import static com.github.abhishek8908.util.DriverUtil.*;
 
-public class TestUtils {
+public class UtilsTest {
 
 	@Test
 	public static void newDownload() throws IOException {

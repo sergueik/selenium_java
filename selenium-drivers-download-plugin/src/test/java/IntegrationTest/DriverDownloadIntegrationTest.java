@@ -1,3 +1,4 @@
+package IntegrationTest;
 import org.apache.commons.configuration.ConfigurationException;
 import org.testng.annotations.Test;
 
@@ -5,7 +6,7 @@ import java.io.IOException;
 
 import static com.github.abhishek8908.util.DriverUtil.download;
 
-public class TestDriverDownload {
+public class DriverDownloadIntegrationTest {
 
 	@Test
 	public void donloadTest() throws IOException, ConfigurationException {
