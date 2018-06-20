@@ -31,14 +31,14 @@ import io.github.bonigarcia.wdm.base.BrowserTestParent;
  */
 public class ChromeTest extends BrowserTestParent {
 
-    @BeforeClass
-    public static void setupClass() {
-        WebDriverManager.chromedriver().setup();
-    }
+	@BeforeClass
+	public static void setupClass() {
+		WebDriverManager.chromedriver().setup();
+	}
 
-    @Before
-    public void setupTest() {
-        driver = new ChromeDriver();
-    }
+	@Before
+	public void setupTest() {
+		driver = new ChromeDriver();
+	}
 
 }

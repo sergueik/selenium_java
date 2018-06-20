@@ -45,27 +45,27 @@ import io.github.bonigarcia.wdm.WebDriverManagerException;
  */
 public class EdgeMsiTest {
 
-    final Logger log = getLogger(lookup().lookupClass());
+	final Logger log = getLogger(lookup().lookupClass());
 
-    @Before
-    @After
-    public void cleanCache() throws IOException {
-        cleanDirectory(new File(new Downloader(EDGE).getTargetPath()));
-    }
+	@Before
+	@After
+	public void cleanCache() throws IOException {
+		cleanDirectory(new File(new Downloader(EDGE).getTargetPath()));
+	}
 
-    @Test(expected = WebDriverManagerException.class)
-    public void testMsiOutWindows() {
-        assumeFalse(IS_OS_WINDOWS);
-        edgedriver().version("2.10586").setup();
-    }
+	@Test(expected = WebDriverManagerException.class)
+	public void testMsiOutWindows() {
+		assumeFalse(IS_OS_WINDOWS);
+		edgedriver().version("2.10586").setup();
+	}
 
-    @Test
-    public void testMsiInWindows() {
-        assumeTrue(IS_OS_WINDOWS);
-        edgedriver().version("2.10586").setup();
-        File binary = new File(edgedriver().getBinaryPath());
-        log.debug("Edge driver {}", binary);
-        assertTrue(binary.getName().endsWith(".exe"));
-    }
+	@Test
+	public void testMsiInWindows() {
+		assumeTrue(IS_OS_WINDOWS);
+		edgedriver().version("2.10586").setup();
+		File binary = new File(edgedriver().getBinaryPath());
+		log.debug("Edge driver {}", binary);
+		assertTrue(binary.getName().endsWith(".exe"));
+	}
 
 }

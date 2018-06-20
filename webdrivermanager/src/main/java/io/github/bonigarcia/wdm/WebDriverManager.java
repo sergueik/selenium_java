@@ -499,8 +499,12 @@ public abstract class WebDriverManager {
 				break;
 			}
 
-			// Filter by architecture and OS
-			candidateUrls = urlFilter.filterByOs(candidateUrls, config().getOs());
+			// Filter by OS (except for IE)
+			if (!getDriverName().contains("IEDriverServer")) {
+				candidateUrls = urlFilter.filterByOs(candidateUrls, config().getOs());
+			}
+
+			// Filter by architecture
 			candidateUrls = urlFilter.filterByArch(candidateUrls, arch, forcedArch);
 
 			// Extra round of filter phantomjs 2.5.0 in Linux
