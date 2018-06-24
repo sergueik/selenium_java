@@ -23,12 +23,21 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
 public class DriverUtil extends Logger {
 
 	private static boolean renameDriver = true;
+	static Map<String, String> downloadURLs = new HashMap<>();
+	static {
+		downloadURLs.put("chromedriver", "chromedriver.download.url");
+		downloadURLs.put("geckodriver", "geckodriver.download.url");
+		downloadURLs.put("safaridriver", "safaridriver.download.url");
+		downloadURLs.put("IEdriver", "iedriver.download.url");
+		downloadURLs.put("edgedriver", "edgedriver.download.url");
+	}
 
 	public static boolean isRenameDriver() {
 		return renameDriver;
@@ -67,13 +76,13 @@ public class DriverUtil extends Logger {
 			Archiver archiver = ArchiverFactory.createArchiver("tar", "gz");
 			archiver.extract(new File(source), new File(destinationPath));
 		}
-		log.info("*****Decompressing file " + source);
+		log.info("Decompressing file: " + source);
 
 	}
 
 	public static void changeFileName(String fileName, String fileOut)
 			throws IOException {
-		String os = System.getProperty("sys:os"); // 
+		String os = System.getProperty("os"); //
 		String ext = "";
 		System.err.println("os is " + os);
 		if (os.toLowerCase().contains("win")) {
@@ -81,13 +90,13 @@ public class DriverUtil extends Logger {
 		}
 		FileUtils.moveFile(FileUtils.getFile(fileName + ext),
 				FileUtils.getFile(fileOut + "-" + os + ext));
-		log.info("***** File Name :" + fileName + "changed to" + fileOut);
+		log.info("File: " + fileName + " renameded to " + fileOut);
 
 	}
 
 	public static String getFileNameFromUrl(String url) {
 		String[] newUrl = url.split("/");
-		log.info("***** File Name :" + newUrl[newUrl.length - 1]);
+		log.info("File Name: " + newUrl[newUrl.length - 1]);
 		return newUrl[newUrl.length - 1];
 
 	}
@@ -121,7 +130,7 @@ public class DriverUtil extends Logger {
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
 		Map<String, String> properties = PropertiesParser
-				.getProperties("driver.properties", false);
+				.getProperties("driver.properties", true);
 		return properties.get(propertyName);
 		/*
 		// may need fixing ?
@@ -143,17 +152,9 @@ public class DriverUtil extends Logger {
 		*/
 	}
 
-	public static String getSourceUrl(String browser)
+	public static String getSourceUrl(String browserDriver)
 			throws ConfigurationException {
-		if (browser.toLowerCase().contains("chromedriver")) {
-			return readProperty("chromedriver.download.url");
-		} else if (browser.toLowerCase().contains("geckodriver")) {
-			return readProperty("geckodriver.download.url");
-		} else if (browser.toLowerCase().contains("safaridriver")) {
-			return readProperty("safaridriver.download.url");
-		} else {
-			return readProperty("edgedriver.download.url");
-		}
+		return readProperty(downloadURLs.get(browserDriver));
 	}
 
 }

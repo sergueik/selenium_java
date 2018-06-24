@@ -4,7 +4,7 @@
   <groupId>com.github.abhishek8908</groupId>
   <artifactId>selenium-drivers-download-plugin</artifactId>
   <packaging>maven-plugin</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <name>selenium-drivers-download-plugin Maven Mojo</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -63,17 +63,29 @@
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <version>3.1.0</version>
-        <configuration>
-          <!--<outputDirectory>${basedir}/target/test-classes/resources</outputDirectory>-->
-          <resources>
-            <resource>
-              <directory>src/main/java/resources</directory>
-            </resource>
-          </resources>
-        </configuration>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>validate</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${basedir}/target</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/main/resources</directory>
+                  <includes>
+                <include>**/*.properties</include>
+                  </includes>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

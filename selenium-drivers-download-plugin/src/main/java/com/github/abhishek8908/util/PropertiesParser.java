@@ -71,10 +71,26 @@ public class PropertiesParser {
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
 		String value = System.getProperty(name);
+		System.err.println("Interpolating " + name);
+		// compatible with
+		// org.apache.commons.configuration.PropertiesConfiguration.interpolatedConfiguration
+		// https://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_utilities.html
 		if (value == null) {
-			value = System.getenv(name);
+
+			Pattern p = Pattern.compile("^(\\w+:)(\\w+)$");
+			Matcher m = p.matcher(name);
+			if (m.find()) {
+				String propertyName = m.replaceFirst("$2");
+				System.err.println("Interpolating " + propertyName);
+				value = System.getProperty(propertyName);
+			}
 			if (value == null) {
-				value = defaultValue;
+				System.err.println("Trying environment " + name);
+				value = System.getenv(name);
+				if (value == null) {
+					System.err.println("Nothing found for " + name);
+					value = defaultValue;
+				}
 			}
 		}
 		return value;
@@ -84,9 +100,7 @@ public class PropertiesParser {
 		if (null == input) {
 			return null;
 		}
-		Pattern p = Pattern.compile("\\$(?:\\{(\\w+)\\}|(\\w+))");
-		p = Pattern.compile("\\$(?:\\{([a-z.]+)\\}|([a-z.]+))");
-		p = Pattern.compile("\\$(?:\\{([\\w.:]+)\\}|([\\w.:]+))");
+		Pattern p = Pattern.compile("\\$(?:\\{([\\w.:]+)\\}|([\\w.:]+))");
 		Matcher m = p.matcher(input);
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
