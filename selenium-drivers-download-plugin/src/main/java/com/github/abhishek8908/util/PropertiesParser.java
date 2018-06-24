@@ -26,66 +26,22 @@ import java.util.regex.Pattern;
 
 public class PropertiesParser {
 
-	/*
-	
-		private static String propertiesFileName = "test.properties";
-		Map<String, String> propertiesMap = PropertiesParser
-						.getProperties(String.format("%s/src/main/resources/%s",
-								System.getProperty("user.dir"), propertiesFileName));
-		String username = propertiesMap.get("username");
-		String password =  propertiesMap.get("password");
-		StringBuilder loggingSb = new StringBuilder();
-		Formatter formatter = new Formatter(loggingSb, Locale.US)
-	*/
-	protected static String getFileContent(String propertiesFileName,
-			boolean fromTheJar) {
-		final InputStream stream;
-		try {
-			if (fromTheJar) {
-				stream = /* this.getClass().getClassLoader()*/
-						PropertiesParser.class.getClassLoader()
-								.getResourceAsStream(propertiesFileName);
-			} else {
-				stream = new FileInputStream(propertiesFileName);
-			}
-
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (
-
-		IOException e) {
-			throw new RuntimeException(propertiesFileName);
-		}
-	}
-
 	public static Map<String, String> getProperties(
-			final String propertiesFileName) {
-		System.err.println(String.format("Reading properties file: \"%s\"",
-				String.format("%s/src/main/resources/%s",
-						System.getProperty("user.dir"), propertiesFileName)));
-		Map<String, String> propertiesMap = PropertiesParser
-				.getPropertiesBroken(String.format("%s/src/main/resources/%s",
-						System.getProperty("user.dir"), propertiesFileName));
-		StringBuilder loggingSb = new StringBuilder();
-		Formatter formatter = new Formatter(loggingSb, Locale.US);
-		return (propertiesMap);
-	}
-
-	public static Map<String, String> getPropertiesBroken(
 			final String propertiesFileName, boolean fromTheJar) {
 		final InputStream stream;
 		Properties p = new Properties();
 		Map<String, String> propertiesMap = new HashMap<>();
-		System.err.println("contents:" + getFileContent(propertiesFileName, false));
+
 		try {
-			System.err.println(
-					String.format("Reading properties file: '%s'", propertiesFileName));
 			// only works when jar has been packaged?
 			if (fromTheJar) {
+				System.err.println(String.format(
+						"Reading properties file from the jar: '%s'", propertiesFileName));
 				stream = PropertiesParser.class.getClassLoader()
 						.getResourceAsStream(propertiesFileName);
 			} else {
+				System.err.println(String.format(
+						"Reading properties file from disk: '%s'", propertiesFileName));
 				stream = new FileInputStream(String.format("%s/src/main/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
 			}
@@ -94,8 +50,8 @@ public class PropertiesParser {
 			Enumeration<String> e = (Enumeration<String>) p.propertyNames();
 			for (; e.hasMoreElements();) {
 				String key = e.nextElement();
-				String val = p.get(key).toString();
-				System.out.println(String.format("Reading: '%s' = '%s'", key, val));
+				String val = resolveEnvVars(p.get(key).toString());
+				System.err.println(String.format("Reading: '%s' = '%s'", key, val));
 				propertiesMap.put(key, resolveEnvVars(val));
 			}
 
@@ -129,11 +85,14 @@ public class PropertiesParser {
 			return null;
 		}
 		Pattern p = Pattern.compile("\\$(?:\\{(\\w+)\\}|(\\w+))");
+		p = Pattern.compile("\\$(?:\\{([a-z.]+)\\}|([a-z.]+))");
+		p = Pattern.compile("\\$(?:\\{([\\w.:]+)\\}|([\\w.:]+))");
 		Matcher m = p.matcher(input);
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
-			String envVarValue = System.getenv(envVarName);
+			System.err.println("Processing " + envVarName);
+			String envVarValue = getPropertyEnv(envVarName, envVarName);
 			m.appendReplacement(sb,
 					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
 		}

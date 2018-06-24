@@ -73,8 +73,9 @@ public class DriverUtil extends Logger {
 
 	public static void changeFileName(String fileName, String fileOut)
 			throws IOException {
-		String os = System.getProperty("os");
+		String os = System.getProperty("sys:os"); // 
 		String ext = "";
+		System.err.println("os is " + os);
 		if (os.toLowerCase().contains("win")) {
 			ext = ".exe";
 		}
@@ -120,7 +121,7 @@ public class DriverUtil extends Logger {
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
 		Map<String, String> properties = PropertiesParser
-				.getProperties("driver.properties");
+				.getProperties("driver.properties", false);
 		return properties.get(propertyName);
 		/*
 		// may need fixing ?

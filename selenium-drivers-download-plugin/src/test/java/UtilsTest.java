@@ -1,6 +1,7 @@
 import com.github.abhishek8908.util.DriverUtil;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FileUtils;
+import org.testng.annotations.Ignore;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import static com.github.abhishek8908.util.DriverUtil.*;
 
 public class UtilsTest {
 
+	@Ignore
 	@Test
 	public static void newDownload() throws IOException {
 
@@ -31,12 +33,11 @@ public class UtilsTest {
 
 	@Test
 	public void urlTest() {
-
 		getFileNameFromUrl(
 				"https://chromedriver.storage.googleapis.com/2.39/chromedriver_win32.zip");
-
 	}
 
+	@Ignore
 	@Test
 	public void fileRename() throws IOException {
 		changeFileName("c:\\temp\\chromedriver.exe",
