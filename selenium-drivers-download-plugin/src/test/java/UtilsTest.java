@@ -39,24 +39,19 @@ public class UtilsTest {
 
 	@Test
 	public void fileRename() throws IOException {
-
 		changeFileName("c:\\temp\\chromedriver.exe",
 				"c:\\temp\\chromedriver-" + "2.38" + ".exe");
-
 	}
 
 	@Test
 	public void testCleanDir() {
-
 		cleanDir("c:\\temp");
-
 	}
 
 	@Test
 	public void testDriverExists() throws IOException {
 		System.out
 				.println(checkDriverVersionExists("chromedriver", "2.38", "c:/temp"));
-
 	}
 
 	@Test

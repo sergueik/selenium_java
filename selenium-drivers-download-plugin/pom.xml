@@ -7,6 +7,11 @@
   <version>1.0-SNAPSHOT</version>
   <name>selenium-drivers-download-plugin Maven Mojo</name>
   <url>http://maven.apache.org</url>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -73,6 +78,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>${maven-compiler-plugin.version}</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
