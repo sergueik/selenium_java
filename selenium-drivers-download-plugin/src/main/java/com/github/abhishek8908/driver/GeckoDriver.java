@@ -33,11 +33,7 @@ public class GeckoDriver extends Logger implements IDriver {
 	}
 
 	private String setExt() {
-		if (os.toLowerCase().contains("win")) {
-			this.ext = "zip";
-		} else {
-			this.ext = "tar.gz";
-		}
+		this.ext = (os.toLowerCase().contains("win")) ? "zip" : "tar.gz";
 		return ext;
 	}
 
