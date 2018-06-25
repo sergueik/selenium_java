@@ -2,32 +2,32 @@ package com.github.abhishek8908.driver;
 
 public class DriverSettings {
 
-	private String version;
+	private String ver;
 	private String os;
 	private String driverDir;
 
-	public String getDriverDir() {
-		return driverDir;
+	public String getVer() {
+		return ver;
+	}
+
+	public void setVer(String ver) {
+		this.ver = ver;
 	}
 
 	public String getOs() {
 		return os;
 	}
 
-	public String getVersion() {
-		return version;
-	}
-
-	public void setDriverDir(String driverDir) {
-		this.driverDir = driverDir;
-	}
-
 	public void setOs(String os) {
 		this.os = os;
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
+	public String getDriverDir() {
+		return driverDir;
+	}
+
+	public void setDriverDir(String driverDir) {
+		this.driverDir = driverDir;
 	}
 
 }

@@ -29,7 +29,13 @@ import java.util.Properties;
 
 public class DriverUtil extends Logger {
 
+	private static boolean useEmbeddedResource = true;
 	private static boolean renameDriver = true;
+
+	public static void setUseEmbeddedResource(boolean useEmbeddedResource) {
+		DriverUtil.useEmbeddedResource = useEmbeddedResource;
+	}
+
 	static Map<String, String> downloadURLs = new HashMap<>();
 	static {
 		downloadURLs.put("chromedriver", "chromedriver.download.url");
@@ -83,11 +89,8 @@ public class DriverUtil extends Logger {
 	public static void changeFileName(String fileName, String fileOut)
 			throws IOException {
 		String os = System.getProperty("os"); //
-		String ext = "";
-		System.err.println("os is " + os);
-		if (os.toLowerCase().contains("win")) {
-			ext = ".exe";
-		}
+		String ext = (os.toLowerCase().contains("win")) ? ".exe" : "";
+
 		FileUtils.moveFile(FileUtils.getFile(fileName + ext),
 				FileUtils.getFile(fileOut + "-" + os + ext));
 		log.info("File: " + fileName + " renameded to " + fileOut);
@@ -101,7 +104,7 @@ public class DriverUtil extends Logger {
 
 	}
 
-	// currently uses filename to figure out the os and version of the driver
+	// currently plugin extracts os and version of the driver from the filename
 	// alternatively one can make a soft link to the same
 	public static boolean checkDriverVersionExists(String driverName,
 			String version, String dir) throws IOException {
@@ -127,34 +130,30 @@ public class DriverUtil extends Logger {
 		log.info("***** Cleaning Dir:" + dir);
 	}
 
+	private static Map<String, String> properties = new HashMap<>();
+
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
-		Map<String, String> properties = PropertiesParser
-				.getProperties("driver.properties", true);
-		return properties.get(propertyName);
-		/*
-		// may need fixing ?
-		// uses the caller resource path ?
-		String resourcePath = "";
-		try {
-			resourcePath = Thread.currentThread().getContextClassLoader()
-					.getResource("").getPath();
-			log.info("Loading properties file from " + resourcePath);
-		} catch (NullPointerException e) {
-			System.err.println("Error loading properties file from " + resourcePath
-					+ e.getMessage());
+		if (properties.isEmpty()) {
+			properties = PropertiesParser.getProperties("driver.properties",
+					useEmbeddedResource);
 		}
-		Configuration config = new PropertiesConfiguration(
-				resourcePath + "driver.properties");
-		Configuration extConfig = ((PropertiesConfiguration) config)
-				.interpolatedConfiguration();
-		return extConfig.getProperty(propertyName).toString();
-		*/
+		return properties.get(propertyName);
 	}
 
 	public static String getSourceUrl(String browserDriver)
 			throws ConfigurationException {
 		return readProperty(downloadURLs.get(browserDriver));
+	}
+
+	public static void checkDriverDirExists(String dirName) throws IOException {
+
+		File directory = new File(dirName);
+		if (!directory.exists()) {
+			log.info("Driver directory does not exists - creating.");
+			FileUtils.forceMkdir(directory);
+		}
+
 	}
 
 }

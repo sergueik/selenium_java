@@ -19,6 +19,10 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
 /**
  * Common configuration / properties file parser
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
@@ -112,6 +116,25 @@ public class PropertiesParser {
 		}
 		m.appendTail(sb);
 		return sb.toString();
+	}
+
+	// origin:
+	// https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/src/main/java/com/github/abhishek8908/util/DriverUtil.java
+	public static String readProperty(String propertyName)
+			throws ConfigurationException {
+		String resourcePath = "";
+		try {
+			resourcePath = Thread.currentThread().getContextClassLoader()
+					.getResource("").getPath();
+		} catch (NullPointerException e) {
+			System.out.println(resourcePath + e.getMessage());
+		}
+		Configuration config = new PropertiesConfiguration(
+				resourcePath + "driver.properties");
+		Configuration extConfig = ((PropertiesConfiguration) config)
+				.interpolatedConfiguration();
+		return extConfig.getProperty(propertyName).toString();
+
 	}
 
 }

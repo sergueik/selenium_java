@@ -3,7 +3,7 @@ package com.github.abhishek8908.plugin;
 public class Driver {
 
 	private String name;
-	private String version;
+	private String ver;
 	private String os;
 
 	public String getName() {
@@ -14,8 +14,8 @@ public class Driver {
 		return os;
 	}
 
-	public String getVersion() {
-		return version;
+	public String getVer() {
+		return ver;
 	}
 
 	public void setName(String name) {
@@ -26,13 +26,13 @@ public class Driver {
 		this.os = os;
 	}
 
-	public void setVersion(String version) {
-		this.version = version;
+	public void setVer(String ver) {
+		this.ver = ver;
 	}
 
 	@Override
 	public String toString() {
-		return "Driver{" + "name='" + name + '\'' + ", version='" + version + '\''
+		return "Driver{" + "name='" + name + '\'' + ", ver='" + ver + '\''
 				+ ", os='" + os + '\'' + '}';
 	}
 }

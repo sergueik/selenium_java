@@ -9,28 +9,27 @@ import java.io.IOException;
 
 public class InternetExplorerDriver extends Logger implements IDriver {
 
-	private final String DRIVER_NAME = "IEDriverServer_Win32";
+	private final String driverName = "IEDriverServer_Win32";
 	// IEDriverServer_Win32_3.12.0.zip private String version;
-	private String version;
+	private String ver;
 	private String os;
 	private String driverDir;
 	private String ext;
 
 	public InternetExplorerDriver(DriverSettings settings) {
-		this.version = settings.getVersion();
-		System.setProperty("ver", this.version);
-		getLog()
-				.info("****System property :" + "version=" + System.getProperty("ver"));
+		this.ver = settings.getVer();
+		System.setProperty("ver", this.ver);
+		getLog().info("Set System property: " + "ver=" + System.getProperty("ver"));
 		this.os = settings.getOs();
 		System.setProperty("os", this.os);
-		getLog().info("****System property :" + "os=" + System.getProperty("os"));
+		getLog().info("Set System property: " + "os=" + System.getProperty("os"));
 		this.driverDir = settings.getDriverDir();
 		System.setProperty("ext", setExt());
-		getLog().info("****System property :" + "ext=" + System.getProperty("ext"));
+		getLog().info("Set System property: " + "ext=" + System.getProperty("ext"));
 	}
 
 	private boolean isDriverAvailable() throws IOException {
-		return DriverUtil.checkDriverVersionExists(DRIVER_NAME, version, driverDir);
+		return DriverUtil.checkDriverVersionExists(driverName, ver, driverDir);
 	}
 
 	private String setExt() {
@@ -48,7 +47,7 @@ public class InternetExplorerDriver extends Logger implements IDriver {
 			throws IOException, ConfigurationException {
 
 		if (!isDriverAvailable()) {
-			DriverUtil.download(DRIVER_NAME, driverDir, version);
+			DriverUtil.download(driverName, driverDir, ver);
 		} else {
 			setDriverInSystemProperty();
 		}
@@ -59,8 +58,8 @@ public class InternetExplorerDriver extends Logger implements IDriver {
 	@Override
 	public void setDriverInSystemProperty() {
 		System.setProperty("webdriver.gecko.driver",
-				driverDir + File.separator + DRIVER_NAME + "-" + version + "-" + os);
-		getLog().info("*****Setting webdriver.gecko.driver : "
+				driverDir + File.separator + driverName + "-" + ver + "-" + os);
+		getLog().info("Set webdriver.gecko.driver: "
 				+ System.getProperty("webdriver.gecko.driver"));
 	}
 

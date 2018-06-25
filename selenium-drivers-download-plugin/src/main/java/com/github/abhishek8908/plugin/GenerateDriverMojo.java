@@ -57,10 +57,10 @@ public class GenerateDriverMojo extends AbstractMojo {
 		// logger.setLog(getLog());
 
 		DriverSettings settings = new DriverSettings();
-		getLog().info("****Get Drivers***** " + drivers);
+		getLog().info("Get Drivers: " + drivers);
 
 		for (Driver driver : drivers) {
-			settings.setVersion(driver.getVersion());
+			settings.setVer(driver.getVer());
 			settings.setOs(driver.getOs());
 			settings.setDriverDir(driverPath);
 			if (driver.getName().equalsIgnoreCase(Drivers.CHROMEDRIVER.toString())) {
