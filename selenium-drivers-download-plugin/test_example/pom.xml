@@ -11,17 +11,20 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
-    <junit.version>4.8.1</junit.version>
-    <json.version>20170516</json.version>
-    <selenium.version>3.8.1</selenium.version>
     <java.version>1.8</java.version>
-    <!--  <selenium-drivers-download-plugin.groupId>com.adsingh.plugin</selenium-drivers-download-plugin.groupId> -->
+    <json.version>20170516</json.version>
+    <junit.version>4.12.1</junit.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
+    <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
+    <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
+    <selenium.version>3.8.1</selenium.version>
+    <!--
+    <selenium-drivers-download-plugin.groupId>com.adsingh.plugin</selenium-drivers-download-plugin.groupId>
+    -->
     <selenium-drivers-download-plugin.groupId>com.github.abhishek8908</selenium-drivers-download-plugin.groupId>
     <selenium-drivers-download-plugin.version>1.2-SNAPSHOT</selenium-drivers-download-plugin.version>
-    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
-    <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
     <testng.version>6.13.1</testng.version>
   </properties>
   <dependencies>
@@ -46,9 +49,15 @@
       <version>${selenium.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.github.detro</groupId>
+      <groupId>com.codeborne</groupId>
       <artifactId>phantomjsdriver</artifactId>
-      <version>1.2.0</version>
+      <version>${phantomjsdriver.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-remote-driver</artifactId>
+          </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -141,12 +150,12 @@
         <version>${selenium-drivers-download-plugin.version}</version>
         <configuration>
           <!-- Path to save selenium drivers -->
-          <driverPath>c:/tmp</driverPath>
+          <driverPath>${driverPath}</driverPath>
           <drivers>
             <driver>
               <name>chromedriver</name>
-              <ver>2.40</ver>
-              <os>win32</os>
+              <version>2.40</version>
+              <os>${host_os}</os>
             </driver>
             <!-- comment the unneded driver / ver / os 
             <driver>
@@ -191,4 +200,86 @@
       </plugins>
     </pluginManagement>
   </build>
+  <profiles>
+    <profile>
+      <id>windows32</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>x86</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>win32</host_os>
+        <driverPath>c:/tmp</driverPath>
+      </properties>
+    </profile>
+    <profile>
+      <id>windows64</id>
+      <activation>
+        <os>
+          <family>dos</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>win64</host_os>
+        <driverPath>c:/temp</driverPath>
+      </properties>
+    </profile>
+    <!-- 'profiles.profile.id' must be unique -->
+    <profile>
+      <id>windows64_2</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>win64</host_os>
+        <driverPath>c:/temp</driverPath>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac64</id>
+      <activation>
+        <os>
+          <family>mac</family>
+          <arch>x86_64</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>mac64</host_os>
+        <selenium.version>2.48.0</selenium.version>
+      </properties>
+    </profile>
+    <profile>
+      <id>unix32</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <arch>i386</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>linux32</host_os>
+        <selenium.version>2.53.1</selenium.version>
+        <driverPath>$HOME/Downloads</driverPath>
+      </properties>
+    </profile>
+    <profile>
+      <id>unix64</id>
+      <activation>
+        <os>
+          <family>unix</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>linux64</host_os>
+        <driverPath>${HOME}/Downloads</driverPath>
+      </properties>
+    </profile>
+  </profiles>
 </project>

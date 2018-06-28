@@ -44,11 +44,13 @@ public class UtilsTest {
 				"c:\\temp\\chromedriver-" + "2.38" + ".exe");
 	}
 
+	@Ignore
 	@Test
 	public void testCleanDir() {
 		cleanDir("c:\\temp");
 	}
 
+	@Ignore
 	@Test
 	public void testDriverExists() throws IOException {
 		System.out
