@@ -13,7 +13,8 @@
     <commons-io.version>2.5</commons-io.version>
     <java.version>1.8</java.version>
     <json.version>20170516</json.version>
-    <junit.version>4.12.1</junit.version>
+    <junit.version>4.8.1</junit.version>
+    <!-- NOTE: `4.12.1` is not in the default maven repo -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
@@ -154,31 +155,10 @@
           <drivers>
             <driver>
               <name>chromedriver</name>
-              <version>2.40</version>
+            <!-- TODO: rename -->
+              <ver>2.40</ver>
               <os>${host_os}</os>
             </driver>
-            <!-- comment the unneded driver / ver / os 
-            <driver>
-              <name>chromedriver</name>
-              <version>2.40</version>
-              <os>linux64</os>
-            </driver>
-            <driver>
-              <name>geckodriver</name>
-              <version>0.20.1</version>
-              <os>linux64</os>
-            </driver>
-            <driver>
-              <name>geckodriver</name>
-              <version>0.20.1</version>
-              <os>macos</os>
-            </driver>
-            <driver>
-              <name>chromedriver</name>
-              <version>2.39</version>
-              <os>mac64</os>
-            </driver>
-            -->
           </drivers>
         </configuration>
         <executions>

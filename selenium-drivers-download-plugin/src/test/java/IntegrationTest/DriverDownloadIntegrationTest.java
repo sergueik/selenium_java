@@ -14,8 +14,9 @@ public class DriverDownloadIntegrationTest {
 	private static String osName = null;
 	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp" : "/tmp";
 
-	@Test
-	public void download1Test() throws IOException, ConfigurationException {
+	// TODO: inter-test dependency
+	@Test(enabled = false)
+	public void downloadChomeDriverTest() throws IOException, ConfigurationException {
 		System.setProperty("ver", "2.39");
 		System.setProperty("os", "win32");
 		System.setProperty("ext", "zip");
@@ -24,7 +25,7 @@ public class DriverDownloadIntegrationTest {
 	}
 
 	@Test
-	public void download2Test() throws IOException, ConfigurationException {
+	public void downloadGeckoDriverTest() throws IOException, ConfigurationException {
 		System.setProperty("ver", "0.21.0");
 		System.setProperty("os", "linux64");
 		System.setProperty("ext", "tar.gz");

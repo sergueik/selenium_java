@@ -114,7 +114,7 @@ public void setupBeforeSuite( ITestContext context ) throws InterruptedException
 	// standalone
 	else { 
 		if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
-			System.setProperty("webdriver.chrome.driver", /* "c:/tmp/chromedriver.exe" */ "c:/tmp/chromedriver-2.40-win32.exe");
+			System.setProperty("webdriver.chrome.driver", /* "c:/temp/chromedriver.exe" */ "c:/temp/chromedriver-2.39-win32.exe");
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			LoggingPreferences logging_preferences = new LoggingPreferences();
 			logging_preferences.enable(LogType.BROWSER, Level.ALL);
