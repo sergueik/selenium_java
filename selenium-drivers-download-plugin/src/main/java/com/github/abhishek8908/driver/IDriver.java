@@ -9,5 +9,4 @@ public interface IDriver {
 	IDriver getDriver() throws IOException, ConfigurationException;
 
 	void setDriverInSystemProperty();
-
 }

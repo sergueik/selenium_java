@@ -1,36 +1,142 @@
 package com.github.abhishek8908.util;
 
-import com.github.abhishek8908.driver.logger.Logger;
-
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.io.FileUtils;
-
-import org.apache.maven.plugin.logging.Log;
-// TODO: get rid of
-import org.rauschig.jarchivelib.Archiver;
-import org.rauschig.jarchivelib.ArchiverFactory;
+import static javax.xml.xpath.XPathFactory.newInstance;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.io.StringReader;
+import java.net.MalformedURLException;
 import java.net.URL;
-
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.maven.plugin.logging.Log;
+
+// TODO: get rid of
+import org.rauschig.jarchivelib.Archiver;
+import org.rauschig.jarchivelib.ArchiverFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import com.github.abhishek8908.driver.logger.Logger;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.annotations.SerializedName;
+import com.google.gson.internal.LinkedTreeMap;
+
+@SuppressWarnings("deprecation")
 public class DriverUtil extends Logger {
 
 	private static boolean useEmbeddedResource = true;
 	private static boolean renameDriver = true;
+
+	// based on:
+	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
+	private static List<URL> getDriversFromJSON(String driverUrl) {
+		DefaultHttpClient client = new DefaultHttpClient();
+		List<URL> urls = new ArrayList<>();
+		ResponseHandler<String> responseHandler = new BasicResponseHandler();
+		HttpGet getMethod = new HttpGet(driverUrl);
+		GitHubApi[] releaseArray = null;
+		try {
+			String responseBody = client.execute(getMethod, responseHandler);
+			GsonBuilder gsonBuilder = new GsonBuilder();
+			Gson gson = gsonBuilder.create();
+			releaseArray = gson.fromJson(new StringReader(responseBody),
+					GitHubApi[].class);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		for (GitHubApi release : releaseArray) {
+			if (release != null) {
+				List<LinkedTreeMap<String, Object>> assets = release.getAssets();
+				Pattern pattern = Pattern.compile(
+						"(?:" + System.getProperty("os") + ")", Pattern.CASE_INSENSITIVE);
+				for (LinkedTreeMap<String, Object> asset : assets) {
+					try {
+						String path = asset.get("browser_download_url").toString();
+						Matcher matcher = pattern.matcher(path);
+						if (matcher.find()) {
+							log.info("Found gecko driver: " + path);
+							urls.add(new URL(path));
+						}
+					} catch (MalformedURLException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		}
+		return urls.stream()
+				.filter(o -> o.getFile().contains(System.getProperty("os")))
+				.collect(Collectors.toList());
+	}
+
+	// based on:
+	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
+	private static List<URL> getDriversFromXml(String driverUrl)
+			throws IOException {
+		DefaultHttpClient client = new DefaultHttpClient();
+		ResponseHandler<String> responseHandler = new BasicResponseHandler();
+		HttpGet getMethod = new HttpGet(driverUrl);
+		String responseBody = client.execute(getMethod, responseHandler);
+		List<URL> urls = new ArrayList<>();
+		try {
+			DocumentBuilder db = DocumentBuilderFactory.newInstance()
+					.newDocumentBuilder();
+			InputSource is = new InputSource();
+			is.setCharacterStream(new StringReader(responseBody));
+
+			Document doc = db.parse(is);
+
+			Element documentElement = doc.getDocumentElement();
+			NodeList nodes = (org.w3c.dom.NodeList) newInstance().newXPath().evaluate(
+					"//Contents/Key", documentElement,
+					javax.xml.xpath.XPathConstants.NODESET);
+
+			Pattern pattern = Pattern.compile(
+					"(?:" + System.getProperty("os") + ")",
+					Pattern.CASE_INSENSITIVE);
+
+			for (int i = 0; i < nodes.getLength(); ++i) {
+				Element e = (Element) nodes.item(i);
+				String path = e.getChildNodes().item(0).getNodeValue();
+				Matcher matcher = pattern.matcher(path);
+				if (matcher.find()) {
+					log.info("Found chrome driver: " + path);
+					urls.add(
+							new URL(driverUrl + e.getChildNodes().item(0).getNodeValue()));
+				}
+			}
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return urls.stream()
+				.filter(o -> o.getFile().contains(System.getProperty("os")))
+				.collect(Collectors.toList());
+	}
 
 	public static void setUseEmbeddedResource(boolean useEmbeddedResource) {
 		DriverUtil.useEmbeddedResource = useEmbeddedResource;
@@ -60,6 +166,11 @@ public class DriverUtil extends Logger {
 
 	public static void download(String driverName, String targetDirectory,
 			String version) throws IOException, ConfigurationException {
+		List<URL> driverUrls = getDriversFromXml(
+				"https://chromedriver.storage.googleapis.com/");
+		driverUrls = getDriversFromJSON(
+				"https://api.github.com/repos/mozilla/geckodriver/releases");
+
 		String sourceURL = getSourceUrl(driverName);
 		String fileName = getFileNameFromUrl(sourceURL);
 		String toFile = targetDirectory + File.separator + fileName;
@@ -97,11 +208,21 @@ public class DriverUtil extends Logger {
 
 	}
 
-	public static String getFileNameFromUrl(String url) {
-		String[] newUrl = url.split("/");
+	public static String getFileNameFromUrl(String location) {
+		String fileName = null;
+		try {
+			URL url = new URL(location);
+			fileName = url.getFile();
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+
+		}
+		return fileName;
+		/*
+		String[] newUrl = location.split("/");
 		log.info("File Name: " + newUrl[newUrl.length - 1]);
 		return newUrl[newUrl.length - 1];
-
+		*/
 	}
 
 	// currently plugin extracts os and version of the driver from the filename
@@ -127,7 +248,7 @@ public class DriverUtil extends Logger {
 				.forEach(File::delete);
 		Arrays.stream(folder.listFiles((f, p) -> p.endsWith(".tar.gz")))
 				.forEach(File::delete);
-		log.info("***** Cleaning Dir:" + dir);
+		log.info("Clean Dir:" + dir);
 	}
 
 	private static Map<String, String> properties = new HashMap<>();
@@ -152,6 +273,28 @@ public class DriverUtil extends Logger {
 		if (!directory.exists()) {
 			log.info("Driver directory does not exists - creating.");
 			FileUtils.forceMkdir(directory);
+		}
+
+	}
+
+	public static class GitHubApi {
+
+		@SerializedName("tag_name")
+		private String tagName;
+
+		private String name;
+		private List<LinkedTreeMap<String, Object>> assets;
+
+		public String getTagName() {
+			return tagName;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public List<LinkedTreeMap<String, Object>> getAssets() {
+			return assets;
 		}
 
 	}

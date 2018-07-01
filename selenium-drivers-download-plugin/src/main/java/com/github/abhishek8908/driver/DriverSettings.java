@@ -1,5 +1,8 @@
 package com.github.abhishek8908.driver;
 
+import java.net.URL;
+import java.util.List;
+
 public class DriverSettings {
 
 	private String ver;
