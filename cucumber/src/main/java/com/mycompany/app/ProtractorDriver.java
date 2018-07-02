@@ -37,9 +37,10 @@ import cucumber.api.Scenario;
 import cucumber.api.java.After;
 import cucumber.api.java.Before;
 
-import com.jprotractor.NgBy;
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
+
+import com.github.sergueik.jprotractor.NgBy;
+import com.github.sergueik.jprotractor.NgWebDriver;
+import com.github.sergueik.jprotractor.NgWebElement;
 
 public class ProtractorDriver {
 
@@ -56,7 +57,6 @@ public class ProtractorDriver {
 	public ProtractorDriver() {
 
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		// DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 		System.setProperty("webdriver.chrome.driver",
 				"c:/java/selenium/chromedriver.exe");
 
@@ -64,8 +64,10 @@ public class ProtractorDriver {
 				+ System.getProperty("file.separator") + "target"
 				+ System.getProperty("file.separator");
 
-		driver = new ChromeDriver(capabilities);
-		// driver = new FirefoxDriver(capabilities);
+		ChromeOptions chromeOptions = new ChromeOptions();
+    chromeOptions.addArguments("--headless");
+    driver = new ChromeDriver(chromeOptions);
+		// driver = new ChromeDriver(capabilities);
 		ngDriver = new NgWebDriver(driver);
 		wait = new WebDriverWait(driver, flexibleWait);
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
@@ -135,8 +137,8 @@ public class ProtractorDriver {
 
 	public void clickJS(By locator) {
 		log.info("Clicking on locator via JS: {}", locator);
-		wait.until(ExpectedConditions.elementToBeClickable(ngDriver
-				.findElement(locator)));
+		wait.until(
+				ExpectedConditions.elementToBeClickable(ngDriver.findElement(locator)));
 		((JavascriptExecutor) driver).executeScript("arguments[0].click();",
 				ngDriver.findElement(locator).getWrappedElement());
 	}
@@ -144,8 +146,8 @@ public class ProtractorDriver {
 	public void scrollIntoView(By locator) {
 		log.info("Scrolling into view: {}", locator);
 		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].scrollIntoView(true);", ngDriver.findElement(locator)
-						.getWrappedElement());
+				"arguments[0].scrollIntoView(true);",
+				ngDriver.findElement(locator).getWrappedElement());
 	}
 
 	public void mouseOver(By locator) {
@@ -212,8 +214,8 @@ public class ProtractorDriver {
 	public void highlight(By locator) throws InterruptedException {
 		log.info("Highlighting element {}", locator);
 		WebElement element = ngDriver.findElement(locator);
-		((JavascriptExecutor) driver).executeScript(
-				"arguments[0].style.border='3px solid yellow'", element);
+		((JavascriptExecutor) driver)
+				.executeScript("arguments[0].style.border='3px solid yellow'", element);
 		Thread.sleep(highlightInterval);
 		((JavascriptExecutor) driver).executeScript("arguments[0].style.border=''",
 				element);

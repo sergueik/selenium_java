@@ -1,6 +1,7 @@
+@ignore
 @Regular
 Feature: Login page
-
+  @ignore
   @test
   Scenario: Login Page Security Warning
     Given I go to the start page
@@ -9,13 +10,14 @@ Feature: Login page
     Then The page shows "Please use the form below to login to your account."
 
   # The same step description annotated as When will be found through Given
+  @ignore    
   @test
   Scenario: Ability to Login
     Given I go to Account page
     When I enter username "cat" and password "be123456"
     Then I am logged in
     # Then The page shows "Your Account"
-
+  @ignore
   @test
   Scenario Outline: Failed Login
     Given I go to Account page

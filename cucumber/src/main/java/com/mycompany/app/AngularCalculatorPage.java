@@ -7,9 +7,9 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import com.jprotractor.NgBy;
-import com.jprotractor.NgWebDriver;
-import com.jprotractor.NgWebElement;
+import com.github.sergueik.jprotractor.NgBy;
+import com.github.sergueik.jprotractor.NgWebDriver;
+import com.github.sergueik.jprotractor.NgWebElement;
 
 public class AngularCalculatorPage {
 
