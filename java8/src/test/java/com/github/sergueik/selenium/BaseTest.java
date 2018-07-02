@@ -180,14 +180,14 @@ public class BaseTest {
 
 					extensionFileInputStream.close();
 					chromeExtensionsBase64Encoded.add(new String(base64EncodedByteArray));
-					System.out.println(String.format(
+					System.err.println(String.format(
 							"Chrome extension successfully encoded and added: %s...",
 							new String(base64EncodedByteArray).substring(0, 64)));
 				} catch (FileNotFoundException e1) {
-					System.out.println(
+					System.err.println(
 							"Chrome extension not found: " + extensionFilePath + " " + e1);
 				} catch (IOException e2) {
-					System.out.println("Problem with reading Chrome extension: " + e2);
+					System.err.println("Problem with reading Chrome extension: " + e2);
 				}
 			}
 			chromeOptions.addEncodedExtensions(chromeExtensionsBase64Encoded);
@@ -314,7 +314,7 @@ public class BaseTest {
 			 profile.setPreference("general.useragent.override",
 			 		"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
 			*/
-			// System.out.println(System.getProperty("user.dir"));
+			// System.err.println(System.getProperty("user.dir"));
 			capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 			try {
 				driver = new FirefoxDriver(capabilities);
@@ -345,6 +345,7 @@ public class BaseTest {
 		driver.get("about:blank");
 		if (driver != null) {
 			try {
+				driver.close();
 				driver.quit();
 			} catch (Exception e) {
 				/*
@@ -361,7 +362,7 @@ public class BaseTest {
 	@BeforeMethod
 	public void beforeMethod(Method method) {
 		String methodName = method.getName();
-		System.out.println("Test Name: " + methodName + "\n");
+		System.err.println("Test Name: " + methodName + "\n");
 	}
 
 	@AfterMethod
@@ -512,6 +513,7 @@ public class BaseTest {
 
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void killProcess(String processName) {
+		System.err.println("Killing the process: " + processName);
 
 		if (processName.isEmpty()) {
 			return;
@@ -542,16 +544,16 @@ public class BaseTest {
 			int exitCode = process.waitFor();
 			// ignore exit code 128: the process "<browser driver>" not found.
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
-				System.out.println("Process exit code: " + exitCode);
+				System.err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					System.out.println("<OUTPUT>" + processOutput + "</OUTPUT>");
+					System.err.println("<OUTPUT>" + processOutput + "</OUTPUT>");
 				}
 				if (processError.length() > 0) {
 					// e.g.
 					// The process "chromedriver.exe"
 					// with PID 5540 could not be terminated.
 					// Reason: Access is denied.
-					System.out.println("<ERROR>" + processError + "</ERROR>");
+					System.err.println("<ERROR>" + processError + "</ERROR>");
 				}
 			}
 		} catch (Exception e) {
