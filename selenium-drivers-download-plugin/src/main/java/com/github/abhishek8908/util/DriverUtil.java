@@ -55,22 +55,22 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
-	private static List<URL> getDriversFromJSON(String driverUrl) {
+	private static List<URL> getDriversFromJSON(String releaseUrl) {
 		DefaultHttpClient client = new DefaultHttpClient();
 		List<URL> urls = new ArrayList<>();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
-		HttpGet getMethod = new HttpGet(driverUrl);
-		GitHubApi[] releaseArray = null;
+		HttpGet getMethod = new HttpGet(releaseUrl);
+		GeckoDriverReleases[] releaseArray = null;
 		try {
 			String responseBody = client.execute(getMethod, responseHandler);
 			GsonBuilder gsonBuilder = new GsonBuilder();
 			Gson gson = gsonBuilder.create();
 			releaseArray = gson.fromJson(new StringReader(responseBody),
-					GitHubApi[].class);
+					GeckoDriverReleases[].class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		for (GitHubApi release : releaseArray) {
+		for (GeckoDriverReleases release : releaseArray) {
 			if (release != null) {
 				List<LinkedTreeMap<String, Object>> assets = release.getAssets();
 				Pattern pattern = Pattern.compile(
@@ -89,18 +89,16 @@ public class DriverUtil extends Logger {
 				}
 			}
 		}
-		return urls.stream()
-				.filter(o -> o.getFile().contains(System.getProperty("os")))
-				.collect(Collectors.toList());
+		return urls;
 	}
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
-	private static List<URL> getDriversFromXml(String driverUrl)
+	private static List<URL> getDriversFromXml(String releaseUrl)
 			throws IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
-		HttpGet getMethod = new HttpGet(driverUrl);
+		HttpGet getMethod = new HttpGet(releaseUrl);
 		String responseBody = client.execute(getMethod, responseHandler);
 		List<URL> urls = new ArrayList<>();
 		try {
@@ -113,11 +111,12 @@ public class DriverUtil extends Logger {
 
 			Element documentElement = doc.getDocumentElement();
 			NodeList nodes = (org.w3c.dom.NodeList) newInstance().newXPath().evaluate(
-					"//Contents/Key", documentElement,
-					javax.xml.xpath.XPathConstants.NODESET);
+					String.format("//Contents/Key[contains(text(), '%s')]",
+							"chromedriver" /* readProperty(driverNames.get(browserDriver));  */),
+					documentElement, javax.xml.xpath.XPathConstants.NODESET);
 
-			Pattern pattern = Pattern.compile(
-					"(?:" + System.getProperty("os") + ")",
+			// TODO: OS filtering does not apply to IE and Edge driver
+			Pattern pattern = Pattern.compile("(?:" + System.getProperty("os") + ")",
 					Pattern.CASE_INSENSITIVE);
 
 			for (int i = 0; i < nodes.getLength(); ++i) {
@@ -126,16 +125,13 @@ public class DriverUtil extends Logger {
 				Matcher matcher = pattern.matcher(path);
 				if (matcher.find()) {
 					log.info("Found chrome driver: " + path);
-					urls.add(
-							new URL(driverUrl + e.getChildNodes().item(0).getNodeValue()));
+					urls.add(new URL(releaseUrl + path));
 				}
 			}
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		return urls.stream()
-				.filter(o -> o.getFile().contains(System.getProperty("os")))
-				.collect(Collectors.toList());
+		return urls;
 	}
 
 	public static void setUseEmbeddedResource(boolean useEmbeddedResource) {
@@ -149,6 +145,15 @@ public class DriverUtil extends Logger {
 		downloadURLs.put("safaridriver", "safaridriver.download.url");
 		downloadURLs.put("IEdriver", "iedriver.download.url");
 		downloadURLs.put("edgedriver", "edgedriver.download.url");
+	}
+
+	static Map<String, String> driverNames = new HashMap<>();
+	static {
+		downloadURLs.put("chromedriver", "chromedriver.name");
+		downloadURLs.put("geckodriver", "geckodriver.name");
+		downloadURLs.put("safaridriver", "safaridriver.name");
+		downloadURLs.put("IEdriver", "iedriver.name");
+		downloadURLs.put("edgedriver", "edgedriver.name");
 	}
 
 	public static boolean isRenameDriver() {
@@ -277,7 +282,7 @@ public class DriverUtil extends Logger {
 
 	}
 
-	public static class GitHubApi {
+	public static class GeckoDriverReleases {
 
 		@SerializedName("tag_name")
 		private String tagName;
