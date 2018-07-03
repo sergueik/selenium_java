@@ -149,11 +149,11 @@ public class DriverUtil extends Logger {
 
 	static Map<String, String> driverNames = new HashMap<>();
 	static {
-		downloadURLs.put("chromedriver", "chromedriver.name");
-		downloadURLs.put("geckodriver", "geckodriver.name");
-		downloadURLs.put("safaridriver", "safaridriver.name");
-		downloadURLs.put("IEdriver", "iedriver.name");
-		downloadURLs.put("edgedriver", "edgedriver.name");
+		driverNames.put("chromedriver", "chromedriver.name");
+		driverNames.put("geckodriver", "geckodriver.name");
+		driverNames.put("safaridriver", "safaridriver.name");
+		driverNames.put("IEdriver", "iedriver.name");
+		driverNames.put("edgedriver", "edgedriver.name");
 	}
 
 	public static boolean isRenameDriver() {
@@ -216,6 +216,7 @@ public class DriverUtil extends Logger {
 	public static String getFileNameFromUrl(String location) {
 		String fileName = null;
 		try {
+			log.info("Getting filename from the url: " + location );
 			URL url = new URL(location);
 			fileName = url.getFile();
 		} catch (MalformedURLException e) {

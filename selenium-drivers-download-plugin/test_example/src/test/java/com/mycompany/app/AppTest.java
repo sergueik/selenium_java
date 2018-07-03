@@ -1,66 +1,44 @@
 package com.mycompany.app;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.StringBuilder;
-import java.net.BindException;
 import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import org.apache.commons.io.FileUtils;
+import java.util.logging.Level;
+
 import org.apache.commons.io.IOUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.chrome.ChromeDriver;
 // import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.logging.LoggingPreferences;
-import org.openqa.selenium.logging.LogType;
-import java.util.logging.Level;
+import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-
-import org.openqa.selenium.firefox.internal.ProfilesIni;
-import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-
-import org.testng.annotations.*;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
-import org.testng.*;
+import org.testng.ITestContext;
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
 
 public class AppTest // extends BaseTest
 {
@@ -70,14 +48,17 @@ public String selenium_host = null;
 public String selenium_port = null;
 public String selenium_browser = null;
 public String selenium_run = null;
+public String driver_path = null;
 
 @BeforeSuite(alwaysRun = true)
 public void setupBeforeSuite( ITestContext context ) throws InterruptedException,MalformedURLException {
 
+	//  reading test configuration from testng.config
 	selenium_host = context.getCurrentXmlTest().getParameter("selenium.host");
 	selenium_port = context.getCurrentXmlTest().getParameter("selenium.port");
 	selenium_browser = context.getCurrentXmlTest().getParameter("selenium.browser");
 	selenium_run = context.getCurrentXmlTest().getParameter("selenium.run");
+	driver_path = context.getCurrentXmlTest().getParameter("driver_path");
 
 	// Remote Configuration
 	if (selenium_run.compareToIgnoreCase("remote") == 0) { 
@@ -114,7 +95,12 @@ public void setupBeforeSuite( ITestContext context ) throws InterruptedException
 	// standalone
 	else { 
 		if (selenium_browser.compareToIgnoreCase("chrome") == 0) {
-			System.setProperty("webdriver.chrome.driver", /* "c:/temp/chromedriver.exe" */ "c:/temp/chromedriver-2.39-win32.exe");
+
+			System.setProperty("webdriver.chrome.driver",
+				System.getProperty("os.name").toLowerCase().startsWith("windows")
+						? new File( "c:/tmp" + /* "chromedriver.exe" */ "chromedriver-2.40-win32.exe").getAbsolutePath()
+						: System.getenv("HOME") + "/Downloads/" + "chromedriver-2.40-linux64");
+
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			LoggingPreferences logging_preferences = new LoggingPreferences();
 			logging_preferences.enable(LogType.BROWSER, Level.ALL);

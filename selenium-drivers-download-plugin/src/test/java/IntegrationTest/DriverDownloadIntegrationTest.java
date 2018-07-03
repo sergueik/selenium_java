@@ -15,7 +15,7 @@ public class DriverDownloadIntegrationTest {
 	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp" : "/tmp";
 
 	// TODO: inter-test dependency
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void downloadChomeDriverTest() throws IOException, ConfigurationException {
 		System.setProperty("ver", "2.39");
 		System.setProperty("os", "win32");
@@ -24,7 +24,7 @@ public class DriverDownloadIntegrationTest {
 		assertTrue((new File(tmpDir + File.separator   + "chromedriver-2.39-win32.exe")).exists());
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void downloadGeckoDriverTest() throws IOException, ConfigurationException {
 		System.setProperty("ver", "0.21.0");
 		System.setProperty("os", "linux64");
