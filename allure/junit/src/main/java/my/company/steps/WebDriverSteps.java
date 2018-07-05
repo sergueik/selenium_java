@@ -49,6 +49,10 @@ public class WebDriverSteps {
 			public boolean apply(WebDriver input) {
 				return driver.findElement(By.className("main__content")).isDisplayed();
 			}
+			@Override
+			public boolean test(WebDriver input) {
+				return driver.findElement(By.className("main__content")).isDisplayed();
+			}
 		};
 	}
 }
