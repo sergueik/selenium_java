@@ -2,17 +2,30 @@
 
 This directory contains a derivative of project [swtestacademy/VisualAutomationImageMagickSelenium](https://github.com/swtestacademy/VisualAutomationImageMagickSelenium).
 
-Note: when using it on Window, install static or dynamically linked [ImageMagick-7.0.6-3-Q16-x64-static.exe](https://www.imagemagick.org/script/download.php)
-and copy `magic.exe` to `convert.exe` and `compare.exe`. 
+Note: when using it on Window, you can install static or dynamically linked application
+[ImageMagick-7.0.6-3-Q16-x64-static.exe](https://www.imagemagick.org/script/download.php). You will need to
+copy the `magic.exe` to `convert.exe` and `compare.exe`.
 
-Note: do not copy the ImageMagick to other directory: it uses Windows Registry to find its own location.
+Note: do not install the Image Magick on Windows via file copy: it uses Windows Registry to find its own location.
+The error
 ```java
 org.im4java.core.CommandException: org.im4java.core.CommandException:
 convert.exe: RegistryKeyLookupFailed `CoderModulesPath' @error/module.c/GetMagickModulePath/657.
 ...
 ```
+is a manifestation of manually installed Image Magic.
 
-The program writes the comparison script to the file
+To demo the project run
+````cmd
+mvn test
+```
+twice with a little delay between the runs. You will find the baseline screenshot of  page element, actual screenshot and a diff
+in the `Screenshots` directory in a subdirecrory named after the test method e.g. `imageCompareTest`.
+
+Aftert the first run, the baseline is created but not the image diff, is not saved (the original project logic has left 
+unmodified in this regards).
+
+The program also creates the comparison script to the file in the following format.
 ```cmd
 @echo off
 REM -------------------------------------------------------
@@ -24,11 +37,30 @@ set PATH=C:\Program Files\ImageMagick-7.0.6-Q16;C:\Program Files\ImageMagick-7.0
 
 compare ^
    -fuzz "5.0" ^
-  -metric "AE" "ScreenShots\kariyerUzmanCssTest\kariyerUzmanCssTest_Baseline.png" "ScreenShots\kariyerUzmanCssTest\kariyerUzmanCssTest_Actual.png" "ScreenShots\kariyerUzmanCssTest\kariyerUzmanCssTest_Diff.png"
+  -metric "AE" "ScreenShots\imageCompareTest\imageCompareTest_Baseline.png" "ScreenShots\imageCompareTest\imageCompareTest_Actual.png" "ScreenShots\imageCompareTest\imageCompareTest_Diff.png"
+
 
 ```
+In addition the project can resize the screen shots with the help of Image Magick.
+### TODO:
+Very recent versions of Selenium jars have runtine errors:
+
+3.8.1:
+```
+java.lang.NoSuchMethodError: com.google.common.util.concurrent.SimpleTimeLimiter.create(Ljava/util/concurrent/ExecutorService;)Lcom/google/common/util/concurrent/SimpleTimeLimiter;
+        at org.utils.VisualTest.setupTestClass(VisualTest.java:87)
+```
+3.4.0 +:
+```
+java.lang.NoSuchMethodError: com.sun.jna.platform.win32.WinNT$PSID.createFieldsOrder(Ljava/lang/String;)Ljava/util/List;
+```
+
 ### See Also
 
 * http://www.programcreek.com/java-api-examples/index.php?api=org.im4java.core.ConvertCmd
 * http://im4java.sourceforge.net/docs/dev-guide.html
-* http://codoid.com/automation-testing-comparing-screenshots/ 
+* http://codoid.com/automation-testing-comparing-screenshots/
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+

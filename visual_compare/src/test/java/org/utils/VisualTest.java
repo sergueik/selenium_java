@@ -77,7 +77,7 @@ public class VisualTest extends BaseTest {
 				WinReg.HKEY_LOCAL_MACHINE, "SOFTWARE\\ImageMagick\\Current", "BinPath");
 		System.err.println("ImageMagick path: " + imageMagickPath);
 
-		// Make sure the convert and compare are in the path
+		// Make sure the `convert.exe` and `compare.exe` exist in the path
 		assertTrue(new File(imageMagickPath + "\\" + "convert.exe").exists(),
 				"\"convert.exe\" has to be present");
 		assertTrue(new File(imageMagickPath + "\\" + "compare.exe").exists(),
@@ -102,9 +102,10 @@ public class VisualTest extends BaseTest {
 
 	@BeforeMethod
 	public void setupTestMethod(Method method) {
-		// Get the test name to create a specific screenshot folder for each test.
+		// Retrieve the test method name and create a specific screenshot folder for
+		// each test method.
 		testName = method.getName();
-		System.out.println("Test Name: " + testName + "\n");
+		System.err.println("Test Name: " + testName + "\n");
 
 		testScreenShotDirectory = parentScreenShotsLocation + testName + "\\";
 		createFolder(testScreenShotDirectory);
@@ -123,27 +124,50 @@ public class VisualTest extends BaseTest {
 		// Close banner
 		closeBanner();
 
-		WebElement uzmanPhotoSection = driver
-				.findElement(By.cssSelector(".item.uzman>a"));
+		WebElement element = driver.findElement(By.cssSelector(".item.uzman>a"));
 
 		// Unhide Text which is changing A lot
 		unhideElement(
 				"document.getElementsByClassName('count')[0].style.display='none';");
 
 		// Move To Operation
-		moveToElement(uzmanPhotoSection);
+		moveToElement(element);
 
 		// Wait for 2 second for violet color animation
 		Thread.sleep(2000);
 
-		Screenshot screenShot = takeScreenshot(uzmanPhotoSection);
+		boolean useAshot = false;
+		if (useAshot) {
+			Screenshot screenShot = takeScreenshot(element);
 
-		writeScreenshotToFolder(screenShot);
+			writeScreenshotToFolder(screenShot);
+			doComparison(screenShot);
+		} else {
+			if (baselineImageFile.exists()) {
+				takeScreenshotOfWebelement(driver, element,
+						// TODO: breakdown into local variables
+						actualImageFile.getAbsolutePath());
+				// Compare screenshot with baseline
+				System.out.println("Comparison method will be called!\n");
+				System.out.println("Baseline: " + baselinePath + "\n" + "Actual: "
+						+ screenshotPath + "\n" + "Diff: " + differencePath);
+				compareImagesWithImageMagick(baselinePath, screenshotPath,
+						differencePath);
 
-		doComparison(screenShot);
+				// Try to use IM4Java for comparison
+			} else {
+				System.out.println(
+						"BaselineScreenshot is not exist! We put it into test screenshot folder.\n");
+				// Put the screenshot to the specified folder
+				takeScreenshotOfWebelement(driver, element,
+						// TODO: breakdown into local variables
+						baselineImageFile.getAbsolutePath());
+			}
+		}
+
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void imageResizeTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -151,22 +175,21 @@ public class VisualTest extends BaseTest {
 		// Close banner
 		closeBanner();
 
-		WebElement uzmanPhotoSection = driver
-				.findElement(By.cssSelector(".item.uzman>a"));
+		WebElement element = driver.findElement(By.cssSelector(".item.uzman>a"));
 
 		// Unhide Text which is changing A lot
 		unhideElement(
 				"document.getElementsByClassName('count')[0].style.display='none';");
 
 		// Move To Operation
-		moveToElement(uzmanPhotoSection);
+		moveToElement(element);
 
 		// Wait for 2 second for violet color animation
 		Thread.sleep(2000);
 
-		Screenshot screenShot = takeScreenshot(uzmanPhotoSection);
+		Screenshot screenShot = takeScreenshot(element);
 
-		takeScreenshotOfWebelement(driver, uzmanPhotoSection,
+		takeScreenshotOfWebelement(driver, element,
 				testScreenShotDirectory + "\\" + "test.png");
 		writeScreenshotToFolder(screenShot);
 
@@ -275,7 +298,7 @@ public class VisualTest extends BaseTest {
 		        .coordsProvider(new WebDriverCoordsProvider())
 		        .takeScreenshot(driver,element);*/
 
-		System.out.println(String.format("Size: Height: %d Width: %d",
+		System.err.println(String.format("Size: Height: %d Width: %d",
 				elementScreenShot.getImage().getHeight(),
 				elementScreenShot.getImage().getWidth()));
 
@@ -284,6 +307,8 @@ public class VisualTest extends BaseTest {
 
 	public void writeScreenshotToFolder(Screenshot screenshot)
 			throws IOException {
+		System.err.println(
+				"actual Image File path : " + actualImageFile.getAbsolutePath());
 		ImageIO.write(screenshot.getImage(), "PNG", actualImageFile);
 	}
 

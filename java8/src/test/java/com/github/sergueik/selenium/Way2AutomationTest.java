@@ -103,7 +103,7 @@ public class Way2AutomationTest extends BaseTest {
 		element = wait.until(ExpectedConditions.visibilityOf(
 				driver.findElement(By.xpath("//select/option[@selected]"))));
 		assertThat(element, notNullValue());
-		assertThat("selected option is dislayed check", element.isDisplayed(),
+		assertThat("selected option is displayed check", element.isDisplayed(),
 				is(true));
 
 		element = wait.until(ExpectedConditions.visibilityOf(driver.findElement(
@@ -112,8 +112,8 @@ public class Way2AutomationTest extends BaseTest {
 
 		assertThat("non-selected option is not selected check",
 				element.isSelected(), is(false));
-		// NOTE: the following fails
-		// assertThat("non-selected option is not dislayed check",
+		// NOTE: the following fails: the non-selected option will still be reported displayed
+		// assertThat("non-selected option is not displayed check",
 		// element.isDisplayed(), is(false));
 
 	}
