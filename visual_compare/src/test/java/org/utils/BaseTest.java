@@ -2,6 +2,8 @@ package org.utils;
 
 import java.io.File;
 import java.io.IOException;
+import static java.io.File.separator;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -21,14 +23,18 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
-import org.testng.ITestContext;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.testng.ITestContext;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
+
 public class BaseTest {
+
+	private static String osName = null;
+	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp"
+			: "/tmp";
 
 	public WebDriver driver;
 	public WebDriverWait wait;
@@ -38,12 +44,11 @@ public class BaseTest {
 
 	private static Map<String, String> config = new HashMap<>();
 	static {
-		config.put("success", "screenshot\\pass");
-		config.put("failure", "screenshot\\fail");
+		config.put("success", "screenshots" + separator + "pass");
+		config.put("failure", "screenshots" + separator + "fail");
 	}
 
 	private static final String browser = "chrome";
-	private static String osName;
 
 	private int scriptTimeout = 5;
 	private int flexibleWait = 120;
@@ -59,21 +64,24 @@ public class BaseTest {
 		driver.quit();
 	}
 
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public void setupTestClass(ITestContext context) throws IOException {
 
-		getOsName();
+		getOSName();
 		if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver",
-					(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+
+			System.setProperty("webdriver.chrome.driver", osName.equals("windows")
+					? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
+					: String.format("%s/Downloads/chromedriver", System.getenv("HOME")));
+
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions options = new ChromeOptions();
 
 			HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 			chromePrefs.put("profile.default_content_settings.popups", 0);
-			String downloadFilepath = System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + "target"
-					+ System.getProperty("file.separator");
+			String downloadFilepath = System.getProperty("user.dir") + separator
+					+ "target" + separator;
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
 			options.setExperimentalOption("prefs", chromePrefs);
@@ -94,13 +102,14 @@ public class BaseTest {
 			driver = new ChromeDriver(capabilities);
 		} else if (browser.equals("firefox")) {
 
-			System.setProperty("webdriver.gecko.driver",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: "/tmp/geckodriver");
+			System.setProperty("webdriver.gecko.driver", osName.equals("windows")
+					? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+					: String.format("%s/Downloads/geckodriver", System.getenv("HOME")));
+			// /tmp may have noexec set
+
 			System
 					.setProperty("webdriver.firefox.bin",
-							osName.toLowerCase().startsWith("windows") ? new File(
+							osName.equals("windows") ? new File(
 									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
 											.getAbsolutePath()
 									: "/usr/bin/firefox");
@@ -145,6 +154,7 @@ public class BaseTest {
 		highlight(element, 100);
 	}
 
+	@SuppressWarnings("deprecation")
 	public void highlight(WebElement element, long highlight_interval) {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
@@ -166,10 +176,14 @@ public class BaseTest {
 		}
 	}
 
-	public static String getOsName() {
+	public static String getOSName() {
 		if (osName == null) {
-			osName = System.getProperty("os.name");
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
 		}
 		return osName;
 	}
+
 }
