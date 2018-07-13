@@ -42,9 +42,6 @@ import org.testng.annotations.Test;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
-import ru.yandex.qatools.ashot.AShot;
-import ru.yandex.qatools.ashot.Screenshot;
-
 public class VisualTest extends BaseTest {
 
 	public String testName;
@@ -136,38 +133,30 @@ public class VisualTest extends BaseTest {
 		// Wait for 2 second for violet color animation
 		Thread.sleep(2000);
 
-		boolean useAshot = false;
-		if (useAshot) {
-			Screenshot screenShot = takeScreenshot(element);
+		if (baselineImageFile.exists()) {
+			takeScreenshotOfWebelement(driver, element,
+					// TODO: breakdown into local variables
+					actualImageFile.getAbsolutePath());
+			// Compare screenshot with baseline
+			System.err.println("Comparison method will be called!\n");
+			System.err.println("Baseline: " + baselinePath + "\n" + "Actual: "
+					+ screenshotPath + "\n" + "Diff: " + differencePath);
+			compareImagesWithImageMagick(baselinePath, screenshotPath,
+					differencePath);
 
-			writeScreenshotToFolder(screenShot);
-			doComparison(screenShot);
+			// Try to use IM4Java for comparison
 		} else {
-			if (baselineImageFile.exists()) {
-				takeScreenshotOfWebelement(driver, element,
-						// TODO: breakdown into local variables
-						actualImageFile.getAbsolutePath());
-				// Compare screenshot with baseline
-				System.out.println("Comparison method will be called!\n");
-				System.out.println("Baseline: " + baselinePath + "\n" + "Actual: "
-						+ screenshotPath + "\n" + "Diff: " + differencePath);
-				compareImagesWithImageMagick(baselinePath, screenshotPath,
-						differencePath);
-
-				// Try to use IM4Java for comparison
-			} else {
-				System.out.println(
-						"BaselineScreenshot is not exist! We put it into test screenshot folder.\n");
-				// Put the screenshot to the specified folder
-				takeScreenshotOfWebelement(driver, element,
-						// TODO: breakdown into local variables
-						baselineImageFile.getAbsolutePath());
-			}
+			System.err.println(
+					"BaselineScreenshot is not exist! We put it into test screenshot folder.\n");
+			// Put the screenshot to the specified folder
+			takeScreenshotOfWebelement(driver, element,
+					// TODO: breakdown into local variables
+					baselineImageFile.getAbsolutePath());
 		}
 
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void imageResizeTest() throws Exception {
 		// Handle popup
 		handlePopup(".ui-dialog-titlebar-close");
@@ -187,14 +176,11 @@ public class VisualTest extends BaseTest {
 		// Wait for 2 second for violet color animation
 		Thread.sleep(2000);
 
-		Screenshot screenShot = takeScreenshot(element);
-
 		takeScreenshotOfWebelement(driver, element,
 				testScreenShotDirectory + "\\" + "test.png");
-		writeScreenshotToFolder(screenShot);
 
 		// Resize
-		resizeImagesWithImageMagick(screenshotPath);
+		resizeImagesWithImageMagick(testScreenShotDirectory + "\\" + "test.png");
 	}
 
 	// utils
@@ -219,12 +205,12 @@ public class VisualTest extends BaseTest {
 		File testDirectory = new File(path);
 		if (!testDirectory.exists()) {
 			if (testDirectory.mkdir()) {
-				System.out.println("Directory: " + path + " is created!");
+				System.err.println("Directory: " + path + " is created!");
 			} else {
-				System.out.println("Failed to create directory: " + path);
+				System.err.println("Failed to create directory: " + path);
 			}
 		} else {
-			System.out.println("Directory already exists: " + path);
+			System.err.println("Directory already exists: " + path);
 		}
 	}
 
@@ -289,27 +275,6 @@ public class VisualTest extends BaseTest {
 
 		ImageIO.write(dest, "png", screen);
 		FileUtils.copyFile(screen, new File(Destination));
-	}
-
-	// using ashot
-	public Screenshot takeScreenshot(WebElement element) {
-		Screenshot elementScreenShot = new AShot().takeScreenshot(driver, element);
-		/*Screenshot elementScreenShot = new AShot()
-		        .coordsProvider(new WebDriverCoordsProvider())
-		        .takeScreenshot(driver,element);*/
-
-		System.err.println(String.format("Size: Height: %d Width: %d",
-				elementScreenShot.getImage().getHeight(),
-				elementScreenShot.getImage().getWidth()));
-
-		return elementScreenShot;
-	}
-
-	public void writeScreenshotToFolder(Screenshot screenshot)
-			throws IOException {
-		System.err.println(
-				"actual Image File path : " + actualImageFile.getAbsolutePath());
-		ImageIO.write(screenshot.getImage(), "PNG", actualImageFile);
 	}
 
 	// Screenshot paths
@@ -385,9 +350,9 @@ public class VisualTest extends BaseTest {
 
 		String script = "myscript";
 		try {
-			System.out.println("Comparison Started");
+			System.err.println("Comparison Started");
 			compare.createScript(script, imOperation);
-			System.out.println("Comparison Script written to " + script);
+			System.err.println("Comparison Script written to " + script);
 			compare.run(imOperation);
 		} catch (CommandException ex) {
 			// ignore
@@ -400,28 +365,6 @@ public class VisualTest extends BaseTest {
 		}
 		// Put the difference image to the global differences folder
 		Files.copy(differenceImageFile, differenceFileForParent);
-	}
-
-	// Compare Operation
-	public void doComparison(Screenshot elementScreenShot) throws Exception {
-		// Did we capture baseline image before?
-		if (baselineImageFile.exists()) {
-			// Compare screenshot with baseline
-			System.out.println("Comparison method will be called!\n");
-
-			System.out.println("Baseline: " + baselinePath + "\n" + "Actual: "
-					+ screenshotPath + "\n" + "Diff: " + differencePath);
-
-			// Try to use IM4Java for comparison
-			compareImagesWithImageMagick(baselinePath, screenshotPath,
-					differencePath);
-		} else {
-			System.out.println(
-					"BaselineScreenshot is not exist! We put it into test screenshot folder.\n");
-			// Put the screenshot to the specified folder
-			ImageIO.write(elementScreenShot.getImage(), "PNG", baselineImageFile);
-
-		}
 	}
 
 	public void sleep(int milis) {

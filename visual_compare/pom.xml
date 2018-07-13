@@ -48,10 +48,6 @@
       <version>${jna-platform.version}</version>
     </dependency>
     <dependency>
-      <groupId>ru.yandex.qatools.ashot</groupId>
-      <artifactId>ashot</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.7.25</version>
@@ -83,11 +79,6 @@
         <groupId>org.im4java</groupId>
         <artifactId>im4java</artifactId>
         <version>1.4.0</version>
-      </dependency>
-      <dependency>
-        <groupId>ru.yandex.qatools.ashot</groupId>
-        <artifactId>ashot</artifactId>
-        <version>1.5.3</version>
       </dependency>
       <dependency>
         <groupId>commons-io</groupId>
