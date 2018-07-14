@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Map;
+
 /**
  * origin: 
  * https://github.com/boonyasukd/headless-chrome/blob/master/src/test/java/com/telenordigital/wowbox/admin/test/utils/listener/ScreenshotTestListener.java
@@ -40,7 +41,8 @@ public class ScreenshotTestListener implements ITestListener {
 
 	@Override
 	public void onTestSuccess(ITestResult result) {
-		log.info("Capture screenshot (success): {} ", result.getMethod().getMethodName());
+		log.info("Capture screenshot of successful test: {} ",
+				result.getMethod().getMethodName());
 		try {
 			this.captureScreenShot(result);
 		} catch (Exception e) {
@@ -50,7 +52,8 @@ public class ScreenshotTestListener implements ITestListener {
 
 	@Override
 	public void onTestFailure(ITestResult result) {
-		log.info("Capture screenshot (failure): {} ", result.getMethod().getMethodName());
+		log.info("Capture screenshot of failed test: {} ",
+				result.getMethod().getMethodName());
 		try {
 			this.captureScreenShot(result);
 		} catch (Exception e) {
@@ -75,8 +78,10 @@ public class ScreenshotTestListener implements ITestListener {
 
 	@Override
 	public void onFinish(ITestContext context) {
-		log.debug("Passed: {}", context.getPassedTests().getAllResults().size());
-		log.debug("Failed: {}", context.getFailedTests().getAllResults().size());
+		log.debug("Passed tests: {}",
+				context.getPassedTests().getAllResults().size());
+		log.debug("Failed tests: {}",
+				context.getFailedTests().getAllResults().size());
 	}
 
 	private void captureScreenShot(ITestResult result) {
@@ -106,13 +111,14 @@ public class ScreenshotTestListener implements ITestListener {
 
 	private String getDir(ITestResult result) {
 		@SuppressWarnings("unchecked")
-		Map<String, String>  config = (Map<String, String> ) result.getTestContext().getAttribute("config");
-		return (result.getStatus() == SUCCESS) ? config.get("success"): config.get("failure");
+		Map<String, String> config = (Map<String, String>) result.getTestContext()
+				.getAttribute("config");
+		return (result.getStatus() == SUCCESS) ? config.get("success")
+				: config.get("failure");
 	}
 
 	private LocalDateTime toLocalDateTime(long millisecs) {
 		return LocalDateTime.ofInstant(Instant.ofEpochMilli(millisecs),
 				ZoneId.systemDefault());
 	}
-
 }

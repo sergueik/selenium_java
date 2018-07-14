@@ -105,7 +105,7 @@ public class BaseTest {
 			System.setProperty("webdriver.gecko.driver", osName.equals("windows")
 					? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
 					: String.format("%s/Downloads/geckodriver", System.getenv("HOME")));
-			// /tmp may have noexec set
+			// the '/tmp' or '/var/run' directory may have noexec set
 
 			System
 					.setProperty("webdriver.firefox.bin",
@@ -162,15 +162,9 @@ public class BaseTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'", element);
-			}
+			js.executeScript("arguments[0].style.border='3px solid yellow'", element);
 			Thread.sleep(highlight_interval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver)
-						.executeScript("arguments[0].style.border=''", element);
-			}
+			js.executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}

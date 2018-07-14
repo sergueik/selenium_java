@@ -2,11 +2,10 @@
 
 This directory contains a derivative of project [swtestacademy/VisualAutomationImageMagickSelenium](https://github.com/swtestacademy/VisualAutomationImageMagickSelenium).
 
-Note: when using it on Window, you can install static or dynamically linked application
-[ImageMagick-7.0.6-3-Q16-x64-static.exe](https://www.imagemagick.org/script/download.php). You will need to
-copy the `magic.exe` to `convert.exe` and `compare.exe`.
-
-Note: do not install the Image Magick on Windows via file copy: it uses Windows Registry to find its own location.
+Note: on Window, you can install either static or dynamically linked application
+[ImageMagick-7.0.6-3-Q16-x64-static.exe](https://www.imagemagick.org/script/download.php), make sure you will need to
+copy the `magic.exe` to `convert.exe` and `compare.exe` after installation and run the installer -
+avoid file copy install: on Windows the Image Magick uses Windows Registry to find its own location.
 The error
 ```java
 org.im4java.core.CommandException: org.im4java.core.CommandException:
@@ -17,15 +16,21 @@ is a manifestation of a manually installed Image Magic.
 
 To demo the project run
 ```cmd
+mvn clean test
+```
+followed by
+```cmd
 mvn test
 ```
-twice with a little delay between the runs. 
+with a little delay between the runs.
 You will find the baseline screenshot of page element, actual screenshot and a visual diff
 in the `screenshots` folder of the project in a subfolder named after the test method e.g. `imageCompareTest`.
 
 After the intial clean run, the baseline screenshot of some example element of the pasge is created snd saved as a new baseline but not the image diff is not ecomputed nor saved: the original project logic has left unmodified in this regards.
 
-The program also creates the comparison script to the file in the following format.
+The program also saves the standalone comparison script into the file `myscript.cmd` (`myscript` on Unix)
+in the following format:
+
 ```cmd
 @echo off
 REM -------------------------------------------------------
@@ -52,24 +57,28 @@ compare \
 ```
 
 In addition the project can resize the screen shots with the help of Image Magick.
+
+
 ### TODO:
 With recent versions of Selenium jars in the `pom.xml` one has the following runtine errors:
 
-3.8.1:
+__3.8.1__:
 ```
 java.lang.NoSuchMethodError: com.google.common.util.concurrent.SimpleTimeLimiter.create(Ljava/util/concurrent/ExecutorService;)Lcom/google/common/util/concurrent/SimpleTimeLimiter;
         at org.utils.VisualTest.setupTestClass(VisualTest.java:87)
 ```
-3.4.0 +:
+__3.4.0__:
 ```
 java.lang.NoSuchMethodError: com.sun.jna.platform.win32.WinNT$PSID.createFieldsOrder(Ljava/lang/String;)Ljava/util/List;
 ```
+Therefore the version of Selenium driver jar in the `pom.xml` should not be newer than __3.3.1__.
 
 ### See Also
 
-* http://www.programcreek.com/java-api-examples/index.php?api=org.im4java.core.ConvertCmd
-* http://im4java.sourceforge.net/docs/dev-guide.html
-* http://codoid.com/automation-testing-comparing-screenshots/
+  * http://www.programcreek.com/java-api-examples/index.php?api=org.im4java.core.ConvertCmd
+  * [im3java guide](http://im4java.sourceforge.net/docs/dev-guide.html)
+  * http://codoid.com/automation-testing-comparing-screenshots/
+  * [ocular](https://github.com/vinsguru/ocular)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
