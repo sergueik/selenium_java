@@ -17,6 +17,7 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.InvalidSelectorException;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
@@ -80,21 +81,69 @@ public class XPathNavigationTest extends BaseTest {
 								"arguments[0].scrollIntoView({ behavior: \"smooth\" });",
 								buttonElement);
 						highlight(buttonElement.findElement(By.xpath("..")));
-						// temporarily catch all exceptions.
 						// System.err.println(buttonElement.getAttribute("outerHTML"));
 						// System.err.println(buttonElement.findElement(By.xpath("..")).getAttribute("outerHTML"));
-						System.err.println(String.format("Connecrtion fee: %s", fee));
+						System.err.println(String.format("Connection fee: %s", fee));
 						// NOTE: funny console output of cyrillic word:
 						// Подключить
 						// чить
 						// ь
 						System.err.println(
 								String.format("Button Text: |%s|", buttonElement.getText()));
+						System.err.println(xpathOfElement(buttonElement));
 					} catch (Exception e) {
+						// temporarily catch all exceptions.
 						System.err.println("Exception: " + e.toString());
 					}
 					return buttonElement;
 				}).collect(Collectors.toList());
-		// List<WebElement> checkboxes = new ArrayList<>();
+	}
+
+	// a debug version of test1.
+	// NOTE: slower
+	@Test(enabled = true)
+	public void test2() {
+		List<WebElement> elements = new ArrayList<>();
+		elements = driver.findElements(By.cssSelector("*[data-fee]"));
+
+		List<WebElement> buttons = elements.stream().map(_element -> {
+			String fee = _element.getAttribute("data-fee");
+			WebElement containerElement = null;
+			WebElement buttonElement = null;
+			if (Integer.parseInt(fee) > 0) {
+				String xpath = String
+						.format("ancestor::div[contains(@class,'js-price')]", fee);
+				try {
+					containerElement = _element.findElement(By.xpath(xpath));
+					if (containerElement != null) {
+
+						// System.err.println("Container element: "
+						// + containerElement.getAttribute("innerHTML"));
+						try {
+							buttonElement = containerElement
+									.findElement(By.cssSelector("a[class *= 'button']"));
+							if (buttonElement != null) {
+								executeScript(
+										"arguments[0].scrollIntoView({ behavior: \"smooth\" });",
+										buttonElement);
+								highlight(buttonElement.findElement(By.xpath("..")));
+								System.err.println(String.format("Connection fee: %s", fee));
+								System.err.println(String.format("Button Text: |%s|",
+										buttonElement.getText()));
+								System.err.println(cssSelectorOfElement(buttonElement));
+								
+							}
+						} catch (TimeoutException e2) {
+							System.err.println(
+									"Exception finding the button element: " + e2.toString());
+						}
+					}
+				} catch (TimeoutException e1) {
+					System.err.println(
+							"Exception finding the container element: " + e1.toString());
+				}
+			}
+			return buttonElement;
+		}).collect(Collectors.toList());
 	}
 }
