@@ -30,7 +30,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>3.4.0</selenium.version>
+    <selenium.version>3.11.0</selenium.version>
     <selenium.firefox-driver.version>3.4.0</selenium.firefox-driver.version>
     <testng.version>6.11</testng.version>
     <guava.version>21.0</guava.version>
@@ -188,6 +188,7 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>utf-8</encoding>
+          <!-- need to change cosole code page to work with cyrillic page -->
           <compilerArgument>-Xlint:all</compilerArgument>
           <compilerArgument>-Xlint:-processing</compilerArgument>
           <showWarnings>true</showWarnings>

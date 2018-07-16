@@ -3,9 +3,6 @@ package com.github.sergueik.selenium;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -275,15 +272,4 @@ public class EscapeXPathTest extends BaseTest {
 	// "//*/text()[matches(.,'test', 'i')]"
 	// "//*/text()[contains(translate(.,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz'),'test')]
 
-	protected String getPageContent(String pagename) {
-		try {
-			URI uri = EscapeXPathTest.class.getClassLoader().getResource(pagename)
-					.toURI();
-			System.err.println("Testing local file: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-																			// supported in -source 1.6
-			throw new RuntimeException(e);
-		}
-	}
 }

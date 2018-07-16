@@ -53,6 +53,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.internal.Nullable;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Selected test scenarios for Selenium WebDriver
@@ -840,6 +842,17 @@ public class BaseTest {
 			return symbol >= 'a' && symbol <= 'z';
 		}
 
+	}
+
+	protected String getPageContent(String pagename) {
+		try {
+			URI uri = BaseTest.class.getClassLoader().getResource(pagename).toURI();
+			System.err.println("Testing local file: " + uri.toString());
+			return uri.toString();
+		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
+																			// supported in -source 1.6
+			throw new RuntimeException(e);
+		}
 	}
 
 }
