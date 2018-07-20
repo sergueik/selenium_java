@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+	<Properties>
+		<Property name="logPath">target/report-logs</Property>
+	</Properties>
+	<Appenders>
+		<Console name="console" target="SYSTEM_OUT">
+			<PatternLayout pattern="[%highlight{%-5level}] %d{DEFAULT} %c{1}.%M() - %msg%n%throwable{short.lineNumber}" />
+		</Console>
+		<RollingFile name="rollingFile" fileName="${logPath}/report.log" filePattern="${logPath}/report_%d{yyyy-MM-dd}.log">
+			<PatternLayout pattern="[%highlight{%-5level}] %d{DEFAULT} %c{1}.%M() - %msg%n%throwable{short.lineNumber}" />
+			<Policies>
+				<!-- Causes a rollover if the log file is older than the current JVM's start time -->
+				<OnStartupTriggeringPolicy />
+				<!-- Causes a rollover once the date/time pattern no longer applies to the active file -->
+				<TimeBasedTriggeringPolicy interval="1" modulate="true" />
+			</Policies>
+		</RollingFile>
+	</Appenders>
+	<Loggers>
+		<Root level="DEBUG" additivity="false">
+			<AppenderRef ref="console" />
+			<AppenderRef ref="rollingFile" />
+		</Root>
+	</Loggers>
+</Configuration>

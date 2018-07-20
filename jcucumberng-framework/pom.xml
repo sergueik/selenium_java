@@ -6,18 +6,20 @@
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>jCucumberNG-Framework</name>
-  <description>A test framework using Selenium, Cucumber, and ngWebDriver  or jProtractor (Protractor) in Java</description>
-  <url/>
+  <description>A test framework using Selenium, Cucumber, and ngWebDriver (Protractor) in Java.</description>
+  <url>https://github.com/kathyrollo/jcucumberng-framework</url>
   <properties>
     <!-- Project Properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <app.name>Simply Do - Balance Projector</app.name>
+    <jcucumberng.output>${project.build.directory}/jcucumberng-output</jcucumberng.output>
     <!-- Maven Properties -->
     <timestamp>${maven.build.timestamp}</timestamp>
-    <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+    <maven.build.timestamp.format>yyyyMMdd'T'HHmmss,SSS'Z'</maven.build.timestamp.format>
     <!-- Framework Core Dependencies -->
-    <selenium.version>3.11.0</selenium.version>
-    <ngwebdriver.version>1.1.3</ngwebdriver.version>
-    <cucumber.version>2.4.0</cucumber.version>
+    <selenium.version>3.13.0</selenium.version>
+    <ngwebdriver.version>1.1.4</ngwebdriver.version>
+    <cucumber.version>3.0.2</cucumber.version>
     <java.version>1.8</java.version>
   </properties>
   <dependencies>
@@ -35,14 +37,14 @@
       <version>${ngwebdriver.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/info.cukes/cucumber-junit -->
+    <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-junit -->
     <dependency>
       <groupId>io.cucumber</groupId>
-      <artifactId>cucumber-testng</artifactId>
+      <artifactId>cucumber-junit</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/info.cukes/cucumber-picocontainer -->
+    <!-- https://mvnrepository.com/artifact/io.cucumber/cucumber-picocontainer -->
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-picocontainer</artifactId>
@@ -53,13 +55,13 @@
     <dependency>
       <groupId>org.assertj</groupId>
       <artifactId>assertj-core</artifactId>
-      <version>3.9.1</version>
+      <version>3.10.0</version>
       <scope>test</scope>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+    <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-slf4j-impl -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
+      <artifactId>log4j-slf4j-impl</artifactId>
       <version>2.11.0</version>
       <scope>test</scope>
     </dependency>
@@ -68,16 +70,31 @@
       <groupId>com.itextpdf</groupId>
       <artifactId>itextpdf</artifactId>
       <version>5.5.13</version>
+      <scope>test</scope>
     </dependency>
     <!-- https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml -->
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>3.17</version>
+      <scope>test</scope>
     </dependency>
   </dependencies>
   <build>
     <plugins>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-site-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId>
+        <version>3.7.1</version>
+      </plugin>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-project-info-reports-plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-project-info-reports-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -87,22 +104,24 @@
           <target>${java.version}</target>
         </configuration>
       </plugin>
+      <!-- https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-surefire-plugin -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.21.0</version>
+        <version>2.22.0</version>
         <configuration>
           <includes>
             <include>**/*Runner.java</include>
           </includes>
-          <testFailureIgnore>true</testFailureIgnore>
-          <reportsDirectory>./target/test-output/${timestamp}</reportsDirectory>
+          <testFailureIgnore>false</testFailureIgnore>
+          <reportsDirectory>${project.build.directory}/junit-reports/${timestamp}</reportsDirectory>
         </configuration>
       </plugin>
+      <!-- https://mvnrepository.com/artifact/net.masterthought/maven-cucumber-reporting -->
       <plugin>
         <groupId>net.masterthought</groupId>
         <artifactId>maven-cucumber-reporting</artifactId>
-        <version>3.16.0</version>
+        <version>3.18.0</version>
         <executions>
           <execution>
             <id>execution</id>
@@ -111,11 +130,14 @@
               <goal>generate</goal>
             </goals>
             <configuration>
-              <projectName>Simply Do - Balance Projector</projectName>
+              <projectName>${app.name}</projectName>
               <outputDirectory>${project.build.directory}</outputDirectory>
               <jsonFiles>
-                <param>${project.build.directory}/cucumber-generated-reports/cucumber-report.json</param>
+                <param>**/cucumber-report.json</param>
               </jsonFiles>
+              <classificationFiles>
+                <param>**/classifications/*.properties</param>
+              </classificationFiles>
               <parallelTesting>false</parallelTesting>
             </configuration>
           </execution>
