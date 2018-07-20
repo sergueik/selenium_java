@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.UnsupportedCommandException;
@@ -644,6 +645,15 @@ public class BaseTest {
 		}
 	}
 
+	// based on:
+	// https://testerslittlehelper.wordpress.com/2016/03/25/quick-find-element/
+	protected boolean isElementPresent(By locator) {
+		driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+		List<WebElement> list = driver.findElements(locator);
+		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
+		return list.size() > 0;
+	}
+
 	protected String getBodyText() {
 		log.info("Getting boby text");
 		return driver.findElement(By.tagName("body")).getText();
@@ -677,8 +687,9 @@ public class BaseTest {
 		sleep(1000);
 		try {
 			// element.getLocation()
-			System.err.println("Scrolling to " + element.getLocation().y);
-			scroll(element.getLocation().x, element.getLocation().y);
+			Point location = element.getLocation();
+			System.err.println("Scrolling to " + location.y);
+			scroll(location.x, location.y);
 		} catch (UnsupportedCommandException e) {
 
 		}

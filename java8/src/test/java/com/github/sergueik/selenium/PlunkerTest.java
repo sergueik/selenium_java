@@ -68,7 +68,7 @@ public class PlunkerTest extends BaseTest {
 
 	@Override
 	@AfterClass
-	public void afterClass() throws Exception {
+	public void afterClass() {
 		try {
 			driver.close();
 		} catch (NoSuchWindowException e) {
@@ -77,7 +77,7 @@ public class PlunkerTest extends BaseTest {
 		driver.quit();
 		driver = null;
 		if (verificationErrors.length() != 0) {
-			throw new Exception(verificationErrors.toString());
+			throw new RuntimeException(verificationErrors.toString());
 		}
 	}
 

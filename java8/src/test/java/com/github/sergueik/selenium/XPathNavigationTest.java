@@ -41,14 +41,10 @@ import org.testng.internal.Nullable;
 public class XPathNavigationTest extends BaseTest {
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static final Logger log = LogManager
+	private static final Logger log = LogManager 
 			.getLogger(XPathNavigationTest.class);
 
 	private static String baseURL = "https://spb.rt.ru/packages/tariffs";
-
-	@SuppressWarnings("unused")
-	private static Pattern pattern;
-	private static Matcher matcher;
 
 	@BeforeClass
 	public void beforeClass() throws IOException {
