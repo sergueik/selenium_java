@@ -100,9 +100,25 @@ public class SeleniumEasyTest extends BaseTest {
 				is(equalTo("You pressed Cancel!")));
 	}
 
+	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html
+	@Test(enabled = true)
+	public void alertWaitPresentTest() {
+
+		WebElement buttonElement = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("button[onclick='myConfirmFunction()']")));
+		System.err.println("Acting on: " + buttonElement.getAttribute("innerHTML"));
+		highlight(buttonElement);
+		flash(buttonElement);
+		buttonElement.click();
+		alert = wait.until(ExpectedConditions.alertIsPresent());
+		alert.dismiss();
+		assertThat(driver.findElement(By.id("confirm-demo")).getText(),
+				is(equalTo("You pressed Cancel!")));
+	}
+
 	@Test(enabled = true)
 	public void alertTest() {
-		// wrong selector
 		WebElement buttonElement = wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(
 						"//*[@id='easycont']//div[@class='panel-heading'][contains(normalize-space(.), '%s')]/..//button[contains(normalize-space(.), '%s')]",
@@ -126,7 +142,6 @@ public class SeleniumEasyTest extends BaseTest {
 
 	@Test(enabled = true)
 	public void alertPromptTest() {
-		// wrong selector
 		String buttonText = "Click for Prompt Box";
 		String buttonSelector = String.format(
 				"//*[@id='easycont']//div[@class='panel-heading'][contains(normalize-space(.), '%s')]/..//button[contains(normalize-space(.), '%s')]",

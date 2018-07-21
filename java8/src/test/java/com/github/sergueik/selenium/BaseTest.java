@@ -604,8 +604,11 @@ public class BaseTest {
 
 	// origin:
 	// https://github.com/TsvetomirSlavov/JavaScriptForSeleniumMyCollection/blob/master/src/utils/UtilsQAAutoman.java
+	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/interactions/internal/Coordinates.html
+	// https://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.interactions.internal.Coordinates
 	public void scrolltoElement(WebElement element) {
 		Coordinates coordinate = ((Locatable) element).getCoordinates();
+		// coordinate.onScreen()
 		coordinate.onPage();
 		coordinate.inViewPort();
 	}
