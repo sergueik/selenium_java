@@ -22,7 +22,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 /**
- * Selected test scenarions for Selenium WebDriver
+ * Selected test scenarios for Selenium WebDriver
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * based on https://groups.google.com/forum/#!topic/selenium-users/ac_PixK1a8c
  * By design, one cannot select a text node in

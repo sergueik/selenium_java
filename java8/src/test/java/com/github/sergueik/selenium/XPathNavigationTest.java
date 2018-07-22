@@ -21,6 +21,7 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -32,16 +33,17 @@ import org.testng.annotations.Test;
 import org.testng.internal.Nullable;
 
 /**
- * Selected test scenarions for Selenium WebDriver
+ * Selected test scenarios for Selenium WebDriver
  * based on:  https://testerslittlehelper.wordpress.com/
- * use XPath ancestor  /  clile navigation to manipulate heavily styled page.
+ * 
+ * use XPath ancestor navigation to manipulate heavily styled page.
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
 public class XPathNavigationTest extends BaseTest {
 
 	private static final StringBuffer verificationErrors = new StringBuffer();
-	private static final Logger log = LogManager 
+	private static final Logger log = LogManager
 			.getLogger(XPathNavigationTest.class);
 
 	private static String baseURL = "https://spb.rt.ru/packages/tariffs";
@@ -57,7 +59,7 @@ public class XPathNavigationTest extends BaseTest {
 		driver.get(baseURL);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test1() {
 		List<WebElement> elements = new ArrayList<>();
 		elements = driver.findElements(By.cssSelector("*[data-fee]"));
@@ -97,7 +99,7 @@ public class XPathNavigationTest extends BaseTest {
 
 	// a debug version of test1.
 	// NOTE: slower
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test2() {
 		List<WebElement> elements = new ArrayList<>();
 		elements = driver.findElements(By.cssSelector("*[data-fee]"));
@@ -127,7 +129,7 @@ public class XPathNavigationTest extends BaseTest {
 								System.err.println(String.format("Button Text: |%s|",
 										buttonElement.getText()));
 								System.err.println(cssSelectorOfElement(buttonElement));
-								
+
 							}
 						} catch (TimeoutException e2) {
 							System.err.println(
@@ -142,4 +144,87 @@ public class XPathNavigationTest extends BaseTest {
 			return buttonElement;
 		}).collect(Collectors.toList());
 	}
+
+	// https://habr.com/company/ruvds/blog/416539/
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+	@Test(enabled = true)
+	public void findingButtonViaLegacyDOMMethodCallTest() {
+
+		// Arrange
+		List<WebElement> elements = new ArrayList<>();
+		elements = driver.findElements(By.cssSelector("*[data-fee]"));
+
+		List<String> fees = elements.stream().map(_e -> _e.getAttribute("data-fee"))
+				.collect(Collectors.toList());
+		fees.stream().forEach(System.err::println);
+		fees.stream().filter(fee -> Integer.parseInt(fee) > 0).forEach(fee -> {
+			String xpath = String.format("//*[@data-fee='%s']", fee);
+			WebElement element = driver.findElement(By.xpath(xpath));
+
+			boolean debug = false;
+			List<String> scripts = new ArrayList<>();
+			if (debug) {
+				scripts = new ArrayList<>(Arrays.asList(new String[] {
+						// immediate ancestor, not the one test is looking for, but
+						// helped finding the following one
+						"var element = arguments[0];\n"
+								+ "var locator = 'div.tariff-desc__cost_m-cell';"
+								+ "var targetElement = element.closest(locator);\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.outerHTML;",
+						// next in the ancestor chain, located and printed the outerHTML of
+						// element for debugging purposes
+						"var element = arguments[0];\n"
+								+ "var locator = 'div.tariff-desc__cost.tariff-desc__cost_reset.js-price-blocks';"
+								+ "var targetElement = element.closest(locator);\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.outerHTML;",
+						// relevant ancestor chain, chained with a quesySelector call
+						// but with full classes making it hard to read and fragile
+						"var element = arguments[0];\n"
+								+ "var locator = 'div.tariff-desc__cost.tariff-desc__cost_reset.js-price-blocks';"
+								+ "var targetElement = element.closest(locator).querySelector('a.button-3');\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.innerHTML;",
+						// final selector
+						"var element = arguments[0];\n"
+								+ "var locator = 'div.js-price-blocks';"
+								+ "var targetElement = element.closest(locator).querySelector('a.button-3');\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.innerHTML;" }));
+				for (String script : scripts) {
+					System.err.println("Running the script:\n" + script);
+					try {
+						String result = (String) js.executeScript(script, element);
+						System.err.println("Found:\n" + result);
+						// assertThat(result, equalTo("text to find"));
+					} catch (Exception e) {
+						// temporarily catch all exceptions.
+						System.err.println("Exception: " + e.toString());
+					}
+				}
+			} else {
+				// convert to function
+				String script = "var element = arguments[0];\n"
+						+ "var ancestorLocator = arguments[1];"
+						+ "var targetElementLocator = arguments[2];"
+						+ "/* alert('ancestorLocator = ' + ancestorLocator); */"
+						+ "var targetElement = element.closest(ancestorLocator).querySelector(targetElementLocator);\n"
+						+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+						+ "return targetElement.text;";
+				try {
+					System.err.println("Running the script:\n" + script);
+					String result = (String) js.executeScript(script, element,
+							"div.js-price-blocks", "a.button-3");
+					System.err.println("Found:\n" + result);
+					// assertThat(result, equalTo("text to find"));
+				} catch (Exception e) {
+					// temporarily catch all exceptions.
+					System.err.println("Exception: " + e.toString());
+				}
+
+			}
+		});
+	}
+
 }

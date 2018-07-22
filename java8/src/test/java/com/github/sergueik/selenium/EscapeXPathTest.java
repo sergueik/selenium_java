@@ -30,7 +30,7 @@ import org.testng.annotations.Test;
 import org.testng.internal.Nullable;
 
 /**
- * Selected test scenarions for Selenium WebDriver
+ * Selected test scenarios for Selenium WebDriver
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
