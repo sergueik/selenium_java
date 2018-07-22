@@ -25,6 +25,11 @@ import org.testng.annotations.Test;
  * Selected test scenarions for Selenium WebDriver
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * based on https://groups.google.com/forum/#!topic/selenium-users/ac_PixK1a8c
+ * By design, one cannot select a text node in
+ * Selenium using XPath even with an XPath query that would be valid on an XML file
+ * transformation, because XPath was not intended to be an element location strategy on
+ * HTML documents, only on much stricter XML documents.
+ * The exception that the result must strictly resolve to an element type is not a Selenium bug.
  */
 
 public class FindingTextObjectTest extends BaseTest {
@@ -45,10 +50,10 @@ public class FindingTextObjectTest extends BaseTest {
 	}
 
 	// NOTE: some selectors intentionally invalid -
-	// none achieved the goal of locating
-	// "text to find" using stock Selenium `findElement` method
+	// none would achieve the goal of locating
+	// "text to find" using XPath with stock Selenium `findElement` method
 	@Test(enabled = true)
-	public void notFindingTest() {
+	public void notFindingViaXPathTest() {
 		// Arrange
 		List<WebElement> elements = new ArrayList<>();
 
@@ -91,14 +96,13 @@ public class FindingTextObjectTest extends BaseTest {
 	}
 
 	// Javascript DOM method successfully finds the text Element
-	// TODO: exercise the querySelector
-	// NOTE: compact locator expressions challenging with sibling:
-	// find + call DOM method is easier
+	// NOTE: compact querySelector locator expressions for sibling
+	// is challenging to construct, but a find + a call DOM method call is easy
 	// https://stackoverflow.com/questions/27571808/find-next-cell-contained-in-sibling-row-with-queryselector
 	// https://plainjs.com/javascript/traversing/get-siblings-of-an-element-40/
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/querySelectorAll
 	@Test(enabled = true)
-	public void findingTest() {
+	public void findingViaDOMMethodCallTest() {
 		// Arrange
 		WebElement element = driver.findElement(By.xpath(String.format(
 				"//table[@class='questionKeyHeader']//td/a[contains(text(), '%s')]",
