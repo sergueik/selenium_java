@@ -46,7 +46,7 @@ public class XPathNavigationTest extends BaseTest {
 	private static final Logger log = LogManager
 			.getLogger(XPathNavigationTest.class);
 
-	private static String baseURL = "https://spb.rt.ru/packages/tariffs";
+	private static String baseURL = "about:blank";
 
 	@BeforeClass
 	public void beforeClass() throws IOException {
@@ -61,6 +61,9 @@ public class XPathNavigationTest extends BaseTest {
 
 	@Test(enabled = false)
 	public void test1() {
+		// Arrange
+		String baseURL = "https://spb.rt.ru/packages/tariffs";
+		driver.get(baseURL);
 		List<WebElement> elements = new ArrayList<>();
 		elements = driver.findElements(By.cssSelector("*[data-fee]"));
 
@@ -101,6 +104,9 @@ public class XPathNavigationTest extends BaseTest {
 	// NOTE: slower
 	@Test(enabled = false)
 	public void test2() {
+		// Arrange
+		String baseURL = "https://spb.rt.ru/packages/tariffs";
+		driver.get(baseURL);
 		List<WebElement> elements = new ArrayList<>();
 		elements = driver.findElements(By.cssSelector("*[data-fee]"));
 
@@ -148,9 +154,11 @@ public class XPathNavigationTest extends BaseTest {
 	// https://habr.com/company/ruvds/blog/416539/
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
 	@Test(enabled = true)
-	public void findingButtonViaLegacyDOMMethodCallTest() {
-
+	public void test3() {
 		// Arrange
+		String baseURL = "https://spb.rt.ru/packages/tariffs";
+		driver.get(baseURL);
+
 		List<WebElement> elements = new ArrayList<>();
 		elements = driver.findElements(By.cssSelector("*[data-fee]"));
 
@@ -223,6 +231,78 @@ public class XPathNavigationTest extends BaseTest {
 					System.err.println("Exception: " + e.toString());
 				}
 
+			}
+		});
+	}
+
+	// https://habr.com/company/ruvds/blog/416539/
+	// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
+	@Test(enabled = true)
+	public void test4() {
+		String baseURL = "http://store.demoqa.com/products-page/";
+		driver.get(baseURL);
+
+		// Arrange
+		List<WebElement> elements = new ArrayList<>();
+		elements = driver
+				.findElements(By.cssSelector("span.currentprice:nth-of-type(1)"));
+		elements.stream().forEach(element -> {
+			executeScript("arguments[0].scrollIntoView({ behavior: \"smooth\" });",
+					element);
+			highlight(element, 1000);
+			boolean debug = false;
+			if (debug) {
+				List<String> scripts = new ArrayList<>(Arrays.asList(new String[] {
+						// immediate ancestor, not the one test is looking for, but
+						// helped finding the following one
+						"var element = arguments[0];\n"
+								+ "var locator = 'div.wpsc_product_price';"
+								+ "var targetElement = element.closest(locator);\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.outerHTML;",
+						// next in the ancestor chain, located and printed the outerHTML of
+						// element for debugging purposes
+						"var element = arguments[0];\n" + "var locator = 'form';\n"
+								+ "var targetElement = element.closest(locator);\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.outerHTML;",
+						// relevant ancestor chain, chained with a quesySelector call
+						// but with full classes making it hard to read and fragile
+						"var element = arguments[0];\n"
+								+ "var ancestorLocator = 'div.productcol';"
+								+ "var targetElementLocator = 'div[class=\"input-button-buy\"]';"
+								+ "var targetElement = element.closest(ancestorLocator).querySelector(targetElementLocator);\n"
+								+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+								+ "return targetElement.innerHTML;" }));
+				for (String script : scripts) {
+					System.err.println("Running the script:\n" + script);
+					try {
+						String result = (String) js.executeScript(script, element);
+						System.err.println("Found:\n" + result);
+						// assertThat(result, equalTo("text to find"));
+					} catch (Exception e) {
+						// temporarily catch all exceptions.
+						System.err.println("Exception: " + e.toString());
+					}
+				}
+			} else {
+				String script = "var element = arguments[0];\n"
+						+ "var ancestorLocator = arguments[1];"
+						+ "var targetElementLocator = arguments[2];"
+						+ "/* alert('ancestorLocator = ' + ancestorLocator); */"
+						+ "var targetElement = element.closest(ancestorLocator).querySelector(targetElementLocator);\n"
+						+ "targetElement.scrollIntoView({ behavior: 'smooth' });\n"
+						+ "return targetElement.text || targetElement.getAttribute('value');";
+				try {
+					System.err.println("Running the script:\n" + script);
+					String result = (String) js.executeScript(script, element, "form",
+							"input[type='submit']");
+					System.err.println("Found:\n" + result);
+					assertTrue(result.equalsIgnoreCase("add to cart"), result);
+				} catch (Exception e) {
+					// temporarily catch all exceptions.
+					System.err.println("Exception: " + e.toString());
+				}
 			}
 		});
 	}
