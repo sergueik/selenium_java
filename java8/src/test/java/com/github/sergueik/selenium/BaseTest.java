@@ -101,6 +101,8 @@ public class BaseTest {
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome");
+	private static final boolean headless = (getPropertyEnv("webdriver.driver",
+			"headless") != null) ? true : false;
 
 	public static String getBrowser() {
 		return browser;
@@ -216,6 +218,7 @@ public class BaseTest {
 									.getAbsolutePath()
 							: String.format("%s/Downloads/chromedriver",
 									System.getenv("HOME")));
+
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions chromeOptions = new ChromeOptions();
 
@@ -231,7 +234,23 @@ public class BaseTest {
 			chromePrefs.put("download.default_directory", downloadFilepath);
 			chromePrefs.put("enableNetwork", "true");
 			chromeOptions.setExperimentalOption("prefs", chromePrefs);
-
+			// TODO: jni
+			if (System.getProperty("os.arch").contains("64")) {
+				String[] paths = new String[] {
+						"C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+						"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe" };
+				// check file existence
+				for (String path : paths) {
+					File exe = new File(path);
+					System.err.println("Inspecting browser path: " + path);
+					if (exe.exists()) {
+						chromeOptions.setBinary(path);
+					}
+				}
+			} else {
+				chromeOptions.setBinary(
+						"c:\\Program Files\\Google\\Chrome\\Application\\chrome.exe");
+			}
 			for (String optionAgrument : (new String[] {
 					"--user-agent=Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0",
 					"--allow-running-insecure-content", "--allow-insecure-localhost",
@@ -249,14 +268,13 @@ public class BaseTest {
 				chromeOptions.addArguments(optionAgrument);
 			}
 
-			// chromeOptions.addArguments("user-data-dir=/path/to/your/custom/profile");
 			// options for headless
-			/*
-			for (String optionAgrument : (new String[] { "headless",
-					"window-size=1200x600", })) {
-				options.addArguments(optionAgrument);
+			if (headless) {
+				for (String optionAgrument : (new String[] { "headless",
+						"window-size=1200x800" })) {
+					chromeOptions.addArguments(optionAgrument);
+				}
 			}
-			*/
 
 			capabilities
 					.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
@@ -269,10 +287,12 @@ public class BaseTest {
 			// For use with RemoteWebDriver
 			/*
 			RemoteWebDriver driver = new RemoteWebDriver(
-			     new URL("http://localhost:4444/wd/hub"), capabilities);
-			  */
+			   new URL("http://localhost:4444/wd/hub"), capabilities);
+			*/
 			driver = new ChromeDriver(capabilities);
-		} else if (browser.equals("firefox")) {
+		} else if (browser.equals("firefox"))
+
+		{
 
 			// https://developer.mozilla.org/en-US/Firefox/Headless_mode
 			// 3.5.3 and later
@@ -315,7 +335,7 @@ public class BaseTest {
 			// optional
 			/*
 			 profile.setPreference("general.useragent.override",
-			 		"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
+				"Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
 			*/
 			// System.err.println(System.getProperty("user.dir"));
 			capabilities.setCapability(FirefoxDriver.PROFILE, profile);

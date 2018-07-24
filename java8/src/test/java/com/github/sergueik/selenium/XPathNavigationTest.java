@@ -59,8 +59,9 @@ public class XPathNavigationTest extends BaseTest {
 		driver.get(baseURL);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void test1() {
+		// does not work very  with headless browser
 		// Arrange
 		String baseURL = "https://spb.rt.ru/packages/tariffs";
 		driver.get(baseURL);
@@ -153,7 +154,7 @@ public class XPathNavigationTest extends BaseTest {
 
 	// https://habr.com/company/ruvds/blog/416539/
 	// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void test3() {
 		// Arrange
 		String baseURL = "https://spb.rt.ru/packages/tariffs";
