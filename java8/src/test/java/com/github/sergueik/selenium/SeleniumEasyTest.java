@@ -33,6 +33,8 @@ public class SeleniumEasyTest extends BaseTest {
 	private static String baseURL = "http://www.seleniumeasy.com/test/javascript-alert-box-demo.html";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
+	// super 
+	private Alert alert = null;
 	@BeforeMethod
 	public void BeforeMethod(Method method) {
 		super.beforeMethod(method);
@@ -117,6 +119,24 @@ public class SeleniumEasyTest extends BaseTest {
 				is(equalTo("You pressed Cancel!")));
 	}
 
+	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html
+	@Test(enabled = true)
+	public void alertWaitPresentAlternativeTest() {
+
+		WebElement buttonElement = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("button[onclick='myConfirmFunction()']")));
+		System.err.println("Acting on: " + buttonElement.getAttribute("innerHTML"));
+		highlight(buttonElement);
+		flash(buttonElement);
+		buttonElement.click();
+		alert = super.getAlert(10000);
+		// confirm alert
+		alert.accept();
+		assertThat(driver.findElement(By.id("confirm-demo")).getText(),
+				is(equalTo("You pressed OK!")));
+	}
+
 	@Test(enabled = true)
 	public void alertTest() {
 		WebElement buttonElement = wait.until(
@@ -177,7 +197,7 @@ public class SeleniumEasyTest extends BaseTest {
 		}
 		try {
 			// fill the data in the alert
-			Alert alert = driver.switchTo().alert();
+			alert = driver.switchTo().alert();
 			System.err.println("In alert " + alert.toString());
 			alert.sendKeys("Harry Potter");
 			alert.accept();

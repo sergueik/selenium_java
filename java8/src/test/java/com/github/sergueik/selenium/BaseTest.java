@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.TakesScreenshot;
@@ -43,6 +44,7 @@ import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -102,7 +104,9 @@ public class BaseTest {
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome");
 	private static final boolean headless = (getPropertyEnv("webdriver.driver",
-			"headless") != null) ? true : false;
+			"headless") != null
+			&& Boolean.parseBoolean(getPropertyEnv("webdriver.driver", "headless")))
+					? true : false;
 
 	public static String getBrowser() {
 		return browser;
@@ -887,6 +891,33 @@ public class BaseTest {
 																			// supported in -source 1.6
 			throw new RuntimeException(e);
 		}
+	}
+
+	// for the ancient versions of Selenium Webdriver when
+	// ExpectedConditions alertIaPresent
+	// not yet availabe (that is pre v2.20.0)
+	public Alert getAlert(final long time) {
+		return new WebDriverWait(driver, time, 200)
+				.until(new ExpectedCondition<Alert>() {
+					@Override
+					public Alert apply(WebDriver d) {
+						Alert alert = null;
+						try {
+							System.err.println("getAlert evaluating alert");
+							alert = d.switchTo().alert();
+							if (alert != null) {
+								System.err.println("getAlert detected alert");
+								return alert;
+							} else {
+								System.err.println("getAlert see no alert");
+								return null;
+							}
+						} catch (NoAlertPresentException e) {
+							System.err.println("getAlert see no alert");
+							return null;
+						}
+					}
+				});
 	}
 
 }
