@@ -35,6 +35,7 @@ import org.openqa.selenium.UnsupportedCommandException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -42,6 +43,7 @@ import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.interactions.internal.Coordinates;
 import org.openqa.selenium.internal.Locatable;
+
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
@@ -413,15 +415,9 @@ public class BaseTest {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						"arguments[0].style.border='3px solid yellow'", element);
-			}
+			executeScript("arguments[0].style.border='3px solid yellow'", element);
 			Thread.sleep(highlightInterval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver)
-						.executeScript("arguments[0].style.border=''", element);
-			}
+			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
 			// System.err.println("Exception (ignored): " + e.toString());
 		}
@@ -435,6 +431,14 @@ public class BaseTest {
 		executeScript("arguments[0].style.border=''", element);
 	}
 
+	// based on https://groups.google.com/forum/#!topic/selenium-users/3J27G1GxCa8
+	public void setAttribute(WebElement element, String attributeName,
+			String attributeValue) {
+		executeScript(
+				"var element = arguments[0]; var attributeName = arguments[1]; var attributeValue = arguments[2]; element.setAttribute(attributeName, attributeValue)",
+				element, attributeName, attributeValue);
+	}
+
 	protected void highlightNew(WebElement element, long highlightInterval) {
 		Rectangle elementRect = element.getRect();
 		String highlightScript = getScriptContent("highlight.js");
@@ -442,19 +446,13 @@ public class BaseTest {
 
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format(
-								"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
-								highlightScript),
-						elementRect.y, elementRect.x, elementRect.width,
-						elementRect.height);
-			}
+			executeScript(
+					String.format(
+							"%s\nhighlight_create(arguments[0],arguments[1],arguments[2],arguments[3]);",
+							highlightScript),
+					elementRect.y, elementRect.x, elementRect.width, elementRect.height);
 			Thread.sleep(highlightInterval);
-			if (driver instanceof JavascriptExecutor) {
-				((JavascriptExecutor) driver).executeScript(
-						String.format("%s\nhighlight_remove();", highlightScript));
-			}
+			executeScript(String.format("%s\nhighlight_remove();", highlightScript));
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
@@ -490,7 +488,7 @@ public class BaseTest {
 	}
 
 	public void changeColor(String color, WebElement element) {
-		js.executeScript("arguments[0].style.backgroundColor = '" + color + "'",
+		executeScript("arguments[0].style.backgroundColor = '" + color + "'",
 				element);
 		try {
 			Thread.sleep(20);

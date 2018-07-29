@@ -71,6 +71,7 @@ public class Select2WrapperTest extends BaseTest {
 				ExpectedConditions.visibilityOf(driver.findElement(By.cssSelector(
 						"span.selection span.select2-selection span.select2-selection__rendered"))));
 		assertThat(selectionElement, notNullValue());
+		assertTrue(selectionElement.isDisplayed());
 		highlight(selectionElement);
 		System.err.println("Selection: " + selectionElement.getText());
 	}
