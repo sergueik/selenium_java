@@ -10,6 +10,7 @@ import java.util.function.Predicate;
 
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
@@ -30,11 +31,15 @@ import org.testng.annotations.Test;
 
 public class SeleniumEasyTest extends BaseTest {
 
-	private static String baseURL = "http://www.seleniumeasy.com/test/javascript-alert-box-demo.html";
+	private static String baseURL = "http://www.seleniumeasy.com/test";
+	private static String javascriptAlertTestBaseURL = "http://www.seleniumeasy.com/test/javascript-alert-box-demo.html";
+	private static String bootstrapAlertTestBaseURL = "http://www.seleniumeasy.com/test/bootstrap-modal-demo.html#";
+
 	private static final StringBuffer verificationErrors = new StringBuffer();
 
-	// super 
+	// super
 	private Alert alert = null;
+
 	@BeforeMethod
 	public void BeforeMethod(Method method) {
 		super.beforeMethod(method);
@@ -55,12 +60,14 @@ public class SeleniumEasyTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void alertConfirmTest() {
+	public void javascriptAlertConfirmTest() {
 		// wrong selector
 		String buttonSelector = String.format(
 				"//*[@id='easycont']//div[@class='panel-heading'][contains(normalize-space(.), '%s')]/..//button",
 				"Java Script Confirm Box");
 		try {
+			// Arrange
+			driver.get(javascriptAlertTestBaseURL);
 			WebElement buttonElement = wait
 					.until(new ExpectedCondition<WebElement>() {
 						Predicate<WebElement> textCheck = _element -> {
@@ -104,8 +111,9 @@ public class SeleniumEasyTest extends BaseTest {
 
 	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html
 	@Test(enabled = true)
-	public void alertWaitPresentTest() {
-
+	public void javascriptAlertWaitPresentTest() {
+		// Arrange
+		driver.get(javascriptAlertTestBaseURL);
 		WebElement buttonElement = wait
 				.until(ExpectedConditions.visibilityOfElementLocated(
 						By.cssSelector("button[onclick='myConfirmFunction()']")));
@@ -121,8 +129,10 @@ public class SeleniumEasyTest extends BaseTest {
 
 	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html
 	@Test(enabled = true)
-	public void alertWaitPresentAlternativeTest() {
+	public void javascriptAlertWaitPresentAlternativeTest() {
 
+		// Arrange
+		driver.get(javascriptAlertTestBaseURL);
 		WebElement buttonElement = wait
 				.until(ExpectedConditions.visibilityOfElementLocated(
 						By.cssSelector("button[onclick='myConfirmFunction()']")));
@@ -138,7 +148,9 @@ public class SeleniumEasyTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void alertTest() {
+	public void javascriptAlertTest() {
+		// Arrange
+		driver.get(javascriptAlertTestBaseURL);
 		WebElement buttonElement = wait.until(
 				ExpectedConditions.visibilityOfElementLocated(By.xpath(String.format(
 						"//*[@id='easycont']//div[@class='panel-heading'][contains(normalize-space(.), '%s')]/..//button[contains(normalize-space(.), '%s')]",
@@ -161,12 +173,14 @@ public class SeleniumEasyTest extends BaseTest {
 	}
 
 	@Test(enabled = true)
-	public void alertPromptTest() {
+	public void javascriptAlertPromptTest() {
 		String buttonText = "Click for Prompt Box";
 		String buttonSelector = String.format(
 				"//*[@id='easycont']//div[@class='panel-heading'][contains(normalize-space(.), '%s')]/..//button[contains(normalize-space(.), '%s')]",
 				"Java Script Alert Box", buttonText);
 		try {
+			// Arrange
+			driver.get(javascriptAlertTestBaseURL);
 			WebElement buttonElement = wait
 					.until(new ExpectedCondition<WebElement>() {
 						Predicate<WebElement> textCheck = _element -> {
@@ -214,6 +228,56 @@ public class SeleniumEasyTest extends BaseTest {
 				wait.until(ExpectedConditions
 						.visibilityOf(driver.findElement(By.id("prompt-demo")))).getText(),
 				is(equalTo("You have entered 'Harry Potter' !")));
+	}
+	// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/ExpectedConditions.html
+
+	// https://developer.mozilla.org/en-US/docs/Web/API/Window/getComputedStyle
+	@Test(enabled = true)
+	public void bootstrapAlertWaitPresentTest() {
+
+		// Arrange
+		driver.get(bootstrapAlertTestBaseURL);
+		WebElement launchButtonElement = wait
+				.until(ExpectedConditions.visibilityOfElementLocated(
+						By.cssSelector("a[data-toggle='modal'][href='#myModal0']")));
+		assertThat(launchButtonElement, notNullValue());
+		// TODO: some other element attribute to change when bootstrap modal is
+		// raised
+		// assertThat(launchButtonElement.getAttribute("style"), is(""));
+
+		// Act
+		launchButtonElement.click();
+		WebElement dialogElement = wait.until(ExpectedConditions
+				.visibilityOfElementLocated(By.cssSelector(".modal-dialog")));
+		assertThat(dialogElement, notNullValue());
+		assertThat(dialogElement.getAttribute("offsetWidth"), is(not("0")));
+		System.err.println("Bootstrap Alert offsetWidth attribute value: "
+				+ dialogElement.getAttribute("offsetWidth"));
+		String singlePropScript = "var element = arguments[0];\n"
+				+ "var propertyName = arguments[1];\n" + "var debug = arguments[2];\n"
+				+ "var result = window.document.defaultView.getComputedStyle(element,null).getPropertyValue(propertyName);\n"
+				+ "if (debug) { alert(propertyName + ' ' + result ); }\n"
+				+ "return result";
+		String propDumpScript = "var element = arguments[0];"
+				+ "var debug = arguments[1];\n"
+				+ "var computedStyles = window.document.defaultView.getComputedStyle(element,null); "
+				+ "var len = computedStyles.length; "
+				+ "for (var i=0;i< len;i++) { var style = computedStyles[i];"
+				+ "console.log(style+' : ' + computedStyles.getPropertyValue(style));}";
+		Object computedStyle = executeScript(singlePropScript, dialogElement,
+				"width", false);
+		try {
+			System.err.println(
+					"Bootstrap Alert width (computed): " + computedStyle.toString());
+		} catch (NullPointerException e) {
+			System.err.println("Script does not return a value : " + e.toString());
+		}
+		// assertThat(launchButtonElement.getAttribute("style"), is(not("")));
+		WebElement closeButtonElement = dialogElement
+				.findElement(By.cssSelector("a[data-dismiss='modal']"));
+		assertThat(closeButtonElement, notNullValue());
+		closeButtonElement.click();
+		
 	}
 
 }
