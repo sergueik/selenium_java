@@ -1,19 +1,28 @@
 package software;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.CoreMatchers.containsString;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
@@ -21,32 +30,97 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MinimalTest {
 
-	public static WebDriver driver;
-	private static String osName = getOsName();
+	// public static WebDriver driver;
+	public static RemoteWebDriver driver;
+
+	private static String osName = getOSName();
+	private static final String chomeDriverPath = osName.equals("windows")
+			? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
+			: "/home/vagrant/chromedriver";
+	private static final String downloadFilepath = String.format("%s\\Downloads",
+			osName.equals("windows")
+					? getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei")
+					: getPropertyEnv("HOME", "/home/serguei"));
+	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp"
+			: "/tmp";
 
 	@BeforeClass
 	public static void setup() throws IOException {
-		getOsName();
+		getOSName();
 
-		System.setProperty("webdriver.chrome.driver",
-				osName.equals("windows")
-						? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
-						: "/home/vagrant/chromedriver");
+		System.setProperty("webdriver.chrome.driver", chomeDriverPath);
 
 		ChromeOptions options = new ChromeOptions();
 		options.setBinary(osName.equals("windows") ? (new File(
 				"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
 						.getAbsolutePath()
 				: "/usr/bin/google-chrome");
-		options.addArguments("headless");
-		options.addArguments("--window-size=320,1200");
-		options.addArguments("disable-gpu");
-		driver = new ChromeDriver(options);
+		for (String optionAgrument : (new String[] { "headless",
+				"--window-size=1200x800", "disable-gpu" })) {
+			options.addArguments(optionAgrument);
+		}
+
+		// based on
+		Map<String, Object> chromePrefs = new HashMap<>();
+		chromePrefs.put("browser.setDownloadBehavior", "allow");
+		chromePrefs.put("profile.default_content_settings.popups", 0);
+		chromePrefs.put("download.default_directory", downloadFilepath);
+
+		options.setExperimentalOption("prefs", chromePrefs);
+		// configuration state support like remote driver
+		ChromeDriverService chromeDriverSevice = new ChromeDriverService.Builder()
+				.usingDriverExecutable(new File(chomeDriverPath)).usingAnyFreePort()
+				.build();
+		chromeDriverSevice.start();
+
+		// driver = new ChromeDriver(options);
+
+		driver = new ChromeDriver(chromeDriverSevice, options);
+		// based on:
+		// https://stackoverflow.com/questions/48049359/download-files-in-java-selenium-using-chromedriver-and-headless-mode
+		// https://automated-testing.info/t/kak-ukazat-papku-dlya-zagruzki-fajlov-chrome-v-rezhime-headless/21107/3
+		// (in Russian)
+		Map<String, Object> commandParams = new HashMap<>();
+		commandParams.put("cmd", "Page.setDownloadBehavior");
+		Map<String, String> params = new HashMap<>();
+		params.put("behavior", "allow");
+		params.put("downloadPath", downloadFilepath);
+		commandParams.put("params", params);
+		JSONObject commandParamsObj = new JSONObject(commandParams);
+
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		String payload = commandParamsObj.toString();
+		System.err.println("Posting: " + payload);
+		String u = chromeDriverSevice.getUrl().toString() + "/session/"
+				+ driver.getSessionId() + "/chromium/send_command";
+		HttpPost request = new HttpPost(u);
+		request.addHeader("content-type", "application/json");
+		request.setEntity(new StringEntity(payload));
+		httpClient.execute(request);
+
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
+	}
+
+	@Ignore
+	@Test
+	public void testChromeDriver() throws Exception {
+		assertThat(driver, notNullValue());
+	}
+
+	// @Ignore
+	@Test
+	public void testDownload() throws Exception {
+		driver.get("http://www.seleniumhq.org/download/");
+		driver.findElement(By.linkText("32 bit Windows IE")).click();
 	}
 
 	@Test
@@ -98,7 +172,7 @@ public class MinimalTest {
 			}
 		}
 	}
-	
+
 	@Ignore
 	@Test
 	public void Test() {
@@ -134,7 +208,7 @@ public class MinimalTest {
 	}
 
 	// Utilities
-	public static String getOsName() {
+	public static String getOSName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name").toLowerCase();
 			if (osName.startsWith("windows")) {
@@ -143,4 +217,18 @@ public class MinimalTest {
 		}
 		return osName;
 	}
+
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
 }
