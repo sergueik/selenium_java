@@ -3,6 +3,7 @@ package software;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,7 +34,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -43,6 +44,7 @@ public class MinimalTest {
 	public static RemoteWebDriver driver;
 
 	private static String osName = getOSName();
+	private static final boolean useChromiumSendCommand = true;
 	private static final String chomeDriverPath = osName.equals("windows")
 			? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
 			: "/home/vagrant/chromedriver";
@@ -69,13 +71,18 @@ public class MinimalTest {
 			options.addArguments(optionAgrument);
 		}
 
-		// based on
-		Map<String, Object> chromePrefs = new HashMap<>();
-		chromePrefs.put("browser.setDownloadBehavior", "allow");
-		chromePrefs.put("profile.default_content_settings.popups", 0);
-		chromePrefs.put("download.default_directory", downloadFilepath);
+		// based on:
+		// https://stackoverflow.com/questions/48049359/download-files-in-java-selenium-using-chromedriver-and-headless-mode
+		// https://automated-testing.info/t/kak-ukazat-papku-dlya-zagruzki-fajlov-chrome-v-rezhime-headless/21107/3
+		// (in Russian)
+		if (!useChromiumSendCommand) {
+			Map<String, Object> chromePrefs = new HashMap<>();
+			chromePrefs.put("browser.setDownloadBehavior", "allow");
+			chromePrefs.put("profile.default_content_settings.popups", 0);
+			chromePrefs.put("download.default_directory", downloadFilepath);
 
-		options.setExperimentalOption("prefs", chromePrefs);
+			options.setExperimentalOption("prefs", chromePrefs);
+		}
 		// configuration state support like remote driver
 		ChromeDriverService chromeDriverSevice = new ChromeDriverService.Builder()
 				.usingDriverExecutable(new File(chomeDriverPath)).usingAnyFreePort()
@@ -85,27 +92,25 @@ public class MinimalTest {
 		// driver = new ChromeDriver(options);
 
 		driver = new ChromeDriver(chromeDriverSevice, options);
-		// based on:
-		// https://stackoverflow.com/questions/48049359/download-files-in-java-selenium-using-chromedriver-and-headless-mode
-		// https://automated-testing.info/t/kak-ukazat-papku-dlya-zagruzki-fajlov-chrome-v-rezhime-headless/21107/3
-		// (in Russian)
-		Map<String, Object> commandParams = new HashMap<>();
-		commandParams.put("cmd", "Page.setDownloadBehavior");
-		Map<String, String> params = new HashMap<>();
-		params.put("behavior", "allow");
-		params.put("downloadPath", downloadFilepath);
-		commandParams.put("params", params);
-		JSONObject commandParamsObj = new JSONObject(commandParams);
+		if (useChromiumSendCommand) {
+			Map<String, Object> commandParams = new HashMap<>();
+			commandParams.put("cmd", "Page.setDownloadBehavior");
+			Map<String, String> params = new HashMap<>();
+			params.put("behavior", "allow");
+			params.put("downloadPath", downloadFilepath);
+			commandParams.put("params", params);
+			JSONObject commandParamsObj = new JSONObject(commandParams);
 
-		HttpClient httpClient = HttpClientBuilder.create().build();
-		String payload = commandParamsObj.toString();
-		System.err.println("Posting: " + payload);
-		String u = chromeDriverSevice.getUrl().toString() + "/session/"
-				+ driver.getSessionId() + "/chromium/send_command";
-		HttpPost request = new HttpPost(u);
-		request.addHeader("content-type", "application/json");
-		request.setEntity(new StringEntity(payload));
-		httpClient.execute(request);
+			HttpClient httpClient = HttpClientBuilder.create().build();
+			String payload = commandParamsObj.toString();
+			System.err.println("Posting: " + payload);
+			String u = chromeDriverSevice.getUrl().toString() + "/session/"
+					+ driver.getSessionId() + "/chromium/send_command";
+			HttpPost request = new HttpPost(u);
+			request.addHeader("content-type", "application/json");
+			request.setEntity(new StringEntity(payload));
+			httpClient.execute(request);
+		}
 
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
@@ -121,6 +126,25 @@ public class MinimalTest {
 	public void testDownload() throws Exception {
 		driver.get("http://www.seleniumhq.org/download/");
 		driver.findElement(By.linkText("32 bit Windows IE")).click();
+		int downloadInterval = 1000;
+		try {
+			Thread.sleep(downloadInterval);
+		} catch (InterruptedException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+		}
+
+		boolean fileExists = false;
+		for (String filename : (new String[] {
+				"IEDriverServer_Win32_3.13.0.zip.crdownload",
+				"IEDriverServer_Win32_3.13.0.zip" })) {
+			String filePath = downloadFilepath + File.separator + filename;
+			System.err.println("Probing " + filePath);
+			if ((new File(filePath)).exists()) {
+				fileExists = true;
+				System.err.println("Found " + filePath);
+			}
+		}
+		assertThat(fileExists, is(true));
 	}
 
 	@Test
