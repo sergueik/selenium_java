@@ -15,13 +15,22 @@ public class DriverDownloadIntegrationTest {
 	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp" : "/tmp";
 
 	// TODO: inter-test dependency
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void downloadChomeDriverTest() throws IOException, ConfigurationException {
 		System.setProperty("ver", "2.39");
 		System.setProperty("os", "win32");
 		System.setProperty("ext", "zip");
 		download("chromedriver", tmpDir, "2.39");
 		assertTrue((new File(tmpDir + File.separator   + "chromedriver-2.39-win32.exe")).exists());
+	}
+
+	@Test(enabled = true)
+	public void downloadEdgeeDriverTest() throws IOException, ConfigurationException {
+		System.setProperty("ver", "2.39");
+		System.setProperty("os", "win32");
+		System.setProperty("ext", "zip");
+		download("edgedriver", tmpDir, "2.39");
+		assertTrue((new File(tmpDir + File.separator   + "MicrosoftWebDriver-2.39-win32.exe")).exists());
 	}
 
 	@Test(enabled = false)
