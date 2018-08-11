@@ -20,9 +20,9 @@ public class UtilsTest {
 		String toFile = "c:/temp/geckodriver-v0.20.1-win32.zip";
 		// connectionTimeout, readTimeout = 10 seconds
 		FileUtils.copyURLToFile(new URL(fromFile), new File(toFile), 10000, 10000);
-
 	}
 
+	@Ignore
 	@Test
 	public void testSystemProperty() throws ConfigurationException {
 		System.setProperty("ver", "2.39");
@@ -31,10 +31,13 @@ public class UtilsTest {
 		System.out.println(DriverUtil.readProperty("chromedriver.download.url"));
 	}
 
+	@Ignore
 	@Test
 	public void urlTest() {
 		getFileNameFromUrl(
 				"https://chromedriver.storage.googleapis.com/2.39/chromedriver_win32.zip");
+		getFileNameFromUrl(
+				"https://download.microsoft.com/download/C/0/7/C07EBF21-5305-4EC8-83B1-A6FCC8F93F45/MicrosoftWebDriver.exe");
 	}
 
 	@Ignore
@@ -57,10 +60,10 @@ public class UtilsTest {
 				.println(checkDriverVersionExists("chromedriver", "2.38", "c:/temp"));
 	}
 
+	@Ignore
 	@Test
 	public void testProperty() throws ConfigurationException {
 		System.out.println(readProperty("chrome.download.url"));
 		System.getProperty("os.name");
 	}
-
 }

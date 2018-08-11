@@ -1,18 +1,19 @@
 package com.github.abhishek8908.util;
 
-import static javax.xml.xpath.XPathFactory.newInstance;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNotEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.AssertJUnit.fail;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.net.URL;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,12 +21,10 @@ import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,15 +34,16 @@ import java.util.stream.Stream;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import static javax.xml.xpath.XPathFactory.newInstance;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FileUtils;
+
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.maven.plugin.logging.Log;
-import org.jsoup.select.Elements;
 
 // TODO: get rid of
 import org.rauschig.jarchivelib.Archiver;
@@ -54,15 +54,17 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.github.abhishek8908.driver.logger.Logger;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.internal.LinkedTreeMap;
 
 import static org.jsoup.Jsoup.parse;
-// import org.jsoup.nodes.Document;
+//import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Elements;
+
+import com.github.abhishek8908.driver.logger.Logger;
 
 @SuppressWarnings("deprecation")
 public class DriverUtil extends Logger {
@@ -124,7 +126,7 @@ public class DriverUtil extends Logger {
 			InputSource is = new InputSource();
 			is.setCharacterStream(new StringReader(responseBody));
 
-			org.w3c.dom.Document doc = db.parse(is);
+			Document doc = db.parse(is);
 
 			Element documentElement = doc.getDocumentElement();
 			NodeList nodes = (org.w3c.dom.NodeList) newInstance().newXPath().evaluate(
@@ -155,37 +157,35 @@ public class DriverUtil extends Logger {
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/EdgeDriverManager.java
 	private static List<URL> getDriversFromHTML(String releaseUrl)
 			throws IOException {
+		String buildNumber = "15063"; // "17134"
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
 		HttpGet getMethod = new HttpGet(releaseUrl);
 		String responseBody = client.execute(getMethod, responseHandler);
 		List<URL> urls = new ArrayList<>();
-		List<String> versions = new ArrayList<>();
+		Map<String, URL> versions = new HashMap<>();
 
 		log.info(String.format(
 				"Reading \"%s\" to find out the latest version of Edge driver",
 				releaseUrl));
 		org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(responseBody);
-		Elements downloadLink = doc
+		org.jsoup.select.Elements downloadLinks = doc
 				.select("ul.driver-downloads li.driver-download > a");
-		Elements versionParagraph = doc.select(
-				"ul.driver-downloads li.driver-download p.driver-download__meta");
-
-		// Due to recent changes in Edge driver page, the first three
-		// paragraphs note related with the version of the binaries
-
-		versionParagraph.remove(0);
-		versionParagraph.remove(0);
-		versionParagraph.remove(0);
-
-		for (int i = 0; i < downloadLink.size(); i++) {
-			String[] _versions = versionParagraph.get(i).text().split(" ");
-			String _version = _versions[1];
-			if (!_version.equalsIgnoreCase("version")) {
-				versions.add(_version);
-				urls.add(new URL(downloadLink.get(i).attr("href")));
-			}
+		assertEquals(6, downloadLinks.size());
+		for (int cnt = 0; cnt < downloadLinks.size(); cnt++) {
+			org.jsoup.nodes.Element downloadLink = downloadLinks.get(cnt);
+			log.info("Found edge driver: " + String.format("# %d|TEXT: %s|URL: %s",
+					cnt, downloadLink.text(), downloadLink.attr("href")));
+			versions.put(downloadLink.text(), new URL(downloadLink.attr("href")));
+			urls.add(new URL(downloadLink.attr("href")));
 		}
+		Elements downloadFilteredLinks = doc.select(
+				String.format("ul.driver-downloads li.driver-download > a:contains(%s)",
+						buildNumber));
+		assertEquals(1, downloadFilteredLinks.size());
+		System.err.println(String.format("Filtered|TEXT: %s|URL: %s",
+				downloadFilteredLinks.get(0).text(),
+				downloadFilteredLinks.get(0).attr("href")));
 		return urls;
 	}
 
@@ -226,10 +226,15 @@ public class DriverUtil extends Logger {
 
 	public static void download(String driverName, String targetDirectory,
 			String version) throws IOException, ConfigurationException {
+		
+		log.info("Loading all urls for chrome");
 		List<URL> driverUrls = getDriversFromXml(
 				"https://chromedriver.storage.googleapis.com/");
+		log.info("Loading all urls for firefox");
 		driverUrls = getDriversFromJSON(
 				"https://api.github.com/repos/mozilla/geckodriver/releases");
+		// TODO: ie
+		log.info("Loading all urls for edge");
 		driverUrls = getDriversFromHTML(
 				"https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/");
 
@@ -256,7 +261,6 @@ public class DriverUtil extends Logger {
 			archiver.extract(new File(source), new File(destinationPath));
 		}
 		log.info("Decompressing file: " + source);
-
 	}
 
 	public static void changeFileName(String fileName, String fileOut)
@@ -275,17 +279,19 @@ public class DriverUtil extends Logger {
 		try {
 			log.info("Getting filename from the url: " + location);
 			URL url = new URL(location);
-			fileName = url.getFile();
+			// fileName = url.getFile();
+			// The "file portion" value returned by getFile() will be the same as
+			// getPath()
+			String path = url.getPath();
+			String[] pathChunks = path.split("/");
+			fileName = pathChunks[pathChunks.length - 1];
+
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 
 		}
+		log.info("File Name: " + fileName);
 		return fileName;
-		/*
-		String[] newUrl = location.split("/");
-		log.info("File Name: " + newUrl[newUrl.length - 1]);
-		return newUrl[newUrl.length - 1];
-		*/
 	}
 
 	// currently plugin extracts os and version of the driver from the filename

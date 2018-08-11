@@ -12,6 +12,7 @@ public class InternetExplorerDriver extends Logger implements IDriver {
 	private final String driverName = "IEDriverServer_Win32";
 	// IEDriverServer_Win32_3.12.0.zip private String version;
 	private String ver;
+	private String url;
 	private String os;
 	private String driverDir;
 	private String ext;

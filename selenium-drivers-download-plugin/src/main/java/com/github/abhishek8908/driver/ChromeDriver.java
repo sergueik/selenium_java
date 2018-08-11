@@ -12,6 +12,7 @@ public class ChromeDriver extends Logger implements IDriver {
 	private final String ext = "zip";
 	private final String driverName = "chromedriver";
 	private String ver;
+	private String url;
 	private String os;
 	private String driverDir;
 

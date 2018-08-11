@@ -11,6 +11,7 @@ public class EdgeDriver extends Logger implements IDriver {
 
 	private final String driverName = "MicrosoftWebDriver";
 	private String ver;
+	private String url;
 	private String os;
 	private String driverDir;
 	private String ext;
@@ -32,7 +33,7 @@ public class EdgeDriver extends Logger implements IDriver {
 	}
 
 	private String setExt() {
-		this.ext = "zip";
+		this.ext = "exe";
 		return ext;
 	}
 
