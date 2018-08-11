@@ -18,7 +18,9 @@ package com.github.abhishek8908.plugin;
 
 import com.github.abhishek8908.driver.ChromeDriver;
 import com.github.abhishek8908.driver.DriverSettings;
+import com.github.abhishek8908.driver.EdgeDriver;
 import com.github.abhishek8908.driver.GeckoDriver;
+import com.github.abhishek8908.driver.InternetExplorerDriver;
 import com.github.abhishek8908.driver.enums.Drivers;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.maven.plugin.AbstractMojo;
@@ -46,9 +48,24 @@ public class GenerateDriverMojo extends AbstractMojo {
 	@Parameter(required = true)
 	private String driverPath;
 
+	public String getDriverPath() {
+		return driverPath;
+	}
+
+	public void setDriverPath(String driverPath) {
+		this.driverPath = driverPath;
+	}
+
 	@Parameter(defaultValue = "${project}")
 	private MavenProject project;
 
+	public MavenProject getProject() {
+		return project;
+	}
+
+	public void setProject(MavenProject project) {
+		this.project = project;
+	}
 	// @Parameter
 	// private Logger logger;
 
@@ -68,8 +85,8 @@ public class GenerateDriverMojo extends AbstractMojo {
 					new ChromeDriver(settings).getDriver().setDriverInSystemProperty();
 				} catch (IOException e) {
 					e.printStackTrace();
-				} catch (ConfigurationException ce) {
-					ce.printStackTrace();
+				} catch (ConfigurationException e) {
+					e.printStackTrace();
 				}
 			}
 			if (driver.getName().equalsIgnoreCase(Drivers.GECKODRIVER.toString())) {
@@ -77,27 +94,32 @@ public class GenerateDriverMojo extends AbstractMojo {
 					new GeckoDriver(settings).getDriver().setDriverInSystemProperty();
 				} catch (IOException e) {
 					e.printStackTrace();
-				} catch (ConfigurationException ce) {
-					ce.printStackTrace();
+				} catch (ConfigurationException e) {
+					e.printStackTrace();
+				}
+
+			}
+			if (driver.getName().equalsIgnoreCase(Drivers.EDGEDRIVER.toString())) {
+				try {
+					new EdgeDriver(settings).getDriver().setDriverInSystemProperty();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ConfigurationException e) {
+					e.printStackTrace();
+				}
+
+			}
+			if (driver.getName().equalsIgnoreCase(Drivers.IEDRIVER.toString())) {
+				try {
+					new InternetExplorerDriver(settings).getDriver()
+							.setDriverInSystemProperty();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (ConfigurationException e) {
+					e.printStackTrace();
 				}
 
 			}
 		}
-	}
-
-	public String getDriverPath() {
-		return driverPath;
-	}
-
-	public MavenProject getProject() {
-		return project;
-	}
-
-	public void setDriverPath(String driverPath) {
-		this.driverPath = driverPath;
-	}
-
-	public void setProject(MavenProject project) {
-		this.project = project;
 	}
 }

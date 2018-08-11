@@ -6,6 +6,8 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 public class GeckoDriver extends Logger implements IDriver {
 
@@ -17,6 +19,11 @@ public class GeckoDriver extends Logger implements IDriver {
 
 	public GeckoDriver(DriverSettings settings) {
 		this.ver = settings.getVer();
+		if (this.ver == null) {
+			List<URL> driverUrls = DriverUtil.getDriversFromJSON(
+					"https://api.github.com/repos/mozilla/geckodriver/releases");
+			this.ver = "0.21.0";
+		}
 		System.setProperty("ver", this.ver);
 		getLog().info("Set System property: " + "ver=" + System.getProperty("ver"));
 		this.os = settings.getOs();

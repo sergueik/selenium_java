@@ -6,6 +6,8 @@ import org.apache.commons.configuration.ConfigurationException;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.util.List;
 
 public class EdgeDriver extends Logger implements IDriver {
 
@@ -18,7 +20,17 @@ public class EdgeDriver extends Logger implements IDriver {
 
 	public EdgeDriver(DriverSettings settings) {
 		this.ver = settings.getVer();
-		System.setProperty("ver", this.ver);
+		if (this.ver == null) {
+			try {
+				List<URL> driverUrls = DriverUtil.getDriversFromHTML(
+						"https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/");
+			} catch (IOException e) {
+				throw new RuntimeException(e); // ConfigurationException ?
+			}
+		} else {
+			// no need to keep ver. One may need the Windows 10 buildNumber rather
+			System.setProperty("ver", this.ver);
+		}
 		getLog().info("Set System property: " + "ver=" + System.getProperty("ver"));
 		this.os = settings.getOs();
 		System.setProperty("os", this.os);

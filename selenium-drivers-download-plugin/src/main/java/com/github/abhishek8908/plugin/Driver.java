@@ -4,6 +4,7 @@ public class Driver {
 
 	private String name;
 	private String ver;
+	private String url; // cannot set directly
 	private String os;
 
 	public String getName() {

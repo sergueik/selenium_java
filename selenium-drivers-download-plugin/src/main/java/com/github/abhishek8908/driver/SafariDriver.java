@@ -2,15 +2,16 @@ package com.github.abhishek8908.driver;
 
 public class SafariDriver implements IDriver {
 
-	private String version;
+	private String ver;
+	private String url;
 	private String driverUrl;
 	private String os;
 	private String driverPath;
 
 	private String ext;
 
-	public SafariDriver(String version, String os, String driverPath) {
-		this.version = version;
+	public SafariDriver(String ver, String os, String driverPath) {
+		this.ver = ver;
 		this.os = os;
 		this.driverPath = driverPath;
 	}

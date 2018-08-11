@@ -74,7 +74,7 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
-	private static List<URL> getDriversFromJSON(String releaseUrl) {
+	public static List<URL> getDriversFromJSON(String releaseUrl) {
 		DefaultHttpClient client = new DefaultHttpClient();
 		List<URL> urls = new ArrayList<>();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -113,7 +113,7 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
-	private static List<URL> getDriversFromXml(String releaseUrl)
+	public static List<URL> getDriversFromXml(String releaseUrl)
 			throws IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -155,7 +155,7 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/EdgeDriverManager.java
-	private static List<URL> getDriversFromHTML(String releaseUrl)
+	public static List<URL> getDriversFromHTML(String releaseUrl)
 			throws IOException {
 		String buildNumber = "15063"; // "17134"
 		DefaultHttpClient client = new DefaultHttpClient();
@@ -226,7 +226,14 @@ public class DriverUtil extends Logger {
 
 	public static void download(String driverName, String targetDirectory,
 			String version) throws IOException, ConfigurationException {
-		
+		// TODO: alternatively can probe version to be null
+		download(driverName, null, targetDirectory, version);
+	}
+
+	public static void download(String driverName, String sourceURL,
+			String targetDirectory, String version)
+			throws IOException, ConfigurationException {
+		/*
 		log.info("Loading all urls for chrome");
 		List<URL> driverUrls = getDriversFromXml(
 				"https://chromedriver.storage.googleapis.com/");
@@ -237,8 +244,10 @@ public class DriverUtil extends Logger {
 		log.info("Loading all urls for edge");
 		driverUrls = getDriversFromHTML(
 				"https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/");
-
-		String sourceURL = getSourceUrl(driverName);
+		*/
+		if (sourceURL == null) {
+			sourceURL = getSourceUrl(driverName);
+		}
 		String fileName = getFileNameFromUrl(sourceURL);
 		String toFile = targetDirectory + File.separator + fileName;
 		FileUtils.copyURLToFile(new URL(sourceURL), new File(toFile), 10000, 10000);
