@@ -67,6 +67,9 @@ public class ParseTest {
 		File file = getFile(filename);
 		Document doc = Jsoup.parse(file, "UTF-8", edgedriverDownloadURL);
 
+		// cssSelector
+		// section#downloads ul[class *= 'driver-downloads']
+
 		org.jsoup.select.Elements downloadLinks = doc
 				.select("ul.driver-downloads li.driver-download > a");
 		assertEquals(6, downloadLinks.size());
