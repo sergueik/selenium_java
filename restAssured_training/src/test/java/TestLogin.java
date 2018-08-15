@@ -1,6 +1,6 @@
 import org.testng.annotations.Test;
 
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
 
 public class TestLogin {
 

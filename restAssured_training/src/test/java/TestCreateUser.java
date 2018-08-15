@@ -1,7 +1,7 @@
-import com.jayway.restassured.RestAssured;
+import static io.restassured.RestAssured.*;
 import org.testng.annotations.Test;
-
-import static com.jayway.restassured.RestAssured.given;
+import static io.restassured.RestAssured.*;
+import static io.restassured.RestAssured.given;
 
 public class TestCreateUser {
 

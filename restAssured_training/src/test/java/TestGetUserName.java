@@ -1,6 +1,5 @@
 import org.testng.annotations.Test;
 
-// import static com.jayway.restassured.RestAssured.given;
 import io.restassured.RestAssured;
 import static io.restassured.RestAssured.*;
 import static io.restassured.matcher.RestAssuredMatchers.*;
