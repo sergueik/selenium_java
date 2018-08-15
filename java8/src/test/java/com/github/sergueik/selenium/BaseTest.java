@@ -97,7 +97,7 @@ public class BaseTest {
 	public String baseURL = "about:blank";
 
 	private List<String> chromeExtensions = new ArrayList<>();
-	private static String osName = getOsName();
+	private static String osName = getOSName();
 
 	private String extensionDir = String.format(
 			"%s\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions",
@@ -105,10 +105,8 @@ public class BaseTest {
 
 	private static final String browser = getPropertyEnv("webdriver.driver",
 			"chrome");
-	private static final boolean headless = (getPropertyEnv("webdriver.driver",
-			"headless") != null
-			&& Boolean.parseBoolean(getPropertyEnv("webdriver.driver", "headless")))
-					? true : false;
+	private static final boolean headless = Boolean
+			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	public static String getBrowser() {
 		return browser;
@@ -116,12 +114,11 @@ public class BaseTest {
 
 	private static final Map<String, String> browserDrivers = new HashMap<>();
 	static {
-		browserDrivers.put("chrome", osName.toLowerCase().startsWith("windows")
-				? "chromedriver.exe" : "chromedriver");
-		browserDrivers.put("firefox", osName.toLowerCase().startsWith("windows")
-				? "geckodriver.exe" : "geckodriver"
-
-		);
+		browserDrivers.put("chrome",
+				osName.contains("windows") ? "chromedriver.exe" : "chromedriver");
+		browserDrivers.put("firefox",
+				osName.contains("windows") ? "geckodriver.exe" : "geckodriver");
+		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 	}
 
 	public void setExtensionDir(String value) {
@@ -218,12 +215,9 @@ public class BaseTest {
 		*/
 		System.err.println("Launching " + browser);
 		if (browser.equals("chrome")) {
-			System.setProperty("webdriver.chrome.driver",
-					osName.toLowerCase().startsWith("windows")
-							? (new File("c:/java/selenium/chromedriver.exe"))
-									.getAbsolutePath()
-							: String.format("%s/Downloads/chromedriver",
-									System.getenv("HOME")));
+			System.setProperty("webdriver.chrome.driver", osName.contains("windows")
+					? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
+					: String.format("%s/Downloads/chromedriver", System.getenv("HOME")));
 
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 			ChromeOptions chromeOptions = new ChromeOptions();
@@ -302,14 +296,12 @@ public class BaseTest {
 
 			// https://developer.mozilla.org/en-US/Firefox/Headless_mode
 			// 3.5.3 and later
-			System.setProperty("webdriver.gecko.driver",
-					osName.toLowerCase().startsWith("windows")
-							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: String.format("%s/Downloads/geckodriver",
-									System.getenv("HOME")));
+			System.setProperty("webdriver.gecko.driver", osName.contains("windows")
+					? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+					: String.format("%s/Downloads/geckodriver", System.getenv("HOME")));
 			System
 					.setProperty("webdriver.firefox.bin",
-							osName.toLowerCase().startsWith("windows") ? new File(
+							osName.contains("windows") ? new File(
 									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
 											.getAbsolutePath()
 									: "/usr/bin/firefox");
@@ -516,9 +508,12 @@ public class BaseTest {
 	}
 
 	// Utilities
-	public static String getOsName() {
+	public static String getOSName() {
 		if (osName == null) {
-			osName = System.getProperty("os.name");
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
 		}
 		return osName;
 	}
