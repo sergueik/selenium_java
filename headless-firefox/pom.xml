@@ -20,7 +20,7 @@
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <junit.version>4.12</junit.version>
-    <selenium.version>3.8.1</selenium.version>
+    <selenium.version>2.53.1</selenium.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
