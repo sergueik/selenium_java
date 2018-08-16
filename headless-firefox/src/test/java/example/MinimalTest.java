@@ -165,7 +165,7 @@ public class MinimalTest {
 	}
 
 	@Test
-	public void selectControlReloadPageTest() {
+	public void selectContextToolbarTest() {
 		String baseURL = "http://the-internet.herokuapp.com/context_menu";
 
 		driver.get(baseURL);
@@ -186,6 +186,29 @@ public class MinimalTest {
 		actions.build().perform();
 		sleep(1000);
 		actions.sendKeys(Keys.ARROW_DOWN);
+		actions.build().perform();
+		sleep(1000);
+		actions.sendKeys(Keys.ENTER);
+		actions.build().perform();
+		sleep(1000);
+
+	}
+
+	@Test
+	public void selectContextMenuNavigationTest() {
+		String baseURL = "http://the-internet.herokuapp.com/context_menu";
+
+		driver.get(baseURL);
+		Actions actions = new Actions(driver);
+		WebElement element = driver.findElement(By.xpath("//*[@id=\"hot-spot\"]"));
+		actions.contextClick(element);
+		actions.build().perform();
+		sleep(2000);
+		actions.sendKeys(Keys.ARROW_UP);
+		actions.build().perform();
+		sleep(2000);
+
+		actions.sendKeys(Keys.ARROW_UP);
 		actions.build().perform();
 		sleep(1000);
 		actions.sendKeys(Keys.ENTER);
