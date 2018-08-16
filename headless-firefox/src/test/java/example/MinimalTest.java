@@ -20,11 +20,12 @@ import org.junit.Test;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.firefox.FirefoxBinary;
-// import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.Keys;
+
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.SessionNotCreatedException;
 import org.openqa.selenium.TakesScreenshot;
@@ -39,7 +40,7 @@ import static org.hamcrest.Matchers.notNullValue;
 public class MinimalTest {
 
 	public static FirefoxDriver driver;
-	private static String osName = getOsName();
+	private static String osName = getOSName();
 	static Map<String, String> browserDrivers = new HashMap<>();
 	static {
 		browserDrivers.put("chrome", "chromeDriverPath");
@@ -53,13 +54,13 @@ public class MinimalTest {
 
 	@BeforeClass
 	public static void setup() throws IOException {
-		getOsName();
 
 		propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/main/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
 
 		// https://www.programcreek.com/java-api-examples/?api=org.openqa.selenium.firefox.FirefoxBinary
+		@SuppressWarnings("unused")
 		FirefoxProfile firefoxProfile = new FirefoxProfile();
 		FirefoxBinary firefoxBinary = new FirefoxBinary();
 		/*
@@ -71,36 +72,39 @@ public class MinimalTest {
 		 * (Exception e) { }
 		 */
 		// TODO: convert to command line parameter
-
-		/*
 		firefoxBinary.addCommandLineOptions("--headless");
-		// size argument appears to be ignored
+		// NOTE: size argument appears to be ignored
 		firefoxBinary.addCommandLineOptions("--window-size=320,200");
-		*/
+
 		String browserDriver = (propertiesMap
 				.get(browserDrivers.get("browser")) != null)
-						? propertiesMap.get(browserDrivers.get("browser")) :
-						// assuming browser is firefox
-						osName.equals("windows")
-								? (new File("c:/java/selenium/geckodriver.exe"))
-										.getAbsolutePath()
-								: "/home/sergueik/Downloads/geckodriver";
+						? propertiesMap.get(browserDrivers.get("browser"))
+						: osName.equals("windows")
+								? new File(String.format("%s/Downloads/geckodriver.exe",
+										System.getenv("USERPROFILE"))).getAbsolutePath()
+								: String.format("%s/Downloads/geckodriver",
+										System.getenv("HOME"));
+		// assuming browser is 32 bit firefox on Windows
+		System.setProperty("webdriver.firefox.bin",
+				osName.equals("windows")
+						? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+								.getAbsolutePath()
+						: "/usr/bin/firefox");
+
 		System.setProperty("webdriver.gecko.driver", browserDriver);
-		// FirefoxOptions firefoxOptions = new FirefoxOptions();
-		// firefoxOptions.setBinary(firefoxBinary);
-		// driver = new FirefoxDriver(firefoxOptions);
-		driver = new FirefoxDriver();
+		FirefoxOptions firefoxOptions = new FirefoxOptions();
+		firefoxOptions.setBinary(firefoxBinary);
+		driver = new FirefoxDriver(firefoxOptions);
 		// dynamicSearchButtonTest
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testChromeDriver() throws Exception {
 		assertThat(driver, notNullValue());
 	}
 
-	@Ignore
 	@Test
 	public void dynamicSearchButtonTest() {
 		try {
@@ -150,7 +154,7 @@ public class MinimalTest {
 		}
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void Test() {
 		driver.navigate().to("https://ya.ru/");
@@ -162,59 +166,6 @@ public class MinimalTest {
 		System.err.println("Text: " + text);
 		Assert.assertEquals(element.getText(), "Найти");
 		assertThat(element.getText(), containsString("Найти")); // quotes
-	}
-
-	@Test
-	public void selectContextToolbarTest() {
-		String baseURL = "http://the-internet.herokuapp.com/context_menu";
-
-		driver.get(baseURL);
-		Actions actions = new Actions(driver);
-		WebElement element = driver.findElement(By.xpath("//*[@id=\"hot-spot\"]"));
-		actions.contextClick(element);
-		actions.build().perform();
-		sleep(1000);
-		actions.sendKeys(Keys.ARROW_DOWN);
-		actions.build().perform();
-		sleep(1000);
-
-		actions.sendKeys(Keys.ARROW_DOWN);
-		actions.build().perform();
-		sleep(1000);
-
-		actions.sendKeys(Keys.ARROW_DOWN);
-		actions.build().perform();
-		sleep(1000);
-		actions.sendKeys(Keys.ARROW_DOWN);
-		actions.build().perform();
-		sleep(1000);
-		actions.sendKeys(Keys.ENTER);
-		actions.build().perform();
-		sleep(1000);
-
-	}
-
-	@Test
-	public void selectContextMenuNavigationTest() {
-		String baseURL = "http://the-internet.herokuapp.com/context_menu";
-
-		driver.get(baseURL);
-		Actions actions = new Actions(driver);
-		WebElement element = driver.findElement(By.xpath("//*[@id=\"hot-spot\"]"));
-		actions.contextClick(element);
-		actions.build().perform();
-		sleep(2000);
-		actions.sendKeys(Keys.ARROW_UP);
-		actions.build().perform();
-		sleep(2000);
-
-		actions.sendKeys(Keys.ARROW_UP);
-		actions.build().perform();
-		sleep(1000);
-		actions.sendKeys(Keys.ENTER);
-		actions.build().perform();
-		sleep(1000);
-
 	}
 
 	@AfterClass
@@ -238,7 +189,7 @@ public class MinimalTest {
 	}
 
 	// Utilities
-	public static String getOsName() {
+	public static String getOSName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name").toLowerCase();
 			if (osName.startsWith("windows")) {
@@ -246,14 +197,5 @@ public class MinimalTest {
 			}
 		}
 		return osName;
-	}
-
-	public void sleep(Integer seconds) {
-		long secondsLong = (long) seconds;
-		try {
-			Thread.sleep(secondsLong);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 	}
 }
