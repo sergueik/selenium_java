@@ -1,3 +1,4 @@
+package tests;
 public class User {
 
 	private int id;
