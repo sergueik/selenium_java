@@ -6,7 +6,7 @@ import static org.hamcrest.Matchers.*;
 // based on: https://github.com/damengwang/restassuredDemo
 public class XuequiTest {
 
-	@Test
+	@Test(enabled = false)
 	public void testSearch() {
 		useRelaxedHTTPSValidation();
 		// Certificate
