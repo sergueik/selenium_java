@@ -37,6 +37,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import static javax.xml.xpath.XPathFactory.newInstance;
 
 import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 
 import org.apache.http.client.ResponseHandler;
@@ -45,7 +46,10 @@ import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.maven.plugin.logging.Log;
 
-// TODO: get rid of
+// TODO: get rid of the wrapper in favor of straight http://commons.apache.org/proper/commons-compress/ 
+// https://stackoverflow.com/questions/7128171/how-to-compress-decompress-tar-gz-files-in-java
+// https://www.mkyong.com/java/how-to-decompress-file-from-gzip-file/
+
 import org.rauschig.jarchivelib.Archiver;
 import org.rauschig.jarchivelib.ArchiverFactory;
 
@@ -60,8 +64,11 @@ import com.google.gson.annotations.SerializedName;
 import com.google.gson.internal.LinkedTreeMap;
 
 import static org.jsoup.Jsoup.parse;
-//import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
+// import org.jsoup.nodes.Document;
+// NOTE:
+// import org.jsoup.nodes.Document collides with another import statement:
+// a type with the same simple name is already defined by the single-type-import of 
+// org.w3c.dom.Document
 import org.jsoup.select.Elements;
 
 import com.github.abhishek8908.driver.logger.Logger;
@@ -69,8 +76,37 @@ import com.github.abhishek8908.driver.logger.Logger;
 @SuppressWarnings("deprecation")
 public class DriverUtil extends Logger {
 
+	private static Log log = new Logger().getLog();
+
+	public DriverUtil() {
+	}
+
 	private static boolean useEmbeddedResource = true;
 	private static boolean renameDriver = true;
+
+	public static void setRenameDriver(boolean value) {
+		DriverUtil.renameDriver = value;
+	}
+
+	private static Map<String, String> properties = new HashMap<>();
+
+	static Map<String, String> downloadURLs = new HashMap<>();
+	static {
+		downloadURLs.put("chromedriver", "chromedriver.download.url");
+		downloadURLs.put("geckodriver", "geckodriver.download.url");
+		downloadURLs.put("safaridriver", "safaridriver.download.url");
+		downloadURLs.put("IEdriver", "iedriver.download.url");
+		downloadURLs.put("edgedriver", "edgedriver.download.url");
+	}
+
+	static Map<String, String> driverNames = new HashMap<>();
+	static {
+		driverNames.put("chromedriver", "chromedriver.name");
+		driverNames.put("geckodriver", "geckodriver.name");
+		driverNames.put("safaridriver", "safaridriver.name");
+		driverNames.put("IEdriver", "iedriver.name");
+		driverNames.put("edgedriver", "edgedriver.name");
+	}
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
@@ -193,37 +229,6 @@ public class DriverUtil extends Logger {
 		DriverUtil.useEmbeddedResource = useEmbeddedResource;
 	}
 
-	static Map<String, String> downloadURLs = new HashMap<>();
-	static {
-		downloadURLs.put("chromedriver", "chromedriver.download.url");
-		downloadURLs.put("geckodriver", "geckodriver.download.url");
-		downloadURLs.put("safaridriver", "safaridriver.download.url");
-		downloadURLs.put("IEdriver", "iedriver.download.url");
-		downloadURLs.put("edgedriver", "edgedriver.download.url");
-	}
-
-	static Map<String, String> driverNames = new HashMap<>();
-	static {
-		driverNames.put("chromedriver", "chromedriver.name");
-		driverNames.put("geckodriver", "geckodriver.name");
-		driverNames.put("safaridriver", "safaridriver.name");
-		driverNames.put("IEdriver", "iedriver.name");
-		driverNames.put("edgedriver", "edgedriver.name");
-	}
-
-	public static boolean isRenameDriver() {
-		return renameDriver;
-	}
-
-	public static void setRenameDriver(boolean renameDriver) {
-		DriverUtil.renameDriver = renameDriver;
-	}
-
-	private static Log log = new Logger().getLog();
-
-	public DriverUtil() {
-	}
-
 	public static void download(String driverName, String targetDirectory,
 			String version) throws IOException, ConfigurationException {
 		// TODO: alternatively can probe version to be null
@@ -233,18 +238,7 @@ public class DriverUtil extends Logger {
 	public static void download(String driverName, String sourceURL,
 			String targetDirectory, String version)
 			throws IOException, ConfigurationException {
-		/*
-		log.info("Loading all urls for chrome");
-		List<URL> driverUrls = getDriversFromXml(
-				"https://chromedriver.storage.googleapis.com/");
-		log.info("Loading all urls for firefox");
-		driverUrls = getDriversFromJSON(
-				"https://api.github.com/repos/mozilla/geckodriver/releases");
-		// TODO: ie
-		log.info("Loading all urls for edge");
-		driverUrls = getDriversFromHTML(
-				"https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/");
-		*/
+
 		if (sourceURL == null) {
 			sourceURL = getSourceUrl(driverName);
 		}
@@ -272,15 +266,39 @@ public class DriverUtil extends Logger {
 		log.info("Decompressing file: " + source);
 	}
 
-	public static void changeFileName(String fileName, String fileOut)
+	public static void changeFileName(String fileName, String newFileName)
 			throws IOException {
+		changeFileName(fileName, newFileName, false);
+	}
+
+	public static void changeFileName(String fileName, String newFileName,
+			boolean createLink) throws IOException {
+		// TODO: use os propety of the driver class
 		String os = System.getProperty("os"); //
 		String ext = (os.toLowerCase().contains("win")) ? ".exe" : "";
 
-		FileUtils.moveFile(FileUtils.getFile(fileName + ext),
-				FileUtils.getFile(fileOut + "-" + os + ext));
-		log.info("File: " + fileName + " renameded to " + fileOut);
-
+		Path filePath = Paths.get(fileName + ext).toAbsolutePath();
+		Path fileLinkPath = Paths.get(newFileName + "-" + os + ext)
+				.toAbsolutePath();
+		if (createLink) {
+			try {
+				Files.createSymbolicLink(fileLinkPath, filePath);
+			} catch (IOException e) {
+				e.printStackTrace();
+				// java.nio.file.FileSystemException:
+				// c:\temp\geckodriver-0.21.0linux64.lnk-linux64: A required privilege
+				// is not held by the client.
+				// on Windows soft links creation requires elevation
+			}
+		} else {
+			try {
+				FileUtils.moveFile(FileUtils.getFile(fileName + ext),
+						FileUtils.getFile(newFileName + "-" + os + ext));
+				log.info("File: " + fileName + " renameded to " + newFileName);
+			} catch (FileExistsException e) {
+				// silently ignore
+			}
+		}
 	}
 
 	public static String getFileNameFromUrl(String location) {
@@ -329,8 +347,6 @@ public class DriverUtil extends Logger {
 		log.info("Clean Dir:" + dir);
 	}
 
-	private static Map<String, String> properties = new HashMap<>();
-
 	public static String readProperty(String propertyName)
 			throws ConfigurationException {
 		if (properties.isEmpty()) {
@@ -355,7 +371,8 @@ public class DriverUtil extends Logger {
 
 	}
 
-	public static class GeckoDriverReleases {
+	// used in JSON deserialization
+	private static class GeckoDriverReleases {
 
 		@SerializedName("tag_name")
 		private String tagName;
@@ -375,6 +392,19 @@ public class DriverUtil extends Logger {
 			return assets;
 		}
 
+	}
+
+	private static String osName;
+
+	public static String getOSName() {
+
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
 	}
 
 }

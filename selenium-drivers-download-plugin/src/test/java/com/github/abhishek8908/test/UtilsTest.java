@@ -54,6 +54,12 @@ public class UtilsTest {
 				"c:\\temp\\chromedriver-" + "2.38" + ".exe");
 	}
 
+	@Test
+	public void fileLink() throws IOException {
+		changeFileName("c:\\temp\\geckodriver",
+				"c:\\temp\\geckodriver-" + "0.21.0" + "linux64.lnk", true);
+	}
+
 	@Ignore
 	@Test
 	public void testCleanDir() {

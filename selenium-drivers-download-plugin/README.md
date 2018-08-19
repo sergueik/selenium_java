@@ -2,15 +2,14 @@
 
 This directory contains a replica of [abhishek8908/selenium-drivers-download-plugin](https://github.com/abhishek8908/selenium-drivers-download-plugin)
 project:
-maven plugin which generates drivers (chromedriver and geckodriver) .
+maven plugin which generates drivers (chromedriver, iedriverServer, edge and geckodriver) .
 
-It is intended to become a fork.
+It was first intended to become a fork, but the changes are too substantial.
 
 ### Run application
 
-For testing instructions, check the original project [README](https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/README.md),
-but replace the release with the snapshot `version`
-and release `groupId` with the actual project `groupId`
+For testing instructions, review the original project [README](https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/README.md),
+but use the snapshot `version` instead of release `version` and update the `groupId` with the actual project `groupId`
 as below:
 ```xml
 <plugin>
@@ -19,12 +18,12 @@ as below:
   <version>1.0-SNAPSHOT</version>
 ```
 
-First you may need to install the plugin locally:
+First you may need to build and install the plugin locally:
 ```sh
 mvn -Dmaven.test.skip=true install
 ```
 
-Also, one is likely to comment the unneded driver(s) / version / os combination otherwise everything listed will be downloaded locally a every compile.
+Also, one is likely to comment the unneded driver(s) / version / os combination otherwise everything listed will be downloaded locally a every clean compile.
 
 Instead one may utilize maven profiles to specify the same:
 ```xml

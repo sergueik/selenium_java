@@ -11,54 +11,55 @@ import com.github.abhishek8908.util.DriverUtil;
 
 public class DriverDownloadIntegrationTest {
 
-	private static String osName = null;
-	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp"
+	private static String osName = DriverUtil.getOSName();
+	private static String tmpDir = (osName.equals("windows")) ? "c:\\temp"
 			: "/tmp";
+	private static String version;
+	private static String os;
+	private static String extension;
 
-	// TODO: inter-test dependency
+	// TODO: establish order
 	@Test(enabled = false)
 	public void downloadChomeDriverTest()
 			throws IOException, ConfigurationException {
-		System.setProperty("ver", "2.39");
-		System.setProperty("os", "win32");
-		System.setProperty("ext", "zip");
-		DriverUtil.download("chromedriver", tmpDir, "2.39");
-		assertTrue(
-				(new File(tmpDir + File.separator + "chromedriver-2.39-win32.exe"))
-						.exists());
+		version = "2.39";
+		os = "win32";
+		extension = "zip";
+		System.setProperty("ver", version);
+		System.setProperty("os", os);
+		System.setProperty("ext", extension);
+		DriverUtil.download("chromedriver", tmpDir, version);
+		assertTrue((new File(tmpDir + File.separator
+				+ String.format("chromedriver-%s-%s.exe", version, os))).exists());
 	}
 
 	@Test(enabled = false)
 	public void downloadEdgeeDriverTest()
 			throws IOException, ConfigurationException {
-		System.setProperty("ver", "c");
-		System.setProperty("os", "win32");
-		System.setProperty("ext", "zip");
-		DriverUtil.download("edgedriver", tmpDir, "2.39");
-		assertTrue((new File(
-				tmpDir + File.separator + "MicrosoftWebDriver-2.39-win32.exe"))
+		version = "1"; // not used with edge ?
+		os = "win32";
+		extension = "zip";
+		System.setProperty("ver", version);
+		System.setProperty("os", os);
+		System.setProperty("ext", extension);
+		DriverUtil.download("edgedriver", tmpDir, version);
+		assertTrue((new File(tmpDir + File.separator
+				+ String.format("MicrosoftWebDriver-%s-%s.exe", version, os)))
 						.exists());
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void downloadGeckoDriverTest()
 			throws IOException, ConfigurationException {
+		version = "0.21.0"; // not used with edge ?
+		os = "linux64";
+		extension = "tar.gz";
 		System.setProperty("ver", "0.21.0");
 		System.setProperty("os", "linux64");
 		System.setProperty("ext", "tar.gz");
-		DriverUtil.download("geckodriver", tmpDir, "0.21.0");
-		assertTrue(
-				(new File(tmpDir + File.separator + "geckodriver-0.21.0-linux64"))
-						.exists());
+		DriverUtil.download("geckodriver", tmpDir, version);
+		assertTrue((new File(tmpDir + File.separator
+				+ String.format("geckodriver-%s-%s", version, os))).exists());
 	}
 
-	public static String getOSName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
-	}
 }
