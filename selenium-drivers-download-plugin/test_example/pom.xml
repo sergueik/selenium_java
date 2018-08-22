@@ -187,7 +187,7 @@
       <properties>
         <host_os>win32</host_os>
 	<driverPath>c:/temp</driverPath>
-	<!-- TODO: ignored -->
+	<!-- TODO: driverPath property appears to be ignored -->
       </properties>
     </profile>
     <profile>
@@ -205,6 +205,21 @@
     </profile>
     <!-- 'profiles.profile.id' must be unique -->
     <profile>
+      <id>windows64_edge</id>
+      <activation>
+        <os>
+          <family>windows</family>
+          <arch>amd64</arch>
+        </os>
+      </activation>
+      <properties>
+        <host_os>win64</host_os>
+        <driverPath>c:/temp</driverPath>
+	<buildNumber>15063</buildNumber>
+      </properties>
+    </profile>
+    <profile>
+    <!-- 'profiles.profile.id' must be unique -->
       <id>windows64_2</id>
       <activation>
         <os>
