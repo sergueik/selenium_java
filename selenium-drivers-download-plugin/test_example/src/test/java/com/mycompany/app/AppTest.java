@@ -98,7 +98,7 @@ public void setupBeforeSuite( ITestContext context ) throws InterruptedException
 
 			System.setProperty("webdriver.chrome.driver",
 				System.getProperty("os.name").toLowerCase().startsWith("windows")
-						? new File( "c:/tmp" + /* "chromedriver.exe" */ "chromedriver-2.40-win32.exe").getAbsolutePath()
+						? new File( "c:/temp/" + /* "chromedriver.exe" */ "chromedriver-2.41-win32.exe").getAbsolutePath()
 						: System.getenv("HOME") + "/Downloads/" + "chromedriver-2.40-linux64");
 
 			DesiredCapabilities capabilities = DesiredCapabilities.chrome();

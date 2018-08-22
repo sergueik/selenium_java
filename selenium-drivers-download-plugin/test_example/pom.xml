@@ -4,7 +4,7 @@
   <groupId>com.mycompany.app</groupId>
   <artifactId>app</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.2-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -13,27 +13,21 @@
     <commons-io.version>2.5</commons-io.version>
     <java.version>1.8</java.version>
     <json.version>20170516</json.version>
-    <junit.version>4.8.1</junit.version>
     <!-- NOTE: `4.12.1` is not in the default maven repo -->
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <phantomjsdriver.version>1.4.2</phantomjsdriver.version>
-    <selenium.version>3.8.1</selenium.version>
+    <selenium.version>3.13.0</selenium.version>
     <!--
     <selenium-drivers-download-plugin.groupId>com.adsingh.plugin</selenium-drivers-download-plugin.groupId>
     -->
     <selenium-drivers-download-plugin.groupId>com.github.abhishek8908</selenium-drivers-download-plugin.groupId>
-    <selenium-drivers-download-plugin.version>1.2-SNAPSHOT</selenium-drivers-download-plugin.version>
+    <selenium-drivers-download-plugin.version>1.4-SNAPSHOT</selenium-drivers-download-plugin.version>
     <testng.version>6.13.1</testng.version>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
@@ -156,8 +150,9 @@
             <driver>
               <name>chromedriver</name>
             <!-- TODO: rename -->
-              <ver>2.40</ver>
-              <os>${host_os}</os>
+              <ver>2.41</ver>
+              <os>win32</os>
+	      <!-- ${host.os} -->
             </driver>
           </drivers>
         </configuration>
@@ -191,7 +186,8 @@
       </activation>
       <properties>
         <host_os>win32</host_os>
-        <driverPath>c:/tmp</driverPath>
+	<driverPath>c:/temp</driverPath>
+	<!-- TODO: ignored -->
       </properties>
     </profile>
     <profile>
