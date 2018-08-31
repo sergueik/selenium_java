@@ -13,7 +13,7 @@ based on:https://github.com/jesuino/jfx8-app
     <log4j.version>1.2.17</log4j.version>
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
     <jar.final.name>javafx_example_app</jar.final.name>
-    <main.class>FlowPaneEx</main.class>
+    <mainClass>FlowPaneEx</mainClass>
     <selenium.version>3.8.1</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
@@ -95,7 +95,7 @@ based on:https://github.com/jesuino/jfx8-app
         <artifactId>javafx-maven-plugin</artifactId>
         <version>1.3</version>
         <configuration>
-          <mainClass>${main.class}</mainClass>
+          <mainClass>${mainClass}</mainClass>
         </configuration>
       </plugin>
       <plugin>
