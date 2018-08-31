@@ -1,6 +1,6 @@
 // https://stackoverflow.com/questions/9846046/run-main-class-of-maven-project
 // https://github.com/kurnakov92/CalculatorFX/blob/master/src/main/java/calculator/conrollers/AlertDialogController.java
-package example;
+package com.github.sergueik.swet_javafx;
 
 import javafx.animation.FadeTransition;
 import javafx.application.Application;

@@ -1,4 +1,4 @@
-package example;
+package com.github.sergueik.swet_javafx;
 
 import java.util.ArrayList;
 import java.util.Arrays;

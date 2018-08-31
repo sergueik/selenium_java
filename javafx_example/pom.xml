@@ -5,9 +5,9 @@ based on:https://github.com/jesuino/jfx8-app
 -->
   <modelVersion>4.0.0</modelVersion>
   <!-- change it according your app configuration -->
-  <groupId>example</groupId>
-  <artifactId>javafx_example</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <groupId>com.github.sergueik.swet_javafx</groupId>
+  <artifactId>javafx_example_app</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j.version>1.2.17</log4j.version>

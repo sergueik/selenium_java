@@ -1,4 +1,4 @@
-package example;
+package com.github.sergueik.swet_javafx;
 
 import javafx.collections.ObservableList;
 import javafx.application.Application;

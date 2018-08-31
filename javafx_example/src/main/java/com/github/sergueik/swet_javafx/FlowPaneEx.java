@@ -1,4 +1,4 @@
-package example;
+package com.github.sergueik.swet_javafx;
 
 import org.apache.log4j.Category;
 import org.openqa.selenium.WebDriver;
@@ -8,6 +8,9 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+
+import com.github.sergueik.swet_javafx.ChoicesDialog;
+import com.github.sergueik.swet_javafx.ConfigFormEx;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,11 +36,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-// import example.ChoiceItem;
-import example.ChoicesDialog;
-import example.ConfigFormEx;
-
 import name.antonsmirnov.javafx.dialog.Dialog;
 
 @SuppressWarnings("restriction")
@@ -102,6 +100,7 @@ public class FlowPaneEx extends Application {
 									String.format("%s element Locators", button.getText()));
 							Map<String, Map> inputs = new HashMap<>();
 							inputs.put("inputs", inputData); // TODO: JSON
+              // see also https://github.com/MrChebik/ControllerRelationship
 							scene.setUserData(inputs);
 							logger.info(
 									"launching complexFormEx for " + inputData.get("title"));
