@@ -21,8 +21,8 @@ if [  $? -eq  0 ] ; then
   APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
   DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml)
 fi
-
-MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_APP_CLASS}
+echo $
+MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_CLASS}
 
 for APP_CONFIG_ENTRY in 'MAIN_APP_CLASS' 'APP_PACKAGE' 'APP_VERSION' 'APP_NAME'; do echo "${APP_CONFIG_ENTRY}=$(eval echo \$$APP_CONFIG_ENTRY )" 1>& 2 ; done
 

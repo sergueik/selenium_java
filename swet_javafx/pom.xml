@@ -13,8 +13,8 @@ based on:https://github.com/jesuino/jfx8-app
     <log4j.version>1.2.17</log4j.version>
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
     <jar.final.name>swet_javafx_app</jar.final.name>
-    <mainClass>FlowPaneEx</mainClass>
-    <selenium.version>3.8.1</selenium.version>
+    <mainClass>SwetMainFlowPanel</mainClass>
+    <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
