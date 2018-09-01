@@ -4,7 +4,6 @@
 SKIP_PACKAGE_VERSION=true
 
 DEFAULT_MAIN_CLASS='FlowPaneEx'
-MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_APP_CLASS}
 APP_NAME='javafx_example_app'
 APP_PACKAGE='com.github.sergueik.swet_javafx'
 APP_VERSION='0.0.2-SNAPSHOT'
@@ -20,13 +19,10 @@ if [  $? -eq  0 ] ; then
   APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
   APP_PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
   APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
-  MAIN_APP_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml)
+  DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml)
 fi
 
-# echo "MAIN_APP_CLASS=${MAIN_APP_CLASS}" 1>& 2
-# echo "APP_PACKAGE=${APP_PACKAGE}" 1>& 2
-# echo "APP_VERSION=${APP_VERSION}" 1>& 2
-# echo "APP_NAME=${APP_NAME}" 1>& 2
+MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_APP_CLASS}
 
 for APP_CONFIG_ENTRY in 'MAIN_APP_CLASS' 'APP_PACKAGE' 'APP_VERSION' 'APP_NAME'; do echo "${APP_CONFIG_ENTRY}=$(eval echo \$$APP_CONFIG_ENTRY )" 1>& 2 ; done
 

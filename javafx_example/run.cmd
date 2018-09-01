@@ -1,17 +1,22 @@
 @echo OFF
 SETLOCAL
 
+REM NOTE: Cannot set SETLOCAL ENABLEDELAYEDEXPANSION
+REM Because of inline ie script in :CALL_JAVASCRIPT
+
 if "%TOOLS_DIR%"=="" set TOOLS_DIR=c:\java
 if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
 if "%JAVA_HOME%"=="" set JAVA_HOME=%TOOLS_DIR%\jdk%JAVA_VERSION%
 set JAVA_OPTS=-Xms256m -Xmx512m
+
 if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.5.0
 if "%M2_HOME%"=="" set M2_HOME=%TOOLS_DIR%\apache-maven-%MAVEN_VERSION%
 if "%M2%"=="" set M2=%M2_HOME%\bin
+
 set MAVEN_OPTS=-Xms256m -Xmx512m
 PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 set TARGET=%CD%\target
-
+set DEBUG=false
 set SKIP_TEST=tue
 set SKIP_PACKAGE_VERSION=true
 
@@ -26,7 +31,6 @@ if /i "%SKIP_PACKAGE_VERSION%"=="true" goto :SKIP_PACKAGE_VERSION
 set APP_JAR=%APP_NAME%-%APP_VERSION%.jar
 :SKIP_PACKAGE_VERSION
 
-
 call :CALL_JAVASCRIPT groupId
 set APP_PACKAGE=%VALUE%
 
@@ -36,12 +40,14 @@ set APP_NAME=%VALUE%
 call :CALL_JAVASCRIPT version
 set APP_VERSION=%VALUE%
 
+REM Cannot get the mainClass currently
+
 if /i NOT "%VERBOSE%"=="true" goto :CONTINUE
 
-echo APP_VERSION="%APP_VERSION%">&2
-echo APP_NAME="%APP_NAME%">&2
-echo APP_PACKAGE="%APP_PACKAGE%">&2
-echo APP_JAR="%APP_JAR%">&2
+call :SHOW_VARIABLE APP_VERSION
+call :SHOW_VARIABLE APP_NAME
+call :SHOW_VARIABLE APP_PACKAGE
+call :SHOW_VARIABLE APP_JAR
 
 :CONTINUE
 
@@ -101,3 +107,21 @@ REM if /i "%DEBUG%"=="true" for /F "delims=" %%_ in ('%SCRIPT% 1 ^| more') do ec
 for /F "tokens=2 delims==" %%_ in ('%SCRIPT% 1 ^| more') do set VALUE=%%_
 ENDLOCAL
 exit /b
+
+
+:SHOW_VARIABLE
+SETLOCAL ENABLEDELAYEDEXPANSION
+set VAR=%1
+if /i "%DEBUG%"=="true" echo>&2 VAR=!VAR!
+set RESULT=!VAR!
+call :SHOW_VARIABLE_VALUE !%VAR%!
+set RESULT=!RESULT!="!DATA!"
+echo>&2 !RESULT!
+ENDLOCAL
+goto :EOF
+
+:SHOW_VARIABLE_VALUE
+set VAL=%1
+set DATA=%VAL%
+if /i "%DEBUG%"=="true" echo>&2 VALUE=%VAL%
+goto :EOF
