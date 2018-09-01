@@ -6,13 +6,13 @@ based on:https://github.com/jesuino/jfx8-app
   <modelVersion>4.0.0</modelVersion>
   <!-- change it according your app configuration -->
   <groupId>com.github.sergueik.swet_javafx</groupId>
-  <artifactId>javafx_example_app</artifactId>
+  <artifactId>swet_javafx_app</artifactId>
   <version>0.0.2-SNAPSHOT</version>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j.version>1.2.17</log4j.version>
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
-    <jar.final.name>javafx_example_app</jar.final.name>
+    <jar.final.name>swet_javafx_app</jar.final.name>
     <mainClass>FlowPaneEx</mainClass>
     <selenium.version>3.8.1</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>

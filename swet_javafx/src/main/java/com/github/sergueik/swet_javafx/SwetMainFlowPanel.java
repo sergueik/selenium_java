@@ -39,10 +39,10 @@ import javafx.stage.StageStyle;
 import name.antonsmirnov.javafx.dialog.Dialog;
 
 @SuppressWarnings("restriction")
-public class FlowPaneEx extends Application {
+public class SwetMainFlowPanel extends Application {
 
 	@SuppressWarnings("deprecation")
-	static final Category logger = Category.getInstance(FlowPaneEx.class);
+	static final Category logger = Category.getInstance(SwetMainFlowPanel.class);
 	static Stage stage = null;
 	private Label statusLabel;
 	String configFilePath = null;

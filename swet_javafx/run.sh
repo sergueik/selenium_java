@@ -2,9 +2,9 @@
 # set -x
 
 SKIP_PACKAGE_VERSION=true
-
-DEFAULT_MAIN_CLASS='FlowPaneEx'
-APP_NAME='javafx_example_app'
+# These get extracted from the pom.xml, keeping the default values for backwad compatibility
+DEFAULT_MAIN_CLASS='SwetMainFlowPanel'
+APP_NAME='swet_javafx_app'
 APP_PACKAGE='com.github.sergueik.swet_javafx'
 APP_VERSION='0.0.2-SNAPSHOT'
 if [[ $SKIP_PACKAGE_VERSION ]] ; then

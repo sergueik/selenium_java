@@ -20,8 +20,10 @@ set DEBUG=false
 set SKIP_TEST=tue
 set SKIP_PACKAGE_VERSION=true
 
-set DEFAULT_MAIN_CLASS=FlowPaneEx
-set APP_NAME=javafx_example_app
+REM this currently is not loaded from pom.xml
+set DEFAULT_MAIN_CLASS=SwetMainFlowPanel
+REM These get extracted from the pom.xml, keeping the default values for backwad compatibility
+set APP_NAME=swet_javafx_app
 set APP_PACKAGE=com.github.sergueik.swet_javafx
 set APP_VERSION=0.0.2-SNAPSHOT
 
