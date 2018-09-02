@@ -10,12 +10,11 @@ import javafx.scene.control.Label;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+@SuppressWarnings({ "restriction" })
 public class StartPresenter implements Initializable {
-	@SuppressWarnings("restriction")
 	@FXML
 	public Label label;
 
-	@SuppressWarnings("restriction")
 	@FXML
 	private void clicked() {
 		label.setText(
