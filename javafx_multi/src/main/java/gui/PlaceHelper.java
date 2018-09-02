@@ -12,8 +12,10 @@ import screen.Screen;
 import screen.measurement.Scale;
 
 public abstract class PlaceHelper extends Application {
+	@SuppressWarnings("restriction")
 	protected Stage stage;
 
+	@SuppressWarnings("restriction")
 	protected void initWindow(String title, Scale scale, ViewHelper viewHelper) {
 		stage.setTitle(title);
 
@@ -23,18 +25,19 @@ public abstract class PlaceHelper extends Application {
 		setSize(scale);
 		setPosition(scale);
 
-		@SuppressWarnings("restriction")
 		Scene scene = initScene(viewHelper);
 		initFrame(viewHelper);
 		stage.setScene(scene);
 		stage.show();
 	}
 
+	@SuppressWarnings("restriction")
 	private void setSize(Scale scale) {
 		stage.setWidth(scale.width);
 		stage.setHeight(scale.height);
 	}
 
+	@SuppressWarnings("restriction")
 	private void setPosition(Scale scale) {
 		Point point = Screen.calculateCenter(scale.width, scale.height);
 
@@ -48,6 +51,7 @@ public abstract class PlaceHelper extends Application {
 	 * @param viewAction
 	 * @return
 	 */
+	@SuppressWarnings("restriction")
 	private Scene initScene(ViewHelper viewAction) {
 		Parent view = viewAction.view.getView();
 
@@ -60,13 +64,14 @@ public abstract class PlaceHelper extends Application {
 	 *
 	 * @param helper
 	 */
+	@SuppressWarnings("restriction")
 	private void initFrame(ViewHelper helper) {
 		if (helper.view.getPresenter() instanceof StartPresenter)
 			((StartPresenter) helper.view.getPresenter()).label.setText("initFrame");
 	}
 
 	@Override
-	public void start(Stage primaryStage) {
+	public void start(@SuppressWarnings("restriction") Stage primaryStage) {
 		throw new UnsupportedOperationException();
 	}
 }

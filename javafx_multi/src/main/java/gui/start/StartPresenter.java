@@ -11,16 +11,20 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class StartPresenter implements Initializable {
-    @FXML
-    public Label label;
+	@SuppressWarnings("restriction")
+	@FXML
+	public Label label;
 
-    @FXML
-    private void clicked() {
-        label.setText(((ChildPresenter) ViewHelper.PLACE_CHILD.view.getPresenter()).textfield.getText());
-    }
+	@SuppressWarnings("restriction")
+	@FXML
+	private void clicked() {
+		label.setText(
+				((ChildPresenter) ViewHelper.PLACE_CHILD.view.getPresenter()).textfield
+						.getText());
+	}
 
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        new ChildPlace().start();
-    }
+	@Override
+	public void initialize(URL location, ResourceBundle resources) {
+		new ChildPlace().start();
+	}
 }

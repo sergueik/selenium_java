@@ -6,12 +6,11 @@ import javafx.stage.Stage;
 import screen.measurement.Scale;
 
 public class StartPlace extends PlaceHelper {
-    @Override
-    public void start(Stage primaryStage) {
-        super.stage = primaryStage;
+	@Override
+	public void start(Stage primaryStage) {
+		super.stage = primaryStage;
 
-        initWindow("Start this stage, let's do it!",
-                Scale.PLACE_START,
-                ViewHelper.PLACE_START);
-    }
+		initWindow("Start this stage, let's do it!", Scale.PLACE_START,
+				ViewHelper.PLACE_START);
+	}
 }
