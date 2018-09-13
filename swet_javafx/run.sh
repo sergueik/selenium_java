@@ -43,6 +43,21 @@ then
 
 fi
 
+DOWNLOAD_EXTERNAL_JAR=false
+ALIAS='richtextfx'
+JARFILE_VERSION='0.9.1'
+JARFILE="$ALIAS-$JARFILE_VERSION.jar"
+URL="https://github.com/TomasMikula/RichTextFX/releases/download/v$JARFILE_VERSION/${ALIAS}-$JARFILE_VERSION.jar?raw=true"
+if [[ $DOWNLOAD_EXTERNAL_JAR ]]
+then
+  if [[ ! -f "src/main/resources/$JARFILE" ]]
+  then
+    pushd 'src/main/resources/'
+    wget -O $JARFILE -nv $URL
+    popd
+  fi
+fi
+
 mvn -Dmaven.test.skip=true package install
 echo "java -cp target/$APP_JAR:target/lib/* $APP_PACKAGE.$MAIN_APP_CLASS"
 java -cp target/$APP_JAR:target/lib/* $APP_PACKAGE.$MAIN_APP_CLASS

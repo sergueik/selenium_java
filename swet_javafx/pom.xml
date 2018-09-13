@@ -1,24 +1,31 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <!--
-based on:https://github.com/jesuino/jfx8-app
--->
   <modelVersion>4.0.0</modelVersion>
   <!-- change it according your app configuration -->
   <groupId>com.github.sergueik.swet_javafx</groupId>
   <artifactId>swet_javafx_app</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <log4j.version>1.2.17</log4j.version>
-    <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
-    <jar.final.name>swet_javafx_app</jar.final.name>
     <mainClass>SwetMainFlowPanel</mainClass>
+    <jar.final.name>swet_javafx_app</jar.final.name>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
+    <log4j.version>1.2.17</log4j.version>
+    <richtextfx.version>0.9.1</richtextfx.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.fxmisc.richtext</groupId>
+      <artifactId>richtextfx</artifactId>
+      <version>${richtextfx.version}</version>
+      <!--
+      <scope>system</scope>
+      <systemPath>${project.basedir}/src/main/resources/richtextfx-${richtextfx.version}.jar</systemPath>
+       --> 
+    </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
