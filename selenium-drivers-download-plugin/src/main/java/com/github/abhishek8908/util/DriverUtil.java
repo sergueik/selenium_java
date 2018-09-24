@@ -193,6 +193,7 @@ public class DriverUtil extends Logger {
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/EdgeDriverManager.java
 	public static List<URL> getDriversFromHTML(String releaseUrl)
 			throws IOException {
+		
 		String buildNumber = "15063"; // "17134"
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -215,7 +216,7 @@ public class DriverUtil extends Logger {
 			versions.put(downloadLink.text(), new URL(downloadLink.attr("href")));
 			urls.add(new URL(downloadLink.attr("href")));
 		}
-		Elements downloadFilteredLinks = doc.select(
+		org.jsoup.select.Elements downloadFilteredLinks = doc.select(
 				String.format("ul.driver-downloads li.driver-download > a:contains(%s)",
 						buildNumber));
 		assertEquals(1, downloadFilteredLinks.size());
@@ -273,7 +274,7 @@ public class DriverUtil extends Logger {
 
 	public static void changeFileName(String fileName, String newFileName,
 			boolean createLink) throws IOException {
-		// TODO: use os propety of the driver class
+		// TODO: use os property of the driver class
 		String os = System.getProperty("os"); //
 		String ext = (os.toLowerCase().contains("win")) ? ".exe" : "";
 

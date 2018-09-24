@@ -136,3 +136,9 @@ and then pass the project configuration to plugin configuration:
 </plugin>
 ```
 See also the test-example directory included in this project.
+
+
+### See Also
+
+* [code of ru.stqa.selenium.webdriver-factory](https://github.com/barancev/webdriver-factory)
+* [some other selenium webdriver factory project](https://github.com/jflorez/webdriver-factory)
