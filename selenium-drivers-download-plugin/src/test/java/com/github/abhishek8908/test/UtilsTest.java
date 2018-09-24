@@ -229,10 +229,14 @@ public class UtilsTest {
 	public void testJsoupNavigation() {
 
 		org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(data);
-		org.jsoup.select.Elements passwordNodes = doc.select(
+		org.jsoup.select.Elements passwordNodeSiblings = doc.select(
 				String.format("body table span > strong:contains(%s)", "Password:"));
-		assertEquals(1, passwordNodes.size());
-		System.err.println(String.format("Data: %s", passwordNodes.get(0).text()));
+		assertEquals(1, passwordNodeSiblings.size());
+		org.jsoup.nodes.Element passwordNodeSibling = passwordNodeSiblings.get(0);
+		System.err.println(
+				String.format("Reference node: %s", passwordNodeSibling.text()));
+		System.err.println(String.format("Data: %s",
+				passwordNodeSibling.parent().parent().nextElementSibling().text()));
 
 	}
 
