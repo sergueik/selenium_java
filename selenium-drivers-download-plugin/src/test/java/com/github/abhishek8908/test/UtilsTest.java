@@ -231,8 +231,6 @@ public class UtilsTest {
 
 	@Test
 	public void testJsoupNavigation2() {
-		// var input = File("C:\\template.html")
-		// val doc = Jsoup.parse(input, "UTF-8", "http://example.com/")
 
 		Document doc = Jsoup.parse(data);
 		Elements passwordNodes = doc.select("tr:contains(Password:)>td>span");
