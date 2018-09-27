@@ -40,6 +40,10 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.io.FileExistsException;
 import org.apache.commons.io.FileUtils;
 
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
+import org.apache.commons.compress.archivers.zip.ZipFile;
+import org.apache.commons.compress.utils.IOUtils;
+
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.BasicResponseHandler;
