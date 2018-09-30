@@ -6,7 +6,7 @@ import ru.yandex.qatools.allure.annotations.Attachment;
 import ru.yandex.qatools.allure.annotations.Step;
 
 /**
- * @author Dmitry Baev charlie@yandex-team.ru Date: 08.09.14
+ * based on 
  */
 public class OnFailure extends TestListenerAdapter {
 

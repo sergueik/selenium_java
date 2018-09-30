@@ -2,9 +2,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>allure-testng-example</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <name>Allure TestNG Example</name>
-  <description>Allure TestNG and WebDriver Usage Example</description>
+  <version>0.2-SNAPSHOT</version>
+  <name>Allure plugin testNG Example</name>
+  <description>Allure plugin testNG and WebDriver Usage Example</description>
   <parent>
     <groupId>ru.yandex.qatools.allure</groupId>
     <artifactId>allure-examples-parent</artifactId>
@@ -12,19 +12,21 @@
   </parent>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <allure.version>1.4.23</allure.version>
-    <allure-maven-plugin.version>2.5</allure-maven-plugin.version>
+    <allure-testng-adaptor.version>1.5.4</allure-testng-adaptor.version>
+    <allure-maven-plugin.version>2.6</allure-maven-plugin.version>
     <aspectj.version>1.8.9</aspectj.version>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
-    <maven.compiler.source>1.7</maven.compiler.source>
-    <maven.compiler.target>1.7</maven.compiler.target>
+    <hamcrest-all.version>1.3</hamcrest-all.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
-    <selenium.version>2.47.0</selenium.version>
-    <selenium-firefox-driver.version>2.47.0</selenium-firefox-driver.version>
+    <selenium.version>3.13.0</selenium.version>
+    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -43,15 +45,9 @@
       <version>${commons-exec.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.jcabi</groupId>
-      <artifactId>jcabi-matchers</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>ru.yandex.qatools.allure</groupId>
       <artifactId>allure-testng-adaptor</artifactId>
-      <version>${allure.version}</version>
+      <version>${allure-testng-adaptor.version}</version>
       <exclusions>
         <exclusion>
           <groupId>junit</groupId>
@@ -78,7 +74,7 @@
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
-      <version>1.3</version>
+      <version>${hamcrest-all.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -90,13 +86,18 @@
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-remote-driver</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
+        <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <testFailureIgnore>true</testFailureIgnore>
           <argLine>-javaagent:"${settings.localRepository}/org/aspectj/aspectjweaver/${aspectj.version}/aspectjweaver-${aspectj.version}.jar"</argLine>
@@ -109,8 +110,6 @@
           </dependency>
         </dependencies>
       </plugin>
-      <!--Needed only to show reports locally. Run jetty:run and
-            open localhost:8080 to show the report-->
       <plugin>
         <groupId>org.eclipse.jetty</groupId>
         <artifactId>jetty-maven-plugin</artifactId>
