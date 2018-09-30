@@ -25,9 +25,10 @@
 java.lang.NoClassDefFoundError: org/openqa/selenium/io/CircularOutputStream
         at my.company.tests.SearchTest.setUp(SearchTest.java:30)
 -->
-    <selenium.version>2.53.1</selenium.version>
-    <selenium-firefox-driver.version>2.53.1</selenium-firefox-driver.version>
-    <selenium-chromedriver.version>2.53.1</selenium-chromedriver.version>
+    <selenium.version>3.13.0</selenium.version>
+    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
+    <selenium-chromedriver.version>${selenium.version}</selenium-chromedriver.version>
+    <webdrivermanager.version>3.0.0</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>
@@ -64,19 +65,21 @@ java.lang.NoClassDefFoundError: org/openqa/selenium/io/CircularOutputStream
     <dependency>
       <groupId>io.github.bonigarcia</groupId>
       <artifactId>webdrivermanager</artifactId>
-      <version>2.2.4</version>
+      <version>${webdrivermanager.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>com.codeborne</groupId>
       <artifactId>phantomjsdriver</artifactId>
       <version>${phantomjsdriver.version}</version>
       <scope>test</scope>
     </dependency>
+    -->
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
