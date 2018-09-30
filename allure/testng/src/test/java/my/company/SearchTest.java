@@ -15,13 +15,25 @@ import static java.lang.String.format;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+
 import static org.testng.Assert.fail;
 
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
+
+import java.io.File;
+import java.io.IOException;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import my.company.steps.WebDriverSteps;
 
@@ -32,9 +44,44 @@ public class SearchTest {
 
 	private WebDriverSteps steps;
 
+	public static RemoteWebDriver driver;
+
+	private static String osName = getOSName();
+
+	private static final String downloadFilepath = String.format("%s\\Downloads",
+			osName.equals("windows") ? System.getenv("USERPROFILE")
+					: System.getenv("HOME"));
+
 	@BeforeMethod
 	public void setUp() throws Exception {
-		steps = new WebDriverSteps(new PhantomJSDriver(new DesiredCapabilities()));
+
+		System.setProperty("webdriver.chrome.driver",
+				Paths
+						.get(osName.equals("windows") ? System.getenv("USERPROFILE")
+								: System.getenv("HOME"))
+						.resolve("Downloads")
+						.resolve(
+								osName.equals("windows") ? "chromedriver.exe" : "chromedriver")
+						.toAbsolutePath().toString());
+
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		ChromeOptions chromeOptions = new ChromeOptions();
+		chromeOptions.setBinary(osName.equals("windows") ? (new File(
+				"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
+						.getAbsolutePath()
+				: "/usr/bin/google-chrome");
+		for (String optionAgrument : (new String[] { "headless",
+				"--window-size=1200x800", "disable-gpu" })) {
+			chromeOptions.addArguments(optionAgrument);
+		}
+		capabilities.setCapability(
+				org.openqa.selenium.chrome.ChromeOptions.CAPABILITY, chromeOptions);
+		capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+
+		driver = new ChromeDriver(chromeOptions);
+		// steps = new WebDriverSteps(new PhantomJSDriver(new
+		// DesiredCapabilities()));
+		steps = new WebDriverSteps(driver);
 		steps.openMainPage("http://www.tizag.com/htmlT/forms.php");
 	}
 
@@ -59,4 +106,15 @@ public class SearchTest {
 		steps.makeScreenshot();
 		steps.quit();
 	}
+
+	public static String getOSName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
+	}
+
 }

@@ -14,21 +14,26 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <allure-testng-adaptor.version>1.5.4</allure-testng-adaptor.version>
     <allure-maven-plugin.version>2.6</allure-maven-plugin.version>
+    <!-- aspectj appears to be needed for onFailure processing     -->
     <aspectj.version>1.8.9</aspectj.version>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <java.version>1.8</java.version>
-    <junit.version>4.12</junit.version>
+    <testng.version>6.14.3</testng.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
-    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+    </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
       <artifactId>commons-lang</artifactId>
@@ -50,26 +55,15 @@
       <version>${allure-testng-adaptor.version}</version>
       <exclusions>
         <exclusion>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
+          <groupId>org.testng</groupId>
+          <artifactId>testng</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit.version}</version>
     </dependency>
     <dependency>
       <groupId>com.jcabi</groupId>
       <artifactId>jcabi-matchers</artifactId>
       <version>1.3</version>
-    </dependency>
-    <dependency>
-      <groupId>com.codeborne</groupId>
-      <artifactId>phantomjsdriver</artifactId>
-      <version>${phantomjsdriver.version}</version>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>

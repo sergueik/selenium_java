@@ -1,37 +1,24 @@
 package my.company.steps;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Formatter;
-import java.util.Hashtable;
-import java.util.Iterator;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.remote.RemoteWebDriver;
+
 import ru.yandex.qatools.allure.annotations.Attachment;
 import ru.yandex.qatools.allure.annotations.Step;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.io.File;
-
-/**
- * @author Dmitry Baev charlie@yandex-team.ru Date: 28.10.13
- */
 public class WebDriverSteps {
 
-	public WebDriver driver;
+	public RemoteWebDriver driver;
 
-	public WebDriverSteps(WebDriver driver) {
+	public WebDriverSteps(RemoteWebDriver driver) {
 		this.driver = driver;
 	}
 
