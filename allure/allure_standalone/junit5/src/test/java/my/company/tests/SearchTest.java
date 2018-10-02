@@ -1,36 +1,24 @@
 package my.company.tests;
 
 import java.io.File;
-import java.io.FileInputStream;
-
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import org.junit.Before;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Platform;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import my.company.steps.WebDriverSteps;
 
 /**
- * based on https://github.com/allure-examples/allure-junit-example
+ * based on example from  https://automated-testing.info/t/maven-allure-directory-allure-results-not-found/21598/16 - in Russian
  */
 public class SearchTest {
 
-	private WebDriverSteps steps;
+	private static WebDriverSteps steps;
 	public static RemoteWebDriver driver;
 	private static String osName = getOSName();
 
@@ -39,7 +27,7 @@ public class SearchTest {
 					: System.getenv("HOME"));
 
 	@SuppressWarnings("deprecation")
-	@BeforeClass
+	@BeforeAll
 	public static void setUp() throws Exception {
 
 		System.setProperty("webdriver.gecko.driver", osName.equals("windows")
@@ -64,9 +52,8 @@ public class SearchTest {
 		steps = new WebDriverSteps(driver);
 	}
 
-	// @Ignore
 	@Test
-	public void testSearch() {
+	public void searchTest() throws Exception {
 		steps.openMainPage();
 		steps.search("Allure framework");
 		steps.makeScreenShot();
