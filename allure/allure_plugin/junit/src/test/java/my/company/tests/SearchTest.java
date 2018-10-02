@@ -1,7 +1,5 @@
 package my.company.tests;
 
-// import io.github.bonigarcia.wdm.ChromeDriverManager;
-
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -12,14 +10,12 @@ import java.nio.file.Paths;
 import org.junit.Before;
 import org.junit.Test;
 
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
@@ -27,41 +23,42 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import my.company.steps.WebDriverSteps;
 
 /**
- * @author Dmitry Baev charlie@yandex-team.ru Date: 28.10.13
+ * based on https://github.com/allure-examples/allure-junit-example
  */
 public class SearchTest {
 
 	private WebDriverSteps steps;
-  private static String osName = getOSName();
+	public static RemoteWebDriver driver;
+	private static String osName = getOSName();
 
+	private static final String downloadFilepath = String.format("%s\\Downloads",
+			osName.equals("windows") ? System.getenv("USERPROFILE")
+					: System.getenv("HOME"));
+
+	@SuppressWarnings("deprecation")
 	@Before
 	public void setUp() throws Exception {
-    
-    			System.setProperty("webdriver.gecko.driver", osName.equals("windows")
-					? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-					: /* String.format("%s/Downloads/geckodriver", System.getenv("HOME"))*/
-					Paths.get(System.getProperty("user.home")).resolve("Downloads")
-							.resolve("geckodriver").toAbsolutePath().toString());
-			System
-					.setProperty("webdriver.firefox.bin",
-							osName.equals("windows") ? new File(
-									"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-											.getAbsolutePath()
-									: "/usr/bin/firefox");
-			// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+
+		System.setProperty("webdriver.gecko.driver", osName.equals("windows")
+				? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+				: /* String.format("%s/Downloads/geckodriver", System.getenv("HOME"))*/
+				Paths.get(System.getProperty("user.home")).resolve("Downloads")
+						.resolve("geckodriver").toAbsolutePath().toString());
+		System.setProperty("webdriver.firefox.bin",
+				osName.equals("windows")
+						? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+								.getAbsolutePath()
+						: "/usr/bin/firefox");
 
 		DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
 				Platform.ANY);
 
+		// NOTE: setting legacy protocol to "true" leads to an error
+		// Missing 'marionetteProtocol' field in handshake
+		capabilities.setCapability("marionette", false);
 
-			capabilities.setCapability("marionette", false);
-
-        WebDriver seleniumDriver = new FirefoxDriver(capabilities);
-		// new ChromeDriver()
-		// ChromeDriverManager.getInstance().setup();
-		// java.lang.NoClassDefFoundError:
-		// org/openqa/selenium/remote/service/DriverService$Builder
-		steps = new WebDriverSteps(seleniumDriver);
+		driver = new FirefoxDriver(capabilities);
+		steps = new WebDriverSteps(driver);
 	}
 
 	@Test
@@ -71,6 +68,7 @@ public class SearchTest {
 		steps.makeScreenShot();
 		steps.quit();
 	}
+
 	// Utilities
 	public static String getOSName() {
 		if (osName == null) {

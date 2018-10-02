@@ -43,9 +43,7 @@ import my.company.steps.WebDriverSteps;
 public class SearchTest {
 
 	private WebDriverSteps steps;
-
 	public static RemoteWebDriver driver;
-
 	private static String osName = getOSName();
 
 	private static final String downloadFilepath = String.format("%s\\Downloads",
