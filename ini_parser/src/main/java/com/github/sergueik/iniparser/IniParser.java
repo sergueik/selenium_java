@@ -16,34 +16,13 @@ import java.util.Map;
 
 // C# twin is also presented by the same author
 // https://github.com/RdlP/IniParser/blob/master/IniParser.cs
+// https://github.com/sergueik/powershell_ui_samples/blob/master/ini_parser.ps1
 // and also
 // https://github.com/lukamicoder/IniParser/tree/master/IniParser
 // note there exist seriously bloated projects containing *dozens of classes* 
 // just to deal with the ini file
 // https://github.com/simplesoft-pt/IniParser
 // https://github.com/lipkau/PsIni/blob/master/PSIni/Functions/Get-IniContent.ps1
-/**
-* This class is a very simple ini parser.
-*
-* In order to write an ini file:
-*
-* <code>
-* IniParser parser = new IniParser();
-* parser.addSection("Section1");
-* parser.addString("Section1", "test", "Hello");
-* parser.writeFile(ini);
-* </code>
-*
-* In order to parse an ini file:
-*
-* <code>
-* IniParser parser = IniParser.getInstance();
-* parser.parseFile(path_to_ini_file);
-* string s1 = parser.getString("Section1", "test");
-* </code>
-*
-* Ángel Luis.
-*/
 
 public final class IniParser {
 
@@ -62,23 +41,20 @@ public final class IniParser {
 	}
 
 	// TODO: this is too tight
-	private HashMap<String, HashMap<String, Object>> data = new HashMap<String, HashMap<String, Object>>();
+	private Map<String, Map<String, Object>> data = new HashMap<>();
 
 	public Map<String, Map<String, Object>> getData() {
-		// java Cannot cast from HashMap<String,HashMap<String,Object>> to
-		// Map<String,Map<String,Object>>
-		return new HashMap<String, Map<String, Object>>();
+		return data;
 	}
 
 	/**
-	 * This method parse a file given by parameter.
-	 *
-	 * @param path A string that contains the path of file to parse
+	 * Parse ini file <i>filePath</i>
+	 * @param filePath Input file path
 	 */
-	public void parseFile(String path) {
+	public void parseFile(String filePath) {
 		try {
 			data.clear();
-			BufferedReader br = new BufferedReader(new FileReader(path));
+			BufferedReader br = new BufferedReader(new FileReader(filePath));
 			String line, lastSection = "";
 			while ((line = br.readLine()) != null) {
 				int startSection = line.indexOf('[');
@@ -92,17 +68,17 @@ public final class IniParser {
 					String[] keyValue = line.split("=");
 					int hasComments = keyValue[1].trim().indexOf(';');
 					if (hasComments == -1) {
-						HashMap<String, Object> hash = data.get(lastSection);
+						Map<String, Object> hash = data.get(lastSection);
 						hash.put(keyValue[0].trim(), keyValue[1].trim());
 					} else {
-						HashMap<String, Object> hash = data.get(lastSection);
+						Map<String, Object> hash = data.get(lastSection);
 						hash.put(keyValue[0].trim(),
 								keyValue[1].trim().substring(0, hasComments));
 					}
 				} else {
 					if (line.trim().startsWith(";")) {
 						String[] comment = line.split(";");
-						HashMap<String, Object> hash = data.get(lastSection);
+						Map<String, Object> hash = data.get(lastSection);
 						hash.put(";", comment[1]);
 					}
 				}
@@ -116,14 +92,14 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method will write the data into file given by path.
+	 * Write the data into file <i>filePath</i>
 	 *
-	 * @param path A string that contains the path of file
+	 * @param filePath Target file path
 	 */
-	public void writeFile(String path) {
+	public void writeFile(String filePath) {
 		try {
-			FileOutputStream outputStreamWriter = new FileOutputStream(path);
-			for (Map.Entry<String, HashMap<String, Object>> de : data.entrySet()) {
+			FileOutputStream outputStreamWriter = new FileOutputStream(filePath);
+			for (Map.Entry<String, Map<String, Object>> de : data.entrySet()) {
 				String line = "[" + de.getKey() + "]\n";
 
 				outputStreamWriter.write(line.getBytes());
@@ -144,7 +120,7 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method will add a section to ini file.
+	 * add a section <i>section</i> 
 	 *
 	 * @param section Name of section.
 	 */
@@ -155,129 +131,122 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method will add a string inside section with key <i>key</i> and value <i>value</i>.
-	 * If the section doesn't exist it throw ArgumentException.
+	 * add an string valued entry inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of key
-	 * @param value Value of Key
+	 * @param section Section name
+	 * @param key Entry name
+	 * @param value Entry value
 	 */
 	public void addString(String section, String key, String value) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		hash.put(key, value);
 	}
 
 	/**
-	 * This method will add an integer inside section with key <i>key</i> and value <i>value</i>.
-	 * If the section doesn't exist it throw ArgumentException.
+	 * add an integer valued entry inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of key
-	 * @param value Value of Key
+	 * @param section Section name
+	 * @param key Entry name
+	 * @param value Entry value
 	 */
 	public void addInteger(String section, String key, int value) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		hash.put(key, value);
 	}
 
 	/**
-	 * This method will add a float inside section with key <i>key</i> and value <i>value</i>.
-	 * If the section doesn't exist it throw ArgumentException.
+	 * add an float valued entry inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of key
-	 * @param value Value of Key
+	 * @param section Section name
+	 * @param key Entry name
+	 * @param value Entry value
 	 */
 	public void addFloat(String section, String key, float value) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		hash.put(key, value);
 	}
 
 	/**
-	 * This method will add a double inside section with key <i>key</i> and value <i>value</i>.
-	 * If the section doesn't exist it throw ArgumentException.
+	 * add an double valued entry inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of key
-	 * @param value Value of Key
+	 * @param section Section name
+	 * @param key Entry name
+	 * @param value Entry value
 	 */
 	public void addDouble(String section, String key, double value) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		hash.put(key, value);
 	}
 
 	/**
-	 * This method will add a boolean inside section with key <i>key</i> and value <i>value</i>.
-	 * If the section doesn't exist it throw ArgumentException.
+	 * add an boolean valued entry inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of key
-	 * @param value Value of Key
+	 * @param section Section name
+	 * @param key Entry name
+	 * @param value Entry value
 	 */
 	public void addBoolean(String section, String key, boolean value) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		hash.put(key, value);
 	}
 
 	/**
-	 * This method return a string inside section <i>section</i> with key <i>key</i>.
-	 * If the section or key doesn't exist it throw IllegalArgumentException.
+	 * return a string inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found 
 	 *
-	 * @param section Name of section
-	 * @param key Name of Key
+	 * @param section Section name
+	 * @param key Entry name
 	 *
-	 * @return Value of Key
+	 * @return Value of entry
 	 */
 	public String getString(String section, String key) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		if (!hash.containsKey(key)) {
-			throw new IllegalArgumentException("Key " + key + " doesn't exist");
+			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 		return hash.get(key).toString();
 
 	}
 
 	/**
-	 * This method return an integer inside section <i>section</i> with key <i>key</i>.
-	 * If the section or key doesn't exist it throw IllegalArgumentException.
+	 * return integer inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found
 	 *
-	 * @param section Name of section
-	 * @param key Name of Key
+	 * @param section Section name
+	 * @param key Entry name
 	 *
-	 * @return Value of Key
+	 * @return Value of entry
 	 */
 	public int getInteger(String section, String key) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		if (!hash.containsKey(key)) {
-			throw new IllegalArgumentException("Key " + key + " doesn't exist");
+			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
 		int num = Integer.parseInt(hash.get(key).toString());
@@ -285,8 +254,8 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method return a float inside section <i>section</i> with key <i>key</i>.
-	 * If the section or key doesn't exist it throw IllegalArgumentException.
+	 * return float inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found
 	 *
 	 * @param section Name of section
 	 * @param key Name of Key
@@ -295,12 +264,11 @@ public final class IniParser {
 	 */
 	public float getFloat(String section, String key) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		if (!hash.containsKey(key)) {
-			throw new IllegalArgumentException("Key " + key + " doesn't exist");
+			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
 		float num = Float.parseFloat(hash.get(key).toString());
@@ -308,22 +276,21 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method return a double inside section <i>section</i> with key <i>key</i>.
-	 * If the section or key doesn't exist it throw IllegalArgumentException.
+	 * return double inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found
 	 *
 	 * @param section Name of section
 	 * @param key Name of Key
 	 *
-	 * @return Value of Key
+	 * @return Value of entry
 	 */
 	public double getDouble(String section, String key) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		if (!hash.containsKey(key)) {
-			throw new IllegalArgumentException("Key " + key + " doesn't exist");
+			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
 		double num = Double.parseDouble(hash.get(key).toString());
@@ -331,8 +298,8 @@ public final class IniParser {
 	}
 
 	/**
-	 * This method return a boolean inside section <i>section</i> with key <i>key</i>.
-	 * If the section or key doesn't exist it throw IllegalArgumentException.
+	 * return a boolean inside section <i>section</i> with key <i>key</i>
+	 * throws ArgumentException when section <i>section</i> not found
 	 *
 	 * @param section Name of section
 	 * @param key Name of Key
@@ -341,12 +308,11 @@ public final class IniParser {
 	 */
 	public boolean getBoolean(String section, String key) {
 		if (!data.containsKey(section)) {
-			throw new IllegalArgumentException(
-					"Section " + section + " doesn't exist");
+			throw new IllegalArgumentException("Section doesn't exist: " + section);
 		}
-		HashMap<String, Object> hash = data.get(section);
+		Map<String, Object> hash = data.get(section);
 		if (!hash.containsKey(key)) {
-			throw new IllegalArgumentException("Key " + key + " doesn't exist");
+			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 		return ((String) hash.get(key)).toLowerCase() == "true" ? true : false;
 	}
