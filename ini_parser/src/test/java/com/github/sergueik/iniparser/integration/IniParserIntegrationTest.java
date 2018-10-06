@@ -45,6 +45,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import com.github.sergueik.iniparser.IniParser;
+import com.github.sergueik.iniparser.integration.CommonFunctions;
 
 /**
  * Local file Integration tests of iniparser
@@ -59,7 +60,7 @@ public class IniParserIntegrationTest {
 	private static String iniFile = String.format("%s/src/main/resources/%s",
 			System.getProperty("user.dir"), "data.ini");
 	private static Map<String, Map<String, Object>> data = new HashMap<>();
-
+	private CommonFunctions helper = new CommonFunctions(parser);
 	private static Map<String, Object> sectionData = new HashMap<>();
 
 	private static Set<String> sections = new HashSet<>();
@@ -103,13 +104,12 @@ public class IniParserIntegrationTest {
 
 	private static Map<String, Function<List<String>, ? extends Object>> dataExtractors = new HashMap<>();
 	static {
-		dataExtractors.put("string", IniParserIntegrationTest::getString);
-		dataExtractors.put("boolean", IniParserIntegrationTest::getBoolean);
-		dataExtractors.put("integer", IniParserIntegrationTest::getInteger);
-		dataExtractors.put("int", IniParserIntegrationTest::getInteger);
+		dataExtractors.put("string", CommonFunctions::getString);
+		dataExtractors.put("boolean", CommonFunctions::getBoolean);
+		dataExtractors.put("integer", CommonFunctions::getInteger);
+		dataExtractors.put("int", CommonFunctions::getInteger);
 		// for result.TYPE.getName()
-		dataExtractors.put("java.lang.Integer",
-				IniParserIntegrationTest::getInteger);
+		dataExtractors.put("java.lang.Integer", CommonFunctions::getInteger);
 		// for result.getClass().getName()
 	}
 
@@ -125,19 +125,19 @@ public class IniParserIntegrationTest {
 
 		Object value = null;
 		String key = "message";
-		value = extract(section, key,
+		value = CommonFunctions.extract(section, key,
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo("data"));
 		key = "number";
-		value = extract(section, key,
+		value = CommonFunctions.extract(section, key,
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo(42));
 		key = "flag";
-		value = extract(section, key,
+		value = CommonFunctions.extract(section, key,
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo(true));
 		key = "empty";
-		value = extract(section, key,
+		value = CommonFunctions.extract(section, key,
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo(""));
 	}
@@ -151,35 +151,12 @@ public class IniParserIntegrationTest {
 		System.err.println("result type name: " + result.getClass().getName());
 
 		String key = "number";
-		result = (Integer) extract(section, key,
+		result = (Integer) CommonFunctions.extract(section, key,
 				dataExtractors.get(result.TYPE.getName().toLowerCase()));
 		assertThat(result, equalTo(42));
-		result = (Integer) extract(section, key,
+		result = (Integer) CommonFunctions.extract(section, key,
 				dataExtractors.get(result.getClass().getName()));
 		assertThat(result, equalTo(42));
-	}
-
-	// this method dispatches the input into the function passed as its argument
-	public static Object extract(String section, String value,
-			Function<List<String>, ? extends Object> func) {
-		return func.apply(Arrays.asList(new String[] { section, value }));
-	}
-
-	// these methods references will be found by type of the receiver
-	public static String getString(List<String> locator) {
-		return parser.getString(locator.get(0), locator.get(1));
-	}
-
-	public static Integer getInteger(List<String> locator) {
-		return parser.getInteger(locator.get(0), locator.get(1));
-	}
-
-	public static Boolean getBoolean(List<String> locator) {
-		return parser.getBoolean(locator.get(0), locator.get(1));
-	}
-
-	public static Float getFloat(List<String> locator) {
-		return parser.getFloat(locator.get(0), locator.get(1));
 	}
 
 }
