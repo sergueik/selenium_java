@@ -227,8 +227,14 @@ public final class IniParser {
 		if (!hash.containsKey(key)) {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
-		return hash.get(key).toString();
-
+		String result = hash.get(key).toString();
+		// special case of empty string
+		result = result.matches("^\"\"$") ? "" : result;
+		if (debug) {
+			System.err
+					.println("Raw value: " + hash.get(key) + "\treturning: " + result);
+		}
+		return result;
 	}
 
 	/**
@@ -249,8 +255,12 @@ public final class IniParser {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
-		int num = Integer.parseInt(hash.get(key).toString());
-		return num;
+		int result = Integer.parseInt(hash.get(key).toString());
+		if (debug) {
+			System.err
+					.println("Raw value: " + hash.get(key) + "\treturning: " + result);
+		}
+		return result;
 	}
 
 	/**
@@ -271,8 +281,12 @@ public final class IniParser {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
-		float num = Float.parseFloat(hash.get(key).toString());
-		return num;
+		float result = Float.parseFloat(hash.get(key).toString());
+		if (debug) {
+			System.err
+					.println("Raw value: " + hash.get(key) + "\treturning: " + result);
+		}
+		return result;
 	}
 
 	/**
@@ -293,8 +307,12 @@ public final class IniParser {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
 
-		double num = Double.parseDouble(hash.get(key).toString());
-		return num;
+		double result = Double.parseDouble(hash.get(key).toString());
+		if (debug) {
+			System.err
+					.println("Raw value: " + hash.get(key) + "\treturning: " + result);
+		}
+		return result;
 	}
 
 	/**
@@ -314,7 +332,13 @@ public final class IniParser {
 		if (!hash.containsKey(key)) {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
-		return ((String) hash.get(key)).toLowerCase() == "true" ? true : false;
+		boolean result = ((String) hash.get(key)).toLowerCase().matches("true")
+				? true : false;
+		if (debug) {
+			System.err
+					.println("Raw value: " + hash.get(key) + "\treturning: " + result);
+		}
+		return result;
 	}
 
 }
