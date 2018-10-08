@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import java.util.regex.Matcher;
@@ -32,14 +31,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.jcabi.matchers.RegexMatchers.matchesPattern;
-import static org.hamcrest.CoreMatchers.*;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasItems;
 
-import static org.junit.Assert.*;
+// NOTE:
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -75,9 +73,7 @@ public class IniParserIntegrationTest {
 
 	private static List<Object> result = new ArrayList<>();
 
-	private static String[] helpTopics = { "Testsuite Program creation",
-			"Keyword-driven Framework flow creation",
-			"Saving and restoring sessions" };
+	private static String[] entries = { "message", "flag", "number", "empty" };
 	private static Map<String, String> help;
 
 	@BeforeClass
@@ -100,6 +96,19 @@ public class IniParserIntegrationTest {
 		assertThat(value, equalTo("data"));
 		assertTrue(sections.containsAll(data.keySet()));
 		assertFalse(data.keySet().containsAll(sections));
+	}
+
+	@Test
+	public void data2Test() {
+		Map<String, Map<String, Object>> data2 = parser.getData2();
+		sectionData = data2.get("Section1");
+		String value = (String) sectionData.get("message");
+		assertThat(value, equalTo("data"));
+		assertTrue(sections.containsAll(data2.keySet()));
+		assertFalse(data2.keySet().containsAll(sections));
+		assertTrue(CollectionUtils.containsAny(sectionData.keySet(),
+				new ArrayList<Object>(Arrays.asList(entries))));
+
 	}
 
 	private static Map<String, Function<List<String>, ? extends Object>> dataExtractors = new HashMap<>();
@@ -137,6 +146,9 @@ public class IniParserIntegrationTest {
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo(true));
 		key = "empty";
+		// see
+		// https://www.codementor.io/eh3rrera/using-java-8-method-reference-du10866vx
+		// about apply with instance
 		value = CommonFunctions.extract(section, key,
 				dataExtractors.get(entryTypes.get(key).toLowerCase()));
 		assertThat(value, equalTo(""));

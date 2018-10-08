@@ -1,19 +1,22 @@
 package com.github.sergueik.iniparser;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-// based on https://github.com/RdlP/IniParser/blob/master/IniParser.java
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+// based on https://github.com/RdlP/IniParser/blob/master/IniParser.java
+// https://github.com/RdlP/IniParser
 // C# twin is also presented by the same author
 // https://github.com/RdlP/IniParser/blob/master/IniParser.cs
 // https://github.com/sergueik/powershell_ui_samples/blob/master/ini_parser.ps1
@@ -42,9 +45,14 @@ public final class IniParser {
 
 	// TODO: this is too tight
 	private Map<String, Map<String, Object>> data = new HashMap<>();
+	private Map<String, Map<String, Object>> data2 = new HashMap<>();
 
 	public Map<String, Map<String, Object>> getData() {
 		return data;
+	}
+
+	public Map<String, Map<String, Object>> getData2() {
+		return data2;
 	}
 
 	/**
@@ -67,11 +75,10 @@ public final class IniParser {
 				} else if (line.contains("=") && !line.trim().startsWith(";")) {
 					String[] keyValue = line.split("=");
 					int hasComments = keyValue[1].trim().indexOf(';');
+					Map<String, Object> hash = data.get(lastSection);
 					if (hasComments == -1) {
-						Map<String, Object> hash = data.get(lastSection);
 						hash.put(keyValue[0].trim(), keyValue[1].trim());
 					} else {
-						Map<String, Object> hash = data.get(lastSection);
 						hash.put(keyValue[0].trim(),
 								keyValue[1].trim().substring(0, hasComments));
 					}
@@ -84,7 +91,61 @@ public final class IniParser {
 				}
 			}
 			br.close();
-		} catch (FileNotFoundException e) {
+
+			br = new BufferedReader(new FileReader(filePath));
+			line = "";
+			StringBuilder stringBuilder = new StringBuilder();
+			String lineSeparator = System.getProperty("line.separator");
+			while ((line = br.readLine()) != null) {
+				stringBuilder.append(line);
+				stringBuilder.append(lineSeparator);
+			}
+			String fileContents = stringBuilder.toString();
+			// positive lookahead keeping the section title and data together
+			String iniSectionPattern = "\\[(?=[^]]+\\])";
+			String[] iniSections = fileContents.split(iniSectionPattern);
+
+			// NOTE the "Count of sections" will be 1 too many
+			System.err.println("Count of sections = " + iniSections.length);
+			// String sectionHeaderPattern = "^(.+)\\]\\n.*$";
+			// Pattern pattern = Pattern.compile(sectionHeaderPattern,
+			// Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
+
+			for (String iniSection : iniSections) {
+				// TODO: use matched to capture section key and data
+				// Matcher matcher = pattern.matcher(iniSection);
+				String[] parts = iniSection.split("\\]");
+				if (parts.length != 0 && !parts[0].isEmpty()) {
+					String section = parts[0];
+					String data = parts[1];
+					data2.put(section, new HashMap<String, Object>());
+					System.err.println(
+							String.format("Section: %s\nData:\n----%s\n", section, data));
+					for (String dataLine : data.split("\\r?\\n")) {
+						if (dataLine.trim().startsWith(";")) {
+							continue;
+						}
+						if (dataLine.contains("=")) {
+							String[] entryParts = dataLine.split("=");
+							Map<String, Object> hash = data2.get(section);
+							// TODO: process comments
+							String entryKey = entryParts[0].trim();
+							String entryValue = entryParts[1].trim();
+							int hasComments = entryValue.indexOf(';');
+							if (hasComments > -1) {
+								hash.put(entryKey, entryValue.substring(0, hasComments));
+							} else {
+								hash.put(entryKey, entryValue);
+							}
+						}
+					}
+				}
+			}
+			br.close();
+
+		} catch (
+
+		FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -270,7 +331,7 @@ public final class IniParser {
 	 * @param section Name of section
 	 * @param key Name of Key
 	 *
-	 * @return Value of Key
+	 * @return Value of entry
 	 */
 	public float getFloat(String section, String key) {
 		if (!data.containsKey(section)) {
@@ -322,7 +383,7 @@ public final class IniParser {
 	 * @param section Name of section
 	 * @param key Name of Key
 	 *
-	 * @return Value of Key
+	 * @return Value of entry
 	 */
 	public boolean getBoolean(String section, String key) {
 		if (!data.containsKey(section)) {
@@ -332,7 +393,7 @@ public final class IniParser {
 		if (!hash.containsKey(key)) {
 			throw new IllegalArgumentException("Key doesn't exist: " + key);
 		}
-		boolean result = ((String) hash.get(key)).toLowerCase().matches("true")
+		boolean result = ((String) hash.get(key)).toLowerCase().equals("true")
 				? true : false;
 		if (debug) {
 			System.err
