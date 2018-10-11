@@ -3,7 +3,9 @@ package demo;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+
 import java.lang.reflect.Method;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +29,6 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import org.testng.Assert;
-
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeMethod;
@@ -54,7 +55,7 @@ public class TestWithData {
 
 	private String username = "you%40yourdomain.com";
 	private String authkey = "yourauthkey";
-	private Sheet mySheet = getSpreadSheet();
+	private Sheet spreadsheet = getSpreadSheet();
 
 	@BeforeSuite
 	public void beforeSuite() {
@@ -94,7 +95,7 @@ public class TestWithData {
 		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
 		screenshot = ((TakesScreenshot) driver);
 		js = ((JavascriptExecutor) driver);
-		mySheet = getSpreadSheet();
+		spreadsheet = getSpreadSheet();
 	}
 
 	public Sheet getSpreadSheet() {
@@ -106,22 +107,22 @@ public class TestWithData {
 		try {
 			inputStream = new FileInputStream(file);
 			wb = WorkbookFactory.create(inputStream);
-			System.out.println(wb.toString());
+			System.err.println(wb.toString());
 		} catch (IOException ex) {
-			System.out.println("Error Message " + ex.getMessage());
+			System.err.println("Error Message " + ex.getMessage());
 		} catch (InvalidFormatException e) {
-			System.out.println("Invalid File format!");
+			System.err.println("Invalid File format!");
 		}
 
-		Sheet mySheet = wb.getSheet("MySheet");
+		Sheet spreadsheet = wb.getSheet("spreadsheet");
 
-		return mySheet;
+		return spreadsheet;
 	}
 
 	@BeforeMethod
 	public void beforeMethod(Method method) {
 		String methodName = method.getName();
-		System.out.println("Test Name: " + methodName + "\n");
+		System.err.println("Test Name: " + methodName + "\n");
 		driver.get("http://crossbrowsertesting.github.io/login-form.html");
 	}
 
@@ -133,51 +134,51 @@ public class TestWithData {
 	@Test
 	public void failedLoginPage() {
 
-		String user = mySheet.getRow(0).getCell(0).toString();
-		String pass = mySheet.getRow(0).getCell(1).toString();
+		String user = spreadsheet.getRow(0).getCell(0).toString();
+		String pass = spreadsheet.getRow(0).getCell(1).toString();
 
-		System.out.println("Enter username: " + user);
+		System.err.println("Enter username: " + user);
 		driver.findElement(By.name("username")).sendKeys(user);
 
-		System.out.println("Enter password: " + pass);
+		System.err.println("Enter password: " + pass);
 		driver.findElement(By.name("password")).sendKeys(pass);
 
-		System.out.println("Logging in");
+		System.err.println("Logging in");
 		driver.findElement(By.cssSelector("div.form-actions > button")).click();
 
-		System.out.println("Confirm unable to Log in");
+		System.err.println("Confirm unable to Log in");
 		wait.until(ExpectedConditions.textToBePresentInElementLocated(
 				By.xpath("/html/body/div/div/div/div[1]"),
 				"Username or password is incorrect"));
-		System.out.println("Test Finished");
+		System.err.println("Test Finished");
 	}
 
 	@Test
 	public void loginPage() {
 
-		String user = mySheet.getRow(1).getCell(0).toString();
-		String pass = mySheet.getRow(1).getCell(1).toString();
+		String user = spreadsheet.getRow(1).getCell(0).toString();
+		String pass = spreadsheet.getRow(1).getCell(1).toString();
 
-		System.out.println("Enter username: " + user);
+		System.err.println("Enter username: " + user);
 		driver.findElement(By.name("username")).sendKeys(user);
 
-		System.out.println("Enter password: " + pass);
+		System.err.println("Enter password: " + pass);
 		driver.findElement(By.name("password")).sendKeys(pass);
 
-		System.out.println("Logging in");
+		System.err.println("Logging in");
 		driver.findElement(By.cssSelector("div.form-actions > button")).click();
 
-		System.out.println("Ensure the page has loaded completely");
+		System.err.println("Ensure the page has loaded completely");
 		wait.until(ExpectedConditions.visibilityOfElementLocated(
 				By.xpath("//*[@id=\"logged-in-message\"]/h2")));
 
-		System.out.println("Confirm welcome message");
+		System.err.println("Confirm welcome message");
 		String welcomeMessage = driver
 				.findElement(By.xpath("//*[@id=\"logged-in-message\"]/h2")).getText();
 		Assert.assertEquals("Welcome tester@crossbrowsertesting.com",
 				welcomeMessage);
 
-		System.out.println("Test Finished");
+		System.err.println("Test Finished");
 	}
 
 	@AfterSuite

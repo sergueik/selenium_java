@@ -4,7 +4,7 @@
   <groupId>demo</groupId>
   <artifactId>runnable-testng</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -18,8 +18,9 @@
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <selenium.version>3.5.1</selenium.version>
-    <selenium.firefox-driver.version>3.5.1</selenium.firefox-driver.version>
+    <selenium.version>3.13.0</selenium.version>
+    <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
+    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <testng.version>6.11</testng.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
@@ -76,13 +77,16 @@
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
-    <!-- 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-firefox-driver</artifactId>
-      <version>${selenium.firefox-driver.version}</version>
+      <version>${selenium-firefox-driver.version}</version>
     </dependency>
-    -->
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${selenium-chrome-driver.version}</version>
+    </dependency>
     <!-- 
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
@@ -137,7 +141,7 @@
             <manifest>
               <addClasspath>true</addClasspath>
               <classpathPrefix>libs/</classpathPrefix>
-              <mainClass>${mainClass}</mainClass>
+              <mainClass>${project.groupId}.${mainClass}</mainClass>
             </manifest>
           </archive>
         </configuration>
@@ -161,7 +165,7 @@
   </build>
   <profiles>
     <profile>
-      <id>core</id>
+      <id>default</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -172,6 +176,7 @@
         <activeByDefault>false</activeByDefault>
       </activation>
       <build>
+        <finalName>${project.artifactId}</finalName>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>

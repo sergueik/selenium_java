@@ -10,31 +10,70 @@ See also [jinahya/executable-jar-with-maven-example](https://github.com/jinahya/
 ### Note
 
 To enable single runnable jar with deendencies (at a cost of the size), use `runnable-jar-with-dependencies` profile:
+
 ```cmd
 mvn -P runnable-jar-with-dependencies clean package
 ```
 and run
 ```cmd
-java -jar target\runnable-testng-0.1-SNAPSHOT-jar-with-dependencies.jar
+set DUMMYDIR=c:\temp
+copy target\runnable-testng-jar-with-dependencies.jar %DUMMYDIR%
+mkdir %DUMMYDIR%\target\classes
+copy target\classes\Test.xlsx %DUMMYDIR%\target\classes
+The `%DUMMYDIR%` represents the Jenkins workspace directory
+
+Running the test
+```cmd
+pushd %DUMMYDIR%
+java -jar runnable-testng-jar-with-dependencies.jar
 ```
-The default, dependencies are coped to the `target/lib`
+
+would produce:
+
+```cmd
+===============================================
+Command line suite
+Total tests run: 2, Failures: 0, Skips: 0
+===============================================
+```
+In the default profile, dependencies are coped to the `target/lib`, and can be stored anywhere in the system
 ```cmd
 mvn clean package
-java -cp target\lib\*;target\runnable-testng-0.1-SNAPSHOT.jar demo.EntryPoint
+robocopy target\lib c:\temp\shared /s
+java -cp c:\temp\shared\*;target\runnable-testng-0.2-SNAPSHOT.jar demo.EntryPoint
 ```
 
-Note:  the dependencies copying seriously bloats the jar:
+This would also produce:
 ```cmd
- Directory of ..\testng_runnable\target
+===============================================
+Command line suite
+Total tests run: 2, Failures: 0, Skips: 0
+===============================================
 
-02/27/2018  08:56 AM    <DIR>          .
-02/27/2018  08:56 AM    <DIR>          ..
-02/27/2018  08:55 AM    <DIR>          archive-tmp
-02/27/2018  08:54 AM    <DIR>          classes
-02/27/2018  08:54 AM    <DIR>          generated-sources
-02/27/2018  08:55 AM    <DIR>          lib
-02/27/2018  08:55 AM    <DIR>          maven-archiver
-02/27/2018  08:54 AM    <DIR>          maven-status
-02/27/2018  08:57 AM        36,901,791 runnable-testng-0.1-SNAPSHOT-jar-with-dependencies.jar
-02/27/2018  08:55 AM            14,445 runnable-testng-0.1-SNAPSHOT.jar
+
+Note that this example project has the data parameter file `Tests.xlsx` which is loaded from file system:
+
+```java		
+File file = new File(System.getProperty("user.dir") + File.separator
+    + "target\\classes\\Test.xlsx");
 ```
+therefore one has to make it avalable from the specific path relative to the directory jar is placed.
+
+The `default` profile makes the project version part of resulting jar filename, 
+the `runnable-jar-with-dependencies` profile strips it away.
+
+The packaging of all and every dependencies into one jar has a disadvantage of 
+seriously increasing the size of that jar file, in our case from under 15 K
+```cmd
+02/27/2018  08:55 AM            14,445 runnable-testng-0.2-SNAPSHOT.jar
+```
+to over 36M:
+```cmd
+02/27/2018  08:57 AM        36,901,791 runnable-testng-jar-with-dependencies.jar
+```
+
+### License
+This project is licensed under the terms of the MIT license.
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
