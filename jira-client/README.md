@@ -1,4 +1,4 @@
-###
+### Info
  This directory contains a replica of [java JIRA client](https://github.com/rcarz/jira-client)
 
 
