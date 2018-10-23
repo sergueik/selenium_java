@@ -1,86 +1,46 @@
 package com.mycompany.app;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
-import java.lang.RuntimeException;
-import static java.lang.Boolean.*;
-
-import java.net.URLDecoder;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
-import java.util.Date;
+import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Scanner;
 import java.util.Set;
-
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.experimental.runners.Enclosed;
-import org.junit.runner.RunWith;
-
-import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
-import org.openqa.selenium.Dimension;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.Keys;
-import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.Platform;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.phantomjs.PhantomJSDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import org.json.JSONObject;
-import org.json.JSONArray;
-import org.json.JSONException;
 
 public class YandexTest {
 
@@ -104,11 +64,16 @@ public class YandexTest {
 	private static StringBuilder loggingSb;
 	private static String configurationFileName = "test.configuration";
 	private static String propertiesFileName = "test.properties";
+	private static final Map<String, String> browserDrivers = new HashMap<>();
+
 	private static String osName = null;
 
 	public static String getOsName() {
 		if (osName == null) {
-			osName = System.getProperty("os.name");
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
 		}
 		return osName;
 	}
@@ -120,6 +85,11 @@ public class YandexTest {
 			debug = true;
 		}
 		getOsName();
+		browserDrivers.put("chrome",
+				osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
+		browserDrivers.put("firefox",
+				osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
+		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 		HashMap<String, String> propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/test/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
@@ -127,9 +97,25 @@ public class YandexTest {
 		password = propertiesMap.get("password");
 		loggingSb = new StringBuilder();
 		formatter = new Formatter(loggingSb, Locale.US);
-		driver = new FirefoxDriver();
+		System.setProperty("webdriver.gecko.driver", osName.equals("windows")
+				? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
+				: /* String.format("%s/Downloads/geckodriver", System.getenv("HOME"))*/
+				Paths.get(System.getProperty("user.home")).resolve("Downloads")
+						.resolve("geckodriver").toAbsolutePath().toString());
+		System.setProperty("webdriver.firefox.bin",
+				osName.equals("windows")
+						? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+								.getAbsolutePath()
+						: "/usr/bin/firefox");
+		// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		// use legacy FirefoxDriver
+		// for Firefox v.59 no longer possible ?
+		capabilities.setCapability("marionette", false);
+		driver = new FirefoxDriver(capabilities);
 		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(polling, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(polling));
+		// wait.pollingEvery(polling, TimeUnit.MILLISECONDS);
 		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 		driver.get(baseURL);
 	}

@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.text.DateFormat;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -116,7 +117,9 @@ public class GoogleDriveTest {
 		formatter = new Formatter(loggingSb, Locale.US);
 		driver = new FirefoxDriver();
 		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(polling, TimeUnit.MILLISECONDS);
+		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
+		wait.pollingEvery(Duration.ofMillis(polling));
+		// wait.pollingEvery(polling, TimeUnit.MILLISECONDS);
 		driver.manage().timeouts().implicitlyWait(implicitWait, TimeUnit.SECONDS);
 		driver.get(baseURL);
 	}
