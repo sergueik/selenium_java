@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -48,14 +49,15 @@ public class YandexTest {
 	private static WebDriverWait wait;
 	private static Actions actions;
 	private static Boolean debug = false;
-	private static long implicitWait = 10;
-	private static int flexibleWait = 30;
-	private static long polling = 1000;
-	private static long highlight = 100;
-	private static long afterTest = 1000;
-	private static String baseURL = "https://ya.ru/";
-	private static String finalUrl = "https://www.yandex.ru/";
-	private static String loginURL = "https://passport.yandex.ru";
+	private static final long implicitWait = 10;
+	private static final int flexibleWait = 30;
+	private static final long polling = 1000;
+	private static final long highlight = 100;
+	private static final long afterTest = 1000;
+	private static final String baseURL = "https://ya.ru/";
+	private static String mailURL = "https://mail.yandex.ru/";
+	private static final String finalUrl = "https://www.yandex.ru/";
+	private static final String loginURL = "https://passport.yandex.ru";
 	private static final StringBuffer verificationErrors = new StringBuffer();
 	private static Map<String, String> env = System.getenv();
 	private static String username = "";
@@ -127,6 +129,21 @@ public class YandexTest {
 				"table.layout__table tr.layout__header div.personal div.b-inline"));
 		highlight(element);
 		element.click();
+		wait.until(ExpectedConditions.urlContains(mailURL));
+		element = driver
+				.findElement(By.xpath("//span[contains(text(), 'Войти')]/.."));
+		highlight(element);
+		element.click(); // does not work with the <span> - works with the <a>
+		// element.sendKeys(Keys.ENTER); // does not work
+		// actions.moveToElement(element).click().build().perform(); // does not
+		// work
+
+		// short explicit wait
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
+		wait.until(ExpectedConditions.urlContains(loginURL));
 	}
 
 	@After
@@ -180,7 +197,7 @@ public class YandexTest {
 		doLogout();
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void useCookieTest() throws Exception {
 		String loginUrl = doLogin();
@@ -224,33 +241,37 @@ public class YandexTest {
 	}
 
 	private String doLogin() {
-
 		// And I enter the username
 		WebElement element = driver
-				.findElement(By.xpath("//form/div[1]/label/span/input"));
+				.findElement(By.xpath("//form//input[@name='login']"));
+		System.err.println(
+				"Form element containing login: " + element.findElement(By.xpath(".."))
+						.findElement(By.xpath("..")).getAttribute("outerHTML"));
+
 		highlight(element);
 		element.clear();
 		element.sendKeys(username);
-		// Assert that input gets added to the background form
-		element = driver
-				.findElement(By.cssSelector("form.new-auth-form input[name='login']"));
-		System.err.println("Username: " + element.getAttribute("value"));
-		// And I enter the password
-		element = driver.findElement(By.xpath("//form/div[2]/label/span/input"));
+
+		element = driver.findElement(By.cssSelector("input[name='passwd']"));
 		highlight(element);
 		element.clear();
 		element.sendKeys(password);
-		// Assert that input gets added to the background form
-		element = driver
-				.findElement(By.cssSelector("form.new-auth-form input[name='passwd']"));
+		// TODO: Assert that input gets added to the background form
 		System.err.println("Password: " + element.getAttribute("value"));
 		// Evaluate the landing page URL
-		element = driver.findElement(
-				By.cssSelector("form.new-auth-form span.new-auth-submit a.nb-button"));
+		// element = driver
+		// .findElement(By.cssSelector("form.new-auth-form input[name='passwd']"));
+		element = driver.findElement(By.cssSelector("form button[type='submit']"));
+		highlight(element);
+		element = driver.findElement(By.cssSelector("form a.nb-button"));
+
 		String login_href = element.getAttribute("href");
 		System.err.println("Login href: " + login_href);
-		Pattern pattern = Pattern
-				.compile(String.format("%s/auth/\\?mode=qr&retpath=(.+)$", loginURL));
+		String matcherExpression = String
+				.format("%s/auth\\?(?:.*)&retpath=(.+)&(?:.*)", loginURL);
+		System.err.println("Matcher: " + matcherExpression);
+		Pattern pattern = Pattern.compile(matcherExpression);
+
 		Matcher matcher = pattern.matcher(login_href);
 		String retpath = null;
 		if (matcher.find()) {
@@ -264,8 +285,8 @@ public class YandexTest {
 		System.err.println("Login retpath: " + retpath);
 
 		// And I click the login button
-		element = driver.findElement(
-				By.cssSelector("form.new-auth-form span.new-auth-submit button"));
+		element = driver.findElement(By.cssSelector("form button[type='submit']"));
+
 		highlight(element);
 		// String currentUrl = driver.getCurrentUrl();
 		element.click();
