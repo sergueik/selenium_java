@@ -1,53 +1,30 @@
 package com.github.sergueik.iniparser.integration;
 
-// import static com.jcabi.matchers.RegexMatchers;
-
-import java.io.IOException;
-
-import java.lang.reflect.Array;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import java.util.function.Function;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static com.jcabi.matchers.RegexMatchers.matchesPattern;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.hamcrest.Matchers.hasItems;
-
 // NOTE:
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+// import static com.jcabi.matchers.RegexMatchers;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import com.github.sergueik.iniparser.IniParser;
-import com.github.sergueik.iniparser.integration.CommonFunctions;
 
 /**
- * Local file Integration tests of iniparser
- * 
+ * Local file Integration tests of ini parser
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -96,19 +73,6 @@ public class IniParserIntegrationTest {
 		assertThat(value, equalTo("data"));
 		assertTrue(sections.containsAll(data.keySet()));
 		assertFalse(data.keySet().containsAll(sections));
-	}
-
-	@Test
-	public void data2Test() {
-		Map<String, Map<String, Object>> data2 = parser.getData2();
-		sectionData = data2.get("Section1");
-		String value = (String) sectionData.get("message");
-		assertThat(value, equalTo("data"));
-		assertTrue(sections.containsAll(data2.keySet()));
-		assertFalse(data2.keySet().containsAll(sections));
-		assertTrue(CollectionUtils.containsAny(sectionData.keySet(),
-				new ArrayList<Object>(Arrays.asList(entries))));
-
 	}
 
 	private static Map<String, Function<List<String>, ? extends Object>> dataExtractors = new HashMap<>();

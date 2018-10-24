@@ -7,8 +7,7 @@ import java.util.function.Function;
 import com.github.sergueik.iniparser.IniParser;
 
 /**
- * Common functions for integration testing of iniparser
- * 
+ * Common functions for integration testing of ini parser
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
