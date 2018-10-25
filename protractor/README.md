@@ -357,6 +357,21 @@ For example of [Keyword-Driven Framework](http://toolsqa.com/selenium-webdriver/
 
 Converting the integration tests to Selenium 3.3.x `ExpectedCondition` [deprecation](https://selenium2.ru/blog/187-predicates-in-explicit-waits.html) - [forum (russian)](http://software-testing.ru/forum/index.php?/topic/34732-selenium-331-java-perestal-rabotat-predikat-kto-pobedil/)
 
+### Note
+
+The [ngWebDriver](https://github.com/paul-hammant/ngWebDriver) and the __jProtractor__ projects are very similar in that they construct Java classes wrapping avascript Protractor methods.
+The internal class hierachy is different, of course.
+
+It appears easier to construct the Page object factory `By` annotations (interfaces) describing the
+__jProtractor__ library methods than to do the same with the __ngWebDriver__.
+
+The other difference is that __jProtractor__ splits the original javascript helper libary into
+small chunks and during execution of a `find` method sends only the specific fragment where the locator in question is implements,
+to the  browser.  The __ngWebDriver__ always sends the whole library.
+
+This also allows one to patch the individual api (it was important a few years ago) and adding new api (currently, only one such API was added, the `selectedRepeaterOption`. This of course comes at a
+higher cost of integrating the "upstream" changes, but the genuine Protracror project is
+no longer evolving as quickly as it used to.
 ### Authors
 [Carlos Alexandro Becker](caarlos0@gmail.com)
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
