@@ -7,8 +7,17 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
+
 import java.nio.file.Paths;
+
+import java.text.Normalizer;
+
 import java.time.Duration;
+
 import java.util.Enumeration;
 import java.util.Formatter;
 import java.util.HashMap;
@@ -22,12 +31,14 @@ import java.util.regex.Pattern;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Cookie;
 import org.openqa.selenium.JavascriptExecutor;
@@ -242,6 +253,9 @@ public class YandexTest {
 
 	private String doLogin() {
 		// And I enter the username
+		// NOTE: elements with class names ending with "Label" e.g.
+		// "passport-Input-Label"
+		// would not accept input
 		WebElement element = driver
 				.findElement(By.xpath("//form//input[@name='login']"));
 		System.err.println(
@@ -297,12 +311,18 @@ public class YandexTest {
 			wait.until(
 					ExpectedConditions.not(ExpectedConditions.urlContains(loginURL)));
 		} catch (TimeoutException tex) {
-			// verify if the page warns about the invalid credentials
+			// TODO: better check if the inputs were propagated and
+			// the following invalid credentials error is not displayed:
+			// <div class="error-hint">Возможно у&nbsp;вас выбрана другая раскладка
+			// клавиатуры или нажата клавиша "Caps Lock".</div>
+
 			try {
 				element = driver.findElement(
 						By.cssSelector("div.layout-inner div.js-messages div.error-msg"));
-				verificationErrors.append("Getting error message " + element.getText());
-				System.err.println("Getting error message " + element.getText());
+				String errorMessageTranslated = Translit.toAscii(element.getText());
+				verificationErrors
+						.append("Getting error message " + errorMessageTranslated);
+				System.err.println("Getting error message " + errorMessageTranslated);
 			} catch (NoSuchElementException elex) {
 				// ignore
 			}
@@ -446,6 +466,66 @@ public class YandexTest {
 				e.printStackTrace();
 			}
 			return (propertiesMap);
+		}
+	}
+
+	// TODO: merge projects
+	// from
+	// https://github.com/sergueik/selenium_tests/tree/master/src/test/java/com/github/sergueik/selenium/TariffTest.java
+	public static class Translit {
+
+		private static final Charset UTF8 = Charset.forName("UTF-8");
+		private static final char[] alphabetCyrillic = { ' ', 'а', 'б', 'в', 'г',
+				'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р',
+				'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ', 'ы', 'ь', 'э', 'ю',
+				'я', 'А', 'Б', 'В', 'Г', 'Д', 'Е', 'Ё', 'Ж', 'З', 'И', 'Й', 'К', 'Л',
+				'М', 'Н', 'О', 'П', 'Р', 'С', 'Т', 'У', 'Ф', 'Х', 'Ц', 'Ч', 'Ш', 'Щ',
+				'Ъ', 'Ы', 'Б', 'Э', 'Ю', 'Я', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h',
+				'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
+				'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J',
+				'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
+				'Y', 'Z' };
+
+		private static final String[] alphabetTranslit = { " ", "a", "b", "v", "g",
+				"d", "e", "e", "zh", "z", "i", "y", "k", "l", "m", "n", "o", "p", "r",
+				"s", "t", "u", "f", "h", "ts", "ch", "sh", "sch", "", "i", "", "e",
+				"ju", "ja", "A", "B", "V", "G", "D", "E", "E", "Zh", "Z", "I", "Y", "K",
+				"L", "M", "N", "O", "P", "R", "S", "T", "U", "F", "H", "Ts", "Ch", "Sh",
+				"Sch", "", "I", "", "E", "Ju", "Ja", "a", "b", "c", "d", "e", "f", "g",
+				"h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u",
+				"v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I",
+				"J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W",
+				"X", "Y", "Z" };
+
+		private static String toAscii(final String input) {
+			final CharsetEncoder charsetEncoder = UTF8.newEncoder();
+			final char[] decomposed = Normalizer
+					.normalize(input, Normalizer.Form.NFKD).toCharArray();
+			final StringBuilder sb = new StringBuilder(decomposed.length);
+
+			// NOTE: evaluating the character charcount is unnecessary with Cyrillic
+			for (int i = 0; i < decomposed.length;) {
+				final int codePoint = Character.codePointAt(decomposed, i);
+				final int charCount = Character.charCount(codePoint);
+
+				if (charsetEncoder
+						.canEncode(CharBuffer.wrap(decomposed, i, charCount))) {
+					sb.append(decomposed, i, charCount);
+				}
+
+				i += charCount;
+			}
+
+			StringBuilder builder = new StringBuilder();
+
+			for (int i = 0; i < sb.length(); i++) {
+				for (int x = 0; x < alphabetCyrillic.length; x++)
+					if (sb.charAt(i) == alphabetCyrillic[x]) {
+						builder.append(alphabetTranslit[x]);
+					}
+			}
+			return builder.toString();
+
 		}
 	}
 }
