@@ -78,6 +78,11 @@ public class YandexTest {
 	private static String configurationFileName = "test.configuration";
 	private static String propertiesFileName = "test.properties";
 	private static final Map<String, String> browserDrivers = new HashMap<>();
+	// TODO: the propery is not visible.
+	private static final String propertyFilePath = (System
+			.getenv("property.filepath") != null)
+					? System.getenv("property_filepath")
+					: /* "src/test/resources" */ "target/classes";
 
 	private static String osName = null;
 
@@ -97,6 +102,8 @@ public class YandexTest {
 		if (env.containsKey("DEBUG") && env.get("DEBUG").equals("true")) {
 			debug = true;
 		}
+		System.err.println(String.format("%s=%s", "property.filepath",
+				System.getenv("property.filepath")));
 		getOsName();
 		browserDrivers.put("chrome",
 				osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
@@ -104,8 +111,9 @@ public class YandexTest {
 				osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
 		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 		HashMap<String, String> propertiesMap = PropertiesParser
-				.getProperties(String.format("%s/src/test/resources/%s",
-						System.getProperty("user.dir"), propertiesFileName));
+				.getProperties(String.format(/* "%s/target/classes/%s" */
+						"%s/%s/%s"
+						/* "%s/src/test/resources/%s" */ , System.getProperty("user.dir"), propertyFilePath, propertiesFileName));
 		username = propertiesMap.get("username");
 		password = propertiesMap.get("password");
 		loggingSb = new StringBuilder();
