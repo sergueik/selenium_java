@@ -1,6 +1,3 @@
-// https://groups.google.com/forum/#!topic/webdriver/aQl5o0TorqM
-// http://amormoeba.blogspot.com/2014/02/how-to-use-browser-mob-proxy.html
-// http://www.assertselenium.com/browsermob-proxy/performance-data-collection-using-browsermob-proxy-and-selenium/
 package com.mycompany.app;
 
 import java.io.File;
@@ -76,6 +73,8 @@ public class App {
 
 	private static BrowserMobProxy proxyServer = null;
 	private static Proxy seleniumProxy = null;
+	private static boolean debug = false;
+	private static long debugSleep = 120000;
 
 	private static String selenium_host = "localhost";
 	private static String selenium_port = "4444";
@@ -84,6 +83,7 @@ public class App {
 
 	private static String baseUrl = "www.imdb.com";
 	private static String filePath = "test.har";
+	private static FileOutputStream outputStream;
 	private static String urlFragment = "http://pubads.g.doubleclick.net";
 	private static String search = "The Matrix";
 
@@ -141,19 +141,29 @@ public class App {
 		System.err.println("created a new HAR for " + baseUrl);
 		// needs longer timeout in the presence of the proxy
 		wait = new WebDriverWait(driver, 10, 500);
+		// TODO: parameter
 		try {
 			driver.get("http://" + baseUrl + "/");
+			if (debug) {
+				try {
+					Thread.sleep(debugSleep);
+				} catch (InterruptedException e) {
+					// System.err.println("Exception (ignored): " + e.toString());
+				}
+			}
 			// wait for the page to load
 			element = wait.until(ExpectedConditions
 					.visibilityOfElementLocated(By.cssSelector("#navbar-query")));
 			// TODO: multi-step transaction
 			element.sendKeys(search);
+
 			driver.findElement(By.cssSelector("#navbar-submit-button")).click();
 			// wait for the search results
 			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
 					"#main > div.article > h1.findHeader > span.findSearchTerm")));
 			// print the node information
 			// System.out.println(getIPOfNode(driver));
+
 		} catch (org.openqa.selenium.TimeoutException e) {
 			System.out.println(e.toString());
 		} catch (Exception e) {
@@ -162,28 +172,33 @@ public class App {
 			try {
 				Har har = proxyServer.getHar();
 				HarLog harLog = har.getLog();
-        // sample entry processing 
-				List<HarEntry> entries = harLog.getEntries();				
+				// sample entry processing
+				List<HarEntry> entries = harLog.getEntries();
 				for (HarEntry entry : entries) {
 					if (entry.getRequest().getUrl().contains(urlFragment)) {
-						System.err.println(String.format("url: %s", entry.getRequest().getUrl()));
+						System.err
+								.println(String.format("url: %s", entry.getRequest().getUrl()));
 					}
 				}
 				// reset the har
 				proxyServer.newHar();
-        
-        // dump the har to the file
-        FileOutputStream outputStream = new FileOutputStream(filePath);
+
+				// dump the har to the file
+				outputStream = new FileOutputStream(filePath);
 				har.writeTo(outputStream);
 				System.out.println(String.format("har written to: %s", filePath));
 			} catch (IOException e) {
 				System.out.println(e.toString());
 			} finally {
-        outputStream.close();
-      }
-    
-      // finish the run
-      proxyServer.stop();
+				try {
+					outputStream.close();
+				} catch (IOException e) {
+					// ignore
+				}
+			}
+
+			// finish the run
+			proxyServer.stop();
 			driver.close();
 			driver.quit();
 		}

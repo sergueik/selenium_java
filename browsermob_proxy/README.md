@@ -1,6 +1,35 @@
 ### Info
 
-This directory contains a [browsermob proxy](https://github.com/lightbody/browsermob-proxy) study example.
+This directory contains the [browsermob proxy](https://bmp.lightbody.net/) (BMP)
+[study example\(https://github.com/lightbody/browsermob-proxy) .
+
+To run,
+```cmd
+mvn -Dmaven.test.skip=true -DskipTests=true package install
+
+java -cp target\app-1.1-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-%SELENIUM_VERSION%.jar;target\lib\* com.mycompany.app.App
+
+```
+or run the provided batch file
+```cmd
+call test.cmd
+```
+
+#### Note
+
+The main __BMP__ artifactId is different for 2.0.x and and for 2.1.x versions of the jar.
+The information in https://github.com/lightbody/browsermob-proxy/releases may not be correct
+Referencing incorrectly named artifact in the `pom.xml` would lead to the error
+
+```sh
+Could not resolve dependencies for project com.mycompany.app:app:jar:1.1-SNAPSHOT:
+Failure to find net.lightbody.bmp:browsermob-proxy:jar:2.1.0-beta-5
+```
+
+The profile `old_bmp` was added to the project `pom.xml` to allow building against old version:
+```sh
+mvn -Pold_bmp clean package install
+```
 
 ### References (in russian)
 
@@ -12,6 +41,10 @@ This directory contains a [browsermob proxy](https://github.com/lightbody/browse
 * blogs
   * [selenium-browser-proxy](http://sidelnikovmike.blogspot.ru/2016/04/selenium-browser-proxy.html)
   * [browsermobproxy-selenium-perfomance](http://internetka.in.ua/browsermobproxy-selenium-perfomance/)
+* misc
+  * https://groups.google.com/forum/#!topic/webdriver/aQl5o0TorqM
+  * http://amormoeba.blogspot.com/2014/02/how-to-use-browser-mob-proxy.html
+  * http://www.assertselenium.com/browsermob-proxy/performance-data-collection-using-browsermob-proxy-and-selenium/
 
 ### Author
 
