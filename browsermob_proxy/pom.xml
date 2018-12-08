@@ -155,6 +155,19 @@
       </activation>
       <properties>
         <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
+<!-- 2.3, 2.4 - do not handle the 
+SEVERE: Failed to submit a listener notification task. Event loop shut down?
+-->
+        <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
+      </properties>
+    </profile>
+    <profile>
+      <id>broken_bmp</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <properties>
+        <browsermob-proxy.version>2.1.5</browsermob-proxy.version>
         <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
       </properties>
     </profile>

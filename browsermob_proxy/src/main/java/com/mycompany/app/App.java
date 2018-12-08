@@ -165,10 +165,24 @@ public class App {
 			try {
 				Har har = proxyServer.getHar();
 				HarLog harLog = har.getLog();
+				// sample entry assertion
+				HarEntry entry0 = harLog.getEntries().get(0);
+				System.err.println(
+						String.format("Processing main har entry (%s). Looking for status.",
+								entry0.getPageref()));
+				if (entry0.getPageref().equals(baseUrl)) {
+					if (entry0.getResponse().getStatus() == 0 && entry0.getResponse()
+							.getError().matches("No response received")) {
+						// in the browser one probably sees the error:
+						// This page isn’t working www.imdb.com didn’t send any data.
+						// ERR_EMPTY_RESPONSE
+						proxyServer.stop();
+						throw new RuntimeException("Suspect BrowserMob Proxy error");
+					}
+				}
 				// sample entry processing
 				System.err.println(String
 						.format("Processing har entries. Looking for %s", urlFragment));
-
 				List<HarEntry> entries = harLog.getEntries();
 				assertTrue(entries.size() > 0);
 				for (HarEntry entry : entries) {
@@ -189,13 +203,20 @@ public class App {
 			} finally {
 				try {
 					proxyServer.stop();
-					outputStream.close();
+				} catch (IllegalStateException e) {
+					// Proxy server is already stopped. Cannot re-stop.
+					// ignore
+				}
+				try {
+					if (outputStream != null) {
+						outputStream.close();
+					}
 				} catch (IOException e) {
 					// ignore
 				}
+				driver.close();
+				driver.quit();
 			}
-			driver.close();
-			driver.quit();
 		}
 	}
 
