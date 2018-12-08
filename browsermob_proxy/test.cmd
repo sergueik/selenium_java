@@ -1,15 +1,14 @@
 @echo OFF
 
 set JAVA_VERSION=1.8.0_101
-set SELENIUM_VERSION=2.53.0
 set MAVEN_VERSION=3.3.9
 set DEFAULT_PROFILE=new_bmp
 set JAVA_HOME=c:\java\jdk%JAVA_VERSION%
-set SELENIUM_HOME=c:\java\selenium
 set M2_HOME=c:\java\apache-maven-%MAVEN_VERSION%
 set M2=%M2_HOME%\bin
 set MAVEN_OPTS=-Xms256m -Xmx512m
 
+set BROWSER=chrome
 set APP_NAME=App
 set APP_VERSION=1.1-SNAPSHOT
 set APP_PACKAGE=com.mycompany.app
@@ -24,9 +23,8 @@ call mvn -P%PROFILE% -Dmaven.test.skip=true -DskipTests=true clean compile packa
 
 set TARGET=%CD%\target
 
-java -cp %TARGET%\%APP_NAME%-%APP_VERSION%.jar;%SELENIUM_HOME%\selenium-server-standalone-%SELENIUM_VERSION%.jar;%TARGET%\lib\* %APP_PACKAGE%.%MAIN_CLASS%
+java -cp %TARGET%\%APP_NAME%-%APP_VERSION%.jar;%TARGET%\lib\* %APP_PACKAGE%.%MAIN_CLASS%
 
 goto :EOF
-
 
 REM https://groups.google.com/forum/#!topic/selenium-users/i_xKZpLfuTk

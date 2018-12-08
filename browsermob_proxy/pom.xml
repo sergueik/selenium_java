@@ -9,15 +9,10 @@
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!-- NOTE: the artifactId is dfferent for 2.0.0 and older and for 2.1.x 
-      this information in https://github.com/lightbody/browsermob-proxy/releases may not be correct 
-      incorrectly named artifact would lead to an error
-      Could not resolve dependencies for project com.mycompany.app:app:jar:1.1-SNAPSHOT: 
-      Failure to find net.lightbody.bmp:browsermob-proxy:jar:2.1.0-beta-5    
-    -->
     <browsermob-proxy.version>2.0.0</browsermob-proxy.version>
     <browsermob-proxy.artifactId>browsermob-proxy</browsermob-proxy.artifactId>
-    <browsermob-proxy.version>2.1.5</browsermob-proxy.version>
+    <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
+    <!-- NOTE: Browsermob proxy appears broken  with 2.1.5 on Windows, even for Administrator user -->
     <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
@@ -25,7 +20,6 @@
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <phantomjsdriver.version>1.2.1</phantomjsdriver.version>
     <selenium.version>2.53.1</selenium.version>
     <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
   </properties>
@@ -69,12 +63,6 @@
       <groupId>com.jcabi</groupId>
       <artifactId>jcabi-matchers</artifactId>
       <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.codeborne</groupId>
-      <artifactId>phantomjsdriver</artifactId>
-      <version>${phantomjsdriver.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -166,7 +154,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <browsermob-proxy.version>2.1.5</browsermob-proxy.version>
+        <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
         <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
       </properties>
     </profile>
