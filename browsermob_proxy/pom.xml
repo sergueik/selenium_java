@@ -10,19 +10,26 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
-    <!-- NOTE: Browsermob proxy appears broken  with 2.1.5 on Windows, even for Administrator user -->
     <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.5</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
+    <har-reader.version>2.1.3</har-reader.version>
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <selenium.version>3.13.0</selenium.version>
+    <selenium.version>2.53.1</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
+<!-- TODO:  coflicts with BMP
+	  <dependency>
+  <groupId>de.sstoehr</groupId>
+  <artifactId>har-reader</artifactId>
+  <version>${har-reader.version}</version>
+</dependency>
+-->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -159,8 +166,9 @@
       </activation>
       <properties>
         <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
-<!-- 2.3, 2.4 - do not handle the 
+<!-- 2.1.3, 2.1.4 - do not handle the 
 SEVERE: Failed to submit a listener notification task. Event loop shut down?
+2.1.2 -  works with Selenium 2.53.1
 -->
         <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
       </properties>

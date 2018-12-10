@@ -46,6 +46,7 @@ The BMP version __2.12__ works with Selenium __2.53__  but not with Selenim __3.
   * https://groups.google.com/forum/#!topic/webdriver/aQl5o0TorqM
   * http://amormoeba.blogspot.com/2014/02/how-to-use-browser-mob-proxy.html
   * http://www.assertselenium.com/browsermob-proxy/performance-data-collection-using-browsermob-proxy-and-selenium/
+  * [HAR reader](https://github.com/sdstoehr/har-reader)
 
 ### Author
 

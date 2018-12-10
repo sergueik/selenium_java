@@ -5,9 +5,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.nio.file.Paths;
+
 import java.util.List;
 import static org.junit.Assert.assertTrue;
 
@@ -17,13 +20,17 @@ import static org.junit.Assert.assertTrue;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
+
 import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHttpEntityEnclosingRequest;
+
 import org.json.JSONException;
 import org.json.JSONObject;
+
 // import org.openqa.selenium.firefox.ProfileManager;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
@@ -38,10 +45,12 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+// import de.sstoehr.harreader.HarReader;
+// import de.sstoehr.harreader.HarReaderException;
+
 import net.lightbody.bmp.BrowserMobProxy;
 import net.lightbody.bmp.BrowserMobProxyServer;
 import net.lightbody.bmp.client.ClientUtil;
-
 import net.lightbody.bmp.core.har.Har;
 import net.lightbody.bmp.core.har.HarEntry;
 import net.lightbody.bmp.core.har.HarLog;
@@ -123,11 +132,11 @@ public class App {
 										? "geckodriver.exe" : "geckodriver")
 								.toAbsolutePath().toString());
 				System
-				.setProperty("webdriver.firefox.bin",
-						osName.equals("windows") ? new File(
-								"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-										.getAbsolutePath()
-								: "/usr/bin/firefox");
+						.setProperty("webdriver.firefox.bin",
+								osName.equals("windows") ? new File(
+										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+												.getAbsolutePath()
+										: "/usr/bin/firefox");
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				capabilities.setCapability("marionette", false);
@@ -239,6 +248,20 @@ public class App {
 				driver.close();
 				driver.quit();
 			}
+
+			// TODO: process the HAR
+      /* 
+			HarReader harReader = new HarReader();
+			de.sstoehr.harreader.model.Har har = null;
+			try {
+				har = harReader.readFromFile(new File("test.har"));
+			} catch (HarReaderException e) {
+				System.err.println("Exception in the file: " + e.toString());
+			}
+			if (har != null) {
+				System.out.println(har.getLog().getCreator().getName());
+			}
+      */
 		}
 	}
 
