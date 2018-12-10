@@ -1,12 +1,13 @@
-package com.mycompany.app;
+package com.github.sergueik.bmp;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.nio.file.Paths;
 import java.util.List;
 import static org.junit.Assert.assertTrue;
 
@@ -54,6 +55,7 @@ public class App {
 	private static WebElement element = null;
 
 	private static BrowserMobProxy proxyServer = null;
+	private static String osName = getOSName();
 	private static Proxy seleniumProxy = null;
 	private static final boolean debug = Boolean
 			.parseBoolean(System.getenv("DEBUG"));
@@ -101,8 +103,12 @@ public class App {
 
 		} else { // standalone
 			if (browser.compareToIgnoreCase("chrome") == 0) {
+
 				System.setProperty("webdriver.chrome.driver",
-						"c:/java/selenium/chromedriver.exe");
+						Paths.get(System.getProperty("user.home"))
+								.resolve("Downloads").resolve(osName.equals("windows")
+										? "chromedriver.exe" : "chromedriver")
+								.toAbsolutePath().toString());
 				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 				/*
 				 * String m_proxy = <host> + ":" + <port>;
@@ -111,6 +117,11 @@ public class App {
 				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				driver = new ChromeDriver(capabilities);
 			} else {
+				System.setProperty("webdriver.gecko.driver",
+						Paths.get(System.getProperty("user.home"))
+								.resolve("Downloads").resolve(osName.equals("windows")
+										? "geckodriver.exe" : "geckodriver")
+								.toAbsolutePath().toString());
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				driver = new FirefoxDriver(capabilities);
@@ -265,4 +276,16 @@ public class App {
 			return null;
 		}
 	}
+
+	// Utilities
+	public static String getOSName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
+	}
+
 }

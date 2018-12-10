@@ -10,8 +10,8 @@ set MAVEN_OPTS=-Xms256m -Xmx512m
 
 set BROWSER=chrome
 set APP_NAME=App
-set APP_VERSION=1.1-SNAPSHOT
-set APP_PACKAGE=com.mycompany.app
+set APP_VERSION=0.2-SNAPSHOT
+set APP_PACKAGE=com.github.sergueik.bmp
 set MAIN_CLASS=App
 
 set PROFILE=%~1

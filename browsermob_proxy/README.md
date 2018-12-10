@@ -7,8 +7,7 @@ To run,
 ```cmd
 mvn -Dmaven.test.skip=true -DskipTests=true package install
 
-java -cp target\app-1.1-SNAPSHOT.jar;c:\java\selenium\selenium-server-standalone-%SELENIUM_VERSION%.jar;target\lib\* com.mycompany.app.App
-
+java -cp target\app-0.2-SNAPSHOT.jar;target\lib\* com.github.sergueik.bmp.App
 ```
 or run the provided batch file
 ```cmd
