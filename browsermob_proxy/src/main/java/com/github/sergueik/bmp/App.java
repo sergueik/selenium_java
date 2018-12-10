@@ -122,8 +122,19 @@ public class App {
 								.resolve("Downloads").resolve(osName.equals("windows")
 										? "geckodriver.exe" : "geckodriver")
 								.toAbsolutePath().toString());
+				System
+				.setProperty("webdriver.firefox.bin",
+						osName.equals("windows") ? new File(
+								"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+										.getAbsolutePath()
+								: "/usr/bin/firefox");
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
+				capabilities.setCapability("marionette", false);
+				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+				capabilities.setCapability("locationContextEnabled", false);
+				capabilities.setCapability("acceptSslCerts", true);
+				capabilities.setCapability("elementScrollBehavior", 1);
 				driver = new FirefoxDriver(capabilities);
 			}
 		}

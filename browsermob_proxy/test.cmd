@@ -9,6 +9,7 @@ set M2=%M2_HOME%\bin
 set MAVEN_OPTS=-Xms256m -Xmx512m
 
 set BROWSER=chrome
+REM set BROWSER=firefox
 set APP_NAME=App
 set APP_VERSION=0.2-SNAPSHOT
 set APP_PACKAGE=com.github.sergueik.bmp

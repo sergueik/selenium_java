@@ -1,7 +1,7 @@
 ### Info
 
 This directory contains the [browsermob proxy](https://bmp.lightbody.net/) (BMP)
-[study example\(https://github.com/lightbody/browsermob-proxy) .
+[study example](https://github.com/lightbody/browsermob-proxy).
 
 To run,
 ```cmd
@@ -29,6 +29,8 @@ The profile `old_bmp` was added to the project `pom.xml` to allow building again
 ```sh
 mvn -Pold_bmp clean package install
 ```
+The BMP version __2.12__ works with Selenium __2.53__  but not with Selenim __3.13.0__. The BMP  version __2.15__ works with Selenium __3.13.0__, but does not work with Selenium __2.53__. Overall the first combination appears more stable then the second. Creation of tags andd branches is a work in progress.
+
 
 ### References (in russian)
 

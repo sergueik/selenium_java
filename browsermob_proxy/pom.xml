@@ -4,13 +4,11 @@
   <groupId>com.github.sergueik.bmp</groupId>
   <artifactId>app</artifactId>
   <packaging>jar</packaging>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.3-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <browsermob-proxy.version>2.0.0</browsermob-proxy.version>
-    <browsermob-proxy.artifactId>browsermob-proxy</browsermob-proxy.artifactId>
     <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
     <!-- NOTE: Browsermob proxy appears broken  with 2.1.5 on Windows, even for Administrator user -->
     <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
@@ -20,8 +18,9 @@
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
-    <selenium.version>2.53.1</selenium.version>
-    <selenium-firefox-driver.version>2.53.0</selenium-firefox-driver.version>
+    <selenium.version>3.13.0</selenium.version>
+    <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
+    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -69,6 +68,11 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-firefox-driver</artifactId>
       <version>${selenium-firefox-driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-chrome-driver</artifactId>
+      <version>${selenium-chrome-driver.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
