@@ -328,6 +328,7 @@ public class NgLocalFileIntegrationTest {
 		String localPath = "C:/developer/sergueik/powershell_selenium/powershell/testfile.txt";
 		System.err.println("sendKeys :" + localPath);
 		fileToUpload.sendKeys(localPath);
+		@SuppressWarnings("unused")
 		NgWebElement ng_fileToUpload = new NgWebElement(ngDriver, fileToUpload);
 		// String script = "angular.element(this).scope().setFiles(this)";
 		// Object result = CommonFunctions.executeScript(script,ng_fileToUpload);
@@ -969,6 +970,7 @@ public class NgLocalFileIntegrationTest {
 		getPageContent("ng_headers_sort_example1.htm");
 		String[] headers = new String[] { "First Name", "Last Name", "Age" };
 
+		@SuppressWarnings("unused")
 		Hashtable<String, String> header_columns = new Hashtable<String, String>();
 
 		// Without Protractor:
@@ -1079,6 +1081,7 @@ public class NgLocalFileIntegrationTest {
 		List<WebElement> availableColors = ngDriver
 				.findElements(By.cssSelector("div[role='option']"));
 		for (WebElement availableColor : availableColors) {
+			@SuppressWarnings("unused")
 			NgWebElement ngAvailableColor = new NgWebElement(ngDriver,
 					availableColor);
 			highlight(availableColor);
@@ -1301,6 +1304,51 @@ public class NgLocalFileIntegrationTest {
 		}
 	}
 
+  	@Test
+	public void testModaulWithAlertWait() {
+		// NOTE: also available as http://fiddle.jshell.net/alexsuch/RLQhh/show/
+		getPageContent("ng_modal2.htm");
+		WebElement showDialogButton = ngDriver
+				.findElement(NgBy.buttonText("Open modal"));
+		showDialogButton.click();
+
+		WebElement titleElement = wait.until(ExpectedConditions
+				.visibilityOf(ngDriver.findElement(NgBy.binding("title"))));
+
+		assertThat(titleElement, notNullValue());
+		assertTrue(titleElement.isDisplayed());
+		highlight(titleElement);
+		WebElement dialogElement = titleElement.findElement(By.xpath("../.."));
+		System.err.println(
+				"Dialog Element contents: " + dialogElement.getAttribute("outerHTML"));
+		Map<String, String> formData = new HashMap<>();
+		formData.put("email", "test_user@rambler.ru");
+		formData.put("password", "secret");
+		List<String> formElementIds = new ArrayList<>(
+				Arrays.asList(new String[] { "email", "password" }));
+
+		for (String formElementId : formElementIds) {
+
+			List<WebElement> labelElements = dialogElement.findElements(By
+					.cssSelector(String.format("form label[ for='%s']", formElementId)));
+			assertThat(labelElements.size(), equalTo(1));
+			highlight(labelElements.get(0));
+
+			WebElement inputElement = dialogElement.findElement(
+					By.cssSelector(String.format("form input#%s", formElementId)));
+			assertThat(inputElement, notNullValue());
+			highlight(inputElement);
+			inputElement.sendKeys(formData.get(formElementId));
+		}
+		sleep(3000);
+		// close the dialog
+		WebElement submitButton = dialogElement
+				.findElement(By.cssSelector("button[type='submit']")); //
+		submitButton.click();
+
+	}
+
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -1339,6 +1387,14 @@ public class NgLocalFileIntegrationTest {
 			CommonFunctions.executeScript(CommonFunctions.getScriptContent(script),
 					sourceElement, destinationElement);
 		} catch (Exception e) {
+		}
+	}
+
+	public void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 }
