@@ -1,4 +1,4 @@
-package retry;
+package com.github.sergueik.tests.retry;
 
 import com.hp.gagawa.java.Document;
 import com.hp.gagawa.java.DocumentType;

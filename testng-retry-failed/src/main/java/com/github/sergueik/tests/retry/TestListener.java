@@ -1,4 +1,4 @@
-package retry;
+package com.github.sergueik.tests.retry;
 
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;

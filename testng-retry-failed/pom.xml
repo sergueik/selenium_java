@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>test</groupId>
+  <groupId>com.github.sergueik.tests</groupId>
   <artifactId>test</artifactId>
-  <version>1.0</version>
-  <name>test</name>
-  <description>test</description>
+  <version>0.2-SNAPSHOT</version>
+  <name>basicTest</name>
+  <description>BasicTest With a Retry Listener</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -52,7 +52,7 @@
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
-      <version>2.53.1</version>
+      <version>3.13.0</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

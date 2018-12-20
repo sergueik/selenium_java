@@ -1,4 +1,4 @@
-package retry;
+package com.github.sergueik.tests.retry;
 
 import org.testng.IReporter;
 import org.testng.ISuite;

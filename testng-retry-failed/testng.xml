@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
 <suite name="test" parallel="tests" thread-count="1">
+  <!-- NOTE: "/suite/@parallel" is a keyword that must have a value from the list 
+"false true none methods tests classes instances ".
+-->
   <listeners>
-    <listener class-name= "retry.Reporter" />
+    <!-- full class GAV -->
+    <listener class-name="com.github.sergueik.tests.retry.Reporter"/>
   </listeners>
-  <test verbose="1" name="test">
+  <!-- not related to jave structure, can be Arbitrary -->
+  <test verbose="1" name="mySuperTestName">
     <packages>
-      <package name="tests"/>
+      <!-- full package GAV -->
+      <package name="com.github.sergueik.tests"/>
     </packages>
   </test>
 </suite>
