@@ -8,7 +8,12 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Platform;
@@ -26,6 +31,9 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 /**
  * Common functions for integration testing
@@ -41,6 +49,7 @@ public class CommonFunctions {
 	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
+	private static final boolean debug = false;
 	// set to true for Desktop, false for headless browser testing
 	static boolean isDestopTesting = true;
 	static boolean isCIBuild = false;
@@ -58,7 +67,7 @@ public class CommonFunctions {
 			// port 4444
 			// For Vagrant box browser testing have localhost port 4444 forwarded to
 			// the hub 4444
-      // Alternatively make the test class launch the browser
+			// Alternatively make the test class launch the browser
 			osName = System.getProperty("os.name");
 			if (browser.equals("chrome")) {
 				System.setProperty("webdriver.chrome.driver",
@@ -215,5 +224,84 @@ public class CommonFunctions {
 					}
 				});
 
+	}
+
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (debug) {
+			System.err.println("Getting propety or environment: " + name);
+		}
+		// compatible with
+		// org.apache.commons.configuration.PropertiesConfiguration.interpolatedConfiguration
+		// https://commons.apache.org/proper/commons-configuration/userguide_v1.10/howto_utilities.html
+		if (value == null) {
+
+			Pattern p = Pattern.compile("^(\\w+:)(\\w+)$");
+			Matcher m = p.matcher(name);
+			if (m.find()) {
+				String propertyName = m.replaceFirst("$2");
+				if (debug) {
+					System.err.println("Interpolating " + propertyName);
+				}
+				value = System.getProperty(propertyName);
+			}
+			if (value == null) {
+				if (debug) {
+					System.err.println("Trying environment " + name);
+				}
+				value = System.getenv(name);
+				if (value == null) {
+					if (debug) {
+						System.err.println("Nothing found for " + name);
+					}
+					value = defaultValue;
+				}
+			}
+		}
+		return value;
+	}
+
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{(\\w+)\\}|(\\w+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = System.getenv(envVarName);
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+
+	// origin:
+	// https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/src/main/java/com/github/abhishek8908/util/DriverUtil.java
+	public static String readProperty(String propertyName) {
+		String resourcePath = "";
+		try {
+			resourcePath = Thread.currentThread().getContextClassLoader()
+					.getResource("").getPath();
+			System.err.println(
+					String.format("The application resource path: \"%s\"", resourcePath));
+		} catch (NullPointerException e) {
+			System.err.println(
+					"Exception for resourcePath: " + resourcePath + " (ignored) :");
+			e.printStackTrace();
+		}
+		Configuration config = null;
+		try {
+			config = new PropertiesConfiguration(
+					resourcePath + "application.properties");
+
+			Configuration extConfig = ((PropertiesConfiguration) config)
+					.interpolatedConfiguration();
+			return extConfig.getProperty(propertyName).toString();
+		} catch (ConfigurationException e) {
+			return null;
+		}
 	}
 }

@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Locale;
@@ -1304,9 +1305,11 @@ public class NgLocalFileIntegrationTest {
 		}
 	}
 
-  	@Test
+	@Test
 	public void testModaulWithAlertWait() {
 		// NOTE: also available as http://fiddle.jshell.net/alexsuch/RLQhh/show/
+		// see also:
+		// https://stackoverflow.com/questions/27416044/simple-popup-by-using-angular-js/27417065#comment43276038_27416044
 		getPageContent("ng_modal2.htm");
 		WebElement showDialogButton = ngDriver
 				.findElement(NgBy.buttonText("Open modal"));
@@ -1347,7 +1350,6 @@ public class NgLocalFileIntegrationTest {
 		submitButton.click();
 
 	}
-
 
 	@AfterClass
 	public static void teardown() {
@@ -1397,4 +1399,5 @@ public class NgLocalFileIntegrationTest {
 			e.printStackTrace();
 		}
 	}
+
 }
