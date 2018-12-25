@@ -15,6 +15,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Category;
 
 import javafx.scene.Node;
 import javafx.stage.Window;
@@ -25,6 +29,21 @@ import javafx.collections.transformation.SortedList;
 @SuppressWarnings({ "unused", "restriction" })
 public class VanillaControllerEx {
 
+	@SuppressWarnings("deprecation")
+	static final Category logger = Category
+			.getInstance(VanillaControllerEx.class);
+	private Map<String, String> inputData = new HashMap<>();
+
+	public void setInputData(Map<String, String> inputData) {
+		this.inputData = inputData;
+		this.contentPreformatted.textProperty().set(inputData.get((Object) "code"));
+		this.contentSummary.textProperty().set(inputData.get((Object) "summary"));
+	}
+
+	public Map<String, String> getInputData() {
+		return this.inputData;
+	}
+
 	private Stage mainStage;
 
 	@FXML
@@ -32,9 +51,15 @@ public class VanillaControllerEx {
 
 	@FXML
 	private Label headerText;
-	
+
 	@FXML
 	private Label contentHeader;
+
+	@FXML
+	private Label contentSummary;
+	
+	@FXML
+	private Label contentPreformatted;
 
 	@FXML
 	private TextField filterField;
