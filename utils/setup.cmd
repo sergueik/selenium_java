@@ -16,14 +16,23 @@ REM copy %IVY_HOME%\ivy-%IVY_VERSION%.jar %ANT_HOME%\lib
 if "%GROOVY_VERSION%"==""  set GROOVY_VERSION=2.4.4
 set GROOVY_HOME=%TOOL_HOME%\groovy-%GROOVY_VERSION%
 
+REM For JDK 9  make sure the JAVA HOME directory is named jdk9.0.4  and not jdk-9.0.4
+REM if "%JAVA_VERSION%"=="" set JAVA_VERSION=9.0.4
+
+REM Currently only supporting JDK up to 1.8
 if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
 set JAVA_HOME=%TOOL_HOME%\jdk%JAVA_VERSION%
 set JAVA_OPTS=-Xms256m -Xmx512m
 
-if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.3.9
+if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.5.0
 set M2_HOME=%TOOL_HOME%\apache-maven-%MAVEN_VERSION%
 set M2=%M2_HOME%\bin
 set MAVEN_OPTS=%JAVA_OPTS%
+
+REM Clear the environment entry that is created by  git bash when starting cmd and ruins Maven 3.5.0 ANSI colors.
+REM see also: https://issues.apache.org/jira/browse/MNG-6282
+REM See also: https://stackoverflow.com/questions/43425304/how-to-customize-colors-in-maven-3-5-console-output
+set TERM=
 
 PATH=%JAVA_HOME%\bin;%PATH%;%ANT_HOME%\bin;%GROOVY_HOME%\bin;%GRADLE_HOME%\bin;%M2%
 
