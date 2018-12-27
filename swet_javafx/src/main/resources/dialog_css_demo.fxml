@@ -37,22 +37,12 @@
   <center>
     <VBox styleClass="content-section">
       <children>
-        <Label fx:id="contentHeader" text="Content header"/>
         <Label fx:id="contentSummary">
-          <text>Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis...</text>
+          <text>Lorem ipsum dolor sit amet...</text>
 		</Label>
         <Label fx:id="contentPreformatted">
-          <text>
-          		FXMLLoader fxmlLoader = new FXMLLoader();
-		fxmlLoader.setLocation(getClass().getResource("/main.fxml"));
-		Parent fxmlMain = fxmlLoader.load();
-		DataFormControllerEx controller = fxmlLoader.getController();
-		controller.setMainStage(stage);
-		</text>
+          <text/>
 		</Label>
-        <Label fx:id="contentFooter">
-          <text>https://github.com/mhrimaz/AwesomeJavaFX</text>
-        </Label>
       </children>
     </VBox>
   </center>

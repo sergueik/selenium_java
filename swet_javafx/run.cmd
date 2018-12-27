@@ -14,6 +14,9 @@ if "%M2_HOME%"=="" set M2_HOME=%TOOLS_DIR%\apache-maven-%MAVEN_VERSION%
 if "%M2%"=="" set M2=%M2_HOME%\bin
 
 set MAVEN_OPTS=-Xms256m -Xmx512m
+REM TODO: monochrome
+set TERM=
+
 PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 set TARGET=%CD%\target
 set DEBUG=false

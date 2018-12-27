@@ -27,6 +27,10 @@ public class CustFXMLConfirmationDialogEx extends Application {
 		FXMLLoader fxmlLoader = new FXMLLoader();
 		Map<String, String> data = new HashMap<>();
 		data.put("title", "Selenium Dialog (WIP)");
+		data.put("close message", "Abort dialog is closed");
+		data.put("header text", "The test is being aborted");
+		data.put("summary message", "Exception in the code");
+		data.put("continue button text", "Abort");
 		data.put("code", "Exception in Application start method\n" +
 "java.lang.reflect.InvocationTargetException\n" +
 "        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n" +
