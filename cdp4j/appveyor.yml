@@ -1,0 +1,37 @@
+version: '{build}'
+
+environment:
+  matrix:
+    - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
+
+# Do not build on tags
+skip_tags: true
+
+# Fix line endings in Windows. (runs before repo cloning)
+init:
+  - git config --global core.autocrlf input
+
+# Install scripts--runs after repo cloning
+install:
+  - ps: |
+      Add-Type -AssemblyName System.IO.Compression.FileSystem
+      choco install -y --no-progress googlechrome
+      if (!(Test-Path -Path "C:\maven")) {
+        (new-object System.Net.WebClient).DownloadFile(
+          'http://www.us.apache.org/dist/maven/maven-3/3.5.0/binaries/apache-maven-3.5.2-bin.zip',
+          'C:\maven-bin.zip'
+        )
+        [System.IO.Compression.ZipFile]::ExtractToDirectory("C:\maven-bin.zip", "C:\maven")
+      }
+      $env:Path +=";C:\maven\apache-maven-3.5.2\bin;%JAVA_HOME%\bin"
+
+cache:
+  - C:\maven
+  - C:\Users\appveyor\.m2
+
+build_script:
+  - mvn -q clean package -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+
+test_script:
+  - wmic datafile where name="C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe" get Version /value
+  - mvn -Dmaven.javadoc.skip=true -B -V -q package

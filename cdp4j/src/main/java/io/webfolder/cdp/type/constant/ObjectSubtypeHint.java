@@ -1,0 +1,69 @@
+/**
+ * cdp4j - Chrome DevTools Protocol for Java
+ * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package io.webfolder.cdp.type.constant;
+
+import com.google.gson.annotations.SerializedName;
+
+public enum ObjectSubtypeHint {
+    @SerializedName("array")
+    Array("array"),
+
+    @SerializedName("null")
+    Null("null"),
+
+    @SerializedName("node")
+    Node("node"),
+
+    @SerializedName("regexp")
+    Regexp("regexp"),
+
+    @SerializedName("date")
+    Date("date"),
+
+    @SerializedName("map")
+    Map("map"),
+
+    @SerializedName("set")
+    Set("set"),
+
+    @SerializedName("weakmap")
+    Weakmap("weakmap"),
+
+    @SerializedName("weakset")
+    Weakset("weakset"),
+
+    @SerializedName("iterator")
+    Iterator("iterator"),
+
+    @SerializedName("generator")
+    Generator("generator"),
+
+    @SerializedName("error")
+    Error("error");
+
+    public final String value;
+
+    ObjectSubtypeHint(String value) {
+        this.value = value;
+    }
+
+    @Override
+    public String toString() {
+        return value;
+    }
+}

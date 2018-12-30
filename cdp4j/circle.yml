@@ -1,0 +1,52 @@
+version: 2
+
+jobs:
+  build:
+    working_directory: ~/cdp4j
+    docker:
+      - image: circleci/openjdk:9-jdk-browsers
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: cdp4j-{{ checksum "pom.xml" }}
+
+      - run: mvn dependency:go-offline
+
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: cdp4j-{{ checksum "pom.xml" }}
+
+      - run:
+          name: Install Chrome Dependencies
+          command: sudo apt-get install lsb-release libxss1 libappindicator1 libindicator7
+
+      - run:
+          name: Download Chrome
+          command: |
+            mkdir -p chrome-archive
+            wget -qnc https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb -O chrome-archive/google-chrome-stable_current_amd64.deb
+
+      - run:
+          name: Install Chrome
+          command: |
+            sudo dpkg -i chrome-archive/google-chrome*.deb # Might show "errors", fixed by next line
+            sudo apt-get install -f
+
+      - run:
+          name: Print Chrome Version
+          command: google-chrome --version
+
+      - run:
+          name: Execute Chrome in Background
+          command: google-chrome --headless --no-default-browser-check --no-first-run --disable-translate --remote-debugging-port=9222 --disable-gpu
+          background: true
+
+      - run:
+          name: Execute Maven
+          command: mvn -Dmaven.javadoc.skip=true -B -V -q package
+
+      - store_test_results:
+          path: target/surefire-reports
