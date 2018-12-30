@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp;
 
@@ -36,6 +37,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import io.webfolder.cdp.exception.CdpException;
+import io.webfolder.cdp.logger.CdpLoggerType;
 import io.webfolder.cdp.session.SessionFactory;
 
 public class Launcher extends AbstractLauncher {
@@ -46,18 +48,10 @@ public class Launcher extends AbstractLauncher {
 
     private static final boolean OSX = OS.startsWith("mac");
 
-    private ProcessManager processManager = new NullProcessManager();
+    private ProcessManager processManager = new AdaptiveProcessManager();
 
-    private static class NullProcessManager extends ProcessManager {
-
-        @Override
-        void setProcess(CdpProcess process) {
-        }
-
-        @Override
-        public boolean kill() {
-            return false;
-        }
+    public Launcher(CdpLoggerType loggerType) {
+        this(new SessionFactory(loggerType));
     }
 
     public Launcher() {
@@ -176,6 +170,7 @@ public class Launcher extends AbstractLauncher {
 
             process.getOutputStream().close();
             process.getInputStream().close();
+            process.getErrorStream().close();
 
             if (!process.isAlive()) {
                 throw new CdpException("No process: the chrome process is not alive.");

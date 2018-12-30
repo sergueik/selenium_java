@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.sample;
 
@@ -34,15 +35,14 @@ public class IncognitoBrowsing {
 
         try (SessionFactory factory = launcher.launch(asList("--headless", "--disable-gpu"))) {
 
-            String firstContext = factory.createBrowserContext();
+            String firstContext = null;
 
-            try (Session firstSession = factory.create(firstContext)) {
+            try (Session firstSession = factory.create()) {
+                firstContext = firstSession.getBrowserContextId();
                 firstSession.navigate("https://httpbin.org/cookies/set?SESSION_ID=1");
                 firstSession.waitDocumentReady();
                 String session1Content = (String) firstSession.evaluate("window.document.body.textContent");
-                factory.disposeBrowserContext(firstContext);
-
-                System.out.println(session1Content);
+                System.err.println(session1Content);
             }
 
             // firstSession & anotherSession share same SESSSION_ID value
@@ -51,7 +51,7 @@ public class IncognitoBrowsing {
                 anotherSession.navigate("https://httpbin.org/cookies");
                 anotherSession.waitDocumentReady();
                 String anotherSessionContent = (String) anotherSession.evaluate("window.document.body.textContent");
-                System.out.println(anotherSessionContent);
+                System.err.println(anotherSessionContent);
             }
 
             String  secondContext = factory.createBrowserContext();
@@ -59,7 +59,7 @@ public class IncognitoBrowsing {
                 secondSession.navigate("https://httpbin.org/cookies");
                 secondSession.waitDocumentReady();
                 String session2Content = (String) secondSession.evaluate("window.document.body.textContent");
-                System.out.println(session2Content); 
+                System.err.println(session2Content); 
             }
 
             // Dispose first context

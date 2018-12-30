@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.type.css;
 
@@ -52,14 +53,20 @@ public class CSSMedia {
     }
 
     /**
-     * Source of the media query: "mediaRule" if specified by a @media rule, "importRule" if specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline stylesheet's STYLE tag.
+     * Source of the media query: "mediaRule" if specified by a @media rule, "importRule" if
+     * specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked
+     * stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline
+     * stylesheet's STYLE tag.
      */
     public CSSMediaSource getSource() {
         return source;
     }
 
     /**
-     * Source of the media query: "mediaRule" if specified by a @media rule, "importRule" if specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline stylesheet's STYLE tag.
+     * Source of the media query: "mediaRule" if specified by a @media rule, "importRule" if
+     * specified by an @import rule, "linkedSheet" if specified by a "media" attribute in a linked
+     * stylesheet's LINK tag, "inlineSheet" if specified by a "media" attribute in an inline
+     * stylesheet's STYLE tag.
      */
     public void setSource(CSSMediaSource source) {
         this.source = source;
@@ -80,14 +87,16 @@ public class CSSMedia {
     }
 
     /**
-     * The associated rule (@media or @import) header range in the enclosing stylesheet (if available).
+     * The associated rule (@media or @import) header range in the enclosing stylesheet (if
+     * available).
      */
     public SourceRange getRange() {
         return range;
     }
 
     /**
-     * The associated rule (@media or @import) header range in the enclosing stylesheet (if available).
+     * The associated rule (@media or @import) header range in the enclosing stylesheet (if
+     * available).
      */
     public void setRange(SourceRange range) {
         this.range = range;

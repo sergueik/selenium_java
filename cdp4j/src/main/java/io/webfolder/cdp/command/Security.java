@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
 
@@ -24,18 +25,25 @@ import io.webfolder.cdp.type.security.CertificateErrorAction;
 /**
  * Security
  */
-@Experimental
 @Domain("Security")
 public interface Security {
+    /**
+     * Disables tracking security state changes.
+     */
+    void disable();
+
     /**
      * Enables tracking security state changes.
      */
     void enable();
 
     /**
-     * Disables tracking security state changes.
+     * Enable/disable whether all certificate errors should be ignored.
+     * 
+     * @param ignore If true, all certificate errors will be ignored.
      */
-    void disable();
+    @Experimental
+    void setIgnoreCertificateErrors(Boolean ignore);
 
     /**
      * Handles a certificate error that fired a certificateError event.
@@ -46,7 +54,8 @@ public interface Security {
     void handleCertificateError(Integer eventId, CertificateErrorAction action);
 
     /**
-     * Enable/disable overriding certificate errors. If enabled, all certificate error events need to be handled by the DevTools client and should be answered with handleCertificateError commands.
+     * Enable/disable overriding certificate errors. If enabled, all certificate error events need to
+     * be handled by the DevTools client and should be answered with <code>handleCertificateError</code> commands.
      * 
      * @param override If true, certificate errors will be overridden.
      */

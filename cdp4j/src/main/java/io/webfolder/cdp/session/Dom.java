@@ -1,29 +1,33 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import static io.webfolder.cdp.session.Option.TYPE_TOKEN;
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.Math.floor;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toList;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,6 +36,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import com.google.gson.Gson;
 
@@ -42,6 +47,7 @@ import io.webfolder.cdp.type.runtime.CallFunctionOnResult;
 import io.webfolder.cdp.type.runtime.ExceptionDetails;
 import io.webfolder.cdp.type.runtime.PropertyDescriptor;
 import io.webfolder.cdp.type.runtime.RemoteObject;
+import io.webfolder.cdp.type.util.Point;
 
 /**
  * Provides the interfaces for the Document Object Model (DOM).
@@ -641,7 +647,17 @@ public interface Dom {
     default String getValue(
                     final String selector,
                     final Object ...args) {
-        return getAttribute(selector, "value", args);
+        String objectId = getThis().getObjectId(selector, args);
+        if (objectId == null) {
+            throw new ElementNotFoundException(format(selector, args));
+        }
+        String value = (String) getThis().getPropertyByObjectId(objectId, "value");
+        getThis().releaseObject(objectId);
+        if (value == null) {
+            return null;
+        }
+        getThis().logExit("getValue", format(selector, args), value);
+        return value;
     }
 
     /**
@@ -870,7 +886,109 @@ public interface Dom {
      */
     default String getOuterHtml(String selector, Object... args) {
         Integer nodeId = getThis().getNodeId(null, selector, args);
-        return getThis().getCommand().getDOM().getOuterHTML(nodeId);
+        return getThis().getCommand().getDOM().getOuterHTML(nodeId, null, null);
+    }
+
+    default void scrollIntoViewIfNeeded(String selector) {
+        scrollIntoViewIfNeeded(selector, Constant.EMPTY_ARGS);
+    }
+
+    default void scrollIntoViewIfNeeded(String selector, Object... args) {
+        String objectId = getThis().getObjectId(selector, args);
+        String fn = "function() {" +
+                    "    var scrollIfNeeded = async function(element) {" +
+                    "        const visibleRatio = await new Promise(resolve => {" +
+                    "            const observer = new IntersectionObserver(entries => {" +
+                    "                resolve(entries[0].intersectionRatio);" +
+                    "                observer.disconnect();" +
+                    "            });" +
+                    "            observer.observe(element);" +
+                    "        });" +
+                    "        if (visibleRatio !== 1.0) element.scrollIntoView({" +
+                    "            block: 'center'," +
+                    "            inline: 'center'," +
+                    "            behavior: 'instant'" +
+                    "        });" +
+                    "        return false;" +
+                    "    };" +
+                    "    return scrollIfNeeded(this);" +
+                    "}";
+        CallFunctionOnResult obj = getThis()
+                                    .getCommand()
+                                    .getRuntime()
+                                    .callFunctionOn(fn, objectId, null,
+                                                        FALSE, FALSE, FALSE,
+                                                        FALSE, TRUE, null,
+                                                        null);
+        if ( obj != null && obj.getResult() != null ) {
+            getThis().releaseObject(obj.getResult().getObjectId());
+        }
+        if ( objectId != null ) {
+            getThis().releaseObject(objectId);
+        }
+    }
+
+    default Point getClickablePoint(String selector) {
+        return getClickablePoint(selector, Constant.EMPTY_ARGS);
+    }
+
+    default Point getClickablePoint(String selector, final Object... args) {
+        DOM dom = getThis().getCommand().getDOM();
+        Integer nodeId = getThis().getNodeId(format(selector, args));
+        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
+            throw new ElementNotFoundException(format(selector, args));
+        }
+        boolean supportsQuad = getThis().getMajorVersion() >= 69;
+        if ( ! supportsQuad ) {
+            BoxModel boxModel = dom.getBoxModel(nodeId, null, null);
+            if (boxModel == null) {
+                return null;
+            }
+            List<Double> content = boxModel.getContent();
+            if (content == null           ||
+                    content.isEmpty() ||
+                    content.size() < 2) {
+                return null;
+            }
+            double left = floor(content.get(0));
+            double top  = floor(content.get(1));
+            return new Point(left, top);
+        } else {
+            // Compute sum of all directed areas of adjacent triangles
+            // https://en.wikipedia.org/wiki/Polygon#Simple_polygons
+            Function<List<Point>, Double> computeQuadArea = quad -> {
+                Double area = 0D;
+                for (int i = 0; i < quad.size(); ++i) {
+                    final Point p1 = quad.get(i);
+                    final Point p2 = quad.get((i + 1) % quad.size());
+                    area += (p1.x * p2.y - p2.x * p1.y) / 2;
+                }
+                return area;
+            };
+            List<List<Double>> quads = dom.getContentQuads(nodeId, null, null);
+            // Filter out quads that have too small area to click into
+            List<List<Point>> clickableQuads = quads.stream()
+                                                    .map(quad -> {
+                                                        List<Point> list = new ArrayList<>();
+                                                        list.add(new Point(quad.get(0), quad.get(1)));
+                                                        list.add(new Point(quad.get(2), quad.get(3)));
+                                                        list.add(new Point(quad.get(4), quad.get(5)));
+                                                        list.add(new Point(quad.get(6), quad.get(7)));
+                                                        return list;
+                                                    }).filter(t -> computeQuadArea.apply(t) > 1)
+                                                    .collect(toList());
+            // Return the middle point of the first quad
+            List<Point> quad = clickableQuads.get(0);
+            Double x = 0D;
+            Double y = 0D;
+            for(Point next : quad) {
+                x += next.x;
+                y += next.y;
+            }
+            x = x / 4;
+            y = y / 4;
+            return new Point(x, y);
+        }
     }
 
     Session getThis();

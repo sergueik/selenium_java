@@ -23,9 +23,12 @@ import java.io.OutputStream;
 
 class WebSocketOutputStream extends BufferedOutputStream
 {
-    public WebSocketOutputStream(OutputStream out)
+    private Masker payloadMask;
+
+    public WebSocketOutputStream(OutputStream out, Masker payloadMask)
     {
         super(out);
+        this.payloadMask = (payloadMask == null) ? new DefaultMasker() : payloadMask;
     }
 
 
@@ -45,13 +48,13 @@ class WebSocketOutputStream extends BufferedOutputStream
         writeFrameExtendedPayloadLength(frame);
 
         // Generate a random masking key.
-        byte[] maskingKey = Misc.nextBytes(4);
+        byte[] maskingKey = this.payloadMask.getMaskingKey();
 
         // Write the masking key.
-        write(maskingKey, 0, maskingKey.length);
+        write(maskingKey);
 
         // Write the payload.
-        writeFramePayload(frame, maskingKey);
+        writeFramePayload(frame);
     }
 
 
@@ -121,7 +124,7 @@ class WebSocketOutputStream extends BufferedOutputStream
     }
 
 
-    private void writeFramePayload(WebSocketFrame frame, byte[] maskingKey) throws IOException
+    private void writeFramePayload(WebSocketFrame frame) throws IOException
     {
         byte[] payload = frame.getPayload();
 
@@ -130,13 +133,9 @@ class WebSocketOutputStream extends BufferedOutputStream
             return;
         }
 
-        for (int i = 0; i < payload.length; ++i)
-        {
-            // Mask
-            int b = (payload[i] ^ maskingKey[i % 4]) & 0xFF;
+        this.payloadMask.mask(payload);
 
             // Write
-            write(b);
-        }
+        write(payload);
     }
 }

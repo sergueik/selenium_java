@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -22,9 +23,11 @@ import static io.webfolder.cdp.event.Events.LogEntryAdded;
 import static io.webfolder.cdp.event.Events.NetworkResponseReceived;
 import static io.webfolder.cdp.event.Events.PageLifecycleEvent;
 import static io.webfolder.cdp.event.Events.RuntimeConsoleAPICalled;
+import static io.webfolder.cdp.session.WaitUntil.DomReady;
+import static io.webfolder.cdp.session.WaitUntil.Load;
 import static io.webfolder.cdp.type.constant.ImageFormat.Png;
-import static io.webfolder.cdp.type.page.ResourceType.Document;
-import static io.webfolder.cdp.type.page.ResourceType.XHR;
+import static io.webfolder.cdp.type.network.ResourceType.Document;
+import static io.webfolder.cdp.type.network.ResourceType.XHR;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Math.floor;
@@ -32,11 +35,16 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.lang.ThreadLocal.withInitial;
 import static java.lang.reflect.Proxy.newProxyInstance;
+import static java.util.Arrays.asList;
 import static java.util.Locale.ENGLISH;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -47,6 +55,10 @@ import java.util.function.Predicate;
 import com.google.gson.Gson;
 import com.neovisionaries.ws.client.WebSocket;
 
+import io.webfolder.cdp.JsFunction;
+import io.webfolder.cdp.annotation.Experimental;
+import io.webfolder.cdp.annotation.Optional;
+import io.webfolder.cdp.command.CSS;
 import io.webfolder.cdp.command.Emulation;
 import io.webfolder.cdp.command.Page;
 import io.webfolder.cdp.event.log.EntryAdded;
@@ -54,17 +66,21 @@ import io.webfolder.cdp.event.network.ResponseReceived;
 import io.webfolder.cdp.event.page.LifecycleEvent;
 import io.webfolder.cdp.event.runtime.ConsoleAPICalled;
 import io.webfolder.cdp.exception.CdpException;
+import io.webfolder.cdp.exception.DestinationUnreachableException;
 import io.webfolder.cdp.exception.LoadTimeoutException;
 import io.webfolder.cdp.listener.EventListener;
 import io.webfolder.cdp.listener.TerminateEvent;
 import io.webfolder.cdp.listener.TerminateListener;
 import io.webfolder.cdp.logger.CdpLogger;
-import io.webfolder.cdp.logger.CdpLoggerFactory;
+import io.webfolder.cdp.logger.LoggerFactory;
+import io.webfolder.cdp.type.constant.ImageFormat;
 import io.webfolder.cdp.type.css.SourceRange;
 import io.webfolder.cdp.type.dom.Rect;
 import io.webfolder.cdp.type.log.LogEntry;
 import io.webfolder.cdp.type.network.Response;
 import io.webfolder.cdp.type.page.GetLayoutMetricsResult;
+import io.webfolder.cdp.type.page.NavigateResult;
+import io.webfolder.cdp.type.page.Viewport;
 import io.webfolder.cdp.type.runtime.RemoteObject;
 
 public class Session implements AutoCloseable,
@@ -73,16 +89,13 @@ public class Session implements AutoCloseable,
                                 Mouse        ,
                                 Navigator    ,
                                 JavaScript   ,
-                                Sizzle       ,
                                 Dom          {
 
     private final Map<Class<?>, Object> proxies = new ConcurrentHashMap<>();
 
     private AtomicBoolean connected = new AtomicBoolean(true);
 
-    private final AtomicBoolean enableSizzle = new AtomicBoolean();
-
-    private final List<EventListener<?>> eventListeners;
+    private final List<EventListener> listeners;
 
     private final SessionInvocationHandler invocationHandler;
 
@@ -98,7 +111,11 @@ public class Session implements AutoCloseable,
 
     private final Gson gson;
 
-    private TerminateListener terminateListener;
+    private final String targetId;
+
+    private final boolean browserSession;
+
+    private volatile TerminateListener terminateListener;
 
     private String frameId;
 
@@ -106,30 +123,52 @@ public class Session implements AutoCloseable,
 
     private final ReentrantLock lock = new ReentrantLock(true);
 
+    private String browserContextId;
+
+    private volatile Integer executionContextId;
+
+    private final int majorVersion;
+
+    private final Map<Class<?>, Object> jsFunctions;
+
     private static final ThreadLocal<Boolean> ENABLE_ENTRY_EXIT_LOG = 
                                                     withInitial(() -> { return TRUE; });
 
     Session(
             final Gson gson,
             final String sessionId,
+            final String targetId,
+            final String browserContextId,
             final WebSocket webSocket,
             final Map<Integer, WSContext> contextList,
             final SessionFactory sessionFactory,
-            final List<EventListener<?>> eventListeners,
-            final CdpLoggerFactory loggerFactory) {
+            final List<EventListener> eventListeners,
+            final LoggerFactory loggerFactory,
+            final boolean browserSession,
+            final Session session,
+            final int majorVersion) {
         this.sessionId = sessionId;
+        this.browserContextId = browserContextId;
         this.invocationHandler = new SessionInvocationHandler(
                                                         gson,
                                                         webSocket,
                                                         contextList,
-                                                        this,
-                                                        loggerFactory.getLogger("cdp4j.ws.request"));
+                                                        session == null ? this : session,
+                                                        loggerFactory.getLogger("cdp4j.ws.request"),
+                                                        browserSession,
+                                                        sessionId,
+                                                        targetId,
+                                                        sessionFactory.getWebSocketReadTimeout());
+        this.targetId         = targetId; 
         this.sesessionFactory = sessionFactory;
-        this.eventListeners   = eventListeners;
+        this.listeners   = eventListeners;
         this.webSocket        = webSocket;
         this.log              = loggerFactory.getLogger("cdp4j.session");
         this.logFlow          = loggerFactory.getLogger("cdp4j.flow");
         this.gson             = gson;
+        this.browserSession   = browserSession;
+        this.majorVersion     = majorVersion;
+        this.jsFunctions      = new ConcurrentHashMap<>();
         this.command          = new Command(this);
     }
 
@@ -143,12 +182,15 @@ public class Session implements AutoCloseable,
     @Override
     public void close() {
         logEntry("close");
-        if (connected.get()) {
+        if (isConnected()) {
             try {
                 sesessionFactory.close(this);
             } finally {
+                terminate("closed");
                 connected.set(false);
             }
+        } else {
+            dispose();
         }
     }
 
@@ -167,16 +209,16 @@ public class Session implements AutoCloseable,
     /**
      * Use {@link Session#getListenerManager()}
      */
-    public void addEventListener(EventListener<?> eventListener) {
-        eventListeners.add(eventListener);
+    public void addEventListener(EventListener eventListener) {
+        listeners.add(eventListener);
     }
 
     /**
      * Use {@link Session#getListenerManager()}
      */
-    public void removeEventEventListener(EventListener<?> eventListener) {
+    public void removeEventEventListener(EventListener eventListener) {
         if (eventListener != null) {
-            eventListeners.remove(eventListener);
+            listeners.remove(eventListener);
         }
     }
 
@@ -209,8 +251,7 @@ public class Session implements AutoCloseable,
         AtomicBoolean  loaded = new AtomicBoolean(false);
         AtomicBoolean  ready  = new AtomicBoolean(false);
         if (isConnected()) {
-            command.getPage().enable();
-            EventListener<?> loadListener = (e, d) -> {
+            EventListener loadListener = (e, d) -> {
                 if (PageLifecycleEvent.equals(e) &&
                         "load".equalsIgnoreCase(((LifecycleEvent) d).getName())) {
                     latch.countDown();
@@ -291,8 +332,76 @@ public class Session implements AutoCloseable,
 
     public Session navigate(final String url) {
         logEntry("navigate", url);
-        command.getInspector().enable();
-        this.frameId = command.getPage().navigate(url);
+        NavigateResult navigate = command.getPage().navigate(url);
+        if ( navigate != null ) {
+            this.frameId = navigate.getFrameId();
+        } else {
+            throw new DestinationUnreachableException(url);
+        }
+        return this;
+    }
+
+    public Session navigateAndWait(final String url, WaitUntil condition) {
+        return navigateAndWait(url, condition, 10_000);
+    }
+
+    public Session navigateAndWait(final String    url,
+                                   final WaitUntil condition,
+                                   final int       timeout) {
+
+        long start = System.currentTimeMillis();
+
+        final WaitUntil waitUntil =
+                            DomReady.equals(condition) ? Load : condition;
+
+        logEntry("navigateAndWait",
+                            format("[url=%s, waitUntil=%s, timeout=%d]", url, condition.name(), timeout));
+
+        NavigateResult navigate = command.getPage().navigate(url);
+        if (navigate == null) {
+            throw new DestinationUnreachableException(url);
+        }
+
+        this.frameId = navigate.getFrameId();
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+        EventListener loadListener = (e, d) -> {
+            if (PageLifecycleEvent.equals(e)) {
+                LifecycleEvent le = (LifecycleEvent) d;
+                if (waitUntil.value.equals(le.getName())) {
+                    latch.countDown();
+                }
+            }
+        };
+
+        addEventListener(loadListener);
+
+        try {
+            latch.await(timeout, MILLISECONDS);
+        } catch (InterruptedException e) {
+            throw new LoadTimeoutException(e);
+        } finally {
+            removeEventEventListener(loadListener);
+        }
+
+        long elapsedTime = System.currentTimeMillis() - start;
+        if (elapsedTime > timeout) {
+            throw new LoadTimeoutException("Page not loaded within " + timeout + " ms");
+        }
+
+        if ( DomReady.equals(condition) && ! isDomReady() ) {
+            try {
+                disableFlowLog();
+                boolean ready = waitUntil(p -> isDomReady(), timeout - (int) elapsedTime, 10);
+                if ( ! ready ) {
+                    throw new LoadTimeoutException("Page not loaded within " + timeout + " ms");
+                }
+            } finally {
+                enableFlowLog();
+            }
+        }
+        
         return this;
     }
 
@@ -381,23 +490,64 @@ public class Session implements AutoCloseable,
         return frameId;
     }
 
+    /**
+     * Capture page screenshot.
+     */
     public byte[] captureScreenshot() {
+        return captureScreenshot(false, Png, null, null, true);
+    }
+
+    /**
+     * Capture page screenshot.
+     * 
+     * @param hideScrollbar hides the scollbar
+     */
+    public byte[] captureScreenshot(boolean hideScrollbar) {
+        return captureScreenshot(hideScrollbar, Png, null, null, true);
+    }
+
+    /**
+     * Capture page screenshot.
+     * 
+     * @param hideScrollbar hides the scollbar
+     * @param format Image compression format (defaults to png).
+     * @param quality Compression quality from range [0..100] (jpeg only).
+     * @param clip Capture the screenshot of a given region only.
+     * @param fromSurface Capture the screenshot from the surface, rather than the view. Defaults to true.
+     */
+    public byte[] captureScreenshot(boolean hideScrollbar,
+                                    @Optional ImageFormat format,
+                                    @Optional Integer quality,
+                                    @Optional Viewport clip,
+                                    @Experimental @Optional Boolean fromSurface) {
         SourceRange location = new SourceRange();
         location.setEndColumn(0);
         location.setEndLine(0);
         location.setStartColumn(0);
         location.setStartLine(0);
+        String styleSheetId = null;
+        if (hideScrollbar) {
+            getThis().getCommand().getDOM().enable();
+            CSS css = getThis().getCommand().getCSS();
+            css.enable();
+            styleSheetId = css.createStyleSheet(frameId);
+            css.addRule(styleSheetId, "::-webkit-scrollbar { display: none !important; }", location);
+        }
         Page page = getThis().getCommand().getPage();
         GetLayoutMetricsResult metrics = page.getLayoutMetrics();
         Rect cs = metrics.getContentSize();
         Emulation emulation = getThis().getCommand().getEmulation();
         emulation.setDeviceMetricsOverride(cs.getWidth().intValue(), cs.getHeight().intValue(), 1D, false);
-        byte[] data = page.captureScreenshot(Png, null, null, true);        
+        byte[] data = page.captureScreenshot(format, quality, clip, fromSurface);
         emulation.clearDeviceMetricsOverride();
         emulation.resetPageScaleFactor();
+        if (hideScrollbar) {
+            CSS css = getThis().getCommand().getCSS();
+            css.setStyleSheetText(styleSheetId, "");
+        }
         return data;
     }
-
+    
     /**
      * Causes the current thread to wait until waiting time elapses.
      * 
@@ -429,7 +579,9 @@ public class Session implements AutoCloseable,
                 }
                 condition.await(timeout, MILLISECONDS);
             } catch (InterruptedException e) {
-                throw new CdpException(e);
+                if (webSocket.isOpen() && connected.get()) {
+                    throw new CdpException(e);
+                }
             } finally {
                 if (lock.isLocked()) {
                     lock.unlock();
@@ -477,11 +629,15 @@ public class Session implements AutoCloseable,
 
     void dispose() {
         proxies.clear();
-        eventListeners.clear();
+        listeners.clear();
+        jsFunctions.clear();
         invocationHandler.dispose();
-        try {
-            webSocket.disconnect(NORMAL, null, 1000); // max wait time to close: 1 seconds
-        } catch (Throwable t) {
+        if (browserSession && webSocket.isOpen()) {
+            try {
+                webSocket.disconnect(NORMAL, null, 1000); // max wait time to close: 1 seconds
+            } catch (Throwable t) {
+                // ignore
+            }
         }
     }
 
@@ -490,8 +646,9 @@ public class Session implements AutoCloseable,
     }
 
     void terminate(String message) {
-        if (terminateListener != null) {
+        if ( terminateListener != null ) {
             terminateListener.onTerminate(new TerminateEvent(message));
+            terminateListener = null;
         }
     }
 
@@ -547,14 +704,6 @@ public class Session implements AutoCloseable,
         });
     }
 
-    void setSizzle(final boolean enable) {
-        this.enableSizzle.set(enable);
-    }
-
-    boolean getSizzle() {
-        return this.enableSizzle.get();
-    }
-
     @SuppressWarnings("unchecked")
     <T> T getProxy(Class<T> klass) {
         T proxy = (T) proxies.get(klass);
@@ -577,6 +726,82 @@ public class Session implements AutoCloseable,
 
     void enableFlowLog() {
         ENABLE_ENTRY_EXIT_LOG.set(TRUE);
+    }
+
+    WSContext getContext(int id) {
+        return invocationHandler.getContext(id);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T registerJsFunction(Class<T> klass) {
+        if ( ! klass.isInterface() ) {
+            throw new CdpException("Class must be interface: " + klass.getName());
+        }
+        if (asList(klass.getMethods())
+                        .stream()
+                        .filter(p -> p.isAnnotationPresent(JsFunction.class))
+                        .count() == 0) {
+            throw new CdpException("Interface must be contain at least one @JsFunction");
+        }
+        if (jsFunctions.containsKey(klass)) {
+            throw new CdpException("Duplicate Registration is not allowed: " + klass);
+        }
+        if (jsFunctions.keySet()
+                        .stream()
+                        .filter(p -> p.getSimpleName()
+                        .equals(klass.getSimpleName())).count() > 0) {
+            throw new CdpException("Duplicate class name is not allowed: " + klass.getSimpleName());            
+        }
+        Method[] methods = klass.getMethods();
+        StringBuilder builder = new StringBuilder();
+        builder.append(format("document.%s = document.%s || {};", klass.getSimpleName(), klass.getSimpleName()));
+        for (Method next : methods) {
+            JsFunction function = next.getAnnotation(JsFunction.class);
+            if (function == null) {
+                continue;
+            }
+            StringBuilder jsMethod = new StringBuilder();
+            jsMethod.append("document.");
+            jsMethod.append(klass.getSimpleName());
+            jsMethod.append(".");
+            jsMethod.append(next.getName());
+            jsMethod.append(" = function(");
+            int count = next.getParameterCount();
+            StringJoiner joiner = new StringJoiner(", ");
+            for (int i = 0; i < count; i++) {
+                Parameter parameter = next.getParameters()[i];
+                joiner.add(parameter.getName());
+            }
+            jsMethod.append(joiner.toString());
+            jsMethod.append(") { ");
+            jsMethod.append(function.value());
+            jsMethod.append(" };");
+            builder.append(jsMethod.toString());
+        }
+        Page page = getCommand().getPage();
+        page.enable();
+        page.addScriptToEvaluateOnNewDocument(builder.toString());
+        Object instance = newProxyInstance(getClass().getClassLoader(),
+                                            new Class<?>[] { klass },
+                                            (InvocationHandler) (proxy, method, args) -> {
+            String className = method.getDeclaringClass().getSimpleName();
+            String methodName = method.getName();
+            Class<?> returnType = method.getReturnType();
+            if ((void.class.equals(returnType) || Void.class.equals(returnType)) && (args == null || args.length == 0)) {
+                callFunction("document." + className + "." + methodName);
+                return null;
+            } else {
+                Object result = callFunction("document." + className + "." + methodName, returnType, args);
+                return result;
+            }
+        });
+        jsFunctions.put(klass, instance);
+        return (T) instance;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getJsFunction(Class<T> klass) {
+        return (T) jsFunctions.get(klass);
     }
 
     boolean isPrimitive(Class<?> klass) {
@@ -602,6 +827,26 @@ public class Session implements AutoCloseable,
             return true;
         }
         return false;
+    }
+
+    public int getMajorVersion() {
+        return majorVersion;
+    }
+
+    public String getTargetId() {
+        return targetId;
+    }
+    
+    public String getBrowserContextId() {
+        return browserContextId;
+    }
+
+    public Integer getExecutionContextId() {
+        return executionContextId;
+    }
+
+    void setExecutionContextId(Integer executionContextId) {
+        this.executionContextId = executionContextId;
     }
 
     @Override

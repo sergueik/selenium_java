@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.sample;
 
@@ -29,6 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -40,10 +42,11 @@ import org.w3c.dom.NodeList;
 import io.webfolder.cdp.Launcher;
 import io.webfolder.cdp.event.network.LoadingFinished;
 import io.webfolder.cdp.event.network.ResponseReceived;
+import io.webfolder.cdp.exception.CdpException;
 import io.webfolder.cdp.session.Session;
 import io.webfolder.cdp.session.SessionFactory;
 import io.webfolder.cdp.type.network.GetResponseBodyResult;
-import io.webfolder.cdp.type.page.ResourceType;
+import io.webfolder.cdp.type.network.ResourceType;
 
 public class Crawler {
 
@@ -168,7 +171,7 @@ public class Crawler {
                     ResourceType type = rr.getType();
 
                     if (ResourceType.Document.equals(type)) {
-                        webResource.setResponseHeaders(rr.getResponse().getHeaders());
+                        webResource.setResponseHeaders(new ConcurrentHashMap<>(rr.getResponse().getHeaders()));
                         webResource.setStatus(rr.getResponse().getStatus().intValue());
                         webResource.setUrl(rr.getResponse().getUrl());
                         webResource.setRequestId(rr.getRequestId());
@@ -179,12 +182,16 @@ public class Crawler {
             session.navigate(url);
             session.waitDocumentReady(pageLoadTimeout);
 
-            for (String requestId : finishedResources) {
-                GetResponseBodyResult rb = session.getCommand().getNetwork().getResponseBody(requestId);
-                if ( rb.getBase64Encoded() ) {
-                    webResource.setContent(getDecoder().decode(rb.getBody()));
-                } else {
-                    webResource.setDocument(rb.getBody());
+            for (String requestId : new ArrayList<>(finishedResources)) {
+                try {
+                    GetResponseBodyResult rb = session.getCommand().getNetwork().getResponseBody(requestId);
+                    if ( rb.getBase64Encoded() ) {
+                        webResource.setContent(getDecoder().decode(rb.getBody()));
+                    } else {
+                        webResource.setDocument(rb.getBody());
+                    }
+                } catch (CdpException e) {
+                    // ignore
                 }
             }
 

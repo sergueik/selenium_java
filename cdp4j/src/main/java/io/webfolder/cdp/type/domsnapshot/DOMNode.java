@@ -1,23 +1,26 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.type.domsnapshot;
 
 import io.webfolder.cdp.type.dom.PseudoType;
+import io.webfolder.cdp.type.dom.ShadowRootType;
+import io.webfolder.cdp.type.domdebugger.EventListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,13 +68,21 @@ public class DOMNode {
 
     private Integer contentDocumentIndex;
 
-    private Integer importedDocumentIndex;
-
-    private Integer templateContentIndex;
-
     private PseudoType pseudoType;
 
+    private ShadowRootType shadowRootType;
+
     private Boolean isClickable;
+
+    private List<EventListener> eventListeners = new ArrayList<>();
+
+    private String currentSourceURL;
+
+    private String originURL;
+
+    private Double scrollOffsetX;
+
+    private Double scrollOffsetY;
 
     /**
      * <code>Node</code>'s nodeType.
@@ -102,7 +113,7 @@ public class DOMNode {
     }
 
     /**
-     * <code>Node</code>'s nodeValue.
+     * <code>Node<code>'s nodeValue.
      */
     public String getNodeValue() {
         return nodeValue;
@@ -186,21 +197,23 @@ public class DOMNode {
     }
 
     /**
-     * The indexes of the node's child nodes in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The indexes of the node's child nodes in the <code>domNodes</code> array returned by<code>getSnapshot</code>, if
+     * any.
      */
     public List<Integer> getChildNodeIndexes() {
         return childNodeIndexes;
     }
 
     /**
-     * The indexes of the node's child nodes in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The indexes of the node's child nodes in the <code>domNodes</code> array returned by<code>getSnapshot</code>, if
+     * any.
      */
     public void setChildNodeIndexes(List<Integer> childNodeIndexes) {
         this.childNodeIndexes = childNodeIndexes;
     }
 
     /**
-     * Attributes of an <code>Element</code> node.
+     * Attributes of an<code>Element</code> node.
      */
     public List<NameValue> getAttributes() {
         return attributes;
@@ -214,28 +227,32 @@ public class DOMNode {
     }
 
     /**
-     * Indexes of pseudo elements associated with this node in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * Indexes of pseudo elements associated with this node in the <code>domNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public List<Integer> getPseudoElementIndexes() {
         return pseudoElementIndexes;
     }
 
     /**
-     * Indexes of pseudo elements associated with this node in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * Indexes of pseudo elements associated with this node in the <code>domNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public void setPseudoElementIndexes(List<Integer> pseudoElementIndexes) {
         this.pseudoElementIndexes = pseudoElementIndexes;
     }
 
     /**
-     * The index of the node's related layout tree node in the <code>layoutTreeNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The index of the node's related layout tree node in the <code>layoutTreeNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public Integer getLayoutNodeIndex() {
         return layoutNodeIndex;
     }
 
     /**
-     * The index of the node's related layout tree node in the <code>layoutTreeNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The index of the node's related layout tree node in the <code>layoutTreeNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public void setLayoutNodeIndex(Integer layoutNodeIndex) {
         this.layoutNodeIndex = layoutNodeIndex;
@@ -340,45 +357,19 @@ public class DOMNode {
     }
 
     /**
-     * The index of a frame owner element's content document in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The index of a frame owner element's content document in the <code>domNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public Integer getContentDocumentIndex() {
         return contentDocumentIndex;
     }
 
     /**
-     * The index of a frame owner element's content document in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
+     * The index of a frame owner element's content document in the <code>domNodes</code> array returned by
+     * <code>getSnapshot</code>, if any.
      */
     public void setContentDocumentIndex(Integer contentDocumentIndex) {
         this.contentDocumentIndex = contentDocumentIndex;
-    }
-
-    /**
-     * Index of the imported document's node of a link element in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
-     */
-    public Integer getImportedDocumentIndex() {
-        return importedDocumentIndex;
-    }
-
-    /**
-     * Index of the imported document's node of a link element in the <code>domNodes</code> array returned by <code>getSnapshot</code>, if any.
-     */
-    public void setImportedDocumentIndex(Integer importedDocumentIndex) {
-        this.importedDocumentIndex = importedDocumentIndex;
-    }
-
-    /**
-     * Index of the content node of a template element in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
-     */
-    public Integer getTemplateContentIndex() {
-        return templateContentIndex;
-    }
-
-    /**
-     * Index of the content node of a template element in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
-     */
-    public void setTemplateContentIndex(Integer templateContentIndex) {
-        this.templateContentIndex = templateContentIndex;
     }
 
     /**
@@ -396,16 +387,98 @@ public class DOMNode {
     }
 
     /**
-     * Whether this DOM node responds to mouse clicks. This includes nodes that have had click event listeners attached via JavaScript as well as anchor tags that naturally navigate when clicked.
+     * Shadow root type.
+     */
+    public ShadowRootType getShadowRootType() {
+        return shadowRootType;
+    }
+
+    /**
+     * Shadow root type.
+     */
+    public void setShadowRootType(ShadowRootType shadowRootType) {
+        this.shadowRootType = shadowRootType;
+    }
+
+    /**
+     * Whether this DOM node responds to mouse clicks. This includes nodes that have had click
+     * event listeners attached via JavaScript as well as anchor tags that naturally navigate when
+     * clicked.
      */
     public Boolean isIsClickable() {
         return isClickable;
     }
 
     /**
-     * Whether this DOM node responds to mouse clicks. This includes nodes that have had click event listeners attached via JavaScript as well as anchor tags that naturally navigate when clicked.
+     * Whether this DOM node responds to mouse clicks. This includes nodes that have had click
+     * event listeners attached via JavaScript as well as anchor tags that naturally navigate when
+     * clicked.
      */
     public void setIsClickable(Boolean isClickable) {
         this.isClickable = isClickable;
+    }
+
+    /**
+     * Details of the node's event listeners, if any.
+     */
+    public List<EventListener> getEventListeners() {
+        return eventListeners;
+    }
+
+    /**
+     * Details of the node's event listeners, if any.
+     */
+    public void setEventListeners(List<EventListener> eventListeners) {
+        this.eventListeners = eventListeners;
+    }
+
+    /**
+     * The selected url for nodes with a srcset attribute.
+     */
+    public String getCurrentSourceURL() {
+        return currentSourceURL;
+    }
+
+    /**
+     * The selected url for nodes with a srcset attribute.
+     */
+    public void setCurrentSourceURL(String currentSourceURL) {
+        this.currentSourceURL = currentSourceURL;
+    }
+
+    /**
+     * The url of the script (if any) that generates this node.
+     */
+    public String getOriginURL() {
+        return originURL;
+    }
+
+    /**
+     * The url of the script (if any) that generates this node.
+     */
+    public void setOriginURL(String originURL) {
+        this.originURL = originURL;
+    }
+
+    /**
+     * Scroll offsets, set when this node is a Document.
+     */
+    public Double getScrollOffsetX() {
+        return scrollOffsetX;
+    }
+
+    /**
+     * Scroll offsets, set when this node is a Document.
+     */
+    public void setScrollOffsetX(Double scrollOffsetX) {
+        this.scrollOffsetX = scrollOffsetX;
+    }
+
+    public Double getScrollOffsetY() {
+        return scrollOffsetY;
+    }
+
+    public void setScrollOffsetY(Double scrollOffsetY) {
+        this.scrollOffsetY = scrollOffsetY;
     }
 }

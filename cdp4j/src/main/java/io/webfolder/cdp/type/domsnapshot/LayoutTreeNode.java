@@ -1,23 +1,23 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.type.domsnapshot;
 
-import io.webfolder.cdp.type.css.InlineTextBox;
 import io.webfolder.cdp.type.dom.Rect;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,29 +36,33 @@ public class LayoutTreeNode {
 
     private Integer styleIndex;
 
+    private Integer paintOrder;
+
+    private Boolean isStackingContext;
+
     /**
-     * The index of the related DOM node in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
+     * The index of the related DOM node in the <code>domNodes</code> array returned by<code>getSnapshot</code>.
      */
     public Integer getDomNodeIndex() {
         return domNodeIndex;
     }
 
     /**
-     * The index of the related DOM node in the <code>domNodes</code> array returned by <code>getSnapshot</code>.
+     * The index of the related DOM node in the <code>domNodes</code> array returned by<code>getSnapshot</code>.
      */
     public void setDomNodeIndex(Integer domNodeIndex) {
         this.domNodeIndex = domNodeIndex;
     }
 
     /**
-     * The absolute position bounding box.
+     * The bounding box in document coordinates. Note that scroll offset of the document is ignored.
      */
     public Rect getBoundingBox() {
         return boundingBox;
     }
 
     /**
-     * The absolute position bounding box.
+     * The bounding box in document coordinates. Note that scroll offset of the document is ignored.
      */
     public void setBoundingBox(Rect boundingBox) {
         this.boundingBox = boundingBox;
@@ -104,5 +108,37 @@ public class LayoutTreeNode {
      */
     public void setStyleIndex(Integer styleIndex) {
         this.styleIndex = styleIndex;
+    }
+
+    /**
+     * Global paint order index, which is determined by the stacking order of the nodes. Nodes
+     * that are painted together will have the same index. Only provided if includePaintOrder in
+     * getSnapshot was true.
+     */
+    public Integer getPaintOrder() {
+        return paintOrder;
+    }
+
+    /**
+     * Global paint order index, which is determined by the stacking order of the nodes. Nodes
+     * that are painted together will have the same index. Only provided if includePaintOrder in
+     * getSnapshot was true.
+     */
+    public void setPaintOrder(Integer paintOrder) {
+        this.paintOrder = paintOrder;
+    }
+
+    /**
+     * Set to true to indicate the element begins a new stacking context.
+     */
+    public Boolean isIsStackingContext() {
+        return isStackingContext;
+    }
+
+    /**
+     * Set to true to indicate the element begins a new stacking context.
+     */
+    public void setIsStackingContext(Boolean isStackingContext) {
+        this.isStackingContext = isStackingContext;
     }
 }

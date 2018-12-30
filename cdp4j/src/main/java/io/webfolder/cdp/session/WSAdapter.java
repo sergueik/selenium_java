@@ -1,23 +1,24 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
-import static java.lang.Double.parseDouble;
+import static java.lang.Integer.parseInt;
 import static java.util.Collections.unmodifiableMap;
 
 import java.util.HashMap;
@@ -42,9 +43,9 @@ class WSAdapter extends WebSocketAdapter {
 
     private final Gson gson;
 
-    private final Map<Integer, WSContext> contextList;
+    private final Map<Integer, WSContext> contexts;
 
-    private final List<EventListener<?>> eventListeners;
+    private final List<EventListener> listeners;
 
     private final Executor executor;
 
@@ -65,7 +66,7 @@ class WSAdapter extends WebSocketAdapter {
 
         @Override
         public void run() {
-            if (session != null) {
+            if ( session != null && session.isConnected() ) {
                 session.close();
                 session.terminate(
                         object.get("params")
@@ -77,43 +78,38 @@ class WSAdapter extends WebSocketAdapter {
 
     WSAdapter(
             final Gson gson,
-            final Map<Integer, WSContext> contextList,
-            final List<EventListener<?>> eventListeners,
+            final Map<Integer, WSContext> contexts,
+            final List<EventListener> listeners,
             final Executor executor,
             final CdpLogger log) {
-        this.gson           = gson;
-        this.contextList    = contextList;
-        this.eventListeners = eventListeners;
-        this.executor       = executor;
-        this.log            = log; 
-    }
-
-    protected Map<String, Events> listEvents() {
-        Map<String, Events> map = new HashMap<>();
-        for (Events next : Events.values()) {
-            map.put(next.domain + "." + next.name, next);
-        }
-        return unmodifiableMap(map);
+        this.gson      = gson;
+        this.contexts  = contexts;
+        this.listeners = listeners;
+        this.executor  = executor;
+        this.log       = log; 
     }
 
     @Override
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     public void onTextMessage(
                             final WebSocket websocket,
                             final String data) throws Exception {
-        executor.execute(() -> {
+        onMessage(data, true);
+    }
+
+    void onMessage(final String data, boolean async) throws Exception {
+        Runnable runnable = () -> {
             log.debug(data);
             JsonElement  json = gson.fromJson(data, JsonElement.class);
             JsonObject object = json.getAsJsonObject();
             JsonElement idElement = object.get("id");
-            if (idElement != null) {
+            if ( idElement != null ) {
                 String id = idElement.getAsString();
-                if (id != null) {
-                    int valId = (int) parseDouble(id);
-                    WSContext context = contextList.remove(valId);
-                    if (context != null) {
+                if ( id != null ) {
+                    int valId = parseInt(id);
+                    WSContext context = contexts.remove(valId);
+                    if ( context != null ) {
                         JsonObject error = object.getAsJsonObject("error");
-                        if (error != null) {
+                        if ( error != null ) {
                             int code = (int) error.getAsJsonPrimitive("code").getAsDouble();
                             String message = error.getAsJsonPrimitive("message").getAsString();
                             JsonElement messageData = error.get("data");
@@ -127,10 +123,10 @@ class WSAdapter extends WebSocketAdapter {
                 }
             } else {
                 JsonElement method = object.get("method");
-                if (method != null && method.isJsonPrimitive()) {
+                if ( method != null && method.isJsonPrimitive() ) {
                     String eventName = method.getAsString();
-                    if ("Inspector.detached".equals(eventName) && session != null) {
-                        if (session != null) {
+                    if ( "Inspector.detached".equals(eventName) && session != null ) {
+                        if ( session != null && session.isConnected() ) {
                             Thread thread = new Thread(new TerminateSession(session, object));
                             thread.setName("cdp4j-terminate");
                             thread.setDaemon(true);
@@ -139,10 +135,10 @@ class WSAdapter extends WebSocketAdapter {
                         }
                     } else {
                         Events event = events.get(eventName);
-                        if (event != null) {
+                        if ( event != null ) {
                             JsonElement params = object.get("params");
                             Object value = gson.fromJson(params, event.klass);
-                            for (EventListener next : eventListeners) {
+                            for (EventListener next : listeners) {
                                 executor.execute(() -> {
                                     next.onEvent(event, value);
                                 });
@@ -151,7 +147,20 @@ class WSAdapter extends WebSocketAdapter {
                     }
                 }
             }
-        });
+        };
+        if (async) {
+            executor.execute(runnable);
+        } else {
+            runnable.run();
+        }
+    }
+
+    Map<String, Events> listEvents() {
+        Map<String, Events> map = new HashMap<>();
+        for (Events next : Events.values()) {
+            map.put(next.domain + "." + next.name, next);
+        }
+        return unmodifiableMap(map);
     }
 
     void setSession(final Session session) {

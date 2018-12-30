@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -26,6 +27,7 @@ import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Collections.emptyList;
+import static java.util.Locale.ENGLISH;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,7 +88,20 @@ public interface Selector {
      *         selector
      */
     default boolean matches(final Integer contextId, final String selector, final Object... args) {
-        Integer nodeId = getThis().getNodeId(contextId, selector, args);
+        Integer nodeId = null;
+        try {
+            nodeId = getThis().getNodeId(contextId, selector, args);
+        } catch (CdpException e) {
+            boolean notFound = e.getMessage() != null &&
+                               e.getMessage()
+                                .toLowerCase(ENGLISH)
+                                .contains("could not find node with given id");
+            if (notFound) {
+                return false;
+            } else {
+                throw e;
+            }
+        }
         if (nodeId == null || EMPTY_NODE_ID.equals(nodeId)) {
             return false;
         }
@@ -289,35 +304,19 @@ public interface Selector {
                     final String selector,
                     final Object ...args) {
         final DOM     dom       = getThis().getCommand().getDOM();
-        final boolean sizzle    = getThis().useSizzle();
         final boolean xpath     = selector.charAt(0) == '/';
         List<String>  objectIds = new ArrayList<>();
-        if (sizzle || xpath) {
+        if (xpath) {
             final Runtime  runtime       = getThis().getCommand().getRuntime();
-            final String   func          = xpath ? "$x(\"%s\")" : "window.cdp4j.queryAll(\"%s\")";
+            final String   func          = "$x(\"%s\")";
             final String   expression    = format(func, format(selector.replace("\"", "\\\""), args));
-            final Boolean  includeCmdApi = xpath ? TRUE : FALSE;
+            final Boolean  includeCmdApi = TRUE;
             EvaluateResult result        = runtime.evaluate(expression, null, includeCmdApi,
+                                                                null, getThis().getExecutionContextId(), null,
                                                                 null, null, null,
-                                                                null, null, null);
+                                                                null, null);
             if (result == null) {
                 return null;
-            }
-            ExceptionDetails ex = result.getExceptionDetails();
-            if ( sizzle && ex != null &&
-                        ex.getException() != null &&
-                        "TypeError".equals(ex.getException().getClassName()) )  {
-                releaseObject(ex.getException().getObjectId());
-                getThis().installSizzle();
-                result = runtime.evaluate(expression, null, null,
-                                                      null, null, null,
-                                                      null, null, null);
-                if ( result != null &&
-                            result.getExceptionDetails() != null ) {
-                    ex = result.getExceptionDetails();
-                } else {
-                    ex = null;
-                }
             }
             GetPropertiesResult properties = runtime.getProperties(result.getResult().getObjectId(), true, false, false);
             if ( properties != null ) {
@@ -370,41 +369,50 @@ public interface Selector {
                 final String selector,
                 final Object ...args) {
         final DOM     dom    = getThis().getCommand().getDOM();
-        final boolean sizzle = getThis().useSizzle();
         final boolean xpath  = selector.charAt(0) == '/';
-        if (sizzle || xpath) {
-            final Runtime  runtime       = getThis().getCommand().getRuntime();
-            final String   func          = xpath ? "$x(\"%s\")[0]" : "window.cdp4j.query(\"%s\")";
-            final String   expression    = format(func, format(selector.replace("\"", "\\\""), args));
-            final Boolean  includeCmdApi = xpath ? TRUE : FALSE;
-            EvaluateResult result        = runtime.evaluate(expression, null, includeCmdApi,
-                                                            null, contextId, null,
-                                                            null, null, null);
+        if (xpath) {
+            RemoteObject docObjectId = null;
+            if (contextId == null) {
+                Node document = dom.getDocument();
+                docObjectId = dom.resolveNode(document.getNodeId(), null, null);
+            }
+
+            List<CallArgument> arguments = new ArrayList<>(2);
+
+            CallArgument argDoc = new CallArgument();
+            argDoc.setObjectId(docObjectId.getObjectId());
+            arguments.add(argDoc);
+
+            CallArgument argExpression = new CallArgument();
+            argExpression.setValue(format(selector, args));
+            arguments.add(argExpression);
+
+            Runtime  runtime = getThis().getCommand().getRuntime();
+            String func = "function(doc, expression) { return doc.evaluate(expression, doc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue; }";
+
+            CallFunctionOnResult result = runtime.callFunctionOn(func, docObjectId != null ? docObjectId.getObjectId() : null,
+                                                                arguments, FALSE,
+                                                                FALSE, FALSE,
+                                                                FALSE, FALSE,
+                                                                contextId,
+                                                                null);
+
+            if ( docObjectId != null ) {
+                releaseObject(docObjectId.getObjectId());
+            }
+
             if (result == null) {
                 return null;
             }
+
             ExceptionDetails ex = result.getExceptionDetails();
-            if ( sizzle && ex != null &&
-                        ex.getException() != null &&
-                        "TypeError".equals(ex.getException().getClassName()) )  {
-                releaseObject(ex.getException().getObjectId());
-                getThis().installSizzle();
-                result = runtime.evaluate(expression, null, null,
-                                                        null, null, null,
-                                                        null, null, null);
-                if ( result != null &&
-                            result.getExceptionDetails() != null ) {
-                    ex = result.getExceptionDetails();
-                } else {
-                    ex = null;
+            if ( ex != null && ex.getException() != null ) {
+                if ( result.getResult() != null && result.getResult().getObjectId() != null ) {
+                    releaseObject(result.getResult().getObjectId());
                 }
-            }
-            if ( ex != null &&
-                        ex.getException() != null &&
-                        ex.getException().getObjectId() != null ) {
-                releaseObject(ex.getException().getObjectId());
-            }
-            if ( xpath && ex != null && ex.getException() != null ) {
+                if ( ex.getException().getObjectId() != null ) {
+                    releaseObject(ex.getException().getObjectId());
+                }
                 throw new CdpException(ex.getException().getDescription());
             }
             RemoteObject remoteObject = result.getResult();
@@ -448,19 +456,18 @@ public interface Selector {
         if (selector == null || selector.trim().isEmpty()) {
             return EMPTY_NODE_ID;
         }
-        boolean sizzle = getThis().useSizzle();
         Integer nodeId = EMPTY_NODE_ID;
         DOM dom = getThis().getCommand().getDOM();
         final boolean xpath = selector.charAt(0) == '/';
-        if (sizzle || xpath) {
+        if (xpath) {
             String objectId = getThis().getObjectId(context, format(selector, args));
-            if (objectId != null) {
+            if ( objectId != null ) {
                 nodeId = dom.requestNode(objectId);
                 getThis().releaseObject(objectId);
             }
         } else {
             Node document = dom.getDocument();
-            if (document != null) {
+            if ( document != null ) {
                 Integer documentNodeId = document.getNodeId();
                 if (documentNodeId != null) {
                     try {

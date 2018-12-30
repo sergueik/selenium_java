@@ -1,27 +1,25 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.sample;
 
-import static java.util.Arrays.asList;
-
-import java.util.List;
-
 import io.webfolder.cdp.Launcher;
+import io.webfolder.cdp.session.Option;
 import io.webfolder.cdp.session.Session;
 import io.webfolder.cdp.session.SessionFactory;
 
@@ -29,8 +27,6 @@ public class BingTranslator {
 
     public static void main(String[] args) {
         Launcher launcher = new Launcher();
-
-        List<String> words = asList("hello", "world");
 
         try (SessionFactory factory = launcher.launch();
                             Session session = factory.create()) {
@@ -41,31 +37,35 @@ public class BingTranslator {
                 .enableDetailLog()
                 .enableNetworkLog();
 
+            Option en = session
+                        .getOptions("#t_sl")
+                        .stream()
+                        .filter(p -> "en".equals(p.getValue()))
+                        .findFirst()
+                        .get();
+            
+            Option et = session
+                        .getOptions("#t_tl")
+                        .stream()
+                        .filter(p -> "et".equals(p.getValue()))
+                        .findFirst()
+                        .get();
+
             session
-                .click(".sourceText #LS_LangList") // click source language
+                .click("#t_sl") // click source language
                 .wait(500)
-                .click(".sourceText td[value='en']") // choose English
+                .setSelectedIndex("#t_sl", en.getIndex()) // choose English
                 .wait(500)
-                .click(".destinationText #LS_LangList") // click destination language
+                .click("#t_tl") // click destination language
                 .wait(500)
-                .click(".destinationText td[value='et']") // choose Estonian
+                .setSelectedIndex("#t_tl", et.getIndex()) // choose Estonian
                 .wait(500);
 
-            StringBuilder builder = new StringBuilder();
-            
-            for (String word : words) {
-                String text = session
-                                .focus(".sourceText .srcTextarea")
-                                .selectInputText(".sourceText .srcTextarea")
-                                .sendBackspace()
-                                .sendKeys(word)
-                                .wait(1000)
-                                .getText("#destText");
-                
-                builder.append(text).append(" ");
-            }
-            
-            System.out.println(builder.toString());
+            session.focus("#t_sv")
+                    .sendKeys("hello world")
+                    .wait(1000);
+
+            System.out.println(session.getValue("#t_tv"));
         }
     }
 }

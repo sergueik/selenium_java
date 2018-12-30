@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -27,8 +28,9 @@ import java.util.Map;
 
 import io.webfolder.cdp.command.DOM;
 import io.webfolder.cdp.command.Network;
-import io.webfolder.cdp.exception.CdpException;
-import io.webfolder.cdp.type.dom.Node;
+import io.webfolder.cdp.command.Page;
+import io.webfolder.cdp.type.page.GetNavigationHistoryResult;
+import io.webfolder.cdp.type.page.NavigationEntry;
 import io.webfolder.cdp.type.runtime.RemoteObject;
 
 public interface Navigator {
@@ -51,7 +53,16 @@ public interface Navigator {
      */
     public default Session back() {
         getThis().logEntry("back");
-        getThis().evaluate("window.history.back()");
+        Page page = getThis().getCommand().getPage();
+        GetNavigationHistoryResult history = page.getNavigationHistory();
+        int index = history.getCurrentIndex() - 1;
+        if (index < 0 || index >= history.getEntries().size()) {
+            return getThis();
+        }
+        NavigationEntry entry = history.getEntries().get(index);
+        if ( entry != null ) {
+            page.navigateToHistoryEntry(entry.getId());
+        }
         return getThis();
     }
 
@@ -62,7 +73,16 @@ public interface Navigator {
      */
     public default Session forward() {
         getThis().logEntry("forward");
-        getThis().evaluate("window.history.forward()");
+        Page page = getThis().getCommand().getPage();
+        GetNavigationHistoryResult history = page.getNavigationHistory();
+        int index = history.getCurrentIndex() + 1;
+        if (index >= history.getEntries().size()) {
+            return getThis();
+        }
+        NavigationEntry entry = history.getEntries().get(index);
+        if ( entry != null ) {
+            page.navigateToHistoryEntry(entry.getId());
+        }
         return getThis();
     }
 
@@ -190,27 +210,10 @@ public interface Navigator {
     default boolean isDomReady() {
         try {
             getThis().disableFlowLog();
-            DOM dom = getThis().getCommand().getDOM();
-            if (dom == null) {
-                return false;
-            }
-            Node document = dom.getDocument();
-            if (document == null) {
-                return false;
-            }
-            Integer nodeId = document.getNodeId();
-            RemoteObject remoteObject = dom.resolveNode(nodeId, null, null);
-            if (remoteObject == null) {
-                return false;
-            }
-            String readyState = (String) getThis().getPropertyByObjectId(remoteObject.getObjectId(), "readyState");
-            getThis().releaseObject(remoteObject.getObjectId());
-            return "complete".equals(readyState);
-        } catch (CdpException e) {
-            return getThis().isConnected() &&
-                        TRUE.equals(getThis().evaluate("window.document.readyState === 'complete'"));
-        } finally {
+            return "true".equals(valueOf(getThis().evaluate("document.readyState == 'complete'")));
+        } catch (Throwable t) {
             getThis().enableFlowLog();
+            return false;
         }
     }
 

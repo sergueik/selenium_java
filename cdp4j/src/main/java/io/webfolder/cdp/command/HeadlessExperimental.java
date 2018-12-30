@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
 
@@ -30,9 +31,26 @@ import io.webfolder.cdp.type.headlessexperimental.ScreenshotParams;
 @Domain("HeadlessExperimental")
 public interface HeadlessExperimental {
     /**
-     * Enables headless events for the target.
+     * Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a
+     * screenshot from the resulting frame. Requires that the target was created with enabled
+     * BeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also
+     * https://goo.gl/3zHXhB for more background.
+     * 
+     * @param frameTimeTicks Timestamp of this BeginFrame in Renderer TimeTicks (milliseconds of uptime). If not set,
+     * the current time will be used.
+     * @param interval The interval between BeginFrames that is reported to the compositor, in milliseconds.
+     * Defaults to a 60 frames/second interval, i.e. about 16.666 milliseconds.
+     * @param noDisplayUpdates Whether updates should not be committed and drawn onto the display. False by default. If
+     * true, only side effects of the BeginFrame will be run, such as layout and animations, but
+     * any visual updates may not be visible on the display or in screenshots.
+     * @param screenshot If set, a screenshot of the frame will be captured and returned in the response. Otherwise,
+     * no screenshot will be captured. Note that capturing a screenshot can fail, for example,
+     * during renderer initialization. In such a case, no screenshot data will be returned.
+     * 
+     * @return BeginFrameResult
      */
-    void enable();
+    BeginFrameResult beginFrame(@Optional Double frameTimeTicks, @Optional Double interval,
+            @Optional Boolean noDisplayUpdates, @Optional ScreenshotParams screenshot);
 
     /**
      * Disables headless events for the target.
@@ -40,20 +58,15 @@ public interface HeadlessExperimental {
     void disable();
 
     /**
-     * Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a screenshot from the resulting frame. Requires that the target was created with enabled BeginFrameControl.
-     * 
-     * @param frameTime Timestamp of this BeginFrame (milliseconds since epoch). If not set, the current time will be used.
-     * @param deadline Deadline of this BeginFrame (milliseconds since epoch). If not set, the deadline will be calculated from the frameTime and interval.
-     * @param interval The interval between BeginFrames that is reported to the compositor, in milliseconds. Defaults to a 60 frames/second interval, i.e. about 16.666 milliseconds.
-     * @param screenshot If set, a screenshot of the frame will be captured and returned in the response. Otherwise, no screenshot will be captured.
-     * 
-     * @return BeginFrameResult
+     * Enables headless events for the target.
      */
-    BeginFrameResult beginFrame(@Optional Double frameTime, @Optional Double deadline,
-            @Optional Double interval, @Optional ScreenshotParams screenshot);
+    void enable();
 
     /**
-     * Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a screenshot from the resulting frame. Requires that the target was created with enabled BeginFrameControl.
+     * Sends a BeginFrame to the target and returns when the frame was completed. Optionally captures a
+     * screenshot from the resulting frame. Requires that the target was created with enabled
+     * BeginFrameControl. Designed for use with --run-all-compositor-stages-before-draw, see also
+     * https://goo.gl/3zHXhB for more background.
      * 
      * @return BeginFrameResult
      */

@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.event.network;
 
@@ -24,11 +25,13 @@ import io.webfolder.cdp.annotation.Domain;
 import io.webfolder.cdp.annotation.EventName;
 import io.webfolder.cdp.annotation.Experimental;
 import io.webfolder.cdp.type.network.AuthChallenge;
+import io.webfolder.cdp.type.network.ErrorReason;
 import io.webfolder.cdp.type.network.Request;
-import io.webfolder.cdp.type.page.ResourceType;
+import io.webfolder.cdp.type.network.ResourceType;
 
 /**
- * Details of an intercepted HTTP request, which must be either allowed, blocked, modified or mocked
+ * Details of an intercepted HTTP request, which must be either allowed, blocked, modified or
+ * mocked
  */
 @Experimental
 @Domain("Network")
@@ -44,23 +47,31 @@ public class RequestIntercepted {
 
     private Boolean isNavigationRequest;
 
-    private Map<String, Object> redirectHeaders = new HashMap<>();
-
-    private Integer redirectStatusCode;
+    private Boolean isDownload;
 
     private String redirectUrl;
 
     private AuthChallenge authChallenge;
 
+    private ErrorReason responseErrorReason;
+
+    private Integer responseStatusCode;
+
+    private Map<String, Object> responseHeaders = new HashMap<>();
+
     /**
-     * Each request the page makes will have a unique id, however if any redirects are encountered while processing that fetch, they will be reported with the same id as the original fetch. Likewise if HTTP authentication is needed then the same fetch id will be used.
+     * Each request the page makes will have a unique id, however if any redirects are encountered
+     * while processing that fetch, they will be reported with the same id as the original fetch.
+     * Likewise if HTTP authentication is needed then the same fetch id will be used.
      */
     public String getInterceptionId() {
         return interceptionId;
     }
 
     /**
-     * Each request the page makes will have a unique id, however if any redirects are encountered while processing that fetch, they will be reported with the same id as the original fetch. Likewise if HTTP authentication is needed then the same fetch id will be used.
+     * Each request the page makes will have a unique id, however if any redirects are encountered
+     * while processing that fetch, they will be reported with the same id as the original fetch.
+     * Likewise if HTTP authentication is needed then the same fetch id will be used.
      */
     public void setInterceptionId(String interceptionId) {
         this.interceptionId = interceptionId;
@@ -117,31 +128,19 @@ public class RequestIntercepted {
     }
 
     /**
-     * HTTP response headers, only sent if a redirect was intercepted.
+     * Set if the request is a navigation that will result in a download.
+     * Only present after response is received from the server (i.e. HeadersReceived stage).
      */
-    public Map<String, Object> getRedirectHeaders() {
-        return redirectHeaders;
+    public Boolean isIsDownload() {
+        return isDownload;
     }
 
     /**
-     * HTTP response headers, only sent if a redirect was intercepted.
+     * Set if the request is a navigation that will result in a download.
+     * Only present after response is received from the server (i.e. HeadersReceived stage).
      */
-    public void setRedirectHeaders(Map<String, Object> redirectHeaders) {
-        this.redirectHeaders = redirectHeaders;
-    }
-
-    /**
-     * HTTP response code, only sent if a redirect was intercepted.
-     */
-    public Integer getRedirectStatusCode() {
-        return redirectStatusCode;
-    }
-
-    /**
-     * HTTP response code, only sent if a redirect was intercepted.
-     */
-    public void setRedirectStatusCode(Integer redirectStatusCode) {
-        this.redirectStatusCode = redirectStatusCode;
+    public void setIsDownload(Boolean isDownload) {
+        this.isDownload = isDownload;
     }
 
     /**
@@ -159,16 +158,66 @@ public class RequestIntercepted {
     }
 
     /**
-     * Details of the Authorization Challenge encountered. If this is set then continueInterceptedRequest must contain an authChallengeResponse.
+     * Details of the Authorization Challenge encountered. If this is set then
+     * continueInterceptedRequest must contain an authChallengeResponse.
      */
     public AuthChallenge getAuthChallenge() {
         return authChallenge;
     }
 
     /**
-     * Details of the Authorization Challenge encountered. If this is set then continueInterceptedRequest must contain an authChallengeResponse.
+     * Details of the Authorization Challenge encountered. If this is set then
+     * continueInterceptedRequest must contain an authChallengeResponse.
      */
     public void setAuthChallenge(AuthChallenge authChallenge) {
         this.authChallenge = authChallenge;
+    }
+
+    /**
+     * Response error if intercepted at response stage or if redirect occurred while intercepting
+     * request.
+     */
+    public ErrorReason getResponseErrorReason() {
+        return responseErrorReason;
+    }
+
+    /**
+     * Response error if intercepted at response stage or if redirect occurred while intercepting
+     * request.
+     */
+    public void setResponseErrorReason(ErrorReason responseErrorReason) {
+        this.responseErrorReason = responseErrorReason;
+    }
+
+    /**
+     * Response code if intercepted at response stage or if redirect occurred while intercepting
+     * request or auth retry occurred.
+     */
+    public Integer getResponseStatusCode() {
+        return responseStatusCode;
+    }
+
+    /**
+     * Response code if intercepted at response stage or if redirect occurred while intercepting
+     * request or auth retry occurred.
+     */
+    public void setResponseStatusCode(Integer responseStatusCode) {
+        this.responseStatusCode = responseStatusCode;
+    }
+
+    /**
+     * Response headers if intercepted at the response stage or if redirect occurred while
+     * intercepting request or auth retry occurred.
+     */
+    public Map<String, Object> getResponseHeaders() {
+        return responseHeaders;
+    }
+
+    /**
+     * Response headers if intercepted at the response stage or if redirect occurred while
+     * intercepting request or auth retry occurred.
+     */
+    public void setResponseHeaders(Map<String, Object> responseHeaders) {
+        this.responseHeaders = responseHeaders;
     }
 }

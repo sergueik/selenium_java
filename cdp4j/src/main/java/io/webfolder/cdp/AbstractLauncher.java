@@ -1,35 +1,38 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp;
-
-import io.webfolder.cdp.exception.CdpException;
-import io.webfolder.cdp.session.SessionFactory;
-import io.webfolder.cdp.session.SessionInfo;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import static java.lang.String.format;
 import static java.lang.Thread.sleep;
 import static java.util.Collections.emptyList;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import io.webfolder.cdp.exception.CdpException;
+import io.webfolder.cdp.session.SessionFactory;
+
 abstract class AbstractLauncher {
+
     protected final SessionFactory factory;
+
+    private volatile boolean launched;
 
     public AbstractLauncher(final SessionFactory factory) {
         this.factory = factory;
@@ -38,7 +41,10 @@ abstract class AbstractLauncher {
     protected List<String> getCommonParameters(String chromeExecutablePath, List<String> arguments) {
         List<String> list = new ArrayList<>();
         list.add(chromeExecutablePath);
-        list.add(format("--remote-debugging-port=%d", factory.getPort()));
+
+        if (factory.getPort() > 0) {
+            list.add(format("--remote-debugging-port=%d", factory.getPort()));
+        }
 
         // Disable built-in Google Translate service
         list.add("--disable-translate");
@@ -69,18 +75,11 @@ abstract class AbstractLauncher {
         return list;
     }
 
-    public boolean launched() {
-        List<SessionInfo> list = emptyList();
-        try {
-            int timeout = 1000; // milliseconds
-            list = factory.list(timeout);
-        } catch (Throwable t) {
-            // ignore
-        }
-        return !list.isEmpty() ? true : false;
-    }
-
     public abstract String findChrome();
+
+    public boolean launched() {
+        return launched;
+    }
 
     public final SessionFactory launch() {
         return launch(findChrome(), emptyList());
@@ -90,36 +89,32 @@ abstract class AbstractLauncher {
         return launch(findChrome(), arguments);
     }
 
-    public final SessionFactory launch(String chromeExecutablePath, List<String> arguments){
-        if (launched()) {
-            return factory;
-        }
-
+    public final SessionFactory launch(String chromeExecutablePath, List<String> arguments) {
         if (chromeExecutablePath == null || chromeExecutablePath.trim().isEmpty()) {
             throw new CdpException("chrome not found");
         }
+        if ( ! launched ) {
+            List<String> list = getCommonParameters(chromeExecutablePath, arguments);
+            internalLaunch(list, arguments);
+            launched = true;
+        }
 
-        List<String> list = getCommonParameters(chromeExecutablePath, arguments);
+        int     retryCount = 0;
+        boolean connected  = factory.ping();
 
-        internalLaunch(list, arguments);
-
-        if (!launched()) {
-            int counter = 0;
-            final int maxCount = 20;
-            while (!launched() && counter < maxCount) {
-                try {
-                    sleep(500);
-                    counter += 1;
-                } catch (InterruptedException e) {
-                    break;
-                }
+        while ( ! ( connected = factory.ping() ) && retryCount < 50 ) {
+            try {
+                sleep(100);
+            } catch (InterruptedException e) {
+                // ignore
             }
+            retryCount += 1;
         }
 
-        if (!launched()) {
-            throw new CdpException("Unable to connect to the chrome remote debugging server [" +
-                    factory.getHost() + ":" + factory.getPort() + "]");
+        if ( ! connected ) {
+            throw new CdpException("Unable to connect to the browser");
         }
+
         return factory;
     }
 

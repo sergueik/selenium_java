@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -49,9 +50,10 @@ public interface JavaScript {
      */
     default Object evaluate(String expression) {
         Runtime runtime = getThis().getCommand().getRuntime();
+        Integer contextId = getThis().getExecutionContextId();
         EvaluateResult result = runtime.evaluate(expression, null, null,
-                                                    null, null, null,
-                                                    null, null, null);
+                                                    null, contextId, null,
+                                                    null, null, null, null, null);
         if (result == null) {
             return null;
         }
@@ -102,18 +104,6 @@ public interface JavaScript {
      */
     @SuppressWarnings("unchecked")
     default <T> T callFunction(String name, Class<T> returnType, Object ...arguments) {
-        EvaluateResult windowResult = getThis().getCommand().getRuntime().evaluate("window");
-
-        if (windowResult == null) {
-            return null;
-        }
-
-        if ( windowResult.getExceptionDetails() != null &&
-                            windowResult.getExceptionDetails().getException() != null ) {
-            getThis().releaseObject(windowResult.getExceptionDetails().getException().getObjectId());
-            throw new CdpException(windowResult.getExceptionDetails().getException().getDescription());
-        }
-
         CallArgument objArgument = new CallArgument();
         objArgument.setValue(name);
 
@@ -121,13 +111,11 @@ public interface JavaScript {
                 .getCommand()
                 .getRuntime()
                 .callFunctionOn("function(functionName) { return functionName.split('.').reduce((o, i) => o[i], this); }",
-                                                        windowResult.getResult().getObjectId(),
+                                                        null,
                                                         asList(objArgument),
                                                         FALSE, FALSE,
                                                         FALSE, FALSE,
-                                                        FALSE, null, null);
-
-        getThis().releaseObject(windowResult.getResult().getObjectId());
+                                                        FALSE, getThis().getExecutionContextId(), null);
 
         if ( funcObj.getExceptionDetails() != null &&
                 funcObj.getExceptionDetails().getException() != null ) {
@@ -140,7 +128,7 @@ public interface JavaScript {
             throw new CdpException(format("Function [%s] is not defined", name));
         }
 
-        StringJoiner argNames = new StringJoiner(",");
+        StringJoiner argNames = new StringJoiner(", ");
 
         List<CallArgument> argsFunc = new ArrayList<>(arguments.length);
 
@@ -153,10 +141,10 @@ public interface JavaScript {
                     if (getThis().isPrimitive(argument.getClass())) {
                         ca.setValue(argument);
                     } else {
-                        ca.setValue(getThis().getGson().toJson(argument));
+                        ca.setUnserializableValue(getThis().getGson().toJson(argument));
                     }
                 }
-                argNames.add("arg" + (i + 1));
+                argNames.add("arg" + i++);
             }
         }
 
@@ -186,13 +174,7 @@ public interface JavaScript {
             String json = valueOf(func.getResult().getValue());
             JsonObject object = getThis().getGson().fromJson(json, JsonObject.class);
             JsonElement result = object.get("result");
-            if (getThis().isPrimitive(returnType)) {
-                value = getThis().getGson().fromJson(result, returnType);
-            } else {
-                if (result.isJsonPrimitive()) {
-                    value = getThis().getGson().fromJson(result.getAsString(), returnType);
-                }
-            }
+            value = getThis().getGson().fromJson(result, returnType);
         } else if (ObjectType.Undefined.equals(func.getResult().getType())) {
             value = void.class;
         }
@@ -203,7 +185,7 @@ public interface JavaScript {
         }
 
         getThis().logExit("callFunction",
-                        name + (arguments == null || arguments.length == 0 ? "" : "\", " + joiner.toString()),
+                        name + (arguments == null || arguments.length == 0 ? "" : "\", \"" + joiner.toString()),
                         valueOf(value).replace("\n", "").replace("\r", ""));
 
         return ! void.class.equals(value) ? (T) value : null;
@@ -224,18 +206,6 @@ public interface JavaScript {
      */
     @SuppressWarnings("unchecked")
     public default <T> T getVariable(String name, Class<T> returnType) {
-        EvaluateResult windowResult = getThis().getCommand().getRuntime().evaluate("window");
-
-        if (windowResult == null) {
-            return null;
-        }
-
-        if ( windowResult.getExceptionDetails() != null &&
-                            windowResult.getExceptionDetails().getException() != null ) {
-            getThis().releaseObject(windowResult.getExceptionDetails().getException().getObjectId());
-            throw new CdpException(windowResult.getExceptionDetails().getException().getDescription());
-        }
-
         CallArgument objArgument = new CallArgument();
         objArgument.setValue(name);
 
@@ -245,13 +215,11 @@ public interface JavaScript {
                 .callFunctionOn(
                         "function(functionName) { const result = functionName.split('.').reduce((o, i) => o[i], this); " +
                                 "return typeof result === 'undefined' ? undefined : JSON.stringify({ result : result }); }",
-                                                        windowResult.getResult().getObjectId(),
+                                                        null,
                                                         asList(objArgument),
                                                         FALSE, FALSE,
                                                         FALSE, FALSE,
-                                                        FALSE, null, null);
-
-        getThis().releaseObject(windowResult.getResult().getObjectId());
+                                                        FALSE, getThis().getExecutionContextId(), null);
 
         if ( obj.getExceptionDetails() != null &&
                 obj.getExceptionDetails().getException() != null ) {
@@ -269,13 +237,7 @@ public interface JavaScript {
             String json = valueOf(obj.getResult().getValue());
             JsonObject object = getThis().getGson().fromJson(json, JsonObject.class);
             JsonElement result = object.get("result");
-            if (getThis().isPrimitive(returnType)) {
-                value = getThis().getGson().fromJson(result, returnType);
-            } else {
-                if (result.isJsonPrimitive()) {
-                    value = getThis().getGson().fromJson(result.getAsString(), returnType);
-                }
-            }
+            value = getThis().getGson().fromJson(result, returnType);
         } else if (ObjectType.Undefined.equals(obj.getResult().getType())) {
             value = void.class;
         }

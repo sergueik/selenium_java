@@ -1,34 +1,31 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import static io.webfolder.cdp.type.constant.MouseButtonType.Left;
+import static io.webfolder.cdp.type.constant.MouseEventType.MouseMoved;
 import static io.webfolder.cdp.type.constant.MouseEventType.MousePressed;
 import static io.webfolder.cdp.type.constant.MouseEventType.MouseReleased;
-import static java.lang.Math.floor;
 import static java.lang.String.format;
 
-import java.util.List;
-
-import io.webfolder.cdp.command.DOM;
 import io.webfolder.cdp.command.Input;
-import io.webfolder.cdp.exception.ElementNotFoundException;
-import io.webfolder.cdp.type.dom.BoxModel;
+import io.webfolder.cdp.type.util.Point;
 
 /**
  * Interface representing basic mouse operations.
@@ -64,27 +61,27 @@ public interface Mouse {
      */
     default Session click(final String selector, final Object... args) {
         getThis().logEntry("click", format(selector, args));
-        DOM dom = getThis().getCommand().getDOM();
-        Integer nodeId = getThis().getNodeId(format(selector, args));
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
-            throw new ElementNotFoundException(format(selector, args));
-        }
-        BoxModel boxModel = dom.getBoxModel(nodeId, null, null);
-        if (boxModel == null) {
-            return getThis();
-        }
-        List<Double> content = boxModel.getContent();
-        if (content == null           ||
-                    content.isEmpty() ||
-                    content.size() < 2) {
-            return getThis();
-        }
-        double left = floor(content.get(0));
-        double top  = floor(content.get(1));
+        getThis().scrollIntoViewIfNeeded(selector, args);
+        Point point = getThis().getClickablePoint(selector, args);
         int clickCount = 1;
         Input input = getThis().getCommand().getInput();
-        input.dispatchMouseEvent(MousePressed, left, top, null, null, Left, clickCount, null, null);
-        input.dispatchMouseEvent(MouseReleased, left, top, null, null, Left, clickCount, null, null);
+        input.dispatchMouseEvent(MousePressed, point.x, point.y, null, null, Left, clickCount, null, null);
+        input.dispatchMouseEvent(MouseReleased, point.x, point.y, null, null, Left, clickCount, null, null);
+        return getThis();
+    }
+
+    /**
+     * Dispatches a mousemove event.
+     * 
+     * @param x X coordinate of the event relative to the main frame's viewport in CSS pixels.
+     * @param y Y coordinate of the event relative to the main frame's viewport in CSS pixels. 0 refers to
+     * the top of the viewport and Y increases as it proceeds towards the bottom of the viewport.
+     * 
+     * @return this
+     */
+    default Session move(double x, double y) {
+        Input input = getThis().getCommand().getInput();
+        input.dispatchMouseEvent(MouseMoved, x, y);
         return getThis();
     }
 

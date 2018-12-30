@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
 
@@ -30,9 +31,29 @@ import java.util.List;
 @Domain("IndexedDB")
 public interface IndexedDB {
     /**
-     * Enables events from backend.
+     * Clears all entries from an object store.
+     * 
+     * @param securityOrigin Security origin.
+     * @param databaseName Database name.
+     * @param objectStoreName Object store name.
      */
-    void enable();
+    void clearObjectStore(String securityOrigin, String databaseName, String objectStoreName);
+
+    /**
+     * Deletes a database.
+     * 
+     * @param securityOrigin Security origin.
+     * @param databaseName Database name.
+     */
+    void deleteDatabase(String securityOrigin, String databaseName);
+
+    /**
+     * Delete a range of entries from an object store
+     * 
+     * @param keyRange Range of entry keys to delete
+     */
+    void deleteObjectStoreEntries(String securityOrigin, String databaseName,
+            String objectStoreName, KeyRange keyRange);
 
     /**
      * Disables events from backend.
@@ -40,25 +61,9 @@ public interface IndexedDB {
     void disable();
 
     /**
-     * Requests database names for given security origin.
-     * 
-     * @param securityOrigin Security origin.
-     * 
-     * @return Database names for origin.
+     * Enables events from backend.
      */
-    @Returns("databaseNames")
-    List<String> requestDatabaseNames(String securityOrigin);
-
-    /**
-     * Requests database with given name in given frame.
-     * 
-     * @param securityOrigin Security origin.
-     * @param databaseName Database name.
-     * 
-     * @return Database with an array of object stores.
-     */
-    @Returns("databaseWithObjectStores")
-    DatabaseWithObjectStores requestDatabase(String securityOrigin, String databaseName);
+    void enable();
 
     /**
      * Requests data from object store or index.
@@ -78,21 +83,25 @@ public interface IndexedDB {
             @Optional KeyRange keyRange);
 
     /**
-     * Clears all entries from an object store.
+     * Requests database with given name in given frame.
      * 
      * @param securityOrigin Security origin.
      * @param databaseName Database name.
-     * @param objectStoreName Object store name.
+     * 
+     * @return Database with an array of object stores.
      */
-    void clearObjectStore(String securityOrigin, String databaseName, String objectStoreName);
+    @Returns("databaseWithObjectStores")
+    DatabaseWithObjectStores requestDatabase(String securityOrigin, String databaseName);
 
     /**
-     * Deletes a database.
+     * Requests database names for given security origin.
      * 
      * @param securityOrigin Security origin.
-     * @param databaseName Database name.
+     * 
+     * @return Database names for origin.
      */
-    void deleteDatabase(String securityOrigin, String databaseName);
+    @Returns("databaseNames")
+    List<String> requestDatabaseNames(String securityOrigin);
 
     /**
      * Requests data from object store or index.

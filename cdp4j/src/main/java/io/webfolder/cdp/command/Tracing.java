@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
 
@@ -23,25 +24,13 @@ import io.webfolder.cdp.annotation.Optional;
 import io.webfolder.cdp.annotation.Returns;
 import io.webfolder.cdp.type.constant.TransferMode;
 import io.webfolder.cdp.type.tracing.RequestMemoryDumpResult;
+import io.webfolder.cdp.type.tracing.StreamCompression;
 import io.webfolder.cdp.type.tracing.TraceConfig;
 import java.util.List;
 
 @Experimental
 @Domain("Tracing")
 public interface Tracing {
-    /**
-     * Start trace events collection.
-     * 
-     * @param categories Category/tag filter
-     * @param options Tracing options
-     * @param bufferUsageReportingInterval If set, the agent will issue bufferUsage events at this interval, specified in milliseconds
-     * @param transferMode Whether to report trace events as series of dataCollected events or to save trace to a stream (defaults to <code>ReportEvents</code>).
-     * @param traceConfig 
-     */
-    void start(@Optional String categories, @Optional String options,
-            @Optional Double bufferUsageReportingInterval, @Optional TransferMode transferMode,
-            @Optional TraceConfig traceConfig);
-
     /**
      * Stop trace events collection.
      */
@@ -56,6 +45,13 @@ public interface Tracing {
     List<String> getCategories();
 
     /**
+     * Record a clock sync marker in the trace.
+     * 
+     * @param syncId The ID of this clock sync marker
+     */
+    void recordClockSyncMarker(String syncId);
+
+    /**
      * Request a global memory dump.
      * 
      * @return RequestMemoryDumpResult
@@ -63,11 +59,19 @@ public interface Tracing {
     RequestMemoryDumpResult requestMemoryDump();
 
     /**
-     * Record a clock sync marker in the trace.
+     * Start trace events collection.
      * 
-     * @param syncId The ID of this clock sync marker
+     * @param categories Category/tag filter
+     * @param options Tracing options
+     * @param bufferUsageReportingInterval If set, the agent will issue bufferUsage events at this interval, specified in milliseconds
+     * @param transferMode Whether to report trace events as series of dataCollected events or to save trace to a
+     * stream (defaults to <code>ReportEvents</code>).
+     * @param streamCompression Compression format to use. This only applies when using <code>ReturnAsStream</code>
+     * transfer mode (defaults to <code>none</code>)
      */
-    void recordClockSyncMarker(String syncId);
+    void start(@Optional String categories, @Optional String options,
+            @Optional Double bufferUsageReportingInterval, @Optional TransferMode transferMode,
+            @Optional StreamCompression streamCompression, @Optional TraceConfig traceConfig);
 
     /**
      * Start trace events collection.

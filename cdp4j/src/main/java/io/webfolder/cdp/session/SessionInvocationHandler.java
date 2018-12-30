@@ -1,25 +1,25 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import static java.lang.String.format;
 import static java.util.Base64.getDecoder;
-import static java.util.Collections.emptyMap;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -28,6 +28,7 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
@@ -43,29 +44,47 @@ import io.webfolder.cdp.logger.CdpLogger;
 
 class SessionInvocationHandler implements InvocationHandler {
 
+    private final AtomicInteger counter = new AtomicInteger(0);
+
     private final Gson gson;
 
     private final WebSocket webSocket;
 
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private final Map<Integer, WSContext> contexts;
 
-    private final Map<Integer, WSContext> contextList;
+    private final List<String> enabledDomains = new CopyOnWriteArrayList<>();
 
     private final CdpLogger log;
 
     private final Session session;
 
-    public SessionInvocationHandler(
+    private final boolean browserSession;
+
+    private final String sessionId;
+
+    private final String targetId;
+
+    private final int timeout;
+
+    SessionInvocationHandler(
                     final Gson gson,
                     final WebSocket webSocket,
-                    final Map<Integer, WSContext> contextList,
+                    final Map<Integer, WSContext> contexts,
                     final Session session,
-                    final CdpLogger log) {
-        this.gson        = gson;
-        this.webSocket   = webSocket;
-        this.contextList = contextList;
-        this.session     = session;
-        this.log         = log;
+                    final CdpLogger log,
+                    final boolean browserSession,
+                    final String sessionId,
+                    final String targetId,
+                    final int webSocketReadTimeout) {
+        this.gson           = gson;
+        this.webSocket      = webSocket;
+        this.contexts       = contexts;
+        this.session        = session;
+        this.log            = log;
+        this.browserSession = browserSession;
+        this.sessionId      = sessionId;
+        this.targetId       = targetId;
+        this.timeout        = webSocketReadTimeout;
     }
 
     @Override
@@ -78,11 +97,23 @@ class SessionInvocationHandler implements InvocationHandler {
         final String  domain = klass.getAnnotation(Domain.class).value();
         final String command = method.getName();
 
-        boolean hasArgs = args != null && args.length > 0;
+        final boolean hasArgs = args != null && args.length > 0;
+        final boolean voidMethod = void.class.equals(method.getReturnType());
 
-        Map<String, Object> params = hasArgs ?
-                                        new HashMap<>(args.length) :
-                                        emptyMap();
+        boolean enable = "enable".intern() == command && voidMethod;
+
+        // it's unnecessary to call enable command more than once.
+        if (enable && enabledDomains.contains(domain)) {
+            return null;
+        }
+
+        boolean disable = "disable".intern() == command && voidMethod;
+
+        if (disable) {
+            enabledDomains.remove(domain);
+        }
+
+        Map<String, Object> params = new HashMap<>(hasArgs ? args.length : 0);
 
         if (hasArgs) {
             int argIndex = 0;
@@ -107,20 +138,30 @@ class SessionInvocationHandler implements InvocationHandler {
 
         if (session.isConnected()) {
             context = new WSContext();
-            contextList.put(id, context);
-            webSocket.sendText(json);
-            context.await();
+            contexts.put(id, context);
+            if (browserSession) {
+                webSocket.sendText(json);
+            } else {
+                session.getCommand()
+                        .getTarget()
+                        .sendMessageToTarget(json, sessionId, targetId);
+            }
+            context.await(timeout);
         } else {
-            throw new CdpException("WebSocket connection is not alive");
+            throw new CdpException("WebSocket connection is not alive. id: " + id);
         }
 
         if ( context.getError() != null ) {
             throw context.getError();
         }
 
+        if (enable) {
+            enabledDomains.add(domain);
+        }
+
         Class<?> retType = method.getReturnType();
 
-        if (retType.equals(void.class) || retType.equals(Void.class)) {
+        if (voidMethod || retType.equals(Void.class)) {
             return null;
         }
 
@@ -148,7 +189,7 @@ class SessionInvocationHandler implements InvocationHandler {
 
         Object ret = null;
         Type genericReturnType = method.getGenericReturnType();
-        
+
         if (returns != null) {
 
             JsonElement jsonElement = resultObject.get(returns);
@@ -188,11 +229,16 @@ class SessionInvocationHandler implements InvocationHandler {
     }
 
     void dispose() {
-        for (WSContext context : contextList.values()) {
+        enabledDomains.clear();
+        for (WSContext context : contexts.values()) {
             try {
                 context.setData(null);
             } catch (Throwable t) {
             }
         }
+    }
+
+    WSContext getContext(int id) {
+        return contexts.get(id);
     }
 }

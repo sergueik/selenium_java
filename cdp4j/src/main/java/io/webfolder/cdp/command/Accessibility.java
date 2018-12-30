@@ -1,19 +1,20 @@
 /**
- * cdp4j - Chrome DevTools Protocol for Java
- * Copyright © 2017 WebFolder OÜ (support@webfolder.io)
+ * cdp4j Commercial License
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Affero General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Copyright 2017, 2018 WebFolder OÜ
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Affero General Public License for more details.
+ * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
+ * associated  documentation files  (the "Software"), to deal in  the Software  without
+ * restriction, including without limitation  the rights  to use, copy, modify,  merge,
+ * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
+ * the Software is furnished to do so, subject to the following conditions:
  *
- * You should have received a copy of the GNU Affero General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
+ * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
+ * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
+ * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+ * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+ * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
 
@@ -28,25 +29,46 @@ import java.util.List;
 @Domain("Accessibility")
 public interface Accessibility {
     /**
-     * Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
-     * 
-     * @param nodeId ID of node to get the partial accessibility tree for.
-     * @param fetchRelatives Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
-     * 
-     * @return The <code>Accessibility.AXNode</code> for this DOM node, if it exists, plus its ancestors, siblings and children, if requested.
+     * Disables the accessibility domain.
      */
-    @Experimental
-    @Returns("nodes")
-    List<AXNode> getPartialAXTree(Integer nodeId, @Optional Boolean fetchRelatives);
+    void disable();
+
+    /**
+     * Enables the accessibility domain which causes <code>AXNodeId</code>s to remain consistent between method calls.
+     * This turns on accessibility for the page, which can impact performance until accessibility is disabled.
+     */
+    void enable();
 
     /**
      * Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
      * 
-     * @param nodeId ID of node to get the partial accessibility tree for.
+     * @param nodeId Identifier of the node to get the partial accessibility tree for.
+     * @param backendNodeId Identifier of the backend node to get the partial accessibility tree for.
+     * @param objectId JavaScript object id of the node wrapper to get the partial accessibility tree for.
+     * @param fetchRelatives Whether to fetch this nodes ancestors, siblings and children. Defaults to true.
      * 
-     * @return The <code>Accessibility.AXNode</code> for this DOM node, if it exists, plus its ancestors, siblings and children, if requested.
+     * @return The <code>Accessibility.AXNode</code> for this DOM node, if it exists, plus its ancestors, siblings and
+     * children, if requested.
      */
     @Experimental
     @Returns("nodes")
-    List<AXNode> getPartialAXTree(Integer nodeId);
+    List<AXNode> getPartialAXTree(@Optional Integer nodeId, @Optional Integer backendNodeId,
+            @Optional String objectId, @Optional Boolean fetchRelatives);
+
+    /**
+     * Fetches the entire accessibility tree
+     */
+    @Experimental
+    @Returns("nodes")
+    List<AXNode> getFullAXTree();
+
+    /**
+     * Fetches the accessibility node and partial accessibility tree for this DOM node, if it exists.
+     * 
+     * @return The <code>Accessibility.AXNode</code> for this DOM node, if it exists, plus its ancestors, siblings and
+     * children, if requested.
+     */
+    @Experimental
+    @Returns("nodes")
+    List<AXNode> getPartialAXTree();
 }
