@@ -34,30 +34,40 @@ Exception in thread "main" java.lang.NullPointerException
 	at jogamp.opengl.egl.EGLDrawableFactory.getAvailableCapabilitiesImpl(EGLDrawableFactory.java:1015)
 ```
 on Ubuntu amd64, the following will work:
-```sh
-# ... install the jogamp-all-platforms.7z
-# into the project directory
 
+Install the jogamp-all-platforms.7z into the project directory, 
+
+run the vendor smoke tests
+```sh
+./etc/test.sh | tee /tmp/vendor-health-check.log
+```
+ -  will be no noticeable UI activity, can review the output.
+In the project link the native library direcory from the exploded archive ocation to the loader default path:
+```sh
 ./etc/test.sh | tee /tmp/vendor-health-check.log
 ln -fs `pwd`/jogamp-all-platforms/lib/linux-amd64/ natives/linux-amd64
 ls -l natives/linux-amd64/libgluegen-rt.so
-mvn install
-java -cp target/canvasex-0.0.1-SNAPSHOT.jar:target/lib/* example/CanvasEx
 ```
+Compile, package, install and run
+```sh
+mvn install
+java -cp target/canvasex-0.0.1-SNAPSHOT.jar:target/lib/* example.CanvasEx
+```
+![Example](https://github.com/sergueik/selenium_java/blob/master/jodl_stw/screenshots/capture_jogapm_ubuntu-trustry-oracle-jdk8-amd64.png)
+
 This has been verified to work with __Oracle HotSpot(TM)__ 64-Bit Server VM JRE build __1.8.0.191__ and __GTK 2__ build __2.4.23__.
 and the very basic `GLEventListener`.
-![Example](https://github.com/sergueik/selenium_java/blob/master/jodl_stw/screenshots/capture_jogapm_ubuntu-trustry-oracle-jdk8-amd64.png)
 
 ### Windows 8.1 amd64
 
-Repeat the vendor smoke test, notice a quickly flashing window launched and cofirm the batch file does not crash.
-In the project copy the native dlls from the archive ocation to the loader default location:
+Repeat the vendor smoke test, notice a quickly flashing window launched and confirm the batch file does not crash.
+Copy the native dlls from the archive ocation to the loader default location in In the project directory:
 ```cmd
 mkdir natives\windows-amd64				
 copy jogamp-all-platforms\lib\windows-amd64\gluegen-rt.dll natives\windows-amd64
 ```
 
-If this is not done, expect the runtime exception:
+Without the last step, would experience the following exception at runtime:
 ```cmd		
 Exception in thread "main" java.lang.UnsatisfiedLinkError: Can't load library:
 C:\developer\sergueik\selenium_java\jodl_stw\natives\windows-amd64\\gluegen-rt.dll
@@ -66,7 +76,7 @@ C:\developer\sergueik\selenium_java\jodl_stw\natives\windows-amd64\\gluegen-rt.d
   at java.lang.System.load(System.java:1086)
 ```
 
-### Build and run standalone class from the maven project (assuming Maven and JDK are in the `PATH`,
+Build and run standalone class from the maven project (assuming Maven and JDK are in the `PATH`,
 currently only tested with Java 8):
 ```cmd
 mvn install
