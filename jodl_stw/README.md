@@ -2,11 +2,20 @@
 Eclipse [SWT](https://www.eclipse.org/swt/) hosted [JOGL](http://jogamp.org/jogl/www/) Skeleton App.
 
 ![Example](https://github.com/sergueik/selenium_java/blob/master/jodl_stw/screenshots/capture_jogapm.png)
+https://focusmm.zendesk.com/hc/en-us/articles/203200801-Check-for-OpenGL-compatibility
 
+https://www.intel.com/content/www/us/en/support/intel-driver-support-assistant.html
+### Code Examples
+
+
+The code examples are based on [jogl-demos](https://github.com/sgothel/jogl-demos) repository
+https://github.com/jvm-graphics-labs/hello-triangle/tree/master/screenshots
 ### Prerequisite
 
 #### Ubuntu
-Basically follow the steps in [j wiki](http://jogamp.org/wiki/index.php/Downloading_and_installing_JOG)
+Basically follow the steps in [jogamp wiki](http://jogamp.org/wiki/index.php/Downloading_and_installing_JOG)
+
+
 
 ```sh
 wget https://jogamp.org/deployment/jogamp-current/archive/jogamp-all-platforms.7z
@@ -100,3 +109,6 @@ Put it on `Shell` (root of the window) or in a `Composite` widget container as c
 
 which is likely the superclasses of everything else of interest in `com.jogamp.opengl`.
 
+### See Also
+
+ * [Gradle guide for Migrating from Maven to Gradle](https://guides.gradle.org/migrating-from-maven/)

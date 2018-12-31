@@ -4,6 +4,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.jogamp.opengl.GL;
@@ -39,7 +41,6 @@ public class CanvasEx {
 				display.sleep();
 			}
 		}
-		animator.stop();
 		display.dispose();
 	}
 
@@ -55,6 +56,7 @@ public class CanvasEx {
 		final GLCapabilities cap = new GLCapabilities(pro);
 		glCanvas = new GLCanvas(shell, 0, cap, (GLCapabilitiesChooser) null);
 		glCanvas.addGLEventListener(new GLEventListener() {
+
 			@Override
 			public void display(final GLAutoDrawable drawable) {
 				final GL2ES2 gl = drawable.getGL().getGL2ES2();
@@ -79,6 +81,14 @@ public class CanvasEx {
 		});
 		animator.add(glCanvas);
 		glCanvas.setVisible(true);
+
+		shell.addListener(SWT.Close, new Listener() {
+			public void handleEvent(Event event) {
+				animator.stop();
+				glCanvas.destroy();
+				shell.setVisible(false);
+			}
+		});
 		animator.start();
 	}
 

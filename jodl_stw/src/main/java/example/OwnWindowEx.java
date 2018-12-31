@@ -1,5 +1,7 @@
 package example;
 
+import com.jogamp.newt.event.WindowAdapter;
+import com.jogamp.newt.event.WindowEvent;
 import com.jogamp.newt.opengl.GLWindow;
 
 import com.jogamp.opengl.GL;
@@ -37,6 +39,15 @@ public class OwnWindowEx implements Runnable {
 		animator = new FPSAnimator(60);
 		animator.setUpdateFPSFrames(60, System.err);
 		animator.add(topWindow);
+
+		topWindow.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowDestroyed(WindowEvent e) {
+				animator.stop();
+				System.exit(1);
+			}
+		});
+		
 		animator.start();
 	}
 
