@@ -44,7 +44,7 @@ Exception in thread "main" java.lang.NullPointerException
 ```
 on Ubuntu amd64, the following will work:
 
-Install the jogamp-all-platforms.7z into the project directory, 
+Install the jogamp-all-platforms.7z into the project directory,
 
 run the vendor smoke tests
 ```sh
@@ -109,11 +109,7 @@ Put it on `Shell` (root of the window) or in a `Composite` widget container as c
 
 which is likely the superclasses of everything else of interest in `com.jogamp.opengl`.
 
-### See Also
-
- * [Gradle guide for Migrating from Maven to Gradle](https://guides.gradle.org/migrating-from-maven/)
-
-### Runtime Error Troubleshooting 
+### Runtime Error Troubleshooting
 
 List of dependencies produced by maven command which used a combo of [gradle-generated](https://stackoverflow.com/questions/17281927/how-to-make-gradle-generate-a-valid-pom-xml-file-at-the-root-of-a-project-for-ma)  `pom.xml` from [jvm-graphcs-labs/hello-triagle](https://github.com/jvm-graphics-labs/hello-triangle) project in and original `pom.xml` topreserve build phases, repositories etc.:
 
@@ -220,3 +216,8 @@ Caused by: com.jogamp.opengl.GLException: Caught GLException: Not a GL3 implemen
 	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:81)
 	... 3 more
 ```
+
+### See Also
+
+ * [Gradle guide for Migrating from Maven to Gradle](https://guides.gradle.org/migrating-from-maven/)
+ * ["Hello Triangle" OpenGL 4 Up and Running](http://antongerdelan.net/opengl/hellotriangle.html)
