@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>canvasex</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description/>
@@ -16,9 +16,6 @@
       <organizationUrl>https://github.com/sergueik</organizationUrl>
     </developer>
   </developers>
-   <!-- Depend on gluegen-main and jogl-all-main, which implicitly depend on all platform natives -->
- 
-
   <properties>
     <!-- NOTE: do not use dot in the mainClass property -->
     <mainClass>CanvasEx</mainClass>
@@ -104,21 +101,46 @@
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
     </dependency>
-
-<dependency>
-    <groupId>org.jogamp.jogl</groupId>
-    <artifactId>jogl-all-main</artifactId>
-    <version>2.3.2</version>
-</dependency>
-
-<!-- https://mvnrepository.com/artifact/org.jogamp.gluegen/gluegen-rt -->
-<dependency>
-    <groupId>org.jogamp.gluegen</groupId>
-    <artifactId>gluegen-rt</artifactId>
-    <version>2.3.2</version>
-</dependency>
-
-
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt</artifactId>
+      <version>2.3.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.github.kotlin-graphics</groupId>
+      <artifactId>glm</artifactId>
+      <version>f63d840cde</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.github.kotlin-graphics</groupId>
+      <artifactId>uno-sdk</artifactId>
+      <version>v0.7.4</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>one.util</groupId>
+      <artifactId>streamex</artifactId>
+      <version>0.6.5</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.gluegen</groupId>
+      <artifactId>gluegen-rt-main</artifactId>
+      <version>2.3.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jogamp.jogl</groupId>
+      <artifactId>jogl-all-main</artifactId>
+      <version>2.3.2</version>
+      <scope>compile</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -282,6 +304,10 @@
     <repository>
       <id>central</id>
       <url>http://central.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>imagej</id>
+      <url>http://maven.imagej.net/content/repositories/public</url>
     </repository>
   </repositories>
 </project>

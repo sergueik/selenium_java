@@ -112,3 +112,111 @@ which is likely the superclasses of everything else of interest in `com.jogamp.o
 ### See Also
 
  * [Gradle guide for Migrating from Maven to Gradle](https://guides.gradle.org/migrating-from-maven/)
+
+### Runtime Error Troubleshooting 
+
+List of dependencies produced by maven command which used a combo of [gradle-generated](https://stackoverflow.com/questions/17281927/how-to-make-gradle-generate-a-valid-pom-xml-file-at-the-root-of-a-project-for-ma)  `pom.xml` from [jvm-graphcs-labs/hello-triagle](https://github.com/jvm-graphics-labs/hello-triangle) project in and original `pom.xml` topreserve build phases, repositories etc.:
+
+
+```sh
+annotations-13.0.jar
+commands-3.3.0-I20070605-0010.jar
+common-3.6.200-v20130402-1505.jar
+commons-configuration-1.10.jar
+commons-exec-1.3.jar
+commons-io-2.5.jar
+commons-lang-2.6.jar
+commons-lang3-3.3.1.jar
+commons-logging-1.1.1.jar
+gli-6938a4b6cffc5af7ef6344d2f86ccc0f827b1f3a.jar
+glm-f63d840cde.jar
+gln-1e35c8c7a5f0f1e61a77f0a2cb803111da5ef4df.jar
+gluegen-rt-2.3.2.jar
+gluegen-rt-2.3.2-natives-android-aarch64.jar
+gluegen-rt-2.3.2-natives-android-armv6.jar
+gluegen-rt-2.3.2-natives-linux-amd64.jar
+gluegen-rt-2.3.2-natives-linux-armv6hf.jar
+gluegen-rt-2.3.2-natives-linux-armv6.jar
+gluegen-rt-2.3.2-natives-linux-i586.jar
+gluegen-rt-2.3.2-natives-macosx-universal.jar
+gluegen-rt-2.3.2-natives-solaris-amd64.jar
+gluegen-rt-2.3.2-natives-solaris-i586.jar
+gluegen-rt-2.3.2-natives-windows-amd64.jar
+gluegen-rt-2.3.2-natives-windows-i586.jar
+gluegen-rt-main-2.3.2.jar
+hamcrest-all-1.3.jar
+hamcrest-core-1.3.jar
+jface-3.3.0-I20070606-0010.jar
+jna-4.5.2.jar
+jna-platform-4.5.2.jar
+jogl-all-2.3.2.jar
+jogl-all-2.3.2-natives-android-aarch64.jar
+jogl-all-2.3.2-natives-android-armv6.jar
+jogl-all-2.3.2-natives-linux-amd64.jar
+jogl-all-2.3.2-natives-linux-armv6hf.jar
+jogl-all-2.3.2-natives-linux-armv6.jar
+jogl-all-2.3.2-natives-linux-i586.jar
+jogl-all-2.3.2-natives-macosx-universal.jar
+jogl-all-2.3.2-natives-solaris-amd64.jar
+jogl-all-2.3.2-natives-solaris-i586.jar
+jogl-all-2.3.2-natives-windows-amd64.jar
+jogl-all-2.3.2-natives-windows-i586.jar
+jogl-all-main-2.3.2.jar
+junit-4.12.jar
+kool-07fad04fe49a7963dfb14725b5f689a8796f685f.jar
+kotlin-reflect-1.2.70.jar
+kotlin-stdlib-1.2.70.jar
+kotlin-stdlib-common-1.2.70.jar
+kotlin-unsigned-75287b442e5c25ec79ec56a741e6dc4b6f3cd479.jar
+log4j-1.2.17.jar
+log4j-api-2.11.1.jar
+log4j-core-2.11.1.jar
+lwjgl-3.2.0.jar
+lwjgl-3.2.0-natives-linux.jar
+lwjgl-glfw-3.2.0.jar
+lwjgl-glfw-3.2.0-natives-linux.jar
+lwjgl-jemalloc-3.2.0.jar
+lwjgl-jemalloc-3.2.0-natives-linux.jar
+lwjgl-openal-3.2.0.jar
+lwjgl-openal-3.2.0-natives-linux.jar
+lwjgl-opengl-3.2.0.jar
+lwjgl-opengl-3.2.0-natives-linux.jar
+lwjgl-stb-3.2.0.jar
+lwjgl-stb-3.2.0-natives-linux.jar
+lwjgl-vulkan-3.2.0.jar
+org.eclipse.swt.gtk.linux.x86_64-4.3.jar
+streamex-0.6.5.jar
+swt-3.5.2.jar
+uno-sdk-v0.7.4.jar
+```
+
+The execution error observed in a physical machine with Intel HD 5500 video card Intel Corporation Broadwell-U Integrated Graphics (rev 09). Note: same error is reported under Windowx 8.1 and Ubuntu Xenial and Intel 50 video card on Windows 10 netbook:
+```sh
+Exception in thread "main-AWTAnimator#00" com.jogamp.opengl.util.AnimatorBase$UncaughtAnimatorException: com.jogamp.opengl.GLException: Caught GLException: No shader code found (source nor binary) for src: [shaders/gl3/hello-triangle.vert], bin: null on thread main-AWTAnimator#00
+	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:92)
+	at com.jogamp.opengl.util.AnimatorBase.display(AnimatorBase.java:452)
+	at com.jogamp.opengl.util.Animator$MainLoop.run(Animator.java:204)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.jogamp.opengl.GLException: Caught GLException: No shader code found (source nor binary) for src: [shaders/gl3/hello-triangle.vert], bin: null on thread main-AWTAnimator#00
+	at com.jogamp.opengl.GLException.newGLException(GLException.java:76)
+	at jogamp.opengl.GLDrawableHelper.invokeGLImpl(GLDrawableHelper.java:1327)
+	at jogamp.opengl.GLDrawableHelper.invokeGL(GLDrawableHelper.java:1147)
+	at com.jogamp.newt.opengl.GLWindow.display(GLWindow.java:759)
+	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:81)
+	... 3 more
+```
+The execution error observed in a virual machine with Virtual Box video card:
+```sh
+Exception in thread "main-AWTAnimator#00" com.jogamp.opengl.util.AnimatorBase$UncaughtAnimatorException: com.jogamp.opengl.GLException: Caught GLException: Not a GL3 implementation on thread main-AWTAnimator#00
+	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:92)
+	at com.jogamp.opengl.util.AnimatorBase.display(AnimatorBase.java:452)
+	at com.jogamp.opengl.util.Animator$MainLoop.run(Animator.java:204)
+	at java.lang.Thread.run(Thread.java:748)
+Caused by: com.jogamp.opengl.GLException: Caught GLException: Not a GL3 implementation on thread main-AWTAnimator#00
+	at com.jogamp.opengl.GLException.newGLException(GLException.java:76)
+	at jogamp.opengl.GLDrawableHelper.invokeGLImpl(GLDrawableHelper.java:1327)
+	at jogamp.opengl.GLDrawableHelper.invokeGL(GLDrawableHelper.java:1147)
+	at com.jogamp.newt.opengl.GLWindow.display(GLWindow.java:759)
+	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:81)
+	... 3 more
+```
