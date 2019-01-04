@@ -86,7 +86,10 @@ public class CanvasEx {
 			public void handleEvent(Event event) {
 				animator.stop();
 				glCanvas.destroy();
-				shell.setVisible(false);
+				// TODO: [ERROR] local variable shell is accessed from within inner
+				// class; needs to be declared final
+
+				// shell.setVisible(false);
 			}
 		});
 		animator.start();

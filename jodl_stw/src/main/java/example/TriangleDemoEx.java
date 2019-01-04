@@ -1,36 +1,47 @@
 package example;
 
-import com.jogamp.newt.event.KeyEvent;
-import com.jogamp.newt.event.KeyListener;
-import com.jogamp.newt.event.WindowAdapter;
-import com.jogamp.newt.event.WindowEvent;
-import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.opengl.*;
-import com.jogamp.opengl.math.FloatUtil;
-import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.GLBuffers;
-import com.jogamp.opengl.util.glsl.ShaderCode;
-import com.jogamp.opengl.util.glsl.ShaderProgram;
-import framework.Semantic;
+import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
+import static com.jogamp.opengl.GL.GL_DEPTH_TEST;
+import static com.jogamp.opengl.GL.GL_ELEMENT_ARRAY_BUFFER;
+import static com.jogamp.opengl.GL.GL_FLOAT;
+import static com.jogamp.opengl.GL.GL_INVALID_ENUM;
+import static com.jogamp.opengl.GL.GL_INVALID_FRAMEBUFFER_OPERATION;
+import static com.jogamp.opengl.GL.GL_INVALID_OPERATION;
+import static com.jogamp.opengl.GL.GL_INVALID_VALUE;
+import static com.jogamp.opengl.GL.GL_NO_ERROR;
+import static com.jogamp.opengl.GL.GL_OUT_OF_MEMORY;
+import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
+import static com.jogamp.opengl.GL.GL_TRIANGLES;
+import static com.jogamp.opengl.GL.GL_UNSIGNED_SHORT;
+import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
+import static com.jogamp.opengl.GL2ES2.GL_STREAM_DRAW;
+import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
+import static com.jogamp.opengl.GL2ES3.GL_COLOR;
+import static com.jogamp.opengl.GL2ES3.GL_DEPTH;
+import static com.jogamp.opengl.GL2ES3.GL_UNIFORM_BUFFER;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 
-import static com.jogamp.opengl.GL.GL_ELEMENT_ARRAY_BUFFER;
-import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
-import static com.jogamp.opengl.GL.GL_TRIANGLES;
-import static com.jogamp.opengl.GL.GL_UNSIGNED_SHORT;
-import static com.jogamp.opengl.GL3.GL_ARRAY_BUFFER;
-import static com.jogamp.opengl.GL3.*;
-import static com.jogamp.opengl.GL3.GL_DEPTH_TEST;
-import static com.jogamp.opengl.GL3.GL_FLOAT;
-import static com.jogamp.opengl.GL3.GL_INVALID_ENUM;
-import static com.jogamp.opengl.GL3.GL_INVALID_FRAMEBUFFER_OPERATION;
-import static com.jogamp.opengl.GL3.GL_INVALID_OPERATION;
-import static com.jogamp.opengl.GL3.GL_INVALID_VALUE;
-import static com.jogamp.opengl.GL3.GL_NO_ERROR;
-import static com.jogamp.opengl.GL3.GL_OUT_OF_MEMORY;
+import com.jogamp.newt.event.KeyEvent;
+import com.jogamp.newt.event.KeyListener;
+import com.jogamp.newt.event.WindowAdapter;
+import com.jogamp.newt.event.WindowEvent;
+import com.jogamp.newt.opengl.GLWindow;
+import com.jogamp.opengl.GL;
+import com.jogamp.opengl.GL3;
+import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
+import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLProfile;
+import com.jogamp.opengl.math.FloatUtil;
+import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.GLBuffers;
+import com.jogamp.opengl.util.glsl.ShaderCode;
+import com.jogamp.opengl.util.glsl.ShaderProgram;
+
+import framework.Semantic;
 
 // based on: https://github.com/jvm-graphics-labs/hello-triangle/blob/master/src/main/java/gl3/HelloTriangleSimple.java
 /*
@@ -134,14 +145,14 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 		{
 			gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Buffer.VERTEX));
 			{
-				int stride = (2 + 3) * Float.BYTES;
+				int stride = (2 + 3) * 4 /* Float.BYTES */;
 				int offset = 0;
 
 				gl.glEnableVertexAttribArray(Semantic.Attr.POSITION);
 				gl.glVertexAttribPointer(Semantic.Attr.POSITION, 2, GL_FLOAT, false,
 						stride, offset);
 
-				offset = 2 * Float.BYTES;
+				offset = 2 * 4 /* Float.BYTES */;
 				gl.glEnableVertexAttribArray(Semantic.Attr.COLOR);
 				gl.glVertexAttribPointer(Semantic.Attr.COLOR, 3, GL_FLOAT, false,
 						stride, offset);
@@ -210,17 +221,19 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 		gl.glGenBuffers(Buffer.MAX, bufferName);
 
 		gl.glBindBuffer(GL_ARRAY_BUFFER, bufferName.get(Buffer.VERTEX));
-		gl.glBufferData(GL_ARRAY_BUFFER, vertexBuffer.capacity() * Float.BYTES,
-				vertexBuffer, GL_STATIC_DRAW);
+		gl.glBufferData(GL_ARRAY_BUFFER,
+				vertexBuffer.capacity() * 4 /* Float.BYTES */, vertexBuffer,
+				GL_STATIC_DRAW);
 		gl.glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferName.get(Buffer.ELEMENT));
 		gl.glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-				elementBuffer.capacity() * Short.BYTES, elementBuffer, GL_STATIC_DRAW);
+				elementBuffer.capacity() * 2 /* Short.BYTES */ , elementBuffer,
+				GL_STATIC_DRAW);
 		gl.glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 		gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
-		gl.glBufferData(GL_UNIFORM_BUFFER, 16 * Float.BYTES * 2, null,
+		gl.glBufferData(GL_UNIFORM_BUFFER, 16 * 4 /* Float.BYTES */ * 2, null,
 				GL_STREAM_DRAW);
 		gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
@@ -274,8 +287,8 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 			}
 			gl.glBindBuffer(GL_UNIFORM_BUFFER,
 					bufferName.get(Buffer.GLOBAL_MATRICES));
-			gl.glBufferSubData(GL_UNIFORM_BUFFER, 16 * Float.BYTES, 16 * Float.BYTES,
-					matBuffer);
+			gl.glBufferSubData(GL_UNIFORM_BUFFER, 16 * 4 /* Float.BYTES */ ,
+					16 * 4 /* Float.BYTES */, matBuffer);
 			gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
 		}
 
@@ -322,8 +335,10 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 		for (int i = 0; i < 16; i++) {
 			matBuffer.put(i, ortho[i]);
 		}
+		// Float.BYTES is since JDK 1.8
 		gl.glBindBuffer(GL_UNIFORM_BUFFER, bufferName.get(Buffer.GLOBAL_MATRICES));
-		gl.glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * Float.BYTES, matBuffer);
+		gl.glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * /* Float.BYTES */ 4,
+				matBuffer);
 		gl.glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
 		gl.glViewport(x, y, width, height);
@@ -341,10 +356,22 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		// lambda will not be available prior JDK 1.8
+		/*
 		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
 			new Thread(() -> {
 				topWindow.destroy();
 			}).start();
+		}
+		*/
+		if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+			Thread thread = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					topWindow.destroy();
+				};
+			});
+			thread.start();
 		}
 	}
 
