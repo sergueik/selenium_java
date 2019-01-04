@@ -216,6 +216,9 @@ Caused by: com.jogamp.opengl.GLException: Caught GLException: Not a GL3 implemen
 	at com.jogamp.opengl.util.AWTAnimatorImpl.display(AWTAnimatorImpl.java:81)
 	... 3 more
 ```
+### JDK version dependency
+
+The jogl jar may need [Java 1.6](https://www.oracle.com/technetwork/java/javase/java-archive-downloads-javase6-419409.html) to run. To support building project in this version one also need to [downgrade Maven](https://stackoverflow.com/questions/36141186/what-version-of-maven-is-compatible-with-java-6) to [3.2.5](https://archive.apache.org/dist/maven/maven-3/3.2.5/). For convenience the environment preparation is done by `setup.cmd` file that is added to the project for console execution. One may also need to install Eclipse 4.3 ([Kepler](https://www.eclipse.org/downloads/packages/release/kepler/sr2)) side by side with one's [default](https://www.eclipse.org/downloads/) eclipse (Mars, Neon or later) installed for a specific user.
 
 ### See Also
 

@@ -302,7 +302,7 @@ public class TriangleDemoEx implements GLEventListener, KeyListener {
 		// model matrix
 		{
 			long now = System.currentTimeMillis();
-			float diff = (float) (now - start) / 1_000f;
+			float diff = (float) (now - start) / 1000f;
 
 			float[] scale = FloatUtil.makeScale(new float[16], true, 0.5f, 0.5f,
 					0.5f);

@@ -31,8 +31,6 @@
     <java.version>1.6</java.version>
     <jna-platform.version>4.5.2</jna-platform.version>
     <junit.version>4.12</junit.version>
-    <log4j.version>1.2.17</log4j.version>
-    <log4j-core.version>2.11.1</log4j-core.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
@@ -40,21 +38,6 @@
     <maven.compiler.source>1.6</maven.compiler.source>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-core</artifactId>
-      <version>${log4j-core.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.logging.log4j</groupId>
-      <artifactId>log4j-api</artifactId>
-      <version>${log4j-core.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
