@@ -1,4 +1,7 @@
 package com.github.sergueik.testng.utils;
+/**
+ * Copyright 2019 Serguei Kouzmine
+ */
 
 import static org.testng.Assert.assertTrue;
 
@@ -15,10 +18,11 @@ import org.testng.annotations.Test;
 import com.github.sergueik.testng.utils.TestRandomizer;
 import com.github.sergueik.testng.utils.BaseTest;
 
-// based on
-// https://stackoverflow.com/questions/21591712/how-do-i-use-testng-skipexception
-// see also: 
-// https://github.com/djangofan/testng-custom-report-example
+/**
+ * Class for skipping random testNg tests from execution by invoking the appropriate 
+ * TestRandomizer class from individual @Test method  
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
 public class RandomizedSetsTest extends BaseTest {
 

@@ -1,31 +1,29 @@
 package com.github.sergueik.testng.utils;
-
-import java.util.Random;
-
-import org.testng.SkipException;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
+/**
+ * Copyright 2019 Serguei Kouzmine
+ */
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.nio.file.Files;
 import java.nio.file.Paths;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Random;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import org.testng.SkipException;
+
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+
+/**
+ * Class for skipping a specific testNg test execution by throwing an exception  
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 
 public class TestRandomizer {
 
@@ -100,7 +98,9 @@ public class TestRandomizer {
 		testInventoryData.put(methodName, true);
 	}
 
-	public void skipAllStartingFromTestFour(String methodName) {
+	
+	// could be more accurately named `skipAllStartingFromTestFour`
+	public void skipTestFour(String methodName) {
 
 		if (debug) {
 			System.err.println("Examine method: 	" + methodName);

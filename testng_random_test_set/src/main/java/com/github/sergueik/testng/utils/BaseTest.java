@@ -1,4 +1,7 @@
 package com.github.sergueik.testng.utils;
+/**
+ * Copyright 2019 Serguei Kouzmine
+ */
 
 import org.testng.ITest;
 
