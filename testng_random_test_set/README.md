@@ -94,6 +94,8 @@ Persistent inventory into a YAML/csv/spreadsheet/ELK is a work in progress.
 ### See Also
  * discussion of `SkipException` in [stackoverflow](https://stackoverflow.com/questions/21591712/how-do-i-use-testng-skipexception)
  * customized TestNG [report](https://github.com/djangofan/testng-custom-report-example)illustrating skip techniques
+ * [snateyaml documentation](https://code.google.com/archive/p/snakeyaml/wikis/Documentation.wiki)
+ * [snakeyaml documentaation](https://bitbucket.org/asomov/snakeyaml/wiki/Documentation)
 
 ### License
 This project is licensed under the terms of the MIT license.

@@ -115,6 +115,7 @@ public class RandomizedSetsTest extends BaseTest {
 	@AfterClass
 	static void afterClass() {
 		testRandomizer.printInventory();
+		testRandomizer.dumpInventory();
 	}
 
 }
