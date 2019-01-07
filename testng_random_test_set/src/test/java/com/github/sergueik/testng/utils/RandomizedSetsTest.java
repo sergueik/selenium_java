@@ -6,107 +6,110 @@ import java.lang.reflect.Method;
 
 import org.testng.Assert;
 import org.testng.SkipException;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import com.github.sergueik.testng.utils.TestRandomizer;
+import com.github.sergueik.testng.utils.BaseTest;
 
-public class RandomizedSetsTest {
+// based on
+// https://stackoverflow.com/questions/21591712/how-do-i-use-testng-skipexception
+// see also: 
+// https://github.com/djangofan/testng-custom-report-example
 
-	private static TestRandomizer testRandomizer = TestRandomizer.getInstance();
-	private static boolean runAll = false;
+public class RandomizedSetsTest extends BaseTest {
 
-	@BeforeSuite
-	static void beforeSuite() {
-		testRandomizer.setRunAll(runAll);
+	private static final TestRandomizer testRandomizer = TestRandomizer
+			.getInstance();
+	private static final boolean runAll = false;
+	private static final boolean debug = false;
+	private static final boolean verbose = true;
+
+	@BeforeClass
+	static void beforeClass() {
+		testRandomizer.setRunAll(RandomizedSetsTest.runAll);
+		testRandomizer.setVerbose(RandomizedSetsTest.verbose);
+		testRandomizer.setDebug(RandomizedSetsTest.debug);
 		testRandomizer.setInventoryFilePath("src/main/resources/tests.yaml");
 		testRandomizer.loadInventory();
 	}
 
-	// https://stackoverflow.com/questions/21591712/how-do-i-use-testng-skipexception
-	// see also: https://github.com/djangofan/testng-custom-report-example
 	@BeforeMethod
-	void beforeMethod(Method method) {
-		String methodName = method.getName();
-		// method.toString() returns fully-qualified name
-		if (!testRandomizer.decide(methodName)) {
-			{
-				System.err
-						.println(String.format("Test Ramdomizer decides to skip %s [%s]",
-								methodName, method.toString()));
-
-				// throw new SkipException("skipping " + methodName);
-				// not really, not skip
-				System.err.println("Not really skiping now.");
-			}
-		}
+	private void setName(Method m) {
+		setTestName(m.getName());
 	}
 
 	public void doTest(String testName) {
+		if (debug) {
+			System.err.println("Called Test Ramdomizer from method.");
+		}
 		if (!testRandomizer.decide(testName)) {
-			System.err.println(
-					String.format("Test Ramdomizer decides to skip %s", testName));
+			if (debug) {
+				System.err.println(String.format("will skip %s", testName));
+			}
 			throw new SkipException("skipping " + testName);
 		}
 		assertTrue(true);
 	}
 
+	// NOTE: cannot modify test method signature this way
+	// org.testng.TestNGException: Cannot inject @Test annotated Method [testOne]
+	// with [class java.lang.String].
 	@Test(enabled = true)
-	public void testOne(String testName) {
-		doTest(testName);
+	public void testOne() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	// org.testng.TestNGException:
-	// Cannot inject @Test annotated Method [testTwo] with [class
-	// java.lang.String].
-	public void testTwo(String testName) {
-		doTest(testName);
+	public void testTwo() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testThree(String testName) {
-		doTest(testName);
+	public void testThree() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testFour(String testName) {
-		doTest(testName);
+	public void testFour() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testFive(String testName) {
-		doTest(testName);
+	public void testFive() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testSix(String testName) {
-		doTest(testName);
+	public void testSix() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testSeven(String testName) {
-		doTest(testName);
+	public void testSeven() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testEight(String testName) {
-		doTest(testName);
+	public void testEight() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testNine(String testName) {
-		doTest(testName);
+	public void testNine() {
+		doTest(getTestName());
 	}
 
 	@Test(enabled = true)
-	public void testTen(String testName) {
-		doTest(testName);
+	public void testTen() {
+		doTest(getTestName());
 	}
 
-	@AfterSuite
-	static void afterSuite() {
+	@AfterClass
+	static void afterClass() {
 		testRandomizer.printInventory();
 	}
 

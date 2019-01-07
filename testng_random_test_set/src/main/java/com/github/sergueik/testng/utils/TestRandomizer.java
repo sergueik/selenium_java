@@ -30,7 +30,8 @@ import java.util.function.Predicate;
 public class TestRandomizer {
 
 	private boolean runAll;
-	private boolean debug = true;
+	private boolean debug = false;
+	private boolean verbose = false;
 	private static DumperOptions options = new DumperOptions();
 	private static Yaml yaml = null;
 	private String inventoryFilePath = null;
@@ -42,6 +43,10 @@ public class TestRandomizer {
 
 	public void setDebug(boolean value) {
 		this.debug = value;
+	}
+
+	public void setVerbose(boolean value) {
+		this.verbose = value;
 	}
 
 	public void setRunAll(boolean value) {
@@ -60,26 +65,51 @@ public class TestRandomizer {
 
 	public boolean decide(String methodName) {
 		// TODO: flexible percentage
-		System.err.println("Deciding on " + methodName);
 		boolean status = (new Random().nextInt() % 10 != 0 & !runAll) ? false
 				: true;
-		status = false;
+		// status = false;
+		/*
 		if (!status) {
 			throw new SkipException("Skipping " + methodName);
 		}
+		*/
 		if (yaml == null) {
 			loadInventory();
 		}
 		testInventoryData.put(methodName, status);
+		if (debug) {
+			System.err.println(
+					"Decided to " + (status ? "run" : "skip") + " " + methodName);
+		}
 		return status;
 	}
 
 	// NOTE: do not throw from here or all subsequent tests would be skipped
 	// https://stackoverflow.com/questions/21591712/how-do-i-use-testng-skipexception
 	public void badDecision(String methodName) {
-		System.err.println("Deciding on " + methodName);
+
 		if (new Random().nextInt() % 10 != 0 & !runAll) {
-			throw new SkipException("skipping " + methodName);
+			if (debug) {
+				System.err.println("Decided to skip" + methodName);
+			}
+			throw new SkipException("Decided to skip " + methodName);
+		}
+		if (yaml == null) {
+			loadInventory();
+		}
+		testInventoryData.put(methodName, true);
+	}
+
+	public void skipAllStartingFromTestFour(String methodName) {
+
+		if (debug) {
+			System.err.println("Examine method: 	" + methodName);
+		}
+		if (methodName.matches("(?i).*four.*")) {
+			if (debug) {
+				System.err.println("Decided to skip" + methodName);
+			}
+			throw new SkipException("Decided to skip " + methodName);
 		}
 		if (yaml == null) {
 			loadInventory();
@@ -100,7 +130,7 @@ public class TestRandomizer {
 		testInventoryData.keySet().forEach(t -> testInventoryData.put(t, false));
 	}
 
-	// based on:
+	// origin:
 	// https://stackoverflow.com/questions/33459961/how-to-filter-a-map-by-its-values-in-java-8
 	static <K, V> Map<K, V> filterByValue(Map<K, V> map, Predicate<V> predicate) {
 		return map.entrySet().stream()
@@ -117,6 +147,7 @@ public class TestRandomizer {
 	}
 
 	public void printInventory() {
+		System.err.println("Inventory tests run:");
 		listExecutedTests().stream().forEach(System.err::println);
 	}
 }
