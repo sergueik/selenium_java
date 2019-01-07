@@ -1,4 +1,6 @@
 package com.github.sergueik.testng.utils;
+
+import java.io.FileWriter;
 /**
  * Copyright 2019 Serguei Kouzmine
  */
@@ -98,7 +100,6 @@ public class TestRandomizer {
 		testInventoryData.put(methodName, true);
 	}
 
-	
 	// could be more accurately named `skipAllStartingFromTestFour`
 	public void skipTestFour(String methodName) {
 
@@ -120,6 +121,10 @@ public class TestRandomizer {
 	public void loadInventory() {
 
 		options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
+		// NOTE: canonical definitely is an overkill
+		// options.setCanonical(true);
+		options.setExplicitStart(true);
+		options.setPrettyFlow(true);
 		yaml = new Yaml(options);
 
 		try (InputStream in = Files.newInputStream(Paths.get(inventoryFilePath))) {
@@ -149,5 +154,19 @@ public class TestRandomizer {
 	public void printInventory() {
 		System.err.println("Inventory tests run:");
 		listExecutedTests().stream().forEach(System.err::println);
+	}
+
+	// NOTE: loses the comments in the checked-in inventory YAML example path
+	public void dumpInventory() {
+		FileWriter writer;
+		try {
+			writer = new FileWriter(inventoryFilePath);
+			yaml.dump(testInventoryData, writer);
+			writer.flush();
+			writer.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+			// e.printStackTrace();
+		}
 	}
 }
