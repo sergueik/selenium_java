@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>example</groupId>
+  <artifactId>fillo_examples</artifactId>
+  <version>0.1-SNAPSHOT</version>
+  <description>project exercising Fillo SQL like DSL for serializing / deseriaizing sets of values into Excel</description>
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <compiler.version>1.8</compiler.version>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <fillo.version>1.18</fillo.version>
+    <testng.version>6.14.3</testng.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>com.codoid.products</groupId>
+      <artifactId>fillo</artifactId>
+      <version>${fillo.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.testng</groupId>
+      <artifactId>testng</artifactId>
+      <version>${testng.version}</version>
+    </dependency>
+  </dependencies>
+</project>
