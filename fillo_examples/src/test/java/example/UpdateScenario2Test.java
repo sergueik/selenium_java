@@ -8,7 +8,7 @@ import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-public class UpdateTest {
+public class UpdateScenario2Test {
 	private static Connection connection;
 	private static Fillo fillo;
 	private static Recordset recordset;
