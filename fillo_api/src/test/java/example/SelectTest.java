@@ -1,6 +1,7 @@
-package com.fillo.excel;
+package example;
 
 import org.junit.Test;
+import org.junit.Before;
 import org.junit.Ignore;
 
 import com.codoid.products.exception.FilloException;
@@ -10,18 +11,23 @@ import com.codoid.products.fillo.Recordset;
 
 public class SelectTest {
 
-	private Fillo fillo = new Fillo();
-	private Connection connection = null;
-	private Recordset recordset = null;
+	private static Fillo fillo = new Fillo();
+	private static Connection connection = null;
+	private static Recordset recordset = null;
+	private static String query = null;
 
-	@Ignore
+	@Before
+	public void beforeTest() throws FilloException {
+		connection = fillo.getConnection(
+				System.getProperty("user.dir") + "/TestData/StatesData.xlsx");
+
+	}
+
 	@Test
 	public void basicSelectTest() throws FilloException {
-		connection = fillo.getConnection(
-				System.getProperty("user.dir") + "/TestData/StatesData.xlsx");
 		// Fetch everything
-		String sqlQuery = "select * from States";
-		recordset = connection.executeQuery(sqlQuery);
+		query = "select * from States";
+		recordset = connection.executeQuery(query);
 		while (recordset.next())
 			System.out.println("Sno is: " + recordset.getField("Sno")
 					+ " -- State Name is: " + recordset.getField("State")
@@ -29,14 +35,11 @@ public class SelectTest {
 					+ " -- Region is: " + recordset.getField("Region"));
 	}
 
-	// @Ignore
 	@Test
 	public void whereConditionSelectTest() throws FilloException {
-		connection = fillo.getConnection(
-				System.getProperty("user.dir") + "/TestData/StatesData.xlsx");
 		// Fetch data using select with compound where clause
-		String newQuery = "select State, Capital, Sno, Region from States where Region='South' and Capital = 'Hyderabad'";
-		recordset = connection.executeQuery(newQuery);
+		query = "select State, Capital, Sno, Region from States where Region='South' and Capital = 'Hyderabad'";
+		recordset = connection.executeQuery(query);
 
 		System.out
 				.println("==========================================================");
@@ -47,14 +50,11 @@ public class SelectTest {
 					+ " -- Region is: " + recordset.getField("Region"));
 	}
 
-	// @Ignore
 	@Test
 	public void whereConditionLikeSelectTest() throws FilloException {
-		connection = fillo.getConnection(
-				System.getProperty("user.dir") + "/TestData/StatesData.xlsx");
 		// Fetch data using select with like where clause
-		String newQuery = "select * from States where State like 'T%'";
-		recordset = connection.executeQuery(newQuery);
+		query = "select * from States where State like 'T%'";
+		recordset = connection.executeQuery(query);
 
 		System.out
 				.println("==========================================================");
@@ -65,15 +65,11 @@ public class SelectTest {
 					+ " -- Region is: " + recordset.getField("Region"));
 	}
 
-	// @Ignore
 	@Test
 	public void chainedWhereClauseSelectTest() throws FilloException {
-		connection = fillo.getConnection(
-				System.getProperty("user.dir") + "/TestData/StatesData.xlsx");
-
-		String newQueryExcep = "select * from States";
+		query = "select * from States";
 		// Fetch data using select with chained where clause
-		recordset = connection.executeQuery(newQueryExcep).where("Region='South'")
+		recordset = connection.executeQuery(query).where("Region='South'")
 				.where("State='Telangana'");
 
 		System.out
