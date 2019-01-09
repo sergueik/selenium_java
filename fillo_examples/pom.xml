@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>fillo_examples</artifactId>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <description>project exercising Fillo SQL like DSL for serializing / deseriaizing sets of values into Excel</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
