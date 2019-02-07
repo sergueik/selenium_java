@@ -48,24 +48,28 @@ public class DynamicAnnotations extends Annotations {
 		FindBys findBys = field.getAnnotation(FindBys.class);
 		if (findBys != null) {
 			// building a chained locator
+			log.debug("building a chained locator");
 			ans = buildByFromFindBys(findBys);
 		}
 
 		FindAll findAll = field.getAnnotation(FindAll.class);
 		if (ans == null && findAll != null) {
 			// building a find by one of locator
+			log.debug("building a find by one of locator");
 			ans = buildBysFromFindByOneOf(findAll);
 		}
 
 		FindBy findBy = field.getAnnotation(FindBy.class);
 		if (ans == null && findBy != null) {
 			// building an ordinary locator
+			log.debug("building an ordinary locator");
 			ans = buildByFromFindBy(findBy);
 		}
 
 		if (ans == null) {
 			// without locator annotation will build a locator based on field name
 			// id or name
+			log.debug("build a locator based on field name id or name");
 			ans = buildByFromDefault();
 		}
 

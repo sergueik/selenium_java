@@ -34,7 +34,7 @@ public class DynamicElementLocator implements ElementLocator {
 				substitutions);
 		shouldCache = annotations.isLookupCached();
 		by = annotations.buildBy();
-		// log.debug("Successful completion of the dynamic element locator");
+		log.debug("Successful completion of the dynamic element locator");
 	}
 
 	/**

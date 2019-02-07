@@ -2,6 +2,7 @@ package com.stackoverflow;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -50,6 +51,7 @@ public class SampleTest {
 	private static int implicitWait = 10;
 	private static int flexibleWait = 5;
 	private static long pollingInterval = 500;
+	private static String osName = getOSName();
 	static int width = 600;
 	static int height = 400;
 	private static String baseUrl = "http://toolsqa.com/automation-practice-table/";
@@ -58,11 +60,22 @@ public class SampleTest {
 	@FindBy(how = How.XPATH, using = "//table[@summary='Sample Table']/tbody/tr/th[@scope='row' and text()='${id}']/../descendant::a[@href='#']")
 	private WebElement someElement;
 
+	private static String browserDriver = osName.equals("windows")
+			? "chromedriver.exe" : "chromedriver";
+
 	@BeforeClass
 	public static void setup() throws IOException {
 
 		System.setProperty("webdriver.chrome.driver",
 				(new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath());
+
+		System.setProperty("webdriver.chrome.driver",
+				osName.equals("windows")
+						? Paths.get(System.getenv("USERPROFILE")).resolve("Downloads")
+								.resolve(browserDriver).toAbsolutePath().toString()
+						: Paths.get(System.getProperty("user.home")).resolve("Downloads")
+								.resolve(browserDriver).toAbsolutePath().toString());
+
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
 		ChromeOptions options = new ChromeOptions();
 
@@ -104,6 +117,7 @@ public class SampleTest {
 	@AfterClass
 	public static void teardown() {
 		driver.quit();
+		// TODO: killprocess
 	}
 
 	@Before
@@ -125,5 +139,16 @@ public class SampleTest {
 			someElement.click();
 			System.err.println(someElement.getAttribute("outerHTML"));
 		}
+	}
+
+	// Utilities
+	public static String getOSName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
 	}
 }
