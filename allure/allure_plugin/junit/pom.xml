@@ -23,7 +23,7 @@
     <selenium.version>3.13.0</selenium.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <selenium-chromedriver.version>${selenium.version}</selenium-chromedriver.version>
-    <webdrivermanager.version>3.0.0</webdrivermanager.version>
+    <webdrivermanager.version>3.3.0</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>

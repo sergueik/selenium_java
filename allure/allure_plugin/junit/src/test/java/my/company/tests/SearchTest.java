@@ -30,7 +30,7 @@ import my.company.steps.WebDriverSteps;
  */
 public class SearchTest {
 
-	private WebDriverSteps steps;
+	private static WebDriverSteps steps;
 	public static RemoteWebDriver driver;
 	private static String osName = getOSName();
 
