@@ -1,0 +1,4 @@
+{
+    "https://example.com/person.schema.json": "person.schema.json",
+    "https://example.com/geographical-location.schema.json": "geographical-location.schema.json"
+}
