@@ -1,5 +1,6 @@
 /*
  * Copyright 2018 midorlo.
+ * Updated 2019 by sergueik
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +18,7 @@ package example;
 
 /**
  * @via https://www.autoitscript.com/forum/topic/72905-c-use-of-the-dll-some-idears-for-you/
- * @author midorlo
+ * @authors midorlo, sergueik
  */
 public class Constants {
 
@@ -39,6 +40,21 @@ public class Constants {
 	public static final int SW_SHOWNOACTIVATE = 12;
 	public static final int SW_SHOWNORMAL = 13;
 	public static final int VERSION = 109;
+
+	// The AutoIt v3 functions return values are unusual
+	// for a java program
+	// e.g.
+	// https://www.autoitscript.com/autoit3/docs/functions/WinClose.htm
+	// https://www.autoitscript.com/autoit3/docs/functions/WinKill.htm
+	// etc. illustrate the pattern:
+	// Success: 1.
+	// Failure: 0 if the window is not found ,
+	// cannot be activated (gives focus
+	// to) for WinActivate
+	// some functions only return the success value of 1.
+
+	public static final int AU3_SUCCESS = 1;
+	public static final int AU3_ERROR = 0;
 
 	public static final String DLL = (System.getProperty("os.arch")
 			.equals("amd64") ? "AutoItX3_x64.dll" : "AutoItX3.dll");
