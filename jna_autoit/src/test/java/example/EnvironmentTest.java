@@ -17,7 +17,6 @@
 package example;
 
 import org.testng.Assert;
-import static org.junit.Assert.assertThat;
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -54,9 +53,9 @@ public class EnvironmentTest {
 		// containsString(expResult2))) is undefined
 		// see also:
 		// https://www.programcreek.com/java-api-examples/index.php?api=org.hamcrest.core.AnyOf
+		/*
 		assertThat(System.getProperty("os.name"),
 				anyOf(containsString(expResult1), containsString(expResult2)));
-		/*
 				assertThat( System.getProperty("os.name"),
 						anyOf(containsString(expResult1), containsString(expResult2),
 								containsString(expResult3), containsString(expResult4)));

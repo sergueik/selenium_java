@@ -32,10 +32,7 @@ import com.sun.jna.WString;
  */
 public class AutoItXNGTest {
 
-	public AutoItXNGTest() {
-	}
-
-	@Test
+	@Test(enabled = false)
 	public void testGetInstance() {
 		System.err.println("getInstance");
 		AutoItX expResult = AutoItX.getInstance();
@@ -43,14 +40,14 @@ public class AutoItXNGTest {
 		assertEquals(result, expResult);
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void testAU3_Init() {
 		System.err.println("Init");
 		AutoItX instance = new AutoItX();
 		instance.AU3_Init();
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void testAU3_WinCloseFileDialog() {
 		System.err.println("Close File Dialog");
 		String szTitle = "Open"; // will switch to "Save"
@@ -64,7 +61,20 @@ public class AutoItXNGTest {
 		assertEquals(result, expResult);
 	}
 
-	@Test
+	@Test(enabled = true)
+	public void testAU3_WinCloseFileDialog2() {
+		System.err.println("Close File Dialog");
+		String szTitle = "Open"; // will switch to "Save"
+		String szText = "";
+		AutoItX instance = new AutoItX();
+		int expResult = Constants.AU3_SUCCESS;
+		// int result = instance.AU3_WinClose(szTitle, szText);
+		int result = instance.WinClose(szTitle, szText);
+
+		assertEquals(result, expResult);
+	}
+
+	@Test(enabled = false)
 	public void testAU3_WinCloseChromeBrowser() {
 		System.err.println("Close Browser");
 		String szTitle = "New Tab"; // chrome
@@ -77,7 +87,7 @@ public class AutoItXNGTest {
 		assertEquals(result, expResult);
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void testAU3_WinCloseFirefoxBrowser() {
 		System.err.println("Close Browser");
 		String szTitle = "Mozilla Firefox Start Page"; // firefox
@@ -93,7 +103,7 @@ public class AutoItXNGTest {
 		// e.g. to zoom
 	}
 
-	@Test
+	@Test(enabled = false)
 	public void testAU3_WinOpenFile() {
 		System.err.println("Provide Path to Open File");
 		String szTitle = "Open";
@@ -112,7 +122,7 @@ public class AutoItXNGTest {
 		assertEquals(result, 0);
 	}
 
-	// @Test
+	// @Test(enabled = false)
 	// public void testAU3_WinActive() {
 	// System.err.println("AU3_WinActive");
 	// WString arg0 = null;
@@ -124,8 +134,8 @@ public class AutoItXNGTest {
 	// // TODO review the generated test code and remove the default call to fail.
 	// fail("The test case is a prototype.");
 	// }
-	//
-	// @Test
+
+	// @Test(enabled = false)
 	// public void testAU3_WinExists() {
 	// System.err.println("AU3_WinExists");
 	// WString arg0 = null;
@@ -137,8 +147,8 @@ public class AutoItXNGTest {
 	// // TODO review the generated test code and remove the default call to fail.
 	// fail("The test case is a prototype.");
 	// }
-	//
-	// @Test
+
+	// @Test(enabled = false)
 	// public void testAU3_WinGetTitle() {
 	// System.err.println("AU3_WinGetTitle");
 	// WString arg0 = null;
@@ -150,5 +160,4 @@ public class AutoItXNGTest {
 	// // TODO review the generated test code and remove the default call to fail.
 	// fail("The test case is a prototype.");
 	// }
-	//
 }

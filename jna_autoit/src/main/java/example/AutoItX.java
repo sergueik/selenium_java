@@ -150,6 +150,10 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinClose(arg0, arg1);
 	}
 
+	public int WinClose(String arg0, String arg1) {
+		return LIB.AU3_WinClose(new WString(arg0), new WString(arg1));
+	}
+
 	@Override
 	public int AU3_WinSetState(WString arg0, WString arg1, int arg2) {
 		return LIB.AU3_WinSetState(arg0, arg1, arg2);
