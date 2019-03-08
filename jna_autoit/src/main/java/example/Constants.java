@@ -54,7 +54,7 @@ public class Constants {
 	// some functions only return the success value of 1.
 
 	public static final int AU3_SUCCESS = 1;
-	public static final int AU3_ERROR = 0;
+	public static final int AU3_FAILURE = 0;
 
 	public static final String DLL = (System.getProperty("os.arch")
 			.equals("amd64") ? "AutoItX3_x64.dll" : "AutoItX3.dll");

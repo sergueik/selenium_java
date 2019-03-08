@@ -24,6 +24,9 @@ import com.sun.jna.platform.win32.WTypes.LPWSTR;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinDef.RECT;
+import com.sun.jna.Pointer;
+import com.sun.jna.WString;
+import com.sun.jna.platform.win32.WTypes.LPWSTR;
 
 /**
  *
@@ -233,9 +236,20 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public void AU3_WinGetText(WString arg0, WString arg1, LPWSTR arg2,
-			int arg3) {
-		LIB.AU3_WinGetText(arg0, arg1, arg2, arg3);
+	public void AU3_WinGetText(WString title, WString text, LPWSTR resultPointer,
+			int bufSize) {
+		LIB.AU3_WinGetText(title, text, resultPointer, bufSize);
+	}
+
+	public String WinGetText(String title, String text) {
+
+		// https://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.WTypes
+		String result = "                     ";
+		int bufSize = result.length() - 1;
+		LPWSTR p = new LPWSTR(result);
+		LIB.AU3_WinGetText(new WString(title), new WString(text), p, bufSize);
+		result = p.getValue();
+		return result.trim();
 	}
 
 	@Override
@@ -448,7 +462,6 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlSendByHandle(arg0, arg1, arg2, arg3);
 	}
 
-	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitActive.htm
 	@Override
 	public int AU3_WinWaitActiveByHandle(HWND arg0, int arg1) {
 		return LIB.AU3_WinWaitActiveByHandle(arg0, arg1);
@@ -560,11 +573,11 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitActive.htm
 	public int WinWaitActive(String title, String text, int timeout) {
-		return AU3_WinWaitActive(new WString(title), new WString(text), timeout);
+		return LIB.AU3_WinWaitActive(new WString(title), new WString(text), timeout);
 	}
 
 	public int WinWaitActive(String title, String text) {
-		return AU3_WinWaitActive(new WString(title), new WString(text));
+		return LIB.AU3_WinWaitActive(new WString(title), new WString(text));
 	}
 
 	@Override
