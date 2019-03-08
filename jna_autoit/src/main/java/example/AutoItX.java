@@ -145,13 +145,15 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinSetOnTop(arg0, arg1, arg2);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinClose.htm
 	@Override
-	public int AU3_WinClose(WString arg0, WString arg1) {
-		return LIB.AU3_WinClose(arg0, arg1);
+	public int AU3_WinClose(WString title, WString text) {
+		return LIB.AU3_WinClose(title, text);
 	}
 
-	public int WinClose(String arg0, String arg1) {
-		return LIB.AU3_WinClose(new WString(arg0), new WString(arg1));
+	public boolean WinClose(String title, String text) {
+		int AU3_status = LIB.AU3_WinClose(new WString(title), new WString(text));
+		return (AU3_status == Constants.AU3_SUCCESS);
 	}
 
 	@Override
@@ -446,6 +448,7 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlSendByHandle(arg0, arg1, arg2, arg3);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitActive.htm
 	@Override
 	public int AU3_WinWaitActiveByHandle(HWND arg0, int arg1) {
 		return LIB.AU3_WinWaitActiveByHandle(arg0, arg1);
@@ -553,6 +556,15 @@ public class AutoItX implements AutoItXLibrary {
 	@Override
 	public int AU3_WinGetCaretPos(Pointer arg0) {
 		return LIB.AU3_WinGetCaretPos(arg0);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitActive.htm
+	public int WinWaitActive(String title, String text, int timeout) {
+		return AU3_WinWaitActive(new WString(title), new WString(text), timeout);
+	}
+
+	public int WinWaitActive(String title, String text) {
+		return AU3_WinWaitActive(new WString(title), new WString(text));
 	}
 
 	@Override
@@ -757,6 +769,15 @@ public class AutoItX implements AutoItXLibrary {
 	@Override
 	public void AU3_ToolTip(WString arg0, int arg1, int arg2) {
 		LIB.AU3_ToolTip(arg0, arg1, arg2);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/Send.htm
+	public void Send(String keys) {
+		LIB.AU3_Send(new WString(keys));
+	}
+
+	public void Send(String keys, Boolean flag) {
+		LIB.AU3_Send(new WString(keys), flag ? 0 : 1);
 	}
 
 	@Override
