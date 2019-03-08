@@ -300,9 +300,14 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlShowByHandle(arg0, arg1);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/AutoItSetOption.htm  
+	public int AutoItSetOption(String option, int param) {
+		return LIB.AU3_AutoItSetOption(new  WString(option), param);
+	}
+
 	@Override
-	public int AU3_AutoItSetOption(WString arg0, int arg1) {
-		return LIB.AU3_AutoItSetOption(arg0, arg1);
+	public int AU3_AutoItSetOption(WString option, int param) {
+		return LIB.AU3_AutoItSetOption(option, param);
 	}
 
 	@Override

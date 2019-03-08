@@ -61,22 +61,39 @@ public class AutoItTest {
 		assertFalse(instance.WinClose(title, text));
 	}
 
-	@Test(enabled = false)
-	public void testCloseFirefoxBrowser() {
+	@Test(enabled = true)
+	public void testZoomFirefoxBrowser() {
 		System.err.println("Close Mozilla Firefox Browser");
 		title = "Mozilla Firefox Start Page";
-		assertTrue(instance.WinClose(title, text));
+		instance.AutoItSetOption("SendKeyDownDelay", 30);
+		instance.AutoItSetOption("SendKeyDelay", 10);
+		// zoom out four times
+		for (int cnt = 0; cnt != 4; cnt++) {
+			instance.Send("^-", true);
+			sleep(1000);
+		}
+		// zoom 100 %
+		instance.Send("^0", true);
+		sleep(1000);
+		// CTLR + is a bit tricky since the '+' itself has a special meaning
+		// zoom in 2 times
+		instance.Send("^{+}^{+}", true);
+		sleep(1000);
+		instance.WinClose(title, text);
 	}
 
-	// TODO: send the jna equivalent of Keys.chord(Keys.CONTROL, Keys.ADD)
-	// e.g. to zoom
+	// try lengthening the c to 50ms or more. If it's not the window focus, it
+	// might be that the window can't detect to sent keys fast enough.
 
 	@Test(enabled = true)
 	public void testProvidePathToOpenFile() {
 		System.err.println("Provide Path to Open File");
 		title = "Open";
+		// modified to transmit shift modifier
+		String filePath = "D:\\AutoIT-commands\\TestingV+i+d+e+o.mp4";
 		instance.WinWaitActive(title, text);
-		instance.Send("D:\\AutoIT-commands\\TestingVideo.mp4");
+		// will successfully send a shift key
+		instance.Send(filePath, true);
 		sleep(100);
 		instance.Send("\n"); // "{ENTER}"
 		result = instance.WinGetText(title, text);

@@ -1,7 +1,7 @@
 ### Info
 
 This directory contains a replica of [JNAutoIt - JNA AutoitX dll wrapper](https://github.com/midorlo/JNAutoIt)
-by Midorlo that generates a java method wrapping all core AutoitX [functions](https://documentation.help/AutoItX/)
+by [Michael Dorlöchter] that generates a java method wrapping all core AutoitX [functions](https://documentation.help/AutoItX/)
 from the dll which can be e.g. installed from
 [Nuget package for AutoitX](https://www.nuget.org/packages/AutoItX/).
 without doing the COM registration. This project is also tracked in a [fork](https://github.com/sergueik/JNAutoIt)
@@ -41,10 +41,11 @@ This addresses the anticipated needs of AutoIt with Selenium testing.
 
 Converting all methods is a work in progress (adequate tests might be a  bit of a challenge).
 
-Sending Control + regular key combinations to the application e.g. to control browser zoom is is a work in progress.
 ### Example Usage
 
-Provide Path to save the downloaded File. This is much lightweight compared to the
+#### Save the downloaded File under desired Path
+
+This is much lightweight compared to the
 original  [file Upload Example using AutoIT and with Selenium Webdriver](https://www.guru99.com/use-autoit-selenium.html) recipe.
 which requires an full "compile script to exe"
 Windows executable generation from the following sample `.au3` [script](https://automated-testing.info/t/webdriver-features-rabota-s-upload-popup-windows-native-okno-pri-pomoshhi-selenium-web-driver/2288):
@@ -69,6 +70,33 @@ import example.AutoItX;
   instance.Send("\n");
 ```
 
+#### Change page Zoom or restore 100% zoom Settings
+
+The JNA verion supports the genuine [AutoIt keys and modifiers](https://www.autoitscript.com/autoit3/docs/appendix/SendKeys.htm)
+
+```java
+import example.AutoItX;
+
+	@Test(enabled = true)
+	public void testZoomFirefoxBrowser() {
+		System.err.println("Close Mozilla Firefox Browser");
+		title = "Mozilla Firefox Start Page";
+		instance.AutoItSetOption("SendKeyDownDelay", 30);
+		instance.AutoItSetOption("SendKeyDelay", 10);
+    // zoom out four times
+		for (int cnt = 0 ; cnt!=4; cnt++){
+      instance.Send("^-", true);
+      sleep(1000);
+		}
+    // zoom 100 %
+		instance.Send("^0", true);
+		sleep(1000);
+		// CTLR + is a bit tricky since the '+' itself has a special meaning
+    // zoom in 2 times
+		instance.Send("^{+}^{+}", true);
+		sleep(1000);
+		instance.WinClose(title, text);
+```
 ### See Also
   * [Index of /autoit3/docs/functions](https://www.autoitscript.com/autoit3/docs/functions/)
   * Powershell iAutoIt cmdlets [documentation](https://www.autoitconsulting.com/site/scripting/autoit-cmdlets-for-windows-powershell/)
