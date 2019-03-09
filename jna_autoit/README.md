@@ -4,7 +4,8 @@ This project started from a replica of [JNAutoIt - JNA AutoitX dll wrapper](http
 project by Michael Dorlöchter that offers a [Java Native Access](https://en.wikipedia.org/wiki/Java_Native_Access)
 based  providing dynamically invoked core AutoitX [functions](https://documentation.help/AutoItX/) methods
 wrappers `AU3_*` that are exported from the vendor dll which can be e.g. installed from
-[Nuget package for AutoitX](https://www.nuget.org/packages/AutoItX/) without doing the COM registration or application intallation.
+[Nuget package for AutoitX](https://www.nuget.org/packages/AutoItX/) with no
+COM dll registration nor application installation.
 
 Since code differences are somewhat big, no upstream PR is available at this time.
 
@@ -36,11 +37,18 @@ to `AutoItX`.  This greately simplifies interacting with AutoIt, see below.
 
 Currently extended with Java-friendly signatures are the following metods:
 
-  * `WinClose`
-  * `WinGetText`
-  * `WinWaitActive`
-  * `Send`
   * `AutoItSetOption`
+  * `ControlSend`
+  * `Run`
+  * `Send`
+  * `WinActivate`
+  * `WinActive`
+  * `WinClose`
+  * `WinExists`
+  * `WinGetText`
+  * `WinGetTitle`
+  * `WinKill`
+  * `WinWaitActive`
 
 This addresses the anticipated needs of AutoIt with Selenium testing.
 

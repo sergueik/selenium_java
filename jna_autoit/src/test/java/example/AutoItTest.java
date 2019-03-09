@@ -82,14 +82,11 @@ public class AutoItTest {
 		instance.WinClose(title, text);
 	}
 
-	// try lengthening the c to 50ms or more. If it's not the window focus, it
-	// might be that the window can't detect to sent keys fast enough.
-
 	@Test(enabled = true)
 	public void testProvidePathToOpenFile() {
 		System.err.println("Provide Path to Open File");
 		title = "Open";
-		// modified to transmit shift modifier
+		// customized to exercise shift modifier
 		String filePath = "D:\\AutoIT-commands\\TestingV+i+d+e+o.mp4";
 		instance.WinWaitActive(title, text);
 		// will successfully send a shift key
