@@ -24,52 +24,45 @@ import java.lang.reflect.Parameter;
  */
 class AutoItXLibraryGenerator {
 
-    protected static void printJavaMethods() {
-        Method[] methods = new AutoItX().LIB.getClass().getMethods();
-        for (Method method : methods) {
-            System.out.println("public " 
-                    + method.getReturnType()
-                    + " "
-                    + method.getName()
-                    + "("
-                    + prefixPrintJavaMethods(method.getParameters())
-                    + ") {"
-                    + System.lineSeparator()
-                    + ((method.getReturnType().getSimpleName().equals("void")) ? "" : "return ")
-                    + " LIB."
-                    + method.getName()
-                    + "("
-                    + paramsPrintJavaMethods(method.getParameters())
-                    + ");"
-                    + System.lineSeparator()
-                    + "}"
-            );
-        }
-    }
+	protected static void printJavaMethods() {
+		Method[] methods = new AutoItX().LIB.getClass().getMethods();
+		for (Method method : methods) {
+			System.out
+					.println("public " + method.getReturnType() + " " + method.getName()
+							+ "(" + prefixPrintJavaMethods(method.getParameters()) + ") {"
+							+ System.lineSeparator()
+							+ ((method.getReturnType().getSimpleName().equals("void")) ? ""
+									: "return ")
+							+ " LIB." + method.getName() + "("
+							+ paramsPrintJavaMethods(method.getParameters()) + ");"
+							+ System.lineSeparator() + "}");
+		}
+	}
 
-    private static String prefixPrintJavaMethods(Parameter[] xx) {
-        String r = "";
-        for (Parameter parameter : xx) {
-            r += parameter.getType().getSimpleName() + " " + parameter.getName() + ", ";
-        }
-        if (r.length() > 0) {
-            r = r.substring(0, r.length() - 2);
-        }
-        return r;
-    }
+	private static String prefixPrintJavaMethods(Parameter[] xx) {
+		String r = "";
+		for (Parameter parameter : xx) {
+			r += parameter.getType().getSimpleName() + " " + parameter.getName()
+					+ ", ";
+		}
+		if (r.length() > 0) {
+			r = r.substring(0, r.length() - 2);
+		}
+		return r;
+	}
 
-    private static String paramsPrintJavaMethods(Parameter[] xx) {
-        String r = "";
-        for (Parameter parameter : xx) {
-            r += parameter.getName() + ", ";
-        }
-        if (r.length() > 0) {
-            r = r.substring(0, r.length() - 2);
-        }
-        return r;
-    }
-    
-    public static void main(String[] args) {
-        printJavaMethods();
-    }
+	private static String paramsPrintJavaMethods(Parameter[] xx) {
+		String r = "";
+		for (Parameter parameter : xx) {
+			r += parameter.getName() + ", ";
+		}
+		if (r.length() > 0) {
+			r = r.substring(0, r.length() - 2);
+		}
+		return r;
+	}
+
+	public static void main(String[] args) {
+		printJavaMethods();
+	}
 }

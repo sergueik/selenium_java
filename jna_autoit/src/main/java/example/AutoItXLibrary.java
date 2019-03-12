@@ -429,4 +429,7 @@ interface AutoItXLibrary extends Library {
 	int AU3_WinWaitCloseByHandle(HWND hWnd, int nTimeout);
 
 	int AU3_WinWaitNotActive(WString szTitle, WString szText, int nTimeout);
+
+	Object AU3_WinList(WString szTitle, WString szText);
+
 }

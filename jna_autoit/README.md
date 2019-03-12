@@ -3,7 +3,8 @@
 This project started from a replica of [JNAutoIt - JNA AutoitX dll wrapper](https://github.com/midorlo/JNAutoIt)
 project by Michael Dorlöchter that offers a [Java Native Access](https://en.wikipedia.org/wiki/Java_Native_Access)
 based  providing dynamically invoked core AutoitX [functions](https://documentation.help/AutoItX/) methods
-wrappers `AU3_*` that are exported from the vendor dll which can be e.g. installed from
+wrappers `AU3_*`
+that are exported from the vendor dll which can be e.g. installed from
 [Nuget package for AutoitX](https://www.nuget.org/packages/AutoItX/) with no
 COM dll registration nor application installation.
 
@@ -109,6 +110,33 @@ import example.AutoItX;
 		instance.Send("^{+}^{+}", true);
 		sleep(1000);
 		instance.WinClose(title, text);
+```
+
+### TODO:
+* Currently the library generator is having problems on a vanilla system:
+
+```cmd
+java -cp target\jnautoit-0.0.4-SNAPSHOT.jar;target\lib\* example.AutoItXLibraryGenerator
+Exception in thread "main" java.lang.UnsatisfiedLinkError:
+Unable to load library 'AutoItX3.dll':
+Can't obtain InputStream for win32-x86/AutoItX3.dll
+```
+
+* Some methods of the vendor libary notably are not accessible to jna:
+```cmd
+java.lang.UnsatisfiedLinkError: Error looking up function 'AU3_WinList':
+The specified procedure could not be found.
+
+ at com.sun.jna.Function.<init>(Function.java:245)
+ at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:566)
+ at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:542)
+ at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:528)
+ at com.sun.jna.Library$Handler.invoke(Library.java:228)
+ at example.$Proxy4.AU3_WinList(Unknown Source)
+ at example.AutoItX.AU3_WinList(AutoItX.java:85)
+ at example.AutoItTest.testWinList(AutoItTest.java:62)
+ at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+ at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.ava:62)
 ```
 ### See Also
 

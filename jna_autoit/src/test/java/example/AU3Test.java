@@ -61,6 +61,18 @@ public class AU3Test {
 	}
 
 	@Test(enabled = false)
+	public void testWinList() {
+		try {
+			System.err.println("WinList");
+			instance.AU3_WinList(new WString(""), new WString(""));
+		} catch (UnsatisfiedLinkError e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			// Error looking up function 'AU3_WinList': specified procedure could not
+			// be found.
+		}
+	}
+
+	@Test(enabled = false)
 	public void testCloseOpenFileDialog() {
 		System.err.println("Close File Dialog");
 		title = "Open"; // will switch to "Save"

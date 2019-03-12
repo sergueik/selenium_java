@@ -41,6 +41,9 @@ public class AutoItX implements AutoItXLibrary {
 	private static int bufSize = resultString.length() - 1;
 
 	AutoItX() {
+		// Exception in thread "main" java.lang.UnsatisfiedLinkError:
+		// Unable to load library 'AutoItX3.dll':
+		// Can't obtain InputStream for win32-x86/AutoItX3.dll
 		LIB = (AutoItXLibrary) Native.loadLibrary(DLL, AutoItXLibrary.class);
 		LIB.AU3_Init();
 		INSTANCE = this;
@@ -77,6 +80,12 @@ public class AutoItX implements AutoItXLibrary {
 	public boolean Run(String program, String workingdir) {
 		return (LIB.AU3_Run(new WString(program),
 				new WString(workingdir)) == Constants.AU3_SUCCESS);
+	}
+	// https://www.autoitscript.com/autoit3/docs/functions/WinList.htm
+	// https://www.autoitscript.com/autoit3/docs/intro/windowsadvanced.htm
+
+	public Object AU3_WinList(WString title, WString text) {
+		return LIB.AU3_WinList(title, text);
 	}
 
 	@Override
