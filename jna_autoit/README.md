@@ -113,30 +113,157 @@ import example.AutoItX;
 ```
 
 ### TODO:
-* Currently the library generator is having problems on a vanilla system:
+
+
+One can generate the dump list of the `AutoItX3_x64.dll` exports using Visual Studio linker tool (platform-specific version):
+
+```cmd
+
+"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /exports AutoItX3_x64.dll 
+  AU3_AutoItSetOption
+  AU3_ClipGet
+  AU3_ClipPut
+  AU3_ControlClick
+  AU3_ControlClickByHandle
+  AU3_ControlCommand
+  AU3_ControlCommandByHandle
+  AU3_ControlDisable
+  AU3_ControlDisableByHandle
+  AU3_ControlEnable
+  AU3_ControlEnableByHandle
+  AU3_ControlFocus
+  AU3_ControlFocusByHandle
+  AU3_ControlGetFocus
+  AU3_ControlGetFocusByHandle
+  AU3_ControlGetHandle
+  AU3_ControlGetHandleAsText
+  AU3_ControlGetPos
+  AU3_ControlGetPosByHandle
+  AU3_ControlGetText
+  AU3_ControlGetTextByHandle
+  AU3_ControlHide
+  AU3_ControlHideByHandle
+  AU3_ControlListView
+  AU3_ControlListViewByHandle
+  AU3_ControlMove
+  AU3_ControlMoveByHandle
+  AU3_ControlSend
+  AU3_ControlSendByHandle
+  AU3_ControlSetText
+  AU3_ControlSetTextByHandle
+  AU3_ControlShow
+  AU3_ControlShowByHandle
+  AU3_ControlTreeView
+  AU3_ControlTreeViewByHandle
+  AU3_DriveMapAdd
+  AU3_DriveMapDel
+  AU3_DriveMapGet
+  AU3_Init
+  AU3_IsAdmin
+  AU3_MouseClick
+  AU3_MouseClickDrag
+  AU3_MouseDown
+  AU3_MouseGetCursor
+  AU3_MouseGetPos
+  AU3_MouseMove
+  AU3_MouseUp
+  AU3_MouseWheel
+  AU3_Opt
+  AU3_PixelChecksum
+  AU3_PixelGetColor
+  AU3_PixelSearch
+  AU3_ProcessClose
+  AU3_ProcessExists
+  AU3_ProcessSetPriority
+  AU3_ProcessWait
+  AU3_ProcessWaitClose
+  AU3_Run
+  AU3_RunAs
+  AU3_RunAsWait
+  AU3_RunWait
+  AU3_Send
+  AU3_Shutdown
+  AU3_Sleep
+  AU3_StatusbarGetText
+  AU3_StatusbarGetTextByHandle
+  AU3_ToolTip
+  AU3_WinActivate
+  AU3_WinActivateByHandle
+  AU3_WinActive
+  AU3_WinActiveByHandle
+  AU3_WinClose
+  AU3_WinCloseByHandle
+  AU3_WinExists
+  AU3_WinExistsByHandle
+  AU3_WinGetCaretPos
+  AU3_WinGetClassList
+  AU3_WinGetClassListByHandle
+  AU3_WinGetClientSize
+  AU3_WinGetClientSizeByHandle
+  AU3_WinGetHandle
+  AU3_WinGetHandleAsText
+  AU3_WinGetPos
+  AU3_WinGetPosByHandle
+  AU3_WinGetProcess
+  AU3_WinGetProcessByHandle
+  AU3_WinGetState
+  AU3_WinGetStateByHandle
+  AU3_WinGetText
+  AU3_WinGetTextByHandle
+  AU3_WinGetTitle
+  AU3_WinGetTitleByHandle
+  AU3_WinKill
+  AU3_WinKillByHandle
+  AU3_WinMenuSelectItem
+  AU3_WinMenuSelectItemByHandle
+  AU3_WinMinimizeAll
+  AU3_WinMinimizeAllUndo
+  AU3_WinMove
+  AU3_WinMoveByHandle
+  AU3_WinSetOnTop
+  AU3_WinSetOnTopByHandle
+  AU3_WinSetState
+  AU3_WinSetStateByHandle
+  AU3_WinSetTitle
+  AU3_WinSetTitleByHandle
+  AU3_WinSetTrans
+  AU3_WinSetTransByHandle
+  AU3_WinWait
+  AU3_WinWaitActive
+  AU3_WinWaitActiveByHandle
+  AU3_WinWaitByHandle
+  AU3_WinWaitClose
+  AU3_WinWaitCloseByHandle
+  AU3_WinWaitNotActive
+  AU3_WinWaitNotActiveByHandle
+  AU3_error
+```
+The plain java library generator is failing on a vanilla system:
 
 ```cmd
 java -cp target\jnautoit-0.0.4-SNAPSHOT.jar;target\lib\* example.AutoItXLibraryGenerator
 Exception in thread "main" java.lang.UnsatisfiedLinkError:
 Unable to load library 'AutoItX3.dll':
-Can't obtain InputStream for win32-x86/AutoItX3.dll
+Can't obtain InputStream for win32-x86/AutoItX3.dll -
 ```
-
-* Some methods of the vendor libary notably are not accessible to jna:
+To solve this one may need a checked version of the dll or place some missing dependency 
+into the System32 folder (all imports listed by link.exe are already in `c:\Windows\System32`:
 ```cmd
-java.lang.UnsatisfiedLinkError: Error looking up function 'AU3_WinList':
-The specified procedure could not be found.
 
- at com.sun.jna.Function.<init>(Function.java:245)
- at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:566)
- at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:542)
- at com.sun.jna.NativeLibrary.getFunction(NativeLibrary.java:528)
- at com.sun.jna.Library$Handler.invoke(Library.java:228)
- at example.$Proxy4.AU3_WinList(Unknown Source)
- at example.AutoItX.AU3_WinList(AutoItX.java:85)
- at example.AutoItTest.testWinList(AutoItTest.java:62)
- at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
- at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.ava:62)
+"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /imports AutoItX3_x64.dll |  findstr /i \.dll
+Dump of file AutoItX3_x64.dll
+  MPR.dll
+  WINMM.dll
+  COMCTL32.dll
+  USERENV.dll
+  KERNEL32.dll
+  USER32.dll
+  GDI32.dll
+  ADVAPI32.dll
+  SHELL32.dll
+  ole32.dll
+  OLEAUT32.dll
+  RPCRT4.dll
 ```
 ### See Also
 

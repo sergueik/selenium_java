@@ -81,12 +81,10 @@ public class AutoItX implements AutoItXLibrary {
 		return (LIB.AU3_Run(new WString(program),
 				new WString(workingdir)) == Constants.AU3_SUCCESS);
 	}
+
 	// https://www.autoitscript.com/autoit3/docs/functions/WinList.htm
 	// https://www.autoitscript.com/autoit3/docs/intro/windowsadvanced.htm
-
-	public Object AU3_WinList(WString title, WString text) {
-		return LIB.AU3_WinList(title, text);
-	}
+	// No AU3_WinList is exported
 
 	@Override
 	public int AU3_Run(WString program, WString workingdir, int showFlag) {
