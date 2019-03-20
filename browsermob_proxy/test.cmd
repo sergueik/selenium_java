@@ -11,7 +11,7 @@ set MAVEN_OPTS=-Xms256m -Xmx512m
 set BROWSER=chrome
 REM set BROWSER=firefox
 set APP_NAME=App
-set APP_VERSION=0.3-SNAPSHOT
+set APP_VERSION=0.4-SNAPSHOT
 set APP_PACKAGE=com.github.sergueik.bmp
 set MAIN_CLASS=App
 

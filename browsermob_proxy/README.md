@@ -6,8 +6,10 @@ This directory contains the [browsermob proxy](https://bmp.lightbody.net/) (BMP)
 To run,
 ```cmd
 mvn -Dmaven.test.skip=true -DskipTests=true package install
-
-java -cp target\app-0.2-SNAPSHOT.jar;target\lib\* com.github.sergueik.bmp.App
+set DEBUG_SLEEP=120000
+set DEBUG=true
+set BROWSER=chrome
+java -cp target\app-0.4-SNAPSHOT.jar;target\lib\* com.github.sergueik.bmp.App
 ```
 or run the provided batch file
 ```cmd

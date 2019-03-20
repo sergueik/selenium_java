@@ -5,10 +5,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
-
+import java.net.Inet4Address;
 import java.net.MalformedURLException;
 import java.net.URL;
-
+import java.net.UnknownHostException;
 import java.nio.file.Paths;
 
 import java.util.List;
@@ -28,6 +28,7 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Assert;
 
 // import org.openqa.selenium.firefox.ProfileManager;
 
@@ -84,8 +85,23 @@ public class App {
 	public static void main(String[] args) throws InterruptedException {
 
 		proxyServer = new BrowserMobProxyServer();
+		// for application with invalid certificates
+		proxyServer.setTrustAllServers(true);
 		proxyServer.start(0);
+
 		seleniumProxy = ClientUtil.createSeleniumProxy(proxyServer);
+		// origin:
+		// https://techblog.dotdash.com/selenium-browsermob-integration-c35f4713fb59
+		/*
+		try {
+			String hostIp = Inet4Address.getLocalHost().getHostAddress();
+			seleniumProxy.setHttpProxy(hostIp + ":" + proxyServer.getPort());
+			seleniumProxy.setSslProxy(hostIp + ":" + proxyServer.getPort());
+		} catch (UnknownHostException e) {
+			System.err.println("Exception : " + e.toString());
+			throw new RuntimeException("invalid localhost ip address");
+		}
+		*/
 		if (browser == null) {
 			browser = "firefox";
 		}
@@ -138,6 +154,10 @@ public class App {
 												.getAbsolutePath()
 										: "/usr/bin/firefox");
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+				System.err
+						.println("Setting HTTP proxy to" + seleniumProxy.getHttpProxy());
+				System.err
+						.println("Setting SSL proxy to" + seleniumProxy.getSslProxy());
 				capabilities.setCapability(CapabilityType.PROXY, seleniumProxy);
 				capabilities.setCapability("marionette", false);
 				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
@@ -164,7 +184,7 @@ public class App {
 				try {
 					debugSleep = Long.parseLong(System.getenv("DEBUG_SLEEP"));
 				} catch (NumberFormatException e) {
-					debugSleep = 10000;
+					debugSleep = 120000;
 				}
 				if (debugSleep == 0) {
 					debugSleep = 10000;
@@ -250,7 +270,7 @@ public class App {
 			}
 
 			// TODO: process the HAR
-      /* 
+			/* 
 			HarReader harReader = new HarReader();
 			de.sstoehr.harreader.model.Har har = null;
 			try {
@@ -261,7 +281,7 @@ public class App {
 			if (har != null) {
 				System.out.println(har.getLog().getCreator().getName());
 			}
-      */
+			*/
 		}
 	}
 
