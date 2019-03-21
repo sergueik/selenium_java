@@ -10,7 +10,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
-
+import java.time.Duration;
 import java.util.List;
 import static org.junit.Assert.assertTrue;
 
@@ -33,6 +33,7 @@ import org.junit.Assert;
 // import org.openqa.selenium.firefox.ProfileManager;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.WebElement;
@@ -76,7 +77,10 @@ public class App {
 	private static String browser = System.getenv("BROWSER"); // "firefox";
 	private static String runMode = "local";
 
-	private static String baseUrl = "www.imdb.com";
+	// NOTE: no http://
+
+	private static String targetHost = "bandi.servizi.politicheagricole.it"; // "www.imdb.com";
+	private static String baseUrl = "http://bandi.servizi.politicheagricole.it/taxcredit/default.aspx";
 	private static String filePath = "test.har";
 	private static FileOutputStream outputStream;
 	private static String urlFragment = "https://s.amazon-adsystem.com";
@@ -92,7 +96,7 @@ public class App {
 		seleniumProxy = ClientUtil.createSeleniumProxy(proxyServer);
 		// origin:
 		// https://techblog.dotdash.com/selenium-browsermob-integration-c35f4713fb59
-		/*
+		// is it needed ?
 		try {
 			String hostIp = Inet4Address.getLocalHost().getHostAddress();
 			seleniumProxy.setHttpProxy(hostIp + ":" + proxyServer.getPort());
@@ -101,7 +105,6 @@ public class App {
 			System.err.println("Exception : " + e.toString());
 			throw new RuntimeException("invalid localhost ip address");
 		}
-		*/
 		if (browser == null) {
 			browser = "firefox";
 		}
@@ -173,21 +176,24 @@ public class App {
 				CaptureType.RESPONSE_CONTENT);
 		// create a new HAR
 		System.err.println("Running proxy on port:" + proxyServer.getPort());
-		proxyServer.newHar(baseUrl);
+		proxyServer.newHar(targetHost);
 		System.err.println("Created a new HAR for " + baseUrl);
 		// needs longer timeout in the presence of the proxy
-		wait = new WebDriverWait(driver, 10, 500);
+		// TODO: parameter
+		long debugWait = Long.parseLong(System.getenv("DEBUG_WAIT"));
+
+		wait = new WebDriverWait(driver, debugWait > 0 ? debugWait : 120, 500);
 		// TODO: parameter
 		try {
-			driver.get("http://" + baseUrl + "/");
+			driver.get(baseUrl);
 			if (debug) {
 				try {
 					debugSleep = Long.parseLong(System.getenv("DEBUG_SLEEP"));
 				} catch (NumberFormatException e) {
-					debugSleep = 120000;
+					debugSleep = 10000;
 				}
 				if (debugSleep == 0) {
-					debugSleep = 10000;
+					debugSleep = 1000;
 				}
 				try {
 					Thread.sleep(debugSleep);
@@ -195,17 +201,26 @@ public class App {
 					// System.err.println("Exception (ignored): " + e.toString());
 				}
 			}
-			// wait for the page to load
-			element = wait.until(ExpectedConditions
-					.visibilityOfElementLocated(By.cssSelector("#navbar-query")));
-			// TODO: multi-step transaction
-			element.sendKeys(search);
 
-			driver.findElement(By.cssSelector("#navbar-submit-button")).click();
-			// wait for the search results
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
-					"#main > div.article > h1.findHeader > span.findSearchTerm")));
-			// print the node information
+			WebElement element = driver
+					.findElement(By.xpath("//*[contains(text(), 'A C C E D I')]"));
+			highlight(element);
+			element.click();
+			wait.until(ExpectedConditions.urlContains(baseUrl));
+
+			element = wait.until(ExpectedConditions.visibilityOf(
+					driver.findElement(By.id("ctl00_phContent_Login_txtEmail"))));
+			highlight(element);
+
+			// #ctl00_phContent_Login_btnAccedi
+			// TODO: press button to navigate
+			// page URL does not change
+			// http://bandi.servizi.politicheagricole.it/taxcredit/default.aspx
+			// wait for the page to load
+			element = wait
+					.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
+							"#ctl00_phContent_Login_btnAccedi" /* "#navbar-query" */)));
+				// print the node information
 			// System.out.println(getIPOfNode(driver));
 
 		} catch (org.openqa.selenium.TimeoutException e) {
@@ -340,6 +355,80 @@ public class App {
 			}
 		}
 		return osName;
+	}
+
+	public static void highlight(WebElement element) {
+		highlight(element, 100, "solid yellow");
+	}
+
+	private static int scriptTimeout = 5;
+	private static int flexibleWait = 60; // too long
+	private static int implicitWait = 1;
+	private static int pollingInterval = 500;
+	private static long highlightInterval = 100;
+
+	public void highlight(WebElement element, long highlightInterval) {
+		highlight(element, highlightInterval, "solid yellow");
+
+	}
+
+	public static void highlight(WebElement element, long highlightInterval,
+			String color) {
+		System.err.println("Color: " + color);
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexibleWait);
+		}
+		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
+		// https://stackoverflow.com/questions/49687699/how-to-remove-deprecation-warning-on-timeout-and-polling-in-selenium-java-client
+		// wait.pollingEvery(Duration.ofMillis((int) pollingInterval));
+
+		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+
+		try {
+			wait.until(ExpectedConditions.visibilityOf(element));
+			executeScript(String.format("arguments[0].style.border='3px %s'", color),
+					element);
+			Thread.sleep(highlightInterval);
+			executeScript("arguments[0].style.border=''", element);
+		} catch (InterruptedException e) {
+			// System.err.println("Exception (ignored): " + e.toString());
+		}
+	}
+
+	public void highlight(By locator) throws InterruptedException {
+		highlight(locator, "solid yellow");
+	}
+
+	public void highlight(By locator, String color) throws InterruptedException {
+		WebElement element = driver.findElement(locator);
+		executeScript(String.format("arguments[0].style.border='3px %s'", color),
+				element);
+		Thread.sleep(highlightInterval);
+		executeScript("arguments[0].style.border=''", element);
+	}
+
+	public static Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			/*
+			 *
+			 // currently unsafe
+			System.err.println(arguments.length + " arguments received.");
+			String argStr = "";
+			
+			for (int i = 0; i < arguments.length; i++) {
+				argStr = argStr + " "
+						+ (arguments[i] == null ? "null" : arguments[i].toString());
+			}
+			
+			System.err.println("Calling " + script.substring(0, 40)
+					+ "..." + \n" + "with arguments: " + argStr);
+					*/
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
+		}
 	}
 
 }
