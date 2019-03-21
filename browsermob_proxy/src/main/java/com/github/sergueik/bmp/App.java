@@ -11,7 +11,10 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import static org.junit.Assert.assertTrue;
 
 // error: a type with the same simple name is already defined by 
@@ -29,6 +32,9 @@ import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 // import org.openqa.selenium.firefox.ProfileManager;
 
@@ -85,6 +91,11 @@ public class App {
 	private static FileOutputStream outputStream;
 	private static String urlFragment = "https://s.amazon-adsystem.com";
 	private static String search = "The Matrix";
+
+	private static final String username = getPropertyEnv("TEST_USER",
+			"testuser");
+	private static final String password = getPropertyEnv("TEST_PASS",
+			"00000000");
 
 	public static void main(String[] args) throws InterruptedException {
 
@@ -220,8 +231,47 @@ public class App {
 			element = wait
 					.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(
 							"#ctl00_phContent_Login_btnAccedi" /* "#navbar-query" */)));
-				// print the node information
+			// print the node information
 			// System.out.println(getIPOfNode(driver));
+
+			element = driver.findElement(By.id("ctl00_phContent_Login_txtEmail"));
+			highlight(element);
+			element.clear();
+			element.sendKeys(username);
+			element = driver.findElement(By.id("ctl00_phContent_Login_txtOTP"));
+			highlight(element);
+			element.clear();
+			element.sendKeys(password);
+
+			// solve the arithmetic
+			element = driver.findElement(By.id("btnRobot"));
+			String arithCaptcha = element.getText();
+			System.err.println("Non sono un robot: " + arithCaptcha);
+			int result = processArithCaptcha(arithCaptcha);
+			element = driver.findElement(By.id("ctl00_phContent_Login_txtRisultato"));
+			// #ctl00_phContent_Login_txtRisultato
+			highlight(element);
+			System.err.println("Result = " + result);
+			element.sendKeys(String.format("%d", result));
+			sleep(1000);
+
+			element = driver.findElement(
+					By.xpath("//input[contains(@name,'Login')][@value='ACCEDI']"));
+			highlight(element);
+			//
+			// javascript:WebForm_DoPostBackWithOptions(new WebForm_PostBackOptions
+			// defined in
+			// http://bandi.servizi.politicheagricole.it/WebResource.axd?d=sM33t9H6RZ2MDpCNlvexSkMkj-P5_i78rpygPX1UgFL7wJP-xELiJgfUq60A4HUeQ8DXhc3u0uhgfh4BqZJT4hAQnMaL7HR0CaXF4dqSK_81&amp;t=636797550873570065
+			// http://bandi.servizi.politicheagricole.it/ScriptResource.axd?d=RvFNo92bmDipxGtSSmL7toJJGO1t9k4EHQvLM_UZdt-X8mAskYrwTlfMWy_vN7a6D9yuoV1ZEr2oKYrLXHWfEAD9H_5esyFeRF-FatLZ5JNDg9x-Lf1Uqo6jQs8pTF_nlm4Nt8C4zX4R10yA4jv86wXgdY3U5JFMg1pqnUdSn8kS7f0a2KJmh9Xg77XmxtLQ0&amp;t=ffffffff999c3159
+			// http://bandi.servizi.politicheagricole.it/ScriptResource.axd?d=ifoKqdOrUyzcVZT7VtxjNyv3h9hddkwuh6sB2CiIFefukPGAkNb9ZXWjzt9ZBWJY3oiXX1O_f0WjBO5GysyEz6eoO12QvhsYwXhcGDinWXc2bf7UxII8xtb1SlU8t2jM0qip1dHZhvyC11codnXUkr-T0uE0a7GKLfr6v4yLAVs1&amp;t=6e962c21
+			// see:
+			// src/test/resources/MicrosoftAjaxWebForms.js
+			// src/test/resources/post_actions_axd_example.js
+			// src/test/resources/post_actions_axd_example2.js
+			// src/test/resources/MicrosoftAjax.js
+			// there are additional jsvascript
+
+			element.click();
 
 		} catch (org.openqa.selenium.TimeoutException e) {
 			System.err.println(e.toString());
@@ -429,6 +479,87 @@ public class App {
 		} else {
 			throw new RuntimeException("Script execution failed.");
 		}
+	}
+
+	private static int processArithCaptcha(String arithCaptcha) {
+
+		// System.err.println("Non sono un robot: " + arithCaptcha);
+
+		Pattern pattern = Pattern
+				.compile("(\\d+)\\s+((?:per|divizo|meno|pi.))\\s+(\\d+)\\s*=\\s*");
+		Matcher matcher = pattern.matcher(arithCaptcha);
+
+		assertTrue(matcher.find());
+
+		Map<String, String> formOps = new HashMap<>();
+		formOps.put("per", "multiply");
+		formOps.put("diviso", "divide");
+		formOps.put("meno", "substract");
+		formOps.put("pi?", "add");
+		String opLoc = matcher.group(2);
+		String op = formOps.containsKey(opLoc) ? formOps.get(opLoc)
+				: formOps.get("pi?");
+		Integer left = Integer.parseInt(matcher.group(1));
+		Integer right = Integer.parseInt(matcher.group(3));
+		System.err.println(
+				"It is: " + left.toString() + " " + op + " " + right.toString());
+		Integer result = 0;
+		switch (op) {
+		case "multiply":
+			result = left * right;
+			break;
+		case "divide":
+			result = left / right;
+			break;
+		case "substract":
+			result = left - right;
+			break;
+		case "add":
+			result = left + right;
+			break;
+		default:
+			result = -1;
+		}
+
+		return result.intValue();
+	}
+
+	private static void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{(?:env:)?(\\w+)\\}|(\\w+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = System.getenv(envVarName);
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 }

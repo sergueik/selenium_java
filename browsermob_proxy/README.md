@@ -43,6 +43,7 @@ The BMP version __2.12__ works with Selenium __2.53__  but not with Selenim __3.
 * [forum](http://automated-testing.info/t/browsermob-proxy-java-webdriver-pomogite-zapustit-prostejshij-test/4531/24)
 * blogs
   * [selenium-browser-proxy](http://sidelnikovmike.blogspot.ru/2016/04/selenium-browser-proxy.html)
+  * [BrowserMob Embedded Mode Integration with Webdriver/Selenium Java](https://techblog.dotdash.com/selenium-browsermob-integration-c35f4713fb59)
   * [browsermobproxy-selenium-perfomance](http://internetka.in.ua/browsermobproxy-selenium-perfomance/)
 * misc
   * https://groups.google.com/forum/#!topic/webdriver/aQl5o0TorqM
