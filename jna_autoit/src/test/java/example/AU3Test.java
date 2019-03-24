@@ -15,16 +15,20 @@
  */
 package example;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
 
+import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.WTypes.LPWSTR;
 
 /**
  * @authors midorlo, sergueik
@@ -98,6 +102,33 @@ public class AU3Test {
 		// TODO: confirm the status
 		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)),
 				au3Failure);
+	}
+
+	@Test(enabled = true)
+	public void testClipboard() {
+		System.err.println("Put and get data using AU3 Clipboard API");
+		String dataPut = "example";
+		int dataPutLength = dataPut.length();
+		instance.AU3_ClipPut(new WString(dataPut));
+		try {
+			StringBuilder sb = new StringBuilder(dataPutLength);
+			while (sb.length() < dataPutLength) {
+				sb.append("*");
+			}
+			String dataGet = sb.toString();
+			// TODO: explain
+			int bufSize = dataGet.length() + 1;
+			LPWSTR resultPtr = new LPWSTR(dataGet);
+			instance.AU3_ClipGet(resultPtr, bufSize);
+			dataGet = resultPtr.getValue().toString();
+			dataGet.trim();
+			assertThat(dataGet, notNullValue());
+			System.err.println("Got data: " + dataGet);
+			Assert.assertTrue(dataGet.equals(dataPut));
+		} catch (Exception e) {
+			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
+			System.err.println("Exception " + e.toString());
+		}
 	}
 
 	// @Test(enabled = false)

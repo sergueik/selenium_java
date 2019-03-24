@@ -17,6 +17,9 @@ package example;
 
 import static example.Constants.DLL;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.WString;
@@ -24,9 +27,6 @@ import com.sun.jna.platform.win32.WTypes.LPWSTR;
 import com.sun.jna.platform.win32.WinDef.DWORD;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.WinDef.RECT;
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.platform.win32.WTypes.LPWSTR;
 
 /**
  *
@@ -37,8 +37,8 @@ public class AutoItX implements AutoItXLibrary {
 
 	final AutoItXLibrary LIB;
 	private static AutoItX INSTANCE;
-	private static String resultString = (new StringBuilder(1024)).toString();
-	private static int bufSize = resultString.length() - 1;
+	private static int bufSize = 1024;
+	private static String resultString = fill(bufSize, " ");
 
 	AutoItX() {
 		LIB = (AutoItXLibrary) Native.loadLibrary(DLL, AutoItXLibrary.class);
@@ -160,14 +160,20 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_ClipPut(new WString(value));
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/Sleep.htm
 	@Override
-	public void AU3_Sleep(int arg0) {
-		LIB.AU3_Sleep(arg0);
+	public void AU3_Sleep(int delay) {
+		LIB.AU3_Sleep(delay);
 	}
 
+	public void Sleep(int delay) {
+		LIB.AU3_Sleep(delay);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/WinGetHandle.htm
 	@Override
-	public HWND AU3_WinGetHandle(WString arg0, WString arg1) {
-		return LIB.AU3_WinGetHandle(arg0, arg1);
+	public HWND AU3_WinGetHandle(WString title, WString text) {
+		return LIB.AU3_WinGetHandle(title, text);
 	}
 
 	@Override
@@ -175,14 +181,16 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_DriveMapGet(arg0, arg1, arg2);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinGetState.htm
 	@Override
 	public int AU3_WinGetState(WString title, WString text) {
 		return LIB.AU3_WinGetState(title, text);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinSetTrans.htm
 	@Override
-	public int AU3_WinSetTrans(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinSetTrans(arg0, arg1, arg2);
+	public int AU3_WinSetTrans(WString title, WString text, int transparency) {
+		return LIB.AU3_WinSetTrans(title, text, transparency);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinExists.htm
@@ -260,9 +268,22 @@ public class AutoItX implements AutoItXLibrary {
 				new WString(text)) == Constants.AU3_SUCCESS);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinSetState.htm
 	@Override
-	public int AU3_WinSetState(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinSetState(arg0, arg1, arg2);
+	public int AU3_WinSetState(WString title, WString text, int flag) {
+		return LIB.AU3_WinSetState(title, text, flag);
+	}
+
+	public boolean WinSetState(String title, String text, int flag) {
+		List<Integer> sw_flags = (List<Integer>) Arrays.asList(Constants.SW_HIDE,
+				Constants.SW_SHOW, Constants.SW_MINIMIZE, Constants.SW_MAXIMIZE,
+				Constants.SW_RESTORE);
+		/* TODO:
+		Constants.SW_DISABLE,
+		Constants.SW_ENABLE
+		*/
+		return (sw_flags.contains(flag)) ? (LIB.AU3_WinSetState(new WString(title),
+				new WString(text), flag) == Constants.AU3_SUCCESS) : false;
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinKill.htm
@@ -277,9 +298,16 @@ public class AutoItX implements AutoItXLibrary {
 				new WString(text)) == Constants.AU3_SUCCESS);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlHide.htm
+	// https://www.autoitscript.com/autoit3/docs/intro/controls.htm
 	@Override
-	public int AU3_ControlHide(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_ControlHide(arg0, arg1, arg2);
+	public int AU3_ControlHide(WString title, WString text, WString controlID) {
+		return LIB.AU3_ControlHide(title, text, controlID);
+	}
+
+	public boolean ControlHide(String title, String text, String controlID) {
+		return (LIB.AU3_ControlHide(new WString(title), new WString(text),
+				new WString(controlID)) == Constants.AU3_SUCCESS);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinActive.htm
@@ -293,9 +321,15 @@ public class AutoItX implements AutoItXLibrary {
 				new WString(text)) == Constants.AU3_SUCCESS);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlFocus.htm
 	@Override
-	public int AU3_ControlFocus(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_ControlFocus(arg0, arg1, arg2);
+	public int AU3_ControlFocus(WString title, WString text, WString controlID) {
+		return LIB.AU3_ControlFocus(title, text, controlID);
+	}
+
+	public boolean ControlFocus(String title, String text, String controlID) {
+		return (LIB.AU3_ControlFocus(new WString(title), new WString(text),
+				new WString(controlID)) == Constants.AU3_SUCCESS);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinGetTitle.htm
@@ -306,11 +340,10 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	public String WinGetTitle(String title, String text) {
-		resultString = (new StringBuilder(1024)).toString();
-		bufSize = resultString.length() - 1;
+		resultString = fill(bufSize, " ");
 		LPWSTR resultPtr = new LPWSTR(resultString);
 		AU3_WinGetTitle(new WString(title), new WString(text), resultPtr, bufSize);
-		resultString = resultPtr.getValue();
+		resultString = resultPtr.getValue().toString();
 		return resultString.trim();
 	}
 
@@ -326,11 +359,11 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	public String ClipGet() {
-		resultString = (new StringBuilder(1024)).toString();
-		bufSize = resultString.length() - 1;
+		resultString = fill(bufSize, " ");
+		// bufSize = resultString.length() + 1;
 		LPWSTR resultPtr = new LPWSTR(resultString);
 		LIB.AU3_ClipGet(resultPtr, bufSize);
-		resultString = resultPtr.getValue();
+		resultString = resultPtr.getValue().toString();
 		return resultString.trim();
 		/*
 		  TODO:  handle error
@@ -384,22 +417,29 @@ public class AutoItX implements AutoItXLibrary {
 	public String WinGetText(String title, String text) {
 
 		// https://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.WTypes
+		resultString = fill(bufSize, " ");
 		LPWSTR resultPtr = new LPWSTR(resultString);
 		LIB.AU3_WinGetText(new WString(title), new WString(text), resultPtr,
 				bufSize);
-		resultString = resultPtr.getValue();
+		resultString = resultPtr.getValue().toString();
 		return resultString.trim();
 	}
 
 	@Override
-	public int AU3_WinSetTitle(WString arg0, WString arg1, WString arg2,
+	public int AU3_WinSetTitle(WString title, WString text, WString arg2,
 			WString arg3) {
-		return LIB.AU3_WinSetTitle(arg0, arg1, arg2, arg3);
+		return LIB.AU3_WinSetTitle(title, text, arg2, arg3);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinSetTitle.htm
 	@Override
-	public int AU3_WinSetTitle(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_WinSetTitle(arg0, arg1, arg2);
+	public int AU3_WinSetTitle(WString title, WString text, WString newTitle) {
+		return LIB.AU3_WinSetTitle(title, text, newTitle);
+	}
+
+	public boolean WinSetTitle(String title, String text, String newTitle) {
+		return (LIB.AU3_WinSetTitle(new WString(title), new WString(text),
+				new WString(newTitle)) == Constants.AU3_SUCCESS);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinActivate.htm
@@ -563,9 +603,11 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_ControlTreeView(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinMinimizeAll.htm
 	@Override
 	public String AU3_WinMinimizeAll() {
 		return LIB.AU3_WinMinimizeAll();
+		// Send("#m") is a possible alternative.
 	}
 
 	@Override
@@ -1022,6 +1064,14 @@ public class AutoItX implements AutoItXLibrary {
 	public int AU3_RunAs(WString arg0, WString arg1, WString arg2, int arg3,
 			WString arg4, WString arg5, int arg6) {
 		return LIB.AU3_RunAs(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+	}
+
+	private static String fill(int length, String with) {
+		StringBuilder sb = new StringBuilder(length);
+		while (sb.length() < length) {
+			sb.append(with);
+		}
+		return sb.toString();
 	}
 
 }
