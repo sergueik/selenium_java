@@ -53,22 +53,46 @@ public class AutoItX implements AutoItXLibrary {
 		return (null == INSTANCE) ? new AutoItX() : INSTANCE;
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlClick.htm
+	// The button to click default is the left button, can be
+	// left, right, middle, main, menu, primary, secondary
 	@Override
-	public int AU3_ControlClick(WString arg0, WString arg1, WString arg2,
-			WString arg3, int arg4, int arg5) {
-		return LIB.AU3_ControlClick(arg0, arg1, arg2, arg3, arg4, arg5);
+	public int AU3_ControlClick(WString title, WString text, WString controlID,
+			WString button, int clicks, int x) {
+		return LIB.AU3_ControlClick(title, text, controlID, button, clicks, x);
+	}
+
+	public boolean ControlClick(String title, String text, String controlID,
+			String button, int clicks, int x) {
+		return (LIB.AU3_ControlClick(new WString(title), new WString(text),
+				new WString(controlID), new WString(button), clicks,
+				x) == Constants.AU3_SUCCESS);
 	}
 
 	@Override
-	public int AU3_ControlClick(WString arg0, WString arg1, WString arg2,
-			WString arg3, int arg4) {
-		return LIB.AU3_ControlClick(arg0, arg1, arg2, arg3, arg4);
+	public int AU3_ControlClick(WString title, WString text, WString controlID,
+			WString button, int clicks) {
+		return LIB.AU3_ControlClick(title, text, controlID, button, clicks);
+	}
+
+	public boolean ControlClick(String title, String text, String controlID,
+			String button, int clicks) {
+		return (LIB.AU3_ControlClick(new WString(title), new WString(text),
+				new WString(controlID), new WString(button),
+				clicks) == Constants.AU3_SUCCESS);
 	}
 
 	@Override
-	public int AU3_ControlClick(WString arg0, WString arg1, WString arg2,
-			WString arg3, int arg4, int arg5, int arg6) {
-		return LIB.AU3_ControlClick(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+	public int AU3_ControlClick(WString title, WString text, WString controlID,
+			WString button, int clicks, int x, int y) {
+		return LIB.AU3_ControlClick(title, text, controlID, button, clicks, x, y);
+	}
+
+	public boolean ControlClick(String title, String text, String controlID,
+			String button, int clicks, int x, int y) {
+		return (LIB.AU3_ControlClick(new WString(title), new WString(text),
+				new WString(controlID), new WString(button), clicks, x,
+				y) == Constants.AU3_SUCCESS);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/Run.htm
@@ -128,9 +152,15 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_Init();
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ClipPut.htm
 	@Override
-	public void AU3_ClipPut(WString arg0) {
-		LIB.AU3_ClipPut(arg0);
+	public void AU3_ClipPut(WString value) {
+		LIB.AU3_ClipPut(value);
+	}
+
+	public void ClipPut(String value) {
+		// TODO: boolean
+		LIB.AU3_ClipPut(new WString(value));
 	}
 
 	@Override
@@ -149,8 +179,8 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public int AU3_WinGetState(WString arg0, WString arg1) {
-		return LIB.AU3_WinGetState(arg0, arg1);
+	public int AU3_WinGetState(WString title, WString text) {
+		return LIB.AU3_WinGetState(title, text);
 	}
 
 	@Override
@@ -165,29 +195,61 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	public boolean WinExists(String title, String text) {
+		// NOTE: LIB.AU3_WinExists will return AU3_SUCCESS even if the window is
+		// hidden
 		return (LIB.AU3_WinExists(new WString(title),
 				new WString(text)) == Constants.AU3_SUCCESS);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ProcessClose.htm
 	@Override
-	public int AU3_ProcessClose(WString arg0) {
-		return LIB.AU3_ProcessClose(arg0);
+	public int AU3_ProcessClose(WString process) {
+		return LIB.AU3_ProcessClose(process);
 	}
 
-	@Override
-	public int AU3_DriveMapDel(WString arg0) {
-		return LIB.AU3_DriveMapDel(arg0);
+	public boolean ProcessClose(String process) {
+		// TODO: implement accessing the @error
+		return (LIB
+				.AU3_ProcessClose(new WString(process)) != Constants.AU3_FAILURE);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/DriveMapDel.htm
 	@Override
-	public void AU3_DriveMapAdd(WString arg0, WString arg1, int arg2,
-			WString arg3, WString arg4, LPWSTR arg5, int arg6) {
-		LIB.AU3_DriveMapAdd(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+	public int AU3_DriveMapDel(WString drive) {
+		return LIB.AU3_DriveMapDel(drive);
 	}
 
+	public boolean DriveMapDel(String drive) {
+		return (LIB.AU3_DriveMapDel(new WString(drive)) == Constants.AU3_SUCCESS);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/DriveMapAdd.htm
 	@Override
-	public int AU3_WinSetOnTop(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinSetOnTop(arg0, arg1, arg2);
+	public void AU3_DriveMapAdd(WString device, WString remoteShare, int flags,
+			WString user, WString password, LPWSTR arg5, int arg6) {
+		LIB.AU3_DriveMapAdd(device, remoteShare, flags, user, password, arg5, arg6);
+	}
+
+	public void DriveMapAdd(String device, String remoteShare, int flags,
+			String user, String password, LPWSTR arg5, int arg6) {
+		LIB.AU3_DriveMapAdd(new WString(device), new WString(remoteShare), flags,
+				new WString(user), new WString(password), arg5, arg6);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/WinSetOnTop.htm
+	@Override
+	public int AU3_WinSetOnTop(WString title, WString text, int flag) {
+		return LIB.AU3_WinSetOnTop(title, text, flag);
+	}
+
+	public boolean WinSetOnTop(String title, String text, int flag) {
+		if (flag == Constants.AU3_WINDOWS_NOONTOP
+				|| flag == Constants.AU3_WINDOWS_ONTOP) {
+			return (LIB.AU3_WinSetOnTop(new WString(title), new WString(text),
+					flag) == Constants.AU3_SUCCESS);
+		} else {
+			return false;
+		}
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinClose.htm
@@ -207,6 +269,7 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinKill.htm
+	// https://www.autoitscript.com/autoit3/docs/intro/windowsadvanced.htm
 	@Override
 	public int AU3_WinKill(WString title, WString text) {
 		return LIB.AU3_WinKill(title, text);
@@ -259,6 +322,7 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlShow(arg0, arg1, arg2);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ClipGet.htm
 	@Override
 	public void AU3_ClipGet(LPWSTR arg0, int arg1) {
 		LIB.AU3_ClipGet(arg0, arg1);
@@ -448,10 +512,12 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlFocusByHandle(arg0, arg1);
 	}
 
+	
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetFocus.htm
 	@Override
-	public void AU3_ControlGetFocus(WString arg0, WString arg1, LPWSTR arg2,
+	public void AU3_ControlGetFocus(WString title, WString text, LPWSTR arg2,
 			int arg3) {
-		LIB.AU3_ControlGetFocus(arg0, arg1, arg2, arg3);
+		LIB.AU3_ControlGetFocus(title, text, arg2, arg3);
 	}
 
 	@Override
@@ -887,22 +953,23 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/Send.htm
+	@Override
+	public void AU3_Send(WString keys) {
+		LIB.AU3_Send(keys);
+	}
+
+	@Override
+	public void AU3_Send(WString keys, int flag) {
+		LIB.AU3_Send(keys, flag);
+	}
+
+
 	public void Send(String keys) {
 		LIB.AU3_Send(new WString(keys));
 	}
 
 	public void Send(String keys, Boolean flag) {
 		LIB.AU3_Send(new WString(keys), flag ? 0 : 1);
-	}
-
-	@Override
-	public void AU3_Send(WString arg0) {
-		LIB.AU3_Send(arg0);
-	}
-
-	@Override
-	public void AU3_Send(WString arg0, int arg1) {
-		LIB.AU3_Send(arg0, arg1);
 	}
 
 	@Override

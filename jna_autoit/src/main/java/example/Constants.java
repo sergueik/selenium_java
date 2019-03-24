@@ -58,6 +58,10 @@ public class Constants {
 	// TODO: rename constants used in this class
 	public static final int AU3_SUCCESS = 1;
 	public static final int AU3_FAILURE = 0;
+
+	public static final int AU3_WINDOWS_NOONTOP = 0;
+	public static final int AU3_WINDOWS_ONTOP = 1;
+
 	public static final int AU3_SEND_DEFAULT = 0;
 	public static final int AU3_SEND_RAW = 1;
 	public static final String DLL = (System.getProperty("os.arch")

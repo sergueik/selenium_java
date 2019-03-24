@@ -65,14 +65,6 @@ class AutoItXLibraryGenerator {
 	public static void main(String[] args) {
 		String libraryPath = System.getProperty("user.dir");
 		System.setProperty("java.library.path", libraryPath);
-		/*
-		 	Exception in thread "main" java.lang.UnsatisfiedLinkError:
-		Unable to load library 'AutoItX3.dll':
-		Can't obtain InputStream for win32-x86/AutoItX3.dll -
-		Can't obtain InputStream for win32-x86-64/AutoItX3_x64.dll
-		one may need a checked version of the dll to overcome this
-		or place  a missing dependency to into the System32 folder
-		 */
 		printJavaMethods();
 	}
 }
