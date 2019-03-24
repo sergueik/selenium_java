@@ -22,6 +22,9 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -76,6 +79,57 @@ public class AutoItTest {
 		}
 	}
 
+	@Test(enabled = true)
+	public void testActiveWindowClassList() {
+		System.err.println("Get active window class List information");
+		title = "[ACTIVE]";
+		try {
+			List<String> classList = instance.WinGetClassList(title, text);
+			assertThat(classList, notNullValue());
+			assertThat(classList.get(0), notNullValue());
+			for (String className : classList) {
+				System.err.println(String.format("C// \"%s\"", className));
+			}
+			// e.g.for Chrome browser:
+			// "Chrome_RenderWidgetHostHWND"
+			// "Intermediate Software Window"
+			// for Internet Explorer:
+			// "BrowserFrameGripperClass"
+			// "Client Caption"
+			// "WorkerW"
+			// "ReBarWindow32"
+			// "TravelBand"
+			// "ToolbarWindow32"
+			// "Address Band Root"
+			// "AddressDisplay Control"
+			// "Edit"
+			// "ToolbarWindow32"
+			// "ToolbarWindow32"
+			// "TabBandClass"
+			// "DirectUIHWND"
+			// "ControlBandClass"
+			// "ToolbarWindow32"
+			// "CommandBarClass"
+			// "ReBarWindow32"
+			// "CommandToolbarBand"
+			// "ToolbarWindow32"
+			// "FrameTab Cover"
+			// for Firefox:
+			// nothing
+		} catch (Exception e) {
+			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
+			System.err.println("Exception " + e.toString());
+		}
+	}
+
+	@Test(enabled = true)
+	public void testActiveWindowHandle() {
+		System.err.println("Get active window handle as string");
+		title = "[ACTIVE]";
+		String result = instance.WinGetHandleAsText(title, text);
+		assertThat(result, notNullValue());
+	}
+
 	@Test(enabled = false)
 	public void testZoomFirefoxBrowser() {
 		System.err.println("Close Mozilla Firefox Browser");
@@ -97,7 +151,7 @@ public class AutoItTest {
 		instance.WinClose(title, text);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testProvidePathToOpenFile() {
 		System.err.println("Provide Path to Open File");
 		title = "Open";
@@ -123,19 +177,15 @@ public class AutoItTest {
 
 	@Test(enabled = true)
 	public void testEnvironment() {
-		System.err
-				.println("Test OS Environment on " + System.getProperty("os.name"));
-		String expResult = null;
+		System.err.println("OS test is Running: " + System.getProperty("os.name"));
 		String result = System.getProperty("os.name");
-		Assert.assertTrue((expResult = "Windows 10").equals(result)
-				|| (expResult = "Windows 8").equals(result)
-				|| (expResult = "Windows 8.1").equals(result)
-				|| (expResult = "Windows 7").equals(result)
-				|| (expResult = "Windows Server 2012 R2").equals(result));
 
-		// NOTE: anyOf(containsString(expResult1),...) does not work with testng ?
+		List<String> osNames = (List<String>) Arrays.asList("Windows 10",
+				"Windows 8", "Windows 8.1", "Windows 7", "Windows Server 2012 R2");
+		Assert.assertTrue(osNames.contains(result));
 		// see also:
 		// https://www.programcreek.com/java-api-examples/index.php?api=org.hamcrest.core.AnyOf
+		// NOTE: anyOf(containsString(expResult1),...) does not work with testng ?
 	}
 
 	public void sleep(Integer milliSeconds) {

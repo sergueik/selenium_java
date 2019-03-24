@@ -17,14 +17,18 @@ Unfortunately for the Java developer the original `AutoItXLibrary` interface met
 This project adds a few more java-friendly methods like
 ```java
 public String WinGetText(String title, String text) {
-// ...
+  String resultString = fill(bufSize, " ");
+  LPWSTR resultPtr = new LPWSTR(resultString);
+  AU3_WinGetTitle(new WString(title), new WString(text), resultPtr, bufSize);
+  resultString = resultPtr.getValue().toString();
+  return resultString.trim();
 }
 ```
 
-compared to underlying
+compared to underlying __jna__ wrapper
 ```java
 public void AU3_WinGetText(WString title, WString text, LPWSTR resultPointer, int bufSize) {
-// ...	
+// ...	com.sun.jna dispaching native code
 }
 ```
 both wrapping the [WinGetText](https://www.autoitscript.com/autoit3/docs/functions/WinGetText.htm) method for retrieving the text from a window.
@@ -39,16 +43,28 @@ to `AutoItX`.  This greately simplifies interacting with AutoIt, see below.
 Currently extended with Java-friendly signatures are the following metods:
 
   * `AutoItSetOption`
+  * `ClipGet`
+  * `ClipPut`
+  * `ControlClick`
+  * `ControlFocus`
+  * `ControlHide`
   * `ControlSend`
+  * `ProcessClose`
   * `Run`
   * `Send`
+  * `Sleep`
   * `WinActivate`
   * `WinActive`
   * `WinClose`
   * `WinExists`
+  * `WinGetClassList`
+  * `WinGetHandleAsText`
   * `WinGetText`
   * `WinGetTitle`
   * `WinKill`
+  * `WinSetOnTop`
+  * `WinSetState`
+  * `WinSetTitle`
   * `WinWaitActive`
 
 This addresses the anticipated needs of AutoIt with Selenium testing.
@@ -91,25 +107,25 @@ The JNA verion supports the genuine [AutoIt keys and modifiers](https://www.auto
 ```java
 import example.AutoItX;
 
-	@Test(enabled = true)
-	public void testZoomFirefoxBrowser() {
-		System.err.println("Close Mozilla Firefox Browser");
-		title = "Mozilla Firefox Start Page";
-		instance.AutoItSetOption("SendKeyDownDelay", 30);
-		instance.AutoItSetOption("SendKeyDelay", 10);
+  @Test(enabled = true)
+  public void testZoomFirefoxBrowser() {
+    System.err.println("Close Mozilla Firefox Browser");
+    title = "Mozilla Firefox Start Page";
+    instance.AutoItSetOption("SendKeyDownDelay", 30);
+    instance.AutoItSetOption("SendKeyDelay", 10);
     // zoom out four times
-		for (int cnt = 0 ; cnt!=4; cnt++){
+    for (int cnt = 0 ; cnt!=4; cnt++){
       instance.Send("^-", true);
       sleep(1000);
-		}
+    }
     // zoom 100 %
-		instance.Send("^0", true);
-		sleep(1000);
-		// CTLR + is a bit tricky since the '+' itself has a special meaning
+    instance.Send("^0", true);
+    sleep(1000);
+    // CTLR + is a bit tricky since the '+' itself has a special meaning
     // zoom in 2 times
-		instance.Send("^{+}^{+}", true);
-		sleep(1000);
-		instance.WinClose(title, text);
+    instance.Send("^{+}^{+}", true);
+    sleep(1000);
+    instance.WinClose(title, text);
 ```
 
 ### TODO:
@@ -119,7 +135,7 @@ One can generate the dump list of the `AutoItX3_x64.dll` exports using Visual St
 
 ```cmd
 
-"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /exports AutoItX3_x64.dll 
+"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /exports AutoItX3_x64.dll
   AU3_AutoItSetOption
   AU3_ClipGet
   AU3_ClipPut
@@ -246,7 +262,7 @@ Exception in thread "main" java.lang.UnsatisfiedLinkError:
 Unable to load library 'AutoItX3.dll':
 Can't obtain InputStream for win32-x86/AutoItX3.dll -
 ```
-To solve this one may need a checked version of the dll or place some missing dependency 
+To solve this one may need a checked version of the dll or place some missing dependency
 into the System32 folder (all imports listed by link.exe are already in `c:\Windows\System32`:
 ```cmd
 

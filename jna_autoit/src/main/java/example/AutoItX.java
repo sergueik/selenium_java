@@ -15,8 +15,6 @@
  */
 package example;
 
-import static example.Constants.DLL;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,8 +38,15 @@ public class AutoItX implements AutoItXLibrary {
 	private static int bufSize = 1024;
 	private static String resultString = fill(bufSize, " ");
 
+	private boolean debug = false;
+
+	public void setDebug(boolean value) {
+		this.debug = value;
+	}
+
 	AutoItX() {
-		LIB = (AutoItXLibrary) Native.loadLibrary(DLL, AutoItXLibrary.class);
+		LIB = (AutoItXLibrary) Native.loadLibrary(Constants.DLL,
+				AutoItXLibrary.class);
 		LIB.AU3_Init();
 		INSTANCE = this;
 	}
@@ -105,7 +110,7 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinList.htm
 	// https://www.autoitscript.com/autoit3/docs/intro/windowsadvanced.htm
-	// No AU3_WinList is exported
+	// No API named AU3_WinList is exported
 
 	@Override
 	public int AU3_Run(WString program, WString workingdir, int showFlag) {
@@ -704,10 +709,24 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_StatusbarGetTextByHandle(arg0, arg1, arg2, arg3);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinGetClassList.htm
 	@Override
-	public void AU3_WinGetClassList(WString arg0, WString arg1, LPWSTR arg2,
-			int arg3) {
-		LIB.AU3_WinGetClassList(arg0, arg1, arg2, arg3);
+	public void AU3_WinGetClassList(WString title, WString text,
+			LPWSTR resultPointer, int bufSize) {
+		LIB.AU3_WinGetClassList(title, text, resultPointer, bufSize);
+	}
+
+	public List<String> WinGetClassList(String title, String text) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_WinGetClassList(new WString(title), new WString(text), resultPtr,
+				bufSize);
+		resultString = resultPtr.getValue().toString().trim();
+		if (debug) {
+			System.err.println("WinGetClassList: " + resultString);
+		}
+		return Arrays.asList(resultString.split("\\n"));
+		// no fancy regexp like (?:\\n+) appears to work
 	}
 
 	@Override
@@ -780,10 +799,20 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_PixelChecksum(arg0, arg1);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinGetHandle.htm
 	@Override
-	public void AU3_WinGetHandleAsText(WString arg0, WString arg1, LPWSTR arg2,
-			int arg3) {
-		LIB.AU3_WinGetHandleAsText(arg0, arg1, arg2, arg3);
+	public void AU3_WinGetHandleAsText(WString title, WString text,
+			LPWSTR resultPointer, int bufSize) {
+		LIB.AU3_WinGetHandleAsText(title, text, resultPointer, bufSize);
+	}
+
+	public String WinGetHandleAsText(String title, String text) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_WinGetHandleAsText(new WString(title), new WString(text), resultPtr,
+				bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
 	@Override
