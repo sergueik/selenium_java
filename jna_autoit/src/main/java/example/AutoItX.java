@@ -41,9 +41,6 @@ public class AutoItX implements AutoItXLibrary {
 	private static int bufSize = resultString.length() - 1;
 
 	AutoItX() {
-		// Exception in thread "main" java.lang.UnsatisfiedLinkError:
-		// Unable to load library 'AutoItX3.dll':
-		// Can't obtain InputStream for win32-x86/AutoItX3.dll
 		LIB = (AutoItXLibrary) Native.loadLibrary(DLL, AutoItXLibrary.class);
 		LIB.AU3_Init();
 		INSTANCE = this;
@@ -328,6 +325,21 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_ClipGet(arg0, arg1);
 	}
 
+	public String ClipGet() {
+		resultString = (new StringBuilder(1024)).toString();
+		bufSize = resultString.length() - 1;
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_ClipGet(resultPtr, bufSize);
+		resultString = resultPtr.getValue();
+		return resultString.trim();
+		/*
+		  TODO:  handle error
+		  1 = if clipboard is empty
+		  2 = if contains a non-text entry.
+		  3 or 4 = if cannot access the clipboard.
+		*/
+	}
+
 	@Override
 	public int AU3_Opt(WString arg0, int arg1) {
 		return LIB.AU3_Opt(arg0, arg1);
@@ -512,7 +524,6 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlFocusByHandle(arg0, arg1);
 	}
 
-	
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetFocus.htm
 	@Override
 	public void AU3_ControlGetFocus(WString title, WString text, LPWSTR arg2,
@@ -962,7 +973,6 @@ public class AutoItX implements AutoItXLibrary {
 	public void AU3_Send(WString keys, int flag) {
 		LIB.AU3_Send(keys, flag);
 	}
-
 
 	public void Send(String keys) {
 		LIB.AU3_Send(new WString(keys));

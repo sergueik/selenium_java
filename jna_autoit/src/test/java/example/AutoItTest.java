@@ -54,7 +54,7 @@ public class AutoItTest {
 		// cleanup of instance ?
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testCloseOpenFileDialog() {
 		System.err.println("Close File Dialog");
 		title = "Open"; // title will become "Save"
@@ -62,6 +62,14 @@ public class AutoItTest {
 	}
 
 	@Test(enabled = true)
+	public void testClopboard() {
+		System.err.println("Put and get data using Clipboard");
+		String ex = "example";
+		instance.ClipPut(ex);
+		Assert.assertTrue(instance.ClipGet().equals(ex));
+	}
+
+	@Test(enabled = false)
 	public void testZoomFirefoxBrowser() {
 		System.err.println("Close Mozilla Firefox Browser");
 		title = "Mozilla Firefox Start Page";
@@ -82,7 +90,7 @@ public class AutoItTest {
 		instance.WinClose(title, text);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testProvidePathToOpenFile() {
 		System.err.println("Provide Path to Open File");
 		title = "Open";
