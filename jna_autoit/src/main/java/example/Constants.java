@@ -48,10 +48,10 @@ public class Constants {
 	// https://www.autoitscript.com/autoit3/docs/functions/WinKill.htm
 	// etc. illustrate the pattern:
 	// Success: 1.
-	// Failure: 0 if the window is not found ,
-	// cannot be activated (gives focus
+	// Failure: 0 if the window is not found,
+	// can not be activated (gives focus
 	// to) for WinActivate
-	// some functions only return the success value of 1.
+	// some functions only return success value of 1.
 
 	// https://www.autoitscript.com/autoit3/docs/appendix/AutoItConstants.htm
 	// https://github.com/310ken1/AutoItSciTEj/blob/master/language/au3/Include/AutoItConstants.au3

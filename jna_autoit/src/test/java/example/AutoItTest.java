@@ -88,34 +88,13 @@ public class AutoItTest {
 			assertThat(classList, notNullValue());
 			assertThat(classList.get(0), notNullValue());
 			for (String className : classList) {
-				System.err.println(String.format("C// \"%s\"", className));
+				System.err.println(String.format("Class name: \"%s\"", className));
 			}
-			// e.g.for Chrome browser:
-			// "Chrome_RenderWidgetHostHWND"
-			// "Intermediate Software Window"
-			// for Internet Explorer:
-			// "BrowserFrameGripperClass"
-			// "Client Caption"
-			// "WorkerW"
-			// "ReBarWindow32"
-			// "TravelBand"
-			// "ToolbarWindow32"
-			// "Address Band Root"
-			// "AddressDisplay Control"
-			// "Edit"
-			// "ToolbarWindow32"
-			// "ToolbarWindow32"
-			// "TabBandClass"
-			// "DirectUIHWND"
-			// "ControlBandClass"
-			// "ToolbarWindow32"
-			// "CommandBarClass"
-			// "ReBarWindow32"
-			// "CommandToolbarBand"
-			// "ToolbarWindow32"
-			// "FrameTab Cover"
-			// for Firefox:
-			// nothing
+			// e.g.for Chrome browser: Chrome_RenderWidgetHostHWND, "Intermediate
+			// Software Window"
+			// for Internet Explorer: BrowserFrameGripperClass, "Client Caption",
+			// WorkerW, ReBarWindow32 etc.
+			// for Firefox: nothing
 		} catch (Exception e) {
 			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
 			System.err.println("Exception " + e.toString());
@@ -126,8 +105,11 @@ public class AutoItTest {
 	public void testActiveWindowHandle() {
 		System.err.println("Get active window handle as string");
 		title = "[ACTIVE]";
-		String result = instance.WinGetHandleAsText(title, text);
+		String windowTitle = instance.WinGetTitle(title, text);
+		String windowHandle = instance.WinGetHandleAsText(title, text);
 		assertThat(result, notNullValue());
+		System.err.println(
+				String.format("Window \"%s\" handle is %s", windowTitle, windowHandle));
 	}
 
 	@Test(enabled = false)

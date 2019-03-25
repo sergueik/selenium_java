@@ -984,15 +984,22 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_MouseGetPos(arg0);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/MouseClick.htm
 	@Override
-	public int AU3_MouseClick(WString arg0, int arg1, int arg2, int arg3,
-			int arg4) {
-		return LIB.AU3_MouseClick(arg0, arg1, arg2, arg3, arg4);
+	public int AU3_MouseClick(WString button, int x, int y, int clicks,
+			int speed) {
+		// button: "left","right","middle","main", "menu", "primary", "secindary"
+		return LIB.AU3_MouseClick(button, x, y, clicks, speed);
+	}
+
+	public int MouseClick(String button, int x, int y, int clicks, int speed) {
+		// button: "left","right","middle","main", "menu", "primary", "secindary"
+		return LIB.AU3_MouseClick(new WString(button), x, y, clicks, speed);
 	}
 
 	@Override
-	public int AU3_MouseClick(WString arg0) {
-		return LIB.AU3_MouseClick(arg0);
+	public int AU3_MouseClick(WString button) {
+		return LIB.AU3_MouseClick(button);
 	}
 
 	@Override
@@ -1019,14 +1026,19 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_RunAsWait(arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ToolTip.htm
 	@Override
-	public void AU3_ToolTip(WString arg0, int arg1) {
-		LIB.AU3_ToolTip(arg0, arg1);
+	public void AU3_ToolTip(WString text, int options) {
+		LIB.AU3_ToolTip(text, options);
 	}
 
 	@Override
-	public void AU3_ToolTip(WString arg0) {
-		LIB.AU3_ToolTip(arg0);
+	public void AU3_ToolTip(WString text) {
+		LIB.AU3_ToolTip(text);
+	}
+
+	public void ToolTip(String text) {
+		LIB.AU3_ToolTip(new WString(text));
 	}
 
 	@Override
@@ -1040,13 +1052,13 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_Send(keys);
 	}
 
+	public void Send(String keys) {
+		LIB.AU3_Send(new WString(keys));
+	}
+
 	@Override
 	public void AU3_Send(WString keys, int flag) {
 		LIB.AU3_Send(keys, flag);
-	}
-
-	public void Send(String keys) {
-		LIB.AU3_Send(new WString(keys));
 	}
 
 	public void Send(String keys, Boolean flag) {
@@ -1063,9 +1075,14 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_MouseMove(arg0, arg1);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ProcessWait.htm
 	@Override
-	public int AU3_ProcessWait(WString arg0) {
-		return LIB.AU3_ProcessWait(arg0);
+	public int AU3_ProcessWait(WString process) {
+		return LIB.AU3_ProcessWait(process);
+	}
+
+	public boolean AU3_ProcessWait(String process) {
+		return (LIB.AU3_ProcessWait(new WString(process)) != Constants.AU3_FAILURE);
 	}
 
 	@Override
@@ -1073,20 +1090,26 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ProcessWait(arg0, arg1);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/RunWait.htm
 	@Override
-	public int AU3_RunWait(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_RunWait(arg0, arg1, arg2);
+	public int AU3_RunWait(WString program, WString workingdir, int show_flag) {
+		// NOTE: may return nonzero Value as the exitcode of the program
+		return LIB.AU3_RunWait(program, workingdir, show_flag);
 	}
 
 	@Override
-	public int AU3_RunWait(WString arg0, WString arg1) {
-		return LIB.AU3_RunWait(arg0, arg1);
+	public int AU3_RunWait(WString program, WString workingdir) {
+		return LIB.AU3_RunWait(program, workingdir);
+	}
+
+	public int RunWait(String program, String workingdir) {
+		return LIB.AU3_RunWait(new WString(program), new WString(workingdir));
 	}
 
 	@Override
-	public int AU3_RunAs(WString arg0, WString arg1, WString arg2, int arg3,
-			WString arg4, WString arg5) {
-		return LIB.AU3_RunAs(arg0, arg1, arg2, arg3, arg4, arg5);
+	public int AU3_RunAs(WString program, WString workingdir, WString arg2,
+			int arg3, WString arg4, WString arg5) {
+		return LIB.AU3_RunAs(program, workingdir, arg2, arg3, arg4, arg5);
 	}
 
 	@Override
