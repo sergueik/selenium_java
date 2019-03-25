@@ -1,6 +1,5 @@
 /*
- * Copyright 2018 midorlo.
- * Updated 2019 by sergueik
+ * Copyright 2018-2019 midorlo, sergueik
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +17,8 @@ package example;
 
 /**
  * @via https://www.autoitscript.com/forum/topic/72905-c-use-of-the-dll-some-idears-for-you/
- * @authors midorlo, sergueik
+ * @author midorlo
+ * @author sergueik
  */
 public class Constants {
 

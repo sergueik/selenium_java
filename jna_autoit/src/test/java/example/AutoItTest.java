@@ -1,6 +1,5 @@
 /*
- * Copyright 2018 midorlo
- * Updated 2019 by sergueik
+ * Copyright 2018-2019 midorlo, sergueik
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,7 +37,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import com.sun.jna.WString;
 
 /**
- * @authors midorlo, sergueik
+ * @author midorlo
+ * @author sergueik
  */
 public class AutoItTest {
 
@@ -155,19 +155,6 @@ public class AutoItTest {
 		sleep(100);
 		// close the file open dialog
 		assertTrue(instance.WinClose(title, text));
-	}
-
-	@Test(enabled = true)
-	public void testEnvironment() {
-		System.err.println("OS test is Running: " + System.getProperty("os.name"));
-		String result = System.getProperty("os.name");
-
-		List<String> osNames = (List<String>) Arrays.asList("Windows 10",
-				"Windows 8", "Windows 8.1", "Windows 7", "Windows Server 2012 R2");
-		Assert.assertTrue(osNames.contains(result));
-		// see also:
-		// https://www.programcreek.com/java-api-examples/index.php?api=org.hamcrest.core.AnyOf
-		// NOTE: anyOf(containsString(expResult1),...) does not work with testng ?
 	}
 
 	public void sleep(Integer milliSeconds) {

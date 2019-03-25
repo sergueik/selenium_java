@@ -1,6 +1,5 @@
 /*
- * Copyright 2018 midorlo
- * Updated 2019 by sergueik
+ * Copyright 2018-2019 midorlo, sergueik
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,7 +17,6 @@ package example;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
 
@@ -31,7 +29,8 @@ import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WTypes.LPWSTR;
 
 /**
- * @authors midorlo, sergueik
+ * @author midorlo
+ * @author sergueik
  */
 public class AU3Test {
 

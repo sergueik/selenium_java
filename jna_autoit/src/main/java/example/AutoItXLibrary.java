@@ -29,7 +29,6 @@ import com.sun.jna.platform.win32.WinDef.RECT;
 /**
  *
  * @author midorlo
- * contribution by sergueik
  */
 interface AutoItXLibrary extends Library {
 
