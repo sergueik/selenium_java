@@ -21,6 +21,7 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.fail;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -106,6 +107,22 @@ public class AutoItTest {
 	}
 
 	@Test(enabled = true)
+	public void testActiveWindowState() {
+		System.err.println("Get active window state information");
+		title = "[ACTIVE]";
+		String state = instance.WinGetState(title, text);
+		assertThat(state, notNullValue());
+		List<String> stateList = new ArrayList<>();
+		stateList = Arrays.asList(state.split("\\n"));
+
+		assertThat(stateList.get(0), notNullValue());
+		for (String stateName : stateList) {
+			System.err.println(String.format("Window state: \"%s\"", stateName));
+		}
+
+	}
+
+	@Test(enabled = true)
 	public void testActiveWindowTitle() {
 		System.err.println("Get active window title");
 		title = "[ACTIVE]";
@@ -129,9 +146,9 @@ public class AutoItTest {
 		HWND hwnd = new HWND();
 		hwnd.setPointer(new Pointer(Long.decode(windowHandle)));
 		assertTrue(User32.INSTANCE.IsWindow(hwnd));
-		System.err.println(
-				String.format("Window \"%s\" handle is %s. It is a valid window handle.",
-						windowTitle, windowHandle));
+		System.err.println(String.format(
+				"Window \"%s\" handle is %s. It is a valid window handle.", windowTitle,
+				windowHandle));
 	}
 
 	@Test(enabled = true)

@@ -16,7 +16,9 @@
 package example;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
@@ -184,15 +186,40 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinGetHandle(new WString(title), new WString(text));
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/DriveMapGet.htm
 	@Override
-	public void AU3_DriveMapGet(WString arg0, LPWSTR arg1, int arg2) {
-		LIB.AU3_DriveMapGet(arg0, arg1, arg2);
+	public void AU3_DriveMapGet(WString device, LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_DriveMapGet(device, resultPtr, bufSize);
+	}
+
+	public String DriveMapGet(String device) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		// TODO: handle @error
+		LIB.AU3_DriveMapGet(new WString(device), resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinGetState.htm
 	@Override
 	public int AU3_WinGetState(WString title, WString text) {
 		return LIB.AU3_WinGetState(title, text);
+	}
+
+	public String WinGetState(String title, String text) {
+		int state = LIB.AU3_WinGetState(new WString(title), new WString(text));
+		String stateName = "";
+
+		if (state != Constants.AU3_FAILURE) {
+			for (int defined_state : Constants.stateNames.keySet()) {
+				if ((state & defined_state) != 0) {
+					stateName += Constants.stateNames.get(defined_state);
+					stateName += "\n";
+				}
+			}
+		}
+		return stateName;
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinSetTrans.htm
@@ -342,9 +369,9 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinGetTitle.htm
 	@Override
-	public void AU3_WinGetTitle(WString title, WString text, LPWSTR resultPointer,
+	public void AU3_WinGetTitle(WString title, WString text, LPWSTR resultPtr,
 			int bufSize) {
-		LIB.AU3_WinGetTitle(title, text, resultPointer, bufSize);
+		LIB.AU3_WinGetTitle(title, text, resultPtr, bufSize);
 	}
 
 	public String WinGetTitle(String title, String text) {
@@ -428,9 +455,9 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public void AU3_WinGetText(WString title, WString text, LPWSTR resultPointer,
+	public void AU3_WinGetText(WString title, WString text, LPWSTR resultPtr,
 			int bufSize) {
-		LIB.AU3_WinGetText(title, text, resultPointer, bufSize);
+		LIB.AU3_WinGetText(title, text, resultPtr, bufSize);
 	}
 
 	public String WinGetText(String title, String text) {
@@ -443,12 +470,6 @@ public class AutoItX implements AutoItXLibrary {
 		return resultString.trim();
 	}
 
-	@Override
-	public int AU3_WinSetTitle(WString title, WString text, WString arg2,
-			WString arg3) {
-		return LIB.AU3_WinSetTitle(title, text, arg2, arg3);
-	}
-
 	// https://www.autoitscript.com/autoit3/docs/functions/WinSetTitle.htm
 	@Override
 	public int AU3_WinSetTitle(WString title, WString text, WString newTitle) {
@@ -458,6 +479,12 @@ public class AutoItX implements AutoItXLibrary {
 	public boolean WinSetTitle(String title, String text, String newTitle) {
 		return (LIB.AU3_WinSetTitle(new WString(title), new WString(text),
 				new WString(newTitle)) == Constants.AU3_SUCCESS);
+	}
+
+	@Override
+	public int AU3_WinSetTitle(WString title, WString text, WString newTitle,
+			WString arg3) {
+		return LIB.AU3_WinSetTitle(title, text, newTitle, arg3);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinActivate.htm
@@ -493,9 +520,15 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_MouseGetCursor();
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlEnable.htm
 	@Override
-	public int AU3_ControlEnable(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_ControlEnable(arg0, arg1, arg2);
+	public int AU3_ControlEnable(WString title, WString text, WString controlID) {
+		return LIB.AU3_ControlEnable(title, text, controlID);
+	}
+
+	public boolean ControlEnable(String title, String text, String controlID) {
+		return (LIB.AU3_ControlEnable(new WString(title), new WString(text),
+				new WString(controlID)) == Constants.AU3_SUCCESS);
 	}
 
 	@Override
@@ -509,8 +542,9 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_AutoItSetOption(option, param);
 	}
 
-	public int AutoItSetOption(String option, int param) {
-		return LIB.AU3_AutoItSetOption(new WString(option), param);
+	public boolean AutoItSetOption(String option, int param) {
+		return (LIB.AU3_AutoItSetOption(new WString(option),
+				param) == Constants.AU3_SUCCESS);
 	}
 
 	@Override
@@ -521,9 +555,9 @@ public class AutoItX implements AutoItXLibrary {
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlCommand.htm
 	@Override
 	public void AU3_ControlCommand(WString title, WString text, WString controlID,
-			WString command, WString option, LPWSTR resultPointer, int bufSize) {
-		LIB.AU3_ControlCommand(title, text, controlID, command, option,
-				resultPointer, bufSize);
+			WString command, WString option, LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_ControlCommand(title, text, controlID, command, option, resultPtr,
+				bufSize);
 		/*	
 		Command, Option	Return Value
 		"IsVisible", ""	Returns 1 if Control is visible, 0 otherwise
@@ -550,6 +584,17 @@ public class AutoItX implements AutoItXLibrary {
 		"TabLeft", ""	Moves to the next tab to the left of a SysTabControl32
 		"SendCommandID", Command ID	Simulates the WM_COMMAND message. Usually used for ToolbarWindow32 controls - use the ToolBar tab of Au3Info to get the Command ID.
 		 */
+	}
+
+	public String ControlCommand(String title, String text, String controlID,
+			String command, String option) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_ControlCommand(new WString(title), new WString(text),
+				new WString(controlID), new WString(command), new WString(option),
+				resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
 	@Override
@@ -650,9 +695,8 @@ public class AutoItX implements AutoItXLibrary {
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetHandle.htm
 	@Override
 	public void AU3_ControlGetHandleAsText(WString title, WString text,
-			WString controlID, LPWSTR resultPointer, int bufSize) {
-		LIB.AU3_ControlGetHandleAsText(title, text, controlID, resultPointer,
-				bufSize);
+			WString controlID, LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_ControlGetHandleAsText(title, text, controlID, resultPtr, bufSize);
 	}
 
 	public String ControlGetHandleAsText(String title, String text,
@@ -681,8 +725,8 @@ public class AutoItX implements AutoItXLibrary {
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetText.htm
 	@Override
 	public void AU3_ControlGetText(WString title, WString text, WString controlID,
-			LPWSTR resultPointer, int bufSize) {
-		LIB.AU3_ControlGetText(title, text, controlID, resultPointer, bufSize);
+			LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_ControlGetText(title, text, controlID, resultPtr, bufSize);
 	}
 
 	public String ControlGetText(String title, String text, String controlID) {
@@ -755,9 +799,9 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinGetClassList.htm
 	@Override
-	public void AU3_WinGetClassList(WString title, WString text,
-			LPWSTR resultPointer, int bufSize) {
-		LIB.AU3_WinGetClassList(title, text, resultPointer, bufSize);
+	public void AU3_WinGetClassList(WString title, WString text, LPWSTR resultPtr,
+			int bufSize) {
+		LIB.AU3_WinGetClassList(title, text, resultPtr, bufSize);
 	}
 
 	public List<String> WinGetClassList(String title, String text) {
@@ -846,8 +890,8 @@ public class AutoItX implements AutoItXLibrary {
 	// https://www.autoitscript.com/autoit3/docs/functions/WinGetHandle.htm
 	@Override
 	public void AU3_WinGetHandleAsText(WString title, WString text,
-			LPWSTR resultPointer, int bufSize) {
-		LIB.AU3_WinGetHandleAsText(title, text, resultPointer, bufSize);
+			LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_WinGetHandleAsText(title, text, resultPtr, bufSize);
 	}
 
 	public String WinGetHandleAsText(String title, String text) {
@@ -918,9 +962,8 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public void AU3_WinGetTextByHandle(HWND hwnd, LPWSTR resultPointer,
-			int bufSize) {
-		LIB.AU3_WinGetTextByHandle(hwnd, resultPointer, bufSize);
+	public void AU3_WinGetTextByHandle(HWND hwnd, LPWSTR resultPtr, int bufSize) {
+		LIB.AU3_WinGetTextByHandle(hwnd, resultPtr, bufSize);
 	}
 
 	public String WinGetTextByHandle(HWND hwnd) {

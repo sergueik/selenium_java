@@ -15,6 +15,9 @@
  */
 package example;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @via https://www.autoitscript.com/forum/topic/72905-c-use-of-the-dll-some-idears-for-you/
  * @author midorlo
@@ -66,8 +69,26 @@ public class Constants {
 	public static final int AU3_WINDOWS_NOONTOP = 0;
 	public static final int AU3_WINDOWS_ONTOP = 1;
 
+	public static final int WIN_STATE_EXISTS = 1;
+	public static final int WIN_STATE_VISIBLE = 2;
+	public static final int WIN_STATE_ENABLED = 4;
+	public static final int WIN_STATE_ACTIVE = 8;
+	public static final int WIN_STATE_MINIMIZED = 16;
+	public static final int WIN_STATE_MAXIMIZED = 32;
+
+	public static final Map<Integer, String> stateNames = new HashMap<>();
+	static {
+		stateNames.put(WIN_STATE_EXISTS, "Window exists");
+		stateNames.put(WIN_STATE_VISIBLE, "Window is visible");
+		stateNames.put(WIN_STATE_ENABLED, "Window is enabled");
+		stateNames.put(WIN_STATE_ACTIVE, "Window is active");
+		stateNames.put(WIN_STATE_MINIMIZED, "Window is minimized");
+		stateNames.put(WIN_STATE_MAXIMIZED, "Window is maximized");
+	}
+
 	public static final int AU3_SEND_DEFAULT = 0;
 	public static final int AU3_SEND_RAW = 1;
+
 	public static final String DLL = (System.getProperty("os.arch")
 			.equals("amd64") ? "AutoItX3_x64.dll" : "AutoItX3.dll");
 }
