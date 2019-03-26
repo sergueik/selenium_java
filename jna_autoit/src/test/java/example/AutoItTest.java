@@ -128,10 +128,9 @@ public class AutoItTest {
 
 		HWND hwnd = new HWND();
 		hwnd.setPointer(new Pointer(Long.decode(windowHandle)));
-		// This is a valid window
 		assertTrue(User32.INSTANCE.IsWindow(hwnd));
 		System.err.println(
-				String.format("Window \"%s\" handle is %s. It i a valid window handle.",
+				String.format("Window \"%s\" handle is %s. It is a valid window handle.",
 						windowTitle, windowHandle));
 	}
 

@@ -41,16 +41,20 @@ public class Constants {
 	public static final int SW_SHOWNORMAL = 13;
 	public static final int VERSION = 109;
 
+	public static final int RUN_LOGON_NOPROFILE = 0;
+	public static final int RUN_LOGON_PROFILE = 1;
+	public static final int RUN_LOGON_NETWORK = 2;
+	public static final int RUN_LOGON_INHERIT = 4;
+
 	// The AutoIt v3 functions return values are unusual
-	// for a java program
+	// for a Java program
 	// e.g.
 	// https://www.autoitscript.com/autoit3/docs/functions/WinClose.htm
 	// https://www.autoitscript.com/autoit3/docs/functions/WinKill.htm
 	// etc. illustrate the pattern:
 	// Success: 1.
 	// Failure: 0 if the window is not found,
-	// can not be activated (gives focus
-	// to) for WinActivate
+	// or can not be activated
 	// some functions only return success value of 1.
 
 	// https://www.autoitscript.com/autoit3/docs/appendix/AutoItConstants.htm

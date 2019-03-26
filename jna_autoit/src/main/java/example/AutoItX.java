@@ -180,6 +180,10 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinGetHandle(title, text);
 	}
 
+	public HWND WinGetHandle(String title, String text) {
+		return LIB.AU3_WinGetHandle(new WString(title), new WString(text));
+	}
+
 	@Override
 	public void AU3_DriveMapGet(WString arg0, LPWSTR arg1, int arg2) {
 		LIB.AU3_DriveMapGet(arg0, arg1, arg2);
@@ -322,7 +326,7 @@ public class AutoItX implements AutoItXLibrary {
 
 	public boolean WinActive(String title, String text) {
 		return (LIB.AU3_WinActive(new WString(title),
-				new WString(text)) == Constants.AU3_SUCCESS);
+				new WString(text)) != Constants.AU3_FAILURE);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlFocus.htm
@@ -351,9 +355,15 @@ public class AutoItX implements AutoItXLibrary {
 		return resultString.trim();
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlShow.htm
 	@Override
-	public int AU3_ControlShow(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_ControlShow(arg0, arg1, arg2);
+	public int AU3_ControlShow(WString title, WString text, WString controlID) {
+		return LIB.AU3_ControlShow(title, text, controlID);
+	}
+
+	public boolean ControlShow(String title, String text, String controlID) {
+		return (LIB.AU3_ControlShow(new WString(title), new WString(text),
+				new WString(controlID)) == Constants.AU3_SUCCESS);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ClipGet.htm
@@ -377,9 +387,14 @@ public class AutoItX implements AutoItXLibrary {
 		*/
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/AutoItSetOption.htm
 	@Override
-	public int AU3_Opt(WString arg0, int arg1) {
-		return LIB.AU3_Opt(arg0, arg1);
+	public int AU3_Opt(WString option, int param) {
+		return LIB.AU3_Opt(option, param);
+	}
+
+	public int Opt(String option, int param) {
+		return LIB.AU3_Opt(new WString(option), param);
 	}
 
 	@Override
@@ -489,13 +504,13 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/AutoItSetOption.htm
-	public int AutoItSetOption(String option, int param) {
-		return LIB.AU3_AutoItSetOption(new WString(option), param);
-	}
-
 	@Override
 	public int AU3_AutoItSetOption(WString option, int param) {
 		return LIB.AU3_AutoItSetOption(option, param);
+	}
+
+	public int AutoItSetOption(String option, int param) {
+		return LIB.AU3_AutoItSetOption(new WString(option), param);
 	}
 
 	@Override
@@ -505,9 +520,10 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlCommand.htm
 	@Override
-	public void AU3_ControlCommand(WString title, WString text, WString arg2,
-			WString arg3, WString arg4, LPWSTR arg5, int arg6) {
-		LIB.AU3_ControlCommand(title, text, arg2, arg3, arg4, arg5, arg6);
+	public void AU3_ControlCommand(WString title, WString text, WString controlID,
+			WString command, WString option, LPWSTR resultPointer, int bufSize) {
+		LIB.AU3_ControlCommand(title, text, controlID, command, option,
+				resultPointer, bufSize);
 		/*	
 		Command, Option	Return Value
 		"IsVisible", ""	Returns 1 if Control is visible, 0 otherwise
@@ -849,23 +865,26 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitActive.htm
-	public int WinWaitActive(String title, String text, int timeout) {
-		return LIB.AU3_WinWaitActive(new WString(title), new WString(text),
-				timeout);
+	@Override
+	public int AU3_WinWaitActive(WString title, WString text, int timeout) {
+		return LIB.AU3_WinWaitActive(title, text, timeout);
 	}
 
-	public int WinWaitActive(String title, String text) {
-		return LIB.AU3_WinWaitActive(new WString(title), new WString(text));
+	// NOTE: not returning handle to requested window getting active
+	public boolean WinWaitActive(String title, String text, int timeout) {
+		return (LIB.AU3_WinWaitActive(new WString(title), new WString(text),
+				timeout) != Constants.AU3_FAILURE);
 	}
 
 	@Override
-	public int AU3_WinWaitActive(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinWaitActive(arg0, arg1, arg2);
+	public int AU3_WinWaitActive(WString title, WString text) {
+		return LIB.AU3_WinWaitActive(title, text);
 	}
 
-	@Override
-	public int AU3_WinWaitActive(WString arg0, WString arg1) {
-		return LIB.AU3_WinWaitActive(arg0, arg1);
+	// NOTE: not returning handle to requested window getting active
+	public boolean WinWaitActive(String title, String text) {
+		return (LIB.AU3_WinWaitActive(new WString(title),
+				new WString(text)) != Constants.AU3_FAILURE);
 	}
 
 	@Override
@@ -1079,6 +1098,10 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_ToolTip(text, options);
 	}
 
+	public void ToolTip(String text, int options) {
+		LIB.AU3_ToolTip(new WString(text), options);
+	}
+
 	@Override
 	public void AU3_ToolTip(WString text) {
 		LIB.AU3_ToolTip(text);
@@ -1153,16 +1176,33 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_RunWait(new WString(program), new WString(workingdir));
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/RunAs.htm
 	@Override
-	public int AU3_RunAs(WString program, WString workingdir, WString arg2,
-			int arg3, WString arg4, WString arg5) {
-		return LIB.AU3_RunAs(program, workingdir, arg2, arg3, arg4, arg5);
+	public int AU3_RunAs(WString username, WString domain, WString password,
+			int logon_flag, WString program, WString workingdir) {
+		return LIB.AU3_RunAs(username, domain, password, logon_flag, program,
+				workingdir);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/RunAs.htm
 	@Override
-	public int AU3_RunAs(WString arg0, WString arg1, WString arg2, int arg3,
-			WString arg4, WString arg5, int arg6) {
-		return LIB.AU3_RunAs(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+	public int AU3_RunAs(WString username, WString domain, WString password,
+			int logon_flag, WString program, WString workingdir, int show_flag) {
+		return LIB.AU3_RunAs(username, domain, password, logon_flag, program,
+				workingdir, show_flag);
+	}
+
+	public boolean RunAs(String username, String domain, String password,
+			int logon_flag, String program, String workingdir, int show_flag) {
+		return (LIB.AU3_RunAs(new WString(username), new WString(domain),
+				new WString(password), logon_flag, new WString(program),
+				new WString(workingdir), show_flag) != Constants.AU3_FAILURE);
+		/*
+		RUN_LOGON_NOPROFILE (0) - Interactive logon with no profile.
+		RUN_LOGON_PROFILE (1) - Interactive logon with profile.
+		RUN_LOGON_NETWORK (2) - Network credentials only.
+		RUN_LOGON_INHERIT (4) - Inherit the calling process's environment instead of the user's environment.
+		 */
 	}
 
 	private static String fill(int length, String with) {
