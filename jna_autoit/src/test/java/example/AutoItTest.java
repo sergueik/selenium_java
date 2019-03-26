@@ -34,7 +34,11 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.User32;
+import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.User32;
 
 /**
  * @author midorlo
@@ -102,14 +106,47 @@ public class AutoItTest {
 	}
 
 	@Test(enabled = true)
+	public void testActiveWindowTitle() {
+		System.err.println("Get active window title");
+		title = "[ACTIVE]";
+		String windowTitle = instance.WinGetTitle(title, text);
+		assertThat(windowTitle, notNullValue());
+		System.err.println(
+				String.format("The active window title is \"%s\"", windowTitle));
+	}
+
+	@Test(enabled = true)
 	public void testActiveWindowHandle() {
 		System.err.println("Get active window handle as string");
 		title = "[ACTIVE]";
 		String windowTitle = instance.WinGetTitle(title, text);
+		assertThat(windowTitle, notNullValue());
 		String windowHandle = instance.WinGetHandleAsText(title, text);
-		assertThat(result, notNullValue());
+		assertThat(windowHandle, notNullValue());
+
+		// https://stackoverflow.com/questions/33705230/how-can-i-get-hwnd-from-string
+
+		HWND hwnd = new HWND();
+		hwnd.setPointer(new Pointer(Long.decode(windowHandle)));
+		// This is a valid window
+		assertTrue(User32.INSTANCE.IsWindow(hwnd));
 		System.err.println(
-				String.format("Window \"%s\" handle is %s", windowTitle, windowHandle));
+				String.format("Window \"%s\" handle is %s. It i a valid window handle.",
+						windowTitle, windowHandle));
+	}
+
+	@Test(enabled = true)
+	public void testActiveWindowGetTextByHandle() {
+		System.err.println("Get active window text by handle (as string)");
+		title = "[ACTIVE]";
+		String windowTitle = instance.WinGetTitle(title, text);
+		assertThat(windowTitle, notNullValue());
+		String windowHandle = instance.WinGetHandleAsText(title, text);
+		assertThat(windowHandle, notNullValue());
+		String windowText = instance.WinGetTextByHandle(windowHandle);
+		assertThat(windowText, notNullValue());
+		System.err.println(String.format("Window \"%s\" text is \"%s\".",
+				windowTitle, windowText));
 	}
 
 	@Test(enabled = false)

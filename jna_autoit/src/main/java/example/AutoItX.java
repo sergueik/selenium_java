@@ -408,8 +408,8 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public int AU3_WinGetPos(WString arg0, WString arg1, RECT arg2) {
-		return LIB.AU3_WinGetPos(arg0, arg1, arg2);
+	public int AU3_WinGetPos(WString title, WString text, RECT rect) {
+		return LIB.AU3_WinGetPos(title, text, rect);
 	}
 
 	@Override
@@ -419,7 +419,6 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	public String WinGetText(String title, String text) {
-
 		// https://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.WTypes
 		resultString = fill(bufSize, " ");
 		LPWSTR resultPtr = new LPWSTR(resultString);
@@ -538,8 +537,9 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public int AU3_ControlDisable(WString arg0, WString arg1, WString arg2) {
-		return LIB.AU3_ControlDisable(arg0, arg1, arg2);
+	public int AU3_ControlDisable(WString title, WString text,
+			WString controlID) {
+		return LIB.AU3_ControlDisable(title, text, controlID);
 	}
 
 	@Override
@@ -631,22 +631,51 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlGetHandle(arg0, arg1);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetHandle.htm
 	@Override
-	public void AU3_ControlGetHandleAsText(WString arg0, WString arg1,
-			WString arg2, LPWSTR arg3, int arg4) {
-		LIB.AU3_ControlGetHandleAsText(arg0, arg1, arg2, arg3, arg4);
+	public void AU3_ControlGetHandleAsText(WString title, WString text,
+			WString controlID, LPWSTR resultPointer, int bufSize) {
+		LIB.AU3_ControlGetHandleAsText(title, text, controlID, resultPointer,
+				bufSize);
 	}
 
-	@Override
-	public int AU3_ControlGetPos(WString arg0, WString arg1, WString arg2,
-			RECT arg3) {
-		return LIB.AU3_ControlGetPos(arg0, arg1, arg2, arg3);
+	public String ControlGetHandleAsText(String title, String text,
+			String controlID) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_ControlGetHandleAsText(new WString(title), new WString(text),
+				new WString(controlID), resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetPos.htm
 	@Override
-	public void AU3_ControlGetText(WString arg0, WString arg1, WString arg2,
-			LPWSTR arg3, int arg4) {
-		LIB.AU3_ControlGetText(arg0, arg1, arg2, arg3, arg4);
+	public int AU3_ControlGetPos(WString title, WString text, WString controlID,
+			RECT rect) {
+		return LIB.AU3_ControlGetPos(title, text, controlID, rect);
+	}
+
+	public boolean ControlGetPos(String title, String text, String controlID,
+			RECT rect) {
+		return (LIB.AU3_ControlGetPos(new WString(title), new WString(text),
+				new WString(controlID), rect) == Constants.AU3_SUCCESS);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/ControlGetText.htm
+	@Override
+	public void AU3_ControlGetText(WString title, WString text, WString controlID,
+			LPWSTR resultPointer, int bufSize) {
+		LIB.AU3_ControlGetText(title, text, controlID, resultPointer, bufSize);
+	}
+
+	public String ControlGetText(String title, String text, String controlID) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_ControlGetText(new WString(title), new WString(text),
+				new WString(controlID), resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
 	@Override
@@ -870,8 +899,27 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	@Override
-	public void AU3_WinGetTextByHandle(HWND arg0, LPWSTR arg1, int arg2) {
-		LIB.AU3_WinGetTextByHandle(arg0, arg1, arg2);
+	public void AU3_WinGetTextByHandle(HWND hwnd, LPWSTR resultPointer,
+			int bufSize) {
+		LIB.AU3_WinGetTextByHandle(hwnd, resultPointer, bufSize);
+	}
+
+	public String WinGetTextByHandle(HWND hwnd) {
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_WinGetTextByHandle(hwnd, resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
+	}
+
+	public String WinGetTextByHandle(String windowHandle) {
+		HWND hwnd = new HWND();
+		hwnd.setPointer(new Pointer(Long.decode(windowHandle)));
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_WinGetTextByHandle(hwnd, resultPtr, bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
 	}
 
 	@Override
