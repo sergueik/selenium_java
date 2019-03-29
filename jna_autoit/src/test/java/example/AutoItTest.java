@@ -41,6 +41,8 @@ import com.sun.jna.platform.win32.User32;
 import com.sun.jna.platform.win32.WinDef.HWND;
 import com.sun.jna.platform.win32.User32;
 
+import example.Constants;
+
 /**
  * @author midorlo
  * @author sergueik
@@ -121,6 +123,53 @@ public class AutoItTest {
 		}
 
 	}
+
+	@Test(enabled = false)
+	public void testProcessState() {
+		System.err.println("Get, create, stop Process");
+		String process = "c:\\Windows\\System32\\notepad.exe";
+		// TODO:
+		String processName = process.replace("^.*[^\\\\]\\\\","");
+		processName = "notepad.exe";
+		if (!instance.ProcessExists(processName)) {
+		 System.err.println("Launch process " + processName);	
+		 int status = instance.AU3_Run(new WString(process), new WString(""), Constants.SW_SHOW /* "c:\\Windows\\Temp" */);
+		 System.err.println("Launch process status " + status);	
+		}
+		assertTrue(instance.ProcessExists(processName));
+	}
+
+	@Test(enabled = true)
+	public void testProcessCreate() {
+		System.err.println("Get, create, stop Process");
+		String process = "c:\\Windows\\System32\\notepad.exe";
+		// TODO:
+		String processName = process.replace("^.*[^\\\\]\\\\","");
+		processName = "notepad.exe";
+		if (!instance.ProcessExists(processName)) {
+		 System.err.println("Launch process " + processName);	
+		 assertTrue(instance.Run(process, "", Constants.SW_SHOWMAXIMIZED /* "c:\\Windows\\Temp" */));
+		}
+		assertTrue(instance.ProcessExists(processName));
+		title = processName.replace(".exe","");
+		title = "Untitled";
+		title = "[ACTIVE]";
+		String state = instance.WinGetState(title, text);
+		assertThat(state, notNullValue());
+		List<String> stateList = new ArrayList<>();
+		stateList = Arrays.asList(state.split("\\n"));
+
+		assertThat(stateList.get(0), notNullValue());
+		for (String stateName : stateList) {
+			System.err.println(String.format("Window state: \"%s\"", stateName));
+		}
+
+		
+		assertTrue(instance.WinExists(title, text));
+		System.err.println("Closing window " + title);
+		assertTrue(instance.WinClose(title, text));
+	}
+
 
 	@Test(enabled = true)
 	public void testActiveWindowTitle() {

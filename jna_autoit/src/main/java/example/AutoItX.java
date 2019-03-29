@@ -642,9 +642,15 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_ControlListView(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ProcessExists.htm
 	@Override
-	public int AU3_ProcessExists(WString arg0) {
-		return LIB.AU3_ProcessExists(arg0);
+	public int AU3_ProcessExists(WString process) {
+		return LIB.AU3_ProcessExists(process);
+	}
+
+	public boolean ProcessExists(String process) {
+		return (LIB
+				.AU3_ProcessExists(new WString(process)) != Constants.AU3_FAILURE);
 	}
 
 	@Override
@@ -867,14 +873,20 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_ControlMoveByHandle(arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/ProcessWaitClose.htm
 	@Override
-	public int AU3_ProcessWaitClose(WString arg0) {
-		return LIB.AU3_ProcessWaitClose(arg0);
+	public int AU3_ProcessWaitClose(WString process) {
+		return LIB.AU3_ProcessWaitClose(process);
+	}
+
+	public boolean ProcessWaitClose(String process) {
+		return (LIB
+				.AU3_ProcessWaitClose(new WString(process)) != Constants.AU3_FAILURE);
 	}
 
 	@Override
-	public int AU3_ProcessWaitClose(WString arg0, int arg1) {
-		return LIB.AU3_ProcessWaitClose(arg0, arg1);
+	public int AU3_ProcessWaitClose(WString process, int timeout) {
+		return LIB.AU3_ProcessWaitClose(process, timeout);
 	}
 
 	@Override
