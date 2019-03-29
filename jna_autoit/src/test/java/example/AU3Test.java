@@ -17,8 +17,14 @@ package example;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.fail;
 
 import java.lang.reflect.Method;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -36,6 +42,9 @@ public class AU3Test {
 
 	private String title = null;
 	private String text = "";
+	private final String commandline = "c:\\Windows\\System32\\notepad.exe";
+	private String workdir = "c:\\Windows\\Temp";
+
 	private final int au3Success = Constants.AU3_SUCCESS;
 	private final int au3Failure = Constants.AU3_FAILURE;
 	AutoItX instance = null;
@@ -101,6 +110,47 @@ public class AU3Test {
 		// TODO: confirm the status
 		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)),
 				au3Failure);
+	}
+
+	@Test(enabled = true)
+	public void testProcessState() {
+		System.err.println("Get, create, stop Process using AU3 API");
+
+		String regex = "^.*\\\\";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(commandline);
+		String processName = matcher.replaceAll("");
+		title = "Untitled - Notepad";
+
+		// System.err.println(
+		// "Commandline: " + commandline + " processname : " + processName);
+		int result = instance.AU3_ProcessExists(new WString(processName));
+		System.err.println("Existing process check: " + (result == 0 ? "not running"
+				: String.format("already running with pid %d", result)));
+
+		if (result == 0) {
+			System.err
+					.println(String.format("Launching process %s with commandline %s",
+							processName, commandline));
+			int pid = instance.AU3_Run(new WString(commandline), new WString(workdir),
+					Constants.SW_SHOW);
+			System.err.println("Launched process pid: " + pid);
+		}
+		assertTrue(instance.AU3_ProcessExists(new WString(processName)) != Constants.AU3_FAILURE);
+		instance.AU3_Sleep(1000);
+		assertTrue(instance.AU3_WinExists(new WString(title),
+				new WString("")) != Constants.AU3_FAILURE );
+		System.err.println("Window exists. ");
+		System.err.println("Closing window title: " + title);
+		instance.AU3_WinClose(new WString(title), new WString(""));
+		instance.AU3_Sleep(1000);
+		if (instance.AU3_WinExists(new WString(title),
+				new WString("")) == Constants.AU3_SUCCESS) {
+			System.err.println("Killing window title: " + title);
+			instance.AU3_WinKill(new WString(title), new WString(""));
+		}
+		assertFalse(instance.AU3_WinExists(new WString(title),
+				new WString("")) == Constants.AU3_SUCCESS);
 	}
 
 	@Test(enabled = true)

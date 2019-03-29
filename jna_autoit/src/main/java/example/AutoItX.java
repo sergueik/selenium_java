@@ -106,7 +106,7 @@ public class AutoItX implements AutoItXLibrary {
 
 	public boolean Run(String program, String workingdir) {
 		return (LIB.AU3_Run(new WString(program),
-				new WString(workingdir)) == Constants.AU3_SUCCESS);
+				new WString(workingdir)) != Constants.AU3_FAILURE);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinList.htm
@@ -121,7 +121,7 @@ public class AutoItX implements AutoItXLibrary {
 	public boolean Run(String program, String workingdir, int showFlag) {
 		// SW_HIDE, SW_MINIMIZE, SW_MAXIMIZE
 		return (LIB.AU3_Run(new WString(program), new WString(workingdir),
-				showFlag) == Constants.AU3_SUCCESS);
+				showFlag) != Constants.AU3_FAILURE);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ControlSend.htm
@@ -238,7 +238,7 @@ public class AutoItX implements AutoItXLibrary {
 		// NOTE: LIB.AU3_WinExists will return AU3_SUCCESS even if the window is
 		// hidden
 		return (LIB.AU3_WinExists(new WString(title),
-				new WString(text)) == Constants.AU3_SUCCESS);
+				new WString(text)) != Constants.AU3_FAILURE);
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ProcessClose.htm
@@ -286,7 +286,7 @@ public class AutoItX implements AutoItXLibrary {
 		if (flag == Constants.AU3_WINDOWS_NOONTOP
 				|| flag == Constants.AU3_WINDOWS_ONTOP) {
 			return (LIB.AU3_WinSetOnTop(new WString(title), new WString(text),
-					flag) == Constants.AU3_SUCCESS);
+					flag) != Constants.AU3_FAILURE);
 		} else {
 			return false;
 		}
@@ -643,6 +643,7 @@ public class AutoItX implements AutoItXLibrary {
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/ProcessExists.htm
+	// NOTE:  returns 0 if the process does not exist, and PID when process exists
 	@Override
 	public int AU3_ProcessExists(WString process) {
 		return LIB.AU3_ProcessExists(process);
@@ -650,7 +651,7 @@ public class AutoItX implements AutoItXLibrary {
 
 	public boolean ProcessExists(String process) {
 		return (LIB
-				.AU3_ProcessExists(new WString(process)) != Constants.AU3_FAILURE);
+				.AU3_ProcessExists(new WString(process)) != 0);
 	}
 
 	@Override
