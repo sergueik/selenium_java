@@ -79,7 +79,7 @@ public class AutoItTest {
 		assertFalse(instance.WinClose(title, text));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testClipboard() {
 		System.err.println("Put and get data using Clipboard");
 		String dataPut = "example";
@@ -93,7 +93,7 @@ public class AutoItTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testActiveWindowClassList() {
 		System.err.println("Get active window class List information");
 		title = "[ACTIVE]";
@@ -115,7 +115,7 @@ public class AutoItTest {
 		}
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testActiveWindowState() {
 		System.err.println("Get active window state information");
 		title = "[ACTIVE]";
@@ -150,7 +150,7 @@ public class AutoItTest {
 			System.err
 					.println(String.format("Launching process %s with commandline %s",
 							processName, commandline));
-			status = instance.Run(commandline, workdir, Constants.SW_SHOW);
+			status = instance.Run(commandline, workdir, Constants.SW_SHOWMAXIMIZED);
 		}
 		assertTrue(instance.ProcessExists(processName));
 		System.err.println( "Process is running");
@@ -160,14 +160,22 @@ public class AutoItTest {
 		System.err.println("Window exists. ");
 
 		// NOTE: not really getting window on top
-		assertTrue(instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
-		instance.Sleep(1000);
+		// assertTrue(instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
+		// instance.Sleep(1000);
 		// NOTE: without the timeout, this call will block the test
 		System.err.println("Window " + title + " is active: "
 				+ instance.WinWaitActive(title, text, 10));
 
+		// https://www.autoitscript.com/autoit3/docs/tutorials/notepad/notepad.htm
+		instance.Send("This is some text.");
+		instance.Sleep(1000);
 		System.err.println("Closing window title: " + title);
 		instance.WinClose(title, text);
+		instance.Sleep(1000);
+		
+		System.err.println("Refusing to save the file if prompted (with timeout)");
+		instance.WinWaitActive("Notepad", "Save", 10);
+		instance.Send("!n", true);
 		instance.Sleep(1000);
 		//  
 		if (instance.WinExists(title,text)) {
@@ -175,46 +183,6 @@ public class AutoItTest {
 			instance.WinKill(title, text);
 		}
 		assertFalse(instance.WinExists(title,text));
-	}
-
-	@Test(enabled = false)
-	public void testProcessManage() {
-		System.err.println("Get, create, stop Process");
-		String process = "c:\\Windows\\System32\\notepad.exe";
-		// TODO:
-		String processName = process.replace("^.*[^\\\\]\\\\", "");
-		processName = "notepad.exe";
-		if (!instance.ProcessExists(processName)) {
-			System.err.println("Launch process " + processName);
-			assertTrue(instance.Run(process, "",
-					Constants.SW_SHOWMAXIMIZED /* "c:\\Windows\\Temp" */));
-		}
-		assertTrue(instance.ProcessExists(processName));
-		title = processName.replace(".exe", "");
-		title = "Untitled - Notepad";
-
-		// TODO: debug
-		// assertTrue(instance.WinExists(title, text));
-		System.err.println("Window is acrive" + title + " : "
-				+ instance.WinWaitActive(title, text));
-
-		String windowHandle = instance.WinGetHandleAsText(title, text);
-		assertThat(windowHandle, notNullValue());
-		System.err.println("Window handle of " + title + ": " + windowHandle);
-
-		// assertTrue(instance.WinSetOnTop(title, text,
-		// Constants.AU3_WINDOWS_ONTOP));
-		// works OK when activated manually. Fails otherwise
-		System.err.println("Window set on top :"
-				+ instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
-		title = "[ACTIVE]";
-		windowHandle = instance.WinGetHandleAsText(title, text);
-		assertThat(windowHandle, notNullValue());
-		System.err.println("Window handle of " + title + ": " + windowHandle);
-		title = "Untitled - Notepad";
-		System.err.println("Closing window " + title);
-		// assertTrue(instance.WinClose(title, text));
-		instance.WinClose(title, text);
 	}
 
 	// todo: order
@@ -228,7 +196,7 @@ public class AutoItTest {
 				String.format("The active window title is \"%s\"", windowTitle));
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testActiveWindowHandle() {
 		System.err.println("Get active window handle as string");
 		title = "[ACTIVE]";
