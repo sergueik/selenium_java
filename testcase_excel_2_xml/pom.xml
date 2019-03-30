@@ -4,7 +4,7 @@
   <groupId>com.github.sergueik.selenium_utils</groupId>
   <artifactId>ToolTestLinkExcelToXml</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>app</name>
   <description/>
   <url>http://maven.apache.org</url>
@@ -76,6 +76,7 @@
     </dependency>
   </dependencies>
   <build>
+<finalName>example</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
