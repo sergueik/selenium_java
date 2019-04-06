@@ -4,8 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -235,18 +237,26 @@ public class YellowClueTest {
 	@Test
 	public void test7() throws Exception {
 
-		URLConnection urlc = new URL(
-				"https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=")
-						.openConnection();
+		// URLConnection url = new URL(
+		// "https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=")
+		// .openConnection();
 
-		BufferedInputStream buffer = new BufferedInputStream(urlc.getInputStream());
+		// TODO: set "pageref": "www.yellowpages.com.au"
+		URL pageURL = new URL("https://www.yellowpages.com.au/search/listings");
+
+		HttpURLConnection urlConnection = (HttpURLConnection) pageURL
+				.openConnection();
+		urlConnection.setRequestProperty("pageref", "www.yellowpages.com.au");
+
+		BufferedInputStream buffer = new BufferedInputStream(
+				urlConnection.getInputStream());
 		int byteRead;
 		StringBuffer processOutput = new StringBuffer();
 		while ((byteRead = buffer.read()) != -1) {
 			// System.err.println((char) byteRead);
 			processOutput.append((char) byteRead);
 		}
-		System.err.println("Response: " + processOutput.toString());
+		System.err.println("test7 response: " + processOutput.toString());
 	}
 
 	@Ignore
