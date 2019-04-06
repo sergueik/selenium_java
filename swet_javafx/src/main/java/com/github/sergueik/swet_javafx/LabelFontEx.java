@@ -19,8 +19,10 @@ public class LabelFontEx extends Application {
 
 	private final Properties properties = new Properties();
 	private String propertiesFileName = "fontstyle.properties";
-	private String propertiesFilePath = getPropertyEnv("TEST_PROPERTIES_PATH",
+	private String propertiesDir = getPropertyEnv("TEST_PROPERTIES_DIR",
 			String.format("%s/src/main/resources", System.getProperty("user.dir")));
+	private String propertiesFilePath = String.format("%s/%s", propertiesDir,
+			propertiesFileName);
 
 	@Override
 	public void start(Stage stage) {
@@ -32,8 +34,7 @@ public class LabelFontEx extends Application {
 		HBox hbox = new HBox();
 
 		try {
-			FileInputStream in = new FileInputStream(
-					String.format("%s/%s", propertiesFilePath, propertiesFileName));
+			FileInputStream in = new FileInputStream(propertiesFilePath);
 			properties.load(in);
 			in.close();
 		} catch (IOException e) {
@@ -49,20 +50,24 @@ public class LabelFontEx extends Application {
 			// https://www.programcreek.com/java-api-examples/?api=javafx.scene.text.FontWeight
 			System.err.println("Applying style : " + style);
 			label.setStyle(style);
-			// NOTE: font will not change
+			// NOTE: font will not change after applying the style
 			System.err
 					.println("Label font information: " + label.getFont().toString());
+			// fully define from font information:
+			// see: https://toster.ru/q/619327?e=7468219#comment_1874221
+			Font labelFont = label.getFont();
+			System.err.println("Generated style information: " + String.format(
+					"-fx-font-size: %2s; -fx-font-family: \"%2s\"; -fx-text-fill: #%2s;",
+					labelFont.getSize(), labelFont.getName(),
+					label.getTextFill().toString().substring(2)));
 			// Update the style dynamically into the same properties file.
 			String labelFontStyle = String.format("%s -fx-text-fill: purple;",
 					label.getStyle().toString());
 			// Let's add some style!
-			System.err.println("Style information: " + labelFontStyle);
-			properties.setProperty("font", labelFontStyle);
+			System.err.println("Label style information: " + labelFontStyle);
 			try {
-				properties.store(
-						new FileOutputStream(
-								String.format("%s/%s", propertiesFilePath, propertiesFileName)),
-						null);
+				properties.setProperty("font", labelFontStyle);
+				properties.store(new FileOutputStream(propertiesFilePath), null);
 			} catch (IOException e) {
 				System.err.println("Exception : " + e.toString());
 			}
