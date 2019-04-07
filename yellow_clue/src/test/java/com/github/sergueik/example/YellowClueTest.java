@@ -1,38 +1,18 @@
 package com.github.sergueik.example;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
-import org.junit.Test;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-
 import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertThat;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
+
+import org.junit.Test;
 
 // based on:
 // http://www.java2s.com/Tutorial/Java/0320__Network/DownloadingawebpageusingURLandURLConnectionclasses.htm
@@ -44,12 +24,10 @@ import static org.hamcrest.CoreMatchers.not;
 public class YellowClueTest {
 
 	private static String mainUrl = "https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=";
-	private static String baseUrl = "https://www.yellowpages.com.au/search/listings";
-	private static String queryString = "clue=restaurant&locationClue=melbourne&lat=&lon=";
-	private static String hostName = "www.yellowpages.com.au";
 	private static String pageSource = null;
-
-	private /* final */ static String defaultBrowserUserAgent = "Mozilla 5.0 (Windows; U; "
+	private static int maxcount = 3;
+	private final static boolean debug = true;
+	private final static String defaultBrowserUserAgent = "Mozilla 5.0 (Windows; U; "
 			+ "Windows NT 5.1; en-US; rv:1.8.0.11) ";
 	// NOTE: the below "User-Agent" header apparently causes the test to hang
 	// private static String defaultBrowserUserAgent =
@@ -59,7 +37,7 @@ public class YellowClueTest {
 	@Test
 	public void test7() throws Exception {
 		String htmlSource = null;
-		for (int cnt = 0; cnt != 100; cnt++) {
+		for (int cnt = 0; cnt != maxcount; cnt++) {
 			htmlSource = getPageHTMLSource(mainUrl);
 			assertThat(htmlSource, notNullValue());
 			assertThat(htmlSource.length(), greaterThan(100000));
@@ -70,14 +48,13 @@ public class YellowClueTest {
 	}
 
 	// opens the url, with a specific User-Agent and returns the pagehtml
-	private String getPageHTMLSource(String mainUrl) {
-		return getPageHTMLSource(mainUrl, defaultBrowserUserAgent);
+	private String getPageHTMLSource(String url) {
+		return getPageHTMLSource(url, defaultBrowserUserAgent);
 	}
 
-	private String getPageHTMLSource(String mainUrl, String userAgent) {
+	private String getPageHTMLSource(String url, String userAgent) {
 		try {
-			URL url = new URL(mainUrl);
-			URLConnection urlConnection = url.openConnection();
+			URLConnection urlConnection = (new URL(url)).openConnection();
 			urlConnection.setRequestProperty("User-Agent", defaultBrowserUserAgent);
 
 			InputStream inputStream = urlConnection.getInputStream();
@@ -91,8 +68,10 @@ public class YellowClueTest {
 
 		} catch (IOException e) {
 		}
-		System.err
-				.println(String.format("test5 response: %d char", pageSource.length()));
+		if (debug) {
+			System.err.println(
+					String.format("url %s response: %d char", url, pageSource.length()));
+		}
 		return pageSource;
 	}
 
