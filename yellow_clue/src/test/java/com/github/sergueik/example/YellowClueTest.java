@@ -26,7 +26,7 @@ public class YellowClueTest {
 
 	private static String mainUrl = "https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=";
 	private static String pageSource = null;
-	private static int maxcount = 10;
+	private static int maxcount = 2;
 	private final static boolean debug = true;
 	private final static String defaultBrowserUserAgent = "Mozilla 5.0 (Windows; U; "
 			+ "Windows NT 5.1; en-US; rv:1.8.0.11) ";
@@ -73,6 +73,12 @@ public class YellowClueTest {
 		if (debug) {
 			System.err.println(
 					String.format("url %s response: %d char", url, pageSource.length()));
+			
+		}
+		if (debug) {
+			System.out.println(
+					String.format("url %s response: %d char\n%s", url, pageSource.length(), pageSource));
+			
 		}
 		return pageSource;
 	}
