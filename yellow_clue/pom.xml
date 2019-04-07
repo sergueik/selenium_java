@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.github.sergueik.example</groupId>
   <artifactId>yellow_clue</artifactId>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description/>
@@ -18,13 +18,6 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <commons-exec.version>1.3</commons-exec.version>
-    <commons-io.version>2.5</commons-io.version>
-    <commons-lang.version>2.6</commons-lang.version>
-    <commons-collections4.version>4.0</commons-collections4.version>
-    <commons-configuration.version>1.10</commons-configuration.version>
-    <hamcrest-all.version>1.3</hamcrest-all.version>
-    <hamcrest-date.version>2.0.4</hamcrest-date.version>
     <java.version>1.8</java.version>
     <junit.version>4.12</junit.version>
     <maven.compiler.source>1.8</maven.compiler.source>
@@ -33,47 +26,6 @@
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>commons-lang</groupId>
-      <artifactId>commons-lang</artifactId>
-      <version>${commons-lang.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>${commons-io.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-exec</artifactId>
-      <version>${commons-exec.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>commons-configuration</groupId>
-      <artifactId>commons-configuration</artifactId>
-      <version>${commons-configuration.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-collections4</artifactId>
-      <version>${commons-collections4.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.exparity</groupId>
-      <artifactId>hamcrest-date</artifactId>
-      <version>${hamcrest-date.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
-      <version>${hamcrest-all.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.jcabi</groupId>
-      <artifactId>jcabi-matchers</artifactId>
-      <version>1.3</version>
-      <scope>test</scope>
-    </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -101,126 +53,6 @@
           <compilerArgument>-verbose</compilerArgument>
           -->
         </configuration>
-      </plugin>
-      <plugin>
-        <!-- Separates the unit tests from the integration tests. -->
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${maven-surefire-plugin.version}</version>
-        <configuration>
-          <!-- Skip the default running of this plug-in (or everything is run twice...see below) -->
-          <skip>true</skip>
-          <!-- Show 100% of the lines from the stack trace (doesn't work) -->
-          <trimStackTrace>false</trimStackTrace>
-        </configuration>
-        <executions>
-          <execution>
-            <id>unit-tests</id>
-            <phase>test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <!-- Never skip running the tests when the test phase is invoked -->
-              <skip>false</skip>
-              <includes>
-                <!-- Include unit tests within integration-test phase. -->
-                <include>**/*Test.java</include>
-              </includes>
-              <excludes>
-                <!-- Exclude integration tests within (unit) test phase. -->
-                <exclude>**/*IntegrationTest.java</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-          <execution>
-            <id>integration-tests</id>
-            <phase>integration-test</phase>
-            <goals>
-              <goal>test</goal>
-            </goals>
-            <configuration>
-              <!-- Never skip running the tests when the integration-test phase is invoked -->
-              <skip>false</skip>
-              <includes>
-                <!-- Include integration tests within integration-test phase. -->
-                <include>**/*IntegrationTest.java</include>
-              </includes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- TODO: profile
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-gpg-plugin</artifactId>
-        <version>1.6</version>
-        <executions>
-          <execution>
-            <id>sign-artifacts</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>sign</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin> -->
-      <plugin>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
-        <configuration>
-          <links>
-            <link>https://docs.oracle.com/javase/8/docs/api/</link>
-          </links>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>3.0.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>2.6</version>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>${main.class}</mainClass>
-            </manifest>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-        <artifactId>maven-enforcer-plugin</artifactId>
-        <version>1.4.1</version>
-        <executions>
-          <execution>
-            <id>enforce-java</id>
-            <goals>
-              <goal>enforce</goal>
-            </goals>
-            <configuration>
-              <rules>
-                <requireJavaVersion>
-                  <version>[1.8, 1.9)</version>
-                </requireJavaVersion>
-              </rules>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
     </plugins>
   </build>

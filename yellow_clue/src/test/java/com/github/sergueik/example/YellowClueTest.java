@@ -1,11 +1,7 @@
 package com.github.sergueik.example;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.notNullValue;
-// import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertFalse;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,10 +20,12 @@ import org.junit.Test;
 
 public class YellowClueTest {
 
-	private static String mainUrl = "https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=";
+	private static String url = "https://www.yellowpages.com.au/search/listings?clue=restaurant&locationClue=melbourne&lat=&lon=";
+	// update to trigger assertion
+	private final String city = "GREATER MELBOURNE";
 	private static String pageSource = null;
 	private static int maxcount = 2;
-	private final static boolean debug = true;
+	private final static boolean debug = false;
 	private final static String defaultBrowserUserAgent = "Mozilla 5.0 (Windows; U; "
 			+ "Windows NT 5.1; en-US; rv:1.8.0.11) ";
 	// NOTE: the below "User-Agent" header apparently causes the test to hang
@@ -39,13 +37,13 @@ public class YellowClueTest {
 	public void test7() throws Exception {
 		String htmlSource = null;
 		for (int cnt = 0; cnt != maxcount; cnt++) {
-			htmlSource = getPageHTMLSource(mainUrl);
-			assertThat(htmlSource, notNullValue());
+			htmlSource = getPageHTMLSource(url);
+			assertTrue(htmlSource != null);
 			assertTrue(htmlSource.length() > 10000);
-			// assertThat(htmlSource.length(), greaterThan(10000));
-			assertThat(htmlSource,
-					not(containsString("we would like to ensure real humans")));
-
+			assertTrue(
+					htmlSource.indexOf("we would like to ensure real humans") == -1);
+			assertFalse(
+					htmlSource.indexOf(String.format("Restaurant in %s", city)) == -1);
 		}
 	}
 
@@ -70,15 +68,11 @@ public class YellowClueTest {
 
 		} catch (IOException e) {
 		}
+		System.err.println(
+				String.format("url %s response: %d char", url, pageSource.length()));
+
 		if (debug) {
-			System.err.println(
-					String.format("url %s response: %d char", url, pageSource.length()));
-			
-		}
-		if (debug) {
-			System.out.println(
-					String.format("url %s response: %d char\n%s", url, pageSource.length(), pageSource));
-			
+			System.err.println("Page source:\n%s" + pageSource);
 		}
 		return pageSource;
 	}
