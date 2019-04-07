@@ -1,5 +1,9 @@
 package com.mycompany.app;
 
+/**
+ * Selected test scenarios for Selenium jBrowserDriver
+ * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
+ */
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -16,7 +20,6 @@ import java.util.Formatter;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +34,7 @@ import java.util.regex.Pattern;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
 import java.text.DateFormat;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -68,7 +72,8 @@ import com.machinepublishers.jbrowserdriver.UserAgent;
 import com.machinepublishers.jbrowserdriver.JBrowserDriver;
 import com.machinepublishers.jbrowserdriver.Settings;
 import org.openqa.selenium.phantomjs.PhantomJSDriver;
-import org.openqa.selenium.remote.DesiredCapabilities;
+// TODO: what is the replacement in 3.13.x+
+// import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.remote.UnreachableBrowserException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -84,13 +89,14 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-public class AppTest {
+public class JBrowserDriverTest {
 
 	private static WebDriver driver;
 	private static WebDriverWait wait;
 	private static WebElement element = null;
 	private static String selector = null;
 	private static long implicit_wait_interval = 3;
+
 	private static int flexible_wait_interval = 5;
 	private static long wait_polling_interval = 500;
 	private static long afterTest_interval = 1000;
@@ -104,7 +110,8 @@ public class AppTest {
 	private static String testFileName = "test.txt";
 	private static String testFilePath = new File(testFileName).getAbsolutePath()
 			.replaceAll("\\\\", "/");
-	private static final Logger log = LogManager.getLogger(AppTest.class);
+	private static final Logger log = LogManager
+			.getLogger(JBrowserDriverTest.class);
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -154,10 +161,12 @@ public class AppTest {
 	// https://github.com/MachinePublishers/jBrowserDriver/issues/110
 	// the file upload plugin issue:
 	// https://github.com/MachinePublishers/jBrowserDriver/issues/143
-  @Ignore
+
+	
+	 @Ignore
 	@Test
 	public void test1SendKeys() {
-    System.err.println("test1SendKeys");
+		System.err.println("test1SendKeys");
 		driver.get("http://blueimp.github.io/jQuery-File-Upload/basic.html");
 		element = driver.findElement(By.id("fileupload"));
 		assertThat(element, notNullValue());
@@ -178,10 +187,10 @@ public class AppTest {
 		assertThat(element.getText(), containsString(testFileName));
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	public void test2SendKeys() {
-    System.err.println("test2SendKeys");
+		System.err.println("test2SendKeys");
 		driver.get("http://siptv.eu/converter/");
 		element = driver
 				.findElement(By.cssSelector("div#container form#file_form input#file"));
@@ -201,11 +210,11 @@ public class AppTest {
 		element.click();
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	public void testExecutePhantomJS() {
 		if (driver instanceof PhantomJSDriver) {
-      System.err.println("testExecutePhantomJS");
+			System.err.println("testExecutePhantomJS");
 			driver.get("http://siptv.eu/converter/");
 			element = driver.findElement(
 					By.cssSelector("div#container form#file_form input#file"));
@@ -223,7 +232,7 @@ public class AppTest {
 		}
 	}
 
-  // @Ignore
+	// @Ignore
 	@Test
 	public void verifyTextTest() throws Exception {
 		try {
@@ -231,27 +240,26 @@ public class AppTest {
 		} catch (Error e) {
 			verificationErrors.append(e.toString());
 		}
-
 	}
 
-  @Ignore
+	@Ignore
 	@Test
 	public void xpathOfElementTest() throws Exception {
-    element = findElement("link_text", "Hotels");
+		element = findElement("link_text", "Hotels");
 		assertThat(element, notNullValue());
-    highlight(element);
-    selector = xpathOfElement(element);
+		highlight(element);
+		selector = xpathOfElement(element);
 		// Assert
 		assertThat(selector, notNullValue());
-    assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
-    element = findElement("xpath", selector);
+		assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
+		element = findElement("xpath", selector);
 		assertThat(element, notNullValue());
-    highlight(element);
+		highlight(element);
 	}
 
-  // NOTE: this test is hanging the jbrowserdriver
-  // after the test is run orphaned java processess require a taskkill
-  @Ignore
+	// NOTE: this test is hanging the jbrowserdriver
+	// after the test is run orphaned java processess require a taskkill
+	@Ignore
 	@Test
 	public void test13_1() {
 		// Arrange
@@ -281,25 +289,26 @@ public class AppTest {
 		}
 	}
 
-	// @Ignore
+	// NOTE: org.junit.ComparisonFailure
+	@Ignore
 	@Test
 	public void cssSelectorOfElementWithIdInParentTest() throws Exception {
-    element = findElement("link_text", "Hotels");
+		element = findElement("link_text", "Hotels");
 		assertThat(element, notNullValue());
-    highlight(element);
-    selector = cssSelectorOfElement(element);
-    assertEquals(
-    "div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
-    // NOTE: old script was 
-    //"div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
-					selector);
+		highlight(element);
+		selector = cssSelectorOfElement(element);
+		assertEquals(
+				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
+				// NOTE: old script was
+				// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
+				selector);
 		assertThat(selector, notNullValue());
-    element = findElement("css_selector", selector);
+		element = findElement("css_selector", selector);
 		assertThat(element, notNullValue());
-    highlight(element);
+		highlight(element);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void cssSelectorOfElementTest() throws Exception {
 		try {
@@ -333,7 +342,7 @@ public class AppTest {
 			element = findElement("id", "searchbox");
 			highlight(element);
 			selector = cssSelectorOfElementAlternative(element);
-			System.err.println("css_selector: " + selector );
+			System.err.println("css_selector: " + selector);
 			assertEquals(
 					"form[name=\"PTPT_HAC_FORM\"] > div > label > input[name=\"q\"]",
 					selector);
@@ -483,17 +492,30 @@ public class AppTest {
 	}
 
 	private void highlight(WebElement element) {
-		highlight(element, highlight_interval);
+		highlight(element, highlight_interval, "yellow");
 	}
 
-	private void highlight(WebElement element, long highlight_interval) {
+	public void highlight(WebElement element, long highlightInterval,
+			String color) {
+		System.err.println("Color: " + color);
+		if (wait == null) {
+			wait = new WebDriverWait(driver, flexible_wait_interval);
+		}
+		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
+		// https://stackoverflow.com/questions/49687699/how-to-remove-deprecation-warning-on-timeout-and-polling-in-selenium-java-client
+		// wait.pollingEvery(Duration.ofMillis(wait_polling_interval));
+		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+
+		// wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript("arguments[0].style.border='3px solid yellow'", element);
-			Thread.sleep(highlight_interval);
+			executeScript(String.format("arguments[0].style.border='3px %s'", color),
+					element);
+			Thread.sleep(highlightInterval);
 			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
-			// System.err.println("Ignored: " + e.toString());
+			// System.err.println("Exception (ignored): " + e.toString());
 		}
 	}
 
@@ -509,7 +531,7 @@ public class AppTest {
 
 	protected static String getScriptContent(String scriptName) throws Exception {
 		try {
-			final InputStream stream = AppTest.class.getClassLoader()
+			final InputStream stream = JBrowserDriverTest.class.getClassLoader()
 					.getResourceAsStream(scriptName);
 			final byte[] bytes = new byte[stream.available()];
 			stream.read(bytes);
