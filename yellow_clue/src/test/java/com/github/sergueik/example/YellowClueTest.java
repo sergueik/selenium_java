@@ -23,8 +23,12 @@ import static org.junit.Assert.assertTrue;
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.Matchers.greaterThan;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.core.AnyOf.anyOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 // based on:
 // http://www.java2s.com/Tutorial/Java/0320__Network/DownloadingawebpageusingURLandURLConnectionclasses.htm
 // http://www.java2s.com/Tutorials/Java/Network/HTTP_Read/Set_request_Property_for_URL_Connection_in_Java.htm
@@ -144,11 +148,19 @@ public class YellowClueTest {
 		System.err.println("test6 response: " + processOutput.toString());
 	}
 
-	@Ignore
+	// @Ignore
 	// POST request
 	@Test
 	public void test7() throws Exception {
-		assertThat(getPageHTMLSource(mainUrl), notNullValue());
+		String htmlSource = null;
+		for (int cnt = 0; cnt != 100; cnt++) {
+			htmlSource = getPageHTMLSource(mainUrl);
+			assertThat(htmlSource, notNullValue());
+			assertThat(htmlSource.length(), greaterThan(100000));
+			assertThat(htmlSource,
+					not(containsString("we would like to ensure real humans")));
+
+		}
 	}
 
 	@Ignore
