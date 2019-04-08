@@ -23,7 +23,8 @@ import static javax.swing.SwingUtilities.invokeLater;
 
 // based on: http://www.java2s.com/Code/Java/Swing-JFC/ButtonActionSample.htm
 // http://www.java2s.com/Tutorials/Java/Swing_How_to/Thread/Shake_Button_text_in_animation.htm
-@SuppressWarnings("unused")
+
+@SuppressWarnings({ "unused", "serial" })
 public class SwingButtonTextChangeEx extends JPanel {
 
 	private static JButton button;
