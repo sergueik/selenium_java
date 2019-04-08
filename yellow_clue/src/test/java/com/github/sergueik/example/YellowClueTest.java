@@ -31,6 +31,8 @@ public class YellowClueTest {
 			assertTrue(htmlSource.length() > 10000);
 			assertTrue(
 					htmlSource.indexOf("we would like to ensure real humans") == -1);
+			assertTrue(htmlSource.indexOf(
+					"We have detected unusual traffic activity originating from your IP address") == -1);
 			assertFalse(
 					htmlSource.indexOf(String.format("Restaurant in %s", city)) == -1);
 		}

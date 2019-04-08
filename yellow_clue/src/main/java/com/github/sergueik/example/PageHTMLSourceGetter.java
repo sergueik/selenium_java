@@ -8,7 +8,7 @@ import java.net.URLConnection;
 
 public class PageHTMLSourceGetter {
 
-	private final static boolean debug = false;
+	private final static boolean debug = true;
 	private final static String defaultBrowserUserAgent = "Mozilla 5.0 (Windows; U; "
 			+ "Windows NT 5.1; en-US; rv:1.8.0.11) ";
 	// NOTE: the below "User-Agent" header apparently causes the test to hang
@@ -21,12 +21,22 @@ public class PageHTMLSourceGetter {
 		return getPageHTMLSource(url, defaultBrowserUserAgent);
 	}
 
+	private static String whitelistedIpAdress = "";
+	private static String externalIpAdress = "";
+
 	public static String getPageHTMLSource(String url, String userAgent) {
 		String pageSource = null;
 		try {
 			URLConnection urlConnection = (new URL(url)).openConnection();
 			urlConnection.setRequestProperty("User-Agent", defaultBrowserUserAgent);
-
+			// set X-FORWARDED-FOR HTTP header to prevent
+			// "We have detected unusual traffic activity originating from your IP
+			// address" redirect
+			// https://johannburkard.de/blog/programming/java/x-forwarded-for-http-header.html
+			if (!(externalIpAdress.isEmpty() || whitelistedIpAdress.isEmpty())) {
+				urlConnection.setRequestProperty("X-FORWARDED-FOR",
+						String.format("%s, %s", whitelistedIpAdress, externalIpAdress));
+			}
 			InputStream inputStream = urlConnection.getInputStream();
 			int byteRead;
 			StringBuffer processOutput = new StringBuffer();
