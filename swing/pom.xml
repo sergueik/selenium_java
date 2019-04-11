@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
-  <artifactId>example-swing-gui</artifactId>
-  <version>1.0</version>
+  <artifactId>examples-swing</artifactId>
+  <version>0.0.2-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.artifactId}</name>
-  <description>Example of basic Java Swing GUI.</description>
-  <url>https://github.com/chabala/${project.artifactId}</url>
+  <description></description>
+  <url></url>
   <prerequisites>
-    <maven>3.0</maven>
+    <maven>3.5</maven>
   </prerequisites>
   <properties>
     <main.class>example.SampleGui</main.class>

@@ -1,4 +1,4 @@
-package com.github.sergueik.swet_javafx;
+package example;
 
 import java.awt.BorderLayout;
 import java.awt.Container;

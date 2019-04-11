@@ -1,6 +1,8 @@
-package com.github.sergueik.swet_javafx;
+package example;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -16,8 +18,10 @@ public class SwingButtonCountdownEx extends JPanel {
 
 	private final JButton button = new JButton("Click me");
 	private final Timer timer;
+	private int interval = 1000;
 	private int count = 3;
 
+	// create timer in the constructor
 	public SwingButtonCountdownEx() {
 		timer = new Timer(1000, e -> {
 			if (count > 0) {
