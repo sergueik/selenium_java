@@ -25,6 +25,7 @@ public class YellowClueTest {
 
 	public void test7() throws Exception {
 		String htmlSource = null;
+		// PageHTMLSourceGetter.getUserAgents();
 		for (int cnt = 0; cnt != maxcount; cnt++) {
 			htmlSource = PageHTMLSourceGetter.getPageHTMLSource(url);
 			assertTrue(htmlSource != null);

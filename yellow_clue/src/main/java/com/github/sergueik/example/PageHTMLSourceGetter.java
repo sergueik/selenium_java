@@ -1,10 +1,20 @@
 package com.github.sergueik.example;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Parameter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.FileBasedConfigurationBuilder;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
+import org.apache.commons.configuration2.ex.ConfigurationException;
 
 public class PageHTMLSourceGetter {
 
@@ -23,6 +33,28 @@ public class PageHTMLSourceGetter {
 
 	private static String whitelistedIpAdress = "";
 	private static String externalIpAdress = "";
+	final static String propertiesFilename = String.format(
+			"%s/src/main/resources/%s", System.getProperty("user.dir"),
+			"application.properties");
+
+	// http://commons.apache.org/proper/commons-configuration/userguide/howto_properties.html#Lists_and_arrays
+	// https://deviceatlas.com/blog/mobile-browser-user-agent-strings
+	public static List<Object> getUserAgents() {
+		List<Object> userAgentList = new ArrayList<>();
+		Configurations configs = new Configurations();
+		Configuration config;
+		try {
+			config = configs.properties(new File(propertiesFilename));
+			userAgentList = config.getList("userAgent");
+		} catch (ConfigurationException e) {
+			// TODO Auto-generated catch block
+			System.err.println(
+					"Cannot load user agents from configuration properties file: "
+							+ e.toString());
+		}
+		System.err.println("Loaded user agents: " + userAgentList.toString());
+		return userAgentList;
+	}
 
 	public static String getPageHTMLSource(String url, String userAgent) {
 		String pageSource = null;
