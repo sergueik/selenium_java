@@ -14,7 +14,7 @@ import javax.swing.Timer;
 // При создании окна создаётся Event Dispatch Thread, внутри которого крутится бесконечный цикл, на каждой итерации достающий событие из очереди и запускающий обработчик для него. В обработчике бесполезно использовать циклы для изменения интерфейса, так как все изменения просто встанут в очередь и будут выполнены только на одной из следующих итераций цикла событий. И тем более нельзя останавливать Поток Обработки Событий (что вы делаете вызовом Thread.sleep(1000)), это заморозит всё приложение. Поэтому необходимо использовать предлагаемые библиотекой механизмы запуска фоновых задач и взаимодействия с ними. Например такие, как SwingUtilities.invokeLater(), Timer и SwingWorker.
 
 @SuppressWarnings("serial")
-public class SwingButtonCountdownEx extends JPanel {
+public class CountdownButton2Ex extends JPanel {
 
 	private final JButton button = new JButton("Click me");
 	private final Timer timer;
@@ -22,7 +22,7 @@ public class SwingButtonCountdownEx extends JPanel {
 	private int count = 3;
 
 	// create timer in the constructor
-	public SwingButtonCountdownEx() {
+	public CountdownButton2Ex() {
 		timer = new Timer(1000, e -> {
 			if (count > 0) {
 				button.setVisible(false);
@@ -32,6 +32,7 @@ public class SwingButtonCountdownEx extends JPanel {
 			} else {
 				((Timer) (e.getSource())).stop();
 				count = 3;
+				// reenable
 				button.setVisible(false);
 				button.setText("Click me");
 				button.doLayout();
@@ -55,6 +56,6 @@ public class SwingButtonCountdownEx extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		new SwingButtonCountdownEx();
+		new CountdownButton2Ex();
 	}
 }

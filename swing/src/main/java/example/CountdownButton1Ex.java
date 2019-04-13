@@ -19,7 +19,7 @@ import javax.swing.SwingUtilities;
 // http://www.java2s.com/Tutorials/Java/Swing_How_to/Thread/Shake_Button_text_in_animation.htm
 
 @SuppressWarnings({ "serial" })
-public class SwingButtonTextChangeEx extends JPanel {
+public class CountdownButton1Ex extends JPanel {
 
 	private static JButton button;
 	private static int total = 10;
