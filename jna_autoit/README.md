@@ -127,6 +127,26 @@ import example.AutoItX;
     sleep(1000);
     instance.WinClose(title, text);
 ```
+### Note
+
+# https://www.autoitscript.com/forum/topic/42691-how-to-automate-java-windowscontrols/
+# can use https://docs.microsoft.com/en-us/windows/desktop/winauto/inspect-objects
+# for Windows own appps
+# https://www.autoitscript.com/autoit3/docs/intro/au3spy.htm
+unclear if there is a jna  version of au3info.exe
+
+Au3Info.exe built native app 
+is available  in
+[AutoIt BETA](https://www.autoitscript.com/autoit3/files/beta/autoit/archive/autoit-v3.3.15.0.zip) (NOTE: beta is from 2015)
+For other downloads see [AutoIt Downloads](https://www.autoitscript.com/site/autoit/downloads/)
+https://www.autoitscript.com/autoit3/files/beta/autoit/COM/
+
+https://www.autoitscript.com/autoit3/files/beta/autoit/archive/
+
+For java native autoit-like see [](https://stackoverflow.com/questions/1097528/autoit-like-gui-automation-tool-for-java)
+e.g. [Marathon - Tools for GUI Test Automation (commercial)](https://marathontesting.com/)
+[java UDF](https://www.autoitscript.com/forum/topic/87956-java-udf/)
+[Jubula Functional Testing Tool](http://www.eclipse.org/jubula/)  
 
 ### TODO:
 
@@ -283,11 +303,15 @@ Dump of file AutoItX3_x64.dll
 ```
 ### See Also
 
+  * [JWinAuto](http://jwinauto.sourceforge.net/)  another wrapper around AutoIt distributed via class and sources bundledd in [zip file](https://downloads.sourceforge.net/project/jwinauto/jAutoIt/lppoint%20bug%20fix/jAutoIt20071116.zip?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fjwinauto%2F&ts=1554221487&use_mirror=iweb), it is very minimal.
   * [Java Native Access](https://github.com/java-native-access/jna) project on github
   * [Index of /autoit3/docs/functions](https://www.autoitscript.com/autoit3/docs/functions/)
   * Powershell iAutoIt cmdlets [documentation](https://www.autoitconsulting.com/site/scripting/autoit-cmdlets-for-windows-powershell/)
+  * Microsoft [Inspect](https://docs.microsoft.com/en-us/windows/desktop/winauto/inspect-objects)  Windows-based tool 
+    for exploring the UI controls and elements of windows "native" aps (not written in java) 
   * [Autoit forum (in Russian)](http://autoit-script.ru/index.php).
   * [Misc. autoit-related topics in QA forum (in Russian, mostly)](https://automated-testing.info/search?q=autoit)
+  * discussion of the tools available for Java application [UI automation](https://www.autoitscript.com/forum/topic/66179-automating-jave-based-application/)
 
 ### License
 This project is licensed under the terms of the MIT license.
