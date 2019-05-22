@@ -136,10 +136,11 @@ public class AU3Test {
 					Constants.SW_SHOWMAXIMIZED);
 			System.err.println("Launched process pid: " + pid);
 		}
-		assertTrue(instance.AU3_ProcessExists(new WString(proacessName)) != Constants.AU3_FAILURE);
+		assertTrue(instance
+				.AU3_ProcessExists(new WString(processName)) != Constants.AU3_FAILURE);
 		instance.AU3_Sleep(1000);
 		assertTrue(instance.AU3_WinExists(new WString(title),
-				new WString("")) != Constants.AU3_FAILURE );
+				new WString("")) != Constants.AU3_FAILURE);
 		System.err.println("Window exists. ");
 		System.err.println("Closing window title: " + title);
 		instance.AU3_WinClose(new WString(title), new WString(""));

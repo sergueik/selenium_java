@@ -233,13 +233,13 @@ public class FirefoxTest {
 		try {
 			driver.get("about:blank");
 		} catch (Exception e) {
-		if (driver != null) {
-			try {
-				driver.close();
-				driver.quit();
-			} catch (Exception e) {
+			if (driver != null) {
+				try {
+					driver.close();
+					driver.quit();
+				} catch (Exception e2) {
+				}
 			}
 		}
 	}
-
 }
