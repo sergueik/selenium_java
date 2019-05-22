@@ -51,9 +51,13 @@ import example.Constants;
 /**
  * @author midorlo
  * @author sergueik
+ * 
  */
 public class AutoItTest {
-
+	// legacy way:
+	// https://www.autoitscript.com/autoit3/docs/intro/running.htm
+	// Runtime.getRuntime().exec(new String[]{"AutoIt3.exe",
+	// "\"c:\\Users\\Serguei\\AppData\\Roaming\\script.au3\""});
 	private String title = null;
 	private String text = "";
 	private String result = null;
@@ -153,14 +157,15 @@ public class AutoItTest {
 			status = instance.Run(commandline, workdir, Constants.SW_SHOWMAXIMIZED);
 		}
 		assertTrue(instance.ProcessExists(processName));
-		System.err.println( "Process is running");
+		System.err.println("Process is running");
 		instance.Sleep(1000);
-		
+
 		assertTrue(instance.WinExists(title, text));
 		System.err.println("Window exists. ");
 
 		// NOTE: not really getting window on top
-		// assertTrue(instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
+		// assertTrue(instance.WinSetOnTop(title, text,
+		// Constants.AU3_WINDOWS_ONTOP));
 		// instance.Sleep(1000);
 		// NOTE: without the timeout, this call will block the test
 		System.err.println("Window " + title + " is active: "
@@ -172,17 +177,17 @@ public class AutoItTest {
 		System.err.println("Closing window title: " + title);
 		instance.WinClose(title, text);
 		instance.Sleep(1000);
-		
+
 		System.err.println("Refusing to save the file if prompted (with timeout)");
 		instance.WinWaitActive("Notepad", "Save", 10);
 		instance.Send("!n", true);
 		instance.Sleep(1000);
-		//  
-		if (instance.WinExists(title,text)) {
+		//
+		if (instance.WinExists(title, text)) {
 			System.err.println("Killing window title: " + title);
 			instance.WinKill(title, text);
 		}
-		assertFalse(instance.WinExists(title,text));
+		assertFalse(instance.WinExists(title, text));
 	}
 
 	// todo: order

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>jnautoit</artifactId>
-  <version>0.0.8-SNAPSHOT</version>
+  <version>0.0.7-SNAPSHOT</version>
   <packaging>jar</packaging>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,6 +15,9 @@
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <selenium.version>3.13.0</selenium.version>
+    <selenium-firefox-driver.version>3.13.0</selenium-firefox-driver.version>
+    <selenium-ie-driver.version>3.13.0</selenium-ie-driver.version>
   </properties>
   <name>JNAutoIt</name>
   <description>JNAutoIt - Java Native wrapper of AutoItX dll</description>
@@ -42,6 +45,31 @@
       <artifactId>testng</artifactId>
       <version>6.10</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-firefox-driver</artifactId>
+      <version>${selenium-firefox-driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-ie-driver</artifactId>
+      <version>${selenium-ie-driver.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-server</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-support</artifactId>
+      <version>${selenium.version}</version>
     </dependency>
   </dependencies>
   <repositories>
@@ -114,3 +142,4 @@
     </plugins>
   </build>
 </project>
+
