@@ -56,7 +56,7 @@ public class InternetExplorerTest {
 	public TakesScreenshot screenshot;
 	private final static String baseURL = "https://file-examples.com/index.php/text-files-and-archives-download/";
 	private final static String directURL = "https://file-examples.com/wp-content/uploads/2017/02/zip_9MB.zip";
-
+	private String originalHandle;
 	private StringBuffer verificationErrors = new StringBuffer();
 
 	@BeforeMethod
@@ -80,7 +80,7 @@ public class InternetExplorerTest {
 		// For IE Internet zones see https://github.com/allquixotic/iepmm (NOTE:
 		// cryptic)
 
-		String originalHandle = driver.getWindowHandle();
+		originalHandle = driver.getWindowHandle();
 		System.err.println("The current window handle " + originalHandle);
 
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -125,32 +125,25 @@ public class InternetExplorerTest {
 
 	}
 
-	@Test(enabled = false)
-	public void test4() {
-
-		driver.get(baseURL);
-		driver.findElement(By.linkText("Enter")).click();
-		// driver.findElement(By.id("handle")).clear();
-		// driver.findElement(By.id("handle")).sendKeys(username);
-		// driver.findElement(By.id("password")).clear();
-		// driver.findElement(By.id("password")).sendKeys( pass );
-		// driver.findElement(By.cssSelector("input.submit")).click();
-		// Thread.sleep(10000);
-		String title = driver.getTitle();
-	}
-
 	@AfterMethod
 	public void afterMethod() {
 
-		try {
-			driver.get("about:blank");
-		} catch (Exception e) {
-			if (driver != null) {
-				try {
-					driver.close();
-					driver.quit();
-				} catch (Exception e2) {
+		if (debug) {
+			System.err.println("navigating to blank page");
+		}
+		driver.get("about:blank");
+		if (driver != null) {
+			try {
+				if (debug) {
+					System.err.println("closing the browser window " + originalHandle);
 				}
+				driver.close();
+				if (debug) {
+					System.err.println("quitting the browser " + originalHandle);
+				}
+				driver.quit();
+			} catch (Exception e) {
+				System.err.println("Exception (ignored)" + e.toString());
 			}
 		}
 	}
@@ -199,7 +192,7 @@ public class InternetExplorerTest {
 			}
 			while (true) {
 				try {
-					System.out.println("Thread: wait .5 sec");
+					System.err.println("Thread: wait .5 sec");
 					Thread.sleep(500);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -218,7 +211,7 @@ public class InternetExplorerTest {
 							"Found " + (windowHandles.size() - 1) + " additional Windows");
 					break;
 				} else {
-					System.out.println("Thread: no other Windows");
+					System.err.println("Thread: no other Windows");
 				}
 			}
 
@@ -226,10 +219,10 @@ public class InternetExplorerTest {
 			while (windowHandleIterator.hasNext()) {
 				String handle = (String) windowHandleIterator.next();
 				if (!handle.equals(currentHandle)) {
-					System.out.println("Switch to " + handle);
+					System.err.println("Switch to " + handle);
 					driver.switchTo().window(handle);
 					// move, print attributes
-					System.out.println("Switch to main window.");
+					System.err.println("Switch to main window.");
 					driver.switchTo().defaultContent();
 				}
 			}
@@ -251,28 +244,7 @@ public class InternetExplorerTest {
 
 		public static void main(String args[])
 				throws InterruptedException, MalformedURLException {
-			// ProfilesIni p=new ProfilesIni();
-			// WebDriver hangs on navigation with Firefox 40 / Selenium 2.44
-			// driver=new FirefoxDriver(p.getProfile("default"));
-			// only works with Firefox
-			DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
-					Platform.ANY);
-			FirefoxProfile profile = new ProfilesIni().getProfile("default");
-			// profile.setEnableNativeEvents(false);
-			capabilities.setCapability("firefox_profile", profile);
 
-			/*
-			System.setProperty("webdriver.chrome.driver", "c:/java/selenium/chromedriver.exe");
-			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-			LoggingPreferences logging_preferences = new LoggingPreferences();
-			logging_preferences.enable(LogType.BROWSER, Level.ALL);
-			capabilities.setCapability(CapabilityType.LOGGING_PREFS, logging_preferences);
-			//  prefs.js:user_pref("extensions.logging.enabled", true);
-			//  user.js:user_pref("extensions.logging.enabled", true);
-			driver = new ChromeDriver(capabilities);
-			*/
-			// driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"),
-			// capabilities);
 			System.setProperty("webdriver.ie.driver",
 					"c:/java/selenium/IEDriverServer.exe");
 			driver = new InternetExplorerDriver();
@@ -298,13 +270,13 @@ public class InternetExplorerTest {
 			WebElement body = driver.findElement(By.xpath("html/body"));
 			body.findElement(By.xpath("input")).click();
 
-			System.out.println("main: sleeping 10 sec");
+			System.err.println("main: sleeping 10 sec");
 
-			Thread.sleep(20000);
-			System.out.println("main: close");
+			Thread.sleep(10000);
+			System.err.println("main: closing the browser window");
 			driver.close();
+			System.err.println("main: quitting the browser");
 			driver.quit();
-
 		}
 
 	}

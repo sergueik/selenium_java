@@ -230,16 +230,14 @@ public class FirefoxTest {
 	@AfterMethod
 	public void afterMethod() {
 
-		try {
-			driver.get("about:blank");
-		} catch (Exception e) {
-			if (driver != null) {
-				try {
-					driver.close();
-					driver.quit();
-				} catch (Exception e2) {
-				}
+		driver.get("about:blank");
+		if (driver != null) {
+			try {
+				driver.close();
+				driver.quit();
+			} catch (Exception e) {
 			}
 		}
+
 	}
 }
