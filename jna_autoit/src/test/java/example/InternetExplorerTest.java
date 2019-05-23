@@ -86,22 +86,13 @@ public class InternetExplorerTest {
 		driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 	}
 
-	@Test(enabled = true)
-	public void multiThreadTest() {
-		try {
-			App.main(new String[] { "dummy" });
-		} catch (InterruptedException | MalformedURLException e) {
-			System.err.println("Exception (ignored) " + e.toString());
-		}
-	}
-
 	@Test(enabled = false)
 	public void testDirectDownload() {
 		// System.err.println("Getting: " + directURL);
 		// driver.get(directURL);
 		System.err.println("Navigating to: " + directURL);
 		driver.navigate().to(directURL);
-		// hangs here:
+		// IE and Java surefire hangs here:
 		// Windows Internet Explorer
 		// "What do you want to do with zip_9MB.zip" -
 		// is a modal dialog.
@@ -161,124 +152,4 @@ public class InternetExplorerTest {
 		}
 
 	}
-
-	private static class App implements Runnable {
-		public static WebDriver driver;
-		private static Set<String> windowHandles;
-		Thread thread;
-
-		App() throws InterruptedException {
-			thread = new Thread(this, "test");
-			thread.start();
-		}
-
-		public void run() {
-			String currentHandle = null;
-
-			try {
-				System.err.println("Thread: sleep 3 sec.");
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
-			System.err.println("Thread: wake.");
-			// With modal window, WebDriver appears to be hanging on [get current
-			// window handle]
-			try {
-				currentHandle = driver.getWindowHandle();
-				System.err.println("Thread: Current Window handle" + currentHandle);
-			} catch (NoSuchWindowException e) {
-
-			}
-			while (true) {
-				try {
-					System.err.println("Thread: wait .5 sec");
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				System.out.println("Thread: inspecting all Window handles");
-				// when a modal window is created by Javascript window.showModalDialog
-				// WebDriver appears to be hanging on [get current window handle], [get
-				// window handles]
-				// Node console shows no Done: [get current window handle] or Done: [get
-				// window handles]
-				// if the window is closed manually, and cleater again, the problem goes
-				// away
-				windowHandles = driver.getWindowHandles();
-				if (windowHandles.size() > 1) {
-					System.err.println(
-							"Found " + (windowHandles.size() - 1) + " additional Windows");
-					break;
-				} else {
-					System.err.println("Thread: no other Windows");
-				}
-			}
-
-			Iterator<String> windowHandleIterator = windowHandles.iterator();
-			while (windowHandleIterator.hasNext()) {
-				String handle = (String) windowHandleIterator.next();
-				if (!handle.equals(currentHandle)) {
-					System.err.println("Switch to " + handle);
-					driver.switchTo().window(handle);
-					// move, print attributes
-					System.err.println("Switch to main window.");
-					driver.switchTo().defaultContent();
-				}
-			}
-			/*
-			// the rest of example commented out
-			String nextHandle = driver.getWindowHandle();
-			System.out.println("nextHandle" + nextHandle);
-			
-			driver.findElement(By.xpath("//input[@type='button'][@value='Close']")).click();
-			
-			// Switch to main window
-			for (String handle : driver.getWindowHandles()) {
-			    driver.switchTo().window(handle);
-			}
-			// Accept alert
-			driver.switchTo().alert().accept();
-			*/
-		}
-
-		public static void main(String args[])
-				throws InterruptedException, MalformedURLException {
-
-			System.setProperty("webdriver.ie.driver",
-					"c:/java/selenium/IEDriverServer.exe");
-			driver = new InternetExplorerDriver();
-
-			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-
-			new App();
-			// non-modal windows are handled successfully.
-			// driver.get("http://www.naukri.com/");
-			driver.get(
-					"https://developer.mozilla.org/samples/domref/showModalDialog.html");
-			// following two locator do not work with IE
-			// driver.findElement(By.xpath("//input[@value='Open modal
-			// dialog']")).click();
-			// driver.findElement(By.cssSelector("input[type='button']")).click();
-			WebDriverWait wait = new WebDriverWait(driver, 5);
-			wait.pollingEvery(500, TimeUnit.MILLISECONDS);
-			Actions actions = new Actions(driver);
-
-			wait.until(ExpectedConditions
-					.visibilityOf(driver.findElement(By.xpath("html/body"))));
-
-			WebElement body = driver.findElement(By.xpath("html/body"));
-			body.findElement(By.xpath("input")).click();
-
-			System.err.println("main: sleeping 10 sec");
-
-			Thread.sleep(10000);
-			System.err.println("main: closing the browser window");
-			driver.close();
-			System.err.println("main: quitting the browser");
-			driver.quit();
-		}
-
-	}
-
 }
