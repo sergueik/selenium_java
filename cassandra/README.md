@@ -9,9 +9,13 @@ set CASSANDRA_HOME=c:\java\ddac-5.1.15
 pushd %CASSANDRA_HOME%
 bin\cassandra.bat
 ```
-It is [said](https://www.datastax.com/2012/01/getting-started-with-apache-cassandra-on-windows-the-easy-way) that Docker containers provide a much better development experience on Windows.
+It is [said](https://www.datastax.com/2012/01/getting-started-with-apache-cassandra-on-windows-the-easy-way) that Docker containers [provide a much better](https://github.com/oscerd/cassandra-image) development experience on Windows.
 
 ### See Also
+  * [connecting to cassandra from java](https://www.javaworld.com/article/2158807/connecting-to-cassandra-from-java.html)
+  * [Virtual Machine images](http://julien.duponchelle.info/cassandra/mysql/Cassandra-MariaDB-Virtual-Box-images/) with Cassandra and MariaDB
+  * [DataSTAX VirtualBox](https://www.datastax.com/2014/03/introducing-the-datastax-sandbox) VM
+  * [Vagrantfiles](https://github.com/bcantoni/vagrant-cassandra) for Cassandra, including multinode
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

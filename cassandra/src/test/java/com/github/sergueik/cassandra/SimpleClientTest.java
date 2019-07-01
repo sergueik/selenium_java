@@ -17,18 +17,39 @@ import com.datastax.driver.core.Statement;
 import com.datastax.driver.core.querybuilder.Ordering;
 import com.datastax.driver.core.querybuilder.QueryBuilder;
 
+import static java.lang.System.out;
+import static java.lang.System.err;
+
 public class SimpleClientTest {
 
-	// TODO: launch the server in @Before, wait for org.apache.cassandra.service.CassandraDaemon process
+	// TODO: launch the server in @Before, wait for
+	// org.apache.cassandra.service.CassandraDaemon process
 	// TCP ports TCP (7000/7001), CLQ(9042) and possibly JMX (7199) to be LISTEN
 	// https://www.linode.com/docs/databases/cassandra/set-up-a-cassandra-node-cluster-on-ubuntu-and-centos/
 	// and bin\nodetool.cmd status
 	// TODO: DataStax_Cassandra_Community_Server, DataStax_DDC_Server checks
 
+	final int portCQL = 9042;
+	// in $CASSANDRA_HOME/conf/jvm.options and
+	// $CASSANDRA_HOME/conf/cassandra-env.sh
+	private static final String node = "localhost"; // "127.0.0.1";
+
+	@Test
+	public void testGetConnected() {
+		CassandraConnector client = new CassandraConnector(node);
+		client.connect(node);
+		Session session = client.getSession();
+		err.println(
+				"connected hosts:" + session.getState().getConnectedHosts().size());
+		err.println("cluster:" + session.getCluster().getClusterName());
+		err.println("driver version: " + session.getCluster().getDriverVersion());
+	}
+
 	@Test
 	public void testClient() {
-		SimpleClient client = new SimpleClient();
-		client.connect("127.0.0.1");
+		CassandraConnector client = new CassandraConnector();
+		client.connect(node);
+		err.println("Connecting to node " + node + ":" + portCQL);
 		client.getSession();
 		client.createSchema();
 		client.loadData();
@@ -37,21 +58,41 @@ public class SimpleClientTest {
 		client.close();
 	}
 
-	private static class SimpleClient {
+	// https://www.javaworld.com/article/2158807/connecting-to-cassandra-from-java.html
+	private static class CassandraConnector {
 		private Cluster cluster;
-		private Session session;
+		private Session session = null;
+		private String node = "localhost";
 
-		public void getSession() {
-			session = cluster.connect();
+		public CassandraConnector(final String node) {
+			this.node = node;
 		}
 
-		public void connect(String node) {
+		public CassandraConnector() {
+		}
+
+		public Session getSession() {
+			if (session == null) {
+				session = cluster.connect();
+			}
+			return this.session;
+		}
+
+		public void connect(final String node, final int port) {
+			cluster = Cluster.builder().addContactPoint(node).withPort(port).build();
+			for (final Host host : cluster.getMetadata().getAllHosts()) {
+				err.printf("Datacenter: %s; Host: %s; Rack: %s\n", host.getDatacenter(),
+						host.getAddress(), host.getRack());
+			}
+		}
+
+		public void connect(final String node) {
 			cluster = Cluster.builder().addContactPoint(node).build();
 			Metadata metadata = cluster.getMetadata();
-			System.out.println("Connected to cluster:" + metadata.getClusterName());
+			err.println("Connected to cluster:" + metadata.getClusterName());
 			for (Host host : metadata.getAllHosts()) {
-				System.out.println("Datatacenter: " + host.getDatacenter() + "; Host: "
-						+ host.getAddress() + "; Rack: " + host.getRack());
+				err.println("Datatacenter: " + host.getDatacenter() + "; " + "Host: "
+						+ host.getAddress() + "; " + "Rack: " + host.getRack());
 			}
 		}
 
@@ -80,14 +121,14 @@ public class SimpleClientTest {
 					+ "(id, title, album, artist, tags) " + "VALUES (?, ?, ?, ?, ?);");
 
 			BoundStatement boundStatement = new BoundStatement(statement);
-			Set<String> tags = new HashSet<String>();
+			Set<String> tags = new HashSet<>();
 			tags.add("metal");
 			tags.add("1992");
 			UUID idAlbum = UUID.randomUUID();
 			ResultSet res = session.execute(boundStatement.bind(idAlbum, "DNR",
 					"The gathering", "Testament", tags));
 
-			System.err.println(res.toString());
+			err.println(res.toString());
 
 			statement = session.prepare("INSERT INTO simplex.playlists "
 					+ "(id, song_id, title, album, artist) " + "VALUES (?, ?, ?, ?, ?);");
@@ -102,15 +143,15 @@ public class SimpleClientTest {
 			Statement statement = QueryBuilder.select().all().from("simplex",
 					"songs");
 			ResultSet results = session.execute(statement);
-			System.err.println(String.format("%-50s\t%-30s\t%-20s\t%-20s\n%s", "id",
-					"title", "album", "artist",
+			err.println(String.format("%-50s\t%-30s\t%-20s\t%-20s\n%s", "id", "title",
+					"album", "artist",
 					"------------------------------------------------------+-------------------------------+------------------------+-----------"));
 			for (Row row : results) {
-				System.err.println(String.format("%-50s\t%-30s\t%-20s\t%-20s",
+				err.println(String.format("%-50s\t%-30s\t%-20s\t%-20s",
 						row.getUUID("id"), row.getString("title"), row.getString("album"),
 						row.getString("artist")));
 			}
-			System.out.println();
+			err.println();
 		}
 	}
 
