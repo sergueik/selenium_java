@@ -30,3 +30,5 @@
 Good luck.
 Amos
 
+See Also: Java class viewer [article on codeproject](https://www.codeproject.com/Articles/35915/Java-Class-Viewer) and [author's source on github](https://github.com/amosshi/freeinternals)
+
