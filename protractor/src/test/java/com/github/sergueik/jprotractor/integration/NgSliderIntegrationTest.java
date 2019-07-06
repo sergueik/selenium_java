@@ -4,14 +4,15 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.math.IntRange;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -86,7 +87,12 @@ public class NgSliderIntegrationTest {
 		CommonFunctions.setHighlightTimeout(10);
 		WebElement sliderElement = sliderContainerElement
 				.findElement(By.className("ui-slider-handle"));
-		for (int cnt : new IntRange(1, 10).toArray()) {
+		// the org.apache.commons.lang3.Range<T> is too complex
+		// and org.apache.commons.lang3.Range<Integer>(mix, max, Comparator.<Int>
+		// naturalOrder())
+		// does not have method to convert to Iterable
+		// https://www.programcreek.com/java-api-examples/index.php?api=org.apache.commons.lang3.Range
+		for (int cnt = 0; cnt != 10; cnt++) {
 			sliderElement.sendKeys(Keys.ARROW_RIGHT);
 			highlight(sliderElement);
 		}

@@ -111,10 +111,37 @@ There is a [Protractor Java and c# Client](https://gctor Java and c# Clientroups
 ![ Providing Protractor to Java / .Net](https://github.com/sergueik/selenium_java/blob/master/protractor/jProtractor.odp?raw=true)
 
 ### Building the jar
-Building the jar
-===============
 
-You can build the `jprotractor.jar` from the source by cloning the repository
+The snapshot release of `jprotractor.jar` is published to https://oss.sonatype.org/content/repositories/snapshots/com/github/sergueik/jprotractor/jprotractor/ and to make it the dependency add the following into the `pom.xml`:
+```xml
+    <dependency>
+      <groupId>com.github.sergueik.jprotractor</groupId>
+      <artifactId>jprotractor</artifactId>
+      <version>1.12-SNAPSHOT</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-java</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-server</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+```
+and create or modify the `repositories` section of the `pom.xml`:
+```xml
+  <repositories>
+    <repository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </repository>
+  </repositories>
+```
+
+You can build the `jprotractor.jar` locally from the source by cloning the repository
 ```bash
 git clone https://github.com/sergueik/jProtractor
 ```

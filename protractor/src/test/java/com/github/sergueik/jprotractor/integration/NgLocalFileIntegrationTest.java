@@ -1,13 +1,15 @@
 package com.github.sergueik.jprotractor.integration;
 
-import static java.lang.Boolean.parseBoolean;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -67,7 +69,7 @@ public class NgLocalFileIntegrationTest {
 	public static String localFile;
 	static StringBuilder sb;
 	static Formatter formatter;
-	private static String fullStackTrace;
+	private static String rootCauseMessage;
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -294,20 +296,18 @@ public class NgLocalFileIntegrationTest {
 			} else {
 				System.err.println(myFile.toString());
 			}
-		} catch (Exception ex) {
-			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-					.getFullStackTrace(ex);
-			System.err.println("Exception:\n" + fullStackTrace);
+		} catch (Exception e) {
+			rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+			System.err.println("Exception:\n" + rootCauseMessage);
 		}
 		try {
 			String script = "var e = angular.element(arguments[0]); var f = e.scope().myFile; return f.name";
 			Object result = CommonFunctions.executeScript(script, ng_file);
 			assertThat(result, notNullValue());
 			System.err.println("myFile.name = " + result);
-		} catch (Exception ex) {
-			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-					.getFullStackTrace(ex);
-			System.err.println("Exception:\n" + fullStackTrace);
+		} catch (Exception e) {
+			rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+			System.err.println("Exception:\n" + rootCauseMessage);
 		}
 	}
 
@@ -618,7 +618,7 @@ public class NgLocalFileIntegrationTest {
 		 * Object fruitSelected = new
 		 * NgWebElement(ngDriver,element).evaluate("fruit.Selected");
 		 * System.err.println("fruit.Selected = " + fruitSelected.toString()) ;
-		 * assertTrue(parseBoolean(fruitSelected.toString()));
+		 * assertTrue(Boolean.parseBoolean(fruitSelected.toString()));
 		 */
 
 		// System.err.println("findElement(NgBy.selectedRepeaterOption(...))");
@@ -705,7 +705,7 @@ public class NgLocalFileIntegrationTest {
 			if (option.getText().isEmpty()) {
 				break;
 			}
-			if (parseBoolean(option.getAttribute("selected"))) {
+			if (Boolean.parseBoolean(option.getAttribute("selected"))) {
 				System.err.println("Selected:	'" + option.getText() + "' value = "
 						+ option.getAttribute("value"));
 				// option.click();
@@ -738,7 +738,7 @@ public class NgLocalFileIntegrationTest {
 			actions.keyDown(Keys.CONTROL).click(option).keyUp(Keys.CONTROL).build()
 					.perform();
 			ngDriver.waitForAngular();
-			if (parseBoolean(option.getAttribute("selected"))) {
+			if (Boolean.parseBoolean(option.getAttribute("selected"))) {
 				data.add(option.getAttribute("value"));
 			}
 		}
@@ -993,8 +993,8 @@ public class NgLocalFileIntegrationTest {
 				WebElement row = rows.get(0);
 				String field = row.getAttribute("ng-order-by");
 				NgWebElement ng_row = new NgWebElement(ngDriver, row);
-				boolean reverseSort = parseBoolean(
-						ng_row.evaluate("reverseSort").toString());
+				boolean reverseSort = Boolean
+						.parseBoolean(ng_row.evaluate("reverseSort").toString());
 				// Without Protractor:
 				// Then the data is sorted by <header> in <sort order>
 				// String binding = header_columns.get(header);
@@ -1011,8 +1011,10 @@ public class NgLocalFileIntegrationTest {
 						assertThat(empFieldElement, notNullValue());
 						System.err.println(empFieldElement.getText());
 					} catch (Exception e) {
-						System.err.println(org.apache.commons.lang.exception.ExceptionUtils
-								.getFullStackTrace(e));
+
+						rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
+						System.err.println("Exception:\n" + rootCauseMessage);
+
 					}
 				}
 
@@ -1164,7 +1166,7 @@ public class NgLocalFileIntegrationTest {
 				NgWebElement ng_element = ngD.findElement(By.id("hover"));
 				Object value = ng_element.evaluate("hovering");
 				System.err.println("hovering: " + value.toString());
-				return parseBoolean(value.toString());
+				return Boolean.parseBoolean(value.toString());
 			}
 		});
 

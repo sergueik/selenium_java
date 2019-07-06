@@ -18,7 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -372,7 +372,7 @@ public class NgWay2AutomationIntegrationTest {
 			// return;
 		} catch (WebDriverException ex) {
 			// fullStackTrace =
-			// org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
+			// org.apache.commons.lang3.exception.ExceptionUtils.getFullStackTrace(ex);
 			// System.err.println("Alert was not handled by PhantomJS: " +
 			// fullStackTrace);
 			System.err.println("Alert was not handled by PhantomJS: "

@@ -2,10 +2,12 @@ package com.github.sergueik.jprotractor.integration;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -25,7 +27,7 @@ import com.github.sergueik.jprotractor.NgWebElement;
 public class NgIgnoreSyncIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private static String fullStackTrace;
+	private static String rootCauseMessage;
 	static WebDriverWait wait;
 	static Actions actions;
 	static Alert alert;
@@ -72,9 +74,8 @@ public class NgIgnoreSyncIntegrationTest {
 			element.getAttribute("id");
 		} catch (TimeoutException exception) {
 			System.err.println("TimeoutException thrown:");
-			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-					.getFullStackTrace(exception);
-			System.err.println("Exception thrown: " + fullStackTrace);
+			rootCauseMessage = ExceptionUtils.getRootCauseMessage(exception);
+			System.err.println("Exception thrown: " + rootCauseMessage);
 			return;
 		}
 	}
@@ -96,9 +97,8 @@ public class NgIgnoreSyncIntegrationTest {
 		try {
 			element.getAttribute("id");
 		} catch (TimeoutException exception) {
-			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
-					.getFullStackTrace(exception);
-			System.err.println("TimeoutException thrown: " + fullStackTrace);
+			rootCauseMessage = ExceptionUtils.getRootCauseMessage(exception);
+			System.err.println("TimeoutException thrown: " + rootCauseMessage);
 			return;
 		}
 	}

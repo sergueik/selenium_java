@@ -3,10 +3,12 @@ package com.github.sergueik.jprotractor.integration;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -82,7 +84,7 @@ public class NgCustomWaitIntegrationTest {
 			System.out.println("Exception (ignored): " + e.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(String.format(
-					"Unexpected exception: " + ExceptionUtils.getFullStackTrace(e)));
+					"Unexpected exception: " + ExceptionUtils.getRootCauseMessage(e)));
 		}
 	}
 
