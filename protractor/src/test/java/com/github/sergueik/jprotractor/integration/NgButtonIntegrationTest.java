@@ -8,6 +8,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
@@ -58,7 +59,7 @@ public class NgButtonIntegrationTest {
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}

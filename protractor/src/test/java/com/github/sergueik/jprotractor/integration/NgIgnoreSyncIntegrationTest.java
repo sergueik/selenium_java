@@ -1,6 +1,7 @@
 package com.github.sergueik.jprotractor.integration;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
@@ -49,7 +50,7 @@ public class NgIgnoreSyncIntegrationTest {
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
 		wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}

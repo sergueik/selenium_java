@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -190,7 +191,7 @@ public class CommonFunctions {
 	public static void highlight(WebElement element) {
 		if (wait == null) {
 			wait = new WebDriverWait(seleniumDriver, flexibleWait);
-			wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+			wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		}
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
@@ -215,7 +216,7 @@ public class CommonFunctions {
 	public static void waitWhileElementIsVisible(By locator) {
 		final By _locator = locator;
 		new WebDriverWait(seleniumDriver, flexibleWait)
-				.pollingEvery(pollingInterval, TimeUnit.SECONDS)
+				.pollingEvery(Duration.ofMillis(pollingInterval))
 				.until(new ExpectedCondition<Boolean>() {
 					@Override
 					public Boolean apply(WebDriver o) {
