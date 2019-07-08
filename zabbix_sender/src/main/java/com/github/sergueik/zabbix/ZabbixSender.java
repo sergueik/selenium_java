@@ -13,13 +13,13 @@ import java.util.regex.Pattern;
 import org.json.JSONObject;
 
 public class ZabbixSender {
-	private static final Pattern PATTERN = Pattern.compile("[^0-9\\.]+");
-	private final static Charset UTF8 = Charset.forName("UTF-8");
 
-	String host;
-	int port;
-	int connectTimeout = 3 * 1000;
-	int socketTimeout = 3 * 1000;
+	private static final Pattern PATTERN = Pattern.compile("[^0-9\\.]+");
+	private final boolean debug = false;
+	private String host;
+	private int port;
+	private int connectTimeout = 3 * 1000;
+	private int socketTimeout = 3 * 1000;
 
 	public ZabbixSender(String host, int port) {
 		this.host = host;
@@ -37,14 +37,6 @@ public class ZabbixSender {
 		return send(dataObject, System.currentTimeMillis() / 1000);
 	}
 
-	/**
-	 *
-	 * @param dataObject
-	 * @param clock
-	 *            TimeUnit is SECONDS.
-	 * @return
-	 * @throws IOException
-	 */
 	public SenderResult send(DataObject dataObject, long clock)
 			throws IOException {
 		return send(Collections.singletonList(dataObject), clock);
@@ -54,14 +46,6 @@ public class ZabbixSender {
 		return send(dataObjectList, System.currentTimeMillis() / 1000);
 	}
 
-	/**
-	 *
-	 * @param dataObjectList
-	 * @param clock
-	 *            TimeUnit is SECONDS.
-	 * @return
-	 * @throws IOException
-	 */
 	public SenderResult send(List<DataObject> dataObjectList, long clock)
 			throws IOException {
 		SenderResult senderResult = new SenderResult();
@@ -101,13 +85,21 @@ public class ZabbixSender {
 			}
 
 			if (readCount < 13) {
-				// seems zabbix server return "[]"?
-				senderResult.setbReturnEmptyArray(true);
+				// likely zabbix server returns "[]"
+				senderResult.setemptyResponse(true);
+			}
+
+			if (debug) {
+				System.err.println("Processing response: " + new String(responseData));
+				// Processing response:
+				// ZBXDZ{"response":"success","info":"processed: 0; failed: 1; total: 1;
+				// seconds spent: 0.000207"}
 			}
 
 			// header('ZBXD\1') + len + 0
 			// 5 + 4 + 4
-			String jsonString = new String(responseData, 13, readCount - 13, UTF8);
+			String jsonString = new String(responseData, 13, readCount - 13,
+					Charset.forName("UTF-8"));
 			JSONObject json = new JSONObject();
 			try {
 				json = new JSONObject(jsonString);
@@ -116,6 +108,7 @@ public class ZabbixSender {
 			}
 
 			String info = json.getString("info");
+
 			// example info: processed: 1; failed: 0; total: 1; seconds spent:
 			// 0.000053
 			// after split: [, 1, 0, 1, 0.000053]

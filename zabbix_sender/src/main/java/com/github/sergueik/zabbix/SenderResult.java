@@ -4,24 +4,18 @@ package com.github.sergueik.zabbix;
 import org.json.JSONObject;
 
 public class SenderResult {
-	int processed;
-	int failed;
-	int total;
 
-	float spentSeconds;
+	private int processed;
+	private int failed;
+	private int total;
+	private float spentSeconds;
 
-	/**
-	 * sometimes zabbix server will return "[]".
-	 */
-	boolean bReturnEmptyArray = false;
+	// track if zabbix server returns an "[]" - sometimes zabbix server does
+	private boolean emptyResponse = false;
 
-	/**
-	 * if all sended data are processed, will return true, else return false.
-	 * 
-	 * @return
-	 */
+	// will return true, if all sended data are processed, else return false.
 	public boolean success() {
-		return !bReturnEmptyArray && processed == total;
+		return !emptyResponse && processed == total;
 	}
 
 	public int getProcessed() {
@@ -56,14 +50,14 @@ public class SenderResult {
 		this.spentSeconds = spentSeconds;
 	}
 
-	public void setbReturnEmptyArray(boolean bReturnEmptyArray) {
-		this.bReturnEmptyArray = bReturnEmptyArray;
+	public void setemptyResponse(boolean emptyResponse) {
+		this.emptyResponse = emptyResponse;
 	}
 
 	@Override
 	public String toString() {
 		try {
-			return JSONObject.valueToString(this);
+			return new JSONObject(this).toString();
 		} catch (org.json.JSONException e) {
 			e.printStackTrace();
 			JSONObject obj = new JSONObject();
@@ -71,7 +65,7 @@ public class SenderResult {
 			obj.put("failed", this.getFailed());
 			obj.put("total", this.getTotal());
 			obj.put("spentSeconds", this.getSpentSeconds());
-			// NOTE: debug how bReturnEmptyArray is serialized by
+			// NOTE: debug how emptyResponse was serialized by
 			// com.alibaba.fastjson.JSONObject
 			return obj.toString();
 		}

@@ -6,10 +6,10 @@ import org.json.JSONObject;
 
 public class DataObject {
 
-	long clock;
-	String host;
-	String key;
-	String value;
+	private long clock;
+	private String host;
+	private String key;
+	private String value;
 
 	public DataObject() {
 

@@ -3,26 +3,38 @@ package com.github.sergueik.zabbix;
 import java.util.List;
 import org.json.JSONObject;
 
-// import com.alibaba.fastjson.JSON;
-
 public class SenderRequest {
-	static final byte header[] = { 'Z', 'B', 'X', 'D', '\1' };
 
-	String request = "sender data";
-
-	/**
-	 * TimeUnit is SECONDS.
-	 */
-	long clock;
-
-	List<DataObject> data;
+	private boolean debug = false;
+	static private final byte header[] = { 'Z', 'B', 'X', 'D', '\1' };
+	private String request = "sender data";
+	private long clock;
+	private List<DataObject> data;
 
 	public byte[] toBytes() {
+
 		// https://www.zabbix.org/wiki/Docs/protocols/zabbix_sender/2.0
 		// https://www.zabbix.org/wiki/Docs/protocols/zabbix_sender/1.8/java_example
 
-		// byte[] jsonBytes = JSON.toJSONBytes(this);
-		byte[] jsonBytes = JSONObject.valueToString(this).getBytes();
+		String jsonString = new JSONObject(this).toString();
+
+		if (debug) {
+			System.err.println("Sending: " + jsonString);
+			// Sending:
+			/*
+				{
+				    "request": "sender data",
+				    "data": [{
+				        "host": "172.17.42.1",
+				        "clock": 1562622751,
+				        "value": "{\"data\":[{\"hello\":\"hello\"}]}",
+				        "key": "healthcheck[dw,notificationserver]"
+				    }],
+				    "clock": 1562622751
+				}			 
+			 */
+		}
+		byte[] jsonBytes = jsonString.getBytes();
 
 		byte[] result = new byte[header.length + 4 + 4 + jsonBytes.length];
 
@@ -46,20 +58,10 @@ public class SenderRequest {
 		this.request = request;
 	}
 
-	/**
-	 * TimeUnit is SECONDS.
-	 *
-	 * @return
-	 */
 	public long getClock() {
 		return clock;
 	}
 
-	/**
-	 * TimeUnit is SECONDS.
-	 *
-	 * @param clock
-	 */
 	public void setClock(long clock) {
 		this.clock = clock;
 	}
