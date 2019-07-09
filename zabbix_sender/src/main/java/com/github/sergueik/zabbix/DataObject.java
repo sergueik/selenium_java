@@ -98,17 +98,18 @@ public class DataObject {
 
 	@Override
 	public String toString() {
+		JSONObject jsonObj;
 		try {
-			return JSONObject.valueToString(this);
+			jsonObj = new JSONObject(this);
 		} catch (org.json.JSONException e) {
-			e.printStackTrace();
-			JSONObject obj = new JSONObject();
-			obj.put("value", this.getValue());
-			obj.put("clock", this.getClock());
-			obj.put("host", this.getHost());
-			obj.put("host", this.getKey());
-			return obj.toString();
+			System.err.println(e.toString());
+			jsonObj = new JSONObject();
+			jsonObj.put("value", this.getValue());
+			jsonObj.put("clock", this.getClock());
+			jsonObj.put("host", this.getHost());
+			jsonObj.put("key", this.getKey());
 		}
+		return jsonObj.toString();
 	}
 
 }

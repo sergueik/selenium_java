@@ -6,6 +6,10 @@ import org.json.JSONObject;
 public class SenderRequest {
 
 	private boolean debug = false;
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
 	static private final byte header[] = { 'Z', 'B', 'X', 'D', '\1' };
 	private String request = "sender data";
 	private long clock;

@@ -31,31 +31,37 @@ public class ZabbixSenderTest {
 	// there is an issue with zabbix appliance not listening to 10051 initially,
 	// most likely due to database error during initialization
 	int port = 10051;
+	private static JSONObject payload;
+	private static JSONObject data;
+	private static List<JSONObject> dataArray;
+	private static DataObject dataObject;
 
 	@Before
 	public void before() throws IOException {
+		// assertThat(isAvailable(port), is(true));
 		assertThat(isListening(port), is(true));
 	}
 
 	@Test
 	public void test_LLD_rule() throws IOException {
 		ZabbixSender zabbixSender = new ZabbixSender(host, port);
-
-		DataObject dataObject = new DataObject();
+		zabbixSender.setDebug(true);
+		dataObject = new DataObject();
 		dataObject.setHost("172.17.42.1");
 		dataObject.setKey("healthcheck[dw,notificationserver]");
 
-		JSONObject data = new JSONObject();
+		payload = new JSONObject();
 
-		List<JSONObject> testDataAray = new LinkedList<>();
-		JSONObject testData = new JSONObject();
-		testData.put("hello", "hello");
+		dataArray = new LinkedList<>();
+		data = new JSONObject();
+		data.put("hello", "hello");
 
-		testDataAray.add(testData);
-		data.put("data", testDataAray);
+		dataArray.add(data);
+		payload.put("data", dataArray);
 
-		dataObject.setValue(data.toString());
+		dataObject.setValue(payload.toString());
 		dataObject.setClock(System.currentTimeMillis() / 1000);
+		// System.err.println();
 		SenderResult result = zabbixSender.send(dataObject);
 
 		System.out.println("result:" + result);
@@ -87,19 +93,22 @@ public class ZabbixSenderTest {
 		// send fail!
 	}
 
+	// based on:
 	// https://stackoverflow.com/questions/434718/sockets-discover-port-availability-using-java
-	// keeping the fancy syntax
 	private boolean isListening(int port) {
-		try (Socket ignored = new Socket(host, port)) {
-			return false;
-		} catch (IOException e) {
+		try {
+			Socket socket = new Socket(host, port);
 			return true;
+		} catch (IOException e) {
+			System.err
+					.println("Failed to open socket to " + port + " : " + e.toString());
+			return false;
 		}
 	}
 
 	// origin:
 	// https://github.com/apache/camel/blob/master/components/camel-test/src/main/java/org/apache/camel/test/AvailablePortFinder.java
-	// unused
+	// unused - not working
 	public static boolean isAvailable(int port) {
 		if (port < 1100 || port > 65535) {
 			throw new IllegalArgumentException(

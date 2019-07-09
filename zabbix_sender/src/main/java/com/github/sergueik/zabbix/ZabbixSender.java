@@ -15,7 +15,11 @@ import org.json.JSONObject;
 public class ZabbixSender {
 
 	private static final Pattern PATTERN = Pattern.compile("[^0-9\\.]+");
-	private final boolean debug = false;
+	private boolean debug = false;
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
 	private String host;
 	private int port;
 	private int connectTimeout = 3 * 1000;
@@ -63,6 +67,7 @@ public class ZabbixSender {
 			outputStream = socket.getOutputStream();
 
 			SenderRequest senderRequest = new SenderRequest();
+			senderRequest.setDebug(debug);
 			senderRequest.setData(dataObjectList);
 			senderRequest.setClock(clock);
 

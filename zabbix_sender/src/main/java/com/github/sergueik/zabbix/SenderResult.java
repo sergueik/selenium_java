@@ -56,19 +56,19 @@ public class SenderResult {
 
 	@Override
 	public String toString() {
+		JSONObject jsonObj;
 		try {
-			return new JSONObject(this).toString();
+			jsonObj = new JSONObject(this);
 		} catch (org.json.JSONException e) {
-			e.printStackTrace();
-			JSONObject obj = new JSONObject();
-			obj.put("processed", this.getProcessed());
-			obj.put("failed", this.getFailed());
-			obj.put("total", this.getTotal());
-			obj.put("spentSeconds", this.getSpentSeconds());
+			System.err.println(e.toString());
+			jsonObj = new JSONObject();
+			jsonObj.put("processed", this.getProcessed());
+			jsonObj.put("failed", this.getFailed());
+			jsonObj.put("total", this.getTotal());
+			jsonObj.put("spentSeconds", this.getSpentSeconds());
 			// NOTE: debug how emptyResponse was serialized by
 			// com.alibaba.fastjson.JSONObject
-			return obj.toString();
 		}
-
+		return jsonObj.toString();
 	}
 }
