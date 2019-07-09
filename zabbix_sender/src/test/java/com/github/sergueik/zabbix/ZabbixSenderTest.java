@@ -1,11 +1,21 @@
 package com.github.sergueik.zabbix;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.core.IsNot.not;
+import static org.hamcrest.CoreMatchers.is;
+
 import java.io.IOException;
+import java.net.DatagramSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 
 import com.github.sergueik.zabbix.DataObject;
@@ -21,6 +31,11 @@ public class ZabbixSenderTest {
 	// there is an issue with zabbix appliance not listening to 10051 initially,
 	// most likely due to database error during initialization
 	int port = 10051;
+
+	@Before
+	public void before() throws IOException {
+		assertThat(isListening(port), is(true));
+	}
 
 	@Test
 	public void test_LLD_rule() throws IOException {
@@ -70,5 +85,50 @@ public class ZabbixSenderTest {
 			System.err.println("send failed -  check server side errors");
 		}
 		// send fail!
+	}
+
+	// https://stackoverflow.com/questions/434718/sockets-discover-port-availability-using-java
+	// keeping the fancy syntax
+	private boolean isListening(int port) {
+		try (Socket ignored = new Socket(host, port)) {
+			return false;
+		} catch (IOException e) {
+			return true;
+		}
+	}
+
+	// origin:
+	// https://github.com/apache/camel/blob/master/components/camel-test/src/main/java/org/apache/camel/test/AvailablePortFinder.java
+	// unused
+	public static boolean isAvailable(int port) {
+		if (port < 1100 || port > 65535) {
+			throw new IllegalArgumentException(
+					"Not a valid IPv4 port value: " + port);
+		}
+
+		ServerSocket serverSocket = null;
+		DatagramSocket datagramSocket = null;
+		try {
+			serverSocket = new ServerSocket(port);
+			serverSocket.setReuseAddress(true);
+			datagramSocket = new DatagramSocket(port);
+			datagramSocket.setReuseAddress(true);
+			return true;
+		} catch (IOException e) {
+			// no op
+		} finally {
+			if (datagramSocket != null) {
+				datagramSocket.close();
+			}
+
+			if (serverSocket != null) {
+				try {
+					serverSocket.close();
+				} catch (IOException e) {
+					// no op
+				}
+			}
+		}
+		return false;
 	}
 }
