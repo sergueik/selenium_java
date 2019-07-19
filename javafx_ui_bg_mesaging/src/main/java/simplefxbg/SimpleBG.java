@@ -1,4 +1,4 @@
-package example;
+package simplefxbg;
 
 import java.util.concurrent.ArrayBlockingQueue;
 

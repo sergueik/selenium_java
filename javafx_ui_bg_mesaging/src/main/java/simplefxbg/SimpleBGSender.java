@@ -1,7 +1,9 @@
-package example;
+package simplefxbg;
 
 import java.util.concurrent.ArrayBlockingQueue;
+import javafx.application.Platform;
 
+@SuppressWarnings("restriction")
 public class SimpleBGSender implements Runnable {
 
 	private final SimpleFXBGController controller;
@@ -22,9 +24,13 @@ public class SimpleBGSender implements Runnable {
 
 		while (true) {
 			try {
-				// Wait for message to be sent to FX
-				textToSend = outBoundMsgQueue.take();
-				sendMsgToFX(textToSend);
+				// Wait for message to appear in the message queue
+				int size = outBoundMsgQueue.size();
+				if (size > 0) {
+					textToSend = outBoundMsgQueue.take();
+					System.err.println("Taken message from the queue: " + textToSend);
+					sendMsgToFX(textToSend);
+				}
 			} catch (InterruptedException e) {
 				break;
 			}
@@ -32,9 +38,22 @@ public class SimpleBGSender implements Runnable {
 	}
 
 	@SuppressWarnings({ "restriction" })
-	private void sendMsgToFX(final String argMsgToFX) {
-		javafx.application.Platform.runLater(() -> {
-			controller.onMessage(argMsgToFX);
+	private void sendMsgToFX(final String message) {
+
+		// Append message text in the list box on the UI
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				controller.onMessage(message);
+			}
 		});
 	}
+	/*
+	  @Override
+	  public void run() {
+	javafx.application.Platform.runLater(() -> {
+		controller.onMessage(message);
+	});
+	}
+	*/
 }

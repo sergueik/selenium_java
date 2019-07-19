@@ -1,4 +1,4 @@
-package example;
+package simplefxbg;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,16 +18,17 @@ public class SimpleFXBGController implements Initializable {
 	@FXML
 	Button buttonStop;
 	@FXML
-	ListView<String> listMsgs;
+	ListView<String> listView;
 	@FXML
 	TextField textToSend;
-	private ObservableList<String> msgData;
+	private ObservableList<String> data;
 	private SimpleBG simpleBG;
 
 	@Override
 	public void initialize(URL url, ResourceBundle rb) {
-		msgData = FXCollections.observableArrayList();
-		listMsgs.setItems(msgData);
+		data = FXCollections.observableArrayList();
+		// associate
+		listView.setItems(data);
 		simpleBG = new SimpleBG(this);
 	}
 
@@ -42,7 +43,7 @@ public class SimpleFXBGController implements Initializable {
 		System.exit(0);
 	}
 
-	public void onMessage(String argMsgToDisplay) {
-		msgData.add(argMsgToDisplay);
+	public void onMessage(String message) {
+		data.add(message);
 	}
 }

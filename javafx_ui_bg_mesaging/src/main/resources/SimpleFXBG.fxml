@@ -6,11 +6,11 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="335.0" prefWidth="320" style="-fx-background-color: lightyellow;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="example.SimpleFXBGController">
+<AnchorPane id="AnchorPane" prefHeight="335.0" prefWidth="320" style="-fx-background-color: lightyellow;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="simplefxbg.SimpleFXBGController">
     <children>
         <Button fx:id="buttonSend" layoutX="199.0" layoutY="21.0" onAction="#handleSendAction" style="-fx-background-color: palegreen;" text="SEND TEXT" />
       <TextField fx:id="textToSend" layoutX="25.0" layoutY="21.0" style="-fx-background-color: palegreen;" />
       <Button fx:id="buttonStop" layoutX="252.0" layoutY="290.0" onAction="#handleStopAction" style="-fx-background-color: pink;" text="STOP" />
-      <ListView fx:id="listMsgs" layoutX="25.0" layoutY="67.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: powderblue;" />
+      <ListView fx:id="listView" layoutX="25.0" layoutY="67.0" prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: powderblue;" />
     </children>
 </AnchorPane>

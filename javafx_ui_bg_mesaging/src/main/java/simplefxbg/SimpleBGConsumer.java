@@ -1,4 +1,4 @@
-package example;
+package simplefxbg;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -21,8 +21,7 @@ public class SimpleBGConsumer implements Runnable {
 		while (true) {
 			try {
 				inboundMsg = inboundMsgQueue.take();
-				text = String.format("BG:'%s'", inboundMsg);
-				System.out.println(text);
+				text = String.format("inbound message: '%s'", inboundMsg);
 			}
 			catch (InterruptedException e) {
 				break;

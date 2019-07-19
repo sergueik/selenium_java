@@ -1,4 +1,4 @@
-package example;
+package simplefxbg;
 
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -23,10 +23,21 @@ public class SimpleBGProducer implements Runnable {
 				// Generate new message every 5 seconds
 				Thread.sleep(FIVE_SECONDS);
 				textToSend = String.format("SM:Number %d", ++msgSendNum);
-				// outboundMsgQueue.add(textToSend);
-				outboundMsgQueue.put(textToSend);
-				System.out.println("Outbound : " + outboundMsgQueue.peek());
+				boolean result = outboundMsgQueue.add(textToSend);
+				// outboundMsgQueue is being monitored by the SimpleBGSender
+				// the size processing added to SimpleBGSender will give a slice of time to see
+				// the queue being non-empty
+				if (result) {
+					System.err.println("Outbound : size=" + outboundMsgQueue.size()
+							+ " peek: " + outboundMsgQueue.peek());
+				} else {
+					System.out.println("Failed to add to the queue");
+
+				}
 			} catch (InterruptedException e) {
+				break;
+			} catch (Exception e) {
+				System.err.println("Exception (ignored): " + e.toString());
 				break;
 			}
 		}

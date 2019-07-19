@@ -1,4 +1,4 @@
-package example;
+package simplefxbg;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -8,18 +8,20 @@ import javafx.stage.Stage;
 
 @SuppressWarnings("restriction")
 public class SimpleFXBG extends Application {
+	private static final String layout = "/SimpleFXBG.fxml";
+
 	@Override
 	public void start(Stage stage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("/SimpleFXBG.fxml"));
+		Parent root = FXMLLoader.load(getClass().getResource(layout));
 
 		Scene scene = new Scene(root);
 
 		stage.setScene(scene);
 		stage.setTitle("Simple FX BG");
 		stage.show();
-	} // public void start(...) throws Exception
+	}
 
 	public static void main(String[] args) {
 		launch(args);
-	} // public static void main(...)
-} // public class SimpleFXBG extends Application
+	}
+}
