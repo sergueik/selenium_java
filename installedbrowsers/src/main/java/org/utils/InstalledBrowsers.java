@@ -1,15 +1,20 @@
 package org.utils;
 
 import java.io.BufferedReader;
+
 import java.io.File;
 import java.io.InputStreamReader;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static java.lang.System.err;
+import static java.lang.System.out;
 
 import com.sun.jna.Memory;
 import com.sun.jna.Pointer;
@@ -22,11 +27,17 @@ import com.sun.jna.ptr.PointerByReference;
 public final class InstalledBrowsers {
 
 	private static boolean is64bit;
+	private static Map<String, String> installedBrowsers = null;
+	private static Map<String, int[]> browserVersionInfo = new HashMap<>();
 
-	private static Map<String, String> installedBrowsers;
+	private static boolean debug = false;
+
+	public static void setDebug(boolean value) {
+		InstalledBrowsers.debug = value;
+	}
 
 	private InstalledBrowsers() {
-		throw new AssertionError("Not for instantiation!");
+		throw new AssertionError("no constructor");
 	}
 
 	public static List<String> getInstalledBrowsers() {
@@ -46,39 +57,80 @@ public final class InstalledBrowsers {
 				? installedBrowsers.get(browserName) : null;
 	}
 
-	public static boolean isInstalled(String browserName) {
+	public static boolean isInstalled(String browser) {
 		if (installedBrowsers == null) {
 			find();
 		}
-		return installedBrowsers.containsKey(browserName);
+		return installedBrowsers.containsKey(browser);
 	}
 
-	public static String getVersion(String browserName) {
-		if (!isInstalled(browserName))
+	private static int[] getBrowserVersionInfo(String browser) {
+
+		if (browserVersionInfo == null
+				|| !browserVersionInfo.containsKey(browser)) {
+			int[] versionInfo = getVersionInfo(installedBrowsers.get(browser));
+			if (debug)
+				err.println("Adding version info for " + browser + " "
+						+ Arrays.asList(versionInfo));
+			browserVersionInfo.put(browser, versionInfo);
+		} else {
+			if (debug)
+				err.println(
+						"getBrowserVersionInfo returning cached value for " + browser);
+		}
+
+		return browserVersionInfo.get(browser);
+	}
+
+	public static String getVersion(String browser) {
+		if (!isInstalled(browser))
 			return null;
-		int[] version = getVersionInfo(installedBrowsers.get(browserName));
-		return String.valueOf(version[0]) + "." + String.valueOf(version[1]) + "."
-				+ String.valueOf(version[2]) + "." + String.valueOf(version[3]);
+		if (debug)
+			err.println("get Version for " + browser);
+		int[] versionInfo = getBrowserVersionInfo(browser);
+		return String.valueOf(versionInfo[0]) + "." + String.valueOf(versionInfo[1])
+				+ "." + String.valueOf(versionInfo[2]) + "."
+				+ String.valueOf(versionInfo[3]);
 	}
 
-	public static int getMajorVersion(String browserName) {
-		return isInstalled(browserName)
-				? getVersionInfo(installedBrowsers.get(browserName))[0] : 0;
+	public static int getMajorVersion(String browser) {
+		if (isInstalled(browser)) {
+			if (debug)
+				err.println("get Major Version for " + browser);
+			int[] versionInfo = getBrowserVersionInfo(browser);
+			return versionInfo[0];
+		} else {
+			return 0;
+		}
 	}
 
-	public static int getMinorVersion(String browserName) {
-		return isInstalled(browserName)
-				? getVersionInfo(installedBrowsers.get(browserName))[1] : 0;
+	public static int getMinorVersion(String browser) {
+		if (isInstalled(browser)) {
+			if (debug)
+				err.println("get Minor Version for " + browser);
+			int[] versionInfo = getBrowserVersionInfo(browser);
+			return versionInfo[1];
+		} else {
+			return 0;
+		}
 	}
 
-	public static int getBuildVersion(String browserName) {
-		return isInstalled(browserName)
-				? getVersionInfo(installedBrowsers.get(browserName))[2] : 0;
+	public static int getBuildVersion(String browser) {
+		if (isInstalled(browser)) {
+			int[] versionInfo = getBrowserVersionInfo(browser);
+			return versionInfo[2];
+		} else {
+			return 0;
+		}
 	}
 
-	public static int getRevisionVersion(String browserName) {
-		return isInstalled(browserName)
-				? getVersionInfo(installedBrowsers.get(browserName))[3] : 0;
+	public static int getRevisionVersion(String browser) {
+		if (isInstalled(browser)) {
+			int[] versionInfo = getBrowserVersionInfo(browser);
+			return versionInfo[3];
+		} else {
+			return 0;
+		}
 	}
 
 	private static void find() {
@@ -96,10 +148,10 @@ public final class InstalledBrowsers {
 		}
 	}
 
-  // https://java-native-access.github.io/jna/4.2.0/com/sun/jna/platform/win32/package-summary.html
-  // https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/Version.java
-  // https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/VersionUtil.java
-  // https://msdn.microsoft.com/en-us/library/windows/desktop/aa381058(v=vs.85).aspx
+	// https://java-native-access.github.io/jna/4.2.0/com/sun/jna/platform/win32/package-summary.html
+	// https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/Version.java
+	// https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/VersionUtil.java
+	// https://msdn.microsoft.com/en-us/library/windows/desktop/aa381058(v=vs.85).aspx
 	@SuppressWarnings("unused")
 	private static int[] getVersionInfo(String path) {
 		if (installedBrowsers == null) {
@@ -232,5 +284,4 @@ public final class InstalledBrowsers {
 		}
 		return browsers;
 	}
-
 }
