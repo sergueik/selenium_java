@@ -15,17 +15,16 @@ One can call cdp protocol to invoke [setUserAgentOverride](https://chromedevtool
   By locator = By.cssSelector(".user-agent");
   WebElement element = driver.findElement(locato);
   assertThat(element.getAttribute("innerText"), containsString("Mozilla"));
-  Map<String, Object> params = Map.of(
-    "userAgent", "python 2.7",
-    "platform", "Windows"
-  );
+  Map<String, Object> params = new HashMap<String, Object>();
+  params.put("userAgent", "python 2.7");
+  params.put("platform", "Windows");
   driver.executeCdpCommand("Network.setUserAgentOverride", params);
   driver.navigate().refresh();
   sleep(100);
 
   element = driver.findElement(locator);
   assertThat(element.isDisplayed(), is(true));
-  assertThat(element.getAttribute("innerText"), containsString("python 2.7"));
+  assertThat(element.getAttribute("innerText"), is("python 2.7"));
 
 ```
 demonstrates that the user-agent is indeed changing

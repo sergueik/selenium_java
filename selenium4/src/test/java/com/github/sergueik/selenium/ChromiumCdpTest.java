@@ -66,6 +66,7 @@ public class ChromiumCdpTest {
 		}
 	}
 
+	@SuppressWarnings("serial")
 	@Test
 	public void executeCdpCommandTest() {
 		// Arrange
@@ -73,15 +74,14 @@ public class ChromiumCdpTest {
 		WebElement element = driver.findElement(locator);
 		assertThat(element.getAttribute("innerText"), containsString("Mozilla"));
 
-		// Available only in version 4.0 Selenium Driver
-		// https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/chromium/ChromiumDriver.java
-		// public Map<String, Object> executeCdpCommand(String commandName,
-		// Map<String, Object> parameters)
 		try {
-			Map<String, Object> params = new HashMap<String, Object>();
-			params.put("userAgent", "python 2.7");
-			params.put("platform", "Windows");
-			driver.executeCdpCommand("Network.setUserAgentOverride", params);
+			driver.executeCdpCommand("Network.setUserAgentOverride",
+					new HashMap<String, Object>() {
+						{
+							put("userAgent", "python 2.7");
+							put("platform", "Windows");
+						}
+					});
 		} catch (WebDriverException e) {
 			System.err.println("Exception (ignored): " + e.toString());
 			// org.openqa.selenium.WebDriverException: unknown error: unhandled
@@ -93,7 +93,7 @@ public class ChromiumCdpTest {
 
 		element = driver.findElement(locator);
 		assertThat(element.isDisplayed(), is(true));
-		assertThat(element.getAttribute("innerText"), containsString("python 2.7"));
+		assertThat(element.getAttribute("innerText"), is("python 2.7"));
 	}
 
 	public void sleep(Integer milliSeconds) {
