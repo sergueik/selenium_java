@@ -1,49 +1,38 @@
 package com.github.sergueik.selenium;
 
+import static java.lang.System.err;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
-import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.chromium.ChromiumDriver;
-
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.remote.CapabilityType;
-import org.openqa.selenium.remote.DesiredCapabilities;
 
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-import static java.lang.System.err;
-import static java.lang.System.out;
-
-import com.google.gson.FieldNamingStrategy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.MalformedJsonException;
 
-// https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html#pollingEvery-java.time.Duration-
-// NOTE: needs java.time.Duration not the org.openqa.selenium.support.ui.Duration;
-import java.time.Duration;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 // https://toster.ru/q/653249?e=7897302#comment_1962398
 // https://stackoverflow.com/questions/29916054/change-user-agent-for-selenium-driver
@@ -117,10 +106,35 @@ public class ChromiumCdpTest {
 		try {
 			Map<String, Object> result = driver.executeCdpCommand("Page.getCookies",
 					new HashMap<String, Object>());
-			List<Map<String, Object>> entries = gson
-					.fromJson((String) result.get("cookies"), null);
-
 			err.println("Cookies: " + result.get("cookies").toString());
+			try {
+				List<Map<String, Object>> cookies = gson
+						.fromJson(result.get("cookies").toString(), ArrayList.class);
+
+			} catch (JsonSyntaxException e) {
+				err.println("Exception (ignored): " + e.toString());
+			}
+			try {
+				ArrayList<Map<String, Object>> cookies = (ArrayList<Map<String, Object>>) result
+						.get("cookies");
+				cookies.stream().limit(3).map(o -> o.keySet())
+						.forEach(System.err::println);
+				Set<String> cookieKeys = new HashSet<>();
+				cookieKeys.add("domain");
+				cookieKeys.add("expires");
+				cookieKeys.add("httpOnly");
+				cookieKeys.add("name");
+				cookieKeys.add("path");
+				cookieKeys.add("secure");
+				cookieKeys.add("session");
+				cookieKeys.add("size");
+				cookieKeys.add("value");
+
+				assertTrue(cookies.get(0).keySet().containsAll(cookieKeys));
+
+			} catch (Exception e) {
+				err.println("Exception (ignored): " + e.toString());
+			}
 
 		} catch (WebDriverException e) {
 			err.println("Exception (ignored): " + e.toString());
