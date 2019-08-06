@@ -1,7 +1,9 @@
 package com.github.sergueik.selenium;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.junit.AfterClass;
@@ -27,6 +29,18 @@ import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
+import com.google.gson.FieldNamingStrategy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
+
 // https://seleniumhq.github.io/selenium/docs/api/java/org/openqa/selenium/support/ui/FluentWait.html#pollingEvery-java.time.Duration-
 // NOTE: needs java.time.Duration not the org.openqa.selenium.support.ui.Duration;
 import java.time.Duration;
@@ -41,6 +55,7 @@ public class ChromiumCdpTest {
 	@SuppressWarnings("unused")
 	private static Actions actions;
 	private static String baseURL = "https://www.whoishostingthis.com/tools/user-agent/";
+	private static Gson gson = new Gson();
 
 	@BeforeClass
 	public static void setUp() throws Exception {
@@ -68,7 +83,7 @@ public class ChromiumCdpTest {
 
 	@SuppressWarnings("serial")
 	@Test
-	public void executeCdpCommandTest() {
+	public void setUserAgentOverrideTest() {
 		// Arrange
 		By locator = By.cssSelector("div.info-box.user-agent");
 		WebElement element = driver.findElement(locator);
@@ -94,6 +109,22 @@ public class ChromiumCdpTest {
 		element = driver.findElement(locator);
 		assertThat(element.isDisplayed(), is(true));
 		assertThat(element.getAttribute("innerText"), is("python 2.7"));
+	}
+
+	@Test
+	public void getCookiesTest() {
+
+		try {
+			Map<String, Object> result = driver.executeCdpCommand("Page.getCookies",
+					new HashMap<String, Object>());
+			List<Map<String, Object>> entries = gson
+					.fromJson((String) result.get("cookies"), null);
+
+			err.println("Cookies: " + result.get("cookies").toString());
+
+		} catch (WebDriverException e) {
+			err.println("Exception (ignored): " + e.toString());
+		}
 	}
 
 	public void sleep(Integer milliSeconds) {
