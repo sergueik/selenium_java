@@ -1,8 +1,10 @@
 ### Info
 
-The project practices Java Selenium 4.0 beta release [ChromiumDriver](https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/chromium/ChromiumDriver.java) for executing the Chrome DevTools Protocol (cdp) commands (a entirely different set of API communicated to the Chrome browser family via `POST` requests to `/session/$sessionId/goog/cdp/execute` with API-specific payload) feature.
+The project practices Java Selenium 4.0 beta release [ChromiumDriver](https://github.com/SeleniumHQ/selenium/blob/master/java/client/src/org/openqa/selenium/chromium/ChromiumDriver.java) for executing the [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) (cdp) commands (a entirely different set of API communicated to the Chrome browser family via `POST` requests to `/session/$sessionId/goog/cdp/execute` with API-specific payload) feature.
 
-### Example
+### Examples
+
+#### Override User Agent
 
 One can call cdp protocol to invoke [setUserAgentOverride](https://chromedevtools.github.io/devtools-protocol/tot/Network#method-setUserAgentOverride) method and dynmically modify the `user-agent` header during the test:
 
@@ -28,7 +30,18 @@ One can call cdp protocol to invoke [setUserAgentOverride](https://chromedevtool
 
 ```
 demonstrates that the user-agent is indeed changing
-		
+#### Cookies
+The example shows alternative API to collect the cookies available to page Javascript
+```java
+  Map<String, Object> result = driver.executeCdpCommand("Page.getCookies", new HashMap<String, Object>());
+  ArrayList<Map<String, Object>> cookies = (ArrayList<Map<String, Object>>) result.get("cookies");
+  cookies.stream().limit(100).map(o -> o.keySet()).forEach(System.err::println);
+```
+Note: some CDP API notably `Page.printToPDF` are not curently implemented:
+```sh
+unhandled inspector error: {"code":-32000,"message":"PrintToPDF is not implemented"}(..)
+```
+
 ### Selenum release dependency
 
 It appears that the critical dependency jar of this project, [selenium-chromium-driver](https://jcenter.bintray.com/org/seleniumhq/selenium/selenium-chromium-driver/) only available for Selenum release 4.x.

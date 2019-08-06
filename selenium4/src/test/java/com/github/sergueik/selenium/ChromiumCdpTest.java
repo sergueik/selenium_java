@@ -43,7 +43,7 @@ public class ChromiumCdpTest {
 	// currently unused
 	@SuppressWarnings("unused")
 	private static Actions actions;
-	private static String baseURL = "https://www.whoishostingthis.com/tools/user-agent/";
+	private static String baseURL = "about:blank";
 	private static Gson gson = new Gson();
 
 	@BeforeClass
@@ -74,10 +74,12 @@ public class ChromiumCdpTest {
 	@Test
 	public void setUserAgentOverrideTest() {
 		// Arrange
+		baseURL = "https://www.whoishostingthis.com/tools/user-agent/";
+		driver.get(baseURL);
 		By locator = By.cssSelector("div.info-box.user-agent");
 		WebElement element = driver.findElement(locator);
 		assertThat(element.getAttribute("innerText"), containsString("Mozilla"));
-
+		// Act
 		try {
 			driver.executeCdpCommand("Network.setUserAgentOverride",
 					new HashMap<String, Object>() {
@@ -100,13 +102,45 @@ public class ChromiumCdpTest {
 		assertThat(element.getAttribute("innerText"), is("python 2.7"));
 	}
 
+	private static Map<String, Object> result = null;
+
+	private static Map<String, Object> params = null;
+
+	@Test
+	public void printToPDFTest() {
+		baseURL = "https://www.google.com";
+		driver.get(baseURL);
+		String command = "Page.printToPDF";
+		params = new HashMap<>();
+		try {
+			result = driver.executeCdpCommand(command, params);
+			err.println("Result: " + result.keySet());
+			// TODO: assert the response is a valid Base64-encoded pdf data.
+		} catch (org.openqa.selenium.WebDriverException e) {
+			err.println("Exception (ignored): " + e.toString());
+			assertThat(e.toString(), containsString("PrintToPDF is not implemented"));
+			// printToPDFTest(com.github.sergueik.selenium.ChromiumCdpTest): unknown
+			// error: unhandled inspector error:
+			// {
+			// "code": -32000,
+			// "message": "PrintToPDF is not implemented"
+			// }
+		}
+	}
+
 	@Test
 	public void getCookiesTest() {
-
+		// Arrange
+		baseURL = "https://www.google.com";
+		driver.get(baseURL);
+		String command = "Page.getCookies";
+		// Act
 		try {
-			Map<String, Object> result = driver.executeCdpCommand("Page.getCookies",
+			Map<String, Object> result = driver.executeCdpCommand(command,
 					new HashMap<String, Object>());
-			err.println("Cookies: " + result.get("cookies").toString());
+			err.println("Cookies: "
+					+ result.get("cookies").toString().substring(0, 100) + "...");
+			// Assert
 			try {
 				List<Map<String, Object>> cookies = gson
 						.fromJson(result.get("cookies").toString(), ArrayList.class);
@@ -114,6 +148,7 @@ public class ChromiumCdpTest {
 			} catch (JsonSyntaxException e) {
 				err.println("Exception (ignored): " + e.toString());
 			}
+			// Assert
 			try {
 				ArrayList<Map<String, Object>> cookies = (ArrayList<Map<String, Object>>) result
 						.get("cookies");
