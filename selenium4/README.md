@@ -37,6 +37,17 @@ The example shows alternative API to collect the cookies available to page Javas
   ArrayList<Map<String, Object>> cookies = (ArrayList<Map<String, Object>>) result.get("cookies");
   cookies.stream().limit(100).map(o -> o.keySet()).forEach(System.err::println);
 ```
+#### Capture Screenshot
+```java
+String result = driver.executeCdpCommand("Page.captureScreenshot", new HashMap<>());
+String data = (String) result.get("data");
+byte[] image = new (Base64());.decode(data);
+assertThat(ImageIO.read(new ByteArrayInputStream(image)).getWidth(), greaterThan(0));
+(new FileOutputStream("temp.png")).write(image);
+fileOutputStream.close();
+```
+
+
 Note: some CDP API notably `Page.printToPDF` are not curently implemented:
 ```sh
 unhandled inspector error: {"code":-32000,"message":"PrintToPDF is not implemented"}(..)

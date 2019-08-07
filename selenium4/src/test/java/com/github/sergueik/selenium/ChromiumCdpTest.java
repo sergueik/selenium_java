@@ -2,12 +2,23 @@ package com.github.sergueik.selenium;
 
 import static java.lang.System.err;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasKey;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.awt.AWTException;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import javax.imageio.ImageIO;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,6 +32,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -36,6 +48,8 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import org.apache.commons.codec.binary.Base64;
+
+// started with
 // https://toster.ru/q/653249?e=7897302#comment_1962398
 // https://stackoverflow.com/questions/29916054/change-user-agent-for-selenium-driver
 
@@ -133,27 +147,39 @@ public class ChromiumCdpTest {
 	@SuppressWarnings("serial")
 	@Test
 	public void captureScreenshotTest() {
-		String command = "Page.captureScreenshot";
 		baseURL = "https://www.google.com";
 		driver.get(baseURL);
-		params = new HashMap<>();
+		result = null;
+		String data = null;
+		String command = "Page.captureScreenshot";
 		try {
-			// Assert the response is a valid Base64-encoded image data.
-			result = driver.executeCdpCommand(command, params);
-			err.println("Result: " + result.keySet());
-			String data = (String) result.get("data");
-		
-			Base64 base64 = new Base64();
-			byte[] image = base64.decode(base64.decode(data.getBytes()));
-
-			FileOutputStream fos = new FileOutputStream("test.png");
-			fos.write(image); // NOTE: not a valid iage
-			fos.close();
-
+			// Act
+			result = driver.executeCdpCommand(command, new HashMap<>());
+			// Assert
+			assertThat(result, notNullValue());
+			assertThat(result, hasKey("data"));
+			data = (String) result.get("data");
+			assertThat(data, notNullValue());
 		} catch (org.openqa.selenium.WebDriverException e) {
 			err.println("Exception (ignored): " + e.toString());
+		}
+
+		Base64 base64 = new Base64();
+		byte[] image = base64.decode(data);
+		try {
+			BufferedImage o = ImageIO.read(new ByteArrayInputStream(image));
+			assertThat(o.getWidth(), greaterThan(0));
+			assertThat(o.getHeight(), greaterThan(0));
 		} catch (IOException e) {
-			e.printStackTrace();
+			err.println("Exception (ignored): " + e.toString());
+		}
+		String tmpFilename = "temp.png";
+		try {
+			FileOutputStream fileOutputStream = new FileOutputStream(tmpFilename);
+			fileOutputStream.write(image);
+			fileOutputStream.close();
+		} catch (IOException e) {
+			err.println("Exception (ignored): " + e.toString());
 		}
 	}
 
