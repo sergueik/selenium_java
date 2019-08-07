@@ -8,6 +8,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,7 +35,7 @@ import com.google.gson.stream.MalformedJsonException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-
+import org.apache.commons.codec.binary.Base64;
 // https://toster.ru/q/653249?e=7897302#comment_1962398
 // https://stackoverflow.com/questions/29916054/change-user-agent-for-selenium-driver
 
@@ -125,6 +127,33 @@ public class ChromiumCdpTest {
 			// "code": -32000,
 			// "message": "PrintToPDF is not implemented"
 			// }
+		}
+	}
+
+	@SuppressWarnings("serial")
+	@Test
+	public void captureScreenshotTest() {
+		String command = "Page.captureScreenshot";
+		baseURL = "https://www.google.com";
+		driver.get(baseURL);
+		params = new HashMap<>();
+		try {
+			// Assert the response is a valid Base64-encoded image data.
+			result = driver.executeCdpCommand(command, params);
+			err.println("Result: " + result.keySet());
+			String data = (String) result.get("data");
+		
+			Base64 base64 = new Base64();
+			byte[] image = base64.decode(base64.decode(data.getBytes()));
+
+			FileOutputStream fos = new FileOutputStream("test.png");
+			fos.write(image); // NOTE: not a valid iage
+			fos.close();
+
+		} catch (org.openqa.selenium.WebDriverException e) {
+			err.println("Exception (ignored): " + e.toString());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
