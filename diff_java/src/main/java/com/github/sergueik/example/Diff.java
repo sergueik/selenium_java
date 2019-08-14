@@ -43,21 +43,40 @@ package com.github.sergueik.example;
 // stripped some comments, and rearranged and renamed the classes to meet the filename to match the first class name  requirements
 import java.io.*;
 import static java.lang.System.err;
+import java.util.function.Predicate;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Diff {
 
 	final int UNREAL = Integer.MAX_VALUE;
+	// send the results to STDERR by default
+	private static Consumer<String> print = s -> System.err.println(s);
 
-	FileInfo oldinfo, newinfo;
+	public static void setPrint(Consumer data) {
+		Diff.print = data;
+	}
+
+	public void println(String data) {
+		print.accept(data);
+	}
+
+	FileInfo oldInfo, newInfo;
 	int blocklen[];
+	private static final StringBuffer verificationErrors = new StringBuffer();
 
-	public static void main(String argstrings[]) {
-		if (argstrings.length != 2) {
+	public static void main(String args[]) {
+		if (args.length != 2) {
 			System.err.println("Usage: diff oldfile newfile");
 			System.exit(1);
 		}
 		Diff d = new Diff();
-		d.doDiff(argstrings[0], argstrings[1]);
+		Diff.setPrint(s -> verificationErrors.append(s + "\n"));
+		d.doDiff(args[0], args[1]);
+		System.err.println(verificationErrors.toString());
 		return;
 	}
 
@@ -72,7 +91,7 @@ public class Diff {
 		static final int freshnode = 0, oldonce = 1, newonce = 2, bothonce = 3,
 				other = 4;
 
-		int /* enum linestates */ linestate;
+		int linestate;
 		String line;
 
 		static Node panchor = null; /* symtab is a tree hung from this */
@@ -80,7 +99,6 @@ public class Diff {
 		Node(String pline) {
 			pleft = pright = null;
 			linestate = freshnode;
-			/* linenum field is not always valid */
 			line = pline;
 		}
 
@@ -134,7 +152,7 @@ public class Diff {
 		}
 
 		void showSymbol() {
-			System.out.println(line);
+			print.accept(line);
 		}
 	}
 
@@ -164,37 +182,36 @@ public class Diff {
 		}
 	};
 
-	/** Do one file comparison. Called with both filenames. */
-	public void doDiff(String oldFile, String newFile) {
-		println(">>>> Difference of file \"" + oldFile + "\" and file \"" + newFile
-				+ "\".\n");
-		oldinfo = new FileInfo(oldFile);
-		newinfo = new FileInfo(newFile);
+	public void doDiff(FileInfo oldFileInfo, FileInfo newFileInfo) {
 		/* we don't process until we know both files really do exist. */
 		try {
-			inputscan(oldinfo);
-			inputscan(newinfo);
+			inputscan(oldInfo);
+			inputscan(newInfo);
 		} catch (IOException e) {
 			System.err.println("Read error: " + e);
 		}
 
 		/* Now that we've read all the lines, allocate some arrays.
 		 */
-		blocklen = new int[(oldinfo.maxLine > newinfo.maxLine ? oldinfo.maxLine
-				: newinfo.maxLine) + 2];
-		oldinfo.alloc();
-		newinfo.alloc();
+		blocklen = new int[(oldInfo.maxLine > newInfo.maxLine ? oldInfo.maxLine
+				: newInfo.maxLine) + 2];
+		oldInfo.alloc();
+		newInfo.alloc();
 
 		/* Now do the work, and print the results. */
 		transform();
 		printout();
 	}
 
-	/**
-	 * inputscan    Reads the file specified by pinfo.file.
-	 * ---------    Places the lines of that file in the symbol table.
-	 *              Sets pinfo.maxLine to the number of lines found.
-	 */
+	/** Do one file comparison. Called with both filenames. */
+	public void doDiff(String oldFile, String newFile) {
+		println(">>>> Difference of file \"" + oldFile + "\" and file \"" + newFile
+				+ "\".\n");
+		oldInfo = new FileInfo(oldFile);
+		newInfo = new FileInfo(newFile);
+		doDiff(oldInfo, newInfo);
+	}
+
 	void inputscan(FileInfo pinfo) throws IOException {
 		String linebuffer;
 
@@ -204,31 +221,25 @@ public class Diff {
 		}
 	}
 
-	/**
-	 * storeline    Places line into symbol table.
-	 * ---------    Expects pinfo.maxLine initted: increments.
-	 *              Places symbol table handle in pinfo.ymbol.
-	 *              Expects pinfo is either oldinfo or newinfo.
-	 */
 	void storeline(String linebuffer, FileInfo pinfo) {
 		int linenum = ++pinfo.maxLine; /* note, no line zero */
 		if (linenum > FileInfo.MAXLINECOUNT) {
 			System.err.println("MAXLINECOUNT exceeded, must stop.");
 			System.exit(1);
 		}
-		pinfo.symbol[linenum] = Node.addSymbol(linebuffer, pinfo == oldinfo,
+		pinfo.symbol[linenum] = Node.addSymbol(linebuffer, pinfo == oldInfo,
 				linenum);
 	}
 
 	void transform() {
 		int oldline, newline;
-		int oldmax = oldinfo.maxLine + 2; /* Count pseudolines at  */
-		int newmax = newinfo.maxLine + 2; /* ..front and rear of file */
+		int oldmax = oldInfo.maxLine + 2; /* Count pseudolines at  */
+		int newmax = newInfo.maxLine + 2; /* ..front and rear of file */
 
 		for (oldline = 0; oldline < oldmax; oldline++)
-			oldinfo.other[oldline] = -1;
+			oldInfo.other[oldline] = -1;
 		for (newline = 0; newline < newmax; newline++)
-			newinfo.other[newline] = -1;
+			newInfo.other[newline] = -1;
 
 		scanunique();
 		scanafter();
@@ -240,41 +251,41 @@ public class Diff {
 		int oldline, newline;
 		Node psymbol;
 
-		for (newline = 1; newline <= newinfo.maxLine; newline++) {
-			psymbol = newinfo.symbol[newline];
+		for (newline = 1; newline <= newInfo.maxLine; newline++) {
+			psymbol = newInfo.symbol[newline];
 			if (psymbol.symbolIsUnique()) {
 				oldline = psymbol.linenum;
-				newinfo.other[newline] = oldline;
-				oldinfo.other[oldline] = newline;
+				newInfo.other[newline] = oldline;
+				oldInfo.other[oldline] = newline;
 			}
 		}
-		newinfo.other[0] = 0;
-		oldinfo.other[0] = 0;
-		newinfo.other[newinfo.maxLine + 1] = oldinfo.maxLine + 1;
-		oldinfo.other[oldinfo.maxLine + 1] = newinfo.maxLine + 1;
+		newInfo.other[0] = 0;
+		oldInfo.other[0] = 0;
+		newInfo.other[newInfo.maxLine + 1] = oldInfo.maxLine + 1;
+		oldInfo.other[oldInfo.maxLine + 1] = newInfo.maxLine + 1;
 	}
 
 	void scanafter() {
 		int oldline, newline;
 
-		for (newline = 0; newline <= newinfo.maxLine; newline++) {
-			oldline = newinfo.other[newline];
+		for (newline = 0; newline <= newInfo.maxLine; newline++) {
+			oldline = newInfo.other[newline];
 			if (oldline >= 0) {
 				for (;;) {
-					if (++oldline > oldinfo.maxLine)
+					if (++oldline > oldInfo.maxLine)
 						break;
-					if (oldinfo.other[oldline] >= 0)
+					if (oldInfo.other[oldline] >= 0)
 						break;
-					if (++newline > newinfo.maxLine)
+					if (++newline > newInfo.maxLine)
 						break;
-					if (newinfo.other[newline] >= 0)
-						break;
-
-					if (newinfo.symbol[newline] != oldinfo.symbol[oldline])
+					if (newInfo.other[newline] >= 0)
 						break;
 
-					newinfo.other[newline] = oldline;
-					oldinfo.other[oldline] = newline;
+					if (newInfo.symbol[newline] != oldInfo.symbol[oldline])
+						break;
+
+					newInfo.other[newline] = oldline;
+					oldInfo.other[oldline] = newline;
 				}
 			}
 		}
@@ -283,27 +294,27 @@ public class Diff {
 	void scanbefore() {
 		int oldline, newline;
 
-		for (newline = newinfo.maxLine + 1; newline > 0; newline--) {
-			oldline = newinfo.other[newline];
+		for (newline = newInfo.maxLine + 1; newline > 0; newline--) {
+			oldline = newInfo.other[newline];
 			if (oldline >= 0) { /* unique in each */
 				for (;;) {
 					if (--oldline <= 0)
 						break;
-					if (oldinfo.other[oldline] >= 0)
+					if (oldInfo.other[oldline] >= 0)
 						break;
 					if (--newline <= 0)
 						break;
-					if (newinfo.other[newline] >= 0)
+					if (newInfo.other[newline] >= 0)
 						break;
 
 					/* oldline and newline exist,
 					and aren't marked yet */
 
-					if (newinfo.symbol[newline] != oldinfo.symbol[oldline])
+					if (newInfo.symbol[newline] != oldInfo.symbol[oldline])
 						break; // not same
 
-					newinfo.other[newline] = oldline;
-					oldinfo.other[oldline] = newline;
+					newInfo.other[newline] = oldline;
+					oldInfo.other[oldline] = newline;
 				}
 			}
 		}
@@ -314,12 +325,12 @@ public class Diff {
 		int oldfront = 0;
 		int newlast = -1;
 
-		for (oldline = 1; oldline <= oldinfo.maxLine; oldline++)
+		for (oldline = 1; oldline <= oldInfo.maxLine; oldline++)
 			blocklen[oldline] = 0;
-		blocklen[oldinfo.maxLine + 1] = UNREAL;
+		blocklen[oldInfo.maxLine + 1] = UNREAL;
 
-		for (oldline = 1; oldline <= oldinfo.maxLine; oldline++) {
-			newline = oldinfo.other[oldline];
+		for (oldline = 1; oldline <= oldInfo.maxLine; oldline++) {
+			newline = oldInfo.other[oldline];
 			if (newline < 0)
 				oldfront = 0;
 			else {
@@ -343,24 +354,24 @@ public class Diff {
 		printstatus = idle;
 		anyprinted = false;
 		for (printoldline = printnewline = 1;;) {
-			if (printoldline > oldinfo.maxLine) {
+			if (printoldline > oldInfo.maxLine) {
 				newconsume();
 				break;
 			}
-			if (printnewline > newinfo.maxLine) {
+			if (printnewline > newInfo.maxLine) {
 				oldconsume();
 				break;
 			}
-			if (newinfo.other[printnewline] < 0) {
-				if (oldinfo.other[printoldline] < 0)
+			if (newInfo.other[printnewline] < 0) {
+				if (oldInfo.other[printoldline] < 0)
 					showchange();
 				else
 					showinsert();
-			} else if (oldinfo.other[printoldline] < 0)
+			} else if (oldInfo.other[printoldline] < 0)
 				showdelete();
 			else if (blocklen[printoldline] < 0)
 				skipold();
-			else if (oldinfo.other[printoldline] == printnewline)
+			else if (oldInfo.other[printoldline] == printnewline)
 				showsame();
 			else
 				showmove();
@@ -373,9 +384,9 @@ public class Diff {
 
 	void newconsume() {
 		for (;;) {
-			if (printnewline > newinfo.maxLine)
+			if (printnewline > newInfo.maxLine)
 				break; /* end of file */
-			if (newinfo.other[printnewline] < 0)
+			if (newInfo.other[printnewline] < 0)
 				showinsert();
 			else
 				showmove();
@@ -384,9 +395,9 @@ public class Diff {
 
 	void oldconsume() {
 		for (;;) {
-			if (printoldline > oldinfo.maxLine)
+			if (printoldline > oldInfo.maxLine)
 				break; /* end of file */
-			printnewline = oldinfo.other[printoldline];
+			printnewline = oldInfo.other[printoldline];
 			if (printnewline < 0)
 				showdelete();
 			else if (blocklen[printoldline] < 0)
@@ -400,7 +411,7 @@ public class Diff {
 		if (printstatus != delete)
 			println(">>>> DELETE AT " + printoldline);
 		printstatus = delete;
-		oldinfo.symbol[printoldline].showSymbol();
+		oldInfo.symbol[printoldline].showSymbol();
 		anyprinted = true;
 		printoldline++;
 	}
@@ -411,7 +422,7 @@ public class Diff {
 		else if (printstatus != insert)
 			println(">>>> INSERT BEFORE " + printoldline);
 		printstatus = insert;
-		newinfo.symbol[printnewline].showSymbol();
+		newInfo.symbol[printnewline].showSymbol();
 		anyprinted = true;
 		printnewline++;
 	}
@@ -420,7 +431,7 @@ public class Diff {
 		if (printstatus != change)
 			println(">>>> " + printoldline + " CHANGED FROM");
 		printstatus = change;
-		oldinfo.symbol[printoldline].showSymbol();
+		oldInfo.symbol[printoldline].showSymbol();
 		anyprinted = true;
 		printoldline++;
 	}
@@ -428,9 +439,9 @@ public class Diff {
 	void skipold() {
 		printstatus = idle;
 		for (;;) {
-			if (++printoldline > oldinfo.maxLine)
+			if (++printoldline > oldInfo.maxLine)
 				break;
-			if (oldinfo.other[printoldline] < 0)
+			if (oldInfo.other[printoldline] < 0)
 				break;
 			if (blocklen[printoldline] != 0)
 				break;
@@ -441,9 +452,9 @@ public class Diff {
 		int oldline;
 		printstatus = idle;
 		for (;;) {
-			if (++printnewline > newinfo.maxLine)
+			if (++printnewline > newInfo.maxLine)
 				break;
-			oldline = newinfo.other[printnewline];
+			oldline = newInfo.other[printnewline];
 			if (oldline < 0)
 				break;
 			if (blocklen[oldline] != 0)
@@ -454,7 +465,7 @@ public class Diff {
 	void showsame() {
 		int count;
 		printstatus = idle;
-		if (newinfo.other[printnewline] != printoldline) {
+		if (newInfo.other[printnewline] != printoldline) {
 			System.err.println("BUG IN LINE REFERENCING");
 			System.exit(1);
 		}
@@ -465,7 +476,7 @@ public class Diff {
 
 	void showmove() {
 		int oldblock = blocklen[printoldline];
-		int newother = newinfo.other[printnewline];
+		int newother = newInfo.other[printnewline];
 		int newblock = blocklen[newother];
 
 		if (newblock < 0)
@@ -475,7 +486,7 @@ public class Diff {
 			println(">>>> " + newother + " THRU " + (newother + newblock - 1)
 					+ " MOVED TO BEFORE " + printoldline);
 			for (; newblock > 0; newblock--, printnewline++)
-				newinfo.symbol[printnewline].showSymbol();
+				newInfo.symbol[printnewline].showSymbol();
 			anyprinted = true;
 			printstatus = idle;
 
@@ -483,8 +494,4 @@ public class Diff {
 			skipold();
 	}
 
-  // send the results to STDERR by default
-	public void println(String s) {
-		err.println(s);
-	}
-};
+}
