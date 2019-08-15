@@ -66,7 +66,7 @@ public class Diff {
 
 	FileInfo oldInfo, newInfo;
 	int blocklen[];
-	private static final StringBuffer verificationErrors = new StringBuffer();
+	private static final StringBuffer results = new StringBuffer();
 
 	public static void main(String args[]) {
 		if (args.length != 2) {
@@ -74,9 +74,9 @@ public class Diff {
 			System.exit(1);
 		}
 		Diff d = new Diff();
-		Diff.setPrint(s -> verificationErrors.append(s + "\n"));
+		Diff.setPrint(s -> results.append(s + "\n"));
 		d.doDiff(args[0], args[1]);
-		System.err.println(verificationErrors.toString());
+		System.err.println(results.toString());
 		return;
 	}
 
