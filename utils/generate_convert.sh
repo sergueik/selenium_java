@@ -19,8 +19,25 @@ if [[ "${DEBUG}" = 'true' ]]
 then
   echo "Finding files \"*${EXTENSION}\""
 fi
-
-find . -iname "*${EXTENSION}" | sort | while read filename ; do D=$(dirname "$filename"); S=$(basename "$filename"); T="${S/${EXTENSION}/mkv}" ; echo ">/dev/null pushd '${D}'"; echo "if [[ ! -f \"$T\" ]] ; " ; echo "then "; echo "echo \"Converting \\\"${S}\\\"\""; echo " ffmpeg -i \"${S}\" -c:v vp9 -s ${SIZE} -v 0 \"${T}\""; echo "fi" ; echo ">/dev/null popd" ;  done | tee $SCRIPT
+# technically able to descend, seldom used
+find . -iname "*${EXTENSION}" | sort | while read filename ; do
+  D=$(dirname "$filename")
+  S=$(basename "$filename")
+  T="${S/${EXTENSION}/mkv}"
+  if [[ "$D" != '.' ]]
+  then
+    echo ">/dev/null pushd '${D}'"
+  fi
+  echo "if [[ ! -f \"$T\" ]];"
+  echo '  then';
+  echo "echo \"Converting \\\"${S}\\\"\""
+  echo " ffmpeg -i \"${S}\" -c:v vp9 -s ${SIZE} -v 0 \"${T}\""
+  echo 'fi'
+  if [[ "$D" != '.' ]]
+  then
+    echo '>/dev/null popd'
+  fi
+done | tee $SCRIPT
 chmod +x $SCRIPT
 if [[ "${DEBUG}" = 'true' ]]
 then
@@ -30,4 +47,5 @@ else
   $SCRIPT
   rm -f $SCRIPT
 fi
+
 
