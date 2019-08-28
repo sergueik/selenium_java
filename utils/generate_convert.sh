@@ -5,9 +5,39 @@
 # https://opensource.com/article/17/6/ffmpeg-convert-media-file-formats
 # https://ffmpeg.org/ffmpeg-utils.html#Video-size
 # e.g.  svga, hd480, hd720
-SCRIPT="/tmp/convert.$$.sh"
+
+# origin: https://gist.github.com/cosimo/3760587
+OPTS=`getopt -o vhnse: --long verbose,dry-run,help,size,extension: -n 'parse-options' -- "$@"`
+if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
+
+VERBOSE=false
+HELP=false
+DRY_RUN=false
+SIZE='svga'
 EXTENSION='mp4'
-SIZE=${1:-svga}
+
+while true; do
+  case "$1" in
+    -v | --verbose ) VERBOSE=true; shift ;;
+    -h | --help )    HELP=true; shift ;;
+    -n | --dry-run ) DRY_RUN=true; shift ;;
+    -s | --size ) SIZE="$2"; shift; shift ;;
+    -e | --extension ) EXTeNSION="$2"; shift; shift ;;
+    -- ) shift; break ;;
+    * ) break ;;
+  esac
+done
+
+if [[ "${VERBOSE}" = "true" ]]; then
+  echo VERBOSE=$VERBOSE
+  echo HELP=$HELP
+  echo DRY_RUN=$DRY_RUN
+  echo SIZE=$SIZE
+  echo EXTENSION=$EXTENSION
+fi
+
+SCRIPT="/tmp/convert.$$.sh"
+
 # NOTE: to set DEBUG need to export it from the calling shell
 if [[ -z "${DEBUG}" ]]
 then
@@ -43,9 +73,13 @@ if [[ "${DEBUG}" = 'true' ]]
 then
   echo "Generated ${SCRIPT}"
 else
-  echo "Running ${SCRIPT}"
-  $SCRIPT
-  rm -f $SCRIPT
+  if [[ "${DRY_RUN}" = "true" ]]; then
+    echo "Generated ${SCRIPT}"
+  else
+    echo "Running ${SCRIPT}"
+    $SCRIPT
+    rm -f $SCRIPT
+  fi
 fi
 
 
