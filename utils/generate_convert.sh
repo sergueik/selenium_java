@@ -82,4 +82,14 @@ else
   fi
 fi
 
-
+# TODO:  need to do this check in every single generate 
+MINUTES=$(upower -i $(upower -e | grep -i battery | head -1)| grep 'time to empty' | grep minutes | awk '{print $4}' | sed 's|\.[0-9][0-9]*||')
+if [[ ! -z $MINUTES ]] 
+then
+  # when the battery is charging  there is no time to empty 
+  if [ $MINUTES -lt 20 ] ; 
+  then 
+    echo ' Too little battery left - aborting' ; 
+    exit 0
+  fi
+fi
