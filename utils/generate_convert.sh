@@ -36,20 +36,24 @@ if [[ "${VERBOSE}" = "true" ]]; then
   echo DRY_RUN=$DRY_RUN
   echo SIZE=$SIZE
   echo EXTENSION=$EXTENSION
+  echo BATTERY_CHECK=$BATTERY_CHECK
 fi
 
 SCRIPT="/tmp/convert.$$.sh"
 cat <<EOF>>$SCRIPT
 check_remaining_battery () {
-# TODO:  need to do this check in every single generate
+STATE=\$(upower -i \$(upower -e | grep -i battery | head -1)| grep -E 'state: *' | awk '{print \$2}')
 MINUTES=\$(upower -i \$(upower -e | grep -i battery | head -1)| grep 'time to empty' | grep minutes | awk '{print \$4}' | sed 's|\.[0-9][0-9]*||')
-if [[ ! -z \$MINUTES ]]
+if [[ "\${STATE}" -ne 'charging' ]]
+# when the battery is charging the time to empty is meaningless
 then
-  # when the battery is charging  there is no time to empty
-  if [ \$MINUTES -lt 20 ] ;
+  if [[ ! -z \$MINUTES ]]
   then
-    echo 'Too little battery left - aborting';
-    exit 0
+    if [ \$MINUTES -lt 5 ]
+    then
+      echo 'Too little battery left - aborting'
+      exit 0
+    fi
   fi
 fi
 }
