@@ -7,7 +7,7 @@
 # e.g.  svga, hd480, hd720
 
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vhnsbe: --long verbose,dry-run,help,size,batterycheck,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhsbe: --long verbose,dry-run,help,size,batterycheck,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 VERBOSE=false
@@ -24,7 +24,7 @@ while true; do
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -b | --battery-check ) BATTERY_CHECK=true; shift ;;
     -s | --size ) SIZE="$2"; shift; shift ;;
-    -e | --extension ) EXTeNSION="$2"; shift; shift ;;
+    -e | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -104,4 +104,3 @@ else
     rm -f $SCRIPT
   fi
 fi
-
