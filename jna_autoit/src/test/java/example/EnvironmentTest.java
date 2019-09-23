@@ -36,8 +36,8 @@ public class EnvironmentTest {
 		System.err.println("OS test is Running: " + System.getProperty("os.name"));
 		String result = System.getProperty("os.name");
 
-		List<String> osNames = (List<String>) Arrays.asList("Windows 10",
-				"Windows 8", "Windows 8.1", "Windows 7", "Windows Server 2012 R2");
+		List<String> osNames = Arrays.asList("Windows 10", "Windows 8",
+				"Windows 8.1", "Windows 7", "Windows Server 2012 R2");
 		Assert.assertTrue(osNames.contains(result));
 		// see also:
 		// https://www.programcreek.com/java-api-examples/index.php?api=org.hamcrest.core.AnyOf

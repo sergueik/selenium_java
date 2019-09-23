@@ -5,33 +5,34 @@
   <artifactId>jnautoit</artifactId>
   <version>0.0.8-SNAPSHOT</version>
   <packaging>jar</packaging>
+  <name>JNAutoIt</name>
+  <description>JNAutoIt - Java Native wrapper of AutoItX dll</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <hamcrest-all.version>1.3</hamcrest-all.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
-    <maven.compiler.source>1.8</maven.compiler.source>
+    <hamcrest-all.version>1.3</hamcrest-all.version>
+    <jna.version>4.5.2</jna.version>
     <selenium.version>3.13.0</selenium.version>
-    <selenium-firefox-driver.version>3.13.0</selenium-firefox-driver.version>
-    <selenium-ie-driver.version>3.13.0</selenium-ie-driver.version>
+    <selenium.version>3.141.59</selenium.version>
+    <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
+    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
+    <selenium-ie-driver.version>${selenium.version}</selenium-ie-driver.version>
+    <testng.version>6.14.3</testng.version>
   </properties>
-  <name>JNAutoIt</name>
-  <description>JNAutoIt - Java Native wrapper of AutoItX dll</description>
   <dependencies>
-    <!-- https://mvnrepository.com/artifact/net.java.dev.jna/jna -->
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna</artifactId>
-      <version>4.5.2</version>
+      <version>${jna.version}</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna-platform</artifactId>
-      <version>4.5.2</version>
+      <version>${jna.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -39,11 +40,10 @@
       <version>${hamcrest-all.version}</version>
       <scope>test</scope>
     </dependency>
-    <!-- http://jcenter.bintray.com/artifact/net.java.dev.jna/jna -->
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.10</version>
+      <version>${testng.version}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -142,4 +142,3 @@
     </plugins>
   </build>
 </project>
-

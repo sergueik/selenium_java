@@ -54,6 +54,7 @@ public class FirefoxTest {
 	public int flexibleWait = 60; // too long
 	public int implicitWait = 1;
 	public int pollingInterval = 500;
+	@SuppressWarnings("unused")
 	private static long highlightInterval = 100;
 	public WebDriver driver;
 	public WebDriverWait wait;
@@ -78,6 +79,7 @@ public class FirefoxTest {
 	private static WebElement element;
 	private static String osName = getOSName();
 
+	@SuppressWarnings("deprecation")
 	@BeforeMethod
 	public void beforeMethod() throws IOException {
 		instance = AutoItX.getInstance();
@@ -215,7 +217,7 @@ public class FirefoxTest {
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexibleWait);
 		}
-		wait.pollingEvery(Duration.ofMillis((int) pollingInterval));
+		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		try {
 			// wait.until(ExpectedConditions.visibilityOf(element));
 			executeScript(String.format("arguments[0].style.border='3px %s'", color),

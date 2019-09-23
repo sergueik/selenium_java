@@ -5,40 +5,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.concurrent.TimeUnit;
 
-import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.NoSuchWindowException;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
-
-import java.net.MalformedURLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-
-import com.sun.jna.Pointer;
-import com.sun.jna.WString;
-import com.sun.jna.platform.win32.User32;
-import com.sun.jna.platform.win32.WinDef.HWND;
 
 public class InternetExplorerTest {
 
@@ -54,11 +30,14 @@ public class InternetExplorerTest {
 	public Actions actions;
 	public JavascriptExecutor js;
 	public TakesScreenshot screenshot;
+	@SuppressWarnings("unused")
 	private final static String baseURL = "https://file-examples.com/index.php/text-files-and-archives-download/";
 	private final static String directURL = "https://file-examples.com/wp-content/uploads/2017/02/zip_9MB.zip";
 	private String originalHandle;
+	@SuppressWarnings("unused")
 	private StringBuffer verificationErrors = new StringBuffer();
 
+	@SuppressWarnings("deprecation")
 	@BeforeMethod
 	public void beforeMethod() throws Exception {
 		instance = AutoItX.getInstance();
