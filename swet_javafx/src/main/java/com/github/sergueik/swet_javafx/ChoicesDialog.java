@@ -32,9 +32,13 @@ public class ChoicesDialog extends Stage {
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(ChoicesDialog.class);
 	public static String result = null;
+	@SuppressWarnings("unused")
 	private Stage stage;
+	@SuppressWarnings("unused")
 	private Scene scene;
+	@SuppressWarnings("unused")
 	private Image image;
+	@SuppressWarnings("unused")
 	private String message;
 	private List<ChoiceItem> choices = new ArrayList<>();
 
@@ -47,7 +51,7 @@ public class ChoicesDialog extends Stage {
 	}
 
 	// https://stackoverflow.com/questions/12830402/javafx-2-buttons-size-fill-width-and-are-each-same-width
-	@SuppressWarnings({ "restriction", "unchecked" })
+	@SuppressWarnings({ "unchecked", "serial", "static-access" })
 	public ChoicesDialog(Stage stage, Scene scene) {
 		super();
 		this.stage = stage;
@@ -144,6 +148,7 @@ public class ChoicesDialog extends Stage {
 	}
 
 	private static class buttonHandler implements EventHandler<ActionEvent> {
+		@SuppressWarnings("unchecked")
 		public void handle(ActionEvent event) {
 			Button button = (Button) event.getSource();
 

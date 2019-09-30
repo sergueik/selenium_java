@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
@@ -13,7 +14,10 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Control;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
@@ -39,6 +43,7 @@ import org.apache.log4j.Category;
 import org.controlsfx.tools.Borders.Border;
 
 // origin: 
+@SuppressWarnings({ "restriction", "unused" })
 public class ComplexFormEx extends Application {
 
 	private Map<String, Object> inputs = new HashMap<>();
@@ -48,12 +53,11 @@ public class ComplexFormEx extends Application {
 
 	private Scene primaryScene = null;
 
-	@SuppressWarnings("restriction")
+	@SuppressWarnings({ "static-access" })
 	@Override
 	public void start(Stage stage) {
 		BorderPane root = new BorderPane();
-		stage.setTitle(inputData.containsKey("title") ? inputData.get("title")
-				: "Element Locators");
+		stage.setTitle(inputData.containsKey("title") ? inputData.get("title") : "Element Locators");
 
 		Scene scene = new Scene(root, 480, 250, Color.WHITE);
 		// stage.setScene(new Scene(root, 480, 250, Color.WHITE));
@@ -80,8 +84,7 @@ public class ComplexFormEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Saved");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
-						.getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
 				stage.close();
 			}
 		});
@@ -94,8 +97,7 @@ public class ComplexFormEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Deleted");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
-						.getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
 				stage.close();
 			}
 		});
@@ -106,8 +108,7 @@ public class ComplexFormEx extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Cancel");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
-						.getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
 				stage.close();
 			}
 		});
@@ -169,16 +170,15 @@ public class ComplexFormEx extends Application {
 		gridPane.add(textFld, 1, 3);
 
 		final RowConstraints rowConstraints = new RowConstraints(64); // constant
-																																	// height
-		final ColumnConstraints column1Constraints = new ColumnConstraints(100,
-				Control.USE_COMPUTED_SIZE, Control.USE_COMPUTED_SIZE);
+																		// height
+		final ColumnConstraints column1Constraints = new ColumnConstraints(100, Control.USE_COMPUTED_SIZE,
+				Control.USE_COMPUTED_SIZE);
 
-		final ColumnConstraints column2Constraints = new ColumnConstraints(250,
-				Control.USE_COMPUTED_SIZE, Double.MAX_VALUE);
+		final ColumnConstraints column2Constraints = new ColumnConstraints(250, Control.USE_COMPUTED_SIZE,
+				Double.MAX_VALUE);
 		gridPane.getRowConstraints().add(rowConstraints);
 		column2Constraints.setHgrow(Priority.ALWAYS);
-		gridPane.getColumnConstraints().addAll(column1Constraints,
-				column2Constraints);
+		gridPane.getColumnConstraints().addAll(column1Constraints, column2Constraints);
 		gridPane.prefWidthProperty().bind(root.widthProperty());
 
 		gridPane1.getChildren().addAll(gridPane, buttonbarHbox);
@@ -188,9 +188,31 @@ public class ComplexFormEx extends Application {
 
 		scene.setRoot(root);
 		stage.show();
+		/*
+		 * oigin: http://www.cyberforum.ru/javafx/thread2497234.html
+		 */
+		stage.setOnCloseRequest(event -> {
+			// confirm close
+			Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+			// update dialog title and text
+			alert.setTitle("Title");
+			alert.setHeaderText("Some Text");
+			alert.setContentText("Choose your option.");
+			// create confirm and cancel buttons
+			ButtonType buttonTypeOne = new ButtonType("Yes");
+			ButtonType buttonTypeCancel = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
+			Optional<ButtonType> result = alert.showAndWait();
+			// show the confirmation dialog
+			if (result.get() == buttonTypeCancel)
+				// ignore the closerequest event
+				event.consume();
+		});
+
 	}
 
-	public void setScene(@SuppressWarnings("restriction") Scene scene) {
+	@SuppressWarnings("unchecked")
+	public void setScene(Scene scene) {
 		this.primaryScene = scene;
 
 		if (scene != null) {
