@@ -86,32 +86,34 @@ echo %COMMAND%>&2
 %COMMAND%
 ENDLOCAL
 exit /b
+goto :EOF
 
 :CALL_JAVASCRIPT
 
-set "SCRIPT=mshta.exe "javascript:{"
+REM This script extracts project g.a.v a custom property from pom.xml using mshta.exe and DOM selectSingleNode method
+set "SCRIPT=javascript:{"
 set "SCRIPT=%SCRIPT% var fso = new ActiveXObject('Scripting.FileSystemObject');"
 set "SCRIPT=%SCRIPT% var out = fso.GetStandardStream(1);"
-set "SCRIPT=%SCRIPT% var handle = fso.OpenTextFile('pom.xml',1,1);"
-set "SCRIPT=%SCRIPT% var xml = new ActiveXObject('Msxml2.DOMDocument.6.0');"
-set "SCRIPT=%SCRIPT% xml.async = false;"
-set "SCRIPT=%SCRIPT% xml.loadXML(handle.ReadAll());"
-set "SCRIPT=%SCRIPT% root = xml.documentElement;"
-set "SCRIPT=%SCRIPT% var tag ='%~1';"
-set "SCRIPT=%SCRIPT% nodes = root.childNodes;"
-set "SCRIPT=%SCRIPT% for(i = 0; i != nodes .length; i++){"
-set "SCRIPT=%SCRIPT%   if (nodes.item(i).nodeName.match(RegExp(tag, 'g'))) {"
-set "SCRIPT=%SCRIPT%     out.Write(tag + '=' + nodes.item(i).text + '\n');"
-set "SCRIPT=%SCRIPT%   }"
+set "SCRIPT=%SCRIPT% var fh = fso.OpenTextFile('pom.xml', 1, true);"
+set "SCRIPT=%SCRIPT% var xd = new ActiveXObject('Msxml2.DOMDocument');"
+set "SCRIPT=%SCRIPT% xd.async = false;"
+set "SCRIPT=%SCRIPT% data = fh.ReadAll();"
+set "SCRIPT=%SCRIPT% xd.loadXML(data);"
+set "SCRIPT=%SCRIPT% root = xd.documentElement;"
+set "SCRIPT=%SCRIPT% var xpath = '%~1';"
+set "SCRIPT=%SCRIPT% var xmlnode = root.selectSingleNode( xpath);"
+set "SCRIPT=%SCRIPT% if (xmlnode != null) {"
+set "SCRIPT=%SCRIPT%   out.Write(xpath + '=' + xmlnode.text);"
+set "SCRIPT=%SCRIPT% } else {"
+set "SCRIPT=%SCRIPT%   out.Write('ERR');"
 set "SCRIPT=%SCRIPT% }"
-set "SCRIPT=%SCRIPT%close();}""
+set "SCRIPT=%SCRIPT% close();}"
 
-REM if /i "%DEBUG%"=="true" echo %SCRIPT%
-REM if /i "%DEBUG%"=="true" for /F "delims=" %%_ in ('%SCRIPT% 1 ^| more') do echo %%_
-
-for /F "tokens=2 delims==" %%_ in ('%SCRIPT% 1 ^| more') do set VALUE=%%_
+for /F "tokens=2 delims==" %%_ in ('mshta.exe "%SCRIPT%" 1 ^| more') do set VALUE=%%_
 ENDLOCAL
 exit /b
+goto :EOF
+
 
 
 :SHOW_VARIABLE
