@@ -196,6 +196,7 @@ public class SwetMainFlowPanel extends Application {
 		testsuiteButton.setGraphic(new ImageView(testsuiteImage));
 		testsuiteButton.setTooltip(new Tooltip("Generate Excel TestSuite"));
 		testsuiteButton.setOnAction(new EventHandler<ActionEvent>() {
+			@SuppressWarnings("rawtypes")
 			@Override
 			public void handle(ActionEvent event) {
 
@@ -224,6 +225,7 @@ public class SwetMainFlowPanel extends Application {
 		saveButton.setGraphic(new ImageView(saveImage));
 		saveButton.setTooltip(new Tooltip("Save session"));
 		saveButton.setOnAction(new EventHandler<ActionEvent>() {
+			@SuppressWarnings("unused")
 			@Override
 			public void handle(ActionEvent event) {
 				try {
@@ -416,6 +418,7 @@ public class SwetMainFlowPanel extends Application {
 		throw new Exception("This is a test exception.");
 	}
 
+	@SuppressWarnings("deprecation")
 	public void setUpSeleniumDriver() {
 		// Create a new instance of a driver
 		System.setProperty("webdriver.chrome.driver",
