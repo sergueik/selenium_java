@@ -85,6 +85,8 @@ find . -iname "*${EXTENSION}" | sort | while read filename ; do
   fi
   echo "echo \"Converting \\\"${S}\\\"\""
   echo " ffmpeg -i \"${S}\" -c:v vp9 -s ${SIZE} -v 0 \"${T}\""
+  # TODO:
+  # echo " ffprobe -show_format -v quiet \"${T}\" | grep -i duration| sed 's/duration=//'"
   echo 'fi'
   if [[ "$D" != '.' ]]
   then
