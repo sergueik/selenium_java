@@ -106,3 +106,10 @@ else
     rm -f $SCRIPT
   fi
 fi
+# TODO:
+# find . -iname '*mp3' | xargs -IX ffprobe -show_format -v quiet X | grep 'track=' |sort
+# NOTE;  may be empty
+# NOTE: xargs: unmatched single quote; by default quotes are special to xargs unless you use the
+# find . -iname '*mp3' -exec ffprobe -show_format -v quiet {} 2>&1 \; | grep 'track *'
+# find . -iname '*mp3' -exec ffprobe -show_format {} 2>&1  \; | grep -E '(track|title) *:'
+
