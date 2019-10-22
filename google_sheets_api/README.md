@@ -10,6 +10,8 @@ In the absence of the file some tests would fail.
 
  * [how to use Google Sheets API to read data from Spreadsheet](http://www.seleniumeasy.com/selenium-tutorials/read-data-from-google-spreadsheet-using-api)
  * [Interact with Google Sheets from Java](https://www.baeldung.com/google-sheets-java-client)
-
+ * very detaled [publication](https://gist.github.com/zmts/802dc9c3510d79fd40f9dc38a12bccfc) on Token-Based Authentication and JSON Web Tokens (JWT) (in Russian)
+ 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
