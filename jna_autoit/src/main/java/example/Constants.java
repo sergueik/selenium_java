@@ -20,15 +20,14 @@ import java.util.Map;
 
 /**
  * @via https://www.autoitscript.com/forum/topic/72905-c-use-of-the-dll-some-idears-for-you/
+ *
  * @author midorlo
  * @author sergueik
  */
 public class Constants {
 
-	public static final int AU3_INTDEFAULT = -2147483647; // "Default" value for
-																												// _some_ final int
-																												// parameters (largest
-																												// negative number)
+	public static final int AU3_INTDEFAULT = -2147483647;
+	// "Default" value for _some_ final int parameters (largest negative number)
 	public static final int ERROR = 1;
 	public static final int SW_HIDE = 2;
 	public static final int SW_MAXIMIZE = 3;

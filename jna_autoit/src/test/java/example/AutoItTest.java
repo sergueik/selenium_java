@@ -51,13 +51,9 @@ import example.Constants;
 /**
  * @author midorlo
  * @author sergueik
- * 
  */
 public class AutoItTest {
-	// legacy way:
-	// https://www.autoitscript.com/autoit3/docs/intro/running.htm
-	// Runtime.getRuntime().exec(new String[]{"AutoIt3.exe",
-	// "\"c:\\Users\\Serguei\\AppData\\Roaming\\script.au3\""});
+
 	private String title = null;
 	private String text = "";
 	private String result = null;
@@ -154,7 +150,7 @@ public class AutoItTest {
 			System.err
 					.println(String.format("Launching process %s with commandline %s",
 							processName, commandline));
-			status = instance.Run(commandline, workdir, Constants.SW_SHOWMAXIMIZED);
+			status = instance.Run(commandline, workdir, Constants.SW_SHOW);
 		}
 		assertTrue(instance.ProcessExists(processName));
 		System.err.println("Process is running");
@@ -164,23 +160,14 @@ public class AutoItTest {
 		System.err.println("Window exists. ");
 
 		// NOTE: not really getting window on top
-		// assertTrue(instance.WinSetOnTop(title, text,
-		// Constants.AU3_WINDOWS_ONTOP));
-		// instance.Sleep(1000);
+		assertTrue(instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
+		instance.Sleep(1000);
 		// NOTE: without the timeout, this call will block the test
 		System.err.println("Window " + title + " is active: "
 				+ instance.WinWaitActive(title, text, 10));
 
-		// https://www.autoitscript.com/autoit3/docs/tutorials/notepad/notepad.htm
-		instance.Send("This is some text.");
-		instance.Sleep(1000);
 		System.err.println("Closing window title: " + title);
 		instance.WinClose(title, text);
-		instance.Sleep(1000);
-
-		System.err.println("Refusing to save the file if prompted (with timeout)");
-		instance.WinWaitActive("Notepad", "Save", 10);
-		instance.Send("!n", true);
 		instance.Sleep(1000);
 		//
 		if (instance.WinExists(title, text)) {

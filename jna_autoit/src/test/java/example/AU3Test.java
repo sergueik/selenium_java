@@ -133,7 +133,7 @@ public class AU3Test {
 					.println(String.format("Launching process %s with commandline %s",
 							processName, commandline));
 			int pid = instance.AU3_Run(new WString(commandline), new WString(workdir),
-					Constants.SW_SHOWMAXIMIZED);
+					Constants.SW_SHOW);
 			System.err.println("Launched process pid: " + pid);
 		}
 		assertTrue(instance
