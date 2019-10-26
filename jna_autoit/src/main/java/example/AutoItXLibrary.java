@@ -327,6 +327,7 @@ interface AutoItXLibrary extends Library {
 	void AU3_WinGetHandleAsText(WString szTitle, WString szText, LPWSTR szRetText,
 			int nBufSize);
 
+	
 	int AU3_WinGetPos(WString szTitle, WString szText, RECT lpRect);
 
 	int AU3_WinGetPosByHandle(HWND hWnd, RECT lpRect);
