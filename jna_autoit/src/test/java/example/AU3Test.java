@@ -16,6 +16,7 @@ package example;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -33,6 +34,7 @@ import org.testng.annotations.Test;
 
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WTypes.LPWSTR;
+import com.sun.jna.platform.win32.WinDef.RECT;
 
 /**
  * @author midorlo
@@ -179,6 +181,19 @@ public class AU3Test {
 			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
 			System.err.println("Exception " + e.toString());
 		}
+	}
+
+	@Test(enabled = true)
+	public void testWinGetPos() {
+		System.err.println("Get active window position information");
+		title = "[ACTIVE]";
+		RECT rect = new RECT();
+		assertTrue(instance.AU3_WinGetPos(new WString(title), new WString(""),
+				rect) != Constants.AU3_FAILURE);
+		assertThat(rect, notNullValue());
+		assertThat(rect.left, greaterThan(0));
+		assertThat(rect.top, greaterThan(0));
+
 	}
 
 	// @Test(enabled = false)

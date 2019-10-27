@@ -47,6 +47,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import example.Constants;
+import static org.hamcrest.Matchers.greaterThan;
 
 /**
  * @author midorlo
@@ -87,6 +88,23 @@ public class AutoItTest {
 			instance.ClipPut(dataPut);
 			String dataGet = instance.ClipGet();
 			Assert.assertTrue(dataGet.equals(dataPut));
+		} catch (Exception e) {
+			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
+			System.err.println("Exception " + e.toString());
+		}
+	}
+
+	@Test(enabled = true)
+	public void testWinGetPos() {
+		System.err.println("Get active window position information");
+		title = "[ACTIVE]";
+		try {
+			int[] pos = instance.WinGetPos(title, text);
+			assertThat(pos, notNullValue());
+			assertThat(pos[0], greaterThan(0));
+			assertThat(pos[1], greaterThan(0));
+			assertThat(pos[2], greaterThan(0));
+			assertThat(pos[3], greaterThan(0));
 		} catch (Exception e) {
 			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
 			System.err.println("Exception " + e.toString());

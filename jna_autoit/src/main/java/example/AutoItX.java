@@ -205,6 +205,51 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinGetHandle(new WString(title), new WString(text));
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinGetPos.htm
+	@Override
+	public int AU3_WinGetPos(WString title, WString text, RECT rect) {
+		return LIB.AU3_WinGetPos(title, text, rect);
+	}
+
+	// 4-element array containing the following information:
+	// $_[0] = X position
+	// $_[1] = Y position
+	// $_[2] = Width
+	// $_[3] = Height
+	public int[] WinGetPos(String title, String text) {
+		RECT rect = new RECT();
+		// @FieldOrder(value={"left", "top", "right", "bottom"})
+		int[] pos = { 0, 0, 0, 0 };
+		if (LIB.AU3_WinGetPos(new WString(title), new WString(text),
+				rect) == Constants.AU3_SUCCESS) {
+			// https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.RECT.html
+			pos[0] = rect.left;
+			pos[1] = rect.top;
+			pos[2] = rect.right - rect.left;
+			pos[3] = rect.bottom - rect.top;
+			// TODO: the original autoit's
+			// WinGetPos() returns negative numbers such as -32000 for minimized
+			// windows, but works fine with (non-minimized) hidden windows.
+		}
+		return pos;
+	}
+
+	@Override
+	public void AU3_WinGetText(WString title, WString text, LPWSTR resultPtr,
+			int bufSize) {
+		LIB.AU3_WinGetText(title, text, resultPtr, bufSize);
+	}
+
+	public String WinGetText(String title, String text) {
+		// https://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.WTypes
+		resultString = fill(bufSize, " ");
+		LPWSTR resultPtr = new LPWSTR(resultString);
+		LIB.AU3_WinGetText(new WString(title), new WString(text), resultPtr,
+				bufSize);
+		resultString = resultPtr.getValue().toString();
+		return resultString.trim();
+	}
+
 	// https://www.autoitscript.com/autoit3/docs/functions/DriveMapGet.htm
 	@Override
 	public void AU3_DriveMapGet(WString device, LPWSTR resultPtr, int bufSize) {
@@ -465,38 +510,6 @@ public class AutoItX implements AutoItXLibrary {
 	@Override
 	public int AU3_Shutdown(int arg0) {
 		return LIB.AU3_Shutdown(arg0);
-	}
-
-	// https://www.autoitscript.com/autoit3/docs/functions/WinGetPos.htm
-	// https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.RECT.html
-	@Override
-	public int AU3_WinGetPos(WString title, WString text, RECT rect) {
-		return LIB.AU3_WinGetPos(title, text, rect);
-	}
-
-	public RECT WinGetPos(WString title, WString text) {
-		RECT rect = new RECT();
-		if (LIB.AU3_WinGetPos(title, text, rect) == Constants.AU3_SUCCESS) {
-			return rect;
-		} else {
-			return (RECT) null;
-		}
-	}
-
-	@Override
-	public void AU3_WinGetText(WString title, WString text, LPWSTR resultPtr,
-			int bufSize) {
-		LIB.AU3_WinGetText(title, text, resultPtr, bufSize);
-	}
-
-	public String WinGetText(String title, String text) {
-		// https://www.programcreek.com/java-api-examples/index.php?api=com.sun.jna.platform.win32.WTypes
-		resultString = fill(bufSize, " ");
-		LPWSTR resultPtr = new LPWSTR(resultString);
-		LIB.AU3_WinGetText(new WString(title), new WString(text), resultPtr,
-				bufSize);
-		resultString = resultPtr.getValue().toString();
-		return resultString.trim();
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinSetTitle.htm

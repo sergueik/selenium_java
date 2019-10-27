@@ -19,7 +19,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 
 /**
- * Util Class to regenerate the interfaces.
+ * Util Class which helped me generate the interface. Stays here
+ * in case I need it again.
  * @author midorlo
  */
 class AutoItXLibraryGenerator {
