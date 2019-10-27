@@ -187,12 +187,18 @@ public class AU3Test {
 	public void testWinGetPos() {
 		System.err.println("Get active window position information");
 		title = "[ACTIVE]";
+		assertTrue(instance.AU3_WinExists(new WString(title),
+				new WString("")) != Constants.AU3_FAILURE);
+
 		RECT rect = new RECT();
-		assertTrue(instance.AU3_WinGetPos(new WString(title), new WString(""),
-				rect) != Constants.AU3_FAILURE);
+		// NOTE: the successful call returns Constants.AU3_FAILURE
+		instance.AU3_WinGetPos(new WString(title), new WString(""), rect);
 		assertThat(rect, notNullValue());
 		assertThat(rect.left, greaterThan(0));
 		assertThat(rect.top, greaterThan(0));
+		System.err
+				.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d",
+						rect.top, rect.left, rect.bottom, rect.right));
 
 	}
 

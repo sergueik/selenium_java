@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>jnautoit</artifactId>
-  <version>0.0.9-SNAPSHOT</version>
+  <version>0.0.10-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>JNAutoIt</name>
   <description>JNAutoIt - Java Native wrapper of AutoItX dll</description>
@@ -16,8 +16,8 @@
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <jna.version>4.5.2</jna.version>
-    <selenium.version>3.13.0</selenium.version>
     <selenium.version>3.141.59</selenium.version>
+    <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <selenium-ie-driver.version>${selenium.version}</selenium-ie-driver.version>

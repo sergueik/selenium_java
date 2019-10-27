@@ -99,14 +99,18 @@ public class AutoItTest {
 		System.err.println("Get active window position information");
 		title = "[ACTIVE]";
 		try {
-			int[] pos = instance.WinGetPos(title, text);
+			int[] pos = instance.WinGetPos(title, "");
 			assertThat(pos, notNullValue());
+
 			assertThat(pos[0], greaterThan(0));
 			assertThat(pos[1], greaterThan(0));
 			assertThat(pos[2], greaterThan(0));
 			assertThat(pos[3], greaterThan(0));
+
+			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d",
+					pos[0], pos[2], pos[2], pos[3]));
+
 		} catch (Exception e) {
-			// Corrupted stdin stream in forked JVM 1. Stream '#' - solved.
 			System.err.println("Exception " + e.toString());
 		}
 	}

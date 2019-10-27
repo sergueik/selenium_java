@@ -127,6 +127,8 @@ public class AutoItX implements AutoItXLibrary {
 		return (LIB.AU3_Run(new WString(program),
 				new WString(workingdir)) != Constants.AU3_FAILURE);
 	}
+	// https://www.autoitscript.com/autoit3/docs/functions/InputBox.htm
+	// No API named AU3_InputBox is currently exported
 
 	// https://www.autoitscript.com/autoit3/docs/functions/WinList.htm
 	// https://www.autoitscript.com/autoit3/docs/intro/windowsadvanced.htm
@@ -209,6 +211,7 @@ public class AutoItX implements AutoItXLibrary {
 	@Override
 	public int AU3_WinGetPos(WString title, WString text, RECT rect) {
 		return LIB.AU3_WinGetPos(title, text, rect);
+		// NOTE: return value is not compatible with other methods
 	}
 
 	// 4-element array containing the following information:
@@ -220,17 +223,18 @@ public class AutoItX implements AutoItXLibrary {
 		RECT rect = new RECT();
 		// @FieldOrder(value={"left", "top", "right", "bottom"})
 		int[] pos = { 0, 0, 0, 0 };
-		if (LIB.AU3_WinGetPos(new WString(title), new WString(text),
-				rect) == Constants.AU3_SUCCESS) {
-			// https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.RECT.html
-			pos[0] = rect.left;
-			pos[1] = rect.top;
-			pos[2] = rect.right - rect.left;
-			pos[3] = rect.bottom - rect.top;
-			// TODO: the original autoit's
-			// WinGetPos() returns negative numbers such as -32000 for minimized
-			// windows, but works fine with (non-minimized) hidden windows.
-		}
+		// NOTE: the successful call returns 0
+		// other AU3 methods return 0 to indicate of a failure
+		// therefore is not verified
+		LIB.AU3_WinGetPos(new WString(title), new WString(text), rect);
+		// https://java-native-access.github.io/jna/4.2.1/com/sun/jna/platform/win32/WinDef.RECT.html
+		pos[0] = rect.left;
+		pos[1] = rect.top;
+		pos[2] = rect.right - rect.left;
+		pos[3] = rect.bottom - rect.top;
+		// TODO: the original autoit's
+		// WinGetPos() returns negative numbers such as -32000 for minimized
+		// windows, but works fine with (non-minimized) hidden windows.
 		return pos;
 	}
 
