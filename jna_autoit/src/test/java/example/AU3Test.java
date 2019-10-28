@@ -16,7 +16,9 @@ package example;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+// import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.assertFalse;
@@ -191,16 +193,34 @@ public class AU3Test {
 				new WString("")) != Constants.AU3_FAILURE);
 
 		RECT rect = new RECT();
-		// NOTE: the successful call returns Constants.AU3_FAILURE
 		instance.AU3_WinGetPos(new WString(title), new WString(""), rect);
 		assertThat(rect, notNullValue());
-		assertThat(rect.left, greaterThan(0));
-		assertThat(rect.top, greaterThan(0));
+		assertThat(rect.bottom, greaterThan(0));
+		assertThat(rect.right, greaterThan(0));
 		System.err
 				.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d",
 						rect.top, rect.left, rect.bottom, rect.right));
 
 	}
+
+	@Test(enabled = true)
+	public void testDesktopWindowDimensions() {
+		System.err.println("Get desktop window position information");
+		title = "Program Manager";
+
+		RECT rect = new RECT();
+		instance.AU3_WinGetPos(new WString(title), new WString(""), rect);
+		assertThat(rect, notNullValue());
+		assertEquals(rect.top, 0);
+		assertEquals(rect.left, 0);
+		assertThat(rect.bottom, greaterThan(0));
+		assertThat(rect.right, greaterThan(0));
+		System.err
+				.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d",
+						rect.top, rect.left, rect.bottom, rect.right));
+
+	}
+
 
 	// @Test(enabled = false)
 	// public void testAU3_WinActive() {

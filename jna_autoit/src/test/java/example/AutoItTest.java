@@ -33,6 +33,8 @@ import org.testng.annotations.Test;
 
 import static org.hamcrest.core.AnyOf.anyOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -47,7 +49,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import example.Constants;
-import static org.hamcrest.Matchers.greaterThan;
 
 /**
  * @author midorlo
@@ -108,7 +109,27 @@ public class AutoItTest {
 			assertThat(pos[3], greaterThan(0));
 
 			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d",
-					pos[0], pos[2], pos[2], pos[3]));
+					pos[0], pos[1], pos[2], pos[3]));
+
+		} catch (Exception e) {
+			System.err.println("Exception " + e.toString());
+		}
+	}
+
+	@Test(enabled = true)
+	public void testDesktopWindowDimensions() {
+		System.err.println("Get desktop window position information");
+		title = "Program Manager";
+		try {
+			int[] pos = instance.WinGetPos(title, "");
+			assertThat(pos, notNullValue());
+			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d",
+					pos[0], pos[1], pos[2], pos[3]));
+
+			assertThat(pos[0], equalTo(0));
+			assertThat(pos[1], equalTo(0));
+			assertThat(pos[2], greaterThan(0));
+			assertThat(pos[3], greaterThan(0));
 
 		} catch (Exception e) {
 			System.err.println("Exception " + e.toString());
