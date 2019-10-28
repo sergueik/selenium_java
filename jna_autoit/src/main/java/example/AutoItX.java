@@ -154,6 +154,11 @@ public class AutoItX implements AutoItXLibrary {
 
 	public boolean ControlSend(String title, String text, String controlID,
 			String data) {
+		// data: String of characters to send to the control.
+		// flag = 0: Changes how "keys" is processed
+		// AU3_SEND_DEFAULT ($SEND_DEFAULT) (0) =
+		// special characters + and ! indicate SHIFT and ALT key-presses
+		// AU3_SEND_RAW ($SEND_RAW) (1) = keys are sent raw
 		return (LIB.AU3_ControlSend(new WString(title), new WString(text),
 				new WString(controlID), new WString(data)) == Constants.AU3_SUCCESS);
 	}
@@ -487,6 +492,7 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_Opt(option, param);
 	}
 
+	// You may use Opt() as an alternative to AutoItSetOption().
 	public int Opt(String option, int param) {
 		return LIB.AU3_Opt(new WString(option), param);
 	}
@@ -816,6 +822,7 @@ public class AutoItX implements AutoItXLibrary {
 		LIB.AU3_WinMinimizeAllUndo();
 	}
 
+	//
 	@Override
 	public int AU3_ControlSendByHandle(HWND arg0, HWND arg1, WString arg2) {
 		return LIB.AU3_ControlSendByHandle(arg0, arg1, arg2);
@@ -1086,17 +1093,37 @@ public class AutoItX implements AutoItXLibrary {
 				arg6, arg7, arg8);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitNotActive.htm
 	@Override
-	public int AU3_WinWaitNotActive(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinWaitNotActive(arg0, arg1, arg2);
+	public int AU3_WinWaitNotActive(WString title, WString text, int timeout) {
+		return LIB.AU3_WinWaitNotActive(title, text, timeout);
 	}
 
+	public boolean WinWaitNotActive(String title, String text, int timeout) {
+		return (LIB.AU3_WinWaitNotActive(new WString(title), new WString(text),
+				timeout) != Constants.AU3_FAILURE);
+	}
+
+	// https://www.autoitscript.com/autoit3/docs/functions/WinMenuSelectItem.htms
+	// NOTE: Autoit documentation only covers 6 submenu text arguments
 	@Override
-	public int AU3_WinMenuSelectItem(WString arg0, WString arg1, WString arg2,
-			WString arg3, WString arg4, WString arg5, WString arg6, WString arg7,
-			WString arg8, WString arg9) {
-		return LIB.AU3_WinMenuSelectItem(arg0, arg1, arg2, arg3, arg4, arg5, arg6,
-				arg7, arg8, arg9);
+	public int AU3_WinMenuSelectItem(WString title, WString text,
+			WString submenu1Text, WString submenu2Text, WString submenu3Text,
+			WString submenu4Text, WString submenu5Text, WString submenu6Text,
+			WString exraArg1, WString exraArg2) {
+		return LIB.AU3_WinMenuSelectItem(title, text, submenu1Text, submenu2Text,
+				submenu3Text, submenu4Text, submenu5Text, submenu6Text, exraArg1,
+				exraArg2);
+	}
+
+	public boolean WinMenuSelectItem(String title, String text,
+			String submenu1Text, String submenu2Text, String submenu3Text,
+			String submenu4Text, String submenu5Text, String submenu6Text) {
+		return (LIB.AU3_WinMenuSelectItem(new WString(title), new WString(text),
+				new WString(submenu1Text), new WString(submenu2Text),
+				new WString(submenu3Text), new WString(submenu4Text),
+				new WString(submenu5Text), new WString(submenu6Text), new WString(""),
+				new WString("")) != Constants.AU3_FAILURE);
 	}
 
 	@Override
@@ -1109,14 +1136,20 @@ public class AutoItX implements AutoItXLibrary {
 		return LIB.AU3_WinKillByHandle(arg0);
 	}
 
+	// https://www.autoitscript.com/autoit3/docs/functions/WinWaitClose.htm
 	@Override
-	public int AU3_WinWaitClose(WString arg0, WString arg1) {
-		return LIB.AU3_WinWaitClose(arg0, arg1);
+	public int AU3_WinWaitClose(WString title, WString text) {
+		return LIB.AU3_WinWaitClose(title, text);
 	}
 
 	@Override
-	public int AU3_WinWaitClose(WString arg0, WString arg1, int arg2) {
-		return LIB.AU3_WinWaitClose(arg0, arg1, arg2);
+	public int AU3_WinWaitClose(WString title, WString text, int timeout) {
+		return LIB.AU3_WinWaitClose(title, text, timeout);
+	}
+
+	public boolean WinWaitClose(String title, String text, int timeout) {
+		return (LIB.AU3_WinWaitClose(new WString(title), new WString(text),
+				timeout) != Constants.AU3_FAILURE);
 	}
 
 	@Override

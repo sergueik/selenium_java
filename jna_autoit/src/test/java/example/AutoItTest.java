@@ -136,6 +136,8 @@ public class AutoItTest {
 		}
 	}
 
+	// see example usage
+	// http://forum.ru-board.com/topic.cgi?forum=5&topic=17705&start=760#8
 	@Test(enabled = true)
 	public void testActiveWindowClassList() {
 		System.err.println("Get active window class List information");
