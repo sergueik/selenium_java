@@ -1,3 +1,4 @@
+@echo OFF
 for /F %%. in ('dir /b /ad ') do call :build %%.
 goto :run
 :build 
