@@ -2,16 +2,25 @@
 
 This directory contains the JavaFx port of [SWT based Selenum recorder](https://github.com/sergueik/SWET) based on basic JavaFX starter maven project
 [jesuino/jfx8-app](https://github.com/jesuino/jfx8-app) and
-intended to explore [controlsfx](https://bitbucket.org/eryzhikov/controlsfx/src/214da980bcfb/controlsfx-samples/?at=default) and [controlsfx](https://github.com/jinghai/controlsfx).
+intended to explore [Eugene Ryzhikov/ControlsFX](https://bitbucket.org/eryzhikov/controlsfx/src/214da980bcfb/controlsfx-samples/?at=default)
+and ControlsFX for JavaFX [jinghai/controlsfx](https://github.com/jinghai/controlsfx).
+
+![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture1.png)
 
 
 ### Run application
 
 The following `run.*` scripts provided to help compile and launch the application:
-Batch file for Windows:
+Batch file 
 ```cmd
 run.cmd
 ```
+or Powershell launcher
+```powershell
+./run.ps1
+```
+for Windows.
+
 Bash script for Unix and Mac:
 ```bash
 ./run.sh
@@ -30,6 +39,7 @@ Bash script for Unix and Mac:
   * [dynamic javafx tableview(in russian)](https://devcolibri.com/javafx-2-как-вывести-данные-в-tableview/)
   * [javafx developer forum (in russian)](http://www.cyberforum.ru/javafx/thread1450829.html)
   * [javafx richtext control](https://github.com/FXMisc/RichTextFX#stable-release)
+  * [curated list of awesome JavaFx resources](https://github.com/mhrimaz/AwesomeJavaFX)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
