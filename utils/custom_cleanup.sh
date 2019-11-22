@@ -62,8 +62,7 @@ then
   touch "${BASENAME}2.tgz"
   touch "${BASENAME}3.tgz"
 fi
-# NOTE: only works with BASENAME whitespace clean
-ls $BASENAME*{.tgz,.sht,_prev.lnk} 2>/dev/null | xargs -pd'\n' -IX rm X
+  ls "$BASENAME"*{.tgz,.sht,_prev.lnk} 2>/dev/null | xargs -pd'\n' -IX rm X
 # will show
 # rm -i test2.tgz
 # rm -i test3.tgz
@@ -71,4 +70,5 @@ ls $BASENAME*{.tgz,.sht,_prev.lnk} 2>/dev/null | xargs -pd'\n' -IX rm X
 # rm -i "test file 2.tgz"
 # rm -i "test file 3.tgz"
 # rm -i "test file.tgz"
+
 
