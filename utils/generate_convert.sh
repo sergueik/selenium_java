@@ -73,7 +73,7 @@ fi
 find . -iname "*${EXTENSION}" | sort | while read filename ; do
   D=$(dirname "$filename")
   S=$(basename "$filename")
-  T="${S/${EXTENSION}/mkv}"
+  T="${S/.${EXTENSION}/.mkv}"
   if [[ "$D" != '.' ]]
   then
     echo ">/dev/null pushd '${D}'"
@@ -112,4 +112,5 @@ fi
 # NOTE: xargs: unmatched single quote; by default quotes are special to xargs unless you use the
 # find . -iname '*mp3' -exec ffprobe -show_format -v quiet {} 2>&1 \; | grep 'track *'
 # find . -iname '*mp3' -exec ffprobe -show_format {} 2>&1  \; | grep -E '(track|title) *:'
+
 
