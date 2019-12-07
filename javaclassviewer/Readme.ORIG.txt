@@ -1,6 +1,3 @@
-
-### Info
-```
 /*****************************************************************************\
  * Note.                                                                     *
  *    This is a snapshot of the source code (may NOT the latest)             *
@@ -32,10 +29,3 @@
 
 Good luck.
 Amos
-```
-### See Also: 
-
-  * Java class viewer [article on codeproject](https://www.codeproject.com/Articles/35915/Java-Class-Viewer) 
-  * [author's source on github](https://github.com/amosshi/freeinternals)
-  * https://github.com/turbanoff/JavaClassViewer
-
