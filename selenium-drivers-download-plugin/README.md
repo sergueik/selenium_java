@@ -140,5 +140,6 @@ See also the test-example directory included in this project.
 
 ### See Also
 
-* [code of ru.stqa.selenium.webdriver-factory](https://github.com/barancev/webdriver-factory)
-* [some other selenium webdriver factory project](https://github.com/jflorez/webdriver-factory)
+  * another WebDriver stand alone server executable download [maven plugin](https://github.com/Ardesco/driver-binary-downloader-maven-plugin)
+  * [code of ru.stqa.selenium.webdriver-factory](https://github.com/barancev/webdriver-factory)
+  * [some other selenium webdriver factory project](https://github.com/jflorez/webdriver-factory)
