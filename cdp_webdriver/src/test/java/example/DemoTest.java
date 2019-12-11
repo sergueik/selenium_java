@@ -1,11 +1,12 @@
 package example;
 
+// TODO: get rid of
 import com.neovisionaries.ws.client.WebSocketException;
 
 import example.messaging.CDPClient;
 import example.messaging.MessageBuilder;
 import example.messaging.ServiceWorker;
-import example.utils.UINotificationService;
+
 import example.utils.UIUtils;
 import example.utils.Utils;
 
@@ -52,6 +53,7 @@ public class DemoTest {
 			chromeDriverService.stop();
 	}
 
+	@Ignore
 	@Test
 	public void doFakeGeoLocation()
 			throws IOException, WebSocketException, InterruptedException {
@@ -142,6 +144,9 @@ public class DemoTest {
 		utils.waitFor(3);
 	}
 
+	// Page.captureSnapshot
+	// Page.handleJavaScriptDialog
+
 	@Ignore
 	@Test
 	public void doElementScreenshot() throws Exception {
@@ -167,6 +172,27 @@ public class DemoTest {
 			f.delete();
 		Files.write(f.toPath(), bytes);
 		uiUtils.takeScreenShot();
+	}
+
+	// @Ignore
+	@Test
+	public void doprintPDF() throws Exception {
+		String URL = "https://www.wikipedia.com/";
+		driver = utils.launchBrowser();
+		wsURL = utils.getWebSocketDebuggerUrl();
+		CDPClient = new CDPClient(wsURL);
+		driver.navigate().to(URL);
+		int id = Utils.getInstance().getDynamicID();
+		CDPClient.sendMessage(MessageBuilder.printPDFMessage(id));
+		String encodedBytes = CDPClient.getResponseDataMessage(id);
+		byte[] bytes = Base64.getDecoder().decode(encodedBytes);
+		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss"))
+				.format(new Date());
+		String imageName = "cdp_img_" + start_time + ".pdf";
+		File f = new File(System.getProperty("user.dir") + "/target/" + imageName);
+		if (f.exists())
+			f.delete();
+		Files.write(f.toPath(), bytes);
 	}
 
 	@Ignore

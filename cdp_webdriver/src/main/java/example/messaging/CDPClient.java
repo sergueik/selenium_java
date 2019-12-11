@@ -39,14 +39,18 @@ public class CDPClient {
 	private void connect() throws IOException, WebSocketException {
 		if (Objects.isNull(ws)) {
 			System.out.println("Making the new WS connection to: " + wsUrl);
-			ws = factory.createSocket(wsUrl).addListener(new WebSocketAdapter() {
-				@Override
-				public void onTextMessage(WebSocket ws, String message) {
-					// Received a response. Print the received message.
-					System.out.println("Received this ws message: " + message);
-					blockingQueue.add(message);
-				}
-			}).connect();
+			String wsUrlModified = wsUrl.replaceAll("page", "session")
+					+ "/chromium/send_command_and_get_result";
+			System.out.println("Making the new WS connection to: " + wsUrlModified);
+			ws = factory.createSocket(wsUrlModified)
+					.addListener(new WebSocketAdapter() {
+						@Override
+						public void onTextMessage(WebSocket ws, String message) {
+							// Received a response. Print the received message.
+							System.out.println("Received this ws message: " + message);
+							blockingQueue.add(message);
+						}
+					}).connect();
 		}
 	}
 

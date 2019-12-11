@@ -96,6 +96,10 @@ public class Utils {
 
 		// wsURL =
 		// String.format("ws://localhost:9222/devtools/page/%s",driver.getWindowHandle().replace("CDwindow-",""));
+		// NOTE: need to try
+		// wsURL =
+		// String.format("ws://localhost:9222/devtools/session/%s/chromium/send_command_and_get_result",
+		// driver.getWindowHandle().replace("CDwindow-",""));
 		wsURL = getWebSocketDebuggerUrl();
 		UIUtils.getInstance().setDriver(driver);
 		return driver;
@@ -146,6 +150,7 @@ public class Utils {
 				if (line.contains("DevTools HTTP Request: http://localhost")) {
 					urlString = line.substring(line.indexOf("http"), line.length())
 							.replace("/version", "");
+					System.err.println("Parsed from the log: " + urlString);
 					break;
 				}
 			}
@@ -159,6 +164,7 @@ public class Utils {
 			JSONArray jsonArray = new JSONArray(json);
 			for (int i = 0; i < jsonArray.length(); i++) {
 				JSONObject jsonObject = jsonArray.getJSONObject(i);
+				System.err.println("inspecting json: " + jsonObject.toString());
 				if (jsonObject.getString("type").equals("page")) {
 					webSocketDebuggerUrl = jsonObject.getString("webSocketDebuggerUrl");
 					break;

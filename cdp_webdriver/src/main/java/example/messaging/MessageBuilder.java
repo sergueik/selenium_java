@@ -85,6 +85,18 @@ public class MessageBuilder {
 		return message;
 	}
 
+	public static String printPDFMessage(int id) {
+		// Received this ws message: {"error":{"code":-32602,"message":"Invalid
+		// parameters" ,"data":"landscape: boolean value expected;
+		// displayHeaderFooter: boolean value expected
+		String message = String.format(
+				"{\"id\":%d,\"method\":\"Page.printToPDF\", \"params\":{\"landscape\":%b,\"displayHeaderFooter\":%b,\"printBackground\":%b,\"preferCSSPageSize\":%b}}",
+				id, false, false, true, true);
+		// Received this ws message: 
+		// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"},"id":...}
+		return message;
+	}
+
 	public static String buildEnableRuntimeMessage(int id) {
 		String message = String.format("{\"id\":%d,\"method\":\"Runtime.enable\"}",
 				id);
