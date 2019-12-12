@@ -1,35 +1,61 @@
 package example.messaging;
 
+import static java.lang.System.err;
+import static java.lang.System.out;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 import org.apache.commons.codec.binary.Base64;
-import org.json.JSONObject;
+
+import com.google.gson.Gson;
 
 import example.utils.Utils;
 
 public class MessageBuilder {
+
+	private static String method = null;
+	private static Message message = null;
+	private static Map<String, Object> params = new HashMap<>();
+	private static Map<String, String> headers = new HashMap<>();
+
 	public static String buildGeoLocationMessage(int id, double latitude,
 			double longitude) {
-		Message msg = new Message(id, "Emulation.setGeolocationOverride");
-		msg.addParam("latitude", latitude);
-		msg.addParam("longitude", longitude);
-		msg.addParam("accuracy", 100);
-		String message = msg.toJson();
+		method = "Emulation.setGeolocationOverride";
+		params = new HashMap<>();
+		params.put("latitude", latitude);
+		params.put("longitude", longitude);
+		params.put("accuracy", 100);
+		return buildMessage(id, method, params);
 		// String message =
 		// String.format("{\"id\":%s,\"method\":\"Emulation.setGeolocationOverride\",\"params\":{\"latitude\":%s,\"longitude\":%s,\"accuracy\":100}}",id,latitude,longitude);
-		return message;
 	}
 
-	public static String buildGetResponseBodyMessage(int id, String requestID) {
+	public static String buildGetResponseBodyMessage(int id, String requestId) {
+		/*
 		String message = String.format(
 				"{\"id\":%s,\"method\":\"Network.getResponseBody\",\"params\":{\"requestId\":\"%s\"}}",
-				id, requestID);
-		return message;
+				id, requestId);
+				*/
+		method = "Emulation.setGeolocationOverride";
+		params = new HashMap<>();
+		params.put("requestId", requestId);
+		return buildMessage(id, method, params);
 	}
 
 	public static String buildNetWorkEnableMessage(int id) {
+		method = "Network.enable";
+		params = new HashMap<>();
+		params.put("maxTotalBufferSize", 10000000);
+		params.put("maxResourceBufferSize", 5000000);
+		return buildMessage(id, method, params);
+		/*
 		String message = String.format(
 				"{\"id\":%s,\"method\":\"Network.enable\",\"params\":{\"maxTotalBufferSize\":10000000,\"maxResourceBufferSize\":5000000}}",
 				id);
-		return message;
+				*/
+		// return message;
 	}
 
 	public static String buildRequestInterceptorPatternMessage(int id,
@@ -92,8 +118,9 @@ public class MessageBuilder {
 		String message = String.format(
 				"{\"id\":%d,\"method\":\"Page.printToPDF\", \"params\":{\"landscape\":%b,\"displayHeaderFooter\":%b,\"printBackground\":%b,\"preferCSSPageSize\":%b}}",
 				id, false, false, true, true);
-		// Received this ws message: 
-		// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"},"id":...}
+		// Received this ws message:
+		// {"error":{"code":-32000,"message":"PrintToPDF is not
+		// implemented"},"id":...}
 		return message;
 	}
 
@@ -151,19 +178,37 @@ public class MessageBuilder {
 		return message;
 	}
 
+	public static String buildMessage(int id, String method) {
+		return (new Message(id, method)).toJson();
+	}
+
+	public static String buildMessage(int id, String method,
+			Map<String, Object> params) {
+		message = new Message(id, method);
+		for (String key : params.keySet()) {
+			message.addParam(key, params.get(key));
+		}
+		return message.toJson();
+	}
+
 	public static String buildTakePageScreenShotMessage(int id) {
-		Message msg = new Message(id, "Page.captureScreenshot");
-		String message = msg.toJson();
-		// String message =
-		// String.format("{\"id\":%s,\"method\":\"Page.captureScreenshot\"}",id);
-		return message;
+		String method = "Page.captureScreenshot";
+		return buildMessage(id, method, null);
 	}
 
 	private String buildRequestInterceptorEnabledMessage() {
+		String method = "Network.setRequestInterception";
+		int id = 4;
+		message = new Message(id, method);
+		params = new HashMap<>();
+		params.put("enabled", true);
+		message.addParam("enabled", true);
+		return buildMessage(id, method, params);
+		/*
 		String message = String.format(
 				"{\"id\":4,\"method\":\"Network.setRequestInterception\",\"params\":{\"enabled\":true}}");
 		System.out.println(message);
-		return message;
+		*/
 	}
 
 	private String buildBasicHttpAuthenticationMessage(String username,
@@ -171,11 +216,21 @@ public class MessageBuilder {
 		byte[] encodedBytes = Base64
 				.encodeBase64(String.format("%s:%s", username, password).getBytes());
 		String base64EncodedCredentials = new String(encodedBytes);
+		String method = "Network.setExtraHTTPHeaders";
+		int id = 2;
+		params = new HashMap<>();
+		headers = new HashMap<>();
+		headers.put("Authorization",
+				String.format("Basic %s", base64EncodedCredentials));
+		params.put("headers", headers);
+		return buildMessage(id, method, params);
+
+		/*
 		String message = String.format(
 				"{\"id\":2,\"method\":\"Network.setExtraHTTPHeaders\",\"params\":{\"headers\":{\"Authorization\":\"Basic %s\"}}}",
 				base64EncodedCredentials);
-		System.out.println(message);
-		return message;
+		System.err.println(message);
+		*/
 	}
 
 	private String buildSendObservingPushMessage() {
@@ -195,4 +250,27 @@ public class MessageBuilder {
 		System.out.println(message);
 		return message;
 	}
+
+	private static class Message {
+		private int id;
+		private String method;
+		private Map<String, Object> params;
+
+		public Message(int id, String method) {
+			this.id = id;
+			this.method = method;
+		}
+
+		public void addParam(String key, Object value) {
+			if (Objects.isNull(params))
+				params = new HashMap<>();
+			params.put(key, value);
+		}
+
+		public String toJson() {
+			Gson gson = new Gson();
+			return gson.toJson(this);
+		}
+	}
+
 }

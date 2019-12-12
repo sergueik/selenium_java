@@ -53,7 +53,7 @@ public class DemoTest {
 			chromeDriverService.stop();
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void doFakeGeoLocation()
 			throws IOException, WebSocketException, InterruptedException {
@@ -144,19 +144,17 @@ public class DemoTest {
 		utils.waitFor(3);
 	}
 
-	// Page.captureSnapshot
 	// Page.handleJavaScriptDialog
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void doElementScreenshot() throws Exception {
-		String URL = "https://www.meetup.com/";
+		String URL = "https://www.google.com/";
 		driver = utils.launchBrowser();
 		wsURL = utils.getWebSocketDebuggerUrl();
 		CDPClient = new CDPClient(wsURL);
 		driver.navigate().to(URL);
-		WebElement logo = uiUtils
-				.findElement(By.cssSelector("img[alt='Meetup logo']"), 5);
+		WebElement logo = uiUtils.findElement(By.cssSelector("img#hplogo"), 5);
 		int x = logo.getLocation().getX();
 		int y = logo.getLocation().getY();
 		int width = logo.getSize().getWidth();
@@ -174,7 +172,8 @@ public class DemoTest {
 		uiUtils.takeScreenShot();
 	}
 
-	// @Ignore
+	@Ignore
+	// No message received
 	@Test
 	public void doprintPDF() throws Exception {
 		String URL = "https://www.wikipedia.com/";

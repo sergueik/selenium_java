@@ -7,7 +7,6 @@ import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFactory;
 
-import example.exceptions.MessageTimeOutException;
 import example.utils.SSLUtil;
 import example.utils.Utils;
 
@@ -39,18 +38,18 @@ public class CDPClient {
 	private void connect() throws IOException, WebSocketException {
 		if (Objects.isNull(ws)) {
 			System.out.println("Making the new WS connection to: " + wsUrl);
+			// 404
 			String wsUrlModified = wsUrl.replaceAll("page", "session")
 					+ "/chromium/send_command_and_get_result";
-			System.out.println("Making the new WS connection to: " + wsUrlModified);
-			ws = factory.createSocket(wsUrlModified)
-					.addListener(new WebSocketAdapter() {
-						@Override
-						public void onTextMessage(WebSocket ws, String message) {
-							// Received a response. Print the received message.
-							System.out.println("Received this ws message: " + message);
-							blockingQueue.add(message);
-						}
-					}).connect();
+			System.out.println("Making the new WS connection to: " + wsUrl);
+			ws = factory.createSocket(wsUrl).addListener(new WebSocketAdapter() {
+				@Override
+				public void onTextMessage(WebSocket ws, String message) {
+					// Received a response. Print the received message.
+					System.out.println("Received this ws message: " + message);
+					blockingQueue.add(message);
+				}
+			}).connect();
 		}
 	}
 
@@ -226,4 +225,19 @@ public class CDPClient {
 	public void disconnect() {
 		ws.disconnect();
 	}
+
+	public static class MessageTimeOutException extends Exception {
+		public MessageTimeOutException() {
+			super();
+		}
+
+		public MessageTimeOutException(String message) {
+			super(message);
+		}
+
+		public MessageTimeOutException(String message, Throwable cause) {
+			super(message, cause);
+		}
+	}
+
 }
