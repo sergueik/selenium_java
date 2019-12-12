@@ -1,71 +1,44 @@
 package example;
 
-// TODO: get rid of
-import com.neovisionaries.ws.client.WebSocketException;
+import java.io.File;
+import java.io.IOException;
 
-import example.messaging.CDPClient;
-import example.messaging.MessageBuilder;
-import example.messaging.ServiceWorker;
+import java.nio.file.Files;
 
-import example.utils.UIUtils;
-import example.utils.Utils;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
 
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 
-import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import org.openqa.selenium.By;
-
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriverService;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.text.SimpleDateFormat;
-import java.util.*;
+// TODO: get rid of
+import com.neovisionaries.ws.client.WebSocketException;
 
-public class DemoTest {
-	private WebDriver driver;
-	private String wsURL;
-	private Utils utils;
-	private UIUtils uiUtils;
-	private CDPClient CDPClient;
-	private ChromeDriverService chromeDriverService;
+import example.messaging.MessageBuilder;
+import example.messaging.ServiceWorker;
+import example.utils.Utils;
 
-	@Before
-	public void beforeTest() {
-		this.utils = Utils.getInstance();
-		this.uiUtils = UIUtils.getInstance();
-	}
-
-	@After
-	public void afterTest() {
-		if (!Objects.isNull(CDPClient))
-			CDPClient.disconnect();
-		utils.stopChrome();
-		if (!Objects.isNull(chromeDriverService))
-			chromeDriverService.stop();
-	}
+public class DemoTest extends BaseTest {
+	private String URL = null;
 
 	// @Ignore
 	@Test
 	public void doFakeGeoLocation()
 			throws IOException, WebSocketException, InterruptedException {
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(
 				MessageBuilder.buildGeoLocationMessage(id, 37.422290, -122.084057));
 		// google HQ
 		utils.waitFor(3);
-		driver.navigate().to("https://www.google.com.sg/maps");
+		URL = "https://www.google.com.sg/maps";
+		driver.navigate().to(URL);
 		uiUtils
 				.findElement(By.cssSelector(
 						"div[class *='widget-mylocation-button-icon-common']"), 120)
@@ -74,16 +47,19 @@ public class DemoTest {
 		uiUtils.takeScreenShot();
 	}
 
+	// NOTE: for doNetworkTracking, need to switch to headless, e.g.
+	// via setting BaseTest property and invoking super.beforeTest() explicitly
+	// @Before
+	// public void beforeTest() {
+	// }
+
 	@Ignore
 	@Test
 	public void doNetworkTracking()
 			throws IOException, WebSocketException, InterruptedException {
-		driver = utils.launchBrowser(true);
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
-		driver.navigate().to("http://petstore.swagger.io/v2/swagger.json");
+		URL = "http://petstore.swagger.io/v2/swagger.json";
+		driver.navigate().to(URL);
 		utils.waitFor(3);
 		String message = CDPClient.getResponseMessage("Network.requestWillBeSent");
 		JSONObject jsonObject = new JSONObject(message);
@@ -92,7 +68,7 @@ public class DemoTest {
 		CDPClient
 				.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
 		String networkResponse = CDPClient.getResponseBodyMessage(id2);
-		System.out.println("Here is the network Response: " + networkResponse);
+		System.err.println("Here is the network Response: " + networkResponse);
 		utils.waitFor(1);
 		uiUtils.takeScreenShot();
 	}
@@ -100,44 +76,34 @@ public class DemoTest {
 	@Ignore
 	@Test
 	public void doResponseMocking() throws Exception {
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder
 				.buildRequestInterceptorPatternMessage(id, "*", "Document"));
 		CDPClient.mockResponse("This is mocked!!!");
-		driver.navigate().to("http://petstore.swagger.io/v2/swagger.json");
+		URL = "http://petstore.swagger.io/v2/swagger.json";
+		driver.navigate().to(URL);
 		utils.waitFor(3);
 	}
 
 	@Ignore
 	@Test
-	public void doFunMocking() throws Exception {
+	public void doFunMocking() throws IOException, WebSocketException {
 		byte[] fileContent = FileUtils.readFileToByteArray(
 				new File(System.getProperty("user.dir") + "/data/durian.png"));
 		String encodedString = Base64.getEncoder().encodeToString(fileContent);
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(
 				MessageBuilder.buildRequestInterceptorPatternMessage(id, "*", "Image"));
 		CDPClient.mockFunResponse(encodedString);
-		driver.navigate().to("https://sg.carousell.com/");
+		URL = "https://sg.carousell.com/";
+		driver.navigate().to(URL);
 		utils.waitFor(300);
 	}
 
 	@Ignore
 	@Test
 	public void doClearSiteData() throws Exception {
-		String URL = "https://framework.realtime.co/demo/web-push";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient CDPClient = new CDPClient(wsURL);
+		URL = "https://framework.realtime.co/demo/web-push";
 		driver.navigate().to(URL);
 		driver.manage().deleteAllCookies();
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder.buildClearBrowserCookiesMessage(id));
 		CDPClient.sendMessage(MessageBuilder.buildClearDataForOriginMessage(id,
 				"https://framework.realtime.co"));
@@ -149,10 +115,7 @@ public class DemoTest {
 	@Ignore
 	@Test
 	public void doElementScreenshot() throws Exception {
-		String URL = "https://www.google.com/";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
+		URL = "https://www.google.com/";
 		driver.navigate().to(URL);
 		WebElement logo = uiUtils.findElement(By.cssSelector("img#hplogo"), 5);
 		int x = logo.getLocation().getX();
@@ -160,7 +123,6 @@ public class DemoTest {
 		int width = logo.getSize().getWidth();
 		int height = logo.getSize().getHeight();
 		int scale = 1;
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
 				x, y, height, width, scale));
 		String encodedBytes = CDPClient.getResponseDataMessage(id);
@@ -177,12 +139,8 @@ public class DemoTest {
 	// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
 	@Test
 	public void doprintPDF() throws Exception {
-		String URL = "https://www.wikipedia.com/";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
+		URL = "https://www.wikipedia.com/";
 		driver.navigate().to(URL);
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder.printPDFMessage(id));
 		String encodedBytes = CDPClient.getResponseDataMessage(id);
 		byte[] bytes = Base64.getDecoder().decode(encodedBytes);
@@ -198,17 +156,13 @@ public class DemoTest {
 	@Ignore
 	@Test
 	public void doFullPageScreenshot() throws Exception {
-		String URL = "https://www.meetup.com/";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
+		URL = "https://www.meetup.com/";
 		driver.navigate().to(URL);
 		long docWidth = (long) uiUtils
 				.executeJavaScript("return document.body.offsetWidth");
 		long docHeight = (long) uiUtils
 				.executeJavaScript("return document.body.offsetHeight");
 		int scale = 1;
-		int id = Utils.getInstance().getDynamicID();
 		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
 				0, 0, docHeight, docWidth, scale));
 		String encodedBytes = CDPClient.getResponseDataMessage(id);
@@ -226,11 +180,7 @@ public class DemoTest {
 	@Ignore
 	@Test
 	public void doServiceWorkerTesting() throws Exception {
-		String URL = "https://www.meetup.com/";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
+		URL = "https://www.meetup.com/";
 		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerEnableMessage(id));
 		driver.navigate().to(URL);
 		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 10,
@@ -242,15 +192,10 @@ public class DemoTest {
 	@Ignore
 	@Test
 	public void doPushNotificationTesting() throws Exception {
-		String URL = "https://framework.realtime.co/demo/web-push";
-		driver = utils.launchBrowser();
-		wsURL = utils.getWebSocketDebuggerUrl();
-		CDPClient = new CDPClient(wsURL);
-		int id = Utils.getInstance().getDynamicID();
+		URL = "https://framework.realtime.co/demo/web-push";
 		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerEnableMessage(id));
 		driver.navigate().to(URL);
-		utils.waitFor(2);
-		utils.waitFor(3);
+		utils.waitFor(5);
 		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 5,
 				"activated");
 		int id1 = Utils.getInstance().getDynamicID();
