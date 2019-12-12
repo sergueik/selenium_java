@@ -146,7 +146,7 @@ public class DemoTest {
 
 	// Page.handleJavaScriptDialog
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void doElementScreenshot() throws Exception {
 		String URL = "https://www.google.com/";
@@ -174,6 +174,7 @@ public class DemoTest {
 
 	@Ignore
 	// No message received
+	// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
 	@Test
 	public void doprintPDF() throws Exception {
 		String URL = "https://www.wikipedia.com/";
