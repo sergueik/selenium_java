@@ -1,5 +1,9 @@
 package example;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.io.File;
 import java.io.IOException;
 
@@ -29,7 +33,32 @@ import example.utils.Utils;
 public class DemoTest extends BaseTest {
 	private String URL = null;
 
-	// @Ignore
+	@SuppressWarnings("serial")
+	@Test
+	public void setUserAgentOverrideTest() {
+		// Arrange
+		driver.get("https://www.whoishostingthis.com/tools/user-agent/");
+		By locator = By.cssSelector("div.user-agent");
+		WebElement element = driver.findElement(locator);
+		assertThat(element.getAttribute("innerText"), containsString("Mozilla"));
+		// Act
+		try {
+			CDPClient.sendMessage(MessageBuilder
+					.buildSetUserAgentOverrideMessage("python 2.7", "windows"));
+		} catch (IOException | WebSocketException e) {
+			// ignore
+			System.err.println("Exception (ignored): " + e.toString());
+		}
+		driver.navigate().refresh();
+		utils.sleep(1);
+
+		element = driver.findElement(locator);
+		assertThat(element.isDisplayed(), is(true));
+		assertThat(element.getAttribute("innerText"), is("python 2.7"));
+
+	}
+
+	@Ignore
 	@Test
 	public void doFakeGeoLocation()
 			throws IOException, WebSocketException, InterruptedException {
@@ -214,3 +243,4 @@ public class DemoTest extends BaseTest {
 		utils.waitFor(60);
 	}
 }
+

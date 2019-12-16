@@ -299,7 +299,7 @@ public class MessageBuilder {
 		return buildMessage(id, "Page.captureScreenshot");
 	}
 
-	private String buildRequestInterceptorEnabledMessage() {
+	public static String buildRequestInterceptorEnabledMessage() {
 		String method = "Network.setRequestInterception";
 		int id = 4;
 		message = new Message(id, method);
@@ -312,7 +312,7 @@ public class MessageBuilder {
 		*/
 	}
 
-	private String buildBasicHttpAuthenticationMessage(String username,
+	public static String buildBasicHttpAuthenticationMessage(String username,
 			String password) {
 		byte[] encodedBytes = Base64
 				.encodeBase64(String.format("%s:%s", username, password).getBytes());
@@ -332,7 +332,7 @@ public class MessageBuilder {
 		*/
 	}
 
-	private String buildSendObservingPushMessage() {
+	public static String buildSendObservingPushMessage() {
 		String method = "BackgroundService.clearEvents";
 		message = new Message(Utils.getInstance().getDynamicID(), method);
 		params = new HashMap<>();
@@ -342,6 +342,16 @@ public class MessageBuilder {
 			return String.format( "{\"id\":%d,\"method\":\"BackgroundService.clearEvents\"," +
 				"\"params\":{\"service\":\"backgroundFetch\"}}", Utils.getInstance().getDynamicID());
 		*/
+	}
+
+	public static String buildSetUserAgentOverrideMessage(String userAgent,
+			String platform) {
+		String method = "Network.setUserAgentOverride";
+		message = new Message(Utils.getInstance().getDynamicID(), method);
+		params = new HashMap<>();
+		params.put("userAgent", userAgent);
+		params.put("platform", platform);
+		return buildMessage(Utils.getInstance().getDynamicID(), method, params);
 	}
 
 	private String buildAttachToTargetMessage(String targetId) {
@@ -358,3 +368,4 @@ public class MessageBuilder {
 		*/
 	}
 }
+

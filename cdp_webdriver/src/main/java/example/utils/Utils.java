@@ -24,7 +24,7 @@ import java.util.logging.Level;
 
 public class Utils {
 
-	private Utils Utils;
+	private Utils utils;
 	protected static String osName = getOSName();
 	private static final String browserDriver = osName.equals("windows")
 			? "chromedriver.exe" : "chromedriver";
@@ -115,13 +115,17 @@ public class Utils {
 		service.stop();
 	}
 
-	public void waitFor(long time) {
+	public void waitFor(long interval) {
 		try {
-			TimeUnit.SECONDS.sleep(time);
-			Thread.sleep(time);
+			TimeUnit.SECONDS.sleep(interval);
+			Thread.sleep(interval);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void sleep(long interval) {
+		waitFor(interval);
 	}
 
 	public int getDynamicID() {
@@ -189,3 +193,4 @@ public class Utils {
 		return osName;
 	}
 }
+
