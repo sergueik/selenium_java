@@ -3,6 +3,7 @@ package example;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasKey;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 
@@ -32,8 +34,10 @@ import example.utils.Utils;
 
 public class DemoTest extends BaseTest {
 	private String URL = null;
+	private String responseMessage = null;
+	private JSONObject result = null;
 
-	@SuppressWarnings("serial")
+	@Ignore
 	@Test
 	public void setUserAgentOverrideTest() {
 		// Arrange
@@ -55,6 +59,25 @@ public class DemoTest extends BaseTest {
 		element = driver.findElement(locator);
 		assertThat(element.isDisplayed(), is(true));
 		assertThat(element.getAttribute("innerText"), is("python 2.7"));
+
+	}
+
+	@Test
+	public void getBroswerVersionTest() {
+		// Arrange
+		// Act
+		try {
+			CDPClient.sendMessage(MessageBuilder.buildBrowserVersionMessage(id));
+			responseMessage = CDPClient.getResponseDataMessage(id);
+			// Assert
+			result = new JSONObject(responseMessage);
+			for (String field : Arrays.asList(new String[] { "protocolVersion",
+					"product", "revision", "userAgent", "jsVersion" })) {
+				assertThat(result.has(field), is(true));
+			}
+		} catch (Exception e) {
+			System.err.println("Exception (ignored): " + e.toString());
+		}
 
 	}
 
@@ -90,9 +113,9 @@ public class DemoTest extends BaseTest {
 		URL = "http://petstore.swagger.io/v2/swagger.json";
 		driver.navigate().to(URL);
 		utils.waitFor(3);
-		String message = CDPClient.getResponseMessage("Network.requestWillBeSent");
-		JSONObject jsonObject = new JSONObject(message);
-		String reqId = jsonObject.getJSONObject("params").getString("requestId");
+		responseMessage = CDPClient.getResponseMessage("Network.requestWillBeSent");
+		result = new JSONObject(responseMessage);
+		String reqId = result.getJSONObject("params").getString("requestId");
 		int id2 = Utils.getInstance().getDynamicID();
 		CDPClient
 				.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
@@ -154,8 +177,8 @@ public class DemoTest extends BaseTest {
 		int scale = 1;
 		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
 				x, y, height, width, scale));
-		String encodedBytes = CDPClient.getResponseDataMessage(id);
-		byte[] bytes = Base64.getDecoder().decode(encodedBytes);
+		responseMessage = CDPClient.getResponseDataMessage(id);
+		byte[] bytes = Base64.getDecoder().decode(responseMessage);
 		File f = new File(System.getProperty("user.dir") + "/target/img.png");
 		if (f.exists())
 			f.delete();
@@ -171,8 +194,8 @@ public class DemoTest extends BaseTest {
 		URL = "https://www.wikipedia.com/";
 		driver.navigate().to(URL);
 		CDPClient.sendMessage(MessageBuilder.printPDFMessage(id));
-		String encodedBytes = CDPClient.getResponseDataMessage(id);
-		byte[] bytes = Base64.getDecoder().decode(encodedBytes);
+		responseMessage = CDPClient.getResponseDataMessage(id);
+		byte[] bytes = Base64.getDecoder().decode(responseMessage);
 		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss"))
 				.format(new Date());
 		String imageName = "cdp_img_" + start_time + ".pdf";
@@ -194,8 +217,8 @@ public class DemoTest extends BaseTest {
 		int scale = 1;
 		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
 				0, 0, docHeight, docWidth, scale));
-		String encodedBytes = CDPClient.getResponseDataMessage(id);
-		byte[] bytes = Base64.getDecoder().decode(encodedBytes);
+		responseMessage = CDPClient.getResponseDataMessage(id);
+		byte[] bytes = Base64.getDecoder().decode(responseMessage);
 		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss"))
 				.format(new Date());
 		String imageName = "cdp_img_" + start_time + ".png";

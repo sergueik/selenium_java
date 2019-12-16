@@ -174,6 +174,21 @@ public class MessageBuilder {
 		*/
 	}
 
+	public static String buildBrowserVersionMessage(int id) {
+		return buildMessage(id, "Browser.getVersion");
+		/*
+		return String.format("{\"id\":%s,\"method\":\"Browser.getVersion\"}", id);
+		*/
+	}
+
+	public static String buildBrowserVersionMessage() {
+		return buildMessage(Utils.getInstance().getDynamicID(),
+				"Browser.getVersion");
+		/*
+		return String.format("{\"id\":%s,\"method\":\"Browser.getVersion\"}", id);
+		*/
+	}
+
 	public static String buildServiceWorkerInspectMessage(int id,
 			String versionId) {
 		method = "ServiceWorker.inspectWorker";
