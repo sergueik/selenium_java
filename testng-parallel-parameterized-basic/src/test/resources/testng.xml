@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
+<suite thread-count="5" name="Suite" parallel="tests">
+  <test name="test kind 1">
+    <parameter name="browser" value="firefox"/>
+    <parameter name="version" value="43.0"/>
+    <parameter name="platform" value="MAC"/>
+    <classes>
+      <class name="example.ParallelTest"/>
+    </classes>
+  </test>
+  <test name="test kind 2">
+    <parameter name="browser" value="chrome"/>
+    <parameter name="version" value="51.0"/>
+    <parameter name="platform" value="WINDOWS"/>
+    <classes>
+      <class name="example.ParallelTest"/>
+    </classes>
+  </test>
+  <test name="test kind 3">
+    <parameter name="browser" value="safari"/>
+    <parameter name="version" value="6.0"/>
+    <parameter name="platform" value="MAC"/>
+    <classes>
+      <class name="example.ParallelTest"/>
+    </classes>
+  </test>
+  <test name="test kind 4">
+    <parameter name="browser" value="chrome"/>
+    <parameter name="version" value="78.0"/>
+    <parameter name="platform" value="LINUX"/>
+    <classes>
+      <class name="example.ParallelTest"/>
+    </classes>
+  </test>
+  <test name="test kind 5">
+    <parameter name="browser" value="chrome"/>
+    <parameter name="version" value="76.0"/>
+    <parameter name="platform" value="LINUX"/>
+    <classes>
+      <class name="example.ParallelTest"/>
+    </classes>
+  </test>
+</suite>
