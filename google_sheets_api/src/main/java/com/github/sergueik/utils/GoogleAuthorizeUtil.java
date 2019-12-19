@@ -24,14 +24,12 @@ import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.SheetsScopes;
 
 public class GoogleAuthorizeUtil {
-	public static Credential authorize()
+	public static Credential authorize(String secretFilePath)
 			throws IOException, GeneralSecurityException {
-		String secretFilePath = Paths.get(System.getProperty("user.home"))
-				.resolve(".secret").resolve("client_secret.json").toAbsolutePath()
-				.toString();
 		System.err
 				.println("GoogleAuthorizeUtil.authorize() reads credentials from file: "
 						+ secretFilePath);
+
 		InputStream in = new FileInputStream(new File(secretFilePath));
 
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets
