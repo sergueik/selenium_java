@@ -1,8 +1,11 @@
 package com.github.sergueik.utils;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +25,14 @@ public class GoogleAuthorizeUtil {
 			throws IOException, GeneralSecurityException {
 		InputStream in = GoogleAuthorizeUtil.class
 				.getResourceAsStream("/client_secret.json");
+		// no longer used
+		String secretFilePath = Paths.get(System.getProperty("user.home"))
+				.resolve(".secret").resolve("client_secret.json").toAbsolutePath()
+				.toString();
+		System.err.println("GoogleAuthorizeUtil.authorize() reads credentials from file: "
+				+ secretFilePath);
+		in = new FileInputStream(new File(secretFilePath));
+
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets
 				.load(JacksonFactory.getDefaultInstance(), new InputStreamReader(in));
 
@@ -34,6 +45,7 @@ public class GoogleAuthorizeUtil {
 						.setAccessType("offline").build();
 		Credential credential = new AuthorizationCodeInstalledApp(flow,
 				new LocalServerReceiver()).authorize("user");
+		System.err.println("Returning credentials");
 
 		return credential;
 	}

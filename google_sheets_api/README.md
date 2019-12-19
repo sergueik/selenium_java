@@ -3,7 +3,8 @@
 This directory contains a subset of the [https://github.com/eugenp/tutorials](https://github.com/eugenp/tutorials)
 intended to be used with the [testNg-DataProviders](https://github.com/sergueik/testng-dataproviders).
 
-The Google Spreadsheet API secret file `client_secret.json` is loaded from main resource directory but must not be checked in.
+The Google Spreadsheet API secret file `client_secret.json` is loaded from a hidden resource 
+directory `.secret` under user profile (home) directory - that file must not be checked in.
 In the absence of the file some tests would fail.
 
 ### See Also
