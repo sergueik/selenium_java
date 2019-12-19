@@ -10,15 +10,29 @@ import com.google.api.services.sheets.v4.Sheets;
 
 public class SheetsServiceUtil {
 
-	private static final String APPLICATION_NAME = "Google Sheets Example";
+	private static SheetsServiceUtil instance = new SheetsServiceUtil();
 
-	public static Sheets getSheetsService()
+	private SheetsServiceUtil() {
+	}
+
+	public static SheetsServiceUtil getInstance() {
+		return instance;
+	}
+
+	private boolean debug = false;
+
+	private String applicationName = null;
+
+	public void setApplicationName(String data) {
+		this.applicationName = data;
+	}
+
+	public Sheets getSheetsService()
 			throws IOException, GeneralSecurityException {
-		// code path
 		Credential credential = GoogleAuthorizeUtil.authorize();
 		return new Sheets.Builder(GoogleNetHttpTransport.newTrustedTransport(),
 				JacksonFactory.getDefaultInstance(), credential)
-						.setApplicationName(APPLICATION_NAME).build();
+						.setApplicationName(this.applicationName).build();
 	}
 
 }
