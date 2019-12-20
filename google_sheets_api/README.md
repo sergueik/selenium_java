@@ -1,11 +1,41 @@
-### Info
-
+### Info 
 This directory contains a subset of the [https://github.com/eugenp/tutorials](https://github.com/eugenp/tutorials)
 intended to be used with the [testNg-DataProviders](https://github.com/sergueik/testng-dataproviders).
 
-The Google Spreadsheet API secret file `client_secret.json` is loaded from main resource directory but must not be checked in.
-In the absence of the file some tests would fail.
+The Google Spreadsheet API secret file `client_secret.json` is loaded from a hidden resource 
+directory `.secret` under user profile (home) directory - that file must not be checked in. The credentials are valid for one hour (this is probably configurable through Google Developer web interface).
+In the absence of the secret file the tests would fail.
 
+### Usage
+The sample test case initializes the `sheetsService` using the singleton `sheetsServiceUtil` proxy class:
+```java
+@Before
+public void setup() throws GeneralSecurityException, IOException {
+	final String applicationName = "Google Sheets Example";
+	sheetsServiceUtil.setApplicationName(applicationName);
+final String secretFilePath = Paths.get(System.getProperty("user.home")).resolve(".secret").resolve("client_secret.json").toAbsolutePath().toString();
+	sheetsServiceUtil.setSecretFilePath(secretFilePath);
+	sheetsService = sheetsServiceUtil.getSheetsService();
+}
+```
+then reads the spreadsheet data:
+```java
+@Test
+public void test1() throws IOException {
+	final String id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx";
+	final String range = "Users!A2:C";
+	System.err.println(
+		"Examine spreadsheets in specified id: " + id + " and range: " + range);
+	List<List<Object>> values = sheetsService.spreadsheets().values()
+		.get(id, range).execute().getValues();
+	assertThat(values, notNullValue());
+	assertThat(values.size() != 0, is(true));
+	System.err.println("Reading " + values.size() + " value rows");
+	for (List<Object> row : values) {
+		System.err.println("Got: " + row);
+	}
+}
+```
 ### See Also
 
  * [how to use Google Sheets API to read data from Spreadsheet](http://www.seleniumeasy.com/selenium-tutorials/read-data-from-google-spreadsheet-using-api)
