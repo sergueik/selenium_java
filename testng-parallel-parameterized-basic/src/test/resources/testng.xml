@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd">
-<suite thread-count="5" name="Suite" parallel="tests">
+<suite thread-count="3" name="Suite" parallel="tests">
+  <!-- the number of threads run will be the smaller of "/suite/@thread-count" and "count(/suite/test)" -->
   <test name="test kind 1">
     <parameter name="browser" value="firefox"/>
     <parameter name="version" value="43.0"/>

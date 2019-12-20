@@ -97,3 +97,13 @@ running test on thread: 1
    * [stackoverflow](https://stackoverflow.com/questions/26604745/parameterized-selenium-tests-in-parallel-with-testng)
    * [Advanced parallel testing with TestNG and data providers](https://beust.com/weblog/2009/04/22/advanced-parallel-testing-with-testng-and-data-providers/)
    * [TestNG parallel execution of tests, classes and suites](https://howtodoinjava.com/testng/testng-executing-parallel-tests/)
+  * [reading data from google spreadsheet tutorial](https://www.seleniumeasy.com/selenium-tutorials/read-data-from-google-spreadsheet-using-api)
+  * another blog on [testnt data providers backed by excel](https://www.uvdesk.com/en/blog/passing-data-dataprovider-excel-sheet-testng/)
+  * [apache JMeter Data-Driven Testing](https://dzone.com/articles/implementing-data-driven-testing-using-google-shee) (naturally, in groovy)
+  * [Google spreadsheet (older) read method using JAVA](https://dzone.com/articles/reading-data-google)
+  * [stackoverflow](https://stackoverflow.com/questions/32860225/read-data-from-google-spreadsheets)
+  * [stackoverflow](https://stackoverflow.com/questions/7566836/read-data-from-google-docs-spreadsheets)
+  * [blog on patallel run testng configuration](https://www.guru99.com/parameterization-using-xml-and-dataproviders-selenium.html) (repeatition of information available elsewhere)
+  
+
+
