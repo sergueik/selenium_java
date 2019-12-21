@@ -36,6 +36,33 @@ public void test1() throws IOException {
 	}
 }
 ```
+### Data Provider
+One can also create a `DataProvider` method to load the test method parameters in a similar fashion to [Excel data provider](https://github.com/sergueik/testng-dataproviders):
+```java
+	public List<Object[]> readGoogleSpreadsheet(String spreadsheetId,
+			String sheetName) {
+		String range = String.format("%s!A2:Z", sheetName);
+		List<Object[]> result = new LinkedList<>();
+
+		try {
+			ValueRange response = sheetsService.spreadsheets().values()
+					.get(spreadsheetId, range).execute();
+
+			List<List<Object>> resultRows = response.getValues();
+			assertThat(resultRows, notNullValue());
+			assertThat(resultRows.size() != 0, is(true));
+
+			System.err.println("Got " + resultRows.size() + " result rows");
+			for (List<Object> resultRow : resultRows) {
+				// System.err.println("Got: " + resultRow);
+				result.add(resultRow.toArray());
+			}
+		} catch (IOException e) {
+		}
+		return result;
+	}
+
+```
 ### See Also
 
  * [how to use Google Sheets API to read data from Spreadsheet](http://www.seleniumeasy.com/selenium-tutorials/read-data-from-google-spreadsheet-using-api)
