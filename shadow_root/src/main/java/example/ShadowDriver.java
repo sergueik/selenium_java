@@ -24,20 +24,20 @@ import org.openqa.selenium.remote.SessionId;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
-public class Shadow {
+public class ShadowDriver {
 
-	WebDriver driver;
-	WebDriverException exception;
-	WebDriverWait wait;
-	CommandExecutor executer;
-	SessionId sessionId;
-	ChromeDriver chromeDriver;
-	RemoteWebDriver remoteWebDriver;
+	private WebDriver driver;
+	private WebDriverException exception;
+	private WebDriverWait wait;
+	private CommandExecutor executer;
+	private SessionId sessionId;
+	private ChromeDriver chromeDriver;
+	private RemoteWebDriver remoteWebDriver;
 	private int implicitWait = 0;
 	private int explicitWait = 0;
 	private int pollingTime = 0;
 
-	public Shadow(WebDriver driver) {
+	public ShadowDriver(WebDriver driver) {
 
 		if (driver instanceof ChromeDriver) {
 			sessionId = ((ChromeDriver) driver).getSessionId();
@@ -180,20 +180,20 @@ public class Shadow {
 			} catch (InterruptedException e) {
 
 			}
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\");");
+			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
 			fixLocator(driver, cssSelector, element);
 			visible = isPresent(element);
 		}
 
 		if (explicitWait > 0) {
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\");");
+			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
 			fixLocator(driver, cssSelector, element);
 			visible = isPresent(element);
 
 			for (int i = 0; i < explicitWait && !visible;) {
 				try {
 					Thread.sleep(pollingTime * 1000);
-					element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\");");
+					element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
 					fixLocator(driver, cssSelector, element);
 					visible = isPresent(element);
 					i = i + pollingTime;
@@ -204,7 +204,7 @@ public class Shadow {
 		}
 
 		if (explicitWait == 0 && implicitWait == 0) {
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\");");
+			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
 			fixLocator(driver, cssSelector, element);
 		}
 
@@ -226,23 +226,23 @@ public class Shadow {
 			} catch (InterruptedException e) {
 
 			}
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\", arguments[0]);",
-					parent);
+			element = (WebElement) executerGetObject(
+					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
 			fixLocator(driver, cssSelector, element);
 			visible = isPresent(element);
 		}
 
 		if (explicitWait > 0) {
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\", arguments[0]);",
-					parent);
+			element = (WebElement) executerGetObject(
+					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
 			fixLocator(driver, cssSelector, element);
 			visible = isPresent(element);
 
 			for (int i = 0; i < explicitWait && !visible;) {
 				try {
 					Thread.sleep(pollingTime * 1000);
-					element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\", arguments[0]);",
-							parent);
+					element = (WebElement) executerGetObject(
+							String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
 					fixLocator(driver, cssSelector, element);
 					visible = isPresent(element);
 					i = i + pollingTime;
@@ -254,8 +254,8 @@ public class Shadow {
 		}
 
 		if (explicitWait == 0 && implicitWait == 0) {
-			element = (WebElement) executerGetObject("return getObject(\"" + cssSelector + "\", arguments[0]);",
-					parent);
+			element = (WebElement) executerGetObject(
+					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
 			fixLocator(driver, cssSelector, element);
 		}
 
@@ -276,7 +276,7 @@ public class Shadow {
 			}
 		}
 		List<WebElement> element = null;
-		Object object = executerGetObject("return getAllObject(\"" + cssSelector + "\");");
+		Object object = executerGetObject(String.format("return getAllObject(\"%s\");", cssSelector));
 		if (object != null && object instanceof List<?>) {
 			element = (List<WebElement>) object;
 		}
@@ -315,7 +315,8 @@ public class Shadow {
 			}
 		}
 		WebElement element = null;
-		element = (WebElement) executerGetObject("return getShadowElement(arguments[0],\"" + selector + "\");", parent);
+		element = (WebElement) executerGetObject(
+				String.format("return getShadowElement(arguments[0],\"%s\");", selector), parent);
 		fixLocator(driver, selector, element);
 		return element;
 	}
@@ -330,7 +331,8 @@ public class Shadow {
 			}
 		}
 		List<WebElement> elements = null;
-		Object object = executerGetObject("return getAllShadowElement(arguments[0],\"" + selector + "\");", parent);
+		Object object = executerGetObject(String.format("return getAllShadowElement(arguments[0],\"%s\");", selector),
+				parent);
 		if (object != null && object instanceof List<?>) {
 			elements = (List<WebElement>) object;
 		}
@@ -393,7 +395,8 @@ public class Shadow {
 
 			}
 		}
-		return (WebElement) executerGetObject("return getSiblingElement(arguments[0],\"" + selector + "\");", element);
+		return (WebElement) executerGetObject(String.format("return getSiblingElement(arguments[0],\"%s\");", selector),
+				element);
 	}
 
 	public WebElement getNextSiblingElement(WebElement element) {
@@ -417,7 +420,8 @@ public class Shadow {
 	}
 
 	public String getAttribute(WebElement element, String attribute) {
-		return (String) executerGetObject("return getAttribute(arguments[0],\"" + attribute + "\");", element);
+		return (String) executerGetObject(String.format("return getAttribute(arguments[0],\"%s\");", attribute),
+				element);
 	}
 
 	public void selectCheckbox(WebElement parentElement, String label) {
