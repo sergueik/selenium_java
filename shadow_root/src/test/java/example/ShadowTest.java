@@ -1,453 +1,313 @@
 package example;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.lang.reflect.Method;
+import static java.lang.System.err;
+import static java.lang.System.out;
+
+import java.io.File;
+import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import java.util.concurrent.TimeUnit;
+
+// https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptException;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.SearchContext;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.remote.CommandExecutor;
-import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.remote.RemoteWebElement;
-import org.openqa.selenium.remote.SessionId;
-import org.openqa.selenium.support.ui.ExpectedCondition;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 
-public class ShadowDriver {
+import example.ShadowDriver;
 
-	private WebDriver driver;
-	private WebDriverException exception;
-	private WebDriverWait wait;
-	private CommandExecutor executer;
-	private SessionId sessionId;
-	private ChromeDriver chromeDriver;
-	private RemoteWebDriver remoteWebDriver;
-	private final String javascriptLibrary = convertJStoText().toString();
-	private int implicitWait = 0;
-	private int explicitWait = 0;
-	private int pollingTime = 0;
+public class ShadowTest {
 
-	public ShadowDriver(WebDriver driver) {
-
-		if (driver instanceof ChromeDriver) {
-			sessionId = ((ChromeDriver) driver).getSessionId();
-			chromeDriver = (ChromeDriver) driver;
-		} else if (driver instanceof RemoteWebDriver) {
-			sessionId = ((RemoteWebDriver) driver).getSessionId();
-			remoteWebDriver = (RemoteWebDriver) driver;
-		}
-		this.driver = driver;
+	private final static String baseUrl = "https://www.virustotal.com";
+	// private static final String urlLocator = "a[data-route='url']";
+	private static final String urlLocator = "*[data-route='url']";
+	private boolean debug = Boolean
+			.parseBoolean(getPropertyEnv("DEBUG", "false"));;
+	protected static String osName = getOSName();
+	private static final Map<String, String> browserDrivers = new HashMap<>();
+	static {
+		browserDrivers.put("chrome",
+				osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
+		browserDrivers.put("firefox",
+				osName.equals("windows") ? "geckodriver.exe" : "driver");
+		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 	}
 
-	private Object injectShadowExecuter(String javascript) {
-		if (chromeDriver != null) {
-			JavascriptExecutor js = (JavascriptExecutor) chromeDriver;
-			waitForPageLoaded();
-			return js.executeScript(javascript);
-		} else if (remoteWebDriver != null) {
-			JavascriptExecutor js = (JavascriptExecutor) remoteWebDriver;
-			waitForPageLoaded();
-			return js.executeScript(javascript);
-		} else {
-			return null;
-		}
+	private static ChromeDriver driver = null;
+	private static ShadowDriver shadowDriver = null;
+	private static String browser = getPropertyEnv("webdriver.driver", "chrome");
+	// use -P profile to override
+	private static final boolean headless = Boolean
+			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
+
+	public static String getBrowser() {
+		return browser;
 	}
 
-	private Object injectShadowExecuter(String javascript, WebElement element) {
-		if (chromeDriver != null) {
-			JavascriptExecutor js = (JavascriptExecutor) chromeDriver;
-			waitForPageLoaded();
-			return js.executeScript(javascript, element);
-		} else if (remoteWebDriver != null) {
-			JavascriptExecutor js = (JavascriptExecutor) remoteWebDriver;
-			waitForPageLoaded();
-			return js.executeScript(javascript, element);
-		} else {
-			return null;
-		}
+	public static void setBrowser(String browser) {
+		ShadowTest.browser = browser;
 	}
 
-	private Object executerGetObject(String script) {
-		// String javascript = convertJStoText().toString();
-		String javascript = javascriptLibrary;
-		javascript += script;
-		return injectShadowExecuter(javascript);
-	}
+	@BeforeClass
+	public static void injectShadowJS() {
+		err.println("Launching " + browser);
+		if (browser.equals("chrome")) {
+		} // TODO: finish for other browser
 
-	private Object executerGetObject(String script, WebElement element) {
-		// String javascript = convertJStoText().toString();
-		String javascript = javascriptLibrary;
-		javascript += script;
-		return injectShadowExecuter(javascript, element);
-	}
+		System
+				.setProperty("webdriver.chrome.driver",
+						Paths.get(System.getProperty("user.home"))
+								.resolve("Downloads").resolve(osName.equals("windows")
+										? "chromedriver.exe" : "chromedriver")
+								.toAbsolutePath().toString());
 
-	private StringBuilder convertJStoText() {
-		InputStream in = getClass().getResourceAsStream("/querySelector.js");
-		BufferedReader reader = null;
-		// File jsFile = new File("querySelector.js");
-		// BufferedReader reader = null;
-		StringBuilder text = new StringBuilder();
-		// reader = new BufferedReader(new FileReader(jsFile));
-		reader = new BufferedReader(new InputStreamReader(in));
-		if (reader != null) {
-			try {
-				while (reader.ready()) {
-					text.append(reader.readLine());
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
+		// https://peter.sh/experiments/chromium-command-line-switches/
+		ChromeOptions options = new ChromeOptions();
+		// options for headless
+		if (headless) {
+			for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
+				options.addArguments(arg);
 			}
 		}
-		if (reader != null) {
-			try {
-				reader.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return text;
+
+		driver = new ChromeDriver(options);
+		driver.navigate().to(baseUrl);
+		shadowDriver = new ShadowDriver(driver);
 	}
 
-	private void fixLocator(SearchContext context, String cssLocator, WebElement element) {
-		if (element instanceof RemoteWebElement) {
-			try {
-				@SuppressWarnings("rawtypes")
-				Class[] parameterTypes = new Class[] { SearchContext.class, String.class, String.class };
-				Method m = element.getClass().getDeclaredMethod("setFoundBy", parameterTypes);
-				m.setAccessible(true);
-				Object[] parameters = new Object[] { context, "cssSelector", cssLocator };
-				m.invoke(element, parameters);
-			} catch (Exception fail) {
-				// fail("Something bad happened when fixing locator");
-			}
-		}
+	@Before
+	public void init() {
+
 	}
 
-	private void waitForPageLoaded() {
-		ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
-			public Boolean apply(WebDriver driver) {
-				return ((JavascriptExecutor) driver).executeScript("return document.readyState").toString()
-						.equals("complete");
-			}
-		};
-		try {
-			Thread.sleep(1000);
-			WebDriverWait wait = new WebDriverWait(driver, 30);
-			wait.until(expectation);
-		} catch (Throwable error) {
-			// Assertions.fail("Timeout waiting for Page Load Request to complete.");
-		}
+	@Ignore
+	@Test
+	public void testApp() {
+
 	}
 
-	// wait methods on shadow objects
-	public void setImplicitWait(int seconds) {
-		this.implicitWait = seconds;
+	@Ignore
+	@Test
+	public void testJSInjection() {
+		WebElement element = shadowDriver.findElement(urlLocator);
+		err.println(element);
+		// Assertions.assertEquals(new String(""),
+		// shadowDriver.driver.getPageSource(),
+		// "Message");
 	}
 
-	public void setExplicitWait(int seconds, int pollingTime) throws Exception {
-		if (pollingTime > seconds) {
-			throw new Exception("pollingTime can't be greater than wait time");
-		}
-		this.explicitWait = seconds;
-		this.pollingTime = pollingTime;
+	@Ignore
+	@Test
+	public void testGetAllObject() {
+		List<WebElement> elements = shadowDriver.findElements(urlLocator);
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		err.println(
+				String.format("Located %d %s elements:", elements.size(), urlLocator));
+		// NOTE: default toString() is not be particularly useful
+		elements.stream().forEach(err::println);
+		elements.stream().map(o -> o.getTagName()).forEach(err::println);
+		elements.stream()
+				.map(o -> String.format("innerHTML: %s", o.getAttribute("innerHTML")))
+				.forEach(err::println);
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(err::println);
 	}
 
-	private boolean isPresent(WebElement element) {
-		boolean present = false;
-		try {
-			present = (Boolean) executerGetObject("return isVisible(arguments[0]);", element);
-		} catch (JavascriptException ex) {
+	@Ignore
+	@Test
+	public void testAPICalls1() {
+		WebElement element = shadowDriver.findElements(urlLocator).stream()
+				.filter(o -> o.getTagName().matches("div")).collect(Collectors.toList())
+				.get(0);
 
-		}
-		return present;
+		WebElement element1 = shadowDriver.getNextSiblingElement(element);
+		assertThat(element1, notNullValue());
+		// TODO: examine the collection of elements returned earlier
 	}
 
-	public WebElement findElement(String cssSelector) {
+	@Ignore
+	@Test
+	public void testAPICalls2() {
+		WebElement element = shadowDriver.findElements(urlLocator).stream()
+				.filter(o -> o.getTagName().matches("div")).collect(Collectors.toList())
+				.get(0);
+		List<WebElement> elements = shadowDriver.findElements(element, "img");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+	}
+
+	@Ignore
+	@Test
+	public void testAPICalls3() {
 		WebElement element = null;
-		boolean visible = false;
 
-		if (implicitWait > 0) {
+		for (String locator : Arrays
+				.asList(new String[] { "#wrapperLink", "*[data-route='url']" })) {
 			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
+				element = shadowDriver.findElement(locator);
+			} catch (ElementNotVisibleException e) {
+				err.println("Exception (ignored): " + e.toString());
 			}
-			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
-			fixLocator(driver, cssSelector, element);
-			visible = isPresent(element);
-		}
-
-		if (explicitWait > 0) {
-			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
-			fixLocator(driver, cssSelector, element);
-			visible = isPresent(element);
-
-			for (int i = 0; i < explicitWait && !visible;) {
+			if (element != null) {
 				try {
-					Thread.sleep(pollingTime * 1000);
-					element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
-					fixLocator(driver, cssSelector, element);
-					visible = isPresent(element);
-					i = i + pollingTime;
-				} catch (InterruptedException e) {
-
+					List<WebElement> elements = shadowDriver.getChildElements(element);
+					assertThat(elements, notNullValue());
+					assertThat(elements.size(), greaterThan(0));
+					err.println(String.format("Located %d child elements in %s:",
+							elements.size(), locator));
+				} catch (JavascriptException e) {
+					err.println("Exception (ignored): " + e.toString());
+					// TODO:
+					// javascript error: Illegal invocation
+					// https://stackoverflow.com/questions/10743596/why-are-certain-function-calls-termed-illegal-invocations-in-javascript
 				}
 			}
 		}
-
-		if (explicitWait == 0 && implicitWait == 0) {
-			element = (WebElement) executerGetObject(String.format("return getObject(\"%s\");", cssSelector));
-			fixLocator(driver, cssSelector, element);
-		}
-
-		if (!isPresent(element)) {
-			throw new ElementNotVisibleException("Element with CSS " + cssSelector + " is not present on screen");
-		}
-
-		return element;
-
 	}
 
-	public WebElement findElement(WebElement parent, String cssSelector) {
-		WebElement element = null;
-		boolean visible = false;
-
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-			element = (WebElement) executerGetObject(
-					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
-			fixLocator(driver, cssSelector, element);
-			visible = isPresent(element);
+	@Test
+	public void testAPICalls41() {
+		WebElement element = shadowDriver.findElement(urlLocator);
+		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
+				"#wrapperLink");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		err.println(
+				String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(err::println);
+		element = elements.get(0);
+		elements.clear();
+		try {
+			elements = shadowDriver.getAllShadowElement(element, "span");
+			assertThat(elements, notNullValue());
+			assertThat(elements.size(), greaterThan(0));
+			err.println(String.format("Located %d child elements", elements.size()));
+		} catch (JavascriptException e) {
+			err.println("Exception (ignored): " + e.toString());
+			// TODO:
+			// javascript error: Cannot read property 'querySelectorAll' of null
 		}
-
-		if (explicitWait > 0) {
-			element = (WebElement) executerGetObject(
-					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
-			fixLocator(driver, cssSelector, element);
-			visible = isPresent(element);
-
-			for (int i = 0; i < explicitWait && !visible;) {
-				try {
-					Thread.sleep(pollingTime * 1000);
-					element = (WebElement) executerGetObject(
-							String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
-					fixLocator(driver, cssSelector, element);
-					visible = isPresent(element);
-					i = i + pollingTime;
-				} catch (InterruptedException e) {
-
-				}
-			}
-
-		}
-
-		if (explicitWait == 0 && implicitWait == 0) {
-			element = (WebElement) executerGetObject(
-					String.format("return getObject(\"%s\", arguments[0]);", cssSelector), parent);
-			fixLocator(driver, cssSelector, element);
-		}
-
-		if (!isPresent(element)) {
-			throw new ElementNotVisibleException("Element with CSS " + cssSelector + " is not present on screen");
-		}
-
-		return element;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<WebElement> findElements(String cssSelector) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
+	@Ignore
+	@Test
+	public void testAPICalls4() {
+		WebElement element = shadowDriver.findElement(urlLocator);
+		List<WebElement> elements = shadowDriver.findElements(element,
+				"#wrapperLink");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		err.println(
+				String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(err::println);
+		element = elements.get(0);
+		elements.clear();
+		try {
+			elements = shadowDriver.getChildElements(element);
+			assertThat(elements, notNullValue());
+			assertThat(elements.size(), greaterThan(0));
+			err.println(String.format("Located %d child elements", elements.size()));
+		} catch (JavascriptException e) {
+			err.println("Exception (ignored): " + e.toString());
+			// TODO:
+			// javascript error: Illegal invocation
+			// https://stackoverflow.com/questions/10743596/why-are-certain-function-calls-termed-illegal-invocations-in-javascript
 		}
-		List<WebElement> element = null;
-		Object object = executerGetObject(String.format("return getAllObject(\"%s\");", cssSelector));
-		if (object != null && object instanceof List<?>) {
-			element = (List<WebElement>) object;
-		}
-		for (WebElement webElement : element) {
-			fixLocator(driver, cssSelector, webElement);
-		}
-		return element;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<WebElement> findElements(WebElement parent, String cssSelector) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		List<WebElement> element = null;
-		Object object = executerGetObject("return getAllObject(\"" + cssSelector + "\", arguments[0]);", parent);
-		if (object != null && object instanceof List<?>) {
-			element = (List<WebElement>) object;
-		}
-		for (WebElement webElement : element) {
-			fixLocator(driver, cssSelector, webElement);
-		}
-		return element;
+	@Ignore
+	@Test
+	public void testAPICalls5() {
+		WebElement element = shadowDriver.findElement(urlLocator);
+		List<WebElement> elements = shadowDriver.findElements(element,
+				"#wrapperLink");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		err.println(
+				String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(err::println);
 	}
 
-	public WebElement getShadowElement(WebElement parent, String selector) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
+	// TODO:
+	@Ignore
+	@Test
+	public void testAPICalls6() {
+		WebElement element = shadowDriver.findElement(urlLocator);
+		List<WebElement> elements = shadowDriver.getSiblingElements(element);
+		// javascript error: object.siblings is not a function
+		// https://www.w3schools.com/jquery/traversing_siblings.asp
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+	}
 
+	@After
+	public void tearDown() {
+	}
+
+	@AfterClass
+	public static void tearDownAll() {
+		driver.close();
+	}
+
+	// Utilities
+	public static String getOSName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
 			}
 		}
-		WebElement element = null;
-		element = (WebElement) executerGetObject(
-				String.format("return getShadowElement(arguments[0],\"%s\");", selector), parent);
-		fixLocator(driver, selector, element);
-		return element;
+		return osName;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<WebElement> getAllShadowElement(WebElement parent, String selector) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
 			}
 		}
-		List<WebElement> elements = null;
-		Object object = executerGetObject(String.format("return getAllShadowElement(arguments[0],\"%s\");", selector),
-				parent);
-		if (object != null && object instanceof List<?>) {
-			elements = (List<WebElement>) object;
-		}
-		for (WebElement element : elements) {
-			fixLocator(driver, selector, element);
-		}
-		return elements;
-	}
-
-	public WebElement getParentElement(WebElement element) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		return (WebElement) executerGetObject("return getParentElement(arguments[0]);", element);
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WebElement> getChildElements(WebElement parent) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		List<WebElement> elements = null;
-		Object object = executerGetObject("return getChildElements(arguments[0]);", parent);
-		if (object != null && object instanceof List<?>) {
-			elements = (List<WebElement>) object;
-		}
-		return elements;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WebElement> getSiblingElements(WebElement element) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		List<WebElement> elements = null;
-		Object object = executerGetObject("return getSiblingElements(arguments[0]);", element);
-		if (object != null && object instanceof List<?>) {
-			elements = (List<WebElement>) object;
-		}
-		return elements;
-	}
-
-	public WebElement getSiblingElement(WebElement element, String selector) {
-		if (implicitWait > 0) {
-			try {
-				Thread.sleep(implicitWait * 1000);
-			} catch (InterruptedException e) {
-
-			}
-		}
-		return (WebElement) executerGetObject(String.format("return getSiblingElement(arguments[0],\"%s\");", selector),
-				element);
-	}
-
-	public WebElement getNextSiblingElement(WebElement element) {
-		return (WebElement) executerGetObject("return getNextSiblingElement(arguments[0]);", element);
-	}
-
-	public WebElement getPreviousSiblingElement(WebElement element) {
-		return (WebElement) executerGetObject("return getPreviousSiblingElement(arguments[0]);", element);
-	}
-
-	public boolean isVisible(WebElement element) {
-		return (Boolean) executerGetObject("return isVisible(arguments[0]);", element);
-	}
-
-	public boolean isChecked(WebElement element) {
-		return (Boolean) executerGetObject("return isChecked(arguments[0]);", element);
-	}
-
-	public boolean isDisabled(WebElement element) {
-		return (Boolean) executerGetObject("return isDisabled(arguments[0]);", element);
-	}
-
-	public String getAttribute(WebElement element, String attribute) {
-		return (String) executerGetObject(String.format("return getAttribute(arguments[0],\"%s\");", attribute),
-				element);
-	}
-
-	public void selectCheckbox(WebElement parentElement, String label) {
-		executerGetObject(String.format("return selectCheckbox(\"%s\",arguments[0]);", label), parentElement);
-	}
-
-	public void selectCheckbox(String label) {
-		executerGetObject(String.format("return selectCheckbox(\"%s\");", label));
-	}
-
-	public void selectRadio(WebElement parentElement, String label) {
-		executerGetObject(String.format("return selectRadio(\"%s\",arguments[0]);", label), parentElement);
-	}
-
-	public void selectRadio(String label) {
-		executerGetObject(String.format("return selectRadio(\"%s\");", label));
-	}
-
-	public void selectDropdown(WebElement parentElement, String label) {
-	}
-
-	public void scrollTo(WebElement element) {
-		executerGetObject("return scrollTo(arguments[0]);", element);
+		return value;
 	}
 
 }
