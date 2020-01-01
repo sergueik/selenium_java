@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 // https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall
 
@@ -38,68 +39,165 @@ import org.junit.Test;
 
 import org.openqa.selenium.ElementNotVisibleException;
 import org.openqa.selenium.JavascriptException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxProfile;
+import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
+import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import example.ShadowDriver;
+import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class ShadowTest {
+
+	private static Map<String, String> env = System.getenv();
+	private static boolean isCIBuild = checkEnvironment();
 
 	private final static String baseUrl = "https://www.virustotal.com";
 	// private static final String urlLocator = "a[data-route='url']";
 	private static final String urlLocator = "*[data-route='url']";
 	private boolean debug = Boolean
-			.parseBoolean(getPropertyEnv("DEBUG", "false"));;
+			.parseBoolean(getPropertyEnv("DEBUG", "false"));
 	protected static String osName = getOSName();
 	private static final Map<String, String> browserDrivers = new HashMap<>();
 	static {
 		browserDrivers.put("chrome",
 				osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
 		browserDrivers.put("firefox",
-				osName.equals("windows") ? "geckodriver.exe" : "driver");
+				osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
 		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 	}
 
-	private static ChromeDriver driver = null;
+	private static WebDriver driver = null;
 	private static ShadowDriver shadowDriver = null;
 	private static String browser = getPropertyEnv("webdriver.driver", "chrome");
 	// use -P profile to override
 	private static final boolean headless = Boolean
 			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
-	public static String getBrowser() {
-		return browser;
-	}
-
-	public static void setBrowser(String browser) {
-		ShadowTest.browser = browser;
-	}
-
+	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void injectShadowJS() {
-		err.println("Launching " + browser);
-		if (browser.equals("chrome")) {
-		} // TODO: finish for other browser
+		if (isCIBuild) {
+			if (browser.equals("chrome")) {
+				WebDriverManager.chromedriver().setup();
+				driver = new ChromeDriver();
+			} // TODO: finish for other browser
+			if (browser.equals("firefox")) {
+				WebDriverManager.firefoxdriver().setup();
+				driver = new FirefoxDriver();
+			} // TODO: finish for other browser
 
-		System
-				.setProperty("webdriver.chrome.driver",
-						Paths.get(System.getProperty("user.home"))
-								.resolve("Downloads").resolve(osName.equals("windows")
-										? "chromedriver.exe" : "chromedriver")
-								.toAbsolutePath().toString());
+		} else {
+			err.println("Launching " + browser);
+			if (browser.equals("chrome")) {
+				System.setProperty("webdriver.chrome.driver",
+						Paths.get(System.getProperty("user.home")).resolve("Downloads")
+								.resolve(browserDrivers.get("chrome")).toAbsolutePath()
+								.toString());
 
-		// https://peter.sh/experiments/chromium-command-line-switches/
-		ChromeOptions options = new ChromeOptions();
-		// options for headless
-		if (headless) {
-			for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
-				options.addArguments(arg);
+				// https://peter.sh/experiments/chromium-command-line-switches/
+				ChromeOptions options = new ChromeOptions();
+				// options for headless
+				if (headless) {
+					for (String arg : (new String[] { "headless",
+							"window-size=1200x800" })) {
+						options.addArguments(arg);
+					}
+				}
+
+				driver = new ChromeDriver(options);
 			}
-		}
+			if (browser.equals("firefox")) {
+				System.setProperty("webdriver.gecko.driver",
+						Paths.get(System.getProperty("user.home")).resolve("Downloads")
+								.resolve(browserDrivers.get("firefox")).toAbsolutePath()
+								.toString());
+				// NOTE: there are both 32 and 64 bit firefox
+				System
+						.setProperty("webdriver.firefox.bin",
+								osName.equals("windows") ? new File(
+										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
+												.getAbsolutePath()
+										: "/usr/bin/firefox");
+				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+				// use legacy FirefoxDriver
+				// for Firefox v.59 no longer possible ?
+				// org.openqa.selenium.WebDriverException: Missing 'marionetteProtocol'
+				// field in handshake
+				// org.openqa.selenium.WebDriverException: Timed out waiting 45 seconds
+				// for Firefox to start.
 
-		driver = new ChromeDriver(options);
+				capabilities.setCapability("marionette", true);
+				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
+				capabilities.setCapability("locationContextEnabled", false);
+				capabilities.setCapability("acceptSslCerts", true);
+				capabilities.setCapability("elementScrollBehavior", 1);
+				FirefoxProfile profile = new FirefoxProfile();
+				// NOTE: the setting below may be too restrictive
+				// http://kb.mozillazine.org/Network.cookie.cookieBehavior
+				// profile.setPreference("network.cookie.cookieBehavior", 2);
+				// no cookies are allowed
+				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+						"application/octet-stream,text/csv");
+				profile.setPreference("browser.helperApps.neverAsk.openFile",
+						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+				// TODO: cannot find symbol: method
+				// addPreference(java.lang.String,java.lang.String)location: variable
+				// profile of type org.openqa.selenium.firefox.FirefoxProfile
+				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
+				profile.setPreference("browser.helperApps.alwaysAsk.force", false);
+				profile.setPreference("browser.download.manager.alertOnEXEOpen", false);
+				// http://learn-automation.com/handle-untrusted-certificate-selenium/
+				profile.setAcceptUntrustedCertificates(true);
+				profile.setAssumeUntrustedCertificateIssuer(true);
+
+				// NOTE: ERROR StatusLogger No log4j2 configuration file found. Using
+				// default configuration: logging only errors to the console.
+				LoggingPreferences logPrefs = new LoggingPreferences();
+				logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
+				logPrefs.enable(LogType.PROFILER, Level.INFO);
+				logPrefs.enable(LogType.BROWSER, Level.INFO);
+				logPrefs.enable(LogType.CLIENT, Level.INFO);
+				logPrefs.enable(LogType.DRIVER, Level.INFO);
+				logPrefs.enable(LogType.SERVER, Level.INFO);
+				capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
+
+				profile.setPreference("webdriver.firefox.logfile", "/dev/null");
+				// NOTE: the next setting appears to have no effect.
+				// does one really need os-specific definition?
+				// like /dev/null for Linux vs. nul for Windows
+				System.setProperty("webdriver.firefox.logfile",
+						osName.equals("windows") ? "nul" : "/dev/null");
+
+				// no longer supported as of Selenium 3.8.x
+				// profile.setEnableNativeEvents(false);
+				profile.setPreference("dom.webnotifications.enabled", false);
+				// optional
+				/*
+				 * profile.setPreference("general.useragent.override",
+				 * "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
+				 */
+				// err.println(System.getProperty("user.dir"));
+				capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+				try {
+					driver = new FirefoxDriver(capabilities);
+					// driver.setLogLevel(FirefoxDriverLogLevel.ERROR);
+				} catch (WebDriverException e) {
+					e.printStackTrace();
+					throw new RuntimeException(
+							"Cannot initialize Firefox driver: " + e.toString());
+				}
+			} // TODO: finish for other browser
+		}
 		driver.navigate().to(baseUrl);
 		shadowDriver = new ShadowDriver(driver);
 	}
@@ -217,8 +315,10 @@ public class ShadowTest {
 			err.println(String.format("Located %d child elements", elements.size()));
 		} catch (JavascriptException e) {
 			err.println("Exception (ignored): " + e.toString());
+
 			// TODO:
 			// javascript error: Cannot read property 'querySelectorAll' of null
+			// org.openqa.selenium.JavascriptException: missing ; before statement
 		}
 	}
 
@@ -301,13 +401,21 @@ public class ShadowTest {
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
 		String value = System.getProperty(name);
-		if (value == null) {
+		if (value == null || value.length() == 0) {
 			value = System.getenv(name);
-			if (value == null) {
+			if (value == null || value.length() == 0) {
 				value = defaultValue;
 			}
 		}
 		return value;
 	}
 
+	public static boolean checkEnvironment() {
+
+		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
+			isCIBuild = true;
+		}
+		return isCIBuild;
+	}
 }
+
