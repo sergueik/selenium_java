@@ -8,7 +8,7 @@
   <description>navigate ROOT DOM page elements using javascript API</description>
   <url>http://maven.apache.org</url>
   <properties>
-    <browser.name>chrome</browser.name>
+    <browser.name>firefox</browser.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <guava.version>23.1</guava.version>
@@ -26,6 +26,7 @@
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
+    <webdrivermanager.version>3.7.1</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>
@@ -70,6 +71,17 @@
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.github.bonigarcia</groupId>
+      <artifactId>webdrivermanager</artifactId>
+      <version>${webdrivermanager.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
 <dependency>
 	    <groupId>org.seleniumhq.selenium</groupId>
@@ -202,4 +214,27 @@ Fatal error compiling: invalid flag: -Dfile.encoding=UTF-8 -> [Help 1]
       </resource>
     </resources>
   </build>
+  <profiles>
+    <profile>
+      <id>chrome</id>
+      <properties>
+        <browser.name>chrome</browser.name>
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>edge</id>
+      <properties>
+        <browser.name>edge</browser.name>
+      </properties>
+    </profile>
+    <profile>
+      <id>firefox</id>
+      <properties>
+        <browser.name>firefox</browser.name>
+      </properties>
+    </profile>
+  </profiles>
 </project>
