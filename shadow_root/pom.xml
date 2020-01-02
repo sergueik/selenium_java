@@ -136,18 +136,8 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <!-- On windows one needs to update console code page outside of maven
-to work with cyrillic pages:
-chcp 65001
-set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-rem ${project.build.sourceEncoding}
- -->
           <compilerArgument>-Xlint:all</compilerArgument>
           <compilerArgument>-Xlint:-processing</compilerArgument>
-          <!--
-   <compilerArgument>-Dfile.encoding=${project.build.sourceEncoding}</compilerArgument>
-Fatal error compiling: invalid flag: -Dfile.encoding=UTF-8 -> [Help 1]
--->
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
         </configuration>
@@ -173,18 +163,7 @@ Fatal error compiling: invalid flag: -Dfile.encoding=UTF-8 -> [Help 1]
         <configuration>
           <trimStackTrace>false</trimStackTrace>
           <encoding>${project.build.sourceEncoding}</encoding>
-          <!--
-	  NOTE: specifying the suite XML file prevents surefile from scannint all tests casses and execute everything with the method name mask match
-          <suiteXmlFiles>
-            <suiteXmlFile>src/test/resources/suites/testng.xml</suiteXmlFile>
-	  </suiteXmlFiles>
-	  -->
-          <!-- For parallel runs with e.g. Vagrant https://github.com/sergueik/selenium-fluxbox
-	  <argLine>-Dfile.encoding=${project.build.sourceEncoding} -Dparallel=tests -DthreadCount=2 </argLine>
-	  -->
           <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
-          <!-- Skip the default running of this plug-in (or everything is run twice...see below) -->
-          <skip>true</skip>
         </configuration>
         <executions>
           <execution>
@@ -194,17 +173,14 @@ Fatal error compiling: invalid flag: -Dfile.encoding=UTF-8 -> [Help 1]
               <goal>test</goal>
             </goals>
             <configuration>
-              <skip>false</skip>
               <systemPropertyVariables>
                 <webdriver.driver>${browser.name}</webdriver.driver>
-                <selenium.version>${selenium.version}</selenium.version>
-                <property.filepath>${property.filepath}</property.filepath>
               </systemPropertyVariables>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      </plugins>
+    </plugins>
     <resources>
       <resource>
         <directory>${basedir}/src/main/resources</directory>

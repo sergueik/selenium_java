@@ -62,28 +62,19 @@ public class ShadowTest {
 	private final static String baseUrl = "https://www.virustotal.com";
 	// private static final String urlLocator = "a[data-route='url']";
 	private static final String urlLocator = "*[data-route='url']";
-	private boolean debug = Boolean
-			.parseBoolean(getPropertyEnv("DEBUG", "false"));
+	private static final boolean debug = Boolean.parseBoolean(getPropertyEnv("DEBUG", "false"));
 	protected static String osName = getOSName();
-	private static final Map<String, String> browserDrivers = new HashMap<>();
-	static {
-		browserDrivers.put("chrome",
-				osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
-		browserDrivers.put("firefox",
-				osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
-		browserDrivers.put("edge", "MicrosoftWebDriver.exe");
-	}
-
 	private static WebDriver driver = null;
 	private static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("webdriver.driver", "chrome");
-	// use -P profile to override
-	private static final boolean headless = Boolean
-			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
+	private static String browser = getPropertyEnv("BROWSER", getPropertyEnv("webdriver.driver", "chrome"));
+	// export BROWSER=firefox or
+	// use -Pfirefox to override
+	private static final boolean headless = Boolean.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void injectShadowJS() {
+		err.println("Launching " + browser);
 		if (isCIBuild) {
 			if (browser.equals("chrome")) {
 				WebDriverManager.chromedriver().setup();
@@ -95,19 +86,20 @@ public class ShadowTest {
 			} // TODO: finish for other browser
 
 		} else {
-			err.println("Launching " + browser);
+
+			final Map<String, String> browserDrivers = new HashMap<>();
+			browserDrivers.put("chrome", osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
+			browserDrivers.put("firefox", osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
+			browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 			if (browser.equals("chrome")) {
-				System.setProperty("webdriver.chrome.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("chrome")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.chrome.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("chrome")).toAbsolutePath().toString());
 
 				// https://peter.sh/experiments/chromium-command-line-switches/
 				ChromeOptions options = new ChromeOptions();
 				// options for headless
 				if (headless) {
-					for (String arg : (new String[] { "headless",
-							"window-size=1200x800" })) {
+					for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
 						options.addArguments(arg);
 					}
 				}
@@ -115,17 +107,13 @@ public class ShadowTest {
 				driver = new ChromeDriver(options);
 			}
 			if (browser.equals("firefox")) {
-				System.setProperty("webdriver.gecko.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("firefox")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.gecko.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("firefox")).toAbsolutePath().toString());
 				// NOTE: there are both 32 and 64 bit firefox
-				System
-						.setProperty("webdriver.firefox.bin",
-								osName.equals("windows") ? new File(
-										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-												.getAbsolutePath()
-										: "/usr/bin/firefox");
+				System.setProperty("webdriver.firefox.bin",
+						osName.equals("windows")
+								? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe").getAbsolutePath()
+								: "/usr/bin/firefox");
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				// use legacy FirefoxDriver
@@ -145,8 +133,7 @@ public class ShadowTest {
 				// http://kb.mozillazine.org/Network.cookie.cookieBehavior
 				// profile.setPreference("network.cookie.cookieBehavior", 2);
 				// no cookies are allowed
-				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-						"application/octet-stream,text/csv");
+				profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream,text/csv");
 				profile.setPreference("browser.helperApps.neverAsk.openFile",
 						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
 				// TODO: cannot find symbol: method
@@ -175,8 +162,7 @@ public class ShadowTest {
 				// NOTE: the next setting appears to have no effect.
 				// does one really need os-specific definition?
 				// like /dev/null for Linux vs. nul for Windows
-				System.setProperty("webdriver.firefox.logfile",
-						osName.equals("windows") ? "nul" : "/dev/null");
+				System.setProperty("webdriver.firefox.logfile", osName.equals("windows") ? "nul" : "/dev/null");
 
 				// no longer supported as of Selenium 3.8.x
 				// profile.setEnableNativeEvents(false);
@@ -193,8 +179,7 @@ public class ShadowTest {
 					// driver.setLogLevel(FirefoxDriverLogLevel.ERROR);
 				} catch (WebDriverException e) {
 					e.printStackTrace();
-					throw new RuntimeException(
-							"Cannot initialize Firefox driver: " + e.toString());
+					throw new RuntimeException("Cannot initialize Firefox driver: " + e.toString());
 				}
 			} // TODO: finish for other browser
 		}
@@ -229,25 +214,19 @@ public class ShadowTest {
 		List<WebElement> elements = shadowDriver.findElements(urlLocator);
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(
-				String.format("Located %d %s elements:", elements.size(), urlLocator));
+		err.println(String.format("Located %d %s elements:", elements.size(), urlLocator));
 		// NOTE: default toString() is not be particularly useful
 		elements.stream().forEach(err::println);
 		elements.stream().map(o -> o.getTagName()).forEach(err::println);
-		elements.stream()
-				.map(o -> String.format("innerHTML: %s", o.getAttribute("innerHTML")))
-				.forEach(err::println);
-		elements.stream()
-				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
-				.forEach(err::println);
+		elements.stream().map(o -> String.format("innerHTML: %s", o.getAttribute("innerHTML"))).forEach(err::println);
+		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
 	}
 
 	@Ignore
 	@Test
 	public void testAPICalls1() {
-		WebElement element = shadowDriver.findElements(urlLocator).stream()
-				.filter(o -> o.getTagName().matches("div")).collect(Collectors.toList())
-				.get(0);
+		WebElement element = shadowDriver.findElements(urlLocator).stream().filter(o -> o.getTagName().matches("div"))
+				.collect(Collectors.toList()).get(0);
 
 		WebElement element1 = shadowDriver.getNextSiblingElement(element);
 		assertThat(element1, notNullValue());
@@ -257,9 +236,8 @@ public class ShadowTest {
 	@Ignore
 	@Test
 	public void testAPICalls2() {
-		WebElement element = shadowDriver.findElements(urlLocator).stream()
-				.filter(o -> o.getTagName().matches("div")).collect(Collectors.toList())
-				.get(0);
+		WebElement element = shadowDriver.findElements(urlLocator).stream().filter(o -> o.getTagName().matches("div"))
+				.collect(Collectors.toList()).get(0);
 		List<WebElement> elements = shadowDriver.findElements(element, "img");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
@@ -270,8 +248,7 @@ public class ShadowTest {
 	public void testAPICalls3() {
 		WebElement element = null;
 
-		for (String locator : Arrays
-				.asList(new String[] { "#wrapperLink", "*[data-route='url']" })) {
+		for (String locator : Arrays.asList(new String[] { "#wrapperLink", "*[data-route='url']" })) {
 			try {
 				element = shadowDriver.findElement(locator);
 			} catch (ElementNotVisibleException e) {
@@ -282,8 +259,7 @@ public class ShadowTest {
 					List<WebElement> elements = shadowDriver.getChildElements(element);
 					assertThat(elements, notNullValue());
 					assertThat(elements.size(), greaterThan(0));
-					err.println(String.format("Located %d child elements in %s:",
-							elements.size(), locator));
+					err.println(String.format("Located %d child elements in %s:", elements.size(), locator));
 				} catch (JavascriptException e) {
 					err.println("Exception (ignored): " + e.toString());
 					// TODO:
@@ -297,15 +273,11 @@ public class ShadowTest {
 	@Test
 	public void testAPICalls41() {
 		WebElement element = shadowDriver.findElement(urlLocator);
-		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
-				"#wrapperLink");
+		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#wrapperLink");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(
-				String.format("Located %d #wrapperLink elements:", elements.size()));
-		elements.stream()
-				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
-				.forEach(err::println);
+		err.println(String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
 		element = elements.get(0);
 		elements.clear();
 		try {
@@ -326,15 +298,11 @@ public class ShadowTest {
 	@Test
 	public void testAPICalls4() {
 		WebElement element = shadowDriver.findElement(urlLocator);
-		List<WebElement> elements = shadowDriver.findElements(element,
-				"#wrapperLink");
+		List<WebElement> elements = shadowDriver.findElements(element, "#wrapperLink");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(
-				String.format("Located %d #wrapperLink elements:", elements.size()));
-		elements.stream()
-				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
-				.forEach(err::println);
+		err.println(String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
 		element = elements.get(0);
 		elements.clear();
 		try {
@@ -354,15 +322,11 @@ public class ShadowTest {
 	@Test
 	public void testAPICalls5() {
 		WebElement element = shadowDriver.findElement(urlLocator);
-		List<WebElement> elements = shadowDriver.findElements(element,
-				"#wrapperLink");
+		List<WebElement> elements = shadowDriver.findElements(element, "#wrapperLink");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(
-				String.format("Located %d #wrapperLink elements:", elements.size()));
-		elements.stream()
-				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
-				.forEach(err::println);
+		err.println(String.format("Located %d #wrapperLink elements:", elements.size()));
+		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
 	}
 
 	// TODO:
@@ -401,10 +365,19 @@ public class ShadowTest {
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
 		String value = System.getProperty(name);
+		if (debug) {
+			err.println("system property " + name + " = " + value);
+		}
 		if (value == null || value.length() == 0) {
 			value = System.getenv(name);
+			if (debug) {
+				err.println("system env " + name + " = " + value);
+			}
 			if (value == null || value.length() == 0) {
 				value = defaultValue;
+				if (debug) {
+					err.println("default value  = " + value);
+				}
 			}
 		}
 		return value;
@@ -418,4 +391,3 @@ public class ShadowTest {
 		return isCIBuild;
 	}
 }
-
