@@ -36,4 +36,14 @@ The custom ShadowDriver class injects a Javascript library implementing a big nu
   * `findParentOrHost(element,`
   * `collectAllElementsDeep(selector`
   * `findAllElements`
+
 from file `querySelector.js`.
+
+### See Also:
+
+  * a collection of [example projects](https://github.com/bonigarcia/mastering-junit5) for junit5 conversion
+  * https://www.webcomponents.org/community/articles/introduction-to-shadow-dom
+  * https://www.grapecity.com/blogs/what-is-shadow-dom-how-to-build-shadow-elements
+  * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
+  * https://www.html5rocks.com/en/tutorials/webcomponents/shadowdom/
+  * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
