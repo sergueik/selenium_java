@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<!-- origin: https://www.html5rocks.com/en/tutorials/webcomponents/shadowdom-201/ -->
+ <body>
+<div><h3>Light DOM</h3></div>
+<script>
+var container = document.querySelector('div');
+// var root = document.querySelector('div').createShadowRoot();
+var root = container.attachShadow({
+    mode: "open"
+})
+root.innerHTML = '<style>h3{ color: red; }</style>' +
+    '<h3>Shadow DOM</h3>';
+</script>
+  </body>
+</html>

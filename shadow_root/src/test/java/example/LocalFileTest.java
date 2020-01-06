@@ -71,17 +71,14 @@ public class LocalFileTest {
 	private static boolean isCIBuild = checkEnvironment();
 
 	private static String filePath = null;
-	private static final boolean debug = Boolean
-			.parseBoolean(getPropertyEnv("DEBUG", "false"));
+	private static final boolean debug = Boolean.parseBoolean(getPropertyEnv("DEBUG", "false"));
 
 	private static WebDriver driver = null;
 	private static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("BROWSER",
-			getPropertyEnv("webdriver.driver", "chrome"));
+	private static String browser = getPropertyEnv("BROWSER", getPropertyEnv("webdriver.driver", "chrome"));
 	// export BROWSER=firefox or
 	// use -Pfirefox to override
-	private static final boolean headless = Boolean
-			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
+	private static final boolean headless = Boolean.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
 	@BeforeClass
@@ -100,23 +97,18 @@ public class LocalFileTest {
 		} else {
 			String osName = getOSName();
 			final Map<String, String> browserDrivers = new HashMap<>();
-			browserDrivers.put("chrome",
-					osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
-			browserDrivers.put("firefox",
-					osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
+			browserDrivers.put("chrome", osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
+			browserDrivers.put("firefox", osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
 			browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 			if (browser.equals("chrome")) {
-				System.setProperty("webdriver.chrome.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("chrome")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.chrome.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("chrome")).toAbsolutePath().toString());
 
 				// https://peter.sh/experiments/chromium-command-line-switches/
 				ChromeOptions options = new ChromeOptions();
 				// options for headless
 				if (headless) {
-					for (String arg : (new String[] { "headless",
-							"window-size=1200x800" })) {
+					for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
 						options.addArguments(arg);
 					}
 				}
@@ -124,17 +116,13 @@ public class LocalFileTest {
 				driver = new ChromeDriver(options);
 			}
 			if (browser.equals("firefox")) {
-				System.setProperty("webdriver.gecko.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("firefox")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.gecko.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("firefox")).toAbsolutePath().toString());
 				// NOTE: there are both 32 and 64 bit firefox
-				System
-						.setProperty("webdriver.firefox.bin",
-								osName.equals("windows") ? new File(
-										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-												.getAbsolutePath()
-										: "/usr/bin/firefox");
+				System.setProperty("webdriver.firefox.bin",
+						osName.equals("windows")
+								? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe").getAbsolutePath()
+								: "/usr/bin/firefox");
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				// use legacy FirefoxDriver
@@ -154,8 +142,7 @@ public class LocalFileTest {
 				// http://kb.mozillazine.org/Network.cookie.cookieBehavior
 				// profile.setPreference("network.cookie.cookieBehavior", 2);
 				// no cookies are allowed
-				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-						"application/octet-stream,text/csv");
+				profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream,text/csv");
 				profile.setPreference("browser.helperApps.neverAsk.openFile",
 						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
 				// TODO: cannot find symbol: method
@@ -184,8 +171,7 @@ public class LocalFileTest {
 				// NOTE: the next setting appears to have no effect.
 				// does one really need os-specific definition?
 				// like /dev/null for Linux vs. nul for Windows
-				System.setProperty("webdriver.firefox.logfile",
-						osName.equals("windows") ? "nul" : "/dev/null");
+				System.setProperty("webdriver.firefox.logfile", osName.equals("windows") ? "nul" : "/dev/null");
 
 				// no longer supported as of Selenium 3.8.x
 				// profile.setEnableNativeEvents(false);
@@ -202,8 +188,7 @@ public class LocalFileTest {
 					// driver.setLogLevel(FirefoxDriverLogLevel.ERROR);
 				} catch (WebDriverException e) {
 					e.printStackTrace();
-					throw new RuntimeException(
-							"Cannot initialize Firefox driver: " + e.toString());
+					throw new RuntimeException("Cannot initialize Firefox driver: " + e.toString());
 				}
 			} // TODO: finish for other browser
 		}
@@ -220,15 +205,11 @@ public class LocalFileTest {
 	public void test1() {
 		driver.navigate().to(getPageContent("index.html"));
 		WebElement element = shadowDriver.findElement("#container");
-		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
-				"#inside");
+		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#inside");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(
-				String.format("Located %d shadow document elements:", elements.size()));
-		elements.stream()
-				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
-				.forEach(err::println);
+		err.println(String.format("Located %d shadow document elements:", elements.size()));
+		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
 	}
 
 	@Test
@@ -266,6 +247,53 @@ public class LocalFileTest {
 		assertThat(element, notNullValue());
 	}
 
+	// @Ignore
+	@Test
+	public void test4() {
+
+		driver.navigate().to(getPageContent("inner_html_example.html"));
+		WebElement element1 = driver.findElement(By.cssSelector("h3"));
+		assertThat(element1, notNullValue());
+		err.println("innerHTML: " + element1.getAttribute("innerHTML"));
+
+		WebElement element2 = shadowDriver.findElement("h3");
+		assertThat(element2, notNullValue());
+		err.println("innerTML: " + shadowDriver.getAttribute(element2, "innerHTM"));
+	}
+
+	@Test
+	public void test6() {
+		driver.navigate().to(getPageContent("inner_html_example.html"));
+		WebElement element = driver.findElement(By.cssSelector("body > div > h3"));
+		assertThat(element, notNullValue());
+		err.println("outerHTML: " + element.getAttribute("outerHTML"));
+		err.println(String.format("Text: \"%s\"", element.getText()));
+		// TODO: assert
+		assertThat(element.getText(), is(""));
+		WebElement parent = shadowDriver.findElement("body > div");
+		assertThat(parent, notNullValue());
+		err.println("Parent outerHTML: " + parent.getAttribute("outerHTML"));
+		err.println(String.format("Parent text(old API): \"%s\"", parent.getText()));
+		element = null;
+		element = shadowDriver.getShadowElement(parent, "h3");
+		assertThat(element, notNullValue());
+		err.println("Got shadow element: " + element); // toString
+		err.println("outerHTML (old API): " + element.getAttribute("outerHTML"));
+		err.println("outerHTML (new API): " + shadowDriver.getAttribute(element, "outerHTML"));
+		err.println(String.format("Text(old API): \"%s\"", element.getText()));
+		err.println("Text(new API): " + shadowDriver.getAttribute(element, "value"));
+
+		List<WebElement> elements = shadowDriver.getAllShadowElement(parent, "h3");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		err.println(String.format("Located %d shadow document elements:", elements.size()));
+		elements.stream().map(e -> String.format("outerHTML (new API): %s", shadowDriver.getAttribute(e, "outerHTML")))
+				.forEach(err::println);
+		elements.stream().map(e -> String.format("outerHTML (old API): %s", e.getAttribute("outerHTML")))
+				.forEach(err::println);
+		elements.stream().map(e -> String.format("Text (old API): \"%s\"", e.getText())).forEach(err::println);
+
+	}
 	@AfterClass
 	public static void tearDownAll() {
 		driver.close();
@@ -312,8 +340,7 @@ public class LocalFileTest {
 
 	protected static String getPageContent(String pagename) {
 		try {
-			URI uri = LocalFileTest.class.getClassLoader()
-					.getResource(pagename).toURI();
+			URI uri = LocalFileTest.class.getClassLoader().getResource(pagename).toURI();
 			err.println("Testing local file: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
