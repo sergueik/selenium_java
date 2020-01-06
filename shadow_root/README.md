@@ -47,3 +47,4 @@ from file `querySelector.js`.
   * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
   * https://www.html5rocks.com/en/tutorials/webcomponents/shadowdom/
   * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
+  * Everything you need to know about Shadow DOM [gist](https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813)
