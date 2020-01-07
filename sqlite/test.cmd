@@ -2,5 +2,7 @@
 
 call mvn clean package install
 set TARGET=%CD%\target
-java -cp target\app-1.1-SNAPSHOT.jar;target\lib\*  com.mycompany.app.App
+set PACKAGE=sqlite_test
+set CLASS=App
+java -cp target\%PACKAGE%-0.2-SNAPSHOT.jar;target\lib\*  %PACKAGE%.%CLASS%
 goto :EOF
