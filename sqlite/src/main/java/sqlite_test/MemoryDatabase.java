@@ -7,9 +7,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.RowId;
-// https://bitbucket.org/xerial/sqlite-jdbc
 
-public class App {
+// https://bitbucket.org/xerial/sqlite-jdbc
+// https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
+
+public class MemoryDatabase {
 	public static void main(String[] args) throws ClassNotFoundException {
 		Class.forName("org.sqlite.JDBC");
 
@@ -37,8 +39,6 @@ public class App {
 						.println("rowid = " + rs.getString("rowid") + "\t" + " name = "
 								+ rs.getString("name") + "\t" + "id = " + rs.getInt("id"));
 			}
-
-			// https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
 
 			statement.executeUpdate("delete from person where name = 'hrr'");
 
