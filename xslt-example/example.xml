@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<class>
+  <student no="1">
+    <name>Linus</name>
+  </student>
+  <student no="2">
+    <name>Stallman</name>
+  </student>
+</class>
