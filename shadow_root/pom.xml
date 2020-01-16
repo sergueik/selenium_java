@@ -26,7 +26,7 @@
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
-    <webdrivermanager.version>3.7.1</webdrivermanager.version>
+    <webdrivermanager.version>3.8.0</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>
