@@ -8,7 +8,7 @@ project with unwanted extra jar dependencies to qualify for a locked environment
 ```sh
 mvn clean package
 java -cp target/xml2json-1.0-SNAPSHOT.jar xml2json.Program pom.xml example.json
-jq '.' example.json
+jq "." example.json
 ```
 
 
