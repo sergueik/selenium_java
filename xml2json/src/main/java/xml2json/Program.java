@@ -25,8 +25,8 @@ public class Program {
 			} else {
 				converter.setPrintStream(System.out);
 			}
-			SAXParserFactory spfactory = SAXParserFactory.newInstance();
-			SAXParser parser = spfactory.newSAXParser();
+			SAXParserFactory sParserFactory = SAXParserFactory.newInstance();
+			SAXParser parser = sParserFactory.newSAXParser();
 			parser.parse(new File(argv[0]), converter);
 		} catch (Exception e) {
 			e.printStackTrace();
