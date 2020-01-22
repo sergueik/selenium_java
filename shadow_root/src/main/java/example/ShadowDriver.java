@@ -279,7 +279,6 @@ public class ShadowDriver {
 			fixLocator(driver, cssSelector, element);
 			visible = isPresent(element);
 		}
-
 		if (explicitWait > 0) {
 			element = (WebElement) executerGetObject(
 					String.format("return getObject(\"%s\", arguments[0]);",
@@ -375,8 +374,10 @@ public class ShadowDriver {
 			}
 		}
 		WebElement element = null;
-		element = (WebElement) executerGetObject(String.format(
-				"return getShadowElement(arguments[0],\"%s\");", selector), parent);
+		element = (WebElement) executerGetObject(
+				String.format("return getShadowElement(arguments[0],\"%s\");",
+						selector.replaceAll("\"", "\\\\\"")),
+				parent);
 		fixLocator(driver, selector, element);
 		return element;
 	}
@@ -392,8 +393,10 @@ public class ShadowDriver {
 			}
 		}
 		List<WebElement> elements = null;
-		Object object = executerGetObject(String.format(
-				"return getAllShadowElement(arguments[0],\"%s\");", selector), parent);
+		Object object = executerGetObject(
+				String.format("return getAllShadowElement(arguments[0],\"%s\");",
+						selector.replaceAll("\"", "\\\\\"")),
+				parent);
 		if (object != null && object instanceof List<?>) {
 			elements = (List<WebElement>) object;
 		}
@@ -459,8 +462,10 @@ public class ShadowDriver {
 
 			}
 		}
-		return (WebElement) executerGetObject(String.format(
-				"return getSiblingElement(arguments[0],\"%s\");", selector), element);
+		return (WebElement) executerGetObject(
+				String.format("return getSiblingElement(arguments[0],\"%s\");",
+						selector.replaceAll("\"", "\\\\\"")),
+				element);
 	}
 
 	public WebElement getNextSiblingElement(WebElement element) {
