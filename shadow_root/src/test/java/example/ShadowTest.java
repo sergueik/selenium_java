@@ -71,8 +71,7 @@ public class ShadowTest {
 	private static boolean isCIBuild = checkEnvironment();
 
 	private final static String baseUrl = "https://www.virustotal.com";
-	// private static final String urlLocator = "a[data-route='url']";
-	private static final String urlLocator = "*[data-route='url']";
+	private static final String urlLocator = "*[data-route=\"url\"]";
 	private static final boolean debug = Boolean
 			.parseBoolean(getPropertyEnv("DEBUG", "false"));
 
@@ -218,23 +217,15 @@ public class ShadowTest {
 
 	}
 
-	@Ignore
-	@Test
-	public void testApp() {
-
-	}
-
-	@Ignore
 	@Test
 	public void testJSInjection() {
 		WebElement element = shadowDriver.findElement(urlLocator);
 		err.println(element);
-		// Assertions.assertEquals(new String(""),
-		// shadowDriver.driver.getPageSource(),
-		// "Message");
+		String pageSource = shadowDriver.getDriver().getPageSource();
+		err.println("page souurce: " + pageSource);
 	}
 
-	@Ignore
+	// @Ignore
 	@Test
 	public void testGetAllObject() {
 		List<WebElement> elements = shadowDriver.findElements(urlLocator);
@@ -305,6 +296,7 @@ public class ShadowTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void testAPICalls41() {
 		WebElement element = shadowDriver.findElement(urlLocator);
