@@ -247,7 +247,7 @@ public class LocalFileTest {
 		assertThat(element, notNullValue());
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void test4() {
 
