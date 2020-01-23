@@ -1,33 +1,13 @@
 package example;
 
 import static java.lang.System.err;
-import static java.lang.System.out;
 
 import java.io.File;
-import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import com.google.common.collect.Maps;
-
-import java.util.concurrent.TimeUnit;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 /*
@@ -43,14 +23,7 @@ import org.junit.jupiter.api.Test;
 // https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall
 import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.openqa.selenium.By;
-import org.openqa.selenium.ElementNotVisibleException;
-import org.openqa.selenium.JavascriptException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -62,7 +35,6 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import example.ShadowDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class BaseTest {
@@ -77,8 +49,13 @@ public class BaseTest {
 	protected static ShadowDriver shadowDriver = null;
 	private static String browser = getPropertyEnv("BROWSER",
 			getPropertyEnv("webdriver.driver", "chrome"));
+
 	// export BROWSER=firefox or
 	// use -Pfirefox to override
+	public static String getBrowser() {
+		return browser;
+	}
+
 	private static final boolean headless = Boolean
 			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
