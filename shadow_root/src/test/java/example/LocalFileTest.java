@@ -65,156 +65,31 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import example.ShadowDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
-public class LocalFileTest {
-
-	private static Map<String, String> env = System.getenv();
-	private static boolean isCIBuild = checkEnvironment();
+public class LocalFileTest extends BaseTest {
 
 	private static String filePath = null;
-	private static final boolean debug = Boolean.parseBoolean(getPropertyEnv("DEBUG", "false"));
-
-	private static WebDriver driver = null;
-	private static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("BROWSER", getPropertyEnv("webdriver.driver", "chrome"));
-	// export BROWSER=firefox or
-	// use -Pfirefox to override
-	private static final boolean headless = Boolean.parseBoolean(getPropertyEnv("HEADLESS", "false"));
-
-	@SuppressWarnings("deprecation")
-	@BeforeClass
-	public static void injectShadowJS() {
-		err.println("Launching " + browser);
-		if (isCIBuild) {
-			if (browser.equals("chrome")) {
-				WebDriverManager.chromedriver().setup();
-				driver = new ChromeDriver();
-			} // TODO: finish for other browser
-			if (browser.equals("firefox")) {
-				WebDriverManager.firefoxdriver().setup();
-				driver = new FirefoxDriver();
-			} // TODO: finish for other browser
-
-		} else {
-			String osName = getOSName();
-			final Map<String, String> browserDrivers = new HashMap<>();
-			browserDrivers.put("chrome", osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
-			browserDrivers.put("firefox", osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
-			browserDrivers.put("edge", "MicrosoftWebDriver.exe");
-			if (browser.equals("chrome")) {
-				System.setProperty("webdriver.chrome.driver", Paths.get(System.getProperty("user.home"))
-						.resolve("Downloads").resolve(browserDrivers.get("chrome")).toAbsolutePath().toString());
-
-				// https://peter.sh/experiments/chromium-command-line-switches/
-				ChromeOptions options = new ChromeOptions();
-				// options for headless
-				if (headless) {
-					for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
-						options.addArguments(arg);
-					}
-				}
-
-				driver = new ChromeDriver(options);
-			}
-			if (browser.equals("firefox")) {
-				System.setProperty("webdriver.gecko.driver", Paths.get(System.getProperty("user.home"))
-						.resolve("Downloads").resolve(browserDrivers.get("firefox")).toAbsolutePath().toString());
-				// NOTE: there are both 32 and 64 bit firefox
-				System.setProperty("webdriver.firefox.bin",
-						osName.equals("windows")
-								? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe").getAbsolutePath()
-								: "/usr/bin/firefox");
-				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
-				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-				// use legacy FirefoxDriver
-				// for Firefox v.59 no longer possible ?
-				// org.openqa.selenium.WebDriverException: Missing 'marionetteProtocol'
-				// field in handshake
-				// org.openqa.selenium.WebDriverException: Timed out waiting 45 seconds
-				// for Firefox to start.
-
-				capabilities.setCapability("marionette", true);
-				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
-				capabilities.setCapability("locationContextEnabled", false);
-				capabilities.setCapability("acceptSslCerts", true);
-				capabilities.setCapability("elementScrollBehavior", 1);
-				FirefoxProfile profile = new FirefoxProfile();
-				// NOTE: the setting below may be too restrictive
-				// http://kb.mozillazine.org/Network.cookie.cookieBehavior
-				// profile.setPreference("network.cookie.cookieBehavior", 2);
-				// no cookies are allowed
-				profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream,text/csv");
-				profile.setPreference("browser.helperApps.neverAsk.openFile",
-						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
-				// TODO: cannot find symbol: method
-				// addPreference(java.lang.String,java.lang.String)location: variable
-				// profile of type org.openqa.selenium.firefox.FirefoxProfile
-				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
-				profile.setPreference("browser.helperApps.alwaysAsk.force", false);
-				profile.setPreference("browser.download.manager.alertOnEXEOpen", false);
-				// http://learn-automation.com/handle-untrusted-certificate-selenium/
-				profile.setAcceptUntrustedCertificates(true);
-				profile.setAssumeUntrustedCertificateIssuer(true);
-
-				// NOTE: ERROR StatusLogger No log4j2 configuration file found. Using
-				// default configuration: logging only errors to the console.
-				LoggingPreferences logPrefs = new LoggingPreferences();
-				logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
-				logPrefs.enable(LogType.PROFILER, Level.INFO);
-				logPrefs.enable(LogType.BROWSER, Level.INFO);
-				logPrefs.enable(LogType.CLIENT, Level.INFO);
-				logPrefs.enable(LogType.DRIVER, Level.INFO);
-				logPrefs.enable(LogType.SERVER, Level.INFO);
-				capabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
-
-				profile.setPreference("webdriver.firefox.logfile", "/dev/null");
-				// NOTE: the next setting appears to have no effect.
-				// does one really need os-specific definition?
-				// like /dev/null for Linux vs. nul for Windows
-				System.setProperty("webdriver.firefox.logfile", osName.equals("windows") ? "nul" : "/dev/null");
-
-				// no longer supported as of Selenium 3.8.x
-				// profile.setEnableNativeEvents(false);
-				profile.setPreference("dom.webnotifications.enabled", false);
-				// optional
-				/*
-				 * profile.setPreference("general.useragent.override",
-				 * "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:33.0) Gecko/20120101 Firefox/33.0");
-				 */
-				// err.println(System.getProperty("user.dir"));
-				capabilities.setCapability(FirefoxDriver.PROFILE, profile);
-				try {
-					driver = new FirefoxDriver(capabilities);
-					// driver.setLogLevel(FirefoxDriverLogLevel.ERROR);
-				} catch (WebDriverException e) {
-					e.printStackTrace();
-					throw new RuntimeException("Cannot initialize Firefox driver: " + e.toString());
-				}
-			} // TODO: finish for other browser
-		}
-		shadowDriver = new ShadowDriver(driver);
-	}
-
-	@After
-	public void AfterMethod() {
-		driver.get("about:blank");
-	}
 
 	// @Ignore
 	@Test
 	public void test1() {
-		driver.navigate().to(getPageContent("index.html"));
+		filePath = "index.html";
+		driver.navigate().to(getPageContent(filePath));
 		WebElement element = shadowDriver.findElement("#container");
-		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#inside");
+		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
+				"#inside");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(String.format("Located %d shadow document elements:", elements.size()));
-		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
+		err.println(
+				String.format("Located %d shadow document elements:", elements.size()));
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(err::println);
 	}
 
 	@Test
 	public void test2() {
-		driver.navigate().to(getPageContent("button.html"));
+		filePath = "button.html";
+		driver.navigate().to(getPageContent(filePath));
 		shadowDriver = new ShadowDriver(driver);
 		WebElement element = shadowDriver.findElement("button");
 		shadowDriver.scrollTo(element);
@@ -238,7 +113,8 @@ public class LocalFileTest {
 	@Test
 	public void test3() {
 
-		driver.navigate().to(getPageContent("button.html"));
+		filePath = "button.html";
+		driver.navigate().to(getPageContent(filePath));
 		WebElement parent = shadowDriver.findElement("body");
 		assertThat(parent, notNullValue());
 		// Cannot read property 'querySelector' of null
@@ -251,7 +127,8 @@ public class LocalFileTest {
 	@Test
 	public void test4() {
 
-		driver.navigate().to(getPageContent("inner_html_example.html"));
+		filePath = "inner_html_example.html";
+		driver.navigate().to(getPageContent(filePath));
 		WebElement element1 = driver.findElement(By.cssSelector("h3"));
 		assertThat(element1, notNullValue());
 		err.println("innerHTML: " + element1.getAttribute("innerHTML"));
@@ -263,7 +140,8 @@ public class LocalFileTest {
 
 	@Test
 	public void test6() {
-		driver.navigate().to(getPageContent("inner_html_example.html"));
+		filePath = "inner_html_example.html";
+		driver.navigate().to(getPageContent(filePath));
 		WebElement element = driver.findElement(By.cssSelector("body > div > h3"));
 		assertThat(element, notNullValue());
 		err.println("outerHTML: " + element.getAttribute("outerHTML"));
@@ -273,79 +151,31 @@ public class LocalFileTest {
 		WebElement parent = shadowDriver.findElement("body > div");
 		assertThat(parent, notNullValue());
 		err.println("Parent outerHTML: " + parent.getAttribute("outerHTML"));
-		err.println(String.format("Parent text(old API): \"%s\"", parent.getText()));
+		err.println(
+				String.format("Parent text(old API): \"%s\"", parent.getText()));
 		element = null;
 		element = shadowDriver.getShadowElement(parent, "h3");
 		assertThat(element, notNullValue());
 		err.println("Got shadow element: " + element); // toString
 		err.println("outerHTML (old API): " + element.getAttribute("outerHTML"));
-		err.println("outerHTML (new API): " + shadowDriver.getAttribute(element, "outerHTML"));
+		err.println("outerHTML (new API): "
+				+ shadowDriver.getAttribute(element, "outerHTML"));
 		err.println(String.format("Text(old API): \"%s\"", element.getText()));
-		err.println("Text(new API): " + shadowDriver.getAttribute(element, "value"));
+		err.println(
+				"Text(new API): " + shadowDriver.getAttribute(element, "value"));
 
 		List<WebElement> elements = shadowDriver.getAllShadowElement(parent, "h3");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(String.format("Located %d shadow document elements:", elements.size()));
-		elements.stream().map(e -> String.format("outerHTML (new API): %s", shadowDriver.getAttribute(e, "outerHTML")))
+		err.println(
+				String.format("Located %d shadow document elements:", elements.size()));
+		elements.stream().map(e -> String.format("outerHTML (new API): %s",
+				shadowDriver.getAttribute(e, "outerHTML"))).forEach(err::println);
+		elements.stream().map(e -> String.format("outerHTML (old API): %s",
+				e.getAttribute("outerHTML"))).forEach(err::println);
+		elements.stream()
+				.map(e -> String.format("Text (old API): \"%s\"", e.getText()))
 				.forEach(err::println);
-		elements.stream().map(e -> String.format("outerHTML (old API): %s", e.getAttribute("outerHTML")))
-				.forEach(err::println);
-		elements.stream().map(e -> String.format("Text (old API): \"%s\"", e.getText())).forEach(err::println);
 
-	}
-	@AfterClass
-	public static void tearDownAll() {
-		driver.close();
-	}
-
-	// Utilities
-	public static String getOSName() {
-		String osName = System.getProperty("os.name").toLowerCase();
-		if (osName.startsWith("windows")) {
-			osName = "windows";
-		}
-		return osName;
-	}
-
-	// origin:
-	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
-	public static String getPropertyEnv(String name, String defaultValue) {
-		String value = System.getProperty(name);
-		if (debug) {
-			err.println("system property " + name + " = " + value);
-		}
-		if (value == null || value.length() == 0) {
-			value = System.getenv(name);
-			if (debug) {
-				err.println("system env " + name + " = " + value);
-			}
-			if (value == null || value.length() == 0) {
-				value = defaultValue;
-				if (debug) {
-					err.println("default value  = " + value);
-				}
-			}
-		}
-		return value;
-	}
-
-	public static boolean checkEnvironment() {
-		boolean result = false;
-		if (env.containsKey("TRAVIS") && env.get("TRAVIS").equals("true")) {
-			result = true;
-		}
-		return result;
-	}
-
-	protected static String getPageContent(String pagename) {
-		try {
-			URI uri = LocalFileTest.class.getClassLoader().getResource(pagename).toURI();
-			err.println("Testing local file: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-			// supported in -source 1.6
-			throw new RuntimeException(e);
-		}
 	}
 }
