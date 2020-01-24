@@ -42,13 +42,11 @@ public class BaseTest {
 	private static Map<String, String> env = System.getenv();
 	private static boolean isCIBuild = checkEnvironment();
 
-	protected static final boolean debug = Boolean
-			.parseBoolean(getPropertyEnv("DEBUG", "false"));
+	protected static final boolean debug = Boolean.parseBoolean(getPropertyEnv("DEBUG", "false"));
 
 	protected static WebDriver driver = null;
 	protected static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("BROWSER",
-			getPropertyEnv("webdriver.driver", "chrome"));
+	private static String browser = getPropertyEnv("BROWSER", getPropertyEnv("webdriver.driver", "chrome"));
 
 	// export BROWSER=firefox or
 	// use -Pfirefox to override
@@ -56,8 +54,7 @@ public class BaseTest {
 		return browser;
 	}
 
-	private static final boolean headless = Boolean
-			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
+	private static final boolean headless = Boolean.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
 	@BeforeClass
@@ -76,23 +73,18 @@ public class BaseTest {
 		} else {
 			String osName = getOSName();
 			final Map<String, String> browserDrivers = new HashMap<>();
-			browserDrivers.put("chrome",
-					osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
-			browserDrivers.put("firefox",
-					osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
+			browserDrivers.put("chrome", osName.equals("windows") ? "chromedriver.exe" : "chromedriver");
+			browserDrivers.put("firefox", osName.equals("windows") ? "geckodriver.exe" : "geckodriver");
 			browserDrivers.put("edge", "MicrosoftWebDriver.exe");
 			if (browser.equals("chrome")) {
-				System.setProperty("webdriver.chrome.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("chrome")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.chrome.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("chrome")).toAbsolutePath().toString());
 
 				// https://peter.sh/experiments/chromium-command-line-switches/
 				ChromeOptions options = new ChromeOptions();
 				// options for headless
 				if (headless) {
-					for (String arg : (new String[] { "headless",
-							"window-size=1200x800" })) {
+					for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
 						options.addArguments(arg);
 					}
 				}
@@ -100,17 +92,13 @@ public class BaseTest {
 				driver = new ChromeDriver(options);
 			}
 			if (browser.equals("firefox")) {
-				System.setProperty("webdriver.gecko.driver",
-						Paths.get(System.getProperty("user.home")).resolve("Downloads")
-								.resolve(browserDrivers.get("firefox")).toAbsolutePath()
-								.toString());
+				System.setProperty("webdriver.gecko.driver", Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads").resolve(browserDrivers.get("firefox")).toAbsolutePath().toString());
 				// NOTE: there are both 32 and 64 bit firefox
-				System
-						.setProperty("webdriver.firefox.bin",
-								osName.equals("windows") ? new File(
-										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
-												.getAbsolutePath()
-										: "/usr/bin/firefox");
+				System.setProperty("webdriver.firefox.bin",
+						osName.equals("windows")
+								? new File("c:/Program Files (x86)/Mozilla Firefox/firefox.exe").getAbsolutePath()
+								: "/usr/bin/firefox");
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				// use legacy FirefoxDriver
@@ -130,8 +118,7 @@ public class BaseTest {
 				// http://kb.mozillazine.org/Network.cookie.cookieBehavior
 				// profile.setPreference("network.cookie.cookieBehavior", 2);
 				// no cookies are allowed
-				profile.setPreference("browser.helperApps.neverAsk.saveToDisk",
-						"application/octet-stream,text/csv");
+				profile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/octet-stream,text/csv");
 				profile.setPreference("browser.helperApps.neverAsk.openFile",
 						"text/csv,application/x-msexcel,application/excel,application/x-excel,application/vnd.ms-excel,image/png,image/jpeg,text/html,text/plain,application/msword,application/xml");
 				// TODO: cannot find symbol: method
@@ -160,8 +147,7 @@ public class BaseTest {
 				// NOTE: the next setting appears to have no effect.
 				// does one really need os-specific definition?
 				// like /dev/null for Linux vs. nul for Windows
-				System.setProperty("webdriver.firefox.logfile",
-						osName.equals("windows") ? "nul" : "/dev/null");
+				System.setProperty("webdriver.firefox.logfile", osName.equals("windows") ? "nul" : "/dev/null");
 
 				// no longer supported as of Selenium 3.8.x
 				// profile.setEnableNativeEvents(false);
@@ -178,8 +164,7 @@ public class BaseTest {
 					// driver.setLogLevel(FirefoxDriverLogLevel.ERROR);
 				} catch (WebDriverException e) {
 					e.printStackTrace();
-					throw new RuntimeException(
-							"Cannot initialize Firefox driver: " + e.toString());
+					throw new RuntimeException("Cannot initialize Firefox driver: " + e.toString());
 				}
 			} // TODO: finish for other browser
 		}
@@ -246,4 +231,13 @@ public class BaseTest {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
 }
