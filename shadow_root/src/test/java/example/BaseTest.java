@@ -240,4 +240,18 @@ public class BaseTest {
 		}
 	}
 
+	// origin: https://reflectoring.io/conditional-junit4-junit5-tests/
+	// probably an overkill
+	public static class BrowserChecker {
+		private String browser;
+
+		public BrowserChecker(String browser) {
+			this.browser = browser;
+		}
+
+		public boolean testingChrome() {
+			return (this.browser.equals("chrome"));
+		}
+	}
+
 }
