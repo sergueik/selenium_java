@@ -47,8 +47,7 @@ public class DemoTest extends BaseTest {
 		assertThat(element.getAttribute("innerText"), containsString("Mozilla"));
 		// Act
 		try {
-			CDPClient.sendMessage(MessageBuilder
-					.buildSetUserAgentOverrideMessage("python 2.7", "windows"));
+			CDPClient.sendMessage(MessageBuilder.buildSetUserAgentOverrideMessage("python 2.7", "windows"));
 		} catch (IOException | WebSocketException e) {
 			// ignore
 			System.err.println("Exception (ignored): " + e.toString());
@@ -71,8 +70,8 @@ public class DemoTest extends BaseTest {
 			responseMessage = CDPClient.getResponseDataMessage(id);
 			// Assert
 			result = new JSONObject(responseMessage);
-			for (String field : Arrays.asList(new String[] { "protocolVersion",
-					"product", "revision", "userAgent", "jsVersion" })) {
+			for (String field : Arrays
+					.asList(new String[] { "protocolVersion", "product", "revision", "userAgent", "jsVersion" })) {
 				assertThat(result.has(field), is(true));
 			}
 		} catch (Exception e) {
@@ -83,18 +82,13 @@ public class DemoTest extends BaseTest {
 
 	@Ignore
 	@Test
-	public void doFakeGeoLocation()
-			throws IOException, WebSocketException, InterruptedException {
-		CDPClient.sendMessage(
-				MessageBuilder.buildGeoLocationMessage(id, 37.422290, -122.084057));
+	public void doFakeGeoLocation() throws IOException, WebSocketException, InterruptedException {
+		CDPClient.sendMessage(MessageBuilder.buildGeoLocationMessage(id, 37.422290, -122.084057));
 		// google HQ
 		utils.waitFor(3);
 		URL = "https://www.google.com.sg/maps";
 		driver.navigate().to(URL);
-		uiUtils
-				.findElement(By.cssSelector(
-						"div[class *='widget-mylocation-button-icon-common']"), 120)
-				.click();
+		uiUtils.findElement(By.cssSelector("div[class *='widget-mylocation-button-icon-common']"), 120).click();
 		utils.waitFor(10);
 		uiUtils.takeScreenShot();
 	}
@@ -107,8 +101,7 @@ public class DemoTest extends BaseTest {
 
 	@Ignore
 	@Test
-	public void doNetworkTracking()
-			throws IOException, WebSocketException, InterruptedException {
+	public void doNetworkTracking() throws IOException, WebSocketException, InterruptedException {
 		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
 		URL = "http://petstore.swagger.io/v2/swagger.json";
 		driver.navigate().to(URL);
@@ -117,8 +110,7 @@ public class DemoTest extends BaseTest {
 		result = new JSONObject(responseMessage);
 		String reqId = result.getJSONObject("params").getString("requestId");
 		int id2 = Utils.getInstance().getDynamicID();
-		CDPClient
-				.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
+		CDPClient.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
 		String networkResponse = CDPClient.getResponseBodyMessage(id2);
 		System.err.println("Here is the network Response: " + networkResponse);
 		utils.waitFor(1);
@@ -128,8 +120,7 @@ public class DemoTest extends BaseTest {
 	@Ignore
 	@Test
 	public void doResponseMocking() throws Exception {
-		CDPClient.sendMessage(MessageBuilder
-				.buildRequestInterceptorPatternMessage(id, "*", "Document"));
+		CDPClient.sendMessage(MessageBuilder.buildRequestInterceptorPatternMessage(id, "*", "Document"));
 		CDPClient.mockResponse("This is mocked!!!");
 		URL = "http://petstore.swagger.io/v2/swagger.json";
 		driver.navigate().to(URL);
@@ -139,11 +130,10 @@ public class DemoTest extends BaseTest {
 	@Ignore
 	@Test
 	public void doFunMocking() throws IOException, WebSocketException {
-		byte[] fileContent = FileUtils.readFileToByteArray(
-				new File(System.getProperty("user.dir") + "/data/durian.png"));
+		byte[] fileContent = FileUtils
+				.readFileToByteArray(new File(System.getProperty("user.dir") + "/data/durian.png"));
 		String encodedString = Base64.getEncoder().encodeToString(fileContent);
-		CDPClient.sendMessage(
-				MessageBuilder.buildRequestInterceptorPatternMessage(id, "*", "Image"));
+		CDPClient.sendMessage(MessageBuilder.buildRequestInterceptorPatternMessage(id, "*", "Image"));
 		CDPClient.mockFunResponse(encodedString);
 		URL = "https://sg.carousell.com/";
 		driver.navigate().to(URL);
@@ -157,8 +147,7 @@ public class DemoTest extends BaseTest {
 		driver.navigate().to(URL);
 		driver.manage().deleteAllCookies();
 		CDPClient.sendMessage(MessageBuilder.buildClearBrowserCookiesMessage(id));
-		CDPClient.sendMessage(MessageBuilder.buildClearDataForOriginMessage(id,
-				"https://framework.realtime.co"));
+		CDPClient.sendMessage(MessageBuilder.buildClearDataForOriginMessage(id, "https://framework.realtime.co"));
 		utils.waitFor(3);
 	}
 
@@ -175,34 +164,35 @@ public class DemoTest extends BaseTest {
 		int width = logo.getSize().getWidth();
 		int height = logo.getSize().getHeight();
 		int scale = 1;
-		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
-				x, y, height, width, scale));
+		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id, x, y, height, width, scale));
 		responseMessage = CDPClient.getResponseDataMessage(id);
 		byte[] bytes = Base64.getDecoder().decode(responseMessage);
 		File f = new File(System.getProperty("user.dir") + "/target/img.png");
 		if (f.exists())
 			f.delete();
+		System.err.println("Saving screenshot.");
 		Files.write(f.toPath(), bytes);
-		uiUtils.takeScreenShot();
+		// uiUtils.takeScreenShot();
 	}
 
-	@Ignore
+	// @Ignore
+	// TODO: headless versus on-screen
 	// No message received
 	// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
 	@Test
 	public void doprintPDF() throws Exception {
 		URL = "https://www.wikipedia.com/";
 		driver.navigate().to(URL);
-		CDPClient.sendMessage(MessageBuilder.printPDFMessage(id));
-		responseMessage = CDPClient.getResponseDataMessage(id);
-		byte[] bytes = Base64.getDecoder().decode(responseMessage);
-		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss"))
-				.format(new Date());
-		String imageName = "cdp_img_" + start_time + ".pdf";
-		File f = new File(System.getProperty("user.dir") + "/target/" + imageName);
-		if (f.exists())
-			f.delete();
-		Files.write(f.toPath(), bytes);
+		try {
+			CDPClient.sendMessage(MessageBuilder.buildPrintPDFMessage(id));
+			System.err.println("Reading response of PrintPDF");
+			responseMessage = CDPClient.getResponseBodyMessage(id);
+			// TODO: assertNull
+		} catch (RuntimeException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			assertThat(e.toString(), containsString("No message received"
+			/* "PrintToPDF is not implemented" */));
+		}
 	}
 
 	@Ignore
@@ -210,17 +200,13 @@ public class DemoTest extends BaseTest {
 	public void doFullPageScreenshot() throws Exception {
 		URL = "https://www.meetup.com/";
 		driver.navigate().to(URL);
-		long docWidth = (long) uiUtils
-				.executeJavaScript("return document.body.offsetWidth");
-		long docHeight = (long) uiUtils
-				.executeJavaScript("return document.body.offsetHeight");
+		long docWidth = (long) uiUtils.executeJavaScript("return document.body.offsetWidth");
+		long docHeight = (long) uiUtils.executeJavaScript("return document.body.offsetHeight");
 		int scale = 1;
-		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id,
-				0, 0, docHeight, docWidth, scale));
+		CDPClient.sendMessage(MessageBuilder.buildTakeElementScreenShotMessage(id, 0, 0, docHeight, docWidth, scale));
 		responseMessage = CDPClient.getResponseDataMessage(id);
 		byte[] bytes = Base64.getDecoder().decode(responseMessage);
-		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss"))
-				.format(new Date());
+		String start_time = (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")).format(new Date());
 		String imageName = "cdp_img_" + start_time + ".png";
 		File f = new File(System.getProperty("user.dir") + "/target/" + imageName);
 		if (f.exists())
@@ -235,8 +221,7 @@ public class DemoTest extends BaseTest {
 		URL = "https://www.meetup.com/";
 		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerEnableMessage(id));
 		driver.navigate().to(URL);
-		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 10,
-				"activated");
+		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 10, "activated");
 		System.out.println(serviceWorker.toString());
 		Assert.assertEquals(serviceWorker.getStatus(), "activated");
 	}
@@ -248,22 +233,18 @@ public class DemoTest extends BaseTest {
 		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerEnableMessage(id));
 		driver.navigate().to(URL);
 		utils.waitFor(5);
-		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 5,
-				"activated");
+		ServiceWorker serviceWorker = CDPClient.getServiceWorker(URL, 5, "activated");
 		int id1 = Utils.getInstance().getDynamicID();
 		int id2 = Utils.getInstance().getDynamicID();
 
 		CDPClient.sendMessage(MessageBuilder.buildEnableLogMessage(id1));
 		CDPClient.sendMessage(MessageBuilder.buildEnableRuntimeMessage(id2));
 
-		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerInspectMessage(id2,
-				serviceWorker.getVersionId()));
-		WebElement elem = uiUtils.findElement(By.cssSelector("button#sendButton"),
-				3);
+		CDPClient.sendMessage(MessageBuilder.buildServiceWorkerInspectMessage(id2, serviceWorker.getVersionId()));
+		WebElement elem = uiUtils.findElement(By.cssSelector("button#sendButton"), 3);
 		uiUtils.scrollToElement(elem);
 		elem.click();
 		utils.waitFor(3);
 		utils.waitFor(60);
 	}
 }
-

@@ -1,8 +1,5 @@
 package example;
 
-// TODO: get rid of
-import com.neovisionaries.ws.client.WebSocketException;
-
 import example.messaging.CDPClient;
 import example.messaging.MessageBuilder;
 import example.messaging.ServiceWorker;
@@ -37,6 +34,16 @@ public class BaseTest {
 	protected UIUtils uiUtils;
 	protected CDPClient CDPClient;
 	protected int id;
+	private boolean debug = false;
+	private boolean headless = false;
+
+	public void setDebug(boolean value) {
+		this.debug = value;
+	}
+
+	public void setHeadless(boolean value) {
+		this.headless = value;
+	}
 
 	protected ChromeDriverService chromeDriverService;
 
@@ -45,7 +52,7 @@ public class BaseTest {
 		this.utils = Utils.getInstance();
 		this.uiUtils = UIUtils.getInstance();
 
-		this.driver = utils.launchBrowser();
+		this.driver = utils.launchBrowser(headless);
 		this.wsURL = utils.getWebSocketDebuggerUrl();
 		this.CDPClient = new CDPClient(wsURL);
 		this.id = Utils.getInstance().getDynamicID();
