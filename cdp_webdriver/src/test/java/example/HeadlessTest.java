@@ -56,8 +56,8 @@ public class HeadlessTest extends BaseTest {
 			responseMessage = CDPClient.getResponseDataMessage(id);
 			// Assert
 			result = new JSONObject(responseMessage);
-			for (String field : Arrays
-					.asList(new String[] { "protocolVersion", "product", "revision", "userAgent", "jsVersion" })) {
+			for (String field : Arrays.asList(new String[] { "protocolVersion",
+					"product", "revision", "userAgent", "jsVersion" })) {
 				assertThat(result.has(field), is(true));
 			}
 		} catch (Exception e) {
@@ -66,7 +66,8 @@ public class HeadlessTest extends BaseTest {
 	}
 
 	@Test
-	public void doNetworkTracking() throws IOException, WebSocketException, InterruptedException {
+	public void doNetworkTracking()
+			throws IOException, WebSocketException, InterruptedException {
 		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
 		URL = "http://petstore.swagger.io/v2/swagger.json";
 		driver.navigate().to(URL);
@@ -75,7 +76,8 @@ public class HeadlessTest extends BaseTest {
 		result = new JSONObject(responseMessage);
 		String reqId = result.getJSONObject("params").getString("requestId");
 		int id2 = Utils.getInstance().getDynamicID();
-		CDPClient.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
+		CDPClient
+				.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
 		String networkResponse = CDPClient.getResponseBodyMessage(id2);
 		System.err.println("Here is the network Response: " + networkResponse);
 		// utils.waitFor(1);
@@ -85,14 +87,17 @@ public class HeadlessTest extends BaseTest {
 	@Test
 	public void doprintPDF() throws Exception {
 		URL = "https://www.wikipedia.com/";
-		imageName = "cdp_img_" + (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")).format(new Date()) + ".pdf";
+		imageName = "cdp_img_"
+				+ (new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss")).format(new Date())
+				+ ".pdf";
 
 		driver.navigate().to(URL);
 		CDPClient.sendMessage(MessageBuilder.buildPrintPDFMessage(id));
 		// responseMessage = CDPClient.getResponseBodyMessage(id);
 		// TODO: assertNull
 		responseMessage = CDPClient.getResponseDataMessage(id);
-		System.err.println("Here is the base 64 PDF response: " + responseMessage.substring(0, 100));
+		System.err.println("Here is the base 64 PDF response: "
+				+ responseMessage.substring(0, 100));
 		byte[] bytes = Base64.getDecoder().decode(responseMessage);
 		File f = new File(filePath + "/" + imageName);
 		if (f.exists())

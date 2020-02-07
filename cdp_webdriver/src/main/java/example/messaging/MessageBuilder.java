@@ -24,6 +24,7 @@ public class MessageBuilder {
 	private static Map<String, Object> data = new HashMap<>();
 
 	private static class Message {
+		// no need for getters or setters in the static nested class
 		@SuppressWarnings("unused")
 		private int id;
 		@SuppressWarnings("unused")
@@ -159,6 +160,36 @@ public class MessageBuilder {
 		 * "{\"id\":%s,\"method\":\"Network.continueInterceptedRequest\",\"params\":{\"interceptionId\":\"%s\",\"rawResponse\":\"%s\"}}",
 		 * id, interceptionId, encodedResponse);
 		 */
+	}
+
+	public static String buildGetDocumentMessage(int id) {
+		return buildMessage(id, "DOM.getDocument");
+		/*
+		return String.format("{\"id\":%s,\"method\":\"DOM.getDocument\"}", id);
+		*/
+	}
+
+	public static String buildDescribeNodeMessage(int id, long nodeId) {
+		method = "DOM.describeNode";
+		params = new HashMap<>();
+		params.put("nodeId", nodeId);
+		params.put("depth", 1);
+		return buildMessage(id, method, params);
+		/*
+		return String.format("{\"id\":%s,\"method\":\"DOM.describeNode\"}\",\"params\":{\"nodeId\":\"%d\",\"depth\":\"%d\"}}", id, nodeId, 1);
+		*/
+	}
+
+	public static String buildQuerySelectorMessage(int id, long nodeId,
+			String selector) {
+		method = "DOM.querySelector";
+		params = new HashMap<>();
+		params.put("nodeId", nodeId);
+		params.put("selector", selector);
+		return buildMessage(id, method, params);
+		/*
+		return String.format("{\"id\":%s,\"method\":\"DOM.querySelector\"}\",\"params\":{\"nodeId\":\"%d\", \"selector\":\"%s\"}}", id, nodeId, selector);
+		*/
 	}
 
 	public static String buildServiceWorkerEnableMessage(int id) {
