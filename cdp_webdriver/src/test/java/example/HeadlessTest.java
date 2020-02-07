@@ -44,12 +44,44 @@ public class HeadlessTest extends BaseTest {
 	public void beforeTest() throws IOException {
 		super.setHeadless(true);
 		super.beforeTest();
+
 	}
 
-	// @Ignore
-	// TODO: headless versus on-screen
-	// No message received
-	// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
+	@Test
+	public void getBroswerVersionTest() {
+		// Arrange
+		// Act
+		try {
+			CDPClient.sendMessage(MessageBuilder.buildBrowserVersionMessage(id));
+			responseMessage = CDPClient.getResponseDataMessage(id);
+			// Assert
+			result = new JSONObject(responseMessage);
+			for (String field : Arrays
+					.asList(new String[] { "protocolVersion", "product", "revision", "userAgent", "jsVersion" })) {
+				assertThat(result.has(field), is(true));
+			}
+		} catch (Exception e) {
+			System.err.println("Exception (ignored): " + e.toString());
+		}
+	}
+
+	@Test
+	public void doNetworkTracking() throws IOException, WebSocketException, InterruptedException {
+		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
+		URL = "http://petstore.swagger.io/v2/swagger.json";
+		driver.navigate().to(URL);
+		utils.waitFor(3);
+		responseMessage = CDPClient.getResponseMessage("Network.requestWillBeSent");
+		result = new JSONObject(responseMessage);
+		String reqId = result.getJSONObject("params").getString("requestId");
+		int id2 = Utils.getInstance().getDynamicID();
+		CDPClient.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
+		String networkResponse = CDPClient.getResponseBodyMessage(id2);
+		System.err.println("Here is the network Response: " + networkResponse);
+		// utils.waitFor(1);
+		// uiUtils.takeScreenShot();
+	}
+
 	@Test
 	public void doprintPDF() throws Exception {
 		URL = "https://www.wikipedia.com/";

@@ -61,25 +61,6 @@ public class DemoTest extends BaseTest {
 
 	}
 
-	@Test
-	public void getBroswerVersionTest() {
-		// Arrange
-		// Act
-		try {
-			CDPClient.sendMessage(MessageBuilder.buildBrowserVersionMessage(id));
-			responseMessage = CDPClient.getResponseDataMessage(id);
-			// Assert
-			result = new JSONObject(responseMessage);
-			for (String field : Arrays
-					.asList(new String[] { "protocolVersion", "product", "revision", "userAgent", "jsVersion" })) {
-				assertThat(result.has(field), is(true));
-			}
-		} catch (Exception e) {
-			System.err.println("Exception (ignored): " + e.toString());
-		}
-
-	}
-
 	@Ignore
 	@Test
 	public void doFakeGeoLocation() throws IOException, WebSocketException, InterruptedException {
@@ -90,30 +71,6 @@ public class DemoTest extends BaseTest {
 		driver.navigate().to(URL);
 		uiUtils.findElement(By.cssSelector("div[class *='widget-mylocation-button-icon-common']"), 120).click();
 		utils.waitFor(10);
-		uiUtils.takeScreenShot();
-	}
-
-	// NOTE: for doNetworkTracking, need to switch to headless, e.g.
-	// via setting BaseTest property and invoking super.beforeTest() explicitly
-	// @Before
-	// public void beforeTest() {
-	// }
-
-	@Ignore
-	@Test
-	public void doNetworkTracking() throws IOException, WebSocketException, InterruptedException {
-		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
-		URL = "http://petstore.swagger.io/v2/swagger.json";
-		driver.navigate().to(URL);
-		utils.waitFor(3);
-		responseMessage = CDPClient.getResponseMessage("Network.requestWillBeSent");
-		result = new JSONObject(responseMessage);
-		String reqId = result.getJSONObject("params").getString("requestId");
-		int id2 = Utils.getInstance().getDynamicID();
-		CDPClient.sendMessage(MessageBuilder.buildGetResponseBodyMessage(id2, reqId));
-		String networkResponse = CDPClient.getResponseBodyMessage(id2);
-		System.err.println("Here is the network Response: " + networkResponse);
-		utils.waitFor(1);
 		uiUtils.takeScreenShot();
 	}
 
@@ -175,10 +132,6 @@ public class DemoTest extends BaseTest {
 		// uiUtils.takeScreenShot();
 	}
 
-	// @Ignore
-	// TODO: headless versus on-screen
-	// No message received
-	// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
 	@Test
 	public void doprintPDF() throws Exception {
 		URL = "https://www.wikipedia.com/";
@@ -190,8 +143,10 @@ public class DemoTest extends BaseTest {
 			// TODO: assertNull
 		} catch (RuntimeException e) {
 			System.err.println("Exception (ignored): " + e.toString());
-			assertThat(e.toString(), containsString("No message received"
-			/* "PrintToPDF is not implemented" */));
+			// No message received
+			// TODO: discover
+			// {"error":{"code":-32000,"message":"PrintToPDF is not implemented"}}
+			assertThat(e.toString(), containsString("No message received"));
 		}
 	}
 
