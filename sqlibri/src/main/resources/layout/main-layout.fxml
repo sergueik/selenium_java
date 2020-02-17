@@ -7,6 +7,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import com.sqlibri.control.editor.SQLEditor?>
+<!-- typo in import can lead to javafx.fxml.LoadException 
+<?import com.sqlibri.control.editor.?>
+-->
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity"
   minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
@@ -146,7 +149,7 @@
                 <ImageView fitHeight="25.0" fitWidth="25.0"
                   pickOnBounds="true" preserveRatio="true">
                   <image>
-                    <Image url="com/sqlibri/resources/image/save.png" />
+                    <Image url="image/save.png" />
                   </image>
                   <viewport>
                     <Rectangle2D />
@@ -162,7 +165,7 @@
                 <ImageView fx:id="load" fitHeight="25.0" fitWidth="25.0"
                   pickOnBounds="true" preserveRatio="true">
                   <image>
-                    <Image url="com/sqlibri/resources/image/load.png" />
+                    <Image url="image/load.png" />
                   </image>
                   <viewport>
                     <Rectangle2D />
@@ -178,7 +181,7 @@
                 <ImageView fx:id="export" fitHeight="25.0" fitWidth="25.0"
                   pickOnBounds="true" preserveRatio="true">
                   <image>
-                    <Image url="com/sqlibri/resources/image/save-data.png" />
+                    <Image url="image/save-data.png" />
                   </image>
                   <viewport>
                     <Rectangle2D />
@@ -194,7 +197,7 @@
                 <ImageView fitHeight="25.0" fitWidth="25.0"
                   pickOnBounds="true" preserveRatio="true">
                   <image>
-                    <Image url="com/sqlibri/resources/image/run.png" />
+                    <Image url="image/run.png" />
                   </image>
                   <viewport>
                     <Rectangle2D />
