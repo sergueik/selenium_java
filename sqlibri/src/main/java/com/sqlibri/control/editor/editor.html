@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<style type="text/css" media="screen">
+#editor {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+</style>
+</head>
+<body>
+  <div id="editor"></div>
+  <script src="ace/ace.js"></script>
+  <script src="ace/ext-language_tools.js"></script>
+  <script>
+    var pasteContent = function(content){
+        editor.onPaste(content);
+    }
+
+    var editor = ace.edit("editor");
+    editor.setTheme("ace/theme/textmate");
+    editor.getSession().setMode("ace/mode/sql");
+    editor.setOptions({
+      fontSize : "16pt",
+      enableBasicAutocompletion : true,
+      enableLiveAutocompletion: true,
+      enableSnippets: true, 
+      showInvisibles : true
+    });
+  </script>
+</body>
+</html>

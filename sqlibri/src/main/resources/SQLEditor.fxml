@@ -1,0 +1,8 @@
+<?import javafx.scene.web.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root type="javafx.scene.layout.StackPane" xmlns:fx="http://javafx.com/fxml">
+  <children>
+    <WebView fx:id="editor" />
+  </children>
+</fx:root>

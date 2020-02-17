@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="370.0" prefWidth="360.0" style="-fx-background-color: linear-gradient(from 0.0% 0.0% to 100.0% 100.0%, rgb(220.0, 220.0, 220.0) 0.0, rgb(255.0, 255.0, 255.0) 100.0);;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <children>
+    <Text layoutX="126.0" layoutY="30.0" strokeType="OUTSIDE" strokeWidth="0.0" text="SQLibri v0.4.3">
+      <font>
+        <Font name="Roboto Bold" size="20.0" />
+      </font>
+    </Text>
+    <TextFlow layoutX="17.0" layoutY="226.0" prefHeight="64.0" prefWidth="326.0" textAlignment="JUSTIFY">
+      <children>
+        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SQLibry is a cross-platform SQLite GUI client. Which allows to manipulate with data easily and effectively." textAlignment="CENTER" wrappingWidth="348.90576171875">
+          <font>
+            <Font name="Roboto Regular" size="15.0" />
+          </font>
+        </Text>
+      </children>
+      <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+      </padding>
+    </TextFlow>
+    <Hyperlink layoutX="64.0" layoutY="312.0" text="https://github.com/Saka7/sqlibri">
+         <font>
+            <Font name="Roboto Regular" size="15.0" />
+         </font></Hyperlink>
+    <ImageView fitHeight="175.0" fitWidth="219.0" layoutX="102.0" layoutY="41.0" pickOnBounds="true" preserveRatio="true">
+      <image>
+        <Image url="@../image/SQLibri.png" />
+      </image>
+    </ImageView>
+      <Label layoutX="32.0" layoutY="341.0" text="Copyrights 2016. Made by Ihor Sakaylyuk">
+         <font>
+            <Font name="Roboto Regular" size="16.0" />
+         </font>
+      </Label>
+  </children>
+</AnchorPane>

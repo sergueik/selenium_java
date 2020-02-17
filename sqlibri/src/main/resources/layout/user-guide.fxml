@@ -1,0 +1,438 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.text.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.*?>
+
+<Accordion
+   expandedPane="$getting_started"
+   maxHeight="-Infinity"
+   maxWidth="-Infinity"
+   minHeight="-Infinity"
+   minWidth="-Infinity"
+   prefHeight="400.0"
+   prefWidth="680.0"
+   xmlns="http://javafx.com/javafx/8"
+   xmlns:fx="http://javafx.com/fxml/1">
+  <panes>
+
+  <TitledPane fx:id="getting_started" contentDisplay="CENTER" text="Getting Started">
+      <content>
+        <StackPane prefHeight="374.0" prefWidth="581.0">
+          <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+          </padding>
+          <children>
+            <ScrollPane prefViewportHeight="354.0" prefViewportWidth="578.7247314453125">
+              <content>
+                <VBox prefHeight="200.0" prefWidth="100.0">
+                  <children>
+                    <Label text="SQLibri Getting Started">
+                      <font>
+                        <Font name="Roboto Bold" size="22.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="48.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="SQLibry is a cross-platform SQLite GUI client. Which allows to manipulate with data easily and effectively. In this getting started section we collect all information which is essential to figure out how to use the applicaiton. You can easily open this manual by pressing CTRL/COMMAND+SHIFT+H.">
+                          <font>
+                            <Font name="Roboto Regular" size="16.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <Label text="Working with Database files">
+                      <font>
+                        <Font name="Roboto Bold" size="22.0" />
+                      </font>
+                      <VBox.margin>
+                        <Insets bottom="5.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+
+                    <Label text="Creating database" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <VBox.margin>
+                        <Insets bottom="3.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="First of all we need to figure out how to create a database. And it's simple as pie. Just click on DATABASE menu -&gt; CREATE menu item / or press CTRL/COMMAND+N, enter database path and name and click OK." wrappingWidth="536.0001831054688">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <VBox.margin>
+                        <Insets bottom="15.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/Database-Create.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Opening database" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To open database click on DATABASE menu -&gt; OPEN menu item -&gt; / or press CTRL/COMMAND+O enter database path and name and click ok.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/Database-Open.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Droping database" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To drop database click on DATABASE menu -&gt; DROP menu item -&gt; and press ok. It will drop currently opened database.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/Database-Drop.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Copying database" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To copy database click on DATABASE menu -&gt; COPY menu item / or press CTRL/COMMAND+SHIFT+C, enter file path and name and press ok. It will copy currently opened database to new one(which is located by entered filepath).">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="574.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/Database-Copy.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Working with SQL editor">
+                      <font>
+                        <Font name="Roboto Bold" size="22.0" />
+                      </font>
+                      <VBox.margin>
+                        <Insets bottom="5.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <Label text="Writing and executing SQL queries" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="You can write SQL queries in the SQL Editor, which provides some advanced code editor features like syntax highlighting, intellisence and snippets(see Snippets section). To run the query Click on Execute button or press F9. Query execution info will be displayed in the status bar. If query returns any data it will be displayed in the table view.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="350.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/SQLEditor.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+                    
+                    <Label text="Navigating through previously executed queries" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="When query has been executed, it saves to history. You can search and select previously executed queries using history combobox.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="350.0" fitWidth="700.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/History.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Working with query files">
+                      <font>
+                        <Font name="Roboto Bold" size="22.0" />
+                      </font>
+                      <VBox.margin>
+                        <Insets bottom="5.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+
+                    <Label text="Saving Queries" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To save written before query you need to click on FILE menu -&gt; SAVE QUERY menu item / or press CTRL/COMMAND+S and enter file path and name.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/File-SaveQuery.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Opening Queries" underline="true">
+                      <font>
+                        <Font name="Roboto Bold" size="18.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To open saved before query you need to click on FILE menu -&gt; LOAD QUERY menu item / or press CTRL/COMMAND+SHIFT+O and enter file path and name.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/File-LoadQuery.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                    <Label text="Exporting to CSV">
+                      <font>
+                        <Font name="Roboto Bold" size="22.0" />
+                      </font>
+                      <VBox.margin>
+                        <Insets bottom="5.0" />
+                      </VBox.margin>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <Label text="Exporting data to CSV file" underline="true">
+                      <font>
+                        <Font name="System Bold" size="16.0" />
+                      </font>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </Label>
+                    <TextFlow prefHeight="59.0" prefWidth="578.0" textAlignment="JUSTIFY">
+                      <children>
+                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="To export data from table view to CSV file you need to click on FILE menu -&gt; EXPORT AS CSV menu item / or press CTRL/COMMAND+E and enter file name and press OK.">
+                          <font>
+                            <Font size="14.0" />
+                          </font>
+                        </Text>
+                      </children>
+                      <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </padding>
+                    </TextFlow>
+                    <ImageView fitHeight="200.0" fitWidth="571.0" pickOnBounds="true" preserveRatio="true">
+                      <image>
+                        <Image url="@../image/File-ExportAsCSV.png" />
+                      </image>
+                      <VBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                      </VBox.margin>
+                    </ImageView>
+
+                  </children>
+                </VBox>
+              </content>
+            </ScrollPane>
+          </children>
+        </StackPane>
+      </content>
+         <font>
+            <Font name="Roboto Regular" size="14.0" />
+         </font>
+      </TitledPane>
+
+      <TitledPane expanded="false" text="Shortcuts">
+        <content>
+          <StackPane prefHeight="150.0" prefWidth="200.0">
+            <children>
+              <ListView prefHeight="200.0" prefWidth="200.0">
+                <items>
+                  <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="[CTRL/COMMAND+S] - Save Query" />
+                    <String fx:value="[CTRL/COMMAND+Shift+O] - Open Query" />
+                    <String fx:value="[CTRL/COMMAND+E] - Export As CSV" />
+                    <String fx:value="[CTRL/COMMAND+X] - Exit" />
+                    <String fx:value="[CTRL/COMMAND+N] - Create Database" />
+                    <String fx:value="[CTRL/COMMAND+O] - Open Database" />
+                    <String fx:value="[CTRL/COMMAND+Shift+C] - Copy Database" />
+                    <String fx:value="[CTRL/COMMAND+Shift+H] - Open User Guide" />
+                  </FXCollections>
+                </items>
+              </ListView>
+            </children>
+          </StackPane>
+        </content>
+         <font>
+            <Font name="Roboto Regular" size="14.0" />
+         </font>
+      </TitledPane>
+      <TitledPane text="Snippets">
+        <content>
+          <StackPane prefHeight="150.0" prefWidth="200.0">
+            <children>
+              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Text" />
+              <ListView prefHeight="200.0" prefWidth="200.0">
+                <items>
+                  <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="[tbl] - create table" />
+                    <String fx:value="[col] - create column" />
+                    <String fx:value="[ccol] - create column (varchar type)" />
+                    <String fx:value="[ncol] - create column (number type)" />
+                    <String fx:value="[dcol] - create column (date type)" />
+                    <String fx:value="[ind] - create index on column" />
+                    <String fx:value="[uind] - create unique index on column" />
+                    <String fx:value="[s*] - select all from table" />
+                    <String fx:value="[addcol] - add column to the table" />
+                    <String fx:value="[seq] - create sequence" />
+                    <String fx:value="[tblcom] - create comment on table" />
+                    <String fx:value="[ins] - insert row(s) to table" />
+                    <String fx:value="[upt] - update row(s)" />
+                    <String fx:value="[dt] - drop table" />
+                    <String fx:value="[dl] - delete row(s) from table" />
+                  </FXCollections>
+                </items>
+              </ListView>
+            </children>
+          </StackPane>
+        </content>
+         <font>
+            <Font name="Roboto Regular" size="14.0" />
+         </font>
+      </TitledPane>
+  </panes>
+</Accordion>
