@@ -10,6 +10,7 @@ import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
+// NOTE: class is not used
 public class Element implements WebElement {
 
 	public <X> X getScreenshotAs(OutputType<X> arg0) throws WebDriverException {
