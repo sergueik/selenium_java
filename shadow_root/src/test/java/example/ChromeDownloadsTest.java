@@ -33,13 +33,19 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import example.BaseTest;
+import example.LocalFileTest;
 
 // this test methods will get skipped when run on Firefox
+// and is skipped Travis build
+// until we figure out how to configure the Chrome browser
+// handled by WebDriverManager
 public class ChromeDownloadsTest {
 
 	private static boolean isCIBuild = BaseTest.checkEnvironment();
 
 	protected static final boolean debug = Boolean.parseBoolean(BaseTest.getPropertyEnv("DEBUG", "false"));
+
+	private final String filePath = "download.html";
 
 	protected static WebDriver driver = null;
 	protected static ShadowDriver shadowDriver = null;
@@ -72,7 +78,7 @@ public class ChromeDownloadsTest {
 
 			// https://peter.sh/experiments/chromium-command-line-switches/
 			ChromeOptions options = new ChromeOptions();
-			// options for headless
+
 			if (headless) {
 				for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
 					options.addArguments(arg);
@@ -107,32 +113,27 @@ public class ChromeDownloadsTest {
 
 	@Before
 	public void init() {
-		// cannot combine junt4 Assume
-		// Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
-		// NOTE: can not use Assume here
 		if ((browser.equals("chrome") && !isCIBuild)) {
 			driver.navigate().to("about:blank");
 		}
 	}
 
-	// TODO: ordering
+	// download PDF have to be run first
 	@Test
-	public void test1() { // downloadPDFTest
-		// cannot combine junt4 Assume
-		Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
-		// Assume.assumeTrue(browser.equals("chrome"));
-		// Assume.assumeFalse(isCIBuild);
-		driver.navigate().to("https://intellipaat.com/blog/tutorial/selenium-tutorial/selenium-cheat-sheet/");
-		WebElement element = driver
-				.findElement(By.xpath("//*[@id=\"global\"]//a[contains(@href, \"Selenium-Cheat-Sheet.pdf\")]"));
+	public void test1() {
+		Assume.assumeTrue(browserChecker.testingChrome());
+		Assume.assumeFalse(isCIBuild);
+		driver.navigate().to(LocalFileTest.getPageContent(filePath));
+		WebElement element = driver.findElement(By.xpath("//a[contains(@href, \"wikipedia.pdf\")]"));
 		element.click();
 		sleep(5000);
 	}
 
+	// list downloads Shadow DOM
 	@Test
-	public void test2() { // listDownloadsShadowTest
-		// cannot combine junt4 Assume
-		Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
+	public void test2() {
+		Assume.assumeTrue(browser.equals("chrome"));
+		Assume.assumeFalse(isCIBuild);
 		driver.navigate().to("chrome://downloads/");
 		WebElement element = driver.findElement(By.tagName("downloads-manager"));
 		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#downloadsList");
@@ -149,16 +150,15 @@ public class ChromeDownloadsTest {
 		assertThat(element5, notNullValue());
 		System.err.println("Result element: " + element5.getAttribute("outerHTML"));
 		final String element4HTML = element5.getAttribute("innerHTML");
-		assertThat(element4HTML, containsString("Selenium-Cheat-Sheet"));
+		assertThat(element4HTML, containsString("wikipedia"));
 		// NOTE: the getText() is failing
 		try {
-			assertThat(element4.getText(), containsString("Selenium-Cheat-Sheet"));
+			assertThat(element4.getText(), containsString("wikipedia"));
 		} catch (AssertionError e) {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
-		// can be OS-specific: "Selenium-Cheat-Sheet (10).pdf"
 
-		Pattern pattern = Pattern.compile(String.format(".*Selenium-Cheat-Sheet(?:%s)*.pdf", " \\((\\d+)\\)"),
+		Pattern pattern = Pattern.compile(String.format("wikipedia(?:%s)*\\.pdf", " \\((\\d+)\\)"),
 				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(element4HTML);
 		assertThat(matcher.find(), is(true));
@@ -186,12 +186,10 @@ public class ChromeDownloadsTest {
 
 	}
 
+	// NOTE: can not use Assume in @Begin or @After
 	@After
 	public void AfterMethod() {
-		// NOTE: can not use Assume here
 		if ((browser.equals("chrome") && !isCIBuild)) {
-			// Assume.assumeTrue(browser.equals("chrome"));
-			// Assume.assumeFalse(isCIBuild);
 			driver.get("about:blank");
 		}
 	}
