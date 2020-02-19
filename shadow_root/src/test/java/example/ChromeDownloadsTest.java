@@ -16,17 +16,6 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/*
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-*/
-
-// https://www.baeldung.com/junit-before-beforeclass-beforeeach-beforeall
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assume;
@@ -66,48 +55,51 @@ public class ChromeDownloadsTest {
 	public static void setup() {
 		if (browser.equals("chrome")) {
 			err.println("Launching " + browser);
+			String chromeDriverPath = null;
+			err.println("Launching " + browser);
 			if (isCIBuild) {
 				WebDriverManager.chromedriver().setup();
-				driver = new ChromeDriver();
+				chromeDriverPath = WebDriverManager.chromedriver().getBinaryPath();
+
 			} else {
-				final String chromeDriverPath = Paths.get(System.getProperty("user.home")).resolve("Downloads")
+				chromeDriverPath = Paths.get(System.getProperty("user.home")).resolve("Downloads")
 						.resolve(System.getProperty("os.name").toLowerCase().startsWith("windows") ? "chromedriver.exe"
 								: "chromedriver")
 						.toAbsolutePath().toString();
 				System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-
-				// https://peter.sh/experiments/chromium-command-line-switches/
-				ChromeOptions options = new ChromeOptions();
-				// options for headless
-				if (headless) {
-					for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
-						options.addArguments(arg);
-					}
-				}
-
-				Map<String, Object> preferences = new Hashtable<>();
-				preferences.put("profile.default_content_settings.popups", 0);
-				preferences.put("download.prompt_for_download", "false");
-				String downloadsPath = System.getProperty("user.home") + "/Downloads";
-				preferences.put("download.default_directory",
-						BaseTest.getPropertyEnv("fileDownloadPath", downloadsPath));
-
-				Map<String, Object> chromePrefs = new HashMap<>();
-				chromePrefs.put("plugins.always_open_pdf_externally", true);
-				Map<String, Object> plugin = new HashMap<>();
-				plugin.put("enabled", false);
-				plugin.put("name", "Chrome PDF Viewer");
-
-				chromePrefs.put("plugins.plugins_list", Arrays.asList(plugin));
-				options.setExperimentalOption("prefs", chromePrefs);
-				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-				capabilities.setCapability("chrome.binary", chromeDriverPath);
-
-				capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-				capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-
-				driver = new ChromeDriver(capabilities);
 			}
+			System.err.println("Chrome Driver Path: " + chromeDriverPath);
+
+			// https://peter.sh/experiments/chromium-command-line-switches/
+			ChromeOptions options = new ChromeOptions();
+			// options for headless
+			if (headless) {
+				for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
+					options.addArguments(arg);
+				}
+			}
+
+			Map<String, Object> preferences = new Hashtable<>();
+			preferences.put("profile.default_content_settings.popups", 0);
+			preferences.put("download.prompt_for_download", "false");
+			String downloadsPath = System.getProperty("user.home") + "/Downloads";
+			preferences.put("download.default_directory", BaseTest.getPropertyEnv("fileDownloadPath", downloadsPath));
+
+			Map<String, Object> chromePrefs = new HashMap<>();
+			chromePrefs.put("plugins.always_open_pdf_externally", true);
+			Map<String, Object> plugin = new HashMap<>();
+			plugin.put("enabled", false);
+			plugin.put("name", "Chrome PDF Viewer");
+
+			chromePrefs.put("plugins.plugins_list", Arrays.asList(plugin));
+			options.setExperimentalOption("prefs", chromePrefs);
+			DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+			capabilities.setCapability("chrome.binary", chromeDriverPath);
+
+			capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			capabilities.setCapability(ChromeOptions.CAPABILITY, options);
+
+			driver = new ChromeDriver(capabilities);
 			shadowDriver = new ShadowDriver(driver);
 			shadowDriver.setDebug(debug);
 		}
@@ -115,13 +107,21 @@ public class ChromeDownloadsTest {
 
 	@Before
 	public void init() {
-		driver.navigate().to("about:blank");
+		// cannot combine junt4 Assume
+		// Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
+		// NOTE: can not use Assume here
+		if ((browser.equals("chrome") && !isCIBuild)) {
+			driver.navigate().to("about:blank");
+		}
 	}
 
 	// TODO: ordering
 	@Test
 	public void test1() { // downloadPDFTest
-		Assume.assumeTrue(browser.equals("chrome"));
+		// cannot combine junt4 Assume
+		Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
+		// Assume.assumeTrue(browser.equals("chrome"));
+		// Assume.assumeFalse(isCIBuild);
 		driver.navigate().to("https://intellipaat.com/blog/tutorial/selenium-tutorial/selenium-cheat-sheet/");
 		WebElement element = driver
 				.findElement(By.xpath("//*[@id=\"global\"]//a[contains(@href, \"Selenium-Cheat-Sheet.pdf\")]"));
@@ -131,7 +131,8 @@ public class ChromeDownloadsTest {
 
 	@Test
 	public void test2() { // listDownloadsShadowTest
-		Assume.assumeTrue(browserChecker.testingChrome());
+		// cannot combine junt4 Assume
+		Assume.assumeTrue((browser.equals("chrome") && !isCIBuild));
 		driver.navigate().to("chrome://downloads/");
 		WebElement element = driver.findElement(By.tagName("downloads-manager"));
 		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#downloadsList");
@@ -187,12 +188,19 @@ public class ChromeDownloadsTest {
 
 	@After
 	public void AfterMethod() {
-		driver.get("about:blank");
+		// NOTE: can not use Assume here
+		if ((browser.equals("chrome") && !isCIBuild)) {
+			// Assume.assumeTrue(browser.equals("chrome"));
+			// Assume.assumeFalse(isCIBuild);
+			driver.get("about:blank");
+		}
 	}
 
 	@AfterClass
 	public static void tearDownAll() {
-		driver.close();
+		if (driver != null) {
+			driver.close();
+		}
 	}
 
 	// origin: https://reflectoring.io/conditional-junit4-junit5-tests/
