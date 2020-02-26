@@ -34,6 +34,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import com.sun.jna.Memory;
+import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.WTypes.LPWSTR;
 import com.sun.jna.platform.win32.WinDef.RECT;
@@ -203,6 +205,33 @@ public class AU3Test {
 
 	}
 
+	
+		@Test(enabled = true)
+	public void testMouseGetPos() {
+		System.err.println("Get mouse position information");
+		try {
+		
+			int[] pos =  new int[2];
+			Pointer arg = new Memory( 32 );
+			instance.AU3_MouseGetPos(arg);
+			System.err.println("Dump: " + arg.dump(0, 16 ));
+			pos = arg.getIntArray(0, 2);
+
+			assertThat(pos, notNullValue());
+
+			assertThat(pos[0], greaterThan(-1));
+			assertThat(pos[1], greaterThan(-1));
+
+			System.err.println(String.format("X: %d\nY: %d",
+					pos[0], pos[1]));
+
+		} catch (Exception e) {
+		// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space : size=4, offset = 8
+			System.err.println("Exception " + e.toString());
+		}
+	}
+
+	
 	@Test(enabled = true)
 	public void testDesktopWindowDimensions() {
 		System.err.println("Get desktop window position information");

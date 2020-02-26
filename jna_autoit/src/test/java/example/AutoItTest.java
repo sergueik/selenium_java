@@ -117,6 +117,25 @@ public class AutoItTest {
 	}
 
 	@Test(enabled = true)
+	public void testMouseGetPos() {
+		System.err.println("Get mouse position information");
+		try {
+			int[] pos = instance.MouseGetPos();
+			assertThat(pos, notNullValue());
+
+			assertThat(pos[0], greaterThan(-1));
+			assertThat(pos[1], greaterThan(-1));
+
+			System.err.println(String.format("X: %d\nY: %d",
+					pos[0], pos[1]));
+
+		} catch (Exception e) {
+		// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space : size=4, offset = 8
+			System.err.println("Exception " + e.toString());
+		}
+	}
+
+	@Test(enabled = true)
 	public void testDesktopWindowDimensions() {
 		System.err.println("Get desktop window position information");
 		title = "Program Manager";

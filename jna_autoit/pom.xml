@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>jnautoit</artifactId>
-  <version>0.0.10-SNAPSHOT</version>
+  <version>0.0.11-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>JNAutoIt</name>
   <description>JNAutoIt - Java Native wrapper of AutoItX dll</description>
