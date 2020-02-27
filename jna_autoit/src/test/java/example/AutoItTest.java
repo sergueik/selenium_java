@@ -108,8 +108,7 @@ public class AutoItTest {
 			assertThat(pos[2], greaterThan(0));
 			assertThat(pos[3], greaterThan(0));
 
-			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d",
-					pos[0], pos[1], pos[2], pos[3]));
+			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d", pos[0], pos[1], pos[2], pos[3]));
 
 		} catch (Exception e) {
 			System.err.println("Exception " + e.toString());
@@ -126,11 +125,11 @@ public class AutoItTest {
 			assertThat(pos[0], greaterThan(-1));
 			assertThat(pos[1], greaterThan(-1));
 
-			System.err.println(String.format("X: %d\nY: %d",
-					pos[0], pos[1]));
+			System.err.println(String.format("X: %d\nY: %d", pos[0], pos[1]));
 
 		} catch (Exception e) {
-		// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space : size=4, offset = 8
+			// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space
+			// : size=4, offset = 8
 			System.err.println("Exception " + e.toString());
 		}
 	}
@@ -142,8 +141,7 @@ public class AutoItTest {
 		try {
 			int[] pos = instance.WinGetPos(title, "");
 			assertThat(pos, notNullValue());
-			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d",
-					pos[0], pos[1], pos[2], pos[3]));
+			System.err.println(String.format("X: %d\nY: %d\nWidth: %d\nHeight: %d", pos[0], pos[1], pos[2], pos[3]));
 
 			assertThat(pos[0], equalTo(0));
 			assertThat(pos[1], equalTo(0));
@@ -207,13 +205,10 @@ public class AutoItTest {
 		// System.err.println(
 		// "Commandline: " + commandline + " processname : " + processName);
 		boolean status = instance.ProcessExists(processName);
-		System.err.println(
-				"Existing process check: " + (status ? "running" : "not running"));
+		System.err.println("Existing process check: " + (status ? "running" : "not running"));
 
 		if (!status) {
-			System.err
-					.println(String.format("Launching process %s with commandline %s",
-							processName, commandline));
+			System.err.println(String.format("Launching process %s with commandline %s", processName, commandline));
 			status = instance.Run(commandline, workdir, Constants.SW_SHOW);
 		}
 		assertTrue(instance.ProcessExists(processName));
@@ -227,8 +222,7 @@ public class AutoItTest {
 		assertTrue(instance.WinSetOnTop(title, text, Constants.AU3_WINDOWS_ONTOP));
 		instance.Sleep(1000);
 		// NOTE: without the timeout, this call will block the test
-		System.err.println("Window " + title + " is active: "
-				+ instance.WinWaitActive(title, text, 10));
+		System.err.println("Window " + title + " is active: " + instance.WinWaitActive(title, text, 10));
 
 		System.err.println("Closing window title: " + title);
 		instance.WinClose(title, text);
@@ -248,8 +242,7 @@ public class AutoItTest {
 		title = "[ACTIVE]";
 		String windowTitle = instance.WinGetTitle(title, text);
 		assertThat(windowTitle, notNullValue());
-		System.err.println(
-				String.format("The active window title is \"%s\"", windowTitle));
+		System.err.println(String.format("The active window title is \"%s\"", windowTitle));
 	}
 
 	@Test(enabled = true)
@@ -266,9 +259,8 @@ public class AutoItTest {
 		HWND hwnd = new HWND();
 		hwnd.setPointer(new Pointer(Long.decode(windowHandle)));
 		assertTrue(User32.INSTANCE.IsWindow(hwnd));
-		System.err.println(String.format(
-				"Window \"%s\" handle is %s. It is a valid window handle.", windowTitle,
-				windowHandle));
+		System.err.println(
+				String.format("Window \"%s\" handle is %s. It is a valid window handle.", windowTitle, windowHandle));
 	}
 
 	@Test(enabled = false)
@@ -281,8 +273,7 @@ public class AutoItTest {
 		assertThat(windowHandle, notNullValue());
 		String windowText = instance.WinGetTextByHandle(windowHandle);
 		assertThat(windowText, notNullValue());
-		System.err.println(String.format("Window \"%s\" text is \"%s\".",
-				windowTitle, windowText));
+		System.err.println(String.format("Window \"%s\" text is \"%s\".", windowTitle, windowText));
 	}
 
 	@Test(enabled = false)

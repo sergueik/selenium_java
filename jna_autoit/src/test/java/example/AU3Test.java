@@ -91,16 +91,14 @@ public class AU3Test {
 	public void testCloseChromeBrowser() {
 		System.err.println("Close Chrome Browser");
 		title = "New Tab";
-		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)),
-				au3Success);
+		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)), au3Success);
 	}
 
 	@Test(enabled = false)
 	public void testCloseFirefoxBrowser() {
 		System.err.println("Close Mozilla Firefox Browser");
 		title = "Mozilla Firefox Start Page";
-		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)),
-				au3Success);
+		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)), au3Success);
 	}
 
 	@Test(enabled = false)
@@ -114,8 +112,7 @@ public class AU3Test {
 		instance.AU3_WinClose(new WString(title), new WString(text));
 		// close the file open dialog
 		// TODO: confirm the status
-		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)),
-				au3Failure);
+		assertEquals(instance.AU3_WinClose(new WString(title), new WString(text)), au3Failure);
 	}
 
 	@Test(enabled = true)
@@ -131,33 +128,26 @@ public class AU3Test {
 		// System.err.println(
 		// "Commandline: " + commandline + " processname : " + processName);
 		int result = instance.AU3_ProcessExists(new WString(processName));
-		System.err.println("Existing process check: " + (result == 0 ? "not running"
-				: String.format("already running with pid %d", result)));
+		System.err.println("Existing process check: "
+				+ (result == 0 ? "not running" : String.format("already running with pid %d", result)));
 
 		if (result == 0) {
-			System.err
-					.println(String.format("Launching process %s with commandline %s",
-							processName, commandline));
-			int pid = instance.AU3_Run(new WString(commandline), new WString(workdir),
-					Constants.SW_SHOW);
+			System.err.println(String.format("Launching process %s with commandline %s", processName, commandline));
+			int pid = instance.AU3_Run(new WString(commandline), new WString(workdir), Constants.SW_SHOW);
 			System.err.println("Launched process pid: " + pid);
 		}
-		assertTrue(instance
-				.AU3_ProcessExists(new WString(processName)) != Constants.AU3_FAILURE);
+		assertTrue(instance.AU3_ProcessExists(new WString(processName)) != Constants.AU3_FAILURE);
 		instance.AU3_Sleep(1000);
-		assertTrue(instance.AU3_WinExists(new WString(title),
-				new WString("")) != Constants.AU3_FAILURE);
+		assertTrue(instance.AU3_WinExists(new WString(title), new WString("")) != Constants.AU3_FAILURE);
 		System.err.println("Window exists. ");
 		System.err.println("Closing window title: " + title);
 		instance.AU3_WinClose(new WString(title), new WString(""));
 		instance.AU3_Sleep(1000);
-		if (instance.AU3_WinExists(new WString(title),
-				new WString("")) == Constants.AU3_SUCCESS) {
+		if (instance.AU3_WinExists(new WString(title), new WString("")) == Constants.AU3_SUCCESS) {
 			System.err.println("Killing window title: " + title);
 			instance.AU3_WinKill(new WString(title), new WString(""));
 		}
-		assertFalse(instance.AU3_WinExists(new WString(title),
-				new WString("")) == Constants.AU3_SUCCESS);
+		assertFalse(instance.AU3_WinExists(new WString(title), new WString("")) == Constants.AU3_SUCCESS);
 	}
 
 	@Test(enabled = true)
@@ -191,30 +181,27 @@ public class AU3Test {
 	public void testWinGetPos() {
 		System.err.println("Get active window position information");
 		title = "[ACTIVE]";
-		assertTrue(instance.AU3_WinExists(new WString(title),
-				new WString("")) != Constants.AU3_FAILURE);
+		assertTrue(instance.AU3_WinExists(new WString(title), new WString("")) != Constants.AU3_FAILURE);
 
 		RECT rect = new RECT();
 		instance.AU3_WinGetPos(new WString(title), new WString(""), rect);
 		assertThat(rect, notNullValue());
 		assertThat(rect.bottom, greaterThan(0));
 		assertThat(rect.right, greaterThan(0));
-		System.err
-				.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d",
-						rect.top, rect.left, rect.bottom, rect.right));
+		System.err.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d", rect.top, rect.left, rect.bottom,
+				rect.right));
 
 	}
 
-	
-		@Test(enabled = true)
+	@Test(enabled = true)
 	public void testMouseGetPos() {
 		System.err.println("Get mouse position information");
 		try {
-		
-			int[] pos =  new int[2];
-			Pointer arg = new Memory( 32 );
+
+			int[] pos = new int[2];
+			Pointer arg = new Memory(32);
 			instance.AU3_MouseGetPos(arg);
-			System.err.println("Dump: " + arg.dump(0, 16 ));
+			System.err.println("Dump: " + arg.dump(0, 16));
 			pos = arg.getIntArray(0, 2);
 
 			assertThat(pos, notNullValue());
@@ -222,16 +209,15 @@ public class AU3Test {
 			assertThat(pos[0], greaterThan(-1));
 			assertThat(pos[1], greaterThan(-1));
 
-			System.err.println(String.format("X: %d\nY: %d",
-					pos[0], pos[1]));
+			System.err.println(String.format("X: %d\nY: %d", pos[0], pos[1]));
 
 		} catch (Exception e) {
-		// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space : size=4, offset = 8
+			// Exception java.lang.IndexOutOfBoundsException: Bounds exceeds available space
+			// : size=4, offset = 8
 			System.err.println("Exception " + e.toString());
 		}
 	}
 
-	
 	@Test(enabled = true)
 	public void testDesktopWindowDimensions() {
 		System.err.println("Get desktop window position information");
@@ -244,12 +230,10 @@ public class AU3Test {
 		assertEquals(rect.left, 0);
 		assertThat(rect.bottom, greaterThan(0));
 		assertThat(rect.right, greaterThan(0));
-		System.err
-				.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d",
-						rect.top, rect.left, rect.bottom, rect.right));
+		System.err.println(String.format("top: %d\nleft: %d\nbottom: %d\nright: %d", rect.top, rect.left, rect.bottom,
+				rect.right));
 
 	}
-
 
 	// @Test(enabled = false)
 	// public void testAU3_WinActive() {

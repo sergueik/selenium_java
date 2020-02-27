@@ -278,6 +278,7 @@ Dump of file AutoItX3_x64.dll
   * Yet another [Autoit forum](http://www.cyberforum.ru/autoit/) (in Russian)
   * [Uploading a file using Autoit & WebDrive](https://selenium-training-way2automation.blogspot.com/2013/04/uploading-file-using-autoit-webdriver.html) - apparently very non-developer geared tutorial covering usage of Autoit's own __SciTe Script Editor__, an UFT-like control for enumerating Windows controls propeties and design Autoit *script* to automate browser file upload when impossible in plain Selenium
   * post discussing [Mouse automation with AutoItX](https://www.codeproject.com/Articles/5258929/Mouse-automation)
+  * Mouse automation with [AutoItX](https://www.codeproject.com/Articles/5258929/Mouse-automation-with-AutoItX)
 
 ### License
 This project is licensed under the terms of the MIT license.

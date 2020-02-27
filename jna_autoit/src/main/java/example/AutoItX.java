@@ -1094,21 +1094,32 @@ public class AutoItX implements AutoItXLibrary {
 
 	// https://www.autoitscript.com/autoit3/docs/functions/MouseGetPos.htm
 	@Override
-	public void AU3_MouseGetPos(Pointer arg0) {
-		LIB.AU3_MouseGetPos(arg0);
+	public void AU3_MouseGetPos(Pointer arg) {
+		LIB.AU3_MouseGetPos(arg);
 	}
 
-	// a two-element int array containing the mouse coordinates:
+	// a two-element int array containing the mouse coordinates
 	// $_[0] X coordinate
 	// $_[1] Y coordinate
 	public int[] MouseGetPos() {
-		int[] pos =  { 0, 0 };
+		int[] pos = { 0, 0 };
 		// https://www.baeldung.com/java-size-of-object
 		// TODO: examine return value of the AU3 method call
-		Pointer arg = new Memory( /* 2 * Pointer.SIZE */ 32 );
+		Pointer arg = new Memory(32);
 		LIB.AU3_MouseGetPos(arg);
 		pos = arg.getIntArray(0, 2);
 		return pos;
+	}
+
+	// an int mouse coordinate
+	// if dimension=0, the X coordinate
+	// if dimension=1, the Y coordinate
+	public int MouseGetPos(int dimension) {
+		int[] pos = { 0, 0 };
+		Pointer arg = new Memory(32);
+		LIB.AU3_MouseGetPos(arg);
+		pos = arg.getIntArray(0, 2);
+		return dimension == 0 ? pos[0] : pos[1];
 	}
 
 	// https://www.autoitscript.com/autoit3/docs/functions/MouseClick.htm
