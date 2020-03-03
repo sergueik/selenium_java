@@ -1,3 +1,9 @@
+### Info 
+Example xstl apply class for the XML tool clean Java / Timcat hosting node management
+
+### Usage
+#### Basic
+#### Non-workin
 `transform.xsl`:
 
 
@@ -53,7 +59,8 @@ java -cp target\xslt-0.0.1-SNAPSHOT.jar example.App example.xml transform.xsl ou
  </student>
  <output>f4224811-6795-41ee-b4ab-5cb013330aed</output>
 ```
-the [Saxon jar](https://www.saxonica.com/documentation9.5/using-xsl/commandline.html) is supposed to be [runnable](https://stackoverflow.com/questions/4604497/xslt-processing-with-java) but it refuses to:
+the [Saxon jar](https://www.saxonica.com/documentation9.5/using-xsl/commandline.html) is supposed to be 
+[runnable](https://stackoverflow.com/questions/4604497/xslt-processing-with-java) but it refuses to:
 
 
 ```sh
@@ -68,5 +75,5 @@ Errors were reported during stylesheet compilation
 
 ### See Also
 
- * 
+ * transforming XML to JSON using [XSLT2JSON](https://github.com/bramstein/xsltjson)
 

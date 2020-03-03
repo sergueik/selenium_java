@@ -1,17 +1,14 @@
 package example;
 
-// https://stackoverflow.com/questions/25061696/xsltproc-doesnt-recognize-xslt-2-0/25061774
-// https://stackoverflow.com/questions/4604497/xslt-processing-with-java
-// https://stackoverflow.com/questions/4604497/xslt-processing-with-java   
-// NOTE: can possibly call saxon.jar directly 
-// https://mvnrepository.com/artifact/net.sf.saxon/Saxon-HE
-
 import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+
+// https://stackoverflow.com/questions/4604497/xslt-processing-with-java
+// https://stackoverflow.com/questions/25061696/xsltproc-doesnt-recognize-xslt-2-0/25061774
 
 public class App {
 	public static void main(String[] args)

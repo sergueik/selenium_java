@@ -1,9 +1,23 @@
 <?xml version="1.0"?>
-<class>
-  <student no="1">
-    <name>Linus</name>
-  </student>
-  <student no="2">
-    <name>Stallman</name>
-  </student>
-</class>
+<!-- uncommenting namespace-heavy declaration breaks the transformation -->
+<!--
+<Parent xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                      http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+		      version="3.1">
+		      -->
+<Parent>
+  <ChildL1 Childtype="A">
+    <ChildL1L1/>
+    <ChildL1L1/>
+    <ChildL1L1>
+      <ChildL1L2/>
+    </ChildL1L1>
+  </ChildL1>
+  <ChildL1 Childtype="B">
+    <ChildL1L1/>
+    <ChildL1L1 foo="bar"/>
+    <ChildL1L1/>
+  </ChildL1>
+</Parent>
