@@ -1,15 +1,44 @@
-### Info 
+### Info
 Example xstl apply class for the XML tool clean Java / Timcat hosting node management
 
 ### Usage
 #### Basic
-#### Non-workin
+```sh
+mvn package
+java -cp target/xslt-0.0.1-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
+```
+```sh
+transforming example.xml with transform.xsl
+```
+
+```sh
+winDiff.Exe example.xml example_output.xml
+```
+
+```sh
+java -cp target/xslt-0.0.1-SNAPSHOT.jar example.App web.xml web_transform.xsl web_output.xml
+```
+```sh
+transforming web.xml with web_transform.xsl
+```
+
+This will create a new nde but with an undesired namespace inside:
+
+```xml
+<filter xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
+  <filter-name>httpHeaderSecurity</filter-name>
+  <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
+  <async-supported>true</async-supported>
+</filter>
+```
+#### Non-working
 `transform.xsl`:
+
 
 
 ```xml
 <?xml version="1.0"?>
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 xmlns:uuid="java.util.UUID" version="2.0" exclude-result-prefixes="uuid">
   <xsl:output method="xml" version="1.0" encoding="utf-8" indent="yes"/>
   <xsl:template match="/">
@@ -59,7 +88,7 @@ java -cp target\xslt-0.0.1-SNAPSHOT.jar example.App example.xml transform.xsl ou
  </student>
  <output>f4224811-6795-41ee-b4ab-5cb013330aed</output>
 ```
-the [Saxon jar](https://www.saxonica.com/documentation9.5/using-xsl/commandline.html) is supposed to be 
+the [Saxon jar](https://www.saxonica.com/documentation9.5/using-xsl/commandline.html) is supposed to be
 [runnable](https://stackoverflow.com/questions/4604497/xslt-processing-with-java) but it refuses to:
 
 
@@ -76,4 +105,5 @@ Errors were reported during stylesheet compilation
 ### See Also
 
  * transforming XML to JSON using [XSLT2JSON](https://github.com/bramstein/xsltjson)
+ * amendment to [XSLT template](https://stackoverflow.com/questions/4964152/xslt-script-doesnt-work-when-a-namespace-is-declared-in-the-root-node) when transfrorm script doesn't work becase some namespace is declared in the root node of the subject
 
