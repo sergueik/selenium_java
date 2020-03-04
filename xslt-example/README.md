@@ -104,6 +104,7 @@ Errors were reported during stylesheet compilation
 
 ### See Also
 
- * transforming XML to JSON using [XSLT2JSON](https://github.com/bramstein/xsltjson)
- * amendment to [XSLT template](https://stackoverflow.com/questions/4964152/xslt-script-doesnt-work-when-a-namespace-is-declared-in-the-root-node) when transfrorm script doesn't work becase some namespace is declared in the root node of the subject
-
+  *  transforming XML to JSON using [XSLT2JSON](https://github.com/bramstein/xsltjson)
+  * amendment to [XSLT template](https://stackoverflow.com/questions/4964152/xslt-script-doesnt-work-when-a-namespace-is-declared-in-the-root-node) when transfrorm script doesn't work becase some namespace is declared in the root node of the subject
+  * another discussion of [the same](https://stackoverflow.com/questions/1344158/xslt-with-xml-source-that-has-a-default-namespace-set-to-xmlns)
+  * wrap a comment around [specific node](https://stackoverflow.com/questions/17607602/comment-a-single-node)
