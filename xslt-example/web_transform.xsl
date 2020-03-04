@@ -6,7 +6,7 @@
       <xsl:apply-templates select="@*|node()"/>
     </xsl:copy>
   </xsl:template>
-  <xsl:template match="xxx:filter[last()]">
+  <xsl:template match="xxx:filter[xxx:filter-name[text()='httpHeaderSecurity']]">
     <xsl:comment>
       <!-- this does not work -->
       <xsl:copy-of select="."/>

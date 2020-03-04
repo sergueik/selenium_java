@@ -5,7 +5,7 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 #### Basic
 ```sh
 mvn package
-java -cp target/xslt-0.0.1-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
+java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
 ```
 ```sh
 transforming example.xml with transform.xsl
@@ -16,7 +16,7 @@ winDiff.Exe example.xml example_output.xml
 ```
 
 ```sh
-java -cp target/xslt-0.0.1-SNAPSHOT.jar example.App web.xml web_transform.xsl web_output.xml
+java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml web_transform.xsl web_output.xml
 ```
 ```sh
 transforming web.xml with web_transform.xsl
@@ -72,7 +72,7 @@ xmlns:uuid="java.util.UUID" version="2.0" exclude-result-prefixes="uuid">
 
 ```sh
 mvn install
-java -cp target\xslt-0.0.1-SNAPSHOT.jar example.App example.xml transform.xsl output.xml
+java -cp target\xslt-0.0.2-SNAPSHOT.jar example.App example.xml transform.xsl output.xml
 ```
 
 `output.xml`:
