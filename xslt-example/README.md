@@ -5,25 +5,23 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 #### Basic
 ```sh
 mvn package
-java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
+java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
 ```
+inspect the modifications made
 ```sh
-transforming example.xml with transform.xsl
+diff example.xml example_output.xml
+```
+(on Windows use windiff.exe)
+
+This will put a XML comment around the selected node removing it from catalina configuration
+```sh
+java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App web.xml comment_node.xsl web_output.xml
 ```
 
+This will create a new node but with an undesired namespace inside:
 ```sh
-winDiff.Exe example.xml example_output.xml
+java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml create_node.xsl web_output.xml
 ```
-
-```sh
-java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml web_transform.xsl web_output.xml
-```
-```sh
-transforming web.xml with web_transform.xsl
-```
-
-This will create a new nde but with an undesired namespace inside:
-
 ```xml
 <filter xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
   <filter-name>httpHeaderSecurity</filter-name>
@@ -67,12 +65,9 @@ xmlns:uuid="java.util.UUID" version="2.0" exclude-result-prefixes="uuid">
 </class>
 ```
 
-
-
-
 ```sh
 mvn install
-java -cp target\xslt-0.0.2-SNAPSHOT.jar example.App example.xml transform.xsl output.xml
+java -cp target\xslt-0.0.3-SNAPSHOT.jar example.App example.xml transform.xsl output.xml
 ```
 
 `output.xml`:
