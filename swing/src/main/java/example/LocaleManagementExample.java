@@ -99,24 +99,24 @@ public class LocaleManagementExample extends javax.swing.JFrame {
 
 	private void jToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {
 		if (jToggleButton.isSelected()) {
-			jToggleButton.setText("RU");
-			System.err.println("Locale was: " + jTextField.getLocale());
+			System.err.println("Locale was: " + jPanel1.getInputContext().getLocale());
 			locale = new Locale("ru", "RU");
 			Locale.setDefault(locale);
 			// jPanel1.getInputContext().selectInputMethod(locale);
-			jTextField.setLocale(locale);
+			// jTextField.setLocale(locale);
 			jToggleButton.setText(locale.getDisplayLanguage());
-			System.err.println("Locale changed to: " + jTextField.getLocale());
+			jPanel1.getInputContext().selectInputMethod(locale);
+			System.err.println("Locale changed to: " + jPanel1.getInputContext().getLocale());
 			// the next line changes input locale on Windows but not on Linux
 			jPanel1.getInputContext().selectInputMethod(new Locale("ru", "RU"));
 		} else if (jToggleButton.isSelected() == false) {
 			locale = new Locale("en", "US");
 			jToggleButton.setText(locale.getDisplayLanguage());
-			System.err.println("Locale was: " + jTextField.getLocale());
-			jTextField.setLocale(locale);
-			System.err.println("Locale changed to: " + jTextField.getLocale());
-			// the next line changes input locale on Windows but not on Linux
+			System.err.println("Locale was: " + jPanel1.getInputContext().getLocale());
 			jPanel1.getInputContext().selectInputMethod(new Locale("en", "US"));
+			// jTextField.setLocale(locale);
+			System.err.println("Locale changed to: " + jPanel1.getInputContext().getLocale());
+			// the next line changes input locale on Windows but not on Linux
 		}
 		jTextField.requestFocusInWindow();
 	}
