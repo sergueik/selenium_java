@@ -16,12 +16,9 @@ import java.net.URISyntaxException;
 
 public class App {
 	public static void main(String[] args) throws IOException, URISyntaxException, TransformerException {
-		TransformerFactory factory = TransformerFactory.newInstance();
-		Source xslt = new StreamSource(new File(args[1]));
-		Transformer transformer = factory.newTransformer(xslt);
-
-		Source text = new StreamSource(new File(args[0]));
 		System.err.println(String.format("transforming %s with %s", args[0], args[1]));
+		Transformer transformer = (TransformerFactory.newInstance()).newTransformer(new StreamSource(new File(args[1])));
+		Source text = new StreamSource(new File(args[0]));
 		transformer.transform(text, new StreamResult(new File(args[2])));
 	}
 }
