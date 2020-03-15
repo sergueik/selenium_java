@@ -21,7 +21,7 @@
  *   Software.
  */
 
-package io.nayuki.json;
+package example;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;

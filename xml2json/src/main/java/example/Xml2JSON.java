@@ -1,4 +1,4 @@
-package xml2json;
+package example;
 
 import java.io.File;
 import java.io.PrintStream;
@@ -46,8 +46,7 @@ public class Xml2JSON {
 			isFirstChild = true;
 		}
 
-		public void startElement(String uri, String localName, String qName,
-				Attributes attributes) {
+		public void startElement(String uri, String localName, String qName, Attributes attributes) {
 			stream.println(isFirstChild ? "" : ",");
 			stream.print("{ \"name\": \"");
 			stream.print(qName);

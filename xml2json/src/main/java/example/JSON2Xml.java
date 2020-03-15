@@ -1,4 +1,4 @@
-package xml2json;
+package example;
 
 import java.io.BufferedReader;
 import java.io.File;

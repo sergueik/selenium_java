@@ -21,7 +21,7 @@
  *   Software.
  */
 
-package io.nayuki.json;
+package example;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
