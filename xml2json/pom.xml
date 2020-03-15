@@ -3,9 +3,12 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>xml2json</groupId>
   <artifactId>xml2json</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.1-SNAPSHOT</version>
   <properties>
+    <!-- NOTE: the mainClass property is used down in the DOM -->
+    <mainClass>JSON2Xml</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <junit.version>4.12</junit.version>
     <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -19,9 +22,18 @@
       <version>1.2.5</version>
     </dependency>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+    </dependency>
+    <dependency>
       <groupId>net.sf.json-lib</groupId>
       <artifactId>json-lib</artifactId>
       <version>2.4</version>
+      <!--
+NOTE: with classified commented get the maven error
+Failure to find net.sf.json-lib:json-lib:jar:2.4 in https://repo.maven.apache.org/maven2
+-->
       <classifier>jdk15</classifier>
     </dependency>
   </dependencies>
@@ -32,7 +44,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
         <configuration>
-          <finalName>SWTsample</finalName>
+          <finalName>app</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -75,4 +87,18 @@
       </plugin>
     </plugins>
   </build>
+  <repositories>
+    <repository>
+      <id>central</id>
+      <!--
+      https://central.maven.org/maven2/ Error 403 Use https://repo1.maven.org
+      -->
+      <url>https://repo1.maven.org/maven2/</url>
+    </repository>
+    <repository>
+      <id>project.local</id>
+      <name>project</name>
+      <url>file:${project.basedir}/repo</url>
+    </repository>
+  </repositories>
 </project>

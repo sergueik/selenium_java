@@ -10,7 +10,7 @@ import java.io.PrintStream;
 import org.xml.sax.Attributes;
 import org.xml.sax.helpers.DefaultHandler;
 
-public class Program {
+public class Xml2JSON {
 	public static void main(String[] argv) {
 		if (argv.length < 1) {
 			System.out.println("Usage: java -jar xml2json.jar input.xml output.json");
