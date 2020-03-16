@@ -1,5 +1,6 @@
 package com.mycompany.app;
 // example from
+
 // https://github.com/seleniumhq/selenium-google-code-issue-archive/issues/284
 // implementation derived from
 // http://bharathautomation.blogspot.in/p/selenium-webdriver-faqs.html
@@ -80,131 +81,152 @@ import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 
-public class App implements Runnable{
-    public static WebDriver driver;
-    private static Set<String> windowHandles;
-    Thread thread;
-    App() throws InterruptedException{
-        thread = new Thread(this,"test");
-        thread.start();
-    }
+public class App implements Runnable {
+	public static WebDriver driver;
+	private static Set<String> windowHandles;
+	Thread thread;
 
-    public void run(){
-      String currentHandle = null;
+	App() throws InterruptedException {
+		thread = new Thread(this, "test");
+		thread.start();
+	}
 
-      try {
-        System.err.println("Thread: sleep 3 sec." );
-        Thread.sleep(3000);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      System.err.println("Thread: wake." );
-			// With modal window, WebDriver appears to be hanging on [get current window handle]
-      try {
-        currentHandle = driver.getWindowHandle();
-        System.err.println("Thread: Current Window handle" + currentHandle );        
-      } catch (NoSuchWindowException e) {
-        
-      }
-      while(true) {
-        try {
-					System.out.println("Thread: wait .5 sec");
-          Thread.sleep(500);
-        } catch (InterruptedException e) {
-          e.printStackTrace();
-        }
-        System.out.println("Thread: inspecting all Window handles" );
-        // when a modal window is created by Javascript window.showModalDialog
-        // WebDriver appears to be hanging on [get current window handle], [get window handles]
-        // Node console shows no Done: [get current window handle] or Done: [get window handles]
-        // if the window is closed manually, and cleater again, the problem goes away
-        windowHandles =  driver.getWindowHandles();
-        if (windowHandles.size() > 1) {
-					System.err.println("Found "  + (windowHandles.size() - 1 ) + " additional Windows");
-					break;
-        } else {
-          System.out.println("Thread: no other Windows" );
-        }
-      }
+	public void run() {
+		String currentHandle = null;
 
-      Iterator<String> windowHandleIterator =  windowHandles.iterator();
-      while(windowHandleIterator.hasNext()) {
-        String handle = (String) windowHandleIterator.next();
-        if (! handle.equals(currentHandle)){				
-          System.out.println("Switch to " + handle);
-          driver.switchTo().window(handle);
-          // move, print attributes
-          System.out.println("Switch to main window." );
-          driver.switchTo().defaultContent();
-        }
-      }
-      /*
-      // the rest of example commented out
-      String nextHandle = driver.getWindowHandle();
-      System.out.println("nextHandle" + nextHandle);
+		try {
+			System.err.println("Thread: sleep 3 sec.");
+			Thread.sleep(3000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		System.err.println("Thread: wake.");
+		// With modal window, WebDriver appears to be hanging on [get current window
+		// handle]
+		try {
+			currentHandle = driver.getWindowHandle();
+			System.err.println("Thread: Current Window handle" + currentHandle);
+		} catch (NoSuchWindowException e) {
 
-      driver.findElement(By.xpath("//input[@type='button'][@value='Close']")).click();
+		}
+		while (true) {
+			try {
+				System.out.println("Thread: wait .5 sec");
+				Thread.sleep(500);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Thread: inspecting all Window handles");
+			// when a modal window is created by Javascript window.showModalDialog
+			// WebDriver appears to be hanging on [get current window handle], [get window
+			// handles]
+			// Node console shows no Done: [get current window handle] or Done: [get window
+			// handles]
+			// if the window is closed manually, and cleater again, the problem goes away
+			windowHandles = driver.getWindowHandles();
+			if (windowHandles.size() > 1) {
+				System.err.println("Found " + (windowHandles.size() - 1) + " additional Windows");
+				break;
+			} else {
+				System.out.println("Thread: no other Windows");
+			}
+		}
 
-      // Switch to main window
-      for (String handle : driver.getWindowHandles()) {
-          driver.switchTo().window(handle);
-      }
-      // Accept alert
-      driver.switchTo().alert().accept();
-			*/
-    }
+		Iterator<String> windowHandleIterator = windowHandles.iterator();
+		while (windowHandleIterator.hasNext()) {
+			String handle = (String) windowHandleIterator.next();
+			if (!handle.equals(currentHandle)) {
+				System.out.println("Switch to " + handle);
+				driver.switchTo().window(handle);
+				// move, print attributes
+				System.out.println("Switch to main window.");
+				driver.switchTo().defaultContent();
+			}
+		}
+		/*
+		 * // the rest of example commented out String nextHandle =
+		 * driver.getWindowHandle(); System.out.println("nextHandle" + nextHandle);
+		 * 
+		 * driver.findElement(By.xpath("//input[@type='button'][@value='Close']")).click
+		 * ();
+		 * 
+		 * // Switch to main window for (String handle : driver.getWindowHandles()) {
+		 * driver.switchTo().window(handle); } // Accept alert
+		 * driver.switchTo().alert().accept();
+		 */
+	}
 
-    public static void main(String args[]) throws InterruptedException,MalformedURLException{
-      // ProfilesIni p=new ProfilesIni();
-      // WebDriver hangs on navigation with Firefox 40 / Selenium 2.44
-      // driver=new FirefoxDriver(p.getProfile("default"));
-      // only works with Firefox
-      DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "", Platform.ANY);
-      FirefoxProfile profile = new ProfilesIni().getProfile("default");
-      profile.setEnableNativeEvents(false);
-      capabilities.setCapability("firefox_profile", profile);
+	public static void main(String args[]) throws InterruptedException, MalformedURLException {
+		// ProfilesIni p=new ProfilesIni();
+		// WebDriver hangs on navigation with Firefox 40 / Selenium 2.44
+		// driver=new FirefoxDriver(p.getProfile("default"));
+		// only works with Firefox
+		/*
+		 * DesiredCapabilities capabilities = new DesiredCapabilities("firefox", "",
+		 * Platform.ANY); FirefoxProfile profile = new
+		 * ProfilesIni().getProfile("default"); profile.setEnableNativeEvents(false);
+		 * capabilities.setCapability("firefox_profile", profile);
+		 */
 
-      /*
-      System.setProperty("webdriver.chrome.driver", "c:/java/selenium/chromedriver.exe");
-      DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-      LoggingPreferences logging_preferences = new LoggingPreferences();
-      logging_preferences.enable(LogType.BROWSER, Level.ALL);
-      capabilities.setCapability(CapabilityType.LOGGING_PREFS, logging_preferences);
-      //  prefs.js:user_pref("extensions.logging.enabled", true);
-      //  user.js:user_pref("extensions.logging.enabled", true);
-      driver = new ChromeDriver(capabilities);
-      */
-      // driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"), capabilities);
-        System.setProperty("webdriver.ie.driver", "c:/java/selenium/IEDriverServer.exe");      
-        driver = new InternetExplorerDriver();
-        
-      driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+		System.setProperty("webdriver.chrome.driver", "/home/sergueik/Downloads/chromedriver");
+		/*
+		 * DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		 * LoggingPreferences logging_preferences = new LoggingPreferences();
+		 * logging_preferences.enable(LogType.BROWSER, Level.ALL);
+		 * capabilities.setCapability(CapabilityType.LOGGING_PREFS,
+		 * logging_preferences);
+		 */
+		// java.lang.NoClassDefFoundError: org/apache/commons/exec/DaemonExecutor
+		// https://github.com/SeleniumHQ/selenium/issues/3284
+		// prefs.js:user_pref("extensions.logging.enabled", true);
+		// user.js:user_pref("extensions.logging.enabled", true);
+		driver = new ChromeDriver(/* capabilities */ );
 
-      new App();
-      // non-modal windows are handled successfully.
-			// driver.get("http://www.naukri.com/");
-      driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
-      // following two locator do not work with IE
-      // driver.findElement(By.xpath("//input[@value='Open modal dialog']")).click();
-      // driver.findElement(By.cssSelector("input[type='button']")).click();
-      WebDriverWait wait = new WebDriverWait(driver, 5 );
-      wait.pollingEvery(500,TimeUnit.MILLISECONDS);
-      Actions actions = new Actions(driver);		
+		// driver = new RemoteWebDriver(new URL("http://127.0.0.1:4444/wd/hub"),
+		// capabilities);
+		/*
+		 * System.setProperty("webdriver.ie.driver",
+		 * "c:/java/selenium/IEDriverServer.exe"); driver = new
+		 * InternetExplorerDriver();
+		 */
+		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
-      wait.until(ExpectedConditions.visibilityOf(driver.findElement(By.xpath("html/body"))));
+		new App();
+		// non-modal windows are handled successfully.
+		// driver.get("http://www.naukri.com/");
+		driver.get("https://developer.mozilla.org/samples/domref/showModalDialog.html");
+		// https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog
+		driver.get("https://developer.mozilla.org/en-US/docs/Web/HTML/Element/dialog");
+		WebElement element = driver.findElement(By.cssSelector("iframe#frame_Advanced_example"));
+		WebDriver iframe = driver.switchTo().frame(element);
+		System.err.println(iframe.getPageSource());
+		element = iframe.findElement(By.cssSelector("button#updateDetails"));
+		System.err.println(element.getAttribute("outerHTML"));
 
-      WebElement body = driver.findElement(By.xpath("html/body"));
-      body.findElement(By.xpath("input")).click();
-      
-      System.out.println("main: sleeping 10 sec");
+		element.click();
+		Actions actions = new Actions(driver);
+		actions.click(element).build().perform();
+		// iframe class="live-sample-frame sample-code-frame" frameborder="0"
+		// height="300" id="frame_Advanced_example"
+		// following two locator do not work with IE
+		// driver.findElement(By.xpath("//input[@value='Open modal dialog']")).click();
+		// driver.findElement(By.cssSelector("input[type='button']")).click();
+		WebDriverWait wait = new WebDriverWait(driver, 5);
+		wait.pollingEvery(500, TimeUnit.MILLISECONDS);
+		// Actions actions = new Actions(driver);
 
-      Thread.sleep(20000);
-      System.out.println("main: close");
-      driver.close();
-      driver.quit();
+		wait.until(ExpectedConditions.visibilityOf(iframe.findElement(By.xpath("//*[@id=\"favDialog\"]"))));
 
-    }
+		WebElement body = iframe.findElement(By.xpath("//*[@id=\"favDialog\"]"));
+		body.findElement(By.xpath("//*[@id=\"confirmBtn\"]")).click();
+
+		System.out.println("main: sleeping 10 sec");
+
+		Thread.sleep(20000);
+		System.out.println("main: close");
+		driver.close();
+		driver.quit();
+
+	}
 
 }
-
-
