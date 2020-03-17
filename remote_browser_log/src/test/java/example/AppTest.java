@@ -2,6 +2,7 @@ package example;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static java.lang.System.err;
 import static org.hamcrest.CoreMatchers.is;
 
 import java.io.File;
@@ -9,7 +10,7 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
-
+import java.lang.NullPointerException;
 import java.lang.StringBuilder;
 
 import java.net.BindException;
@@ -21,7 +22,11 @@ import java.nio.charset.Charset;
 
 import java.util.concurrent.TimeUnit;
 import java.util.Date;
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -84,12 +89,21 @@ public class AppTest // extends BaseTest
 				.getParameter("browser");
 		DesiredCapabilities capabilities;
 		LoggingPreferences loggingPreferences = new LoggingPreferences();
-		;
+
+		final String chromeDriverPath = context.getCurrentXmlTest()
+				.getParameter("webdriver.chrome.driver");
+		if (chromeDriverPath != null) {
+			String value = resolveEnvVars(chromeDriverPath);
+			System.setProperty("webdriver.chrome.driver", value);
+			System.err.println(String.format("Setting the environment: \"%s\"=\"%s\"",
+					"webdriver.chrome.driver", value));
+			// TODO: cover "webdriver.gecko.driver"
+		}
 		// remote Configuration
 		if (context.getCurrentXmlTest().getParameter("execution")
 				.compareToIgnoreCase("remote") == 0) {
-			String hub = "http://" + seleniumHost + ":" + seleniumPort + "/wd/hub";
 
+			String hub = "http://" + seleniumHost + ":" + seleniumPort + "/wd/hub";
 			loggingPreferences.enable(LogType.BROWSER, Level.ALL);
 			loggingPreferences.enable(LogType.CLIENT, Level.INFO);
 			loggingPreferences.enable(LogType.SERVER, Level.INFO);
@@ -121,8 +135,6 @@ public class AppTest // extends BaseTest
 		// standalone
 		else {
 			if (seleniumBrowser.compareToIgnoreCase("chrome") == 0) {
-				System.setProperty("webdriver.chrome.driver", context
-						.getCurrentXmlTest().getParameter("webdriver.chrome.driver"));
 				capabilities = DesiredCapabilities.chrome();
 				loggingPreferences.enable(LogType.BROWSER, Level.ALL);
 				capabilities.setCapability(CapabilityType.LOGGING_PREFS,
@@ -143,6 +155,8 @@ public class AppTest // extends BaseTest
 		}
 		wait = new WebDriverWait(driver, 5);
 		actions = new Actions(driver);
+		Set<String> logTypes = driver.manage().logs().getAvailableLogTypes();
+		System.err.println("Discovered supported log types: " + logTypes);
 		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
 			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
@@ -152,19 +166,23 @@ public class AppTest // extends BaseTest
 		}
 	}
 
-	@AfterSuite(alwaysRun = true, enabled = true)
-	public void cleanupSuite() {
-		driver.close();
-		driver.quit();
+	@Test(description = "Opens the local file", enabled = true)
+	public void consoleLogTest() {
+		String filePath = "clock.html";
+		driver.navigate().to(getPageContent(filePath));
+		WebElement element = driver
+				.findElement(By.cssSelector("input[name=\"clock\"]"));
+		final String script = "console.log(arguments[0].value) ; console.log('just test') ;  return arguments[0].value";
+		String value = (String) executeScript(script, element);
 	}
 
-	@Test(description = "Opens the site")
-	public void LoggingTest() throws InterruptedException {
+	@Test(description = "Opens the site", enabled = false)
+	public void loggingTest() throws InterruptedException {
 		String base_url = "http://www.cnn.com/";
 		driver.get(base_url);
 
 		String class_name = "logo";
-		class_name = "cnn-badge-icon"; 
+		class_name = "cnn-badge-icon";
 		wait.until(ExpectedConditions
 				.visibilityOfElementLocated(By.className(class_name)));
 		WebElement element = driver.findElement(By.className(class_name));
@@ -176,14 +194,24 @@ public class AppTest // extends BaseTest
 		// Thread.sleep(3000L);
 
 		actions.moveToElement(element).click().build().perform();
+		// analyzeLog();
+	}
+
+	@AfterSuite(alwaysRun = true, enabled = true)
+	public void cleanupSuite() {
 		analyzeLog();
+
+		if (driver != null) {
+			driver.close();
+			driver.quit();
+		}
 	}
 
 	public void analyzeLog() {
 		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-
+		System.err.println("Analyze log:");
 		for (LogEntry entry : logEntries) {
-			System.out.println(new Date(entry.getTimestamp()) + " " + entry.getLevel()
+			System.err.println(new Date(entry.getTimestamp()) + " " + entry.getLevel()
 					+ " " + entry.getMessage());
 		}
 	}
@@ -196,4 +224,52 @@ public class AppTest // extends BaseTest
 		JSONObject objToReturn = new JSONObject(writer.toString());
 		return objToReturn;
 	}
+
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{(?:env:)?(\\w+)\\}|(\\w+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			String envVarValue = System.getenv(envVarName);
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
+	}
+
+	private final boolean debug = true;
+
+	protected String getPageContent(String pagename) {
+		try {
+			System.err.println("loading " + pagename + " with "
+					+ AppTest.class.getClassLoader().getResource(pagename));
+			// probably does not work with surefire + testng + testng.config ? NPE
+			URI uri = AppTest.class.getClassLoader().getResource(pagename).toURI();
+			System.err.println("Testing local file: " + uri.toString());
+			return uri.toString();
+		} catch (URISyntaxException | NullPointerException e) {
+			// mask the exception
+			if (debug) {
+				return "file:///C:/developer/sergueik/selenium_tests/target/test-classes/clock.html";
+			} else {
+				throw new RuntimeException(e);
+			}
+		}
+	}
+
+	public Object executeScript(String script, Object... arguments) {
+		if (driver instanceof JavascriptExecutor) {
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
+					.cast(driver);
+			return javascriptExecutor.executeScript(script, arguments);
+		} else {
+			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
 }
