@@ -2,80 +2,62 @@ package example;
 
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static java.lang.System.err;
-import static org.hamcrest.CoreMatchers.is;
 
-import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.lang.NullPointerException;
-import java.lang.StringBuilder;
 
-import java.net.BindException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.charset.Charset;
 
-import java.util.concurrent.TimeUnit;
 import java.util.Date;
 import java.util.Set;
+
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
 import org.apache.http.HttpResponse;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHttpEntityEnclosingRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import org.openqa.selenium.By;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.Dimension;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Platform;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.internal.ProfilesIni;
-// import org.openqa.selenium.firefox.ProfileManager;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogEntry;
-import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.logging.LogType;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.Platform;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
-import org.openqa.selenium.remote.HttpCommandExecutor;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
 
-import org.testng.*;
-import org.testng.annotations.*;
+import org.testng.ITestContext;
 
-public class AppTest // extends BaseTest
-{
+import org.testng.annotations.AfterSuite;
+import org.testng.annotations.AfterTest;
+import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.Test;
+
+public class AppTest {
 	private RemoteWebDriver driver;
+	private final boolean debug = true;
+	private static final String filePath = "logger.html";
+	private final static String base_url = "http://www.cnn.com/";
 	private Actions actions;
 	private WebDriverWait wait;
 
@@ -155,83 +137,87 @@ public class AppTest // extends BaseTest
 		}
 		wait = new WebDriverWait(driver, 5);
 		actions = new Actions(driver);
-		Set<String> logTypes = driver.manage().logs().getAvailableLogTypes();
-		System.err.println("Discovered supported log types: " + logTypes);
+		Set<String> availableLogTypes = driver.manage().logs()
+				.getAvailableLogTypes();
+		System.err.println("Discovered supported log types: " + availableLogTypes);
 		try {
 			driver.manage().window().setSize(new Dimension(600, 800));
 			driver.manage().timeouts().pageLoadTimeout(10, TimeUnit.SECONDS);
 			driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-		} catch (Exception ex) {
-			System.out.println(ex.toString());
+		} catch (Exception e) {
+			System.err.println("Exceptio (ignored): " + e.toString());
 		}
 	}
 
 	@Test(description = "Opens the local file", enabled = true)
 	public void consoleLogTest() {
-		String filePath = "clock.html";
 		driver.navigate().to(getPageContent(filePath));
 		WebElement element = driver
 				.findElement(By.cssSelector("input[name=\"clock\"]"));
-		final String script = "console.log(arguments[0].value) ; console.log('just test') ;  return arguments[0].value";
-		String value = (String) executeScript(script, element);
+		final String script = "console.log('Test from client: ' + arguments[0].value); return";
+		sleep(10000);
+		executeScript(script, element);
 	}
 
-	@Test(description = "Opens the site", enabled = false)
+	@Test(description = "Opens the site", enabled = true)
 	public void loggingTest() throws InterruptedException {
-		String base_url = "http://www.cnn.com/";
+
 		driver.get(base_url);
 
-		String class_name = "logo";
-		class_name = "cnn-badge-icon";
-		wait.until(ExpectedConditions
-				.visibilityOfElementLocated(By.className(class_name)));
-		WebElement element = driver.findElement(By.className(class_name));
+		String className = "cnn-badge-icon";
+		WebElement element = wait.until(
+				ExpectedConditions.visibilityOfElementLocated(By.className(className)));
 		assertThat(element, notNullValue());
-		if (driver instanceof JavascriptExecutor) {
-			((JavascriptExecutor) driver).executeScript(
-					"arguments[0].style.border='3px solid yellow'", element);
-		}
-		// Thread.sleep(3000L);
+	}
 
-		actions.moveToElement(element).click().build().perform();
-		// analyzeLog();
+	@AfterTest(alwaysRun = true, enabled = true)
+	public void afterTest() {
+		if (driver != null) {
+			// hanging ?
+			analyzeLog("After Test");
+		}
 	}
 
 	@AfterSuite(alwaysRun = true, enabled = true)
 	public void cleanupSuite() {
-		analyzeLog();
-
 		if (driver != null) {
+			analyzeLog("After Suite");
 			driver.close();
 			driver.quit();
 		}
 	}
 
-	public void analyzeLog() {
+	public void analyzeLog(String context) {
 		LogEntries logEntries = driver.manage().logs().get(LogType.BROWSER);
-		System.err.println("Analyze log:");
-		for (LogEntry entry : logEntries) {
-			System.err.println(new Date(entry.getTimestamp()) + " " + entry.getLevel()
-					+ " " + entry.getMessage());
+		// TODO: sqlite ? ELK ?
+		if (debug) {
+			System.err.println(String.format("Analyze log %s:", context));
+			for (LogEntry entry : logEntries) {
+				System.err.println("time stamp: " + new Date(entry.getTimestamp())
+						+ "\t" + "log level: " + entry.getLevel() + "\t" + "message: "
+						+ entry.getMessage());
+			}
+
 		}
+
 	}
 
-	private static JSONObject extractObject(HttpResponse resp)
+	@SuppressWarnings("unused")
+	private static JSONObject extractObject(HttpResponse httpResponse)
 			throws IOException, JSONException {
-		InputStream contents = resp.getEntity().getContent();
+		InputStream contents = httpResponse.getEntity().getContent();
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(contents, writer, "UTF8");
-		JSONObject objToReturn = new JSONObject(writer.toString());
-		return objToReturn;
+		return new JSONObject(writer.toString());
 	}
 
 	public static String resolveEnvVars(String input) {
 		if (null == input) {
 			return null;
 		}
-		Pattern p = Pattern.compile("\\$(?:\\{(?:env:)?(\\w+)\\}|(\\w+))");
-		Matcher m = p.matcher(input);
-		StringBuffer sb = new StringBuffer();
+		final Pattern p = Pattern.compile("\\$(?:\\{(?:env:)?(\\w+)\\}|(\\w+))");
+		final Matcher m = p.matcher(input);
+		final StringBuffer sb = new StringBuffer();
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
 			String envVarValue = System.getenv(envVarName);
@@ -242,20 +228,19 @@ public class AppTest // extends BaseTest
 		return sb.toString();
 	}
 
-	private final boolean debug = true;
-
+	// NOTE: cannot make this version static
 	protected String getPageContent(String pagename) {
 		try {
-			System.err.println("loading " + pagename + " with "
-					+ AppTest.class.getClassLoader().getResource(pagename));
-			// probably does not work with surefire + testng + testng.config ? NPE
-			URI uri = AppTest.class.getClassLoader().getResource(pagename).toURI();
-			System.err.println("Testing local file: " + uri.toString());
+			URI uri = this.getClass().getClassLoader().getResource(pagename).toURI();
+			if (debug) {
+				System.err.println("Testing local file: " + uri.toString());
+			}
 			return uri.toString();
 		} catch (URISyntaxException | NullPointerException e) {
-			// mask the exception
 			if (debug) {
-				return "file:///C:/developer/sergueik/selenium_tests/target/test-classes/clock.html";
+				// mask the exception when debug
+				return String.format("file:///%s/target/test-classes/%s",
+						System.getProperty("user.dir"), pagename);
 			} else {
 				throw new RuntimeException(e);
 			}
@@ -269,6 +254,14 @@ public class AppTest // extends BaseTest
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
+		}
+	}
+
+	public void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
