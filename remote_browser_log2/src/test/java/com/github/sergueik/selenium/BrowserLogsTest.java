@@ -53,6 +53,7 @@ public class BrowserLogsTest {
 		capabilities = DesiredCapabilities.chrome();
 		loggingPreferences.enable(LogType.BROWSER, Level.ALL);
 		capabilities.setCapability(CapabilityType.LOGGING_PREFS, loggingPreferences);
+		// driver = new ChromeDriver();
 		driver = new ChromeDriver(capabilities);
 		// driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
 		wait = new WebDriverWait(driver, 5);
