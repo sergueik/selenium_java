@@ -1,0 +1,5 @@
+**/*output*
+**/target/**
+**/test-output/**
+**/.gitignore
+*~

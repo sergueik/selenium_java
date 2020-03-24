@@ -18,10 +18,6 @@ This will put a XML comment around the selected node removing it from catalina c
 java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App web.xml comment_node.xsl web_output.xml
 ```
 
-This will create a new node but with an undesired namespace inside:
-```sh
-java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml create_node.xsl web_output.xml
-```
 ```xml
 <filter xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
   <filter-name>httpHeaderSecurity</filter-name>
@@ -29,6 +25,70 @@ java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml create_node.xsl web_
   <async-supported>true</async-supported>
 </filter>
 ```
+#### Verbatim Data
+
+The best way to add a DOM tree fragment of application-specific nodes to XML is by applying the style sheet with a lot of fard coded data. say  one intends to add `` to catalina `web.xml`:
+
+```xml
+<filter>
+  <filter-name>customFilter</filter-name>
+  <filter-class>example.CustomFilter</filter-class>
+  <async-supported>true</async-supported>
+</filter>
+```
+and
+```xml
+<filter-mapping>
+  <filter-name>customFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+```
+After aplying
+templates
+```xml
+  <xsl:template match="xxx:filter-mapping[last()]">
+
+    <filter-mapping>
+      <filter-name>customFilter</filter-name>
+      <url-pattern>/*</url-pattern>
+      <dispatcher>REQUEST</dispatcher>
+    </filter-mapping>
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+  </xsl:template>
+```
+to inject the custom filter-mapping DOM  fragment before the last `filter-mapping` node
+and
+```xml
+  <xsl:template match="xxx:filter[xxx:filter-name[text()='httpHeaderSecurity']]">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+    </xsl:copy>
+    <filter>
+      <filter-name>customFilter</filter-name>
+      <filter-class>example.CustomFilter</filter-class>
+      <async-supported>true</async-supported>
+    </filter>
+  </xsl:template>
+```
+toappent the filter `customFilter` after the filter named `httpHeaderSecurity`
+and
+running the vanilla command:
+```sh
+java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml create_node.xsl web_output.xml
+```
+the following extraneous attribute will be found:
+```
+<filter-mapping xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
+  <filter-name>customFilter</filter-name>
+  <url-pattern>/*</url-pattern>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+```
+in both DOM fragments.
+No known way to get rid of it atm without pathcing the tool (work in progress).
 #### Non-working
 `transform.xsl`:
 
