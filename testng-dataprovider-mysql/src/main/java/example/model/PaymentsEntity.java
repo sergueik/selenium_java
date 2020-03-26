@@ -41,14 +41,17 @@ public class PaymentsEntity extends BaseEntity {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
 		PaymentsEntity that = (PaymentsEntity) o;
 
-		return getId() == that.getId() && (account != null ?
-				account.equals(that.account) : that.account == null &&
-				(amount != null ? amount.equals(that.amount) : that.amount == null));
+		return getId() == that.getId()
+				&& (account != null ? account.equals(that.account)
+						: that.account == null && (amount != null
+								? amount.equals(that.amount) : that.amount == null));
 
 	}
 
@@ -62,9 +65,7 @@ public class PaymentsEntity extends BaseEntity {
 
 	@Override
 	public String toString() {
-		return "PaymentsEntity{" +
-				"account='" + account + '\'' +
-				", amount=" + amount +
-				'}';
+		return "PaymentsEntity{" + "account='" + account + '\'' + ", amount="
+				+ amount + '}';
 	}
 }

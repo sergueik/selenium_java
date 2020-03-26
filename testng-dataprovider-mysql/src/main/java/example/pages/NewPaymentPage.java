@@ -45,6 +45,8 @@ public class NewPaymentPage {
 	}
 
 	public MonetaryAmount getActualAmount() {
-		return moneyOf("£1098.23");
+		// return moneyOf("ï¿½1098.23");
+		// unmappable character for encoding UTF-8
+		return moneyOf("$1098.23");
 	}
 }
