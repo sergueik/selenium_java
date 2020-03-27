@@ -23,6 +23,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
+// http://magicmonster.com/kb/prg/java/xml/dom/merging_nodes_diff_docs.html
 public class Noop {
 
 	public static void main(String[] args)

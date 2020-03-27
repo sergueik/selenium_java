@@ -7,7 +7,14 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 mvn package
 java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
 ```
-inspect the modifications made
+```sh
+
+java -cp target\xslt-0.0.4-SNAP SHOT.jar example.MergeDocumentFragments web.xml web_output.xml
+Loading input: file:///home/sergueik/src/selenium_java/xslt-example/xxx/web.xml
+Testing local file: jar:file:/home/sergueik/src/selenium_java/xslt-example/xxx/xslt-0.0.4-SNAPSHOT.jar!/fragment.xml
+Updated the output.xml
+```
+* inspect the modifications made
 ```sh
 diff example.xml example_output.xml
 ```
