@@ -40,7 +40,7 @@ import example.CommandLineParser;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-public class CommandLineParserTest {
+public class CommandLineParserAdvancedTest {
 
 	private static boolean debug = true;
 	private static CommandLineParser commandLineParser;
@@ -50,53 +50,27 @@ public class CommandLineParserTest {
 		commandLineParser = new CommandLineParser();
 	}
 
+	private static Map<String, String> argTable = new HashMap<>();
+	private static final String[] argsArray = new String[] { "a", "b", "c" };
+	private static final List<Object> argsList = new ArrayList<>();
+
 	@BeforeClass
 	public static void convertSetsToArrays() {
 
-	}
-
-	// @Ignore
-	@Test
-	public void blankArgumensTest() {
-		commandLineParser.parse(new String[] {});
-		if (debug) {
-			System.err
-					.println("Flags: " + Arrays.asList(commandLineParser.getFlags()));
+		for (String arg : argsArray) {
+			argTable.put(arg, arg);
+			commandLineParser.saveFlagValue(arg);
+			argsList.add(String.format("-%s", arg));
+			argsList.add(String.format("%s", arg));
 		}
-		assertThat(commandLineParser.getNumberOfFlags(), is(0));
+
 	}
 
-	// @Ignore
 	@Test
-	public void argumentCountsTest() {
-		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
-		commandLineParser.saveFlagValue("a");
-		commandLineParser.parse(argsArray);
-		assertThat(commandLineParser.getNumberOfArguments(), is(1));
-		if (debug) {
-			System.err.println(
-					"Arguments: " + Arrays.asList(commandLineParser.getArguments()));
-		}
-		assertThat(commandLineParser.getNumberOfFlags(), is(2));
-
-		if (debug) {
-			System.err
-					.println("Flags: " + Arrays.asList(commandLineParser.getFlags()));
-		}
+	public void argumentCollectionTest() {
+		commandLineParser
+				.parse((String[]) argsList.toArray(new String[argsList.size()]));
+		assertTrue(new HashSet<Object>(commandLineParser.getFlags())
+				.containsAll(new HashSet<Object>(Arrays.asList(argsArray))));
 	}
-
-	// @Ignore
-	@Test
-	public void argumentNamesValuesTest() {
-
-		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
-		commandLineParser.saveFlagValue("a");
-		commandLineParser.parse(argsArray);
-		assertThat(commandLineParser.hasFlag("a"), is(true));
-		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
-		//
-		System.err.println(
-				"Arguments: " + Arrays.asList(commandLineParser.getArguments()));
-	}
-
 }

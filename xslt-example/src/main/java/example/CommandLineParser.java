@@ -35,6 +35,11 @@ public class CommandLineParser {
 	//
 	private Set<String> _flagsWithValues = new HashSet<>();
 
+	public Set<String> getFlags() {
+		Set<String> result = _flags.keySet();
+		return result;
+	}
+
 	public String getFlagValue(String flagName) {
 		return (String) _flags.get(flagName);
 	}
