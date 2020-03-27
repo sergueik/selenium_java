@@ -15,7 +15,7 @@ diff example.xml example_output.xml
 
 This will put a XML comment around the selected node removing it from catalina configuration
 ```sh
-java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App web.xml comment_node.xsl web_output.xml
+java -cp target\xslt-0.0.4-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml
 ```
 
 ```xml

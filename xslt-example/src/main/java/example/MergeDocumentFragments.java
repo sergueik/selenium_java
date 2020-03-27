@@ -23,17 +23,27 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import example.CommandLineParser;
 
 // http://magicmonster.com/kb/prg/java/xml/dom/merging_nodes_diff_docs.html
 // https://www.programcreek.com/java-api-examples/?class=org.w3c.dom.Document&method=importNode
+
 public class MergeDocumentFragments {
+	private static boolean debug = true;
+	private static CommandLineParser commandLineParser;
 
 	public static void main(String args[]) {
+		commandLineParser = new CommandLineParser();
+		commandLineParser.saveFlagValue("in");
+		commandLineParser.saveFlagValue("out");
+
+		commandLineParser.parse(args);
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
 
-			String inputPath = Paths.get(args[0]).toUri().toString();
+			String inputPath = Paths.get(commandLineParser.getFlagValue("in")).toUri()
+					.toString();
 			System.err.println("Loading input: " + inputPath);
 			Document webDocument = documentBuilder.parse(inputPath);
 			Document configDocument = documentBuilder
@@ -57,7 +67,8 @@ public class MergeDocumentFragments {
 				Transformer transformer = transformerFactory.newTransformer();
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				DOMSource source = new DOMSource(webDocument);
-				StreamResult file = new StreamResult(new File(args[1]));
+				StreamResult file = new StreamResult(
+						new File(commandLineParser.getFlagValue("out")));
 				transformer.transform(source, file);
 			} catch (TransformerException e) {
 				System.err.println("Exception (ignored): " + e.toString());
