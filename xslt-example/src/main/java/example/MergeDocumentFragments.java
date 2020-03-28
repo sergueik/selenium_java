@@ -39,7 +39,7 @@ public class MergeDocumentFragments {
 		commandLineParser.saveFlagValue("tag1");
 		commandLineParser.saveFlagValue("tag2");
 		commandLineParser.saveFlagValue("tag3");
-		commandLineParser.saveFlagValue("tag3");
+		commandLineParser.saveFlagValue("name");
 
 		String tag1 = commandLineParser.getFlagValue("tag1");
 		if (tag1 == null) {
