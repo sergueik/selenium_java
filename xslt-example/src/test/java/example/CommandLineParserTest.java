@@ -5,6 +5,7 @@ package example;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
@@ -25,6 +26,7 @@ public class CommandLineParserTest {
 	@BeforeClass
 	public static void load() {
 		commandLineParser = new CommandLineParser();
+		commandLineParser.setDebug(debug);
 	}
 
 	@Test
@@ -63,6 +65,7 @@ public class CommandLineParserTest {
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.hasFlag("a"), is(true));
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
+		assertThat(commandLineParser.getFlagValue("z"), nullValue());
 		System.err.println(
 				"Arguments: " + Arrays.asList(commandLineParser.getArguments()));
 	}

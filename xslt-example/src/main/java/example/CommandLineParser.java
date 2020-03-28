@@ -7,43 +7,44 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
+// based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
 // see also: 
 // https://github.com/freehep/freehep-argv/blob/master/src/main/java/org/freehep/util/argv/ArgumentParser.java
-/**
-*
-* CommandLineParser is a representation of the command line arguments passed to 
-* a Java class' main(String[]) method. It parses the arguments for flags 
-* (tokens prefixed with a dash ('-')), flag-value pairs, and an ordered 
-* list of argument values.
-*
-* @author Dan Jemiolo (danj)
-*
-*/
 
 public class CommandLineParser {
-	// non-flag values
+
+	private boolean debug = false;
+
+	public boolean isDebug() {
+		return debug;
+	}
+
+	public void setDebug(boolean debug) {
+		this.debug = debug;
+	}
+
+	// pass-through
 	private String[] arguments = null;
 
 	public String[] getArguments() {
 		return arguments;
 	}
 
-	private Map<String, String> _flags = new HashMap<>();
+	private Map<String, String> flags = new HashMap<>();
 
 	//
 	// the flag values that are expected to be followed with a value
 	// that allows the application to process the flag.
 	//
-	private Set<String> _flagsWithValues = new HashSet<>();
+	private Set<String> flagsWithValues = new HashSet<>();
 
 	public Set<String> getFlags() {
-		Set<String> result = _flags.keySet();
+		Set<String> result = flags.keySet();
 		return result;
 	}
 
 	public String getFlagValue(String flagName) {
-		return (String) _flags.get(flagName);
+		return (String) flags.get(flagName);
 	}
 
 	public int getNumberOfArguments() {
@@ -51,11 +52,11 @@ public class CommandLineParser {
 	}
 
 	public int getNumberOfFlags() {
-		return _flags.size();
+		return flags.size();
 	}
 
 	public boolean hasFlag(String flagName) {
-		return _flags.containsKey(flagName);
+		return flags.containsKey(flagName);
 	}
 
 	// contains no constructor nor logic to discover unknown flags
@@ -67,18 +68,21 @@ public class CommandLineParser {
 				String name = args[n].replaceFirst("-", "");
 				String value = null;
 				// remove the dash
-
-				System.err.println("Examine: " + name);
-				if (_flagsWithValues.contains(name) && n < args.length - 1) {
+				if (debug) {
+					System.err.println("Examine: " + name);
+				}
+				if (flagsWithValues.contains(name) && n < args.length - 1) {
 					value = args[++n];
-					System.err.println("Collect value for: " + name + " = " + value);
+					if (debug) {
+						System.err.println("Collect value for: " + name + " = " + value);
+					}
 				} else {
-
-					System.err.println("Ignore the value for " + name);
-
+					if (debug) {
+						System.err.println("Ignore the value for " + name);
+					}
 				}
 
-				_flags.put(name, value);
+				flags.put(name, value);
 			}
 
 			else
@@ -89,6 +93,6 @@ public class CommandLineParser {
 	}
 
 	public void saveFlagValue(String flagName) {
-		_flagsWithValues.add(flagName);
+		flagsWithValues.add(flagName);
 	}
 }
