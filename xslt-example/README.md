@@ -4,18 +4,35 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 ### Usage
 #### Basic
 ```sh
-mvn package
-java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App example.xml example_transform.xsl example_output.xml
+mvn clean package
+```
+```sh
+java -cp target/xslt-0.0.4-SNAPSHOT.jar  example.MergeDocumentFragments -in web.xml -out output.xml
 ```
 inspect the modifications made
 ```sh
-diff example.xml example_output.xml
+diff -w web.xml output.xml
 ```
 (on Windows use windiff.exe)
-
+```sh
+7a8,15
+> <filter>
+>   <filter-name>responseHeadersFilter</filter-name>
+>   <filter-class>example.ResponseHeadersFilter</filter-class>
+>   <init-param>
+>     <param-name>Expires</param-name>
+>     <param-value>0</param-value>
+>   </init-param>
+> </filter>
+13a22,25
+> <filter-mapping>
+>    <filter-name>responseHeadersFilter</filter-name>
+>    <url-pattern>/*</url-pattern>
+> </filter-mapping>
+```
 This will put a XML comment around the selected node removing it from catalina configuration
 ```sh
-java -cp target/xslt-0.0.3-SNAPSHOT.jar example.App web.xml comment_node.xsl web_output.xml
+java -cp target\xslt-0.0.4-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml
 ```
 
 ```xml

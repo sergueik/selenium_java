@@ -23,33 +23,45 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import example.CommandLineParser;
 
 // http://magicmonster.com/kb/prg/java/xml/dom/merging_nodes_diff_docs.html
 // https://www.programcreek.com/java-api-examples/?class=org.w3c.dom.Document&method=importNode
+
 public class MergeDocumentFragments {
+	private static boolean debug = true;
+	private static CommandLineParser commandLineParser;
 
 	public static void main(String args[]) {
+		commandLineParser = new CommandLineParser();
+		commandLineParser.saveFlagValue("in");
+		commandLineParser.saveFlagValue("out");
+
+		commandLineParser.parse(args);
+		String outFile = commandLineParser.getFlagValue("out");
+		String inputPath = Paths.get(commandLineParser.getFlagValue("in")).toUri()
+				.toString();
+		if (debug) {
+			System.err.println("Loading input: " + inputPath);
+		}
 		try {
 			DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = dbf.newDocumentBuilder();
-
-			String inputPath = Paths.get(args[0]).toUri().toString();
-			System.err.println("Loading input: " + inputPath);
 			Document webDocument = documentBuilder.parse(inputPath);
 			Document configDocument = documentBuilder
 					.parse(getPageContent("fragment.xml"));
-			// Assume the first child is an Element.
-			Element web = (Element) webDocument.getFirstChild();
 			NodeList filterNodeList = configDocument.getElementsByTagName("filter");
 			Node filterNode = filterNodeList.item(0);
 			Element filterElement = (Element) filterNode;
-			web.appendChild(webDocument.importNode(filterElement, true));
 
-			NodeList filterMappingNodeList = configDocument
-					.getElementsByTagName("filter-mapping");
-			Node filterMappingNode = filterMappingNodeList.item(0);
-			Element filterMappingElement = (Element) filterMappingNode;
-			web.appendChild(webDocument.importNode(filterMappingElement, true));
+			Element filterMappingElement = (Element) configDocument
+					.getElementsByTagName("filter-mapping").item(0);
+
+			insertNode(webDocument, "filter", "filter-name", "failedRequestFilter",
+					webDocument.importNode(filterElement, true));
+			insertNode(webDocument, "filter-mapping", "filter-name",
+					"failedRequestFilter",
+					webDocument.importNode(filterMappingElement, true));
 
 			try {
 				TransformerFactory transformerFactory = TransformerFactory
@@ -57,14 +69,15 @@ public class MergeDocumentFragments {
 				Transformer transformer = transformerFactory.newTransformer();
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				DOMSource source = new DOMSource(webDocument);
-				StreamResult file = new StreamResult(new File(args[1]));
+				StreamResult file = new StreamResult(new File(outFile));
 				transformer.transform(source, file);
 			} catch (TransformerException e) {
 				System.err.println("Exception (ignored): " + e.toString());
-
 			}
 
-			System.out.println("Updated the " + args[1]);
+			if (debug) {
+				System.err.println("Updated the " + outFile);
+			}
 
 		} catch (ParserConfigurationException e) {
 			e.printStackTrace();
@@ -93,10 +106,52 @@ public class MergeDocumentFragments {
 					.getResource(pagename).toURI();
 			System.err.println("Testing local file: " + uri.toString());
 			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-			// supported in -source 1.6
+		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
+	private static void insertNode(Document webDocument, String tag1, String tag2,
+			String text, Node newChild4) {
+		NodeList nodeList2 = webDocument.getElementsByTagName(tag1);
+		int maxcnt2 = nodeList2.getLength();
+		boolean done = false;
+		for (int cnt2 = 0; cnt2 < maxcnt2; cnt2++) {
+			Node node2 = nodeList2.item(cnt2);
+			if (node2.getNodeType() == Node.ELEMENT_NODE) {
+				Element element2 = (Element) node2;
+				if (debug) {
+					System.err.println("Exploring node: " + node2.getNodeName());
+				}
+				NodeList nodeList3 = node2.getOwnerDocument()
+						.getElementsByTagName(tag2);
+				if (debug) {
+					System.err.println("Subnode list length: " + nodeList3.getLength());
+				}
+				int maxcnt3 = nodeList3.getLength();
+				for (int cnt3 = 0; cnt3 < maxcnt3; cnt3++) {
+					if (!done) {
+						Node node3 = nodeList3.item(cnt3);
+						if (debug) {
+							System.err
+									.println("Exploring nested node: " + node3.getNodeName());
+						}
+						if (node3.getTextContent().equalsIgnoreCase(text)) {
+							if (debug) {
+								System.err.println(
+										String.format("Found text %s (index %d)", text, cnt3));
+							}
+							element2.getParentNode().insertBefore(newChild4,
+									element2.getNextSibling());
+							if (debug) {
+								System.err.println("Added " + newChild4.getNodeName());
+							}
+
+							done = true;
+						}
+					}
+				}
+			}
+		}
+	}
 }

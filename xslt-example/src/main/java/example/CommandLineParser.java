@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 
 //based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
+// see also: 
+// https://github.com/freehep/freehep-argv/blob/master/src/main/java/org/freehep/util/argv/ArgumentParser.java
 /**
 *
 * CommandLineParser is a representation of the command line arguments passed to 
