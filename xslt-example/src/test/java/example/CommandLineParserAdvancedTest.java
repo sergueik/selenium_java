@@ -32,6 +32,7 @@ public class CommandLineParserAdvancedTest {
 	@BeforeClass
 	public static void load() {
 		commandLineParser = new CommandLineParser();
+		commandLineParser.setDebug(debug);
 	}
 
 	@BeforeClass
