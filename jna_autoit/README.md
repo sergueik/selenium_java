@@ -39,17 +39,49 @@ to `AutoItX`.  This greately simplifies interacting with AutoIt, see below.
 Currently extended with Java-friendly signatures are the following metods:
 
   * `AutoItSetOption`
+  * `ClipGet`
+  * `ClipPut`
+  * `ControlCommand`
+  * `ControlClick`
+  * `ControlFocus`
+  * `ControlGetPos`
+  * `ControlGetText`
+  * `ControlShow`
+  * `ControlHide`
   * `ControlSend`
+  * `DriveMapAdd`
+  * `DriveMapDel`
+  * `DriveMapGet`
+  * `MouseGetPos`
+  * `MouseClick`
+  * `ProcessClose`
+  * `ProcessExists`
+  * `ProcessWaitClose`
   * `Run`
+  * `RunAs`
+  * `RunWait`
   * `Send`
+  * `ToolTip`	
   * `WinActivate`
   * `WinActive`
   * `WinClose`
   * `WinExists`
+  * `WinGetClassList`
+  * `WinGetHandle`
+  * `WinGetHandleAsText`
+  * `WinGetTextByHandle`
+  * `WinGetPos`
   * `WinGetText`
+  * `WinGetState`
   * `WinGetTitle`
+  * `WinSetOnTop`
+  * `WinSetState`
+  * `WinSetTitle`
   * `WinKill`
+  * `WinMenuSelectItem`
+  * `WinClose`
   * `WinWaitActive`
+  * `WinWaitNotActive`
 
 This addresses the anticipated needs of AutoIt with Selenium testing.
 
@@ -119,7 +151,7 @@ One can generate the dump list of the `AutoItX3_x64.dll` exports using Visual St
 
 ```cmd
 
-"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /exports AutoItX3_x64.dll 
+"c:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\amd64\link.exe" /dump /exports AutoItX3_x64.dll
   AU3_AutoItSetOption
   AU3_ClipGet
   AU3_ClipPut
@@ -246,7 +278,7 @@ Exception in thread "main" java.lang.UnsatisfiedLinkError:
 Unable to load library 'AutoItX3.dll':
 Can't obtain InputStream for win32-x86/AutoItX3.dll -
 ```
-To solve this one may need a checked version of the dll or place some missing dependency 
+To solve this one may need a checked version of the dll or place some missing dependency
 into the System32 folder (all imports listed by link.exe are already in `c:\Windows\System32`:
 ```cmd
 
@@ -286,3 +318,4 @@ This project is licensed under the terms of the MIT license.
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
