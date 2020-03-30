@@ -32,7 +32,7 @@ diff -w web.xml output.xml
 ```
 This will put a XML comment around the selected node removing it from catalina configuration
 ```sh
-java -cp target/xslt-0.5.0-SNAPSHOT.jar example.CommentNode -in web.xml -out web_output.xml -debug
+java -cp target/xslt-0.5.0-SNAPSHOT.jar example.CommentNode -in web.xml -out web_output.xml -name responseHeadersFilter -debug
 transforming web.xml with embedded stylesheet
 Loaded: web.xml
 Written: web_output.xml

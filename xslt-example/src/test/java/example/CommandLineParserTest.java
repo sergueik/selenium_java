@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
+import example.CommandLineParser;
 
 /**
  * Unit Tests for CommandLineParser 

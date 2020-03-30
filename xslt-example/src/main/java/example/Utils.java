@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -30,4 +32,52 @@ public class Utils {
 		}
 	}
 
+	public static String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern pattern = Pattern.compile("\\$(?:\\{(?:env:)?(\\w+)\\}|(\\w+))");
+		Matcher matcher = pattern.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			String envVarName = null == matcher.group(1) ? matcher.group(2)
+					: matcher.group(1);
+			String envVarValue = System.getenv(envVarName);
+			matcher.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		matcher.appendTail(sb);
+		return sb.toString();
+	}
+
+	public static String replaceXPath(String input, String name, boolean debug) {
+		if (null == input) {
+			return null;
+		}
+		Pattern pattern = Pattern.compile("\\[text\\(\\)='(?:\\w+)'\\]");
+		Matcher matcher = pattern.matcher(input);
+		if (debug) {
+			if (!matcher.find()) {
+				return null;
+			}
+		}
+		return matcher.replaceAll(String.format("[text()='%s']", name));
+	}
+
+	public static String replaceXPath(String input, String tag1, String tag2,
+			String name, boolean debug) {
+		if (null == input) {
+			return null;
+		}
+		Pattern pattern = Pattern.compile(
+				"xxx:(?:[a-z.0-9-]+)\\[xxx:(?:[a-z.0-9-]+)\\[text\\(\\)='(?:\\w+)'\\]\\]");
+		Matcher matcher = pattern.matcher(input);
+		if (debug) {
+			if (!matcher.find()) {
+				return null;
+			}
+		}
+		return matcher.replaceAll(
+				String.format("xxx:%s[xxx:%s[text()='%s']]", tag1, tag2, name));
+	}
 }

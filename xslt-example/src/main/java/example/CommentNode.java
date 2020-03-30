@@ -40,11 +40,11 @@ public class CommentNode {
 			System.err.println("Missing required argument: in");
 		}
 
+		Transformer transformer = null;
 		String name = commandLineParser.getFlagValue("name");
 		if (name == null) {
 			name = "responseHeadersFilter";
 		}
-		Transformer transformer = null;
 
 		String xsl = commandLineParser.getFlagValue("xsl");
 		// https://www.programcreek.com/java-api-examples/javax.xml.transform.Source
@@ -61,11 +61,9 @@ public class CommentNode {
 						.println(String.format("transforming %s with embedded stylesheet",
 								inFile, defaultStyleSheeet));
 			}
-			// TODO: replace
-			// xxx:filter[xxx:filter-name[text()='httpHeaderSecurity']]
 			transformer = (TransformerFactory.newInstance())
-					.newTransformer(new StreamSource(
-							new StringReader(Utils.getScriptContent(defaultStyleSheeet))));
+					.newTransformer(new StreamSource(new StringReader(Utils.replaceXPath(
+							Utils.getScriptContent(defaultStyleSheeet), name, false))));
 		}
 		Source text = new StreamSource(new File(inFile));
 		if (debug) {

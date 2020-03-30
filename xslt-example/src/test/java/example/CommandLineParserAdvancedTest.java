@@ -15,6 +15,8 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import example.CommandLineParser;
+
 /**
  * More advanced Unit Tests for CommandLineParser 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
