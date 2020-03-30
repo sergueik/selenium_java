@@ -7,11 +7,11 @@
     </xsl:copy>
   </xsl:template>
   <xsl:template match="xxx:filter[xxx:filter-name[text()='httpHeaderSecurity']]">
-    <xsl:comment>
-      <!-- this does not work -->
-      <xsl:copy-of select="."/>
-    </xsl:comment>
-    <!-- this does work, though ranked as a hack -->
+    <xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
+    <xsl:copy-of select="."/>
+    <xsl:text disable-output-escaping="yes">--&gt;</xsl:text>
+  </xsl:template>
+ <xsl:template match="xxx:filter-mapping[xxx:filter-name[text()='httpHeaderSecurity']]">
     <xsl:text disable-output-escaping="yes">&lt;!--</xsl:text>
     <xsl:copy-of select="."/>
     <xsl:text disable-output-escaping="yes">--&gt;</xsl:text>

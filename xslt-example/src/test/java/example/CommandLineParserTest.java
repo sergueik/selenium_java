@@ -63,6 +63,7 @@ public class CommandLineParserTest {
 		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
+
 		assertThat(commandLineParser.hasFlag("a"), is(true));
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
 		assertThat(commandLineParser.getFlagValue("z"), nullValue());
@@ -70,4 +71,20 @@ public class CommandLineParserTest {
 				"Arguments: " + Arrays.asList(commandLineParser.getArguments()));
 	}
 
+	@Test
+	public void argumentValueLessTest() {
+		final String[] argsArray = new String[] { "-a", "-b" };
+		commandLineParser.saveFlagValue("c");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.hasFlag("a"), is(true));
+		assertThat(commandLineParser.hasFlag("b"), is(true));
+		assertThat(commandLineParser.hasFlag("c"), is(false));
+		assertThat(commandLineParser.hasFlag("d"), is(false));
+		assertThat(commandLineParser.getFlagValue("a"), nullValue());
+
+		if (debug) {
+			System.err
+					.println("Flags: " + Arrays.asList(commandLineParser.getFlags()));
+		}
+	}
 }

@@ -1,13 +1,11 @@
 package example;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -16,20 +14,17 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import example.CommandLineParser;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 // http://magicmonster.com/kb/prg/java/xml/dom/merging_nodes_diff_docs.html
 // https://www.programcreek.com/java-api-examples/?class=org.w3c.dom.Document&method=importNode
 
 public class MergeDocumentFragments {
-	private static boolean debug = true;
+	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
 
 	public static void main(String args[]) {
@@ -41,6 +36,11 @@ public class MergeDocumentFragments {
 		commandLineParser.saveFlagValue("tag3");
 		commandLineParser.saveFlagValue("name");
 
+		commandLineParser.parse(args);
+
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
+		}
 		String tag1 = commandLineParser.getFlagValue("tag1");
 		if (tag1 == null) {
 			tag1 = "filter";
@@ -58,8 +58,13 @@ public class MergeDocumentFragments {
 			name = "failedRequestFilter";
 		}
 
-		commandLineParser.parse(args);
 		String outFile = commandLineParser.getFlagValue("out");
+		if (outFile == null) {
+			System.err.println("Missing required argument: out");
+		}
+		if (commandLineParser.getFlagValue("in") == null) {
+			System.err.println("Missing required argument: in");
+		}
 		String inputUri = Paths.get(commandLineParser.getFlagValue("in")).toUri()
 				.toString();
 		if (debug) {
@@ -72,7 +77,7 @@ public class MergeDocumentFragments {
 					.newDocumentBuilder();
 			Document document = documentBuilder.parse(inputUri);
 			Document configDocument = documentBuilder
-					.parse(getPageContent("fragment.xml"));
+					.parse(Utils.getPageContent("fragment.xml"));
 
 			insertNode(document, tag1, tag3, name, document.importNode(
 					(Element) configDocument.getElementsByTagName(tag1).item(0), true));
@@ -96,29 +101,6 @@ public class MergeDocumentFragments {
 			}
 		} catch (IOException | SAXException | ParserConfigurationException e) {
 			e.printStackTrace();
-		}
-	}
-
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = MergeDocumentFragments.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
-	}
-
-	protected static String getPageContent(String pagename) {
-		try {
-			URI uri = MergeDocumentFragments.class.getClassLoader()
-					.getResource(pagename).toURI();
-			System.err.println("Testing local file: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

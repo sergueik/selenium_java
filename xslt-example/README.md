@@ -32,7 +32,15 @@ diff -w web.xml output.xml
 ```
 This will put a XML comment around the selected node removing it from catalina configuration
 ```sh
-java -cp target\xslt-0.0.4-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml
+java -cp target/xslt-0.5.0-SNAPSHOT.jar example.CommentNode -in web.xml -out web_output.xml -debug
+transforming web.xml with embedded stylesheet
+Loaded: web.xml
+Written: web_output.xml
+```
+This will add DOM fragments `filter` and `filter-mapping` nodes from the resorce `fragment.xml` embedded in the Jar
+```
+```sh
+java -cp target\xslt-0.5.0-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml -debug
 ```
 
 ```xml
@@ -182,3 +190,4 @@ Errors were reported during stylesheet compilation
   * wrap a comment around [specific node](https://stackoverflow.com/questions/17607602/comment-a-single-node)
   * locating and exposing contents of [comments](https://stackoverflow.com/questions/3837169/how-do-i-select-all-comment-nodes-in-an-xml-file)
   * [deep copy](https://stackoverflow.com/questions/1769194/xslt-deep-child-copy)
+  * [Streaming and Complex Event Processing engine](https://github.com/siddhi-io/siddhi)
