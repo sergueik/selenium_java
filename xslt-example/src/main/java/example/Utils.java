@@ -54,8 +54,8 @@ public class Utils {
 		if (null == input) {
 			return null;
 		}
-		Pattern pattern = Pattern.compile("\\[text\\(\\)='(?:\\w+)'\\]");
-		Matcher matcher = pattern.matcher(input);
+		Matcher matcher = (Pattern.compile("\\[text\\(\\)='(?:\\w+)'\\]"))
+				.matcher(input);
 		if (debug) {
 			if (!matcher.find()) {
 				return null;
@@ -66,18 +66,25 @@ public class Utils {
 
 	public static String replaceXPath(String input, String tag1, String tag2,
 			String name, boolean debug) {
+		final String prefix = "xxx";
+		return replaceXPath(input, prefix, tag1, tag2, name, debug);
+	}
+
+	public static String replaceXPath(String input, String prefix, String tag1,
+			String tag2, String name, boolean debug) {
 		if (null == input) {
 			return null;
 		}
-		Pattern pattern = Pattern.compile(
-				"xxx:(?:[a-z.0-9-]+)\\[xxx:(?:[a-z.0-9-]+)\\[text\\(\\)='(?:\\w+)'\\]\\]");
-		Matcher matcher = pattern.matcher(input);
+		Matcher matcher = Pattern
+				.compile(
+						"(?:\\w+):(?:[a-z.0-9-]+)\\[(?:\\w+):(?:[a-z.0-9-]+)\\[text\\(\\)='(?:\\w+)'\\]\\]")
+				.matcher(input);
 		if (debug) {
 			if (!matcher.find()) {
 				return null;
 			}
 		}
-		return matcher.replaceAll(
-				String.format("xxx:%s[xxx:%s[text()='%s']]", tag1, tag2, name));
+		return matcher.replaceAll(String.format("%s:%s[%s:%s[text()='%s']]", prefix,
+				tag1, prefix, tag2, name));
 	}
 }

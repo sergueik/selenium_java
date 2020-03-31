@@ -104,6 +104,36 @@ public class MergeDocumentFragments {
 		}
 	}
 
+	private static boolean searchNode(Document document, String tag1, String tag2,
+			String nodeText) {
+		boolean status = false;
+		NodeList nodeList1 = document.getElementsByTagName(tag1);
+		int maxcnt1 = nodeList1.getLength();
+		if (maxcnt1 != 0) {
+			for (int cnt1 = 0; cnt1 < maxcnt1; cnt1++) {
+				Node node1 = nodeList1.item(cnt1);
+				if (node1.getNodeType() == Node.ELEMENT_NODE) {
+					Element element1 = (Element) node1;
+					if (debug) {
+						System.err.println("Exploring node: " + node1.getNodeName());
+					}
+					NodeList nodeList2 = node1.getOwnerDocument()
+							.getElementsByTagName(tag2);
+					int maxcnt2 = nodeList2.getLength();
+					if (maxcnt2 != 0) {
+						for (int cnt2 = 0; cnt2 < maxcnt2; cnt2++) {
+							Node node2 = nodeList2.item(cnt2);
+							if (node2.getTextContent().equalsIgnoreCase(nodeText)) {
+								status = true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return status;
+	}
+
 	private static void insertNode(Document document, String tag1, String tag2,
 			String nodeText, Node newChild) {
 		NodeList nodeList1 = document.getElementsByTagName(tag1);

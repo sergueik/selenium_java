@@ -16,7 +16,7 @@ import org.junit.Test;
 import example.Utils;
 
 /**
- * Unit Tests for CommandLineParser 
+ * Unit Tests for Utils 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
@@ -25,8 +25,6 @@ public class UtilsTest {
 	private static boolean debug = true;
 
 	private final static String resource = "<xsl:template match=\"xxx:filter-mapping[xxx:filter-name[text()='httpHeaderSecurity']]\">";
-	// private final static String resource =
-	// "xxx:filter-mapping[xxx:filter-name[text()='httpHeaderSecurity']]";
 
 	@Test
 	public void xpathReplaceNameTest() {
@@ -34,7 +32,7 @@ public class UtilsTest {
 		assertThat(result, notNullValue());
 		assertThat(result, containsString("dummy"));
 		if (debug) {
-			System.err.println("Result: " + result);
+			System.err.println("xpathReplaceNameTest result: " + result);
 		}
 	}
 
@@ -47,7 +45,20 @@ public class UtilsTest {
 		assertThat(result, containsString("tag-info"));
 		assertThat(result, containsString("dummy"));
 		if (debug) {
-			System.err.println("Result: " + result);
+			System.err.println("xpathReplaceTagNameTest result: " + result);
+		}
+	}
+
+	@Test
+	public void xpathReplacePrefixTagNameTest() {
+		String result = Utils.replaceXPath(resource, "prefix", "tag", "tag-info",
+				"dummy", true);
+		assertThat(result, notNullValue());
+		assertThat(result, containsString("prefix:tag"));
+		assertThat(result, containsString("prefix:tag-info"));
+		assertThat(result, containsString("dummy"));
+		if (debug) {
+			System.err.println("xpathReplacePrefixTagNameTest result: " + result);
 		}
 	}
 }
