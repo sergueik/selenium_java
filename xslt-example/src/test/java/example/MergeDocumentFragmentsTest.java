@@ -11,15 +11,19 @@ import static org.hamcrest.CoreMatchers.containsString;
 import static org.junit.Assert.assertThat;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Arrays;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Source;
+import javax.xml.transform.stream.StreamSource;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import example.MergeDocumentFragments;
@@ -50,14 +54,17 @@ public class MergeDocumentFragmentsTest {
 			throws ParserConfigurationException, SAXException, IOException {
 		documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		document = documentBuilder.parse(resource);
-
+		InputSource source = new InputSource(new StringReader(resource));
+		document = documentBuilder.parse(source);
 	}
 
 	@Test
-	public void xpathReplaceNameTest() {
-		boolean result = MergeDocumentFragments.searchNode(document, "filter",
-				"filter-name", "httpHeaderSecurity");
-		assertThat(result, is(true));
+	public void searchNodeTest() {
+		assertThat(MergeDocumentFragments.searchNode(document, "filter",
+				"filter-name", "httpHeaderSecurity"), is(true));
+		assertThat(MergeDocumentFragments.searchNode(document, "filter",
+				"filter-name", "other"), is(false));
+		assertThat(MergeDocumentFragments.searchNode(document, "filter", "tag", ""),
+				is(false));
 	}
 }

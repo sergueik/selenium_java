@@ -26,6 +26,7 @@ import org.xml.sax.SAXException;
 public class MergeDocumentFragments {
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
+	private static final String newName = "responseHeadersFilter";
 
 	public static void main(String args[]) {
 		commandLineParser = new CommandLineParser();
@@ -76,6 +77,15 @@ public class MergeDocumentFragments {
 			DocumentBuilder documentBuilder = documentBuilderFactory
 					.newDocumentBuilder();
 			Document document = documentBuilder.parse(inputUri);
+
+			if (searchNode(document, tag1, tag3, newName)) {
+				if (debug) {
+					System.err.println(
+							String.format("Already have the node: //%s/%s[text()=\"%s\"]",
+									tag1, tag3, newName));
+					return;
+				}
+			}
 			Document configDocument = documentBuilder
 					.parse(Utils.getPageContent("fragment.xml"));
 
@@ -104,7 +114,7 @@ public class MergeDocumentFragments {
 		}
 	}
 
-	private static boolean searchNode(Document document, String tag1, String tag2,
+	static boolean searchNode(Document document, String tag1, String tag2,
 			String nodeText) {
 		boolean status = false;
 		NodeList nodeList1 = document.getElementsByTagName(tag1);

@@ -43,6 +43,20 @@ This will add DOM fragments `filter` and `filter-mapping` nodes from the resorce
 java -cp target\xslt-0.5.0-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml -debug
 ```
 
+It validates the presence of the node before adding it:
+
+```sh
+java -cp target/xslt-0.6.0-SNAPSHOT.jar  example.MergeDocumentFragments -in output.xml -out output2.xml -debug
+```
+```sh
+Loaded: file:///C:/developer/sergueik/selenium_java/xslt-example/output.xml
+
+Exploring node: filter
+Exploring node: filter
+Exploring node: filter
+Already have the node: //filter/filter-name[text()="responseHeadersFilter"]
+```
+
 ```xml
 <filter xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
   <filter-name>httpHeaderSecurity</filter-name>
