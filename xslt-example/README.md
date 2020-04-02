@@ -7,7 +7,7 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 mvn clean package
 ```
 ```sh
-java -cp target/xslt-0.0.4-SNAPSHOT.jar  example.MergeDocumentFragments -in web.xml -out output.xml
+java -cp target/xslt-0.7.0-SNAPSHOT.jar  example.MergeDocumentFragments -in web.xml -out output.xml
 ```
 inspect the modifications made
 ```sh
@@ -63,6 +63,14 @@ Already have the node: //filter/filter-name[text()="responseHeadersFilter"]
   <filter-class>org.apache.catalina.filters.HttpHeaderSecurityFilter</filter-class>
   <async-supported>true</async-supported>
 </filter>
+```
+this will remove specific node altogether
+```sh
+java -cp target\xslt-0.7.0-SNAP SHOT.jar example.RemoveNode -in web_output.xml -tag1 filter -tag3 filter-name -name responseHeadersFilter -debug -out web_output2.xml
+```
+verify with
+```sh
+WinDiff.Exe web_output .xml web_output2.xml
 ```
 #### Verbatim Data
 

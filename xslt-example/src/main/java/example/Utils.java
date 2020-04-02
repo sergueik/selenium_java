@@ -2,10 +2,21 @@ package example;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
 
 public class Utils {
 
@@ -87,4 +98,15 @@ public class Utils {
 		return matcher.replaceAll(String.format("%s:%s[%s:%s[text()='%s']]", prefix,
 				tag1, prefix, tag2, name));
 	}
+
+	@SuppressWarnings("unused")
+	private static String toStringXML(Document document)
+			throws TransformerFactoryConfigurationError, TransformerException {
+		Transformer transformer = TransformerFactory.newInstance().newTransformer();
+		StringWriter stringWriter = new StringWriter();
+		transformer.transform(new DOMSource(document),
+				new StreamResult(stringWriter));
+		return stringWriter.toString();
+	}
+
 }
