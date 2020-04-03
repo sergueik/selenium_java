@@ -30,8 +30,7 @@ public class RemoveNode {
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
 
-	public static void main(String[] args)
-			throws IOException, URISyntaxException {
+	public static void main(String[] args) throws IOException, URISyntaxException {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.saveFlagValue("in");
 		commandLineParser.saveFlagValue("out");
@@ -67,22 +66,18 @@ public class RemoveNode {
 			System.err.println("Missing required argument: in");
 			return;
 		}
-		String inputUri = Paths.get(commandLineParser.getFlagValue("in")).toUri()
-				.toString();
+		String inputUri = Paths.get(commandLineParser.getFlagValue("in")).toUri().toString();
 		if (debug) {
 			System.err.println("Loaded: " + inputUri);
 		}
 		Transformer transformer = null;
 		try {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder documentBuilder = documentBuilderFactory
-					.newDocumentBuilder();
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			Document document = documentBuilder.parse(inputUri);
 			if (!MergeDocumentFragments.searchNode(document, tag1, tag3, name)) {
 				if (debug) {
-					System.err.println(String.format(
-							"Not found the node: //%s/%s[text()=\"%s\"]", tag1, tag3, name));
+					System.err.println(String.format("Not found the node: //%s/%s[text()=\"%s\"]", tag1, tag3, name));
 				}
 				return;
 
@@ -94,8 +89,7 @@ public class RemoveNode {
 			DOMSource source = new DOMSource(document);
 			StreamResult file = new StreamResult(new File(outFile));
 			transformer.transform(source, file);
-		} catch (ParserConfigurationException | TransformerException
-				| SAXException e) {
+		} catch (ParserConfigurationException | TransformerException | SAXException e) {
 			System.err.println("Exception (ignored): " + e.toString());
 		}
 
@@ -106,11 +100,9 @@ public class RemoveNode {
 
 	// based on
 	// http://www.java2s.com/Tutorials/Java/XML/Delete_element_from_XML_document_using_Java_DOM.htm
-	private static void removeNode(Document document, String tag1, String tag2,
-			String nodeText) {
+	private static void removeNode(Document document, String tag1, String tag2, String nodeText) {
 		if (debug) {
-			System.err.println(String.format(
-					"Removing the node: //%s/%s[text()=\"%s\"]", tag1, tag2, nodeText));
+			System.err.println(String.format("Removing the node: //%s/%s[text()=\"%s\"]", tag1, tag2, nodeText));
 		}
 
 		Node node1 = null;
@@ -124,18 +116,16 @@ public class RemoveNode {
 					if (debug) {
 						System.err.println("Exploring node: " + node1.getNodeName());
 					}
-					NodeList nodeList2 = node1.getOwnerDocument()
-							.getElementsByTagName(tag2);
+					NodeList nodeList2 = ((Element) node1).getElementsByTagName(tag2);
 					int maxcnt2 = nodeList2.getLength();
 					if (maxcnt2 != 0) {
 						for (int cnt2 = 0; cnt2 < maxcnt2; cnt2++) {
 							Node node2 = nodeList2.item(cnt2);
 							if (node2.getTextContent().equalsIgnoreCase(nodeText)) {
 								if (debug) {
-									System.err.println(String.format(
-											"Found node://%s/%s[test()=\"%s\"] %s ",
-											node2.getOwnerDocument().getNodeName(),
-											node2.getNodeName(), node2.getTextContent(), nodeText));
+									System.err.println(String.format("Found node://%s/%s[test()=\"%s\"] %s ",
+											node2.getOwnerDocument().getNodeName(), node2.getNodeName(),
+											node2.getTextContent(), nodeText));
 								}
 								status = true;
 							}

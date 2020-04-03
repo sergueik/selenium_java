@@ -66,37 +66,31 @@ public class MergeDocumentFragments {
 		if (commandLineParser.getFlagValue("in") == null) {
 			System.err.println("Missing required argument: in");
 		}
-		String inputUri = Paths.get(commandLineParser.getFlagValue("in")).toUri()
-				.toString();
+		String inputUri = Paths.get(commandLineParser.getFlagValue("in")).toUri().toString();
 		if (debug) {
 			System.err.println("Loaded: " + inputUri);
 		}
 		try {
-			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
-					.newInstance();
-			DocumentBuilder documentBuilder = documentBuilderFactory
-					.newDocumentBuilder();
+			DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
 			Document document = documentBuilder.parse(inputUri);
 
 			if (searchNode(document, tag1, tag3, newName)) {
 				if (debug) {
 					System.err.println(
-							String.format("Already have the node: //%s/%s[text()=\"%s\"]",
-									tag1, tag3, newName));
+							String.format("Already have the node: //%s/%s[text()=\"%s\"]", tag1, tag3, newName));
 					return;
 				}
 			}
-			Document configDocument = documentBuilder
-					.parse(Utils.getPageContent("fragment.xml"));
+			Document configDocument = documentBuilder.parse(Utils.getPageContent("fragment.xml"));
 
-			insertNode(document, tag1, tag3, name, document.importNode(
-					(Element) configDocument.getElementsByTagName(tag1).item(0), true));
-			insertNode(document, tag2, tag3, name, document.importNode(
-					(Element) configDocument.getElementsByTagName(tag2).item(0), true));
+			insertNode(document, tag1, tag3, name,
+					document.importNode((Element) configDocument.getElementsByTagName(tag1).item(0), true));
+			insertNode(document, tag2, tag3, name,
+					document.importNode((Element) configDocument.getElementsByTagName(tag2).item(0), true));
 
 			try {
-				TransformerFactory transformerFactory = TransformerFactory
-						.newInstance();
+				TransformerFactory transformerFactory = TransformerFactory.newInstance();
 				Transformer transformer = transformerFactory.newTransformer();
 				transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 				DOMSource source = new DOMSource(document);
@@ -114,8 +108,7 @@ public class MergeDocumentFragments {
 		}
 	}
 
-	static boolean searchNode(Document document, String tag1, String tag2,
-			String nodeText) {
+	static boolean searchNode(Document document, String tag1, String tag2, String nodeText) {
 		boolean status = false;
 		NodeList nodeList1 = document.getElementsByTagName(tag1);
 		int maxcnt1 = nodeList1.getLength();
@@ -123,12 +116,11 @@ public class MergeDocumentFragments {
 			for (int cnt1 = 0; cnt1 < maxcnt1; cnt1++) {
 				Node node1 = nodeList1.item(cnt1);
 				if (node1.getNodeType() == Node.ELEMENT_NODE) {
-					Element element1 = (Element) node1;
 					if (debug) {
 						System.err.println("Exploring node: " + node1.getNodeName());
 					}
-					NodeList nodeList2 = node1.getOwnerDocument()
-							.getElementsByTagName(tag2);
+					NodeList nodeList2 = ((Element) node1).getElementsByTagName(tag2);
+
 					int maxcnt2 = nodeList2.getLength();
 					if (maxcnt2 != 0) {
 						for (int cnt2 = 0; cnt2 < maxcnt2; cnt2++) {
@@ -144,8 +136,7 @@ public class MergeDocumentFragments {
 		return status;
 	}
 
-	private static void insertNode(Document document, String tag1, String tag2,
-			String nodeText, Node newChild) {
+	private static void insertNode(Document document, String tag1, String tag2, String nodeText, Node newChild) {
 		NodeList nodeList1 = document.getElementsByTagName(tag1);
 		int maxcnt1 = nodeList1.getLength();
 		if (maxcnt1 == 0) {
@@ -160,8 +151,7 @@ public class MergeDocumentFragments {
 					if (debug) {
 						System.err.println("Exploring node: " + node1.getNodeName());
 					}
-					NodeList nodeList2 = node1.getOwnerDocument()
-							.getElementsByTagName(tag2);
+					NodeList nodeList2 = node1.getOwnerDocument().getElementsByTagName(tag2);
 					if (debug) {
 						System.err.println("Subnode list length: " + nodeList2.getLength());
 					}
@@ -170,16 +160,13 @@ public class MergeDocumentFragments {
 						if (!done) {
 							Node node2 = nodeList2.item(cnt2);
 							if (debug) {
-								System.err
-										.println("Exploring nested node: " + node2.getNodeName());
+								System.err.println("Exploring nested node: " + node2.getNodeName());
 							}
 							if (node2.getTextContent().equalsIgnoreCase(nodeText)) {
 								if (debug) {
-									System.err.println(String.format("Found text %s (index %d)",
-											nodeText, cnt2));
+									System.err.println(String.format("Found text %s (index %d)", nodeText, cnt2));
 								}
-								element1.getParentNode().insertBefore(newChild,
-										element1.getNextSibling());
+								element1.getParentNode().insertBefore(newChild, element1.getNextSibling());
 								if (debug) {
 									System.err.println("Added " + newChild.getNodeName());
 								}
