@@ -108,6 +108,11 @@ public class RemoveNode {
 	// http://www.java2s.com/Tutorials/Java/XML/Delete_element_from_XML_document_using_Java_DOM.htm
 	private static void removeNode(Document document, String tag1, String tag2,
 			String nodeText) {
+		if (debug) {
+			System.err.println(String.format(
+					"Removing the node: //%s/%s[text()=\"%s\"]", tag1, tag2, nodeText));
+		}
+
 		Node node1 = null;
 		boolean status = false;
 		NodeList nodeList1 = document.getElementsByTagName(tag1);
@@ -126,6 +131,12 @@ public class RemoveNode {
 						for (int cnt2 = 0; cnt2 < maxcnt2; cnt2++) {
 							Node node2 = nodeList2.item(cnt2);
 							if (node2.getTextContent().equalsIgnoreCase(nodeText)) {
+								if (debug) {
+									System.err.println(String.format(
+											"Found node://%s/%s[test()=\"%s\"] %s ",
+											node2.getOwnerDocument().getNodeName(),
+											node2.getNodeName(), node2.getTextContent(), nodeText));
+								}
 								status = true;
 							}
 						}
@@ -136,6 +147,9 @@ public class RemoveNode {
 
 		if (status && node1 != null) {
 			Node parent = node1.getParentNode();
+			if (debug) {
+				System.err.println("Removing the node: " + node1.getNodeName());
+			}
 			parent.removeChild(node1);
 			parent.normalize();
 		}
