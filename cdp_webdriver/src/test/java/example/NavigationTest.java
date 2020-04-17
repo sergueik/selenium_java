@@ -2,6 +2,7 @@ package example;
 
 import example.messaging.CDPClient;
 import static java.lang.System.err;
+
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;

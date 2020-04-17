@@ -34,6 +34,8 @@ public class Utils {
 	private String wsURL;
 	private static ThreadLocal<Utils> instance = new ThreadLocal<Utils>();
 	private static final Logger logger = LoggerFactory.getLogger(Utils.class);
+	private static final String chromeDriverLogFile = System
+			.getProperty("user.dir") + "/target/chromedriver.log";
 
 	public static Utils getInstance() {
 		if (instance.get() == null) {
@@ -49,7 +51,7 @@ public class Utils {
 	public WebDriver launchBrowser(boolean isHeadless) throws IOException {
 		logger.info("Launching the Chrome...");
 
-		Map<String, Object> prefs = new HashMap<String, Object>();
+		Map<String, Object> prefs = new HashMap<>();
 		// 1-Allow, 2-Block, 0-default
 		prefs.put("profile.default_content_setting_values.notifications", 1);
 		LoggingPreferences logPrefs = new LoggingPreferences();
@@ -62,9 +64,7 @@ public class Utils {
 		options.addArguments(Arrays.asList("--ignore-certificate-errors"));
 		options.setExperimentalOption("useAutomationExtension", false);
 		// options.addArguments("enable-automation");
-		//// options.addArguments(Arrays.asList("--start-maximized"));
 		// options.addArguments("start-maximized");
-		// options.addArguments(Arrays.asList("--disable-extensions"));
 		if (isHeadless) {
 			options.addArguments(Arrays.asList("--headless", "--disable-gpu"));
 		}
@@ -77,8 +77,9 @@ public class Utils {
 		crcapabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 		crcapabilities.setCapability(CapabilityType.LOGGING_PREFS, logPrefs);
 
+		// the chrome driver log is where the session will be extracted from
 		System.setProperty(ChromeDriverService.CHROME_DRIVER_LOG_PROPERTY,
-				System.getProperty("user.dir") + "/target/chromedriver.log");
+				chromeDriverLogFile);
 
 		System.setProperty(ChromeDriverService.CHROME_DRIVER_EXE_PROPERTY,
 				Paths.get(System.getProperty("user.home")).resolve("Downloads")
@@ -143,8 +144,7 @@ public class Utils {
 
 	public String getWebSocketDebuggerUrl() throws IOException {
 		String webSocketDebuggerUrl = "";
-		File file = new File(
-				System.getProperty("user.dir") + "/target/chromedriver.log");
+		File file = new File(chromeDriverLogFile);
 		try {
 
 			Scanner sc = new Scanner(file);
@@ -193,4 +193,3 @@ public class Utils {
 		return osName;
 	}
 }
-

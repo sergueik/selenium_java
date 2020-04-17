@@ -65,6 +65,17 @@ public class HeadlessTest extends BaseTest {
 		}
 	}
 
+	// @Ignore
+	@Test
+	public void doCustomHeaders()
+			throws IOException, WebSocketException, InterruptedException {
+		CDPClient.sendMessage(MessageBuilder.buildNetWorkEnableMessage(id));
+		CDPClient.sendMessage(MessageBuilder.buildNetWorkSetExtraHTTPHeadersMessage(
+				id, "customHeaderName",
+				this.getClass().getSimpleName() + " " + "customHeaderValue"));
+		driver.navigate().to("http://127.0.0.1:8080/demo/Demo");
+	}
+
 	@Test
 	public void doNetworkTracking()
 			throws IOException, WebSocketException, InterruptedException {
