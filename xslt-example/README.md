@@ -7,7 +7,7 @@ Example xstl apply class for the XML tool clean Java / Timcat hosting node manag
 mvn clean package
 ```
 ```sh
-java -cp target/xslt-0.7.0-SNAPSHOT.jar  example.MergeDocumentFragments -in web.xml -out output.xml
+java -cp target/example.xslt.jar example.MergeDocumentFragments -in web.xml -out output.xml
 ```
 inspect the modifications made
 ```sh
@@ -32,7 +32,7 @@ diff -w web.xml output.xml
 ```
 This will put a XML comment around the selected node removing it from catalina configuration
 ```sh
-java -cp target/xslt-0.5.0-SNAPSHOT.jar example.CommentNode -in web.xml -out web_output.xml -name responseHeadersFilter -debug
+java -cp target/example.xslt.jar example.CommentNode -in web.xml -out web_output.xml -name responseHeadersFilter -debug
 transforming web.xml with embedded stylesheet
 Loaded: web.xml
 Written: web_output.xml
@@ -40,13 +40,13 @@ Written: web_output.xml
 This will add DOM fragments `filter` and `filter-mapping` nodes from the resorce `fragment.xml` embedded in the Jar
 ```
 ```sh
-java -cp target\xslt-0.5.0-SNAPSHOT.jar example.MergeDocumentFragments -in web.xml -out output.xml -debug
+java -cp target/example.xslt.jar example.MergeDocumentFragments -in web.xml -out output.xml -debug
 ```
 
 It validates the presence of the node before adding it:
 
 ```sh
-java -cp target/xslt-0.6.0-SNAPSHOT.jar  example.MergeDocumentFragments -in output.xml -out output2.xml -debug
+java -cp target/example.xslt.jar example.MergeDocumentFragments -in output.xml -out output2.xml -debug
 ```
 ```sh
 Loaded: file:///C:/developer/sergueik/selenium_java/xslt-example/output.xml
@@ -66,11 +66,39 @@ Already have the node: //filter/filter-name[text()="responseHeadersFilter"]
 ```
 this will remove specific node altogether
 ```sh
-java -cp target\xslt-0.7.0-SNAP SHOT.jar example.RemoveNode -in web_output.xml -tag1 filter -tag3 filter-name -name responseHeadersFilter -debug -out web_output2.xml
+java -cp target\example.xslt.jar example.RemoveNode -in web_output.xml -tag1 filter -tag3 filter-name -name responseHeadersFilter -debug -out web_output2.xml
 ```
 verify with
 ```sh
 WinDiff.Exe web_output .xml web_output2.xml
+```
+
+
+#### Running as Jar
+
+Alternatively run
+
+```sh
+java -jar target\example.xslt.jar -op add -in web.xml -out output.xml -debug
+```
+this will log:
+```sh
+Loaded: file:///C:/developer/sergueik/selenium_java/xslt-example/web.xml
+Exploring node: filter
+Testing local file: jar:file:/C:/developer/sergueik/selenium_java/xslt-example/t
+arget/example.xslt.jar!/fragment.xml
+Exploring node: filter
+Subnode list length: 2
+Exploring nested node: filter-name
+Found text failedRequestFilter (index 0)
+Added filter
+Exploring node: filter-mapping
+Subnode list length: 3
+Exploring nested node: filter-name
+Found text failedRequestFilter (index 0)
+Added filter-mapping
+Written: output.xml
+Done: add
 ```
 #### Verbatim Data
 
@@ -124,7 +152,7 @@ toappent the filter `customFilter` after the filter named `httpHeaderSecurity`
 and
 running the vanilla command:
 ```sh
-java -cp target/xslt-0.0.2-SNAPSHOT.jar example.App web.xml create_node.xsl web_output.xml
+java -cp target/example.xslt.jar example.App web.xml create_node.xsl web_output.xml
 ```
 the following extraneous attribute will be found:
 ```
@@ -174,7 +202,7 @@ xmlns:uuid="java.util.UUID" version="2.0" exclude-result-prefixes="uuid">
 
 ```sh
 mvn install
-java -cp target\xslt-0.0.3-SNAPSHOT.jar example.App example.xml transform.xsl output.xml
+java -cp target\example.xslt.jar example.App example.xml transform.xsl output.xml
 ```
 
 `output.xml`:
