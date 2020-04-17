@@ -1,3 +1,5 @@
 [submodule "selenium_tests"]
 	path = selenium_tests/selenium_tests
 	url = https://github.com/sergueik/selenium_tests
+	path = cdp_webdriver/cdp_webdriver
+	url = https://github.com/sergueik/cdp_webdriver
