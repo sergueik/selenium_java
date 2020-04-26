@@ -15,6 +15,7 @@
     <junit.version>4.12</junit.version>
     <!-- NOTE: java.version is a special variable: when not set goes  and correctly finds but unavle to use with the java.lang.IllegalArgumentException: invalid target release: 1.8.0_161 -->
     <java.version>1.8</java.version>
+    <javax.mail.version>1.6.2</javax.mail.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -28,7 +29,7 @@
     <dependency>
       <groupId>com.sun.mail</groupId>
       <artifactId>javax.mail</artifactId>
-      <version>1.6.2</version>
+      <version>${javax.mail.version}</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -42,10 +43,6 @@
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>${maven-clean-plugin.varsion}</version>
-      </plugin>
-      <plugin>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>3.0.2</version>
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -67,16 +64,24 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
         <configuration>
-          <finalName>${project.artifactId}</finalName>
+          <finalName>${finalName}</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
           </descriptorRefs>
           <archive>
+            <manifestEntries>
+              <Built-By>maven</Built-By>
+            </manifestEntries>
             <manifest>
               <mainClass>${project.groupId}.${mainClass}</mainClass>
             </manifest>
           </archive>
+          <excludes>
+            <exclude>**/pom.properties</exclude>
+            <exclude>**/log4j.properties</exclude>
+            <exclude>**/sandbox/*</exclude>
+          </excludes>
         </configuration>
         <executions>
           <execution>
@@ -104,31 +109,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <version>${maven-jar-plugin.version}</version>
-        <configuration>
-          <finalName>${finalName}</finalName>
-          <forceCreation>true</forceCreation>
-          <archive>
-            <manifestEntries>
-              <Built-By>maven</Built-By>
-            </manifestEntries>
-            <manifest>
-              <addClasspath>true</addClasspath>
-              <mainClass>${project.groupId}.${mainClass}</mainClass>
-              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-              <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-            </manifest>
-          </archive>
-          <excludes>
-            <exclude>**/pom.properties</exclude>
-            <exclude>**/log4j.properties</exclude>
-            <exclude>**/sandbox/*</exclude>
-          </excludes>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

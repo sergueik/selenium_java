@@ -2,6 +2,7 @@ package example;
 
 import java.util.Properties;
 
+import javax.mail.AuthenticationFailedException;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
@@ -70,9 +71,11 @@ public class App {
 			message.setSubject("This is the Subject Line!");
 			message.setText("This is actual message");
 
-			System.out.println("sending...");
+			System.err.println("sending...");
 			Transport.send(message);
-			System.out.println("Sent message successfully....");
+			System.err.println("Sent message successfully....");
+		} catch (AuthenticationFailedException e) {
+			System.err.println("Invalid credentials");
 		} catch (MessagingException e) {
 			e.printStackTrace();
 		}
