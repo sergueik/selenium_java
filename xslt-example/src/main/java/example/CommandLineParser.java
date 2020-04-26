@@ -44,7 +44,7 @@ public class CommandLineParser {
 	}
 
 	public String getFlagValue(String flagName) {
-		return (String) flags.get(flagName);
+		return flags.get(flagName);
 	}
 
 	public int getNumberOfArguments() {
@@ -89,7 +89,7 @@ public class CommandLineParser {
 				regularArgs.add(args[n]);
 		}
 
-		arguments = (String[]) regularArgs.toArray(new String[regularArgs.size()]);
+		arguments = regularArgs.toArray(new String[regularArgs.size()]);
 	}
 
 	public void saveFlagValue(String flagName) {
