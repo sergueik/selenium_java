@@ -102,25 +102,26 @@ public class CommandLineParser {
 	private static final String keyValueSeparator = ":";
 	private static final String entrySeparator = ",";
 
-	public Map<String, String> extractExtraArgs(String argument) {
+	public Map<String, String> extractExtraArgs(String argument)
+			throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.substring(1, argument.length() - 1);
+		if (argument.indexOf("{") > -1 || argument.indexOf("}") > -1) {
+			if (debug) {
+				System.err.println("Found invalid nested data");
+			}
+			throw new IllegalArgumentException("Nested JSON athuments not supprted");
+		}
 		final String[] pairs = argument.split(entrySeparator);
 
 		for (String pair : pairs) {
 			String[] values = pair.split(keyValueSeparator);
 
-			if (values[1].trim().toLowerCase().substring(0, 1).compareTo("{") != 0) {
-				if (debug) {
-					System.err.println("Collecting: " + pair);
-				}
-				extraArgData.put(values[0].trim(), values[1].trim());
-			} else {
-				if (debug) {
-					System.err.println("Ignoring: " + pair);
-				}
+			if (debug) {
+				System.err.println("Collecting: " + pair);
 			}
+			extraArgData.put(values[0].trim(), values[1].trim());
 		}
 		return extraArgData;
 	}

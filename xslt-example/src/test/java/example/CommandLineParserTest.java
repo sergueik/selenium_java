@@ -38,7 +38,8 @@ public class CommandLineParserTest {
 	public void blankArgumensTest() {
 		commandLineParser.parse(new String[] {});
 		if (debug) {
-			System.err.println("blankArgumensTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("blankArgumensTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 		assertThat(commandLineParser.getNumberOfFlags(), is(0));
 	}
@@ -50,12 +51,14 @@ public class CommandLineParserTest {
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getNumberOfArguments(), is(1));
 		if (debug) {
-			System.err.println("argumentCountsTest: arguments: " + Arrays.asList(commandLineParser.getArguments()));
+			System.err.println("argumentCountsTest: arguments: "
+					+ Arrays.asList(commandLineParser.getArguments()));
 		}
 		assertThat(commandLineParser.getNumberOfFlags(), is(2));
 
 		if (debug) {
-			System.err.println("argumentCountsTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("argumentCountsTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 	}
 
@@ -69,7 +72,8 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("a"), is(true));
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
 		assertThat(commandLineParser.getFlagValue("z"), nullValue());
-		System.err.println("argumentNamesValuesTest(): arguments: " + Arrays.asList(commandLineParser.getArguments()));
+		System.err.println("argumentNamesValuesTest(): arguments: "
+				+ Arrays.asList(commandLineParser.getArguments()));
 	}
 
 	@Test
@@ -84,25 +88,40 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.getFlagValue("a"), nullValue());
 
 		if (debug) {
-			System.err.println("argumentValueLessTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("argumentValueLessTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 	}
 
 	@Test
-	public void argumentextractExtraArgsTest() {
+	public void extractExtraArgsTest() {
 		final String[] argsArray = new String[] { "-a",
-				"{count:0, type: navigate, size:100.1, flag:true, deep:{ignore:true}}" };
+				"{count:0, type: navigate, size:100.1, flag:true}" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
-		assertThat(commandLineParser.extractExtraArgs(commandLineParser.getFlagValue("a")), notNullValue());
+		assertThat(
+				commandLineParser.extractExtraArgs(commandLineParser.getFlagValue("a")),
+				notNullValue());
 		final Map<String, String> extraArgData = commandLineParser
 				.extractExtraArgs(commandLineParser.getFlagValue("a"));
 		assertThat(extraArgData.containsKey("count"), is(true));
 		assertThat(extraArgData.containsKey("type"), is(true));
 		assertThat(extraArgData.containsKey("size"), is(true));
 		assertThat(extraArgData.containsKey("flag"), is(true));
-		assertThat(extraArgData.containsKey("deep"), is(false));
+		assertThat(extraArgData.containsKey("missing"), is(false));
 
 	}
+
+	// https://www.baeldung.com/junit-assert-exception
+	@Test(expected = java.lang.IllegalArgumentException.class)
+	public void argumentExtraArgsGuardTest() {
+		final String[] argsArray = new String[] { "-a",
+				"{count:0,deep:{key:value}}" };
+		commandLineParser.saveFlagValue("a");
+		commandLineParser.parse(argsArray);
+		final Map<String, String> extraArgData = commandLineParser
+				.extractExtraArgs(commandLineParser.getFlagValue("a"));
+	}
+
 }
