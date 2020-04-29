@@ -13,7 +13,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 // http://magicmonster.com/kb/prg/java/xml/dom/merging_nodes_diff_docs.html
-public class CommentNode {
+public class TransformDocument {
 	private static boolean debug = false;
 	private static final String defaultStyleSheeet = "comment_node.xsl";
 	private static CommandLineParser commandLineParser;

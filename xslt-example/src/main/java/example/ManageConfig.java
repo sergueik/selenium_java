@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import javax.xml.transform.TransformerException;
 
 import example.RemoveNode;
-import example.CommentNode;
+import example.TransformDocument;
 import example.MergeDocumentFragments;
 
 public class ManageConfig {
@@ -47,9 +47,17 @@ public class ManageConfig {
 		if (op.equalsIgnoreCase("remove")) {
 			RemoveNode.main(args);
 		}
-		if (op.equalsIgnoreCase("comment")) {
+		if (op.equalsIgnoreCase("transform")) {
+			// external style sheet
 			try {
-				CommentNode.main(args);
+				TransformDocument.main(args);
+			} catch (TransformerException e) {
+			}
+		}
+		if (op.equalsIgnoreCase("comment")) {
+			// embedded style sheet
+			try {
+				TransformDocument.main(args);
 			} catch (TransformerException e) {
 			}
 		}

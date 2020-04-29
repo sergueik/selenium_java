@@ -1,5 +1,5 @@
 ### Info
-Example xstl apply class for the XML tool clean Java / Timcat hosting node management
+Example __xslt__ apply class for the __XML__ tool-clean Java / Timcat hosting node management
 
 ### Usage
 #### Basic
@@ -13,7 +13,10 @@ inspect the modifications made
 ```sh
 diff -w web.xml output.xml
 ```
-(on Windows use windiff.exe)
+on Windows use 
+```cmd
+windiff.exe web.xml output.xml
+```
 ```sh
 7a8,15
 > <filter>
@@ -100,8 +103,38 @@ Added filter-mapping
 Written: output.xml
 Done: add
 ```
-#### Verbatim Data
 
+then
+```cmd
+java -jar target\example.xslt.jar -op comment -in output.xml -out output2.xml -debug
+```
+which will log
+```sh
+transforming output.xml with embedded stylesheet
+Loaded: output.xml
+Written: output2.xml
+```
+then
+
+```cmd
+java -jar target\example.xslt.jar -op transform -in output.xml -out output2.xml -debug -xsl src\main\resources\
+```
+which will log
+```sh
+transforming output.xml with src\main\resources\create_node.xsl
+Loaded: output.xml
+Written: output2.xml
+Done: transform
+```
+which will  create a DOM node with undesired `xmlns:xxx` namespace-like attribute:
+```xml
+<filter-mapping xmlns:xxx="http://xmlns.jcp.org/xml/ns/javaee">
+<filter-name>customFilter</filter-name>
+<url-pattern>/*</url-pattern>
+<dispatcher>REQUEST</dispatcher>
+</filter-mapping>
+#### Verbatim Data
+```
 The best way to add a DOM tree fragment of application-specific nodes to XML is by applying the style sheet with a lot of fard coded data. say  one intends to add `` to catalina `web.xml`:
 
 ```xml

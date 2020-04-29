@@ -95,18 +95,17 @@ public class CommandLineParser {
 	public void saveFlagValue(String flagName) {
 		flagsWithValues.add(flagName);
 	}
-	// Example data:
-	// -argument "{count:0, type:navigate, size:100, flag:true}"
-	// NOTE: not using org.json to reduce size
 
 	private static final String keyValueSeparator = ":";
 	private static final String entrySeparator = ",";
 
-	public Map<String, String> extractExtraArgs(String argument)
-			throws IllegalArgumentException {
+	// Example data:
+	// -argument "{count:0, type:navigate, size:100, flag:true}"
+	// NOTE: not using org.json to reduce size
+	public Map<String, String> extractExtraArgs(String argument) throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
-		argument = argument.substring(1, argument.length() - 1);
+		argument = argument.trim().substring(1, argument.length() - 1);
 		if (argument.indexOf("{") > -1 || argument.indexOf("}") > -1) {
 			if (debug) {
 				System.err.println("Found invalid nested data");
