@@ -95,4 +95,34 @@ public class CommandLineParser {
 	public void saveFlagValue(String flagName) {
 		flagsWithValues.add(flagName);
 	}
+	// Example data:
+	// -argument "{count:0, type:navigate, size:100, flag:true}"
+	// NOTE: not using org.json to reduce size
+
+	private static final String keyValueSeparator = ":";
+	private static final String entrySeparator = ",";
+
+	public Map<String, String> extractExtraArgs(String argument) {
+
+		final Map<String, String> extraArgData = new HashMap<>();
+		argument = argument.substring(1, argument.length() - 1);
+		final String[] pairs = argument.split(entrySeparator);
+
+		for (String pair : pairs) {
+			String[] values = pair.split(keyValueSeparator);
+
+			if (values[1].trim().toLowerCase().substring(0, 1).compareTo("{") != 0) {
+				if (debug) {
+					System.err.println("Collecting: " + pair);
+				}
+				extraArgData.put(values[0].trim(), values[1].trim());
+			} else {
+				if (debug) {
+					System.err.println("Ignoring: " + pair);
+				}
+			}
+		}
+		return extraArgData;
+	}
+
 }
