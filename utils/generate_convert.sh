@@ -10,7 +10,8 @@
 # lynx -dump https://ffmpeg.org/ffmpeg-utils.html#Video-size 2>&1 |sed -n '/Video size/,/Video rate/p'
 # see also: https://www.maketecheasier.com/manipulate-html-and-xml-files-from-commnad-line/
 # to calculate the new video size based on the current use
-# ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_height=\(.*\)$|\1|p'
+# use https://www.commandlinefu.com/commands/view/2207/get-video-information-with-ffmpeg
+# e.g. ffmpeg -i or ffprobe -show_streams 
 
 # following is the complete list of abbreviations recognized by ffmpeg:
 
