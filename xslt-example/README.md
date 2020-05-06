@@ -1,11 +1,16 @@
 ### Info
-Example __xslt__ apply class for the __XML__ tool-clean Java / Timcat hosting node management
+Example exteral jar-clean java class for the Java driven Tomcat hosted node __XML__ configuration management
 
 ### Usage
 #### Basic
 ```sh
 mvn clean package
 ```
+
+#### Legacy Invocation 
+
+Probably only useful for debugging and adding new features
+
 ```sh
 java -cp target/example.xslt.jar example.MergeDocumentFragments -in web.xml -out output.xml
 ```
@@ -75,7 +80,6 @@ verify with
 ```sh
 WinDiff.Exe web_output .xml web_output2.xml
 ```
-
 
 #### Running as Jar
 
