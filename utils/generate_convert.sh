@@ -9,6 +9,10 @@
 # videos converted from hs720 to svga is best viewed with aspect ratio of 16:9
 # lynx -dump https://ffmpeg.org/ffmpeg-utils.html#Video-size 2>&1 |sed -n '/Video size/,/Video rate/p'
 # see also: https://www.maketecheasier.com/manipulate-html-and-xml-files-from-commnad-line/
+# to calculate the new video size based on the current use
+# use https://www.commandlinefu.com/commands/view/2207/get-video-information-with-ffmpeg
+# e.g. ffmpeg -i or ffprobe -show_streams 
+
 # following is the complete list of abbreviations recognized by ffmpeg:
 
 # ‘sqcif’ 128x96
@@ -66,7 +70,7 @@
 # ‘whuxga’ 7680x4800
 
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vnhsbe: --long verbose,dry-run,help,size,batterycheck,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhisbe: --long verbose,dry-run,help,inspect,size,batterycheck,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 VERBOSE=false
@@ -79,6 +83,7 @@ EXTENSION='mp4'
 while true; do
   case "$1" in
     -v | --verbose ) VERBOSE=true; shift ;;
+    -i | --inspect ) INSPECT=true; shift ;;
     -h | --help )    HELP=true; shift ;;
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -b | --battery-check ) BATTERY_CHECK=true; shift ;;
@@ -91,6 +96,7 @@ done
 
 if [[ "${VERBOSE}" = "true" ]]; then
   echo VERBOSE=$VERBOSE
+  echo INSPECT=$INSPECT
   echo HELP=$HELP
   echo DRY_RUN=$DRY_RUN
   echo SIZE=$SIZE
@@ -118,15 +124,49 @@ fi
 }
 EOF
 # NOTE: to set DEBUG need to export it from the calling shell
-if [[ -z "${DEBUG}" ]]
-then
+if [[ -z "${DEBUG}" ]] ; then
   echo 'DEBUG was not set explicitly, default is false'
   DEBUG='false'
 fi
 echo "DEBUG=${DEBUG}"
-if [[ "${DEBUG}" = 'true' ]]
-then
+if [[ "${DEBUG}" = 'true' ]] ; then
   echo "Finding files \"*${EXTENSION}\""
+fi
+if [[ "${INSPECT}" = 'true' ]]; then
+  if [[ "${DEBUG}" = 'true' ]]; then
+    echo "Inspecting first file \"*${EXTENSION}\""
+  fi
+  # ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_height=\(.*\)$|\1|p'
+  S=$(find . -iname "*${EXTENSION}" | head -1)
+  H=$(ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_height=\(.*\)$|\1|p')
+  W=$(ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_width=\(.*\)$|\1|p')
+
+  CODED="${W}x${H}"
+  if [[ "${DEBUG}" = 'true' ]]; then
+    echo "height=$H"
+    echo "width=$W"
+    echo "coded dimensions=$CODED"
+  fi
+
+  SIZES=( '1024x768:svga'
+    '1024x576:hd480'
+    '1920x1080:qhd'
+    '800x600:spal'
+    '1278x718:qhd'
+    '1280x720:qhd')
+  
+  SIZE='?'
+   
+  for ENTRY in "${SIZES[@]}" ; do
+    KEY="${ENTRY%%:*}"
+    VALUE="${ENTRY##*:}"
+    if [[ "${CODED}" = "${KEY}" ]] ; then
+      SIZE=$VALUE
+    fi
+  done
+  echo $CODED
+  echo $SIZE
+  exit 0
 fi
 # technically able to descend, seldom used
 find . -iname "*${EXTENSION}" | sort | while read filename ; do
@@ -135,17 +175,17 @@ find . -iname "*${EXTENSION}" | sort | while read filename ; do
   T="${S/.${EXTENSION}/.mkv}"
   if [[ "$D" != '.' ]]
   then
-    echo ">/dev/null pushd '${D}'"
+    echo ">/dev/null pushd '$D'"
   fi
   echo "if [[ ! -f \"$T\" ]];"
   echo '  then'
   if [[ "${BATTERY_CHECK}" = 'true' ]] ; then
     echo 'check_remaining_battery'
   fi
-  echo "echo \"Converting \\\"${S}\\\"\""
-  echo " ffmpeg -i \"${S}\" -c:v vp9 -s ${SIZE} -v 0 \"${T}\""
+  echo "echo \"Converting \\\"$S\\\"\""
+  echo " ffmpeg -i \"$S\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
   # TODO:
-  # echo " ffprobe -show_format -v quiet \"${T}\" | grep -i duration| sed 's/duration=//'"
+  # echo " ffprobe -show_format -v quiet \"$T\" | grep -i duration| sed 's/duration=//'"
   echo 'fi'
   if [[ "$D" != '.' ]]
   then
