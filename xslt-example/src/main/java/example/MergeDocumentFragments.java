@@ -14,6 +14,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -140,8 +141,40 @@ public class MergeDocumentFragments {
 		NodeList nodeList1 = document.getElementsByTagName(tag1);
 		int maxcnt1 = nodeList1.getLength();
 		if (maxcnt1 == 0) {
-			// Put as the first child is an Element.
-			((Element) document.getFirstChild()).appendChild(newChild);
+			// Put as the first child in the document - no similar tag names
+			nodeList1 = document.getChildNodes();
+			int maxcnt2 = nodeList1.getLength();
+			if (maxcnt2 == 0) {
+				if (debug) {
+					System.err.println("Adding to document" + newChild.getNodeName());
+				}
+				document.appendChild(newChild);
+				// NOTE: probably never here
+			} else {
+				for (int cnt1 = 0; cnt1 < maxcnt2; cnt1++) {
+					Node node1 = nodeList1.item(cnt1);
+					if (node1.getNodeType() == Node.ELEMENT_NODE) {
+						try {
+							Element element1 = (Element) node1;
+							if (debug) {
+								System.err.println("Adding child node to " + element1.getNodeName() + " "
+										+ newChild.getNodeName());
+							}
+							element1.appendChild(newChild);
+						} catch (ClassCastException e) {
+							// com.sun.org.apache.xerces.internal.dom.DeferredCommentImpl cannot be cast to
+							// org.w3c.dom.Element
+							// when not filtering by node type
+							System.err.println("Exception (ignored): " + e.toString());
+						} catch (DOMException e) {
+							// HIERARCHY_REQUEST_ERR:
+							// An attempt was made to insert a node where it is not permitted
+							// when adding after root element
+							System.err.println("Exception (ignored): " + e.toString());
+						}
+					}
+				}
+			}
 		} else {
 			boolean done = false;
 			for (int cnt1 = 0; cnt1 < maxcnt1; cnt1++) {
