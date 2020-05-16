@@ -169,7 +169,7 @@ public class ShadowDriver {
 		}
 	}
 
-	private void waitForPageLoaded() {
+	public void waitForPageLoaded() {
 		ExpectedCondition<Boolean> expectation = new ExpectedCondition<Boolean>() {
 			public Boolean apply(WebDriver driver) {
 				return ((JavascriptExecutor) driver)
