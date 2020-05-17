@@ -272,12 +272,17 @@ public class BaseTest {
 
 	// based on:
 	// https://github.com/yashaka/NSelene/blob/master/NSeleneTests/Given.cs
-	public Object setPage(String html) {
-		JavascriptExecutor js = (JavascriptExecutor) driver;
+	public void setPage(String html) {
+		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
 		shadowDriver.waitForPageLoaded();
-		return js
-				.executeScript("document.getElementsByTagName('body')[0].innerHTML = \""
+		javascriptExecutor.executeScript("document.getElementsByTagName('body')[0].innerHTML = \""
 						+ html.replace("\n", "").replace("\r", "").replace("\"", "\\\"")
 						+ "\";");
+	}
+	public void setPageWithTimeout(String html, int timeout) {
+		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
+		shadowDriver.waitForPageLoaded();
+		javascriptExecutor.executeScript("setTimeout(function(){ " + "document.getElementsByTagName('body')[0].innerHTML = \""
+				+ html.replace("\n", "").replace("\r", "").replace("\"", "\\\"") + "\" } ," + timeout + ");");
 	}
 }
