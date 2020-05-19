@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>io.github.sukgu</groupId>
+  <groupId>example</groupId>
   <artifactId>shadow_root</artifactId>
-  <version>0.0.12</version>
+  <version>0.1.0-SNAPSHOT</version>
   <name>shadow_root</name>
   <description>navigate ROOT DOM page elements using javascript API</description>
   <url>http://maven.apache.org</url>
@@ -28,7 +28,7 @@
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
-    <webdrivermanager.version>3.8.1</webdrivermanager.version>
+    <webdrivermanager.version>4.0.0</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>
