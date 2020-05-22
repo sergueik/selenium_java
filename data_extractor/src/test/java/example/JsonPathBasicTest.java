@@ -25,15 +25,16 @@ import java.util.List;
 import java.util.Map;
 
 import static im.nll.data.extractor.Extractors.*;
+import example.Utils;
 
-public class JsonPathTest {
+public class JsonPathBasicTest {
 	private String jsonString;
 	private Extractors extractors = null;
 	private DocumentContext jsonContext;
 
 	@Before
 	public void before() {
-		jsonString = getScriptContent("example.json");
+		jsonString = Utils.getScriptContent("example.json");
 		jsonContext = JsonPath.parse(jsonString);
 	}
 
@@ -41,7 +42,7 @@ public class JsonPathTest {
 	// testng syntax:
 	// @Test(expectedExceptions = ClassCastException.class)
 	@Test(expected = ClassCastException.class)
-	public void basicTest1() throws Exception {
+	public void test1() throws Exception {
 		String store = jsonContext.read("$[\"store\"]");
 		assertThat(store, notNullValue());
 		System.err.println("Store: " + store);
@@ -49,7 +50,7 @@ public class JsonPathTest {
 	}
 
 	@Test
-	public void basicTest2() {
+	public void test2() {
 		Map<String, Object> store = jsonContext.read("$[\"store\"]");
 		assertThat(store, notNullValue());
 		assertThat(store.containsKey("book"), is(true));
@@ -57,7 +58,7 @@ public class JsonPathTest {
 	}
 
 	@Test
-	public void basicTest3() throws Exception {
+	public void test3() throws Exception {
 		JSONArray books = jsonContext.read("$.store.book");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), is(4));
@@ -65,53 +66,60 @@ public class JsonPathTest {
 	}
 
 	@Test
-	public void basicTest4() throws Exception {
+	public void test4() {
 		List<Map<String, Object>> books = jsonContext.read("$.store.book");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), is(4));
-		System.err.println("Books[1]: " + books.get(1).toString());
+		System.err.println("test4: " + books.get(1).toString());
 	}
 
 	@Test
-	public void basicTest5() throws Exception {
+	public void test5() {
 		List<Map<String, Object>> books = jsonContext
 				.read("$.store.book[?(@.category == \"fiction\")] ");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
-		System.err.println("Books[1]: " + books.get(1).toString());
+		System.err.println("test5 Books[1]: " + books.get(1).toString());
 	}
 
 	@Test
-	public void basicTest6() throws Exception {
+	public void test6() {
 		List<Map<String, Object>> stores = jsonContext
-				.read("$.store[?(@.book[0].category == \"reference\")] ");
+				.read("$.store[?(@.book[0].category == \"reference\")]");
 		assertThat(stores, notNullValue());
 		assertThat(stores.size(), greaterThan(0));
-		System.err.println("Store[0] books: " + stores.get(0).get("book"));
+		System.err.println("Store[0] book: " + stores.get(0).get("book"));
 	}
 
 	@Test
-	public void basicTest7() throws Exception {
+	public void test7() {
 		Filter categoryFilter = Filter
 				.filter(Criteria.where("category").eq("fiction"));
 		List<Map<String, Object>> books = JsonPath.parse(jsonString)
 				.read("$.store.book", categoryFilter);
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
-		System.err.println("Books[1]: " + books.get(1).toString());
+		System.err.println("test7:");
+		for (int cnt = 0; cnt != books.size(); cnt++) {
+			System.err.println(
+					String.format("Books[%d]: %s ", cnt, books.get(cnt).toString()));
+		}
 	}
 
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = JsonPathTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
+	// does not work
+	@Test
+	public void test8() {
+		Filter categoryFilter = Filter
+				.filter(Criteria.where("@.category").eq("fiction"));
+		List<Map<String, Object>> books = JsonPath.parse(jsonString)
+				.read("$.store.book", categoryFilter);
+		assertThat(books, notNullValue());
+		assertThat(books.size(), greaterThan(0));
+		System.err.println("test8:");
+		for (int cnt = 0; cnt != books.size(); cnt++) {
+			System.err.println(
+					String.format("Books[%d]: %s ", cnt, books.get(cnt).toString()));
 		}
 	}
 
 }
-
