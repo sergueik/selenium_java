@@ -62,7 +62,7 @@ public class JsonPathBasicTest {
 		JSONArray books = jsonContext.read("$.store.book");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), is(4));
-		System.err.println("Books[0]: " + books.get(0).toString());
+		System.err.println("test3 result (Books[0]): " + books.get(0).toString());
 	}
 
 	@Test
@@ -70,7 +70,7 @@ public class JsonPathBasicTest {
 		List<Map<String, Object>> books = jsonContext.read("$.store.book");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), is(4));
-		System.err.println("test4: " + books.get(1).toString());
+		System.err.println("test4 result(books[1]): " + books.get(1).toString());
 	}
 
 	@Test
@@ -79,7 +79,7 @@ public class JsonPathBasicTest {
 				.read("$.store.book[?(@.category == \"fiction\")] ");
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
-		System.err.println("test5 Books[1]: " + books.get(1).toString());
+		System.err.println("test5 result(Books[1]): " + books.get(1).toString());
 	}
 
 	@Test
@@ -88,7 +88,7 @@ public class JsonPathBasicTest {
 				.read("$.store[?(@.book[0].category == \"reference\")]");
 		assertThat(stores, notNullValue());
 		assertThat(stores.size(), greaterThan(0));
-		System.err.println("Store[0] book: " + stores.get(0).get("book"));
+		System.err.println("test6 result(book): " + stores.get(0).get("book"));
 	}
 
 	@Test
@@ -96,29 +96,29 @@ public class JsonPathBasicTest {
 		Filter categoryFilter = Filter
 				.filter(Criteria.where("category").eq("fiction"));
 		List<Map<String, Object>> books = JsonPath.parse(jsonString)
-				.read("$.store.book", categoryFilter);
+				.read("$.store.book[?]", categoryFilter);
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
-		System.err.println("test7:");
+		System.err.println("test7 results(category):");
 		for (int cnt = 0; cnt != books.size(); cnt++) {
-			System.err.println(
-					String.format("Books[%d]: %s ", cnt, books.get(cnt).toString()));
+			System.err.println(String.format("Books[%d]: %s ", cnt,
+					books.get(cnt).get("category").toString()));
 		}
 	}
 
-	// does not work
+	// https://www.programcreek.com/java-api-examples/?api=com.jayway.jsonpath.Filter
 	@Test
 	public void test8() {
 		Filter categoryFilter = Filter
-				.filter(Criteria.where("@.category").eq("fiction"));
+				.filter(Criteria.where("@.category").ne("fiction"));
 		List<Map<String, Object>> books = JsonPath.parse(jsonString)
-				.read("$.store.book", categoryFilter);
+				.read("$.store.book[?]", categoryFilter);
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
-		System.err.println("test8:");
+		System.err.println("test8 results(category):");
 		for (int cnt = 0; cnt != books.size(); cnt++) {
-			System.err.println(
-					String.format("Books[%d]: %s ", cnt, books.get(cnt).toString()));
+			System.err.println(String.format("Books[%d]: %s ", cnt,
+					books.get(cnt).get("category").toString()));
 		}
 	}
 

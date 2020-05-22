@@ -35,15 +35,14 @@ public class JsonPathExpressionTest {
 	private DocumentContext jsonContext;
 
 	// https://qna.habr.com/q/777357
-
+	// https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html
+	// https://support.smartbear.com/alertsite/docs/dashboards/dashboard.html
 	@Before
 	public void before() {
 		jsonString = Utils.getScriptContent("goal_exclude.json");
 		jsonContext = JsonPath.parse(jsonString);
 	}
 
-	// loosely typed de-serialization with some com.jayway.jsonpath paths
-	// testng syntax:
 	@Test
 	public void test1() {
 		List<Map<String, Object>> data = jsonContext
@@ -52,26 +51,45 @@ public class JsonPathExpressionTest {
 		assertThat(data.size(), greaterThan(0));
 		List<Integer> ids = data.stream()
 				.map(o -> Integer.parseInt(o.get("id").toString()))
-				.collect(Collectors.toList(/* Integer.class */));
-		System.err.println("Result ids: " + ids);
+				.collect(Collectors.toList());
+		System.err.println("test1 results(ids): " + ids);
 	}
 
-	@Test
+	@Test	
 	public void test2() {
 		List<String> data = jsonContext.read("$.[?(@.acc != 'Not Found')].acc");
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		System.err.println("Results: " + data);
+		System.err.println("test2 results(acc): " + data);
+	}
+
+	@Test
+	public void test3() {
+		List<String> data = jsonContext.read("$.[?(@.id > 1)][?(@.pass)].acc");
+		assertThat(data, notNullValue());
+		assertThat(data.size(), greaterThan(0));
+		System.err.println("test3 results(acc): " + data);
+	}
+
+	@Test
+	public void test4() {
+		List<String> data = jsonContext.read("$.[?(@.id < 3 && @.pass)].acc");
+		assertThat(data, notNullValue());
+		assertThat(data.size(), greaterThan(0));
+		System.err.println("test4 results(acc): " + data);
 	}
 
 	// @Ignore
 	@Test
-	public void test3() {
-		Filter categoryFilter = Filter.filter(Criteria.where("pass").eq(true));
-		List<Map<String, Object>> data = JsonPath.parse(jsonString).read("$",
+	public void test5() {
+		Filter categoryFilter = Filter
+				.filter(Criteria.where("acc").eq("Not Found"));
+		// java.lang.IllegalArgumentException: path can not be null or empty
+		List<Map<String, Object>> data = JsonPath.parse(jsonString).read("$.[?]",
 				categoryFilter);
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
+		System.err.println("test5 results(acc): ");
 		for (int cnt = 0; cnt != data.size(); cnt++) {
 			System.err.println(
 					String.format("Books[%d]: %s ", cnt, data.get(cnt).toString()));
