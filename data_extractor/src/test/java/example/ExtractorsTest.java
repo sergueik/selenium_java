@@ -1,21 +1,19 @@
 package example;
 
-import im.nll.data.extractor.Extractors;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasKey;
 
-import org.junit.Assert;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
+import example.Utils;
+import im.nll.data.extractor.Extractors;
 
 import static im.nll.data.extractor.Extractors.*;
 
@@ -25,21 +23,23 @@ public class ExtractorsTest {
 
 	@Before
 	public void before() {
-		jsonString = getScriptContent("example.json");
+		jsonString = Utils.getScriptContent("example.json");
 		extractors = Extractors.on(jsonString);
 	}
 
 	// loosely typed de-serialization with some com.jayway.jsonpath paths
 	@Test
 	public void basicTest1ByJson() throws Exception {
-		String store = extractors.extract("store", Extractors.json("$[\"store\"]")).asJSONString();
+		String store = extractors.extract("store", Extractors.json("$[\"store\"]"))
+				.asJSONString();
 		assertThat(store, notNullValue());
 		System.err.println("Store: " + store);
 	}
 
 	@Test
 	public void basicTest2ByJson() throws Exception {
-		Map<String, String> store = extractors.extract("store", Extractors.json("$[\"store\"]")).asMap();
+		Map<String, String> store = extractors
+				.extract("store", Extractors.json("$[\"store\"]")).asMap();
 		System.err.println("Store:" + store);
 		assertThat(store, hasKey("store"));
 		System.err.println("Store: " + store.get("store"));
@@ -48,7 +48,8 @@ public class ExtractorsTest {
 	// strongly typed de-serialization with some jq paths
 	@Test
 	public void testToBeanListByJson() throws Exception {
-		List<Book> books = extractors.split(json("$..book.*")).extract("category", json("$..category"))
+		List<Book> books = extractors.split(json("$..book.*"))
+				.extract("category", json("$..category"))
 				.extract("author", json("$..author")).extract("title", json("$..title"))
 				.extract("price", json("$..price")).asBeanList(Book.class);
 		isValidBooks(books);
@@ -56,21 +57,11 @@ public class ExtractorsTest {
 
 	@Test
 	public void testToBeanListByJsonString() throws Exception {
-		List<Book> books = extractors.split("json:$..book.*").extract("category", "json:$..category")
-				.extract("author", "json:$..author").extract("title", "json:$..title").extract("price", "json:$..price")
-				.asBeanList(Book.class);
+		List<Book> books = extractors.split("json:$..book.*")
+				.extract("category", "json:$..category")
+				.extract("author", "json:$..author").extract("title", "json:$..title")
+				.extract("price", "json:$..price").asBeanList(Book.class);
 		isValidBooks(books);
-	}
-
-	protected static String getScriptContent(String scriptName) {
-		try {
-			final InputStream stream = ExtractorsTest.class.getClassLoader().getResourceAsStream(scriptName);
-			final byte[] bytes = new byte[stream.available()];
-			stream.read(bytes);
-			return new String(bytes, "UTF-8");
-		} catch (IOException e) {
-			throw new RuntimeException(scriptName);
-		}
 	}
 
 	private void isValidBooks(List<Book> books) throws AssertionError {

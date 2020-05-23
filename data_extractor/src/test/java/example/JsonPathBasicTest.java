@@ -24,18 +24,14 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import static im.nll.data.extractor.Extractors.*;
 import example.Utils;
 
 public class JsonPathBasicTest {
-	private String jsonString;
-	private Extractors extractors = null;
 	private DocumentContext jsonContext;
 
 	@Before
 	public void before() {
-		jsonString = Utils.getScriptContent("example.json");
-		jsonContext = JsonPath.parse(jsonString);
+		jsonContext = JsonPath.parse(Utils.getScriptContent("example.json"));
 	}
 
 	// loosely typed de-serialization with some com.jayway.jsonpath paths
@@ -95,8 +91,8 @@ public class JsonPathBasicTest {
 	public void test7() {
 		Filter categoryFilter = Filter
 				.filter(Criteria.where("category").eq("fiction"));
-		List<Map<String, Object>> books = JsonPath.parse(jsonString)
-				.read("$.store.book[?]", categoryFilter);
+		List<Map<String, Object>> books = jsonContext.read("$.store.book[?]",
+				categoryFilter);
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
 		System.err.println("test7 results(category):");
@@ -111,8 +107,8 @@ public class JsonPathBasicTest {
 	public void test8() {
 		Filter categoryFilter = Filter
 				.filter(Criteria.where("@.category").ne("fiction"));
-		List<Map<String, Object>> books = JsonPath.parse(jsonString)
-				.read("$.store.book[?]", categoryFilter);
+		List<Map<String, Object>> books = jsonContext.read("$.store.book[?]",
+				categoryFilter);
 		assertThat(books, notNullValue());
 		assertThat(books.size(), greaterThan(0));
 		System.err.println("test8 results(category):");
