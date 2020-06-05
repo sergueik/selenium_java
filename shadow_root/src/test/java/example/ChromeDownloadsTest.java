@@ -7,6 +7,8 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -43,7 +45,8 @@ public class ChromeDownloadsTest {
 
 	private static boolean isCIBuild = BaseTest.checkEnvironment();
 
-	protected static final boolean debug = Boolean.parseBoolean(BaseTest.getPropertyEnv("DEBUG", "false"));
+	protected static final boolean debug = Boolean
+			.parseBoolean(BaseTest.getPropertyEnv("DEBUG", "false"));
 
 	private final String filePath = "download.html";
 
@@ -52,9 +55,11 @@ public class ChromeDownloadsTest {
 	private static String browser = BaseTest.getPropertyEnv("BROWSER",
 			BaseTest.getPropertyEnv("webdriver.driver", "chrome"));
 
-	private static final BrowserChecker browserChecker = new BrowserChecker(browser);
+	private static final BrowserChecker browserChecker = new BrowserChecker(
+			browser);
 
-	private static final boolean headless = Boolean.parseBoolean(BaseTest.getPropertyEnv("HEADLESS", "false"));
+	private static final boolean headless = Boolean
+			.parseBoolean(BaseTest.getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
 	@BeforeClass
@@ -68,9 +73,10 @@ public class ChromeDownloadsTest {
 				chromeDriverPath = WebDriverManager.chromedriver().getBinaryPath();
 
 			} else {
-				chromeDriverPath = Paths.get(System.getProperty("user.home")).resolve("Downloads")
-						.resolve(System.getProperty("os.name").toLowerCase().startsWith("windows") ? "chromedriver.exe"
-								: "chromedriver")
+				chromeDriverPath = Paths.get(System.getProperty("user.home"))
+						.resolve("Downloads")
+						.resolve(System.getProperty("os.name").toLowerCase()
+								.startsWith("windows") ? "chromedriver.exe" : "chromedriver")
 						.toAbsolutePath().toString();
 				System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 			}
@@ -80,7 +86,8 @@ public class ChromeDownloadsTest {
 			ChromeOptions options = new ChromeOptions();
 
 			if (headless) {
-				for (String arg : (new String[] { "headless", "window-size=1200x800" })) {
+				for (String arg : (new String[] { "headless",
+						"window-size=1200x800" })) {
 					options.addArguments(arg);
 				}
 			}
@@ -89,7 +96,8 @@ public class ChromeDownloadsTest {
 			preferences.put("profile.default_content_settings.popups", 0);
 			preferences.put("download.prompt_for_download", "false");
 			String downloadsPath = System.getProperty("user.home") + "/Downloads";
-			preferences.put("download.default_directory", BaseTest.getPropertyEnv("fileDownloadPath", downloadsPath));
+			preferences.put("download.default_directory",
+					BaseTest.getPropertyEnv("fileDownloadPath", downloadsPath));
 
 			Map<String, Object> chromePrefs = new HashMap<>();
 			chromePrefs.put("plugins.always_open_pdf_externally", true);
@@ -123,8 +131,9 @@ public class ChromeDownloadsTest {
 	public void test1() {
 		Assume.assumeTrue(browserChecker.testingChrome());
 		Assume.assumeFalse(isCIBuild);
-		driver.navigate().to(LocalFileTest.getPageContent(filePath));
-		WebElement element = driver.findElement(By.xpath("//a[contains(@href, \"wikipedia.pdf\")]"));
+		driver.navigate().to(ChromeDownloadsTest.getPageContent(filePath));
+		WebElement element = driver
+				.findElement(By.xpath("//a[contains(@href, \"wikipedia.pdf\")]"));
 		element.click();
 		sleep(5000);
 	}
@@ -136,14 +145,17 @@ public class ChromeDownloadsTest {
 		Assume.assumeFalse(isCIBuild);
 		driver.navigate().to("chrome://downloads/");
 		WebElement element = driver.findElement(By.tagName("downloads-manager"));
-		List<WebElement> elements = shadowDriver.getAllShadowElement(element, "#downloadsList");
+		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
+				"#downloadsList");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
 		WebElement element2 = elements.get(0);
-		err.println(String.format("Located element:", element2.getAttribute("outerHTML")));
+		err.println(
+				String.format("Located element:", element2.getAttribute("outerHTML")));
 		WebElement element3 = element2.findElement(By.tagName("downloads-item"));
 		assertThat(element3, notNullValue());
-		WebElement element4 = shadowDriver.getShadowElement(element3, "div#details");
+		WebElement element4 = shadowDriver.getShadowElement(element3,
+				"div#details");
 		assertThat(element4, notNullValue());
 		System.err.println("Result element: " + element3.getAttribute("outerHTML"));
 		WebElement element5 = element4.findElement(By.cssSelector("span#name"));
@@ -158,14 +170,16 @@ public class ChromeDownloadsTest {
 			System.err.println("Exception (ignored) " + e.toString());
 		}
 
-		Pattern pattern = Pattern.compile(String.format("wikipedia(?:%s)*\\.pdf", " \\((\\d+)\\)"),
+		Pattern pattern = Pattern.compile(
+				String.format("wikipedia(?:%s)*\\.pdf", " \\((\\d+)\\)"),
 				Pattern.CASE_INSENSITIVE);
 		Matcher matcher = pattern.matcher(element4HTML);
 		assertThat(matcher.find(), is(true));
 		assertThat(pattern.matcher(element4HTML).find(), is(true));
 		WebElement element6 = element4.findElement(By.cssSelector("a#url"));
 		assertThat(element6, notNullValue());
-		System.err.println("Inspecting element: " + element6.getAttribute("outerHTML"));
+		System.err
+				.println("Inspecting element: " + element6.getAttribute("outerHTML"));
 		shadowDriver.scrollTo(element6);
 		WebElement element7 = shadowDriver.getParentElement(element6);
 		assertThat(element7, notNullValue());
@@ -173,9 +187,12 @@ public class ChromeDownloadsTest {
 		String html = element7.getAttribute("outerHTML");
 		System.err.println("Inspecting parent element: " + html);
 		try {
-			assertThat(shadowDriver.getAttribute(element7, "outerHTML"), notNullValue());
-			assertThat(shadowDriver.getAttribute(element7, "outerHTML"), containsString(html));
-			System.err.println("Vefified attribute extraction: " + shadowDriver.getAttribute(element7, "outerHTML"));
+			assertThat(shadowDriver.getAttribute(element7, "outerHTML"),
+					notNullValue());
+			assertThat(shadowDriver.getAttribute(element7, "outerHTML"),
+					containsString(html));
+			System.err.println("Vefified attribute extraction: "
+					+ shadowDriver.getAttribute(element7, "outerHTML"));
 		} catch (AssertionError e) {
 			System.err.println("Exception (ignored): " + e.toString());
 		}
@@ -222,4 +239,17 @@ public class ChromeDownloadsTest {
 			e.printStackTrace();
 		}
 	}
+
+	// temporarily copied
+	protected static String getPageContent(String pagename) {
+		try {
+			URI uri = BaseTest.class.getClassLoader().getResource(pagename).toURI();
+			err.println("Testing local file: " + uri.toString());
+			return uri.toString();
+		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
+			// supported in -source 1.6
+			throw new RuntimeException(e);
+		}
+	}
+
 }

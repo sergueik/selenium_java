@@ -275,14 +275,18 @@ public class BaseTest {
 	public void setPage(String html) {
 		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
 		shadowDriver.waitForPageLoaded();
-		javascriptExecutor.executeScript("document.getElementsByTagName('body')[0].innerHTML = \""
+		javascriptExecutor
+				.executeScript("document.getElementsByTagName('body')[0].innerHTML = \""
 						+ html.replace("\n", "").replace("\r", "").replace("\"", "\\\"")
 						+ "\";");
 	}
+
 	public void setPageWithTimeout(String html, int timeout) {
 		JavascriptExecutor javascriptExecutor = (JavascriptExecutor) driver;
 		shadowDriver.waitForPageLoaded();
-		javascriptExecutor.executeScript("setTimeout(function(){ " + "document.getElementsByTagName('body')[0].innerHTML = \""
-				+ html.replace("\n", "").replace("\r", "").replace("\"", "\\\"") + "\" } ," + timeout + ");");
+		javascriptExecutor.executeScript("setTimeout(function(){ "
+				+ "document.getElementsByTagName('body')[0].innerHTML = \""
+				+ html.replace("\n", "").replace("\r", "").replace("\"", "\\\"")
+				+ "\" } ," + timeout + ");");
 	}
 }
