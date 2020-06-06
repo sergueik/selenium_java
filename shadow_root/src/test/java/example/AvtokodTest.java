@@ -20,7 +20,7 @@ import org.openqa.selenium.WebElement;
 public class AvtokodTest extends BaseTest {
 
 	private final static String baseUrl = "https://avtokod.mos.ru/Autohistory#!/Home";
-	private static final String locator = "autohistory-card";
+	private static String locator = "autohistory-card";
 	private JavascriptExecutor js;
 
 	@Before
@@ -67,11 +67,12 @@ public class AvtokodTest extends BaseTest {
 	public void test4() {
 		WebElement element = shadowDriver.findElement(locator);
 		String locator2 = "button-ui";
+		String locator3 = "button";
 		System.err.println(element);
 		js = ((JavascriptExecutor) driver);
 		WebElement result = (WebElement) (js.executeScript(String.format(
-				"return document.querySelector('%s').shadowRoot.querySelector('%s').shadowRoot.querySelector('button')",
-				locator, locator2)));
+				"return document.querySelector('%s').shadowRoot.querySelector('%s').shadowRoot.querySelector('%s')",
+				locator, locator2, locator3)));
 		System.err.println("test4: " + result.getAttribute("outerHTML"));
 	}
 
@@ -100,7 +101,8 @@ public class AvtokodTest extends BaseTest {
 
 	@Test
 	public void test6() {
-		WebElement element = driver.findElement(By.tagName("autohistory-card"));
+		locator = "autohistory-card";
+		WebElement element = driver.findElement(By.tagName(locator));
 		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
 				"label[for=autoVin]");
 		assertThat(elements, notNullValue());
@@ -115,6 +117,25 @@ public class AvtokodTest extends BaseTest {
 		element2 = elements.get(0);
 		System.err.println(String.format("test6 located element: %s",
 				element2.getAttribute("outerHTML")));
+	}
+
+	@Test
+	public void test7() {
+		String locator2 = "button-ui";
+		String locator3 = "button";
+		WebElement element = driver.findElement(By.tagName(locator));
+		List<WebElement> elements2 = shadowDriver.getAllShadowElement(element,
+				locator2);
+		assertThat(elements2, notNullValue());
+		assertThat(elements2.size(), greaterThan(0));
+		WebElement element2 = elements2.get(0);
+		List<WebElement> elements3 = shadowDriver.getAllShadowElement(element2,
+				locator3);
+		assertThat(elements3, notNullValue());
+		assertThat(elements3.size(), greaterThan(0));
+		WebElement element3 = elements3.get(0);
+		System.err.println(String.format("test7 located element: %s",
+				element3.getAttribute("outerHTML")));
 	}
 
 }
