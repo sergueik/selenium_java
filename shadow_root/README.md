@@ -10,14 +10,20 @@ This directory contains a replica of [sukgu/shadow-automation-selenium](https://
 ![Shadow Root in Developer Pane Example](https://github.com/sergueik/selenium_java/blob/master/shadow_root/screenshots/capture_shadow_root.png)
  * the `#shadow-root` DOM element (leave alone its inner DOM tree) is not dislayed via menu`view-source:chrome://downloads/`
 
+The __Shadow DOM__ is a web standard that offers component style and markup encapsulation. It is a critically important piece of the Web Components story as it ensures that a component will work in any environment even if other CSS or JavaScript is at play on the page.
+A related topic is __Custom HTML tags__ . These can't be directly identified with core Selenium tools, but __Shadow Root DOM Automation__ can handle these.
+
+
+
 ### Usage
-The __Shadow Root DOM Automation__  allows one get rid of fragile and Javasrcipt-heavy calls 
-like
+
+The __Shadow Root DOM Automation__  allows one get rid of fragile and Javasrcipt-heavy calls like
 ```java
 String locator1 = "autohistory-card";
 String locator2 = "button-ui";
 String locator3 = "button";
 // traversing nested Shadow Root elements, found quite often
+JavascriptExecutor js = (JavascriptExecutor) driver;
 WebElement element = (WebElement) (js.executeScript(String.format(
     "return document.querySelector('%s')"
   + ".shadowRoot.querySelector('%s')"
@@ -34,8 +40,11 @@ String locator3 = "button";
 
 
 WebElement element1 = driver.findElement(By.tagName(locator1));
-WebElement elements2 = shadowDriver.getAllShadowElement(element1,locator2).get(0);
-WebElement element3 = shadowDriver.getAllShadowElement(element2, locator3).get(0);
+List<WebElement> elements2 = shadowDriver.getAllShadowElement(element1, locator2);
+assertThat(elements2, notNullValue());
+assertThat(elements2.size(), greaterThan(0));
+WebElement element2 = elements2.get(0);
+WebElement element3 = shadowDriver.getShadowElement(element2, locator3).get(0);
 assertThat(element3, notNullValue());
 ```
 and other methods listed below

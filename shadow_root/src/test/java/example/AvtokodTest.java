@@ -42,7 +42,7 @@ public class AvtokodTest extends BaseTest {
 	public void test2() {
 		WebElement element = shadowDriver.findElement(locator);
 		System.err.println(element);
-		js = ((JavascriptExecutor) driver);
+		js = (JavascriptExecutor) driver;
 		WebElement result = (WebElement) (js.executeScript(String.format(
 				"return document.querySelector('%s').shadowRoot.querySelector('label[for=autoVin]')",
 				locator)));
@@ -129,11 +129,8 @@ public class AvtokodTest extends BaseTest {
 		assertThat(elements2, notNullValue());
 		assertThat(elements2.size(), greaterThan(0));
 		WebElement element2 = elements2.get(0);
-		List<WebElement> elements3 = shadowDriver.getAllShadowElement(element2,
-				locator3);
-		assertThat(elements3, notNullValue());
-		assertThat(elements3.size(), greaterThan(0));
-		WebElement element3 = elements3.get(0);
+		WebElement element3 = shadowDriver.getShadowElement(element2, locator3);
+		assertThat(element3, notNullValue());
 		System.err.println(String.format("test7 located element: %s",
 				element3.getAttribute("outerHTML")));
 	}
