@@ -3,4 +3,5 @@ This direcrory contains a replicaof test cases of [multi-common format extractor
 
 ### See Also
   * [Introduction to JsonPath](https://www.baeldung.com/guide-to-jayway-jsonpath)
-  * [](https://github.com/json-path/JsonPath)
+  * jsonPath [repository](https://github.com/json-path/JsonPath)
+  * [JSON Pointer spec](https://tools.ietf.org/html/rfc6901)
