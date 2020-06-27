@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import example.CommandLineParser;
 
@@ -82,6 +83,7 @@ public class CommandLineParserTest {
 		commandLineParser.saveFlagValue("c");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.hasFlag("a"), is(true));
+		// TODO: fix processing - argument is lost
 		assertThat(commandLineParser.hasFlag("b"), is(true));
 		assertThat(commandLineParser.hasFlag("c"), is(false));
 		assertThat(commandLineParser.hasFlag("d"), is(false));
@@ -122,6 +124,24 @@ public class CommandLineParserTest {
 		commandLineParser.parse(argsArray);
 		final Map<String, String> extraArgData = commandLineParser
 				.extractExtraArgs(commandLineParser.getFlagValue("a"));
+	}
+
+	// TODO: enabling the test below leads two other tests to start failing:
+	// argumentValueLessTest, argumentCountsTest
+	@Ignore
+	@Test
+	public void argumentEnvionmentValueTest() {
+		final String[] argsArray = new String[] { "-a", "env:JAVA_HOME", "-b",
+				"env:java_home" };
+		commandLineParser.saveFlagValue("a");
+		commandLineParser.saveFlagValue("b");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.hasFlag("a"), is(true));
+		assertThat(commandLineParser.getFlagValue("a"),
+				is(System.getenv("JAVA_HOME")));
+		assertThat(commandLineParser.hasFlag("b"), is(true));
+		assertThat(commandLineParser.getFlagValue("b"),
+				is(System.getenv("JAVA_HOME")));
 	}
 
 }

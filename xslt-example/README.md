@@ -107,6 +107,12 @@ Added filter-mapping
 Written: output.xml
 Done: add
 ```
+Yet another alternative is to pass argument, e.g. op via environment like
+
+```sh
+export OP=add
+java -jar target\example.xslt.jar -op env:op -in web.xml -out output.xml -debug
+```
 
 then
 ```cmd

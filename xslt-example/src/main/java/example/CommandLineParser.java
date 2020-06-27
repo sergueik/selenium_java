@@ -72,16 +72,30 @@ public class CommandLineParser {
 					System.err.println("Examine: " + name);
 				}
 				if (flagsWithValues.contains(name) && n < args.length - 1) {
-					value = args[++n];
+					/*
+					// TODO: prevent collecting sibling flags into preceding flag value
+					// so -foo -bar ends up with both "foo" and "	bar" set 
+					if (flagsWithValues.contains(name) && n < args.length - 1
+						&& !args[n + 1].matches("^-")) {					
+					  */
+					String data = args[++n];
+					// https://www.baeldung.com/java-case-insensitive-string-matching
+					value = data.matches("(?i)^env:[a-z_0-9]+")
+							? System.getenv(data.replaceFirst("(?i)^env:", "")) : data;
+
 					if (debug) {
-						System.err.println("Collect value for: " + name + " = " + value);
+						if (data.matches("(?i)^env:[a-z_0-9]+")) {
+							System.err.println("Evaluate value for: " + name + " = " + value);
+
+						} else {
+							System.err.println("Collect value for: " + name + " = " + value);
+						}
 					}
 				} else {
 					if (debug) {
 						System.err.println("Ignore the value for " + name);
 					}
 				}
-
 				flags.put(name, value);
 			}
 
@@ -102,7 +116,8 @@ public class CommandLineParser {
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"
 	// NOTE: not using org.json to reduce size
-	public Map<String, String> extractExtraArgs(String argument) throws IllegalArgumentException {
+	public Map<String, String> extractExtraArgs(String argument)
+			throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.trim().substring(1, argument.length() - 1);
