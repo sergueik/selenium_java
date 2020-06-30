@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -29,8 +30,9 @@ public class CommandLineParserTest {
 	private static boolean debug = true;
 	private static CommandLineParser commandLineParser;
 
-	@BeforeClass
-	public static void load() {
+	// stop keeping it
+	@Before
+	public void load() {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.setDebug(debug);
 	}
@@ -88,6 +90,28 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("c"), is(false));
 		assertThat(commandLineParser.hasFlag("d"), is(false));
 		assertThat(commandLineParser.getFlagValue("a"), nullValue());
+
+		if (debug) {
+			System.err.println("argumentValueLessTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
+		}
+	}
+
+	@Test
+	public void argumentValueLessMixedTest() {
+		final String[] argsArray = new String[] { "-foo", "bar", "-debug",
+				"-verbose", "-answer", "42" };
+		commandLineParser.saveFlagValue("foo");
+		commandLineParser.saveFlagValue("answer");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.hasFlag("debug"), is(true));
+		// TODO: fix processing - argument is lost
+		assertThat(commandLineParser.hasFlag("verbose"), is(true));
+		assertThat(commandLineParser.getFlagValue("debug"), nullValue());
+		assertThat(commandLineParser.getFlagValue("verbose"), nullValue());
+		assertThat(commandLineParser.hasFlag("dummy"), is(false));
+		assertThat(commandLineParser.hasFlag("foo"), is(true));
+		assertThat(commandLineParser.hasFlag("answer"), is(true));
 
 		if (debug) {
 			System.err.println("argumentValueLessTest: flags: "
