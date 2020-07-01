@@ -23,7 +23,7 @@
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
 
-    <log4j.version>2.5</log4j.version>
+    <log4j.version>2.13.2</log4j.version>
   </properties>
   <dependencies>
     <dependency>
