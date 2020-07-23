@@ -34,7 +34,7 @@ public class CommandLineFileArgParserTest {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.setDebug(debug);
 	}
-
+	@Ignore
 	@Test
 	public void argumentDataFileValueTest() {
 		final String[] argsArray = new String[] { "-a", "@a.txt" };
