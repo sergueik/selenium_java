@@ -8,11 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.poi.openxml4j.opc.OPCPackage;
-import org.apache.poi.wp.usermodel.CharacterRun;
 import org.apache.poi.xwpf.usermodel.IBodyElement;
+// import org.apache.poi.xwpf.usermodel.IRunElement;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
+import org.apache.poi.xwpf.usermodel.XWPFParagraph;
+import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
+import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 
 public class TableReader {
 
@@ -22,6 +25,9 @@ public class TableReader {
 		XWPFDocument document = new XWPFDocument(OPCPackage.open(fis));
 		return document;
 	}
+
+	private static final String findText = "Degree";
+	private static final String replaceText = "Acknowledgement";
 
 	public static void main(String[] args) {
 		try {
@@ -34,20 +40,27 @@ public class TableReader {
 					List<XWPFTable> tableList = element.getBody().getTables();
 					for (XWPFTable table : tableList) {
 						System.out.println("Total Number of Rows of Table:" + table.getNumberOfRows());
-						for (int i = 0; i < table.getRows().size(); i++) {
-
-							for (int j = 0; j < table.getRow(i).getTableCells().size(); j++) {
-								String findText = "Year";
-								String replaceText = "YEAR";
-								// CharacterRun run =
-								XWPFTableCell cell = table.getRow(i).getCell(j);
-
+						for (int rowNum = 0; rowNum < table.getRows().size(); rowNum++) {
+							XWPFTableRow row = table.getRow(rowNum);
+							for (int colNum = 0; colNum < row.getTableCells().size(); colNum++) {
+								XWPFTableCell cell = row.getCell(colNum);
 								if (cell.getText().contains(findText)) {
-									
-									cell.setText(replaceText);
-									// .replaceText(findText, replaceText);
+
+									List<XWPFParagraph> paragraphs = cell.getParagraphs();
+									for (XWPFParagraph paragraph : paragraphs) {
+										List<XWPFRun> runElemens = paragraph.getRuns();
+
+										for (XWPFRun runElement : runElemens) {
+											String text = runElement.getText(0);
+											if (text.contains(findText)) {
+												System.out.println(findText + " ~> " + replaceText);
+												runElement.setText(String.format("%-30s",
+														text.replaceFirst(findText, replaceText)), 0);
+											}
+										}
+									}
 								}
-								System.out.println("-->" + table.getRow(i).getCell(j).getText());
+								System.out.println("-->" + cell.getText());
 							}
 						}
 					}
