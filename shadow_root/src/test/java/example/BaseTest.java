@@ -51,6 +51,8 @@ public class BaseTest {
 	private static String browser = getPropertyEnv("BROWSER",
 			getPropertyEnv("webdriver.driver", "chrome"));
 
+	// shadow root Python example:
+	// https://stackoverflow.com/questions/28111539/can-we-zoom-the-browser-window-in-python-selenium-webdriver
 	// export BROWSER=firefox or
 	// use -Pfirefox to override
 	public static String getBrowser() {
