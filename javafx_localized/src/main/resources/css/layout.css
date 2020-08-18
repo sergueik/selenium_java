@@ -1,0 +1,23 @@
+.hbox {
+    -fx-background-color: #2f4f4f;
+    -fx-padding: 15;
+    -fx-spacing: 10;
+}
+.locale-label {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
+}
+#hbox-custom {
+    -fx-background-radius: 5.0; 
+    -fx-padding: 8;
+}
+.pane {
+    -fx-background-color: #8fbc8f;
+}
+.grid {
+    -fx-background-insets: 5.0 5.0 5.0 5.0;
+    -fx-padding: 10;
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+}

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<fx:root xmlns:fx="http://javafx.com/fxml/1" type="javafx.scene.layout.GridPane" hgap="10" vgap="10" 
+    stylesheets="@../../css/layout.css" styleClass="grid"> 
+    <children>
+      <Label text="%letter_field_label" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+      <TextField fx:id="letterText" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+      <Label text="%digit_field_label" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+      <TextField fx:id="digitText" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+      <Label text="%date_label" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+      <DatePicker fx:id="datePicker" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+      <Label text="%currency_field_label" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+      <TextField fx:id="currencyText" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+    </children>
+</fx:root>
+
