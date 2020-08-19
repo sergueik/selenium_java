@@ -4,6 +4,14 @@ This directory contains a replica of JavaFx project
 [tomoTaka01/LocalizationSample](https://github.com/tomoTaka01/LocalizationSample) demonstrating localization effort. The project directory structure converted to maven, and adding `ru-RU` localization is in progress.
 
 
+### Testing
+```sh
+mvn clean package
+```
+```sh
+java -cp target/lib/*:target/localized_example.jar  com.sample.Main
+```
+
 ```sh
 // https://programminghistorian.org/en/lessons/transliterating
 

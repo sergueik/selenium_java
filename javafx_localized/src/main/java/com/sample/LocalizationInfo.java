@@ -3,6 +3,7 @@ package com.sample;
 import java.time.chrono.Chronology;
 import java.util.Locale;
 
+
 public class LocalizationInfo {
 	private Locale locale;
 	private Chronology chronolory;

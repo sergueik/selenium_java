@@ -18,6 +18,7 @@ import javafx.stage.Stage;
  * Localization Entry Sample. origin:
  * https://github.com/tomoTaka01/LocalizationSample
  */
+@SuppressWarnings("restriction")
 public class Main extends Application {
 	private BorderPane root;
 	private EntryStartController entryStartController;
@@ -46,9 +47,30 @@ public class Main extends Application {
 		this.resetLocaleButton = new Button("reset locale");
 		this.nextButton = new Button("next");
 		this.bottomHBox.getChildren().add(this.startButton);
-		this.setStartEvent();
-		this.setResetLocaleEvent();
-		this.setNextEvent();
+
+		this.startButton.setOnAction(event -> {
+			this.presentInfo.localizationInfo = this.entryStartController.getLocalizationInfo();
+			this.root.getChildren().remove(this.presentInfo.centerNode);
+			this.presentInfo.topTitle = new LocalizationInfoTitle(this.presentInfo.localizationInfo);
+			this.root.setTop(this.presentInfo.topTitle);
+			this.bottomHBox.getChildren().remove(this.startButton);
+			this.bottomHBox.getChildren().addAll(this.resetLocaleButton, this.nextButton);
+			setEntry();
+		});
+		this.resetLocaleButton.setOnAction(event -> {
+			this.root.getChildren().remove(this.presentInfo.centerNode);
+			this.root.getChildren().remove(this.presentInfo.topTitle);
+			fxmlIx = 0;
+			this.bottomHBox.getChildren().remove(this.resetLocaleButton);
+			this.bottomHBox.getChildren().remove(this.nextButton);
+			this.bottomHBox.getChildren().addAll(this.startButton);
+			this.setEntryStart();
+		});
+		this.nextButton.setOnAction(event -> {
+			this.root.getChildren().remove(this.presentInfo.centerNode);
+			fxmlIx++;
+			setEntry();
+		});
 		this.root.setBottom(this.bottomHBox);
 		Scene scene = new Scene(root, 700, 500);
 		stage.setTitle("Localization Sample");
@@ -67,38 +89,6 @@ public class Main extends Application {
 		}
 		this.root.setCenter(this.presentInfo.centerNode);
 		this.entryStartController = loader.getController();
-	}
-
-	private void setStartEvent() {
-		this.startButton.setOnAction(event -> {
-			this.presentInfo.localizationInfo = this.entryStartController.getLocalizationInfo();
-			this.root.getChildren().remove(this.presentInfo.centerNode);
-			this.presentInfo.topTitle = new LocalizationInfoTitle(this.presentInfo.localizationInfo);
-			this.root.setTop(this.presentInfo.topTitle);
-			this.bottomHBox.getChildren().remove(this.startButton);
-			this.bottomHBox.getChildren().addAll(this.resetLocaleButton, this.nextButton);
-			setEntry();
-		});
-	}
-
-	private void setResetLocaleEvent() {
-		this.resetLocaleButton.setOnAction(event -> {
-			this.root.getChildren().remove(this.presentInfo.centerNode);
-			this.root.getChildren().remove(this.presentInfo.topTitle);
-			fxmlIx = 0;
-			this.bottomHBox.getChildren().remove(this.resetLocaleButton);
-			this.bottomHBox.getChildren().remove(this.nextButton);
-			this.bottomHBox.getChildren().addAll(this.startButton);
-			this.setEntryStart();
-		});
-	}
-
-	private void setNextEvent() {
-		this.nextButton.setOnAction(event -> {
-			this.root.getChildren().remove(this.presentInfo.centerNode);
-			fxmlIx++;
-			setEntry();
-		});
 	}
 
 	private void setEntry() {
