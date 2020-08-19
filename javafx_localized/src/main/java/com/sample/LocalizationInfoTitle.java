@@ -6,52 +6,49 @@ import java.time.chrono.Chronology;
 import java.time.format.TextStyle;
 import java.util.Locale;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-/**
- *
- * @author tomo
- */
+@SuppressWarnings("restriction")
 public class LocalizationInfoTitle extends HBox implements Initializable {
 	private LocalizationInfo localizationInfo;
 	@FXML
 	private Label selectedLocale;
 	@FXML
 	private Label selectedChronology;
+	private final URL url = getClass().getResource("/LocalizationInfoTitle.fxml");
+	private static final Logger log = LogManager.getLogger(LocalizationInfoTitle.class);
 
-	public LocalizationInfoTitle(LocalizationInfo info) {
-		this.localizationInfo = info;
+	public LocalizationInfoTitle(LocalizationInfo data) {
+		localizationInfo = data;
 		loadFxml();
 	}
 
 	private void loadFxml() {
-		URL url = getClass().getResource("/LocalizationInfoTitle.fxml");
-		ResourceBundle bundle = ResourceBundle.getBundle("Label",
-				localizationInfo.getLocale());
+		ResourceBundle bundle = ResourceBundle.getBundle("Label", localizationInfo.getLocale());
 		FXMLLoader loader = new FXMLLoader(url, bundle);
 		loader.setRoot(this);
 		loader.setController(this);
 		try {
-			loader.<HBox> load();
-		} catch (IOException ex) {
-			Logger.getLogger(LocalizationInfoTitle.class.getName()).log(Level.SEVERE,
-					null, ex);
+			loader.<HBox>load();
+		} catch (IOException e) {
+			// Logger.getLogger(LocalizationInfoTitle.class.getName()).log(Level.SEVERE,
+			// null, e);
+			log.info("Exception (ignored) : " + e.toString());
 		}
 	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		Locale locale = this.localizationInfo.getLocale();
-		this.selectedLocale.setText(String.format("%s(%s)",
-				locale.getDisplayCountry(locale), locale.getDisplayLanguage(locale)));
-		Chronology chronolory = this.localizationInfo.getChronolory();
-		this.selectedChronology
-				.setText(chronolory.getDisplayName(TextStyle.FULL, locale));
+		selectedLocale
+				.setText(String.format("%s(%s)", locale.getDisplayCountry(locale), locale.getDisplayLanguage(locale)));
+		Chronology chronolory = localizationInfo.getChronolory();
+		selectedChronology.setText(chronolory.getDisplayName(TextStyle.FULL, locale));
 	}
 }

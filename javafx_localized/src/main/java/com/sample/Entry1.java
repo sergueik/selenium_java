@@ -5,13 +5,14 @@ import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.scene.control.DatePicker;
 
+@SuppressWarnings("restriction")
 public class Entry1 extends EntryBase {
 	@FXML
 	private DatePicker datePicker;
 
 	@Override
 	public boolean goNext() {
-		// TODO do something about locatizaltion
+		// TODO do something about localization
 		return true;
 	}
 

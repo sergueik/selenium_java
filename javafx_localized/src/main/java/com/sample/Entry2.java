@@ -4,6 +4,7 @@ import java.net.URL;
 // TODO
 import java.util.ResourceBundle;
 
+@SuppressWarnings("restriction")
 public class Entry2 extends EntryBase {
 	@Override
 	public boolean goNext() {

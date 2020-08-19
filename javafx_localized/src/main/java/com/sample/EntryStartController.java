@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -35,17 +34,9 @@ public class EntryStartController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		Locale.setDefault(Locale.ENGLISH);
-		setLocaleCombo();
-		setCalendar();
-	}
-
-	private void setLocaleCombo() {
-		ObservableList<Locale> list = FXCollections.observableArrayList(new Locale("en", "US"), // United States
-				new Locale("fr", "FR"), // France
-				new Locale("ru", "RU"), // Russia
-				new Locale("ar", "SA"), // Saudi Arabia
-				new Locale("ja", "JP") // Japan
-		);
+		ObservableList<Locale> list = FXCollections.observableArrayList(new Locale("en", "US"), new Locale("fr", "FR"),
+				new Locale("ru", "RU"), new Locale("ar", "SA"), // Saudi Arabia
+				new Locale("ja", "JP"));
 		StringConverter<Locale> converter = new StringConverter<Locale>() {
 			@Override
 			public String toString(Locale object) {
@@ -60,9 +51,8 @@ public class EntryStartController implements Initializable {
 		localeCombo.getItems().addAll(list);
 		localeCombo.setCellFactory(ComboBoxListCell.<Locale>forListView(converter));
 		localeCombo.getSelectionModel().select(0);
-	}
+		// setCalendar();
 
-	private void setCalendar() {
 		List<RadioButton> chronolories = Chronology.getAvailableChronologies().stream().map(chronology -> {
 			RadioButton radioButton = new RadioButton(chronology.getDisplayName(TextStyle.FULL, Locale.getDefault()));
 			radioButton.setToggleGroup(calendarGroup);
@@ -73,6 +63,7 @@ public class EntryStartController implements Initializable {
 			return radioButton;
 		}).collect(Collectors.toList());
 		calendarVBox.getChildren().addAll(chronolories);
+
 	}
 
 	public LocalizationInfo getLocalizationInfo() {

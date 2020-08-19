@@ -3,8 +3,8 @@ package com.sample;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Locale;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -29,6 +29,7 @@ public class Main extends Application {
 	private PresentInfo presentInfo;
 	private int fxmlIx = 0;
 	private ENTRY[] fxmls = ENTRY.values();
+	private static final Logger log = LogManager.getLogger(Main.class);
 
 	public static void main(String[] args) {
 		launch();
@@ -36,42 +37,42 @@ public class Main extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		this.presentInfo = new PresentInfo();
+		presentInfo = new PresentInfo();
 		Locale.setDefault(Locale.US);
-		this.root = new BorderPane();
+		root = new BorderPane();
 		setEntryStart();
-		this.bottomHBox = new HBox();
-		this.bottomHBox.getStyleClass().add("hbox");
-		this.bottomHBox.setId("hbox-custom");
-		this.startButton = new Button("Start");
-		this.resetLocaleButton = new Button("reset locale");
-		this.nextButton = new Button("next");
-		this.bottomHBox.getChildren().add(this.startButton);
+		bottomHBox = new HBox();
+		bottomHBox.getStyleClass().add("hbox");
+		bottomHBox.setId("hbox-custom");
+		startButton = new Button("Start");
+		resetLocaleButton = new Button("reset locale");
+		nextButton = new Button("next");
+		bottomHBox.getChildren().add(this.startButton);
 
-		this.startButton.setOnAction(event -> {
-			this.presentInfo.localizationInfo = this.entryStartController.getLocalizationInfo();
-			this.root.getChildren().remove(this.presentInfo.centerNode);
-			this.presentInfo.topTitle = new LocalizationInfoTitle(this.presentInfo.localizationInfo);
-			this.root.setTop(this.presentInfo.topTitle);
-			this.bottomHBox.getChildren().remove(this.startButton);
-			this.bottomHBox.getChildren().addAll(this.resetLocaleButton, this.nextButton);
+		startButton.setOnAction(event -> {
+			presentInfo.localizationInfo = this.entryStartController.getLocalizationInfo();
+			root.getChildren().remove(this.presentInfo.centerNode);
+			presentInfo.topTitle = new LocalizationInfoTitle(this.presentInfo.localizationInfo);
+			root.setTop(this.presentInfo.topTitle);
+			bottomHBox.getChildren().remove(this.startButton);
+			bottomHBox.getChildren().addAll(this.resetLocaleButton, this.nextButton);
 			setEntry();
 		});
-		this.resetLocaleButton.setOnAction(event -> {
-			this.root.getChildren().remove(this.presentInfo.centerNode);
-			this.root.getChildren().remove(this.presentInfo.topTitle);
+		resetLocaleButton.setOnAction(event -> {
+			root.getChildren().remove(presentInfo.centerNode);
+			root.getChildren().remove(presentInfo.topTitle);
 			fxmlIx = 0;
-			this.bottomHBox.getChildren().remove(this.resetLocaleButton);
-			this.bottomHBox.getChildren().remove(this.nextButton);
-			this.bottomHBox.getChildren().addAll(this.startButton);
-			this.setEntryStart();
+			bottomHBox.getChildren().remove(resetLocaleButton);
+			bottomHBox.getChildren().remove(nextButton);
+			bottomHBox.getChildren().addAll(startButton);
+			setEntryStart();
 		});
-		this.nextButton.setOnAction(event -> {
-			this.root.getChildren().remove(this.presentInfo.centerNode);
+		nextButton.setOnAction(event -> {
+			root.getChildren().remove(presentInfo.centerNode);
 			fxmlIx++;
 			setEntry();
 		});
-		this.root.setBottom(this.bottomHBox);
+		root.setBottom(bottomHBox);
 		Scene scene = new Scene(root, 700, 500);
 		stage.setTitle("Localization Sample");
 		scene.getStylesheets().addAll("/css/layout.css");
@@ -83,19 +84,21 @@ public class Main extends Application {
 		URL url = getClass().getResource("/EntryStart.fxml");
 		FXMLLoader loader = new FXMLLoader(url);
 		try {
-			this.presentInfo.centerNode = loader.<Node>load();
-		} catch (IOException ex) {
-			Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+			presentInfo.centerNode = loader.<Node>load();
+		} catch (IOException e) {
+			log.info("Exception (ignored) : " + e.toString());
+			// Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
 		}
-		this.root.setCenter(this.presentInfo.centerNode);
-		this.entryStartController = loader.getController();
+
+		root.setCenter(this.presentInfo.centerNode);
+		entryStartController = loader.getController();
 	}
 
 	private void setEntry() {
 		ENTRY entry = fxmls[fxmlIx];
 		EntryBase entryBase = entry.getController();
-		entryBase.loadFxml(this.presentInfo.localizationInfo, entry.getFxmlPath());
-		this.root.setCenter(entryBase);
+		entryBase.loadFxml(presentInfo.localizationInfo, entry.getFxmlPath());
+		root.setCenter(entryBase);
 	}
 
 	private class PresentInfo {

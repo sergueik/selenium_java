@@ -3,8 +3,6 @@ package com.sample;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-// import java.util.logging.Logger;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.GridPane;
@@ -12,6 +10,7 @@ import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+@SuppressWarnings("restriction")
 public abstract class EntryBase extends GridPane implements Initializable {
 	protected LocalizationInfo localizationInfo;
 	private static final Logger log = LogManager.getLogger(EntryBase.class);
