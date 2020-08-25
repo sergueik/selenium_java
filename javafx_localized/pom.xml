@@ -4,7 +4,7 @@
   <!-- change it according your app configuration -->
     <groupId>com.sample</groupId>
   <artifactId>localized_example</artifactId>
-  <version>0.0.3-SNAPSHOT</version>
+  <version>0.0.4-SNAPSHOT</version>
   <properties>
     <mainClass>Main</mainClass>
     <encoding>UTF-8</encoding>
@@ -17,9 +17,6 @@
     <slf4j.version>1.7.30</slf4j.version>
     <log4j.version>1.2.17</log4j.version>
     <log4j-core.version>2.13.2</log4j-core.version>
-    <selenium.version>3.13.0</selenium.version>
-    <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
-    <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>
   <dependencies>
     <dependency>
@@ -27,6 +24,14 @@
       <artifactId>slf4j-api</artifactId>
       <version>${slf4j.version}</version>
     </dependency>
+    <!--
+<dependency>
+    <groupId>com.github.sarxos</groupId>
+    <artifactId>v4l4j</artifactId>
+    <version>0.9.1-r507</version>
+</dependency>
+    -->
+
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>

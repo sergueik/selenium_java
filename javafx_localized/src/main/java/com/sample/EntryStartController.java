@@ -29,18 +29,25 @@ public class EntryStartController implements Initializable {
 	@FXML
 	private VBox calendarVBox;
 	private ToggleGroup calendarGroup = new ToggleGroup();
-	private static final Logger log = LogManager.getLogger(EntryStartController.class);
+	private static final Logger log = LogManager
+			.getLogger(EntryStartController.class);
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		Locale.setDefault(Locale.ENGLISH);
-		ObservableList<Locale> list = FXCollections.observableArrayList(new Locale("en", "US"), new Locale("fr", "FR"),
-				new Locale("ru", "RU"), new Locale("ar", "SA"), // Saudi Arabia
+		// @formatter:off
+		ObservableList<Locale> list = FXCollections.observableArrayList(
+				new Locale("en", "US"), 
+				new Locale("fr", "FR"),
+				new Locale("ru", "RU"), 
+				new Locale("ar", "SA"), // Saudi Arabia
 				new Locale("ja", "JP"));
+		// @formatter:on
 		StringConverter<Locale> converter = new StringConverter<Locale>() {
 			@Override
 			public String toString(Locale object) {
-				return String.format("%s(%s)", object.getDisplayCountry(), object.getDisplayLanguage());
+				return String.format("%s(%s)", object.getDisplayCountry(),
+						object.getDisplayLanguage());
 			}
 
 			@Override
@@ -49,26 +56,29 @@ public class EntryStartController implements Initializable {
 			}
 		};
 		localeCombo.getItems().addAll(list);
-		localeCombo.setCellFactory(ComboBoxListCell.<Locale>forListView(converter));
+		localeCombo
+				.setCellFactory(ComboBoxListCell.<Locale> forListView(converter));
 		localeCombo.getSelectionModel().select(0);
-		// setCalendar();
 
-		List<RadioButton> chronolories = Chronology.getAvailableChronologies().stream().map(chronology -> {
-			RadioButton radioButton = new RadioButton(chronology.getDisplayName(TextStyle.FULL, Locale.getDefault()));
-			radioButton.setToggleGroup(calendarGroup);
-			radioButton.setUserData(chronology);
-			if (chronology.getCalendarType().equals("iso8601")) {
-				radioButton.setSelected(true);
-			}
-			return radioButton;
-		}).collect(Collectors.toList());
+		List<RadioButton> chronolories = Chronology.getAvailableChronologies()
+				.stream().map(chronology -> {
+					RadioButton radioButton = new RadioButton(
+							chronology.getDisplayName(TextStyle.FULL, Locale.getDefault()));
+					radioButton.setToggleGroup(calendarGroup);
+					radioButton.setUserData(chronology);
+					if (chronology.getCalendarType().equals("iso8601")) {
+						radioButton.setSelected(true);
+					}
+					return radioButton;
+				}).collect(Collectors.toList());
 		calendarVBox.getChildren().addAll(chronolories);
 
 	}
 
 	public LocalizationInfo getLocalizationInfo() {
 		Locale locale = localeCombo.getSelectionModel().getSelectedItem();
-		Chronology chronology = (Chronology) calendarGroup.getSelectedToggle().getUserData();
+		Chronology chronology = (Chronology) calendarGroup.getSelectedToggle()
+				.getUserData();
 		LocalizationInfo localizationInfo = new LocalizationInfo();
 		log.info("Setting locale from selection :" + locale.getDisplayName());
 		localizationInfo.setLocale(locale);

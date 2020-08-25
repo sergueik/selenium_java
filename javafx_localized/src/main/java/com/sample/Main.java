@@ -50,9 +50,10 @@ public class Main extends Application {
 		bottomHBox.getChildren().add(this.startButton);
 
 		startButton.setOnAction(event -> {
-			presentInfo.localizationInfo = this.entryStartController.getLocalizationInfo();
+			presentInfo.localizationInfo = entryStartController.getLocalizationInfo();
 			root.getChildren().remove(this.presentInfo.centerNode);
-			presentInfo.topTitle = new LocalizationInfoTitle(this.presentInfo.localizationInfo);
+			presentInfo.topTitle = new LocalizationInfoTitle(
+					presentInfo.localizationInfo);
 			root.setTop(this.presentInfo.topTitle);
 			bottomHBox.getChildren().remove(this.startButton);
 			bottomHBox.getChildren().addAll(this.resetLocaleButton, this.nextButton);
@@ -84,7 +85,7 @@ public class Main extends Application {
 		URL url = getClass().getResource("/EntryStart.fxml");
 		FXMLLoader loader = new FXMLLoader(url);
 		try {
-			presentInfo.centerNode = loader.<Node>load();
+			presentInfo.centerNode = loader.<Node> load();
 		} catch (IOException e) {
 			log.info("Exception (ignored) : " + e.toString());
 			// Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, e);
