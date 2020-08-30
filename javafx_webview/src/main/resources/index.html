@@ -25,7 +25,7 @@
       <p>A JavaFX desktop application using WebView. The main logic is programmed in pure Java, but the user interface is based on state of the art web technologies: AngularJS (user controller) and Bootstrap (style and layout).</p>  
       <div class="container-fluid">
       <div class="row">
-       <div class="col-sm-6">
+        <div class="col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Calculator (synchronous example)</h3>
@@ -39,21 +39,20 @@
             </p>
             </div>
           </div>
-         </div>
+        </div>
         <div class="col-sm-6">
           <div class="panel panel-default">
             <div class="panel-heading">
               <h3 class="panel-title">Fruits (asynchronous example)</h3>
             </div>            
             <div class="panel-body">
-            Fruits:
               <div class="row">
                 <div class="col-sm-6">
                    <span class="space" ng-repeat="fruit in fruits">
                      <span class="label label-info">{{fruit.getName()}}</span>
                    </span>
                 </div>
-                <!-- getName() is a native-Java method inside Fruit class -->
+                <!-- getName() is a native-Java method of static Fruit class within FruitService class -->
                 <!-- WARNING: It is better to use getters, instead of public fields inside pure Java objects since it seems that wrappers created automatically from the web engine for Java objects seem to do a cache of fields and this cache is affected during Java garbage collection. So getters are better -->
               </div>
               <div class="row">
@@ -61,12 +60,11 @@
                   <small>(generated via an asynchronous pure Java call)</small>
                 </div>
               </div>
-             <button class="btn btn-lg btn-success" ng-click="update()">Update data</button>
+              <button class="btn btn-sm btn-success" ng-click="update()">Update data</button>
             </div>
-       <!--   </div> -->
-         </div> 
-        </div>
-</div>
-<a href="index.html">Reload page</a>
-      </body>
+          </div>
+       </div>
+    </div>
+   <a href="index.html">Reload page</a>
+   </body>
 </html>

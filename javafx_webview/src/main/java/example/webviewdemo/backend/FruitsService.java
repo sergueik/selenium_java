@@ -8,31 +8,29 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.shuffle;
 import netscape.javascript.JSObject;
 
+import java.util.Arrays;
 import java.util.List;
 
 @SuppressWarnings("restriction")
 public class FruitsService {
 
-	// a database... WARNING: I use a static field, since references from javascript
-	// seem not to be taken into account for GC, then,
-	// if I set fruits as a local variable inside loadFruits, they could be garbage
-	// collected and not seen anymore from
-	// javascript
-
+	// since references from Javascript appear not taken into account for GC,
+	// when fruits is a local variable in the method,
+	// is may be garbage collected too early
 	private static Fruit[] fruits;
 	static {
-		fruits = new Fruit[] { new Fruit("orange"), new Fruit("apple"), new Fruit("banana"), new Fruit("strawberry") };
+		fruits = new Fruit[] { new Fruit("apricot"), new Fruit("banana"), new Fruit("cherry"), new Fruit("durian"),
+				new Fruit("elderberry"), new Fruit("fig"), new Fruit("grape") };
 	}
 
 	// async function
 	public void loadFruits(final JSObject callbackfunction) {
-
-		// launch a background thread (async)
 		new Thread(() -> {
 			try {
 				shuffleFruits();
-				sleep(1000); // add some processing simulation...
+				sleep(1000); // backend processing simulation
 				runLater(() -> {
+					System.err.println("return data: " + Arrays.asList(FruitsService.fruits));
 					call(callbackfunction, (Object) FruitsService.fruits);
 				});
 
@@ -45,5 +43,21 @@ public class FruitsService {
 		List<Object> list = asList(FruitsService.fruits);
 		shuffle(list);
 		FruitsService.fruits = list.toArray(new Fruit[] {});
+	}
+
+	public static class Fruit {
+		private String name;
+
+		public Fruit(String name) {
+			this.name = name;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public String toString() {
+			return String.format("%s: %s", this.getClass().getCanonicalName(), name);
+		}
 	}
 }

@@ -11,7 +11,6 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-
 @SuppressWarnings("restriction")
 public class WebViewDemo extends Application {
 
@@ -24,18 +23,14 @@ public class WebViewDemo extends Application {
 
 	private void createWebView(Stage primaryStage, String page) {
 
-		// create the JavaFX webview
 		final WebView webView = new WebView();
 
-		// connect the FruitsService instance as "fruitsService"
-		// javascript variable
 		connectBackendObject(webView.getEngine(), "fruitsService", new FruitsService());
 
-		// connect the CalculatorService instance as "calculatorService"
-		// javascript variable
 		connectBackendObject(webView.getEngine(), "calculatorService", new CalculatorService());
 
-		// show "alert" Javascript messages in stdout (useful to debug)
+		// print messages from invoking "alert" Javascript to stdout
+		// useful to debug, does not appear to work
 		webView.getEngine().setOnAlert(new EventHandler<WebEvent<String>>() {
 			@Override
 			public void handle(WebEvent<String> arg0) {
