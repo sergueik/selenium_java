@@ -1,0 +1,72 @@
+<!doctype html>
+    <html lang="en" ng-app="javafxwebdemo">
+      <head>
+        <meta charset="utf-8">
+        <title>My HTML File</title>
+          <script src="js/fruits-service.js" type="text/javascript"></script>
+          <script src="js/calculator-service.js" type="text/javascript"></script>
+       <script src="jslib/angular.min.js" type="text/javascript"></script>
+      
+      <script src="js/controller-angular.js" type="text/javascript"></script>
+      <!-- Latest compiled and minified CSS -->
+      <link rel="stylesheet" href="css/bootstrap.min.css">
+      
+      <!-- Optional theme -->
+      <link rel="stylesheet" href="css/bootstrap-theme.min.css">
+      
+      <!-- Latest compiled and minified JavaScript -->
+      <script src="jslib/bootstrap.min.js"></script>   
+      
+      <link rel="stylesheet" href="style.css">
+      </head>
+      
+      <body ng-controller="JavaFXWebDemoController">
+      <h1>Java 8 desktop app with Web-based UI</h1>
+      <p>A JavaFX desktop application using WebView. The main logic is programmed in pure Java, but the user interface is based on state of the art web technologies: AngularJS (user controller) and Bootstrap (style and layout).</p>  
+      <div class="container-fluid">
+      <div class="row">
+       <div class="col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Calculator (synchronous example)</h3>
+            </div>
+            <div class="panel-body">
+            Number1: <input ng-model="number1" class="form-control"><br>
+            Number2: <input ng-model="number2" class="form-control"><br>
+            <p>
+              Result of Number1 + Number2 is: {{ sum() }}<br>
+              <small>computed via a synchronous Java call</small>
+            </p>
+            </div>
+          </div>
+         </div>
+        <div class="col-sm-6">
+          <div class="panel panel-default">
+            <div class="panel-heading">
+              <h3 class="panel-title">Fruits (asynchronous example)</h3>
+            </div>            
+            <div class="panel-body">
+            Fruits:
+              <div class="row">
+                <div class="col-sm-6">
+                   <span class="space" ng-repeat="fruit in fruits">
+                     <span class="label label-info">{{fruit.getName()}}</span>
+                   </span>
+                </div>
+                <!-- getName() is a native-Java method inside Fruit class -->
+                <!-- WARNING: It is better to use getters, instead of public fields inside pure Java objects since it seems that wrappers created automatically from the web engine for Java objects seem to do a cache of fields and this cache is affected during Java garbage collection. So getters are better -->
+              </div>
+              <div class="row">
+                <div class="col-xs-12">
+                  <small>(generated via an asynchronous pure Java call)</small>
+                </div>
+              </div>
+             <button class="btn btn-lg btn-success" ng-click="update()">Update data</button>
+            </div>
+       <!--   </div> -->
+         </div> 
+        </div>
+</div>
+<a href="index.html">Reload page</a>
+      </body>
+</html>
