@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example.webviewdemo</groupId>
   <artifactId>javafx-webview</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <properties>
     <!-- NOTE: do not use dot in the mainClass property -->
     <mainClass>WebViewDemo</mainClass>

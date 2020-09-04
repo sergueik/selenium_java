@@ -17,37 +17,37 @@ public class WebViewDemo extends Application {
 	private final String PAGE = "/index.html";
 
 	@Override
-	public void start(Stage primaryStage) {
-		createWebView(primaryStage, PAGE);
+	public void start(Stage stage) {
+		createWebView(stage, PAGE);
 	}
 
-	private void createWebView(Stage primaryStage, String page) {
+	private void createWebView(Stage stage, String page) {
 
 		final WebView webView = new WebView();
 
 		connectBackendObject(webView.getEngine(), "fruitsService", new FruitsService());
 
 		connectBackendObject(webView.getEngine(), "calculatorService", new CalculatorService());
-
-		// print messages from invoking "alert" Javascript to stdout
+		// set the JavaScript alert handler
+		// to print Javascript "alert" argument to stdout
 		// useful to debug, does not appear to work
 		webView.getEngine().setOnAlert(new EventHandler<WebEvent<String>>() {
 			@Override
-			public void handle(WebEvent<String> arg0) {
-				System.err.println("alertwb1: " + arg0.getData());
+			public void handle(WebEvent<String> e) {
+				System.err.println("alert received: " + e.getData());
 			}
 		});
 
-		// load index.html
+		// load web page
 		webView.getEngine().load(getClass().getResource(page).toExternalForm());
-
-		primaryStage.setScene(new Scene(webView));
-		primaryStage.setTitle("WebView with Java backend");
-		primaryStage.show();
+		// Specify the scene to be used on this stage.
+		stage.setScene(new Scene(webView));
+		stage.setTitle("WebView with Java backend");
+		stage.show();
 	}
 
 	public static void main(String[] args) {
 		System.setProperty("prism.lcdtext", "false"); // enhance fonts
-		launch(args);
+		Application.launch(args);
 	}
 }

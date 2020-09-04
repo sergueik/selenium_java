@@ -13,11 +13,8 @@ import javafx.scene.web.WebEvent;
 import netscape.javascript.JSObject;
 
 /**
- * Utilities to connect Java objects as javascript objects in a WebEngine.
- * 
- * It also allows to call callback functions.
- * 
- * @author lipido
+ * Connect Java objects as javascript objects in a WebEngine. It also allows to
+ * call callback functions.
  */
 @SuppressWarnings("restriction")
 public class Java2JavascriptUtils {
@@ -98,12 +95,16 @@ public class Java2JavascriptUtils {
 
 		}
 		webEngineBridges.put(varname, backend);
-
 	}
 
 	private static void connectToWebEngine(WebEngine engine, String varname) {
 		if (backendObjects.containsKey(engine) && backendObjects.get(engine).containsKey(varname)) {
 
+			// allows Java code to manipulate JavaScript objects.
+			// When a JavaScript object is passed or returned to Java code,
+			// it is wrapped in an instance of JSObject.
+			// Any data returned from the JavaScript engine to Java
+			// is converted to Java data types.
 			JSObject window = (JSObject) engine.executeScript("window");
 			window.setMember(varname, backendObjects.get(engine).get(varname));
 		}
@@ -136,13 +137,13 @@ public class Java2JavascriptUtils {
 		}
 
 		@Override
-		public void handle(WebEvent<String> arg0) {
-			if (arg0.getData().contains(CONNECT_BACKEND_MAGIC_WORD)) {
-				String varname = arg0.getData().substring(CONNECT_BACKEND_MAGIC_WORD.length());
-
+		public void handle(WebEvent<String> e) {
+			if (e.getData().contains(CONNECT_BACKEND_MAGIC_WORD)) {
+				String varname = e.getData().substring(CONNECT_BACKEND_MAGIC_WORD.length());
+				System.err.println("Read argument: " + varname);
 				connectToWebEngine(engine, varname);
 			} else if (wrappedHandler != null)
-				wrappedHandler.handle(arg0);
+				wrappedHandler.handle(e);
 		}
 	}
 }

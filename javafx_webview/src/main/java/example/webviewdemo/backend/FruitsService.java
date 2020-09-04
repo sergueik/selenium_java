@@ -1,15 +1,13 @@
 package example.webviewdemo.backend;
 
 import static example.webview.Java2JavascriptUtils.call;
-import static java.lang.Thread.sleep;
-import static javafx.application.Platform.runLater;
-
-import static java.util.Arrays.asList;
-import static java.util.Collections.shuffle;
-import netscape.javascript.JSObject;
+import java.lang.Thread;
+import javafx.application.Platform;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Collections;
+import netscape.javascript.JSObject;
 
 @SuppressWarnings("restriction")
 public class FruitsService {
@@ -28,8 +26,8 @@ public class FruitsService {
 		new Thread(() -> {
 			try {
 				shuffleFruits();
-				sleep(1000); // backend processing simulation
-				runLater(() -> {
+				Thread.sleep(1000); // backend processing simulation
+				Platform.runLater(() -> {
 					System.err.println("return data: " + Arrays.asList(FruitsService.fruits));
 					call(callbackfunction, (Object) FruitsService.fruits);
 				});
@@ -40,8 +38,8 @@ public class FruitsService {
 	}
 
 	private static void shuffleFruits() {
-		List<Object> list = asList(FruitsService.fruits);
-		shuffle(list);
+		List<Object> list = Arrays.asList(FruitsService.fruits);
+		Collections.shuffle(list);
 		FruitsService.fruits = list.toArray(new Fruit[] {});
 	}
 
