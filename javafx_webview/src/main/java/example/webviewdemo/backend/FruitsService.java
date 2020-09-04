@@ -1,6 +1,6 @@
 package example.webviewdemo.backend;
 
-import static example.webview.Java2JavascriptUtils.call;
+import example.webview.Java2JavascriptUtils;
 import java.lang.Thread;
 import javafx.application.Platform;
 
@@ -23,13 +23,18 @@ public class FruitsService {
 
 	// async function
 	public void loadFruits(final JSObject callbackfunction) {
+		System.err.println("loadFruits called with: "
+				+ (callbackfunction.toString().length() > 300 ? callbackfunction.toString().substring(0, 300)
+						: callbackfunction.toString()));
 		new Thread(() -> {
+
+			// launch a background thread
 			try {
 				shuffleFruits();
 				Thread.sleep(1000); // backend processing simulation
 				Platform.runLater(() -> {
 					System.err.println("return data: " + Arrays.asList(FruitsService.fruits));
-					call(callbackfunction, (Object) FruitsService.fruits);
+					Java2JavascriptUtils.call(callbackfunction, (Object) FruitsService.fruits);
 				});
 
 			} catch (InterruptedException e) {

@@ -113,8 +113,9 @@ public class Java2JavascriptUtils {
 	public static void call(JSObject callback, Object... arguments) {
 		String argumentsList = "";
 		for (int i = 0; i < arguments.length; i++) {
-			((JSObject) callback).setMember("___res___" + i, arguments[i]);
-			argumentsList += "this.___res___" + i;
+			String member = String.format("___res___%d", i);
+			((JSObject) callback).setMember(member, arguments[i]);
+			argumentsList += String.format("this.%s", member);
 			if (i != arguments.length - 1) {
 				argumentsList += ",";
 			}

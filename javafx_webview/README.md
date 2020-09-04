@@ -1,7 +1,8 @@
 ### Info
 Project extracted from
-JavaFX WebView component-based [desktop application](https://github.com/lipido/javafxwebview) with AngularJS and Bootstrap
-
+JavaFX WebView component-based [desktop application](https://github.com/lipido/javafxwebview) with AngularJS and Bootstrap.
+The project uses `netscape.javascript.JSObject` [class](https://docs.oracle.com/javase/8/javafx/api/netscape/javascript/JSObject.html)
+to alow Java code to manipulate JavaScript objects.
 
 ### Test
 
