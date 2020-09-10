@@ -1,25 +1,30 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import static java.lang.String.format;
 import static java.util.Base64.getDecoder;
+import static java.util.Collections.emptyMap;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -28,7 +33,6 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.gson.Gson;
@@ -44,47 +48,29 @@ import io.webfolder.cdp.logger.CdpLogger;
 
 class SessionInvocationHandler implements InvocationHandler {
 
-    private final AtomicInteger counter = new AtomicInteger(0);
-
     private final Gson gson;
 
     private final WebSocket webSocket;
 
-    private final Map<Integer, WSContext> contexts;
+    private final AtomicInteger counter = new AtomicInteger(0);
 
-    private final List<String> enabledDomains = new CopyOnWriteArrayList<>();
+    private final Map<Integer, WSContext> contextList;
 
     private final CdpLogger log;
 
     private final Session session;
 
-    private final boolean browserSession;
-
-    private final String sessionId;
-
-    private final String targetId;
-
-    private final int timeout;
-
-    SessionInvocationHandler(
+    public SessionInvocationHandler(
                     final Gson gson,
                     final WebSocket webSocket,
-                    final Map<Integer, WSContext> contexts,
+                    final Map<Integer, WSContext> contextList,
                     final Session session,
-                    final CdpLogger log,
-                    final boolean browserSession,
-                    final String sessionId,
-                    final String targetId,
-                    final int webSocketReadTimeout) {
+                    final CdpLogger log) {
         this.gson           = gson;
         this.webSocket      = webSocket;
-        this.contexts       = contexts;
+        this.contextList    = contextList;
         this.session        = session;
         this.log            = log;
-        this.browserSession = browserSession;
-        this.sessionId      = sessionId;
-        this.targetId       = targetId;
-        this.timeout        = webSocketReadTimeout;
     }
 
     @Override
@@ -93,27 +79,22 @@ class SessionInvocationHandler implements InvocationHandler {
                 final Method method,
                 final Object[] args) throws Throwable {
 
+        if ( ! session.isConnected() ) {
+            log.error("Unable to invoke {}.{}()", new Object[] {
+                    method.getDeclaringClass().getName(), method.getName()
+            });
+            throw new CdpException("WebSocket connection is not alive");
+        }
+
         final Class<?> klass = method.getDeclaringClass();
         final String  domain = klass.getAnnotation(Domain.class).value();
         final String command = method.getName();
 
-        final boolean hasArgs = args != null && args.length > 0;
-        final boolean voidMethod = void.class.equals(method.getReturnType());
+        boolean hasArgs = args != null && args.length > 0;
 
-        boolean enable = "enable".intern() == command && voidMethod;
-
-        // it's unnecessary to call enable command more than once.
-        if (enable && enabledDomains.contains(domain)) {
-            return null;
-        }
-
-        boolean disable = "disable".intern() == command && voidMethod;
-
-        if (disable) {
-            enabledDomains.remove(domain);
-        }
-
-        Map<String, Object> params = new HashMap<>(hasArgs ? args.length : 0);
+        Map<String, Object> params = hasArgs ?
+                                        new HashMap<>(args.length) :
+                                        emptyMap();
 
         if (hasArgs) {
             int argIndex = 0;
@@ -134,34 +115,19 @@ class SessionInvocationHandler implements InvocationHandler {
 
         log.debug(json);
 
-        WSContext context = null;
+        WSContext context = new WSContext();
+        contextList.put(id, context);
 
-        if (session.isConnected()) {
-            context = new WSContext();
-            contexts.put(id, context);
-            if (browserSession) {
-                webSocket.sendText(json);
-            } else {
-                session.getCommand()
-                        .getTarget()
-                        .sendMessageToTarget(json, sessionId, targetId);
-            }
-            context.await(timeout);
-        } else {
-            throw new CdpException("WebSocket connection is not alive. id: " + id);
-        }
+        webSocket.sendText(json);
+        context.await();
 
-        if ( context.getError() != null ) {
+        if (context.getError() != null) {
             throw context.getError();
-        }
-
-        if (enable) {
-            enabledDomains.add(domain);
         }
 
         Class<?> retType = method.getReturnType();
 
-        if (voidMethod || retType.equals(Void.class)) {
+        if (retType.equals(void.class) || retType.equals(Void.class)) {
             return null;
         }
 
@@ -189,7 +155,7 @@ class SessionInvocationHandler implements InvocationHandler {
 
         Object ret = null;
         Type genericReturnType = method.getGenericReturnType();
-
+        
         if (returns != null) {
 
             JsonElement jsonElement = resultObject.get(returns);
@@ -200,9 +166,9 @@ class SessionInvocationHandler implements InvocationHandler {
                 } else if (Boolean.class.equals(retType)) {
                     return resultObject.get(returns).getAsBoolean() ? Boolean.TRUE : Boolean.FALSE;
                 } else if (Integer.class.equals(retType)) {
-                    return resultObject.get(returns).getAsInt();
+                    return new Integer(resultObject.get(returns).getAsInt());
                 } else if (Double.class.equals(retType)) {
-                    return resultObject.get(returns).getAsDouble();
+                    return new Double(resultObject.get(returns).getAsDouble());
                 }
             }
 
@@ -229,16 +195,11 @@ class SessionInvocationHandler implements InvocationHandler {
     }
 
     void dispose() {
-        enabledDomains.clear();
-        for (WSContext context : contexts.values()) {
+        for (WSContext context : contextList.values()) {
             try {
                 context.setData(null);
             } catch (Throwable t) {
             }
         }
-    }
-
-    WSContext getContext(int id) {
-        return contexts.get(id);
     }
 }

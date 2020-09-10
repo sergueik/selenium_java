@@ -1,20 +1,24 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.type.dom;
 
@@ -83,18 +87,14 @@ public class Node {
     private Boolean isSVG;
 
     /**
-     * Node identifier that is passed into the rest of the DOM messages as the <code>nodeId</code>. Backend
-     * will only push node with given <code>id</code> once. It is aware of all requested nodes and will only
-     * fire DOM events for nodes known to the client.
+     * Node identifier that is passed into the rest of the DOM messages as the <code>nodeId</code>. Backend will only push node with given <code>id</code> once. It is aware of all requested nodes and will only fire DOM events for nodes known to the client.
      */
     public Integer getNodeId() {
         return nodeId;
     }
 
     /**
-     * Node identifier that is passed into the rest of the DOM messages as the <code>nodeId</code>. Backend
-     * will only push node with given <code>id</code> once. It is aware of all requested nodes and will only
-     * fire DOM events for nodes known to the client.
+     * Node identifier that is passed into the rest of the DOM messages as the <code>nodeId</code>. Backend will only push node with given <code>id</code> once. It is aware of all requested nodes and will only fire DOM events for nodes known to the client.
      */
     public void setNodeId(Integer nodeId) {
         this.nodeId = nodeId;
@@ -213,42 +213,42 @@ public class Node {
     }
 
     /**
-     * Attributes of the <code>Element</code>node in the form of flat array<code>[name1, value1, name2, value2]</code>.
+     * Attributes of the <code>Element</code> node in the form of flat array <code>[name1, value1, name2, value2]</code>.
      */
     public List<String> getAttributes() {
         return attributes;
     }
 
     /**
-     * Attributes of the <code>Element</code>node in the form of flat array<code>[name1, value1, name2, value2]</code>.
+     * Attributes of the <code>Element</code> node in the form of flat array <code>[name1, value1, name2, value2]</code>.
      */
     public void setAttributes(List<String> attributes) {
         this.attributes = attributes;
     }
 
     /**
-     * Document URL that <code>Document</code>or<code>FrameOwner</code> node points to.
+     * Document URL that <code>Document</code> or <code>FrameOwner</code> node points to.
      */
     public String getDocumentURL() {
         return documentURL;
     }
 
     /**
-     * Document URL that <code>Document</code>or<code>FrameOwner</code> node points to.
+     * Document URL that <code>Document</code> or <code>FrameOwner</code> node points to.
      */
     public void setDocumentURL(String documentURL) {
         this.documentURL = documentURL;
     }
 
     /**
-     * Base URL that <code>Document</code>or<code>FrameOwner</code> node uses for URL completion.
+     * Base URL that <code>Document</code> or <code>FrameOwner</code> node uses for URL completion.
      */
     public String getBaseURL() {
         return baseURL;
     }
 
     /**
-     * Base URL that <code>Document</code>or<code>FrameOwner</code> node uses for URL completion.
+     * Base URL that <code>Document</code> or <code>FrameOwner</code> node uses for URL completion.
      */
     public void setBaseURL(String baseURL) {
         this.baseURL = baseURL;

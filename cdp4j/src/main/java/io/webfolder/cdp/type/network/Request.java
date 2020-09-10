@@ -1,27 +1,32 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.type.network;
 
-import io.webfolder.cdp.type.constant.ReferrerPolicy;
-import io.webfolder.cdp.type.security.MixedContentType;
 import java.util.HashMap;
 import java.util.Map;
+
+import io.webfolder.cdp.type.constant.MixedContentType;
+import io.webfolder.cdp.type.constant.ReferrerPolicy;
 
 /**
  * HTTP request data
@@ -29,15 +34,11 @@ import java.util.Map;
 public class Request {
     private String url;
 
-    private String urlFragment;
-
     private String method;
 
     private Map<String, Object> headers = new HashMap<>();
 
     private String postData;
-
-    private Boolean hasPostData;
 
     private MixedContentType mixedContentType;
 
@@ -48,31 +49,17 @@ public class Request {
     private Boolean isLinkPreload;
 
     /**
-     * Request URL (without fragment).
+     * Request URL.
      */
     public String getUrl() {
         return url;
     }
 
     /**
-     * Request URL (without fragment).
+     * Request URL.
      */
     public void setUrl(String url) {
         this.url = url;
-    }
-
-    /**
-     * Fragment of the requested URL starting with hash, if present.
-     */
-    public String getUrlFragment() {
-        return urlFragment;
-    }
-
-    /**
-     * Fragment of the requested URL starting with hash, if present.
-     */
-    public void setUrlFragment(String urlFragment) {
-        this.urlFragment = urlFragment;
     }
 
     /**
@@ -118,28 +105,14 @@ public class Request {
     }
 
     /**
-     * True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
-     */
-    public Boolean isHasPostData() {
-        return hasPostData;
-    }
-
-    /**
-     * True when the request has POST data. Note that postData might still be omitted when this flag is true when the data is too long.
-     */
-    public void setHasPostData(Boolean hasPostData) {
-        this.hasPostData = hasPostData;
-    }
-
-    /**
-     * The mixed content type of the request.
+     * The mixed content status of the request, as defined in http://www.w3.org/TR/mixed-content/
      */
     public MixedContentType getMixedContentType() {
         return mixedContentType;
     }
 
     /**
-     * The mixed content type of the request.
+     * The mixed content status of the request, as defined in http://www.w3.org/TR/mixed-content/
      */
     public void setMixedContentType(MixedContentType mixedContentType) {
         this.mixedContentType = mixedContentType;

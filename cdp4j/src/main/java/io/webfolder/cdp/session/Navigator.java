@@ -1,20 +1,24 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -28,9 +32,7 @@ import java.util.Map;
 
 import io.webfolder.cdp.command.DOM;
 import io.webfolder.cdp.command.Network;
-import io.webfolder.cdp.command.Page;
-import io.webfolder.cdp.type.page.GetNavigationHistoryResult;
-import io.webfolder.cdp.type.page.NavigationEntry;
+import io.webfolder.cdp.exception.CdpException;
 import io.webfolder.cdp.type.runtime.RemoteObject;
 
 public interface Navigator {
@@ -53,16 +55,7 @@ public interface Navigator {
      */
     public default Session back() {
         getThis().logEntry("back");
-        Page page = getThis().getCommand().getPage();
-        GetNavigationHistoryResult history = page.getNavigationHistory();
-        int index = history.getCurrentIndex() - 1;
-        if (index < 0 || index >= history.getEntries().size()) {
-            return getThis();
-        }
-        NavigationEntry entry = history.getEntries().get(index);
-        if ( entry != null ) {
-            page.navigateToHistoryEntry(entry.getId());
-        }
+        getThis().evaluate("window.history.back()");
         return getThis();
     }
 
@@ -73,16 +66,7 @@ public interface Navigator {
      */
     public default Session forward() {
         getThis().logEntry("forward");
-        Page page = getThis().getCommand().getPage();
-        GetNavigationHistoryResult history = page.getNavigationHistory();
-        int index = history.getCurrentIndex() + 1;
-        if (index >= history.getEntries().size()) {
-            return getThis();
-        }
-        NavigationEntry entry = history.getEntries().get(index);
-        if ( entry != null ) {
-            page.navigateToHistoryEntry(entry.getId());
-        }
+        getThis().evaluate("window.history.forward()");
         return getThis();
     }
 
@@ -134,7 +118,7 @@ public interface Navigator {
     public default String getPathname() {
         DOM dom = getThis().getCommand().getDOM();
         Integer nodeId = dom.getDocument().getNodeId();
-        RemoteObject remoteObject = dom.resolveNode(nodeId, null, null);
+        RemoteObject remoteObject = dom.resolveNode(nodeId);
         String pathname = (String) getThis().getPropertyByObjectId(remoteObject.getObjectId(), "location.pathname");
         getThis().releaseObject(remoteObject.getObjectId());
         System.out.println(pathname);
@@ -172,22 +156,6 @@ public interface Navigator {
     }
 
     /**
-     * Gets the full HTML contents of the page, including the doctype.
-     * 
-     * @return string content of the document
-     */
-    default String getContent() {
-        getThis().disableFlowLog();
-        DOM dom = getThis().getCommand().getDOM();
-        Integer nodeId = dom.getDocument().getNodeId();
-        RemoteObject remoteObject = dom.resolveNode(nodeId, null, null);
-        String title = (String) getThis().getPropertyByObjectId(remoteObject.getObjectId(), "documentElement.outerHTML");
-        getThis().logExit("getContent", title);
-        getThis().releaseObject(remoteObject.getObjectId());
-        return title;
-    }
-
-    /**
      * Gets the title of the document.
      * 
      * @return string containing the document's title
@@ -195,7 +163,7 @@ public interface Navigator {
     default String getTitle() {
         DOM dom = getThis().getCommand().getDOM();
         Integer nodeId = dom.getDocument().getNodeId();
-        RemoteObject remoteObject = dom.resolveNode(nodeId, null, null);
+        RemoteObject remoteObject = dom.resolveNode(nodeId);
         String title = (String) getThis().getPropertyByObjectId(remoteObject.getObjectId(), "title");
         getThis().logExit("getTitle", title);
         getThis().releaseObject(remoteObject.getObjectId());
@@ -210,10 +178,17 @@ public interface Navigator {
     default boolean isDomReady() {
         try {
             getThis().disableFlowLog();
-            return "true".equals(valueOf(getThis().evaluate("document.readyState == 'complete'")));
-        } catch (Throwable t) {
+            DOM dom = getThis().getCommand().getDOM();
+            Integer nodeId = dom.getDocument().getNodeId();
+            RemoteObject remoteObject = dom.resolveNode(nodeId);
+            String readyState = (String) getThis().getPropertyByObjectId(remoteObject.getObjectId(), "readyState");
+            getThis().releaseObject(remoteObject.getObjectId());
+            boolean domReady = "complete".equals(readyState);
+            return domReady;            
+        } catch (CdpException e) {
+            return TRUE.equals(getThis().evaluate("window.document.readyState === 'complete'"));
+        } finally {
             getThis().enableFlowLog();
-            return false;
         }
     }
 

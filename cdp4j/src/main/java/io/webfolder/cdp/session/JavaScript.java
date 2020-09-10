@@ -1,20 +1,24 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -50,10 +54,9 @@ public interface JavaScript {
      */
     default Object evaluate(String expression) {
         Runtime runtime = getThis().getCommand().getRuntime();
-        Integer contextId = getThis().getExecutionContextId();
         EvaluateResult result = runtime.evaluate(expression, null, null,
-                                                    null, contextId, null,
-                                                    null, null, null, null, null);
+                                                    null, null, null,
+                                                    null, null, null);
         if (result == null) {
             return null;
         }
@@ -104,18 +107,32 @@ public interface JavaScript {
      */
     @SuppressWarnings("unchecked")
     default <T> T callFunction(String name, Class<T> returnType, Object ...arguments) {
+        EvaluateResult windowResult = getThis().getCommand().getRuntime().evaluate("window");
+
+        if (windowResult == null) {
+            return null;
+        }
+
+        if ( windowResult.getExceptionDetails() != null &&
+                            windowResult.getExceptionDetails().getException() != null ) {
+            getThis().releaseObject(windowResult.getExceptionDetails().getException().getObjectId());
+            throw new CdpException(windowResult.getExceptionDetails().getException().getDescription());
+        }
+
         CallArgument objArgument = new CallArgument();
         objArgument.setValue(name);
 
         CallFunctionOnResult funcObj = getThis()
                 .getCommand()
                 .getRuntime()
-                .callFunctionOn("function(functionName) { return functionName.split('.').reduce((o, i) => o[i], this); }",
-                                                        null,
+                .callFunctionOn(windowResult.getResult().getObjectId(),
+                        "function(functionName) { return functionName.split('.').reduce((o, i) => o[i], this); }",
                                                         asList(objArgument),
                                                         FALSE, FALSE,
                                                         FALSE, FALSE,
-                                                        FALSE, getThis().getExecutionContextId(), null);
+                                                        FALSE);
+
+        getThis().releaseObject(windowResult.getResult().getObjectId());
 
         if ( funcObj.getExceptionDetails() != null &&
                 funcObj.getExceptionDetails().getException() != null ) {
@@ -128,9 +145,9 @@ public interface JavaScript {
             throw new CdpException(format("Function [%s] is not defined", name));
         }
 
-        StringJoiner argNames = new StringJoiner(", ");
+        StringJoiner argNames = new StringJoiner(",");
 
-        List<CallArgument> argsFunc = new ArrayList<>(arguments.length);
+        List<CallArgument> argsFunc = new ArrayList<>();
 
         int i = 0;
         if ( arguments != null && arguments.length > 0) {
@@ -141,24 +158,24 @@ public interface JavaScript {
                     if (getThis().isPrimitive(argument.getClass())) {
                         ca.setValue(argument);
                     } else {
-                        ca.setUnserializableValue(getThis().getGson().toJson(argument));
+                        ca.setValue(getThis().getGson().toJson(argument));
                     }
                 }
-                argNames.add("arg" + i++);
+                argNames.add("arg" + (i + 1));
             }
         }
 
         CallFunctionOnResult func = getThis()
                                         .getCommand()
                                         .getRuntime()
-                                        .callFunctionOn(format("function(%s) { const result = this.apply(this, Array.prototype.slice.call(arguments)); " +
+                                        .callFunctionOn(funcObj.getResult().getObjectId(),
+                                                format("function(%s) { const result = this.apply(this, Array.prototype.slice.call(arguments)); " +
                                                         "return typeof result === 'undefined' ? undefined : JSON.stringify({ result : result }); }",
                                                         argNames.toString()),
-                                                funcObj.getResult().getObjectId(),
                                                 argsFunc,
                                                 FALSE, TRUE,
                                                 FALSE, FALSE,
-                                                FALSE, null, null);
+                                                FALSE);
 
         getThis().releaseObject(funcObj.getResult().getObjectId());
         getThis().releaseObject(func.getResult().getObjectId());
@@ -174,7 +191,13 @@ public interface JavaScript {
             String json = valueOf(func.getResult().getValue());
             JsonObject object = getThis().getGson().fromJson(json, JsonObject.class);
             JsonElement result = object.get("result");
-            value = getThis().getGson().fromJson(result, returnType);
+            if (getThis().isPrimitive(returnType)) {
+                value = getThis().getGson().fromJson(result, returnType);
+            } else {
+                if (result.isJsonPrimitive()) {
+                    value = getThis().getGson().fromJson(result.getAsString(), returnType);
+                }
+            }
         } else if (ObjectType.Undefined.equals(func.getResult().getType())) {
             value = void.class;
         }
@@ -185,7 +208,7 @@ public interface JavaScript {
         }
 
         getThis().logExit("callFunction",
-                        name + (arguments == null || arguments.length == 0 ? "" : "\", \"" + joiner.toString()),
+                        name + (arguments == null || arguments.length == 0 ? "" : "\", " + joiner.toString()),
                         valueOf(value).replace("\n", "").replace("\r", ""));
 
         return ! void.class.equals(value) ? (T) value : null;
@@ -206,20 +229,33 @@ public interface JavaScript {
      */
     @SuppressWarnings("unchecked")
     public default <T> T getVariable(String name, Class<T> returnType) {
+        EvaluateResult windowResult = getThis().getCommand().getRuntime().evaluate("window");
+
+        if (windowResult == null) {
+            return null;
+        }
+
+        if ( windowResult.getExceptionDetails() != null &&
+                            windowResult.getExceptionDetails().getException() != null ) {
+            getThis().releaseObject(windowResult.getExceptionDetails().getException().getObjectId());
+            throw new CdpException(windowResult.getExceptionDetails().getException().getDescription());
+        }
+
         CallArgument objArgument = new CallArgument();
         objArgument.setValue(name);
 
         CallFunctionOnResult obj = getThis()
                 .getCommand()
                 .getRuntime()
-                .callFunctionOn(
+                .callFunctionOn(windowResult.getResult().getObjectId(),
                         "function(functionName) { const result = functionName.split('.').reduce((o, i) => o[i], this); " +
                                 "return typeof result === 'undefined' ? undefined : JSON.stringify({ result : result }); }",
-                                                        null,
                                                         asList(objArgument),
                                                         FALSE, FALSE,
                                                         FALSE, FALSE,
-                                                        FALSE, getThis().getExecutionContextId(), null);
+                                                        FALSE);
+
+        getThis().releaseObject(windowResult.getResult().getObjectId());
 
         if ( obj.getExceptionDetails() != null &&
                 obj.getExceptionDetails().getException() != null ) {
@@ -237,7 +273,13 @@ public interface JavaScript {
             String json = valueOf(obj.getResult().getValue());
             JsonObject object = getThis().getGson().fromJson(json, JsonObject.class);
             JsonElement result = object.get("result");
-            value = getThis().getGson().fromJson(result, returnType);
+            if (getThis().isPrimitive(returnType)) {
+                value = getThis().getGson().fromJson(result, returnType);
+            } else {
+                if (result.isJsonPrimitive()) {
+                    value = getThis().getGson().fromJson(result.getAsString(), returnType);
+                }
+            }
         } else if (ObjectType.Undefined.equals(obj.getResult().getType())) {
             value = void.class;
         }
@@ -285,13 +327,14 @@ public interface JavaScript {
         CallFunctionOnResult obj = getThis()
                 .getCommand()
                 .getRuntime()
-                .callFunctionOn("function(is, value) { function index(obj, is, value) { if (typeof is == 'string') return index(obj, is.split('.'), value); " +
+                .callFunctionOn(windowResult.getResult().getObjectId(),
+                        "function(is, value) { console.info(Object.prototype.toString.call(value)); function index(obj, is, value) { if (typeof is == 'string') return index(obj, is.split('.'), value); " +
                         "else if (is.length === 1 && value !== undefined) return obj[is[0]] = value; else if (is.length === 0) " +
-                        "return obj; else return index(obj[is[0]], is.slice(1), value); } index(window, is, value); }", windowResult.getResult().getObjectId(),
+                        "return obj; else return index(obj[is[0]], is.slice(1), value); } index(window, is, value); }",
                                                 asList(argVariableName, argVariableValue),
                                                 FALSE, FALSE,
                                                 FALSE, FALSE,
-                                                FALSE, null, null);
+                                                FALSE);
 
         getThis().releaseObject(windowResult.getResult().getObjectId());
 

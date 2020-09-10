@@ -1,33 +1,34 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import static io.webfolder.cdp.session.Option.TYPE_TOKEN;
-import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.lang.Math.floor;
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toList;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 
 import com.google.gson.Gson;
 
@@ -47,7 +47,6 @@ import io.webfolder.cdp.type.runtime.CallFunctionOnResult;
 import io.webfolder.cdp.type.runtime.ExceptionDetails;
 import io.webfolder.cdp.type.runtime.PropertyDescriptor;
 import io.webfolder.cdp.type.runtime.RemoteObject;
-import io.webfolder.cdp.type.util.Point;
 
 /**
  * Provides the interfaces for the Document Object Model (DOM).
@@ -114,8 +113,7 @@ public interface Dom {
         }
         CallFunctionOnResult functionResult = getThis()
             .getCommand().getRuntime()
-            .callFunctionOn("function() { this.select(); }", objectId, null, null, null, null,
-                                                                       null, null, null, null);
+            .callFunctionOn(objectId, "function() { this.select(); }");
         if (functionResult != null) {
             RemoteObject result = functionResult.getResult();
             if (result != null) {
@@ -141,43 +139,25 @@ public interface Dom {
      * @return this
      */
     default Session focus(final String selector) {
-        return focus(null, selector);
+        return focus(selector, Constant.EMPTY_ARGS);
     }
 
     /**
-     * The HTMLElement.focus() method sets focus on the specified element, if it
-     * can be focused.
+     * The HTMLElement.focus() method sets focus on the specified element, if it can be focused.
      * 
-     * @param selector
-     *            css or xpath selector
-     * @param contextId
-     *            Context id of the frame
+     * @param selector css or xpath selector
+     * @param args format string
+     * 
      * @return this
      */
-    default Session focus(final Integer contextId, final String selector) {
-        return focus(contextId, selector, Constant.EMPTY_ARGS);
-    }
-
-    /**
-     * The HTMLElement.focus() method sets focus on the specified element, if it
-     * can be focused.
-     * 
-     * @param selector
-     *            css or xpath selector
-     * @param args
-     *            format string
-     * @param contextId
-     *            Context id of the frame
-     * @return this
-     */
-    default Session focus(final Integer contextId, final String selector, final Object... args) {
+    default Session focus(final String selector, final Object ...args) {
         getThis().logEntry("focus", format(selector, args));
-        Integer nodeId = getThis().getNodeId(contextId, selector, contextId, args);
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
+        Integer nodeId = getThis().getNodeId(selector, args);
+        if (nodeId == null || nodeId == Constant.EMPTY_NODE_ID) {
             throw new ElementNotFoundException(format(selector, args));
         }
         DOM dom = getThis().getCommand().getDOM();
-        dom.focus(nodeId, null, null);
+        dom.focus(nodeId);
         return getThis();
     }
 
@@ -259,11 +239,8 @@ public interface Dom {
         if (objectId == null) {
             throw new ElementNotFoundException(format(selector, args));
         }
-        CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(
-                                                    format("function() { this.selectedIndex = %d }", index),
-                                                    objectId,
-                                                    null, null, null, null,
-                                                    null, null, null, null);
+        CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(objectId,
+                                                    format("function() { this.selectedIndex = %d }", index));
         if (result != null && result.getResult() != null) {
             getThis().releaseObject(result.getResult().getObjectId());
         }
@@ -300,32 +277,31 @@ public interface Dom {
             throw new ElementNotFoundException(format(selector, args));
         }
         PropertyDescriptor pd = getThis().getPropertyDescriptor(objectId, "options");
-        if ( pd != null && pd.getValue() != null ) {
-            Double length = (Double) getThis().getPropertyByObjectId(pd.getValue().getObjectId(), "length");
-            List<Option> list = emptyList();
-            if (length != null) {
-                if (length.intValue() <= 0) {
-                    getThis().releaseObject(objectId);
-                } else {
-                    CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(
-                            "function() { let options = []; for (let i = 0; i < this.length; i++) " +
-                            "{ options.push({ index : this[i].index, selected: this[i].selected, " +
-                            "value: this[i].value, text: this[i].textContent, group: this[i].parentElement.tagName" +
-                            "=== 'OPTGROUP' ? this[i].parentElement.getAttribute('label') : null }); } return JSON.stringify(options); }",
-                            pd.getValue().getObjectId(),
-                            null, null, null, null,
-                            null, null, null, null);
-                    if (result != null && result.getResult() != null) {
-                        String json = (String) result.getResult().getValue();
-                        getThis().releaseObject(result.getResult().getObjectId());
-                        Gson gson = getThis().getGson();
-                        list = gson.fromJson(json, TYPE_TOKEN.getType());
+        if (pd != null) {
+            if (pd.getValue() != null) {
+                Double length = (Double) getThis().getPropertyByObjectId(pd.getValue().getObjectId(), "length");
+                List<Option> list = emptyList();
+                if (length != null) {
+                    if (length.intValue() <= 0) {
+                        getThis().releaseObject(objectId);
+                    } else {
+                        CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(pd.getValue().getObjectId(),
+                                "function() { let options = []; for (let i = 0; i < this.length; i++) " +
+                                "{ options.push({ index : this[i].index, selected: this[i].selected, " +
+                                "value: this[i].value, text: this[i].textContent, group: this[i].parentElement.tagName" +
+                                "=== 'OPTGROUP' ? this[i].parentElement.getAttribute('label') : null }); } return JSON.stringify(options); }");
+                        if (result != null && result.getResult() != null) {
+                            String json = (String) result.getResult().getValue();
+                            getThis().releaseObject(result.getResult().getObjectId());
+                            Gson gson = getThis().getGson();
+                            list = gson.fromJson(json, TYPE_TOKEN.getType());
+                        }
                     }
                 }
+                getThis().releaseObject(pd.getValue().getObjectId());
+                getThis().releaseObject(objectId);
+                return list;
             }
-            getThis().releaseObject(pd.getValue().getObjectId());
-            getThis().releaseObject(objectId);
-            return list;
         }
         getThis().releaseObject(objectId);
         return emptyList();
@@ -403,11 +379,8 @@ public interface Dom {
                                 getThis().error("invalid index value [{}]", index.intValue());
                                 continue;
                             }
-                            CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(
-                                    format("function() { this[%d].selected = true }", index),
-                                    pd.getValue().getObjectId(),
-                                    null, null, null, null,
-                                    null, null, null, null);
+                            CallFunctionOnResult result = getThis().getCommand().getRuntime().callFunctionOn(pd.getValue().getObjectId(),
+                                    format("function() { this[%d].selected = true }", index));
                             if (result != null && result.getResult() != null) {
                                 getThis().releaseObject(result.getResult().getObjectId());
                             }
@@ -459,12 +432,12 @@ public interface Dom {
             return getThis();
         }
         Integer nodeId = getThis().getNodeId(selector);
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
+        if (nodeId == null || nodeId.intValue() == Constant.EMPTY_NODE_ID) {
             throw new ElementNotFoundException(format(selector));
         }
         getThis().logEntry("setFiles", format(selector) + "\", \"" + Arrays.toString(files));
         DOM dom = getThis().getCommand().getDOM();
-        dom.setFileInputFiles(asList(files), nodeId, null, null);
+        dom.setFileInputFiles(nodeId, asList(files));
         return getThis();
     }
 
@@ -647,17 +620,7 @@ public interface Dom {
     default String getValue(
                     final String selector,
                     final Object ...args) {
-        String objectId = getThis().getObjectId(selector, args);
-        if (objectId == null) {
-            throw new ElementNotFoundException(format(selector, args));
-        }
-        String value = (String) getThis().getPropertyByObjectId(objectId, "value");
-        getThis().releaseObject(objectId);
-        if (value == null) {
-            return null;
-        }
-        getThis().logExit("getValue", format(selector, args), value);
-        return value;
+        return getAttribute(selector, "value", args);
     }
 
     /**
@@ -674,33 +637,15 @@ public interface Dom {
     /**
      * Gets attributes of the node or {@link Collections#emptyMap()} otherwise.
      * 
-     * @param selector
-     *            css or xpath selector
-     * @param args
-     *            format string
+     * @param selector css or xpath selector
+     * @param args format string
      * 
-     * @return returns all attribute nodes registered to the specified node.
-     */
-    default Map<String, String> getAttributes(final String selector, final Object... args) {
-        return getAttributes(null, selector, args);
-    }
-
-    /**
-     * Gets attributes of the node or {@link Collections#emptyMap()} otherwise.
-     * 
-     * @param selector
-     *            css or xpath selector
-     * @param args
-     *            format string
-     * @param contextId
-     *            Frame context id
-     * @return returns all attribute nodes registered to the specified node.
+     * @return returns all attribute nodes registered to the specified node. 
      */
     default Map<String, String> getAttributes(
-                                final Integer contextId,
                                 final String selector,
                                 final Object ...args) {
-        Integer nodeId = getThis().getNodeId(contextId, selector, args);
+        Integer nodeId = getThis().getNodeId(selector, args);
         if (nodeId != null && nodeId.intValue() > 0) {
             DOM dom = getThis().getCommand().getDOM();
             List<String> attributes = dom.getAttributes(nodeId);
@@ -740,32 +685,13 @@ public interface Dom {
      * @return the value of attribute or <code>null</code> if there is no such attribute.
      */
     default String getAttribute(
-            final String selector, final String name, final Object... args) {
-        return getAttribute(null, selector, name, args);
-    }
-
-    /**
-     * Retrieves an attribute value by name.
-     * 
-     * @param selector
-     *            css or xpath selector
-     * @param name
-     *            the name of the attribute to retrieve
-     * @param args
-     *            format string
-     * 
-     * @return the value of attribute or <code>null</code> if there is no such
-     *         attribute.
-     */
-    default String getAttribute(
-                        final Integer contextId,
                         final String selector,
                         final String name,
                         final Object ...args) {
         if (name == null || name.trim().isEmpty()) {
             return null;
         }
-        String value = getAttributes(contextId, format(selector, args)).get(name);
+        String value = getAttributes(format(selector, args)).get(name);
         getThis().logExit("getAttribute", format(selector, args) + "\", \"" + name, value);
         return value;
     }
@@ -785,27 +711,8 @@ public interface Dom {
                         final String name,
                         final Object value,
                         final Object ...args) {
-        return setAttribute(null, selector, name, value, args);
-    }
-
-    /**
-     * Sets attribute for an element
-     * 
-     * @param selector
-     *            css or xpath selector
-     * @param name
-     *            the name of the attribute to create or alter
-     * @param value
-     *            value to set in string form
-     * @param args
-     *            format string
-     * 
-     * @return this
-     */
-    default Session setAttribute(final Integer contextId, final String selector, final String name, final Object value,
-            final Object... args) {
-        Integer nodeId = getThis().getNodeId(contextId, selector, args);
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
+        Integer nodeId = getThis().getNodeId(selector, args);
+        if (nodeId == null || nodeId == Constant.EMPTY_NODE_ID) {
             throw new ElementNotFoundException(format(selector, args));
         }
         getThis().logEntry("setAttribute", format(selector) + "\", \"" + name + "\", \"" + value);
@@ -831,6 +738,7 @@ public interface Dom {
                         final Object value) {
         return setAttribute(selector, name, value, Constant.EMPTY_ARGS);
     }
+
     /**
      * Gets box model of an element
      * 
@@ -841,154 +749,12 @@ public interface Dom {
      * 
      * @return Box model of element or <code>null</code> otherwise
      */
-    default BoxModel getBoxModel(final String selector, final Object ...args) {
-        return getBoxModel(null, selector, args);
-    }
-
-    /**
-     * Gets box model of an element
-     * 
-     * Box model hold the height, width and coordinate of the element
-     * 
-     * @param selector
-     *            css or xpath selector
-     * @param args
-     *            fromat string
-     * 
-     * @return Box model of element or <code>null</code> otherwise
-     */
-    default BoxModel getBoxModel(Integer contextId, final String selector, Object... args) {
-        Integer nodeId = getThis().getNodeId(contextId, selector, args);
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
+    default BoxModel getBoxModel(final String selector, Object ...args) {
+        Integer nodeId = getThis().getNodeId(selector, args);
+        if (nodeId == null || nodeId == Constant.EMPTY_NODE_ID) {
             throw new ElementNotFoundException(format(selector, args));
         }
-        return getThis().getCommand().getDOM().getBoxModel(nodeId, null, null);
-    }
-
-    /**
-     * Returns node's HTML markup.
-     * 
-     * @param selector css or xpath selector
-     * 
-     * @return Outer HTML markup.
-     */
-    default String getOuterHtml(String selector) {
-        return getOuterHtml(selector, Constant.EMPTY_ARGS);
-    }
-
-    /**
-     * Returns node's HTML markup.
-     * 
-     * @param selector css or xpath selector
-     * @param args fromat string
-     * 
-     * @return Outer HTML markup.
-     */
-    default String getOuterHtml(String selector, Object... args) {
-        Integer nodeId = getThis().getNodeId(null, selector, args);
-        return getThis().getCommand().getDOM().getOuterHTML(nodeId, null, null);
-    }
-
-    default void scrollIntoViewIfNeeded(String selector) {
-        scrollIntoViewIfNeeded(selector, Constant.EMPTY_ARGS);
-    }
-
-    default void scrollIntoViewIfNeeded(String selector, Object... args) {
-        String objectId = getThis().getObjectId(selector, args);
-        String fn = "function() {" +
-                    "    var scrollIfNeeded = async function(element) {" +
-                    "        const visibleRatio = await new Promise(resolve => {" +
-                    "            const observer = new IntersectionObserver(entries => {" +
-                    "                resolve(entries[0].intersectionRatio);" +
-                    "                observer.disconnect();" +
-                    "            });" +
-                    "            observer.observe(element);" +
-                    "        });" +
-                    "        if (visibleRatio !== 1.0) element.scrollIntoView({" +
-                    "            block: 'center'," +
-                    "            inline: 'center'," +
-                    "            behavior: 'instant'" +
-                    "        });" +
-                    "        return false;" +
-                    "    };" +
-                    "    return scrollIfNeeded(this);" +
-                    "}";
-        CallFunctionOnResult obj = getThis()
-                                    .getCommand()
-                                    .getRuntime()
-                                    .callFunctionOn(fn, objectId, null,
-                                                        FALSE, FALSE, FALSE,
-                                                        FALSE, TRUE, null,
-                                                        null);
-        if ( obj != null && obj.getResult() != null ) {
-            getThis().releaseObject(obj.getResult().getObjectId());
-        }
-        if ( objectId != null ) {
-            getThis().releaseObject(objectId);
-        }
-    }
-
-    default Point getClickablePoint(String selector) {
-        return getClickablePoint(selector, Constant.EMPTY_ARGS);
-    }
-
-    default Point getClickablePoint(String selector, final Object... args) {
-        DOM dom = getThis().getCommand().getDOM();
-        Integer nodeId = getThis().getNodeId(format(selector, args));
-        if (nodeId == null || Constant.EMPTY_NODE_ID.equals(nodeId)) {
-            throw new ElementNotFoundException(format(selector, args));
-        }
-        boolean supportsQuad = getThis().getMajorVersion() >= 69;
-        if ( ! supportsQuad ) {
-            BoxModel boxModel = dom.getBoxModel(nodeId, null, null);
-            if (boxModel == null) {
-                return null;
-            }
-            List<Double> content = boxModel.getContent();
-            if (content == null           ||
-                    content.isEmpty() ||
-                    content.size() < 2) {
-                return null;
-            }
-            double left = floor(content.get(0));
-            double top  = floor(content.get(1));
-            return new Point(left, top);
-        } else {
-            // Compute sum of all directed areas of adjacent triangles
-            // https://en.wikipedia.org/wiki/Polygon#Simple_polygons
-            Function<List<Point>, Double> computeQuadArea = quad -> {
-                Double area = 0D;
-                for (int i = 0; i < quad.size(); ++i) {
-                    final Point p1 = quad.get(i);
-                    final Point p2 = quad.get((i + 1) % quad.size());
-                    area += (p1.x * p2.y - p2.x * p1.y) / 2;
-                }
-                return area;
-            };
-            List<List<Double>> quads = dom.getContentQuads(nodeId, null, null);
-            // Filter out quads that have too small area to click into
-            List<List<Point>> clickableQuads = quads.stream()
-                                                    .map(quad -> {
-                                                        List<Point> list = new ArrayList<>();
-                                                        list.add(new Point(quad.get(0), quad.get(1)));
-                                                        list.add(new Point(quad.get(2), quad.get(3)));
-                                                        list.add(new Point(quad.get(4), quad.get(5)));
-                                                        list.add(new Point(quad.get(6), quad.get(7)));
-                                                        return list;
-                                                    }).filter(t -> computeQuadArea.apply(t) > 1)
-                                                    .collect(toList());
-            // Return the middle point of the first quad
-            List<Point> quad = clickableQuads.get(0);
-            Double x = 0D;
-            Double y = 0D;
-            for(Point next : quad) {
-                x += next.x;
-                y += next.y;
-            }
-            x = x / 4;
-            y = y / 4;
-            return new Point(x, y);
-        }
+        return getThis().getCommand().getDOM().getBoxModel(nodeId);
     }
 
     Session getThis();

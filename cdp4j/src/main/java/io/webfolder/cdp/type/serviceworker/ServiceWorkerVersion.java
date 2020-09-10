@@ -1,25 +1,26 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.type.serviceworker;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * ServiceWorker version
@@ -38,8 +39,6 @@ public class ServiceWorkerVersion {
     private Double scriptLastModified;
 
     private Double scriptResponseTime;
-
-    private List<String> controlledClients = new ArrayList<>();
 
     private String targetId;
 
@@ -98,27 +97,17 @@ public class ServiceWorkerVersion {
     }
 
     /**
-     * The time at which the response headers of the main script were received from the server.
-     * For cached script it is the last time the cache entry was validated.
+     * The time at which the response headers of the main script were received from the server.  For cached script it is the last time the cache entry was validated.
      */
     public Double getScriptResponseTime() {
         return scriptResponseTime;
     }
 
     /**
-     * The time at which the response headers of the main script were received from the server.
-     * For cached script it is the last time the cache entry was validated.
+     * The time at which the response headers of the main script were received from the server.  For cached script it is the last time the cache entry was validated.
      */
     public void setScriptResponseTime(Double scriptResponseTime) {
         this.scriptResponseTime = scriptResponseTime;
-    }
-
-    public List<String> getControlledClients() {
-        return controlledClients;
-    }
-
-    public void setControlledClients(List<String> controlledClients) {
-        this.controlledClients = controlledClients;
     }
 
     public String getTargetId() {

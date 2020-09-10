@@ -1,47 +1,44 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.command;
+
+import java.util.List;
 
 import io.webfolder.cdp.annotation.Domain;
 import io.webfolder.cdp.annotation.Experimental;
 import io.webfolder.cdp.annotation.Optional;
 import io.webfolder.cdp.annotation.Returns;
-import io.webfolder.cdp.type.constant.DownloadBehavior;
 import io.webfolder.cdp.type.constant.ImageFormat;
 import io.webfolder.cdp.type.constant.Platform;
-import io.webfolder.cdp.type.constant.SnapshotType;
-import io.webfolder.cdp.type.constant.TargetLifecycleState;
 import io.webfolder.cdp.type.debugger.SearchMatch;
 import io.webfolder.cdp.type.emulation.ScreenOrientation;
 import io.webfolder.cdp.type.network.Cookie;
-import io.webfolder.cdp.type.page.FontFamilies;
-import io.webfolder.cdp.type.page.FontSizes;
 import io.webfolder.cdp.type.page.FrameResourceTree;
-import io.webfolder.cdp.type.page.FrameTree;
 import io.webfolder.cdp.type.page.GetAppManifestResult;
 import io.webfolder.cdp.type.page.GetLayoutMetricsResult;
 import io.webfolder.cdp.type.page.GetNavigationHistoryResult;
 import io.webfolder.cdp.type.page.GetResourceContentResult;
-import io.webfolder.cdp.type.page.NavigateResult;
-import io.webfolder.cdp.type.page.TransitionType;
-import io.webfolder.cdp.type.page.Viewport;
-import java.util.List;
+import io.webfolder.cdp.type.page.NavigationResponse;
 
 /**
  * Actions and events related to the inspected page belong to the page domain
@@ -49,89 +46,79 @@ import java.util.List;
 @Domain("Page")
 public interface Page {
     /**
-     * Deprecated, please use addScriptToEvaluateOnNewDocument instead.
-     * 
-     * 
-     * @return Identifier of the added script.
+     * Enables page domain notifications.
      */
+    void enable();
+
+    /**
+     * Disables page domain notifications.
+     */
+    void disable();
+
     @Experimental
     @Returns("identifier")
     String addScriptToEvaluateOnLoad(String scriptSource);
 
-    /**
-     * Evaluates given script in every frame upon creation (before loading frame's scripts).
-     * 
-     * @param worldName If specified, creates an isolated world with the given name and evaluates given script in it.
-     * This world name will be used as the ExecutionContextDescription::name when the corresponding
-     * event is emitted.
-     * 
-     * @return Identifier of the added script.
-     */
-    @Returns("identifier")
-    String addScriptToEvaluateOnNewDocument(String source,
-            @Experimental @Optional String worldName);
+    @Experimental
+    void removeScriptToEvaluateOnLoad(String identifier);
 
     /**
-     * Brings page to front (activates tab).
-     */
-    void bringToFront();
-
-    /**
-     * Capture page screenshot.
+     * Controls whether browser will open a new inspector window for connected pages.
      * 
-     * @param format Image compression format (defaults to png).
-     * @param quality Compression quality from range [0..100] (jpeg only).
-     * @param clip Capture the screenshot of a given region only.
-     * @param fromSurface Capture the screenshot from the surface, rather than the view. Defaults to true.
-     * 
-     * @return Base64-encoded image data.
-     */
-    @Returns("data")
-    byte[] captureScreenshot(@Optional ImageFormat format, @Optional Integer quality,
-            @Optional Viewport clip, @Experimental @Optional Boolean fromSurface);
-
-    /**
-     * Returns a snapshot of the page as a string. For MHTML format, the serialization includes
-     * iframes, shadow DOM, external resources, and element-inline styles.
-     * 
-     * @param format Format (defaults to mhtml).
-     * 
-     * @return Serialized page data.
+     * @param autoAttach If true, browser will open a new inspector window for every page created from this one.
      */
     @Experimental
-    @Returns("data")
-    String captureSnapshot(@Optional SnapshotType format);
+    void setAutoAttachToCreatedPages(Boolean autoAttach);
 
     /**
-     * Clears the overriden device metrics.
+     * Reloads given page optionally ignoring the cache.
+     * 
+     * @param ignoreCache If true, browser cache is ignored (as if the user pressed Shift+refresh).
+     * @param scriptToEvaluateOnLoad If set, the script will be injected into all frames of the inspected page after reload.
+     */
+    void reload(@Optional Boolean ignoreCache, @Optional String scriptToEvaluateOnLoad);
+
+    /**
+     * Navigates current page to the given URL.
+     * 
+     * @param url URL to navigate the page to.
+     * @param referrer Referrer URL.
+     * 
+     * @return Frame id that will be navigated.
+     */
+    @Returns("frameId")
+    String navigate(String url, @Experimental @Optional String referrer);
+
+    /**
+     * Force the page stop all navigations and pending resource fetches.
      */
     @Experimental
-    void clearDeviceMetricsOverride();
+    void stopLoading();
 
     /**
-     * Clears the overridden Device Orientation.
+     * Returns navigation history for the current page.
+     * 
+     * @return GetNavigationHistoryResult
      */
     @Experimental
-    void clearDeviceOrientationOverride();
+    GetNavigationHistoryResult getNavigationHistory();
 
     /**
-     * Clears the overriden Geolocation Position and Error.
+     * Navigates current page to the given history entry.
+     * 
+     * @param entryId Unique id of the entry to navigate to.
      */
-    void clearGeolocationOverride();
+    @Experimental
+    void navigateToHistoryEntry(Integer entryId);
 
     /**
-     * Creates an isolated world for the given frame.
+     * Returns all browser cookies. Depending on the backend support, will return detailed cookie information in the <tt>cookies</tt> field.
      * 
-     * @param frameId Id of the frame in which the isolated world should be created.
-     * @param worldName An optional name which is reported in the Execution Context.
-     * @param grantUniveralAccess Whether or not universal access should be granted to the isolated world. This is a powerful
-     * option, use with caution.
-     * 
-     * @return Execution context of the isolated world.
+     * @return Array of cookie objects.
      */
-    @Returns("executionContextId")
-    Integer createIsolatedWorld(String frameId, @Optional String worldName,
-            @Optional Boolean grantUniveralAccess);
+    @Experimental
+    @Returns("cookies")
+    List<Cookie> getCookies();
 
     /**
      * Deletes browser cookie with given name, domain and path.
@@ -143,52 +130,13 @@ public interface Page {
     void deleteCookie(String cookieName, String url);
 
     /**
-     * Disables page domain notifications.
-     */
-    void disable();
-
-    /**
-     * Enables page domain notifications.
-     */
-    void enable();
-
-    /**
+     * Returns present frame / resource tree structure.
      * 
-     * @return GetAppManifestResult
-     */
-    GetAppManifestResult getAppManifest();
-
-    /**
-     * Returns all browser cookies. Depending on the backend support, will return detailed cookie
-     * information in the <code>cookies</code> field.
-     * 
-     * @return Array of cookie objects.
+     * @return Present frame / resource tree structure.
      */
     @Experimental
-    @Returns("cookies")
-    List<Cookie> getCookies();
-
-    /**
-     * Returns present frame tree structure.
-     * 
-     * @return Present frame tree structure.
-     */
     @Returns("frameTree")
-    FrameTree getFrameTree();
-
-    /**
-     * Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
-     * 
-     * @return GetLayoutMetricsResult
-     */
-    GetLayoutMetricsResult getLayoutMetrics();
-
-    /**
-     * Returns navigation history for the current page.
-     * 
-     * @return GetNavigationHistoryResult
-     */
-    GetNavigationHistoryResult getNavigationHistory();
+    FrameResourceTree getResourceTree();
 
     /**
      * Returns content of the given resource.
@@ -200,117 +148,6 @@ public interface Page {
      */
     @Experimental
     GetResourceContentResult getResourceContent(String frameId, String url);
-
-    /**
-     * Returns present frame / resource tree structure.
-     * 
-     * @return Present frame / resource tree structure.
-     */
-    @Experimental
-    @Returns("frameTree")
-    FrameResourceTree getResourceTree();
-
-    /**
-     * Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
-     * 
-     * @param accept Whether to accept or dismiss the dialog.
-     * @param promptText The text to enter into the dialog prompt before accepting. Used only if this is a prompt
-     * dialog.
-     */
-    void handleJavaScriptDialog(Boolean accept, @Optional String promptText);
-
-    /**
-     * Navigates current page to the given URL.
-     * 
-     * @param url URL to navigate the page to.
-     * @param referrer Referrer URL.
-     * @param transitionType Intended transition type.
-     * @param frameId Frame id to navigate, if not specified navigates the top frame.
-     * 
-     * @return NavigateResult
-     */
-    NavigateResult navigate(String url, @Optional String referrer,
-            @Optional TransitionType transitionType, @Optional String frameId);
-
-    /**
-     * Navigates current page to the given history entry.
-     * 
-     * @param entryId Unique id of the entry to navigate to.
-     */
-    void navigateToHistoryEntry(Integer entryId);
-
-    /**
-     * Print page as PDF.
-     * 
-     * @param landscape Paper orientation. Defaults to false.
-     * @param displayHeaderFooter Display header and footer. Defaults to false.
-     * @param printBackground Print background graphics. Defaults to false.
-     * @param scale Scale of the webpage rendering. Defaults to 1.
-     * @param paperWidth Paper width in inches. Defaults to 8.5 inches.
-     * @param paperHeight Paper height in inches. Defaults to 11 inches.
-     * @param marginTop Top margin in inches. Defaults to 1cm (~0.4 inches).
-     * @param marginBottom Bottom margin in inches. Defaults to 1cm (~0.4 inches).
-     * @param marginLeft Left margin in inches. Defaults to 1cm (~0.4 inches).
-     * @param marginRight Right margin in inches. Defaults to 1cm (~0.4 inches).
-     * @param pageRanges Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means
-     * print all pages.
-     * @param ignoreInvalidPageRanges Whether to silently ignore invalid but successfully parsed page ranges, such as '3-2'.
-     * Defaults to false.
-     * @param headerTemplate HTML template for the print header. Should be valid HTML markup with following
-     * classes used to inject printing values into them:
-     * - <code>date</code>: formatted print date
-     * - <code>title</code>: document title
-     * - <code>url</code>: document location
-     * - <code>pageNumber</code>: current page number
-     * - <code>totalPages</code>: total pages in the document
-     *
-     * For example, <code><span class=title></span></code> would generate span containing the title.
-     * @param footerTemplate HTML template for the print footer. Should use the same format as the <code>headerTemplate</code>.
-     * @param preferCSSPageSize Whether or not to prefer page size as defined by css. Defaults to false,
-     * in which case the content will be scaled to fit the paper size.
-     * 
-     * @return Base64-encoded pdf data.
-     */
-    @Returns("data")
-    byte[] printToPDF(@Optional Boolean landscape, @Optional Boolean displayHeaderFooter,
-            @Optional Boolean printBackground, @Optional Double scale, @Optional Double paperWidth,
-            @Optional Double paperHeight, @Optional Double marginTop, @Optional Double marginBottom,
-            @Optional Double marginLeft, @Optional Double marginRight, @Optional String pageRanges,
-            @Optional Boolean ignoreInvalidPageRanges, @Optional String headerTemplate,
-            @Optional String footerTemplate, @Optional Boolean preferCSSPageSize);
-
-    /**
-     * Reloads given page optionally ignoring the cache.
-     * 
-     * @param ignoreCache If true, browser cache is ignored (as if the user pressed Shift+refresh).
-     * @param scriptToEvaluateOnLoad If set, the script will be injected into all frames of the inspected page after reload.
-     * Argument will be ignored if reloading dataURL origin.
-     */
-    void reload(@Optional Boolean ignoreCache, @Optional String scriptToEvaluateOnLoad);
-
-    /**
-     * Deprecated, please use removeScriptToEvaluateOnNewDocument instead.
-     * 
-     */
-    @Experimental
-    void removeScriptToEvaluateOnLoad(String identifier);
-
-    /**
-     * Removes given script from the list.
-     * 
-     */
-    void removeScriptToEvaluateOnNewDocument(String identifier);
-
-    @Experimental
-    void requestAppBanner();
-
-    /**
-     * Acknowledges that a screencast frame has been received by the frontend.
-     * 
-     * @param sessionId Frame number.
-     */
-    @Experimental
-    void screencastFrameAck(Integer sessionId);
 
     /**
      * Searches for given string in resource content.
@@ -329,46 +166,58 @@ public interface Page {
             @Optional Boolean caseSensitive, @Optional Boolean isRegex);
 
     /**
-     * Enable Chrome's experimental ad filter on all sites.
+     * Sets given markup as the document's HTML.
      * 
-     * @param enabled Whether to block ads.
+     * @param frameId Frame id to set HTML for.
+     * @param html HTML content to set.
      */
     @Experimental
-    void setAdBlockingEnabled(Boolean enabled);
+    void setDocumentContent(String frameId, String html);
 
     /**
-     * Enable page Content Security Policy by-passing.
-     * 
-     * @param enabled Whether to bypass page CSP.
-     */
-    @Experimental
-    void setBypassCSP(Boolean enabled);
-
-    /**
-     * Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
-     * window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
-     * query results).
+     * Overrides the values of device screen dimensions (window.screen.width, window.screen.height, window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media query results).
      * 
      * @param width Overriding width value in pixels (minimum 0, maximum 10000000). 0 disables the override.
      * @param height Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
      * @param deviceScaleFactor Overriding device scale factor value. 0 disables the override.
-     * @param mobile Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text
-     * autosizing and more.
-     * @param scale Scale to apply to resulting view image.
-     * @param screenWidth Overriding screen width value in pixels (minimum 0, maximum 10000000).
-     * @param screenHeight Overriding screen height value in pixels (minimum 0, maximum 10000000).
-     * @param positionX Overriding view X position on screen in pixels (minimum 0, maximum 10000000).
-     * @param positionY Overriding view Y position on screen in pixels (minimum 0, maximum 10000000).
-     * @param dontSetVisibleSize Do not set visible view size, rely upon explicit setVisibleSize call.
+     * @param mobile Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text autosizing and more.
+     * @param fitWindow Whether a view that exceeds the available browser window area should be scaled down to fit.
+     * @param scale Scale to apply to resulting view image. Ignored in |fitWindow| mode.
+     * @param offsetX X offset to shift resulting view image by. Ignored in |fitWindow| mode.
+     * @param offsetY Y offset to shift resulting view image by. Ignored in |fitWindow| mode.
+     * @param screenWidth Overriding screen width value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
+     * @param screenHeight Overriding screen height value in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
+     * @param positionX Overriding view X position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
+     * @param positionY Overriding view Y position on screen in pixels (minimum 0, maximum 10000000). Only used for |mobile==true|.
      * @param screenOrientation Screen orientation override.
-     * @param viewport The viewport dimensions and scale. If not set, the override is cleared.
      */
     @Experimental
     void setDeviceMetricsOverride(Integer width, Integer height, Double deviceScaleFactor,
-            Boolean mobile, @Optional Double scale, @Optional Integer screenWidth,
-            @Optional Integer screenHeight, @Optional Integer positionX,
-            @Optional Integer positionY, @Optional Boolean dontSetVisibleSize,
-            @Optional ScreenOrientation screenOrientation, @Optional Viewport viewport);
+            Boolean mobile, Boolean fitWindow, @Optional Double scale, @Optional Double offsetX,
+            @Optional Double offsetY, @Optional Integer screenWidth, @Optional Integer screenHeight,
+            @Optional Integer positionX, @Optional Integer positionY,
+            @Optional ScreenOrientation screenOrientation);
+
+    /**
+     * Clears the overriden device metrics.
+     */
+    @Experimental
+    void clearDeviceMetricsOverride();
+
+    /**
+     * Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position unavailable.
+     * 
+     * @param latitude Mock latitude
+     * @param longitude Mock longitude
+     * @param accuracy Mock accuracy
+     */
+    void setGeolocationOverride(@Optional Double latitude, @Optional Double longitude,
+            @Optional Double accuracy);
+
+    /**
+     * Clears the overriden Geolocation Position and Error.
+     */
+    void clearGeolocationOverride();
 
     /**
      * Overrides the Device Orientation.
@@ -381,57 +230,10 @@ public interface Page {
     void setDeviceOrientationOverride(Double alpha, Double beta, Double gamma);
 
     /**
-     * Set generic font families.
-     * 
-     * @param fontFamilies Specifies font families to set. If a font family is not specified, it won't be changed.
+     * Clears the overridden Device Orientation.
      */
     @Experimental
-    void setFontFamilies(FontFamilies fontFamilies);
-
-    /**
-     * Set default font sizes.
-     * 
-     * @param fontSizes Specifies font sizes to set. If a font size is not specified, it won't be changed.
-     */
-    @Experimental
-    void setFontSizes(FontSizes fontSizes);
-
-    /**
-     * Sets given markup as the document's HTML.
-     * 
-     * @param frameId Frame id to set HTML for.
-     * @param html HTML content to set.
-     */
-    void setDocumentContent(String frameId, String html);
-
-    /**
-     * Set the behavior when downloading a file.
-     * 
-     * @param behavior Whether to allow all or deny all download requests, or use default Chrome behavior if
-     * available (otherwise deny).
-     * @param downloadPath The default path to save downloaded files to. This is requred if behavior is set to 'allow'
-     */
-    @Experimental
-    void setDownloadBehavior(DownloadBehavior behavior, @Optional String downloadPath);
-
-    /**
-     * Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
-     * unavailable.
-     * 
-     * @param latitude Mock latitude
-     * @param longitude Mock longitude
-     * @param accuracy Mock accuracy
-     */
-    void setGeolocationOverride(@Optional Double latitude, @Optional Double longitude,
-            @Optional Double accuracy);
-
-    /**
-     * Controls whether page will emit lifecycle events.
-     * 
-     * @param enabled If true, starts emitting lifecycle events.
-     */
-    @Experimental
-    void setLifecycleEventsEnabled(Boolean enabled);
+    void clearDeviceOrientationOverride();
 
     /**
      * Toggles mouse event-based touch event emulation.
@@ -443,7 +245,45 @@ public interface Page {
     void setTouchEmulationEnabled(Boolean enabled, @Optional Platform configuration);
 
     /**
-     * Starts sending each frame using the <code>screencastFrame</code> event.
+     * Capture page screenshot.
+     * 
+     * @param format Image compression format (defaults to png).
+     * @param quality Compression quality from range [0..100] (jpeg only).
+     * @param fromSurface Capture the screenshot from the surface, rather than the view. Defaults to false.
+     * 
+     * @return Base64-encoded image data.
+     */
+    @Experimental
+    @Returns("data")
+    byte[] captureScreenshot(@Optional ImageFormat format, @Optional Integer quality,
+            @Experimental @Optional Boolean fromSurface);
+
+    /**
+     * Print page as PDF.
+     * 
+     * @param landscape Paper orientation. Defaults to false.
+     * @param displayHeaderFooter Display header and footer. Defaults to false.
+     * @param printBackground Print background graphics. Defaults to false.
+     * @param scale Scale of the webpage rendering. Defaults to 1.
+     * @param paperWidth Paper width in inches. Defaults to 8.5 inches.
+     * @param paperHeight Paper height in inches. Defaults to 11 inches.
+     * @param marginTop Top margin in inches. Defaults to 1cm (~0.4 inches).
+     * @param marginBottom Bottom margin in inches. Defaults to 1cm (~0.4 inches).
+     * @param marginLeft Left margin in inches. Defaults to 1cm (~0.4 inches).
+     * @param marginRight Right margin in inches. Defaults to 1cm (~0.4 inches).
+     * @param pageRanges Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
+     * 
+     * @return Base64-encoded pdf data.
+     */
+    @Experimental
+    @Returns("data")
+    byte[] printToPDF(@Optional Boolean landscape, @Optional Boolean displayHeaderFooter,
+            @Optional Boolean printBackground, @Optional Double scale, @Optional Double paperWidth,
+            @Optional Double paperHeight, @Optional Double marginTop, @Optional Double marginBottom,
+            @Optional Double marginLeft, @Optional Double marginRight, @Optional String pageRanges);
+
+    /**
+     * Starts sending each frame using the <tt>screencastFrame</tt> event.
      * 
      * @param format Image compression format.
      * @param quality Compression quality from range [0..100].
@@ -457,134 +297,73 @@ public interface Page {
             @Optional Integer everyNthFrame);
 
     /**
-     * Force the page stop all navigations and pending resource fetches.
-     */
-    void stopLoading();
-
-    /**
-     * Crashes renderer on the IO thread, generates minidumps.
-     */
-    @Experimental
-    void crash();
-
-    /**
-     * Tries to close page, running its beforeunload hooks, if any.
-     */
-    @Experimental
-    void close();
-
-    /**
-     * Tries to update the web lifecycle state of the page.
-     * It will transition the page to the given state according to:
-     * https://github.com/WICG/web-lifecycle/
-     * 
-     * @param state Target lifecycle state
-     */
-    @Experimental
-    void setWebLifecycleState(TargetLifecycleState state);
-
-    /**
-     * Stops sending each frame in the<code>screencastFrame</code>.
+     * Stops sending each frame in the <tt>screencastFrame</tt>.
      */
     @Experimental
     void stopScreencast();
 
     /**
-     * Forces compilation cache to be generated for every subresource script.
+     * Acknowledges that a screencast frame has been received by the frontend.
      * 
+     * @param sessionId Frame number.
      */
     @Experimental
-    void setProduceCompilationCache(Boolean enabled);
-
-    /**
-     * Seeds compilation cache for given url. Compilation cache does not survive
-     * cross-process navigation.
-     * 
-     * @param data Base64-encoded data
-     */
-    @Experimental
-    void addCompilationCache(String url, String data);
-
-    /**
-     * Clears seeded compilation cache.
-     */
-    @Experimental
-    void clearCompilationCache();
-
-    /**
-     * Generates a report for testing.
-     * 
-     * @param message Message to be displayed in the report.
-     * @param group Specifies the endpoint group to deliver the report to.
-     */
-    @Experimental
-    void generateTestReport(String message, @Optional String group);
-
-    /**
-     * Evaluates given script in every frame upon creation (before loading frame's scripts).
-     * 
-     * 
-     * @return Identifier of the added script.
-     */
-    @Returns("identifier")
-    String addScriptToEvaluateOnNewDocument(String source);
-
-    /**
-     * Capture page screenshot.
-     * 
-     * @return Base64-encoded image data.
-     */
-    @Returns("data")
-    byte[] captureScreenshot();
-
-    /**
-     * Returns a snapshot of the page as a string. For MHTML format, the serialization includes
-     * iframes, shadow DOM, external resources, and element-inline styles.
-     * 
-     * @return Serialized page data.
-     */
-    @Experimental
-    @Returns("data")
-    String captureSnapshot();
-
-    /**
-     * Creates an isolated world for the given frame.
-     * 
-     * @param frameId Id of the frame in which the isolated world should be created.
-     * 
-     * @return Execution context of the isolated world.
-     */
-    @Returns("executionContextId")
-    Integer createIsolatedWorld(String frameId);
+    void screencastFrameAck(Integer sessionId);
 
     /**
      * Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
      * 
      * @param accept Whether to accept or dismiss the dialog.
+     * @param promptText The text to enter into the dialog prompt before accepting. Used only if this is a prompt dialog.
      */
-    void handleJavaScriptDialog(Boolean accept);
+    void handleJavaScriptDialog(Boolean accept, @Optional String promptText);
+
+    /**
+     * 
+     * @return GetAppManifestResult
+     */
+    @Experimental
+    GetAppManifestResult getAppManifest();
+
+    @Experimental
+    void requestAppBanner();
+
+    /**
+     * Toggles navigation throttling which allows programatic control over navigation and redirect response.
+     * 
+     */
+    @Experimental
+    void setControlNavigations(Boolean enabled);
+
+    /**
+     * Should be sent in response to a navigationRequested or a redirectRequested event, telling the browser how to handle the navigation.
+     * 
+     */
+    @Experimental
+    void processNavigation(NavigationResponse response, Integer navigationId);
+
+    /**
+     * Returns metrics relating to the layouting of the page, such as viewport bounds/scale.
+     * 
+     * @return GetLayoutMetricsResult
+     */
+    @Experimental
+    GetLayoutMetricsResult getLayoutMetrics();
+
+    /**
+     * Reloads given page optionally ignoring the cache.
+     */
+    void reload();
 
     /**
      * Navigates current page to the given URL.
      * 
      * @param url URL to navigate the page to.
      * 
-     * @return NavigateResult
+     * @return Frame id that will be navigated.
      */
-    NavigateResult navigate(String url);
-
-    /**
-     * Print page as PDF.
-     * 
-     * @return Base64-encoded pdf data.
-     */
-    @Returns("data")
-    byte[] printToPDF();
-
-    /**
-     * Reloads given page optionally ignoring the cache.
-     */
-    void reload();
+    @Returns("frameId")
+    String navigate(String url);
 
     /**
      * Searches for given string in resource content.
@@ -600,32 +379,20 @@ public interface Page {
     List<SearchMatch> searchInResource(String frameId, String url, String query);
 
     /**
-     * Overrides the values of device screen dimensions (window.screen.width, window.screen.height,
-     * window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media
-     * query results).
+     * Overrides the values of device screen dimensions (window.screen.width, window.screen.height, window.innerWidth, window.innerHeight, and "device-width"/"device-height"-related CSS media query results).
      * 
      * @param width Overriding width value in pixels (minimum 0, maximum 10000000). 0 disables the override.
      * @param height Overriding height value in pixels (minimum 0, maximum 10000000). 0 disables the override.
      * @param deviceScaleFactor Overriding device scale factor value. 0 disables the override.
-     * @param mobile Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text
-     * autosizing and more.
+     * @param mobile Whether to emulate mobile device. This includes viewport meta tag, overlay scrollbars, text autosizing and more.
+     * @param fitWindow Whether a view that exceeds the available browser window area should be scaled down to fit.
      */
     @Experimental
     void setDeviceMetricsOverride(Integer width, Integer height, Double deviceScaleFactor,
-            Boolean mobile);
+            Boolean mobile, Boolean fitWindow);
 
     /**
-     * Set the behavior when downloading a file.
-     * 
-     * @param behavior Whether to allow all or deny all download requests, or use default Chrome behavior if
-     * available (otherwise deny).
-     */
-    @Experimental
-    void setDownloadBehavior(DownloadBehavior behavior);
-
-    /**
-     * Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position
-     * unavailable.
+     * Overrides the Geolocation Position or Error. Omitting any of the parameters emulates position unavailable.
      */
     void setGeolocationOverride();
 
@@ -638,16 +405,33 @@ public interface Page {
     void setTouchEmulationEnabled(Boolean enabled);
 
     /**
-     * Starts sending each frame using the <code>screencastFrame</code> event.
+     * Capture page screenshot.
+     * 
+     * @return Base64-encoded image data.
+     */
+    @Experimental
+    @Returns("data")
+    byte[] captureScreenshot();
+
+    /**
+     * Print page as PDF.
+     * 
+     * @return Base64-encoded pdf data.
+     */
+    @Experimental
+    @Returns("data")
+    byte[] printToPDF();
+
+    /**
+     * Starts sending each frame using the <tt>screencastFrame</tt> event.
      */
     @Experimental
     void startScreencast();
 
     /**
-     * Generates a report for testing.
+     * Accepts or dismisses a JavaScript initiated dialog (alert, confirm, prompt, or onbeforeunload).
      * 
-     * @param message Message to be displayed in the report.
+     * @param accept Whether to accept or dismiss the dialog.
      */
-    @Experimental
-    void generateTestReport(String message);
+    void handleJavaScriptDialog(Boolean accept);
 }

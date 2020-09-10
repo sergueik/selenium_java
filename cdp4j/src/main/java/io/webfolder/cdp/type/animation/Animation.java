@@ -1,28 +1,34 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.type.animation;
 
+import io.webfolder.cdp.annotation.Experimental;
 import io.webfolder.cdp.type.constant.AnimationType;
 
 /**
  * Animation instance
  */
+@Experimental
 public class Animation {
     private String id;
 
@@ -38,9 +44,9 @@ public class Animation {
 
     private Double currentTime;
 
-    private AnimationType type;
-
     private AnimationEffect source;
+
+    private AnimationType type;
 
     private String cssId;
 
@@ -143,20 +149,6 @@ public class Animation {
     }
 
     /**
-     * Animation type of <code>Animation</code>.
-     */
-    public AnimationType getType() {
-        return type;
-    }
-
-    /**
-     * Animation type of <code>Animation</code>.
-     */
-    public void setType(AnimationType type) {
-        this.type = type;
-    }
-
-    /**
      * <code>Animation</code>'s source animation node.
      */
     public AnimationEffect getSource() {
@@ -171,16 +163,28 @@ public class Animation {
     }
 
     /**
-     * A unique ID for <code>Animation</code> representing the sources that triggered this CSS
-     * animation/transition.
+     * Animation type of <code>Animation</code>.
+     */
+    public AnimationType getType() {
+        return type;
+    }
+
+    /**
+     * Animation type of <code>Animation</code>.
+     */
+    public void setType(AnimationType type) {
+        this.type = type;
+    }
+
+    /**
+     * A unique ID for <code>Animation</code> representing the sources that triggered this CSS animation/transition.
      */
     public String getCssId() {
         return cssId;
     }
 
     /**
-     * A unique ID for <code>Animation</code> representing the sources that triggered this CSS
-     * animation/transition.
+     * A unique ID for <code>Animation</code> representing the sources that triggered this CSS animation/transition.
      */
     public void setCssId(String cssId) {
         this.cssId = cssId;

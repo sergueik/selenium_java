@@ -1,20 +1,24 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
@@ -23,11 +27,12 @@ import static io.webfolder.cdp.type.constant.KeyEventType.KeyUp;
 import static java.lang.String.valueOf;
 
 import io.webfolder.cdp.command.Input;
+import io.webfolder.cdp.type.constant.KeyEventType;
 
 /**
  * Interface representing basic keyboard operations.
  */
-public interface Keyboard extends Constant {
+public interface Keyboard {
 
     /**
      * Use this method to simulate typing into an element, which may set its value.
@@ -45,15 +50,15 @@ public interface Keyboard extends Constant {
         for (int i = 0; i < text.length(); i++) {
             String c = text.substring(i, i + 1);
             input.dispatchKeyEvent(
-                    KeyDown, null, null, c,
+                    KeyEventType.KeyDown, null, null, c,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null);
+                    null);
             input.dispatchKeyEvent(
-                    KeyUp, null, null, c,
+                    KeyEventType.KeyUp, null, null, c,
                     null, null, null, null,
                     null, null, null, null,
-                    null, null);
+                    null);
         }
         return getThis();
     }
@@ -68,10 +73,10 @@ public interface Keyboard extends Constant {
         Input input = getThis().getCommand().getInput();
         input.dispatchKeyEvent(KeyDown, null, null, null,
                                 null, null, null, "Tab",
-                                TAB, TAB, null, null, null, null);
+                                9, 9, null, null, null);
         input.dispatchKeyEvent(KeyUp, null, null, null,
                                 null, null, null, "Tab",
-                                TAB, TAB, null, null, null, null);
+                                9, 9, null, null, null);
         return getThis();
     }
 
@@ -85,10 +90,10 @@ public interface Keyboard extends Constant {
         Input input = getThis().getCommand().getInput();
         input.dispatchKeyEvent(KeyDown, null, null, "\r",
                                 null, null, null, "Enter",
-                                ENTER, ENTER, null, null, null, null);
+                                13, 13, null, null, null);
         input.dispatchKeyEvent(KeyUp, null, null, null,
                                 null, null, null, "Enter",
-                                ENTER, ENTER, null, null, null, null);
+                                13, 13, null, null, null);
         return getThis();
     }
 
@@ -99,7 +104,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendBackspace() {
         getThis().logEntry("sendBackspace");
-        return sendKeyCode(BACKSPACE);
+        return sendKeyCode(46);
     }
 
     /**
@@ -109,7 +114,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendLeftArrow() {
         getThis().logEntry("sendLeftArrow");
-        return sendKeyCode(LEFT_ARROW);
+        return sendKeyCode(37);
     }
 
     /**
@@ -119,7 +124,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendUpArrow() {
         getThis().logEntry("sendUpArrow");
-        return sendKeyCode(UP_ARROW);
+        return sendKeyCode(38);
     }
 
     /**
@@ -129,7 +134,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendRightArrow() {
         getThis().logEntry("sendRightArrow");
-        return sendKeyCode(RIGHT_ARROW);
+        return sendKeyCode(39);
     }
 
     /**
@@ -139,7 +144,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendDownArrow() {
         getThis().logEntry("sendDownArrow");
-        return sendKeyCode(DOWN_ARROW);
+        return sendKeyCode(40);
     }
 
     /**
@@ -149,7 +154,7 @@ public interface Keyboard extends Constant {
      */
     default Session sendEsc() {
         getThis().logEntry("sendEsc");
-        return sendKeyCode(ESC);
+        return sendKeyCode(27);
     }
 
     /**
@@ -164,10 +169,10 @@ public interface Keyboard extends Constant {
         Input input = getThis().getCommand().getInput();
         input.dispatchKeyEvent(KeyDown, null, null, null,
                                 null, null, null, null,
-                                keyCode, keyCode, null, null, null, null);
+                                keyCode, keyCode, null, null, null);
         input.dispatchKeyEvent(KeyUp, null, null, null,
                                 null, null, null, null,
-                                keyCode, keyCode, null, null, null, null);
+                                keyCode, keyCode, null, null, null);
         return getThis();
     }
 

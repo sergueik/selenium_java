@@ -1,40 +1,39 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.session;
 
 import io.webfolder.cdp.command.Accessibility;
 import io.webfolder.cdp.command.Animation;
 import io.webfolder.cdp.command.ApplicationCache;
-import io.webfolder.cdp.command.Audits;
 import io.webfolder.cdp.command.Browser;
 import io.webfolder.cdp.command.CSS;
 import io.webfolder.cdp.command.CacheStorage;
 import io.webfolder.cdp.command.DOM;
 import io.webfolder.cdp.command.DOMDebugger;
-import io.webfolder.cdp.command.DOMSnapshot;
 import io.webfolder.cdp.command.DOMStorage;
 import io.webfolder.cdp.command.Database;
-import io.webfolder.cdp.command.Debugger;
 import io.webfolder.cdp.command.DeviceOrientation;
 import io.webfolder.cdp.command.Emulation;
-import io.webfolder.cdp.command.Fetch;
-import io.webfolder.cdp.command.HeadlessExperimental;
 import io.webfolder.cdp.command.HeapProfiler;
 import io.webfolder.cdp.command.IO;
 import io.webfolder.cdp.command.IndexedDB;
@@ -46,7 +45,6 @@ import io.webfolder.cdp.command.Memory;
 import io.webfolder.cdp.command.Network;
 import io.webfolder.cdp.command.Overlay;
 import io.webfolder.cdp.command.Page;
-import io.webfolder.cdp.command.Performance;
 import io.webfolder.cdp.command.Profiler;
 import io.webfolder.cdp.command.Runtime;
 import io.webfolder.cdp.command.Schema;
@@ -58,7 +56,6 @@ import io.webfolder.cdp.command.Target;
 import io.webfolder.cdp.command.Tethering;
 import io.webfolder.cdp.command.Tracing;
 
-@SuppressWarnings("deprecation")
 public class Command {
 
     private final Session session;
@@ -79,10 +76,6 @@ public class Command {
         return getProxy(ApplicationCache.class);
     }
 
-    public Audits getAudits() {
-        return getProxy(Audits.class);
-    }
-
     public Browser getBrowser() {
         return getProxy(Browser.class);
     }
@@ -97,10 +90,6 @@ public class Command {
 
     public Database getDatabase() {
         return getProxy(Database.class);
-    }
-    
-    public Debugger getDebugger() {
-        return getProxy(Debugger.class);
     }
 
     public DeviceOrientation getDeviceOrientation() {
@@ -121,14 +110,6 @@ public class Command {
 
     public Emulation getEmulation() {
         return getProxy(Emulation.class);
-    }
-
-    public Fetch getFetch() {
-        return getProxy(Fetch.class);
-    }
-
-    public HeadlessExperimental getHeadlessExperimental() {
-        return getProxy(HeadlessExperimental.class);
     }
 
     public HeapProfiler getHeapProfiler() {
@@ -171,10 +152,6 @@ public class Command {
         return getProxy(Page.class);
     }
 
-    public Performance getPerformance() {
-        return getProxy(Performance.class);
-    }
-
     public Profiler getProfiler() {
         return getProxy(Profiler.class);
     }
@@ -195,7 +172,7 @@ public class Command {
         return getProxy(Security.class);
     }
 
-    public ServiceWorker getServiceWorker() {
+    public ServiceWorker ServiceWorker() {
         return getProxy(ServiceWorker.class);
     }
 
@@ -217,10 +194,6 @@ public class Command {
 
     public Tracing getTracing() {
         return getProxy(Tracing.class);
-    }
-
-    public DOMSnapshot getDOMSnapshot() {
-        return getProxy(DOMSnapshot.class);
     }
 
     @SuppressWarnings("unchecked")

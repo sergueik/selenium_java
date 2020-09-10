@@ -1,25 +1,27 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp;
 
-import static io.webfolder.cdp.session.SessionFactory.DEFAULT_HOST;
-import static java.lang.Long.toHexString;
 import static java.lang.Runtime.getRuntime;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -27,90 +29,56 @@ import static java.nio.file.Paths.get;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Locale.ENGLISH;
-import static java.util.concurrent.ThreadLocalRandom.current;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 import io.webfolder.cdp.exception.CdpException;
-import io.webfolder.cdp.logger.CdpLoggerType;
 import io.webfolder.cdp.session.SessionFactory;
+import io.webfolder.cdp.session.SessionInfo;
 
-public class Launcher extends AbstractLauncher {
+public class Launcher {
 
-    private static final String OS = getProperty("os.name").toLowerCase(ENGLISH);
-
-    private static final boolean WINDOWS = OS.startsWith("windows");
-
-    private static final boolean OSX = OS.startsWith("mac");
-
-    private ProcessManager processManager = new AdaptiveProcessManager();
-
-    public Launcher(CdpLoggerType loggerType) {
-        this(new SessionFactory(loggerType));
-    }
+    private final SessionFactory factory;
 
     public Launcher() {
         this(new SessionFactory());
     }
 
-    public Launcher(int port) {
-        this(new SessionFactory(port));
-    }
-
     public Launcher(final SessionFactory factory) {
-        super(factory);
+        this.factory = factory;
     }
 
-    private String getCustomChromeBinary() {
-        String chromeBinary = getProperty("chrome_binary");
-        if (chromeBinary != null) {
-            File chromeExecutable = new File(chromeBinary);
-            if (chromeExecutable.exists() && chromeExecutable.canExecute()) {
-                return chromeExecutable.getAbsolutePath();
-            }
-        }
-        return null;
-    }
-
-    @Override
     public String findChrome() {
-        String chromeExecutablePath = null;
-        chromeExecutablePath = getCustomChromeBinary();
-        if (chromeExecutablePath == null && WINDOWS) {
-            chromeExecutablePath = findChromeWinPath();
-        }
-        if (chromeExecutablePath == null && OSX) {
-            chromeExecutablePath = findChromeOsxPath();
-        }
-        if (chromeExecutablePath == null && !WINDOWS) {
-            chromeExecutablePath = "google-chrome";
-        }
-        return chromeExecutablePath;
-    }
-
-    public String findChromeWinPath() {
-        try {
-            for (String path : getChromeWinPaths()) {
-                final Process process = getRuntime().exec(new String[]{
-                        "cmd", "/c", "echo", path
-                });
-                final int exitCode = process.waitFor();
-                if (exitCode == 0) {
-                    final String location = toString(process.getInputStream()).trim().replace("\"", "");
-                    final File chrome = new File(location);
-                    if (chrome.exists() && chrome.canExecute()) {
-                        return chrome.toString();
-                    }
+        String os = getProperty("os.name")
+                        .toLowerCase(ENGLISH);
+        boolean windows = os.startsWith("windows");
+        if (windows) {
+            try {
+                for (String path : getChromeWinPaths()) {
+                    final Process process = getRuntime().exec(new String[] {
+                            "cmd", "/c", "echo", path
+                    });
+                    final int exitCode = process.waitFor();
+                    if (exitCode == 0) {
+                        final String location = toString(process.getInputStream()).trim().replace("\"", "");
+                        final File chrome = new File(location);
+                        if (chrome.exists() && chrome.canExecute()) {
+                            return chrome.toString();
+                        }
+                    }                    
                 }
+                throw new CdpException("Unable to find chrome.exe");
+            } catch (Throwable e) {
+                // ignore
             }
-            throw new CdpException("Unable to find chrome.exe");
-        } catch (Throwable e) {
-            // ignore
+        } else {
+            return "google-chrome";
         }
         return null;
     }
@@ -123,63 +91,41 @@ public class Launcher extends AbstractLauncher {
         );
     }
 
-    public String findChromeOsxPath() {
-        for (String path : getChromeOsxPaths()) {
-            final File chrome = new File(path);
-            if (chrome.exists() && chrome.canExecute()) {
-                return chrome.toString();
-            }
+    public SessionFactory launch() {
+        return launch(new String[] { });
+    }
+
+    public SessionFactory launch(String... arguments) {
+        if (launched()) {
+            return factory;
         }
-        return null;
-    }
-
-    protected List<String> getChromeOsxPaths() {
-        return asList(
-                "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary", // Chrome Canary
-                "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"                // Chrome Stable
-        );
-    }
-
-    public SessionFactory launch(Path chromeExecutablePath, List<String> arguments) {
-        return launch(chromeExecutablePath.toString(), arguments);
-    }
-
-    public SessionFactory launch(Path chromeExecutablePath) {
-        return launch(chromeExecutablePath, emptyList());
-    }
-
-    @Override
-    protected void internalLaunch(List<String> list, List<String> arguments) {
-        boolean foundUserDataDir = arguments.stream().anyMatch(arg -> arg.startsWith("--user-data-dir="));
-
-        if (!foundUserDataDir) {
-            Path remoteProfileData = get(getProperty("java.io.tmpdir")).resolve("remote-profile");
-            list.add(format("--user-data-dir=%s", remoteProfileData.toString()));
+        String chromePath = findChrome();
+        Path remoteProfileData = get(getProperty("java.io.tmpdir"))
+                                        .resolve("remote-profile");
+        List<String> list = new ArrayList<>();
+        list.add(chromePath);
+        list.add(format("--remote-debugging-port=%d", factory.getPort()));
+        list.add(format("--user-data-dir=%s", remoteProfileData.toString()));
+        list.add(format("--remote-debugging-address=%s", factory.getHost()));
+        list.add("--disable-translate");
+        list.add("--disable-extensions");
+        list.add("--no-default-browser-check");
+        list.add("--disable-plugin-power-saver");
+        list.add("--disable-sync");
+        list.add("--no-first-run");
+        list.add("--safebrowsing-disable-auto-update");
+        list.add("--disable-popup-blocking");
+        if (arguments != null) {
+            list.addAll(asList(arguments));
         }
-
-        if (!DEFAULT_HOST.equals(factory.getHost())) {
-            list.add(format("--remote-debugging-address=%s", factory.getHost()));
-        }
-
         try {
-            String cdp4jId = toHexString(current().nextLong());
-            list.add("--cdp4jId=" + cdp4jId);
-            ProcessBuilder builder = new ProcessBuilder(list);
-            builder.environment().put("CDP4J_ID", cdp4jId);
-            Process process = builder.start();
-
+            Process process = getRuntime().exec(list.toArray(new String[0]));
             process.getOutputStream().close();
             process.getInputStream().close();
-            process.getErrorStream().close();
-
-            if (!process.isAlive()) {
-                throw new CdpException("No process: the chrome process is not alive.");
-            }
-
-            processManager.setProcess(new CdpProcess(process, cdp4jId));
         } catch (IOException e) {
             throw new CdpException(e);
         }
+        return factory;
     }
 
     protected String toString(InputStream is) {
@@ -189,16 +135,13 @@ public class Launcher extends AbstractLauncher {
         }
     }
 
-    public void setProcessManager(ProcessManager processManager) {
-        this.processManager = processManager;
-    }
-
-    public ProcessManager getProcessManager() {
-        return processManager;
-    }
-
-    @Override
-    public void kill() {
-        getProcessManager().kill();
+    public boolean launched() {
+        List<SessionInfo> list = emptyList();
+        try {
+            list = factory.list();
+        } catch (Throwable t) {
+            // ignore
+        }
+        return ! list.isEmpty() ? true : false;
     }
 }

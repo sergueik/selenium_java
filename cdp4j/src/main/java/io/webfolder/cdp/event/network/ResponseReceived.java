@@ -1,27 +1,31 @@
 /**
- * cdp4j Commercial License
+ * The MIT License
+ * Copyright © 2017 WebFolder OÜ
  *
- * Copyright 2017, 2018 WebFolder OÜ
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * Permission  is hereby  granted,  to "____" obtaining  a  copy of  this software  and
- * associated  documentation files  (the "Software"), to deal in  the Software  without
- * restriction, including without limitation  the rights  to use, copy, modify,  merge,
- * publish, distribute  and sublicense  of the Software,  and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
  *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR  IMPLIED,
- * INCLUDING  BUT NOT  LIMITED  TO THE  WARRANTIES  OF  MERCHANTABILITY, FITNESS  FOR A
- * PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL  THE AUTHORS  OR COPYRIGHT
- * HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
- * OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  */
 package io.webfolder.cdp.event.network;
 
 import io.webfolder.cdp.annotation.Domain;
 import io.webfolder.cdp.annotation.EventName;
-import io.webfolder.cdp.type.network.ResourceType;
 import io.webfolder.cdp.type.network.Response;
+import io.webfolder.cdp.type.page.ResourceType;
 
 /**
  * Fired when HTTP response is available
@@ -31,6 +35,8 @@ import io.webfolder.cdp.type.network.Response;
 public class ResponseReceived {
     private String requestId;
 
+    private String frameId;
+
     private String loaderId;
 
     private Double timestamp;
@@ -38,8 +44,6 @@ public class ResponseReceived {
     private ResourceType type;
 
     private Response response;
-
-    private String frameId;
 
     /**
      * Request identifier.
@@ -56,14 +60,28 @@ public class ResponseReceived {
     }
 
     /**
-     * Loader identifier. Empty string if the request is fetched from worker.
+     * Frame identifier.
+     */
+    public String getFrameId() {
+        return frameId;
+    }
+
+    /**
+     * Frame identifier.
+     */
+    public void setFrameId(String frameId) {
+        this.frameId = frameId;
+    }
+
+    /**
+     * Loader identifier.
      */
     public String getLoaderId() {
         return loaderId;
     }
 
     /**
-     * Loader identifier. Empty string if the request is fetched from worker.
+     * Loader identifier.
      */
     public void setLoaderId(String loaderId) {
         this.loaderId = loaderId;
@@ -109,19 +127,5 @@ public class ResponseReceived {
      */
     public void setResponse(Response response) {
         this.response = response;
-    }
-
-    /**
-     * Frame identifier.
-     */
-    public String getFrameId() {
-        return frameId;
-    }
-
-    /**
-     * Frame identifier.
-     */
-    public void setFrameId(String frameId) {
-        this.frameId = frameId;
     }
 }
