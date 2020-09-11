@@ -38,6 +38,26 @@ public class CommandLineParserTest {
 	}
 
 	@Test
+	public void addLoadTest() {
+		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
+		commandLineParser.saveFlagValue("a");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.getNumberOfFlags(), is(2));
+		assertThat(commandLineParser.getFlagValue("b"), nullValue());
+		commandLineParser.saveFlagValue("b");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.getNumberOfFlags(), is(2));
+
+		assertThat(commandLineParser.hasFlag("a"), is(true));
+		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
+		assertThat(commandLineParser.hasFlag("b"), is(true));
+		assertThat(commandLineParser.getFlagValue("b"), notNullValue());
+		assertThat(commandLineParser.getFlagValue("z"), nullValue());
+		System.err.println("argumentNamesValuesTest(): arguments: "
+				+ Arrays.asList(commandLineParser.getArguments()));
+	}
+
+	@Test
 	public void blankArgumensTest() {
 		commandLineParser.parse(new String[] {});
 		if (debug) {
@@ -169,3 +189,4 @@ public class CommandLineParserTest {
 	}
 
 }
+

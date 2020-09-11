@@ -1,0 +1,6 @@
+body {
+	margin: 10px;
+}
+.space::after {
+   content: " ";
+}

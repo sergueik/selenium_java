@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<Configuration status="WARN">
+  <!-- https://logging.apache.org/log4j/2.x/manual/migration.html -->
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %Logger{36} - %msg%n"/>
+    </Console>
+    <!-- not specifying the fileOwner and fileGroup -->
+    <File name="RootFileLogger" fileName="Common.log" append="true">
+      <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} %F [%c{1}] - [%M] - %m%n"/>
+    </File>
+    <RollingFile name="AppFileLogger" fileName="App.log" append="true" filePattern="App.%i.log.gz" filePermissions="rw-rw-r--">
+      <!-- Double hyphen within comment eror if placing unix file mask into comment.  Keep rw- for owner,group and other while inside the XML comment, then update accordingly after convertingto real attribute -->
+      <!-- filePermissions="rw-rw-rw-" -->
+      <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} %F [%c{1}] - [%M] - %m%n"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="1KB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="3"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Root level="debug">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="RootFileLogger"/>
+    </Root>
+    <Logger name="org.springframework" level="WARN"/>
+    <Logger name="org.springframework.jdbc" level="TRACE"/>
+    <Logger name="java.sql.Connection" level="DEBUG"/>
+    <Logger name="java.sql.Statement" level="DEBUG"/>
+    <Logger name="java.sql.PreparedStatement" level="DEBUG"/>
+    <Logger name="example.repository.CarRepository" level="DEBUG">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="AppFileLogger"/>
+    </Logger>
+    <Logger name="example.config.JdbcConfiguration" level="DEBUG">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="AppFileLogger"/>
+    </Logger>
+  </Loggers>
+</Configuration>

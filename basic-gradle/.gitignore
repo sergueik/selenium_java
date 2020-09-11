@@ -1,0 +1,27 @@
+# Eclipse Project Files
+.project
+.metadata
+.settings/
+.classpath
+.loadpath
+bin/**
+*.launch
+.externalToolsBuilders/
+
+
+# Maven Files
+target
+
+# Compiled
+*.class
+
+# Misc
+*~
+*.tmp
+*.bak
+*.sw?
+
+.gradle
+build/*
+gradle/*
+out/*
