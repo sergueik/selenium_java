@@ -64,10 +64,10 @@ public class BaseTest {
 			session = factory.create();
 			sleep(1000);
 			// install extensions
-			session.clearCookies();
-			session.clearCache();
-			session.setUserAgent(
-					"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari/534.34");
+			// session.clearCookies();
+			// session.clearCache();
+			// session.setUserAgent(
+			// 		"Mozilla/5.0 (Windows NT 6.1) AppleWebKit/534.34 (KHTML, like Gecko) PhantomJS/1.9.7 Safari/534.34");
 			session.navigate(baseURL);
 		} catch (CommandException e) {
 			throw new RuntimeException(e);
