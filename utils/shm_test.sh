@@ -1,6 +1,12 @@
 #!/bin/bash
+# based on: https://stackoverflow.com/questions/50849183/how-to-implement-shared-memory-in-shell-scripting
+# see also: https://docs.python.org/3/library/multiprocessing.shared_memory.html
+# available starting with version 3.8.
+# earlier Python releases only have Value and Array
+# https://docs.python.org/3.7/library/multiprocessing.html#multiprocessing.Value
 
-OPTS=`getopt -o vrhnwei:d: --long verbose,read,help,dry-run,write,erase,id:,data: -n 'parse-options' -- "$@"`
+
+OPTS=`getopt -o vhnrwei:d: --long verbose,help,dry-run,read,write,erase,id:,data: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 VERBOSE=false
