@@ -70,12 +70,13 @@
 # ‘whuxga’ 7680x4800
 
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vnhisbe: --long verbose,dry-run,help,inspect,size,batterycheck,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhibks:e: --long verbose,dry-run,help,inspect,batterycheck,keep,size,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 VERBOSE=false
 HELP=false
 DRY_RUN=false
+KEEP_SIZE=false
 BATTERY_CHECK=false
 SIZE='qhd'
 EXTENSION='mp4'
@@ -88,6 +89,7 @@ while true; do
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -b | --battery-check ) BATTERY_CHECK=true; shift ;;
     -s | --size ) SIZE="$2"; shift; shift ;;
+    -k | --keep ) KEEP_SIZE=true; shift ;;
     -e | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
@@ -99,7 +101,11 @@ if [[ "${VERBOSE}" = "true" ]]; then
   echo INSPECT=$INSPECT
   echo HELP=$HELP
   echo DRY_RUN=$DRY_RUN
-  echo SIZE=$SIZE
+  if $KEEP_SIZE ; then
+    echo 'keep the original size'
+  else
+    echo SIZE=$SIZE
+  fi
   echo EXTENSION=$EXTENSION
   echo BATTERY_CHECK=$BATTERY_CHECK
 fi
@@ -183,7 +189,11 @@ find . -iname "*${EXTENSION}" | sort | while read filename ; do
     echo 'check_remaining_battery'
   fi
   echo "echo \"Converting \\\"$S\\\"\""
-  echo " ffmpeg -i \"$S\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
+  if $KEEP_SIZE ; then 
+    echo " ffmpeg -i \"$S\" -c:v vp9 -v 0 \"$T\""
+  else
+    echo " ffmpeg -i \"$S\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
+  fi
   # TODO:
   # echo " ffprobe -show_format -v quiet \"$T\" | grep -i duration| sed 's/duration=//'"
   echo 'fi'
@@ -211,5 +221,4 @@ fi
 # NOTE: xargs: unmatched single quote; by default quotes are special to xargs unless you use the
 # find . -iname '*mp3' -exec ffprobe -show_format -v quiet {} 2>&1 \; | grep 'track *'
 # find . -iname '*mp3' -exec ffprobe -show_format {} 2>&1  \; | grep -E '(track|title) *:'
-
 
