@@ -15,67 +15,68 @@
 
 # following is the complete list of abbreviations recognized by ffmpeg:
 
-# ‘sqcif’ 128x96
-# ‘qqvga’ 160x120
-# ‘qcif’ 176x144
-# ‘hqvga’ 240x160
-# ‘cga’ 320x200
-# ‘qvga’ 320x240
-# ‘cif’ 352x288
-# ‘film’ 352x240
-# ‘ntsc-film’ 352x240
-# ‘qntsc’ 352x240
-# ‘qpal’ 352x288
-# ‘wqvga’ 400x240
-# ‘fwqvga’ 432x240
-# ‘hvga’ 480x320
-# ‘ega’ 640x350
-# ‘nhd’ 640x360
-# ‘sntsc’ 640x480
-# ‘vga’ 640x480
-# ‘4cif’ 704x576
-# ‘ntsc’ 720x480
-# ‘pal’ 720x576
-# ‘spal’ 768x576
-# ‘svga’ 800x600
-# ‘hd480’ 852x480
-# ‘wvga’ 852x480
-# ‘qhd’ 960x540
-# ‘xga’ 1024x768
-# ‘hd720’ 1280x720
-# ‘sxga’ 1280x1024
-# ‘wxga’ 1366x768
-# ‘16cif’ 1408x1152
-# ‘uxga’ 1600x1200
-# ‘wsxga’ 1600x1024
-# ‘hd1080’ 1920x1080
-# ‘wuxga’ 1920x1200
-# ‘2kflat’ 1998x1080
-# ‘2k’ 2048x1080
-# ‘2kdci’ 2048x1080
-# ‘2kscope’ 2048x858
-# ‘qxga’ 2048x1536
-# ‘qsxga’ 2560x2048
-# ‘woxga’ 2560x1600
-# ‘wqsxga’ 3200x2048
-# ‘uhd2160’ 3840x2160
-# ‘wquxga’ 3840x2400
-# ‘4kflat’ 3996x2160
-# ‘4k’ 4096x2160
-# ‘4kdci’ 4096x2160
-# ‘4kscope’ 4096x1716
-# ‘hsxga’ 5120x4096
-# ‘whsxga’ 6400x4096
-# ‘uhd4320’ 7680x4320
-# ‘whuxga’ 7680x4800
+# 'sqcif' 128x96
+# 'qqvga' 160x120
+# 'qcif' 176x144
+# 'hqvga' 240x160
+# 'cga' 320x200
+# 'qvga' 320x240
+# 'cif' 352x288
+# 'film' 352x240
+# 'ntsc-film' 352x240
+# 'qntsc' 352x240
+# 'qpal' 352x288
+# 'wqvga' 400x240
+# 'fwqvga' 432x240
+# 'hvga' 480x320
+# 'ega' 640x350
+# 'nhd' 640x360
+# 'sntsc' 640x480
+# 'vga' 640x480
+# '4cif' 704x576
+# 'ntsc' 720x480
+# 'pal' 720x576
+# 'spal' 768x576
+# 'svga' 800x600
+# 'hd480' 852x480
+# 'wvga' 852x480
+# 'qhd' 960x540
+# 'xga' 1024x768
+# 'hd720' 1280x720
+# 'sxga' 1280x1024
+# 'wxga' 1366x768
+# '16cif' 1408x1152
+# 'uxga' 1600x1200
+# 'wsxga' 1600x1024
+# 'hd1080' 1920x1080
+# 'wuxga' 1920x1200
+# '2kflat' 1998x1080
+# '2k' 2048x1080
+# '2kdci' 2048x1080
+# '2kscope' 2048x858
+# 'qxga' 2048x1536
+# 'qsxga' 2560x2048
+# 'woxga' 2560x1600
+# 'wqsxga' 3200x2048
+# 'uhd2160' 3840x2160
+# 'wquxga' 3840x2400
+# '4kflat' 3996x2160
+# '4k' 4096x2160
+# '4kdci' 4096x2160
+# '4kscope' 4096x1716
+# 'hsxga' 5120x4096
+# 'whsxga' 6400x4096
+# 'uhd4320' 7680x4320
+# 'whuxga' 7680x4800
 
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vnhisbe: --long verbose,dry-run,help,inspect,size,batterycheck,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhibks:e: --long verbose,dry-run,help,inspect,batterycheck,keep,size,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 
 VERBOSE=false
 HELP=false
 DRY_RUN=false
+KEEP_SIZE=false
 BATTERY_CHECK=false
 SIZE='qhd'
 EXTENSION='mp4'
@@ -88,6 +89,7 @@ while true; do
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -b | --battery-check ) BATTERY_CHECK=true; shift ;;
     -s | --size ) SIZE="$2"; shift; shift ;;
+    -k | --keep ) KEEP_SIZE=true; shift ;;
     -e | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
@@ -99,7 +101,11 @@ if [[ "${VERBOSE}" = "true" ]]; then
   echo INSPECT=$INSPECT
   echo HELP=$HELP
   echo DRY_RUN=$DRY_RUN
-  echo SIZE=$SIZE
+  if $KEEP_SIZE ; then
+    echo 'keep the original size'
+  else
+    echo SIZE=$SIZE
+  fi
   echo EXTENSION=$EXTENSION
   echo BATTERY_CHECK=$BATTERY_CHECK
 fi
@@ -172,6 +178,7 @@ fi
 find . -iname "*${EXTENSION}" | sort | while read filename ; do
   D=$(dirname "$filename")
   S=$(basename "$filename")
+  N="${S/.${EXTENSION}/.temp.mkv}"
   T="${S/.${EXTENSION}/.mkv}"
   if [[ "$D" != '.' ]]
   then
@@ -183,7 +190,17 @@ find . -iname "*${EXTENSION}" | sort | while read filename ; do
     echo 'check_remaining_battery'
   fi
   echo "echo \"Converting \\\"$S\\\"\""
-  echo " ffmpeg -i \"$S\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
+  if $KEEP_SIZE ; then 
+    echo " ffmpeg -i \"$S\" -c:v vp9 -v 0 \"$T\""
+  else
+    if [[ $EXTENSION == 'mov' ]] ; then
+      echo " ffmpeg -i \"$S\" -map 0 -c copy \"$N\" &> /dev/null"
+      echo " ffmpeg -i \"$N\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
+      echo " rm -f \"$N\""
+    else
+      echo " ffmpeg -i \"$S\" -c:v vp9 -s ${SIZE} -v 0 \"$T\""
+    fi
+  fi
   # TODO:
   # echo " ffprobe -show_format -v quiet \"$T\" | grep -i duration| sed 's/duration=//'"
   echo 'fi'
@@ -207,9 +224,8 @@ else
 fi
 # TODO:
 # find . -iname '*mp3' | xargs -IX ffprobe -show_format -v quiet X | grep 'track=' |sort
-# NOTE;  may be empty
+# NOTE: may be empty
 # NOTE: xargs: unmatched single quote; by default quotes are special to xargs unless you use the
 # find . -iname '*mp3' -exec ffprobe -show_format -v quiet {} 2>&1 \; | grep 'track *'
 # find . -iname '*mp3' -exec ffprobe -show_format {} 2>&1  \; | grep -E '(track|title) *:'
-
 
