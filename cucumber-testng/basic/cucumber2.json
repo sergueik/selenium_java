@@ -1,0 +1,220 @@
+[
+  {
+    "comments": [
+      {
+        "line": 1,
+        "value": "# comment to get ignored"
+      }
+    ],
+    "line": 3,
+    "elements": [
+      {
+        "before": [
+          {
+            "result": {
+              "duration": 31646,
+              "status": "passed"
+            },
+            "match": {
+              "location": "DateStepdefs.beforescenario(Scenario)"
+            }
+          },
+          {
+            "result": {
+              "duration": 1324443,
+              "status": "passed"
+            },
+            "match": {
+              "location": "BaseStepDefs.before(Scenario)"
+            }
+          }
+        ],
+        "line": 6,
+        "name": "Determine future date one day after today",
+        "description": "",
+        "id": "feature2;determine-future-date-one-day-after-today",
+        "after": [
+          {
+            "result": {
+              "duration": 89379,
+              "status": "passed"
+            },
+            "match": {
+              "location": "BaseStepDefs.after(Scenario)"
+            }
+          }
+        ],
+        "type": "scenario",
+        "keyword": "Scenario",
+        "steps": [
+          {
+            "output": [
+              "<b>This is test message</b>"
+            ],
+            "result": {
+              "duration": 2437625,
+              "status": "passed"
+            },
+            "line": 7,
+            "name": "today is 2015-12-20",
+            "match": {
+              "arguments": [
+                {
+                  "val": "2015-12-20",
+                  "offset": 9
+                }
+              ],
+              "location": "DateStepdefs.today_is(Date)"
+            },
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "duration": 299785,
+              "status": "passed"
+            },
+            "line": 8,
+            "name": "I ask if Dec 21, 2015 is in the past",
+            "match": {
+              "arguments": [
+                {
+                  "val": "Dec 21, 2015",
+                  "offset": 9
+                }
+              ],
+              "location": "DateStepdefs.I_ask_if_date_is_in_the_past(Date)"
+            },
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "duration": 103920,
+              "status": "passed"
+            },
+            "line": 9,
+            "name": "the result should be no",
+            "match": {
+              "arguments": [
+                {
+                  "val": "no",
+                  "offset": 21
+                }
+              ],
+              "location": "DateStepdefs.the_result_should_be(String)"
+            },
+            "keyword": "Then "
+          }
+        ]
+      },
+      {
+        "before": [
+          {
+            "result": {
+              "duration": 39344,
+              "status": "passed"
+            },
+            "match": {
+              "location": "DateStepdefs.beforescenario(Scenario)"
+            }
+          },
+          {
+            "result": {
+              "duration": 66714,
+              "status": "passed"
+            },
+            "match": {
+              "location": "BaseStepDefs.before(Scenario)"
+            }
+          }
+        ],
+        "line": 11,
+        "name": "Determine future date ten days after today",
+        "description": "",
+        "id": "feature2;determine-future-date-ten-days-after-today",
+        "after": [
+          {
+            "result": {
+              "duration": 197576,
+              "status": "passed"
+            },
+            "match": {
+              "location": "BaseStepDefs.after(Scenario)"
+            }
+          }
+        ],
+        "type": "scenario",
+        "keyword": "Scenario",
+        "steps": [
+          {
+            "output": [
+              "<b>This is test message</b>"
+            ],
+            "result": {
+              "duration": 520454,
+              "status": "passed"
+            },
+            "line": 12,
+            "name": "today is 2015-12-20",
+            "match": {
+              "arguments": [
+                {
+                  "val": "2015-12-20",
+                  "offset": 9
+                }
+              ],
+              "location": "DateStepdefs.today_is(Date)"
+            },
+            "keyword": "Given "
+          },
+          {
+            "result": {
+              "duration": 591872,
+              "status": "passed"
+            },
+            "line": 13,
+            "name": "I ask if Dec 30, 2015 is in the past",
+            "match": {
+              "arguments": [
+                {
+                  "val": "Dec 30, 2015",
+                  "offset": 9
+                }
+              ],
+              "location": "DateStepdefs.I_ask_if_date_is_in_the_past(Date)"
+            },
+            "keyword": "When "
+          },
+          {
+            "result": {
+              "duration": 56878,
+              "status": "passed"
+            },
+            "line": 14,
+            "name": "the result should be no",
+            "match": {
+              "arguments": [
+                {
+                  "val": "no",
+                  "offset": 21
+                }
+              ],
+              "location": "DateStepdefs.the_result_should_be(String)"
+            },
+            "keyword": "Then "
+          }
+        ]
+      }
+    ],
+    "name": "Feature2",
+    "description": "This is the description for Feature2",
+    "id": "feature2",
+    "keyword": "Feature",
+    "uri": "src/test/resources/example/date_calculator2.feature",
+    "tags": [
+      {
+        "line": 2,
+        "name": "@calculator"
+      }
+    ]
+  }
+]
