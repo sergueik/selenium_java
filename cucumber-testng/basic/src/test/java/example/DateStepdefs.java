@@ -2,6 +2,8 @@ package example;
 
 import cucumber.api.Format;
 import cucumber.api.Scenario;
+import cucumber.api.Transform;
+import cucumber.api.Transformer;
 import cucumber.api.java.Before;
 import cucumber.api.java.en.Given;
 import cucumber.api.java.en.Then;
@@ -10,6 +12,8 @@ import example.DateCalculator;
 
 import static org.testng.Assert.assertEquals;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateStepdefs {
@@ -28,9 +32,26 @@ public class DateStepdefs {
 		scenario.write("<b>This is test message</b>");
 	}
 
-	@When("^I ask if (?<date>.+) is in the past$")
-	public void I_ask_if_date_is_in_the_past(Date value) {
-		result = calculator.isDateInThePast(value);
+	// NOTE: attmpt to use cucumber expression leads to
+	// cucumber.runtime.CucumberException
+	@When("^I ask if (.*) is in the past$")
+	public void I_ask_if_date_is_in_the_past(
+			@Transform(DateMapper.class) Date date) {
+		result = calculator.isDateInThePast(date);
+	}
+
+	public class DateMapper extends Transformer<Date> {
+		@SuppressWarnings("deprecation")
+		@Override
+		public Date transform(String data) {
+			System.err.println("Transformimg data: " + data);
+			try {
+				return new Date(Date.parse(data));
+			} catch (cucumber.runtime.CucumberException e) {
+				System.err.println("Exception (ignored) " + e.toString());
+				return null;
+			}
+		}
 	}
 
 	// NOTE: the role based naming may be beneficial here
@@ -39,4 +60,5 @@ public class DateStepdefs {
 	public void the_result_should_be(String data) {
 		assertEquals(data, result);
 	}
+
 }
