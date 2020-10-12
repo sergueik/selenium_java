@@ -8,7 +8,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-@CucumberOptions(features = "src/test/resources/example/date_calculator2.feature", tags = "@calculator", plugin = "json:target/cucumber2.json")
+@CucumberOptions(features = "src/test/resources/example/date_calculator2.feature", tags = {
+		"@calculator", "@data" }, plugin = "json:target/cucumber2.json")
 public class RunCukesByFeatureAndCompositionTest2 {
 	private TestNGCucumberRunner runner;
 

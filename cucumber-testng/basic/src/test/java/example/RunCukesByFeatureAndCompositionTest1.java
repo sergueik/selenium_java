@@ -21,7 +21,8 @@ import org.testng.annotations.Test;
 import org.testng.internal.annotations.IDataProvidable;
 
 // loop over all features "src/test/resources/example/date_calculator1.feature"
-@CucumberOptions(features = "src/test/resources/example", tags = "@calculator")
+// @CucumberOptions(features = "src/test/resources/example", tags = "@calculator")
+@CucumberOptions(features = "src/test/resources/example/date_calculator1.feature", tags = "@calculator")
 public class RunCukesByFeatureAndCompositionTest1 {
 	private final boolean debug = true;
 	private TestNGCucumberRunner runner;

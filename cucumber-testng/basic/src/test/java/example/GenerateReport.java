@@ -11,7 +11,9 @@ public class GenerateReport {
 			String RootDir = System.getProperty("user.dir");
 			File reportOutputDirectory = new File("target/Masterthought");
 			List<String> list = new ArrayList<String>();
-			list.add("target/cucumber1.json");
+			if (new File(RootDir + "/" + "target/cucumber1.json").exists()) {
+				list.add("target/cucumber1.json");
+			}
 			list.add("target/cucumber2.json");
 
 			String pluginUrlPath = "";
