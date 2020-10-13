@@ -19,7 +19,7 @@
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
   </properties>

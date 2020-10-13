@@ -14,7 +14,7 @@
     <hamcrest-date.version>2.0.4</hamcrest-date.version>
     <htmlunit.version>2.33</htmlunit.version>
     <java.version>1.8</java.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <junit-platform-launcher.version>1.4.0</junit-platform-launcher.version>
     <junit-jupiter.version>5.3.2</junit-jupiter.version>
     <log4j.version>2.5</log4j.version>

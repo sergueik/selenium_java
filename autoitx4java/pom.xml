@@ -25,7 +25,7 @@
     <commons-collections4.version>4.2</commons-collections4.version>
     <java.version>1.8</java.version>
     <jna-platform.version>4.5.0</jna-platform.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>

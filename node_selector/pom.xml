@@ -29,7 +29,7 @@
     <java.version>1.8</java.version>
     <jna-platform.version>4.5.1</jna-platform.version>
     <json.version>20170516</json.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <log4j.version>1.2.17</log4j.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>

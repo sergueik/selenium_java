@@ -8,7 +8,7 @@
   <name>autotest.report.excel</name>
   <properties>
     <spring.version>4.3.7.RELEASE</spring.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
     <selenium.version>3.3.1</selenium.version>
