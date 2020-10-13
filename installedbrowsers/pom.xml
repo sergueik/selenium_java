@@ -14,7 +14,7 @@
     <commons-io.version>2.5</commons-io.version>
     <commons-lang3.version>3.3.1</commons-lang3.version>
     <jna-platform.version>5.4.0</jna-platform.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <selenium.version>4.0.0-alpha-2</selenium.version>
  </properties>

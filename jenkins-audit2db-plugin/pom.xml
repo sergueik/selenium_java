@@ -38,7 +38,7 @@
 		<version.hibernate-jpa>1.0.0.Final</version.hibernate-jpa>
 		<version.c3p0>0.9.1.2</version.c3p0>
 		<version.javassist>3.8.0.GA</version.javassist>
-		<version.junit>4.12</version.junit>
+		<version.junit>4.13.1</version.junit>
 		<version.mockito>1.9.0</version.mockito>
 		<version.springframework>3.1.2.RELEASE</version.springframework>
 		<version.slf4j>1.7.25</version.slf4j>

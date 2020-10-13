@@ -1,4 +1,3 @@
-# comment to get ignored
 @calculator
 @data
 Feature: Feature2

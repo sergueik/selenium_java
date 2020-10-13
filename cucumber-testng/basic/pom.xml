@@ -8,7 +8,7 @@
     <dependency>
       <groupId>info.cukes</groupId>
       <artifactId>cucumber-java</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.6</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -20,7 +20,7 @@
     <dependency>
       <groupId>info.cukes</groupId>
       <artifactId>cucumber-testng</artifactId>
-      <version>1.2.4</version>
+      <version>1.2.6</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -32,7 +32,7 @@
     <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
-      <version>6.9.8</version>
+      <version>6.14.3</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -46,7 +46,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.18.1</version>
+        <version>2.20</version>
         <configuration>
           <suiteXmlFiles>
             <suiteXmlFile>testng.xml</suiteXmlFile>
@@ -59,6 +59,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.6.1</version>
         <configuration>
           <source>1.8</source>
           <target>1.8</target>
@@ -67,42 +68,9 @@
     </plugins>
   </build>
   <repositories>
-    <!--
-    <repository>
-      <id>central</id>
-      <name>maven central repo</name>
-      <url>https://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>maven-central</id>
-      <name>maven central repo</name>
-      <url>https://mvnrepository.com/repos/central</url>
-    </repository> 
-    <repository>
-      <id>osgeo</id>
-      <name>osgeo repo</name>
-      <url>https://download.osgeo.org/webdav/geotools/</url>
-    </repository>
-    <repository>
-      <id>seasar</id>
-      <name>seasar repo</name>
-      <url>https://www.seasar.org/maven/maven2</url>
-    </repository>
-    <repository>
-      <id>jcenter</id>
-      <url>https://jcenter.bintray.com/</url>
-    </repository>
-    <repository>
-      <id>swt-repo</id>
-      <url>https://swt-repo.googlecode.com/svn/repo/</url>
-    </repository>-->
     <repository>
       <id>central</id>
       <url>https://repo1.maven.org/maven2/</url>
-    </repository>
-    <repository>
-      <id>consol</id>
-      <url>https://labs.consol.de/maven/repository/</url>
     </repository>
     <repository>
       <id>ossrh</id>
