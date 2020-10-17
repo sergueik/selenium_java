@@ -23,12 +23,17 @@ host:
 {datacenter=oxdc, role=integration-server-2, environment=test, unused1=null}```
 ```
 The operation `op` has to be supplied and the following is supported:
-`dump`. The `excel` is a work in progress.
+`dump` and `excel` 
 
 When a specified yaml file path is provided, the specified file is read:
 
 ```sh
 java -cp target/app-0.2-SNAPSHOT.jar:target/lib/*  example.LaunchDirect -role integration-server- -input src/main/resources/classification.yaml -dc wec -env test -op dump
 ```
+
+```cmd
+java -cp target\app-0.2-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc wec -env test -op excel -output test1.xlsx
+```
+will generate specified file
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
