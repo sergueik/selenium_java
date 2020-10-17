@@ -1,0 +1,32 @@
+---
+ad8c3125:
+  datacenter: wec
+  role: service-discovery-server-0
+  environment: prod
+  unused1:
+e530095c:
+  datacenter: wec
+  role: service-discovery-server-1
+  environment: prod
+  unused1:
+  unused2:
+e577775c:
+  datacenter: oxdc
+  role: integration-server-0
+  environment: test
+  unused1:
+  unused2:
+a517535c:
+  datacenter: oxdc
+  role: integration-server-3
+  environment: test
+e577775d:
+  datacenter: oxdc
+  role: integration-server-1
+  environment: test
+  unused1:
+e57fd0e12:
+  datacenter: oxdc
+  role: integration-server-2
+  environment: test
+  unused1:
