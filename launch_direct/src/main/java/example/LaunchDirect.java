@@ -14,10 +14,13 @@ import org.yaml.snakeyaml.Yaml;
 public class LaunchDirect {
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
+	private static String input;
 	private static String role;
 	private static String dc;
 	private static String op;
 	private static String env;
+	private static String fileName = "classification.yaml";
+	private static String encoding = "UTF-8";
 
 	public static void main(String[] args) throws IOException, URISyntaxException {
 		commandLineParser = new CommandLineParser();
@@ -39,10 +42,12 @@ public class LaunchDirect {
 			return;
 		}
 
+		input = commandLineParser.getFlagValue("input");
 		// TODO: look up in workspace if not specified
-		if (commandLineParser.getFlagValue("input") == null) {
-			System.err.println("Missing required argument: input");
-			return;
+		if (input == null) {
+			input = String.join(System.getProperty("file.separator"),
+					Arrays.asList(System.getProperty("user.dir"), "src", "main", "resources", fileName));
+			System.err.println(String.format("Using default input argument: %s", input));
 		}
 		dc = commandLineParser.getFlagValue("dc");
 		if (dc == null) {
@@ -74,11 +79,8 @@ public class LaunchDirect {
 	}
 
 	public static void dump() {
-		String fileName = "classification.yaml";
-		String encoding = "UTF-8";
 		try {
-			InputStream in = Files.newInputStream(Paths.get(String.join(System.getProperty("file.separator"),
-					Arrays.asList(System.getProperty("user.dir"), "src", "main", "resources", fileName))));
+			InputStream in = Files.newInputStream(Paths.get(input));
 			@SuppressWarnings("unchecked")
 			LinkedHashMap<String, Map<String, String>> nodes = (LinkedHashMap<String, Map<String, String>>) new Yaml()
 					.load(in);

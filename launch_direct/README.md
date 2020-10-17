@@ -2,9 +2,13 @@
 
 ```sh
 mvn package
-java -cp target/app-0.1-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -input b -dc wec -env test -op dump
+java -cp target/app-0.1-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -dc wec -env test -op dump
 ```
 this will produce
+```sh
+Using default input argument: /home/sergueik/src/selenium_java/launch_direct/src/main/resources/classification.yaml
+```
+and then
 ```sh
 host:
 {datacenter=oxdc, role=integration-server-0, environment=test, unused1=null, unused2=null}
@@ -21,5 +25,10 @@ host:
 The operation `op` has to be supplied and the following is supported:
 `dump`. The `excel` is a work in progress.
 
+When a specified yaml file path is provided, the specified file is read:
+
+```sh
+java -cp target/app-0.2-SNAPSHOT.jar:target/lib/*  example.LaunchDirect -role integration-server- -input src/main/resources/classification.yaml -dc wec -env test -op dump
+```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
