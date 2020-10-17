@@ -1,21 +1,13 @@
 package example;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
-import org.yaml.snakeyaml.Yaml;
-import example.Utils;
-import example.Configuration;
 
 public class LaunchDirect {
 
@@ -86,7 +78,7 @@ public class LaunchDirect {
 		if (op.equalsIgnoreCase("dump")) {
 			dump();
 		}
-		
+
 		if (op.equalsIgnoreCase("typed")) {
 			dumpTyped();
 		}
@@ -152,6 +144,20 @@ public class LaunchDirect {
 			Utils.setSheetFormat("Excel 2007");
 			Utils.writeXLSXFile();
 		} catch (Exception e) {
+		}
+	}
+
+	public static void dumpTyped() {
+		List<Configuration> nodes = Utils.loadTypedConfiguration(inputFile);
+		if (debug) {
+			System.err.println(String.format("nodes:\n%s\n", nodes.toString()));
+		}
+		for (Configuration node : nodes) {
+			if (node.getDatacenter().matches(String.format("^%s.*$", dc))
+					&& node.getRole().matches(String.format("^%s.*$", role))
+					&& node.getEnvironment().matches(String.format("^%s.*$", env))) {
+				System.err.println(String.format("node:\n%s\n", node.toString()));
+			}
 		}
 	}
 

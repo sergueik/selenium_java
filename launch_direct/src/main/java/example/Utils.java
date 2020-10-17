@@ -1,18 +1,18 @@
 package example;
 
-import static java.lang.String.format;
-
 import java.io.FileOutputStream;
 import java.io.IOException;
-
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.nio.file.Files;
 import java.nio.file.Paths;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -22,27 +22,13 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-
-//import org.apache.logging.log4j.LogManager;
-//import org.apache.logging.log4j.Logger;
-
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-
-import example.Configuration;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
 
 public class Utils {
 
@@ -130,6 +116,40 @@ public class Utils {
 		}
 		return config;
 
+	}
+
+	// TODO
+	public static List<Configuration> loadTypedConfiguration(String fileName) {
+		init();
+		List<Configuration> configurations = new ArrayList<>();
+		Configuration configuration = null;
+		Map<String, Configuration> data = null;
+		try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
+			data = yaml.loadAs(in, Map.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		for (Entry<String, Configuration> rawdata : data.entrySet()) {
+			String hostname = rawdata.getKey();
+			System.err
+					.println(String.format("Processing configration of %s", hostname));
+			try {
+				configuration = (Configuration) rawdata.getValue();
+			} catch (java.lang.ClassCastException e) {
+				System.err
+						.println(String.format("Processing exception %s", e.toString()));
+				// java.lang.ClassCastException:
+				// java.util.LinkedHashMap cannot be cast to example.Configuration
+				Map<String, Object> value = rawdata.getValue();
+				configuration = new Configuration();
+				configuration.setEnvironment(value.get("environment").toString());
+				configuration.setDatacenter(value.get("datacenter").toString());
+				configuration.setRole(value.get("role").toString());
+			}
+			configuration.setHostname(hostname);
+			configurations.add(configuration);
+		}
+		return configurations;
 	}
 
 	// name of excel file
