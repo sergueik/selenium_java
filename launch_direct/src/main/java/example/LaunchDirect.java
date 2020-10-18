@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ public class LaunchDirect {
 
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
+	private static List<String> nodelist = new LinkedList<>();
 	private static String inputFile;
 	private static String outputFile;
 	private static String role;
@@ -32,6 +34,7 @@ public class LaunchDirect {
 		commandLineParser.saveFlagValue("env");
 		commandLineParser.saveFlagValue("dc");
 		commandLineParser.saveFlagValue("op");
+		commandLineParser.saveFlagValue("nodes");
 		commandLineParser.saveFlagValue("if");
 		// TODO: input format
 
@@ -68,6 +71,11 @@ public class LaunchDirect {
 		if (commandLineParser.hasFlag("debug")) {
 			debug = true;
 		}
+		nodelist = Arrays
+				.asList(commandLineParser.getFlagValue("nodes").split(" *, *"));
+		if (debug) {
+			System.err.println("Loaded node list: " + nodelist);
+		}
 		// operation
 		op = commandLineParser.getFlagValue("op");
 		if (op == null) {
@@ -83,6 +91,14 @@ public class LaunchDirect {
 			dumpTyped();
 		}
 
+		if (op.equalsIgnoreCase("known")) {
+			filter(true);
+		}
+
+		if (op.equalsIgnoreCase("unknown")) {
+			filter(false);
+		}
+
 		if (op.equalsIgnoreCase("excel")) {
 			outputFile = commandLineParser.getFlagValue("output");
 			if (outputFile == null) {
@@ -91,10 +107,25 @@ public class LaunchDirect {
 						.println(String.format("Using default outputFile: %s", outputFile));
 			}
 			excel();
-
 		}
 		if (debug) {
 			System.err.println("Done: " + op);
+		}
+	}
+
+	public static void filter(final boolean collectKnown) {
+		LinkedHashMap<String, Map<String, String>> nodes = Utils
+				.loadConfiguration(inputFile);
+		List<String> knownNodes = Arrays
+				.asList(nodes.keySet().toArray(new String[nodes.size()]));
+
+		for (String hostname : nodelist) {
+			if (collectKnown == true && knownNodes.contains(hostname)) {
+				System.err.println(String.format("hostname:\n%s\n", hostname));
+			}
+			if (collectKnown == false && !knownNodes.contains(hostname)) {
+				System.err.println(String.format("host:\n%s\n", hostname));
+			}
 		}
 	}
 
@@ -137,7 +168,7 @@ public class LaunchDirect {
 			tableData.add(rowData);
 		}
 		Utils.setExcelFileName(outputFile);
-		Utils.setSheetName("SWT Test");
+		Utils.setSheetName("Data");
 		Utils.setTableData(tableData);
 
 		try {
@@ -153,16 +184,16 @@ public class LaunchDirect {
 			System.err.println(String.format("nodes:\n%s\n", nodes.toString()));
 		}
 		for (Configuration node : nodes) {
-			if (node.getDatacenter().matches(String.format("^%s.*$", dc))
-					&& node.getRole().matches(String.format("^%s.*$", role))
-					&& node.getEnvironment().matches(String.format("^%s.*$", env))) {
+			if (matchedValue(node.getDatacenter(), dc)
+					&& matchedValue(node.getRole(), role)
+					&& matchedValue(node.getEnvironment(), env)) {
 				System.err.println(String.format("node:\n%s\n", node.toString()));
 			}
 		}
 	}
 
-	private static boolean matchedValue(Map<String, String> row, String key,
-			String value) {
+	private static boolean matchedValue(final Map<String, String> row,
+			final String key, final String value) {
 		if (debug) {
 			System.err
 					.println(String.format("Comparing value of: %s with %s", key, value));
@@ -170,6 +201,15 @@ public class LaunchDirect {
 		}
 		return (row.containsKey(key)
 				&& row.get(key).matches(String.format("^%s.*$", value)));
+	}
+
+	private static boolean matchedValue(final String data, final String value) {
+		if (debug) {
+			System.err
+					.println(String.format("Comparing data: %s with %s", data, value));
+
+		}
+		return (data.matches(String.format("^%s.*$", value)));
 
 	}
 }
