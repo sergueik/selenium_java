@@ -34,6 +34,7 @@ public class Utils {
 
 	private static DumperOptions options = new DumperOptions();
 	private static Yaml yaml = null;
+	private static boolean debug = false;
 
 	protected static String getScriptContent(String scriptName) {
 		try {
@@ -51,7 +52,8 @@ public class Utils {
 		try {
 			URI uri = LaunchDirect.class.getClassLoader().getResource(pagename)
 					.toURI();
-			System.err.println("Testing local file: " + uri.toString());
+			if (debug)
+				System.err.println("Testing local file: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
@@ -82,7 +84,8 @@ public class Utils {
 			try {
 				Writer out = new OutputStreamWriter(new FileOutputStream(fileName),
 						"UTF8");
-				System.err.println("Dumping the config to: " + fileName);
+				if (debug)
+					System.err.println("Writing the config to: " + fileName);
 
 				yaml.dump(config, out);
 				out.close();
@@ -90,12 +93,12 @@ public class Utils {
 				e.printStackTrace();
 			}
 		} else {
-			System.err.println("Dumped the YAML: \n" + yaml.dump(config));
+			if (debug)
+				System.err.println("Dumping the config: \n" + yaml.dump(config));
 		}
 	}
 
 	private static void init() {
-
 		if (yaml == null) {
 			options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 			options.setExplicitStart(true);
@@ -119,10 +122,10 @@ public class Utils {
 	}
 
 	// TODO
+	@SuppressWarnings("unchecked")
 	public static List<Configuration> loadTypedConfiguration(String fileName) {
 		init();
 		List<Configuration> configurations = new ArrayList<>();
-		Configuration configuration = null;
 		Map<String, Configuration> data = null;
 		try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
 			data = yaml.loadAs(in, Map.class);
@@ -130,23 +133,16 @@ public class Utils {
 			e.printStackTrace();
 		}
 		for (Entry<String, Configuration> rawdata : data.entrySet()) {
-			String hostname = rawdata.getKey();
-			System.err
-					.println(String.format("Processing configration of %s", hostname));
-			try {
-				configuration = (Configuration) rawdata.getValue();
-			} catch (java.lang.ClassCastException e) {
-				System.err
-						.println(String.format("Processing exception %s", e.toString()));
-				// java.lang.ClassCastException:
-				// java.util.LinkedHashMap cannot be cast to example.Configuration
-				Map<String, Object> value = rawdata.getValue();
-				configuration = new Configuration();
-				configuration.setEnvironment(value.get("environment").toString());
-				configuration.setDatacenter(value.get("datacenter").toString());
-				configuration.setRole(value.get("role").toString());
-			}
-			configuration.setHostname(hostname);
+			Map<String, Object> hostdata = rawdata.getValue();
+			if (debug)
+				System.err.println(
+						String.format("Processing host %s configration", rawdata.getKey()));
+
+			Configuration configuration = new Configuration.Builder()
+					.Hostname(rawdata.getKey())
+					.Environment(hostdata.get("environment").toString())
+					.Datacenter(hostdata.get("datacenter").toString())
+					.Role(hostdata.get("role").toString()).build();
 			configurations.add(configuration);
 		}
 		return configurations;
@@ -191,8 +187,9 @@ public class Utils {
 			for (int col = 0; col < rowData.size(); col++) {
 				XSSFCell cell = xddfrow.createCell(col);
 				cell.setCellValue(rowData.get(col));
-				System.err
-						.println("Writing " + row + " " + col + "  " + rowData.get(col));
+				if (debug)
+					System.err
+							.println("Writing " + row + " " + col + "  " + rowData.get(col));
 			}
 		}
 
@@ -207,7 +204,6 @@ public class Utils {
 			String message = String.format("Exception saving XLSX file %s\n",
 					excelFileName) + e.getMessage();
 			throw new Exception(message);
-
 		}
 	}
 

@@ -1,6 +1,6 @@
 package example;
 /**
- * Copyright 2014 - 2019 Serguei Kouzmine
+ * Copyright 2020 Serguei Kouzmine
  */
 
 import static org.junit.Assert.assertTrue;

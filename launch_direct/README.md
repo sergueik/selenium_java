@@ -2,7 +2,7 @@
 
 ```sh
 mvn package
-java -cp target/launchdirect-0.3-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -dc wec -env test -op dump
+java -cp target/launchdirect-0.4-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -dc wec -env test -op dump
 ```
 this will produce
 ```sh
@@ -23,7 +23,7 @@ host:
 {datacenter=oxdc, role=integration-server-2, environment=test, unused1=null}```
 ```
 ```cmd
-java -cp target\launchdirect-0.3-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op typed
+java -cp target\launchdirect-0.4-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op typed
 ```
 this will produce
 ```sh
@@ -59,18 +59,18 @@ The operation `op` has to be supplied and the following is supported:
 When a specified yaml file path is provided, the specified file is read:
 
 ```sh
-java -cp target/launchdirect-0.3-SNAPSHOT.jar:target/lib/*  example.LaunchDirect -role integration-server- -input src/main/resources/classification.yaml -dc wec -env test -op dump
+java -cp target/launchdirect-0.4-SNAPSHOT.jar:target/lib/*  example.LaunchDirect -role integration-server- -input src/main/resources/classification.yaml -dc wec -env test -op dump
 ```
 
 ```cmd
-java -cp target\launchdirect-0.3-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc wec -env test -op excel -output test1.xlsx
+java -cp target\launchdirect-0.4-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc wec -env test -op excel -output test1.xlsx
 ```
 will generate specified file
 
 
 Saving the list of host names containing known and unknown entries  then showing either `known` or `unknown` based on their presence in the keys of `classificator.yaml` works like below:
 ```cmd
-java -cp target\launchdirect-0.3-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op unknown -nodes @nodes.txt
+java -cp target\launchdirect-0.4-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op unknown -nodes @nodes.txt
 ```
 will respond with
 ```sh
@@ -79,7 +79,7 @@ e5absent0
 ```
 and
 ```cmd
-java -cp target\launchdirect-0.3-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op known -nodes @nodes.txt
+java -cp target\launchdirect-0.4-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc oxdc -env test -op known -nodes @nodes.txt
 ```
 will respond with
 ```sh

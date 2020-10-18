@@ -1,12 +1,49 @@
 package example;
 
+import java.util.LinkedHashMap;
 import static java.lang.String.format;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+// The type LinkedHashMap<String,Object> cannot be a superinterface of Configuration; 
+// a superinterface must be an interface
 final class Configuration implements Map<String, Object> {
+
+	public static class Builder {
+		public String environment;
+		public String datacenter;
+		public String role;
+		public String hostname;
+
+		public Builder() {
+		}
+
+		public Builder Environment(final String data) {
+			this.environment = data;
+			return this;
+		}
+
+		public Builder Datacenter(final String data) {
+			this.datacenter = data;
+			return this;
+		}
+
+		public Builder Role(final String data) {
+			this.role = data;
+			return this;
+		}
+
+		public Builder Hostname(final String data) {
+			this.hostname = data;
+			return this;
+		}
+
+		public Configuration build() {
+			return new Configuration(this);
+		}
+	}
 
 	public Map<String, String> data; // not used
 	public String environment;
@@ -14,27 +51,26 @@ final class Configuration implements Map<String, Object> {
 	public String role;
 	public String hostname;
 
-	public String getEnvironment() {
-		return environment;
+	public Configuration(final Builder builder) {
+		this.datacenter = builder.datacenter;
+		this.role = builder.role;
+		this.environment = builder.environment;
+		this.hostname = builder.hostname;
 	}
 
-	public void setEnvironment(String data) {
-		environment = data;
+	public String getEnvironment() {
+		return environment;
 	}
 
 	public String getRole() {
 		return role;
 	}
 
-	public void setRole(String data) {
-		role = data;
-	}
-
 	public String getHostname() {
 		return hostname;
 	}
 
-	public void setHostname(String data) {
+	public void setHostname(final String data) {
 		hostname = data;
 	}
 
@@ -42,15 +78,11 @@ final class Configuration implements Map<String, Object> {
 		return datacenter;
 	}
 
-	public void setDatacenter(String data) {
-		datacenter = data;
-	}
-
 	public Map<String, String> getData() {
 		return data;
 	}
 
-	public void setData(Map<String, String> data) {
+	public void setData(final Map<String, String> data) {
 		this.data = data;
 	}
 
