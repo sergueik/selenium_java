@@ -11,22 +11,22 @@ e530095c:
   unused1:
   unused2:
 e577775c:
-  datacenter: oxdc
+  datacenter: westcoast
   role: integration-server-0
   environment: test
   unused1:
   unused2:
 a517535c:
-  datacenter: oxdc
+  datacenter: westcoast
   role: integration-server-3
   environment: test
 e577775d:
-  datacenter: oxdc
+  datacenter: westcoast
   role: integration-server-1
   environment: test
   unused1:
 e57fd0e12:
-  datacenter: oxdc
+  datacenter: westcoast
   role: integration-server-2
   environment: test
   unused1:
