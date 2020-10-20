@@ -1,32 +1,30 @@
 ---
 ad8c3125:
-  datacenter: wec
+  datacenter: eastcoast
   role: service-discovery-server-0
+  branch: release
   environment: prod
-  unused1:
 e530095c:
-  datacenter: wec
+  datacenter: eastcoast
   role: service-discovery-server-1
+  branch: release
   environment: prod
-  unused1:
-  unused2:
+a3391271:
+  datacenter: westcoast
+  role: service-discovery-server-0
+  branch: release
+  environment: prod
+e44820191:
+  datacenter: westcoast
+  role: service-discovery-server-1
+  branch: release
+  environment: prod
 e577775c:
   datacenter: westcoast
-  role: integration-server-0
+  role: service-discovery-server-0
+  branch: test
   environment: test
   unused1:
   unused2:
-a517535c:
-  datacenter: westcoast
-  role: integration-server-3
-  environment: test
-e577775d:
-  datacenter: westcoast
-  role: integration-server-1
-  environment: test
-  unused1:
-e57fd0e12:
-  datacenter: westcoast
-  role: integration-server-2
-  environment: test
-  unused1:
+  unused3:
+  unused4:

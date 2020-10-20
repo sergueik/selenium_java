@@ -1,4 +1,4 @@
-	### Usage
+### Usage
 
 ```sh
 mvn package
@@ -23,7 +23,7 @@ host:
 {datacenter=westcoast, role=integration-server-2, environment=test, unused1=null}```
 ```
 ```cmd
-java -cp target\launchdirect-0.5-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role integration-server -dc westcoast -env test -op typed
+java -cp target\launchdirect-0.5-SNAPSHOT.jar;target\lib\* example.LaunchDirect -role server -dc westcoast -env test -op typed
 ```
 this will produce
 ```sh
@@ -46,7 +46,8 @@ node:
 Hostname: e57fd0e12
 Role: integration-server-2
 Environment: test
-DC: westcoast...
+DC: westcoast
+...
 ```
 
 The operation `op` has to be supplied and the following is supported:
@@ -55,6 +56,9 @@ The operation `op` has to be supplied and the following is supported:
   * `excel`
   * `known`
   * `unknown`
+
+To provide arguments to those opetations, the following arguments are recognized: `role`, `env`, `dc`, `nodes`, `input`, `output`.
+To provide the list of nodes to examine, pass the filename argument via `@<filename>`. 
 
 When a specified yaml file path is provided, the specified file is read:
 

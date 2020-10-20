@@ -29,6 +29,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 public class Utils {
 
@@ -57,6 +60,31 @@ public class Utils {
 			return uri.toString();
 		} catch (URISyntaxException e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	public static String readProperty(String propertyName, String propertyFile) {
+		String resourcePath = "";
+		try {
+			resourcePath = Thread.currentThread().getContextClassLoader()
+					.getResource("").getPath();
+			System.err.println(String.format(
+					"The running application resource path: \"%s\"", resourcePath));
+		} catch (NullPointerException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			/*
+			 * if (debug) { e.printStackTrace(); }
+			 */
+		}
+		Configuration config = null;
+		try {
+			config = new PropertiesConfiguration(resourcePath + propertyFile);
+
+			Configuration extConfig = ((PropertiesConfiguration) config)
+					.interpolatedConfiguration();
+			return extConfig.getProperty(propertyName).toString();
+		} catch (ConfigurationException e) {
+			return null;
 		}
 	}
 
@@ -123,22 +151,23 @@ public class Utils {
 
 	// TODO
 	@SuppressWarnings("unchecked")
-	public static List<Configuration> loadTypedConfiguration(String fileName) {
+	public static List<NodeConfiguration> loadTypedConfiguration(
+			String fileName) {
 		init();
-		List<Configuration> configurations = new ArrayList<>();
-		Map<String, Configuration> data = null;
+		List<NodeConfiguration> configurations = new ArrayList<>();
+		Map<String, NodeConfiguration> data = null;
 		try (InputStream in = Files.newInputStream(Paths.get(fileName))) {
 			data = yaml.loadAs(in, Map.class);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		for (Entry<String, Configuration> rawdata : data.entrySet()) {
-			Map<String, Object> hostdata = rawdata.getValue();
+		for (Entry<String, NodeConfiguration> rawdata : data.entrySet()) {
+			Map<String, Object> hostdata = (Map<String, Object>) rawdata.getValue();
 			if (debug)
 				System.err.println(
 						String.format("Processing host %s configration", rawdata.getKey()));
 
-			Configuration configuration = new Configuration.Builder()
+			NodeConfiguration configuration = new NodeConfiguration.Builder()
 					.Hostname(rawdata.getKey())
 					.Environment(hostdata.get("environment").toString())
 					.Datacenter(hostdata.get("datacenter").toString())

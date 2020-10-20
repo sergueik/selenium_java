@@ -9,7 +9,7 @@ import java.util.Set;
 
 // The type LinkedHashMap<String,Object> cannot be a superinterface of Configuration; 
 // a superinterface must be an interface
-final class Configuration implements Map<String, Object> {
+final class NodeConfiguration implements Map<String, Object> {
 
 	public static class Builder {
 		public String environment;
@@ -40,8 +40,8 @@ final class Configuration implements Map<String, Object> {
 			return this;
 		}
 
-		public Configuration build() {
-			return new Configuration(this);
+		public NodeConfiguration build() {
+			return new NodeConfiguration(this);
 		}
 	}
 
@@ -51,7 +51,7 @@ final class Configuration implements Map<String, Object> {
 	public String role;
 	public String hostname;
 
-	public Configuration(final Builder builder) {
+	public NodeConfiguration(final Builder builder) {
 		this.datacenter = builder.datacenter;
 		this.role = builder.role;
 		this.environment = builder.environment;

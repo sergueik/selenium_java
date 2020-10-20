@@ -24,7 +24,8 @@ public class LaunchDirect {
 	private static String fileName = "classification.yaml";
 	private static String encoding = "UTF-8";
 
-	public static void main(String[] args) throws IOException, URISyntaxException {
+	public static void main(String[] args)
+			throws IOException, URISyntaxException {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.saveFlagValue("input");
 		commandLineParser.saveFlagValue("output");
@@ -50,8 +51,10 @@ public class LaunchDirect {
 		// TODO: look up in workspace if not specified
 		if (inputFile == null) {
 			inputFile = String.join(System.getProperty("file.separator"),
-					Arrays.asList(System.getProperty("user.dir"), "src", "main", "resources", fileName));
-			System.err.println(String.format("Using default inputFile: %s", inputFile));
+					Arrays.asList(System.getProperty("user.dir"), "src", "main",
+							"resources", fileName));
+			System.err
+					.println(String.format("Using default inputFile: %s", inputFile));
 		}
 
 		dc = commandLineParser.getFlagValue("dc");
@@ -68,12 +71,6 @@ public class LaunchDirect {
 		if (commandLineParser.hasFlag("debug")) {
 			debug = true;
 		}
-		if (commandLineParser.hasFlag("nodes")) {
-			nodelist = Arrays.asList(commandLineParser.getFlagValue("nodes").split(" *, *"));
-			if (debug) {
-				System.err.println("Loaded node list: " + nodelist);
-			}
-		}
 		// operation
 		op = commandLineParser.getFlagValue("op");
 		if (op == null) {
@@ -88,6 +85,16 @@ public class LaunchDirect {
 		if (op.equalsIgnoreCase("typed")) {
 			dumpTyped();
 		}
+		
+		if (op.matches("(?:known|unknown)")) {
+			if (commandLineParser.hasFlag("nodes")) {
+				nodelist = Arrays
+						.asList(commandLineParser.getFlagValue("nodes").split(" *, *"));
+				if (debug) {
+					System.err.println("Loaded node list: " + nodelist);
+				}
+			}
+		}
 
 		if (op.equalsIgnoreCase("known")) {
 			filter(true);
@@ -100,8 +107,9 @@ public class LaunchDirect {
 		if (op.equalsIgnoreCase("excel")) {
 			outputFile = commandLineParser.getFlagValue("output");
 			if (outputFile == null) {
-				outputFile = "test.xlsx";
-				System.err.println(String.format("Using default outputFile: %s", outputFile));
+				outputFile = "result.xlsx";
+				System.err.println(
+						String.format("Using default output filename: %s", outputFile));
 			}
 			excel();
 		}
@@ -111,8 +119,10 @@ public class LaunchDirect {
 	}
 
 	public static void filter(final boolean collectKnown) {
-		LinkedHashMap<String, Map<String, String>> nodes = Utils.loadConfiguration(inputFile);
-		List<String> knownNodes = Arrays.asList(nodes.keySet().toArray(new String[nodes.size()]));
+		LinkedHashMap<String, Map<String, String>> nodes = Utils
+				.loadConfiguration(inputFile);
+		List<String> knownNodes = Arrays
+				.asList(nodes.keySet().toArray(new String[nodes.size()]));
 
 		for (String hostname : nodelist) {
 			if (collectKnown == true && knownNodes.contains(hostname)) {
@@ -125,15 +135,18 @@ public class LaunchDirect {
 	}
 
 	public static void dump() {
-		LinkedHashMap<String, Map<String, String>> nodes = Utils.loadConfiguration(inputFile);
+		LinkedHashMap<String, Map<String, String>> nodes = Utils
+				.loadConfiguration(inputFile);
 		for (String key : nodes.keySet()) {
 			Map<String, String> row = nodes.get(key);
 			if (debug) {
 				System.err.println(String.format("host:\n%s\n", row.toString()));
-				System.err.println(String.format("host:\n%s\n", Arrays.asList(row.keySet())));
+				System.err
+						.println(String.format("host:\n%s\n", Arrays.asList(row.keySet())));
 				System.err.println(String.format("host role:\n%s\n", row.get("role")));
 			}
-			if (matchedValue(row, "datacenter", dc) && matchedValue(row, "environment", env)
+			if (matchedValue(row, "datacenter", dc)
+					&& matchedValue(row, "environment", env)
 					&& matchedValue(row, "role", role, true)) {
 				System.err.println(String.format("host:\n%s\n", row.toString()));
 			}
@@ -145,12 +158,14 @@ public class LaunchDirect {
 		List<Map<Integer, String>> tableData = new ArrayList<>();
 		Map<Integer, String> rowData = new HashMap<>();
 
-		LinkedHashMap<String, Map<String, String>> nodes = Utils.loadConfiguration(inputFile);
+		LinkedHashMap<String, Map<String, String>> nodes = Utils
+				.loadConfiguration(inputFile);
 		for (String key : nodes.keySet()) {
 			Map<String, String> row = nodes.get(key);
 			rowData = new HashMap<>();
 			rowData.put(0, key);
-			List<String> columns = Arrays.asList(row.keySet().toArray(new String[row.size()]));
+			List<String> columns = Arrays
+					.asList(row.keySet().toArray(new String[row.size()]));
 
 			for (int col = 0; col != columns.size(); col++) {
 				rowData.put(col + 1, row.get(columns.get(col)));
@@ -169,43 +184,49 @@ public class LaunchDirect {
 	}
 
 	public static void dumpTyped() {
-		List<Configuration> nodes = Utils.loadTypedConfiguration(inputFile);
+		List<NodeConfiguration> nodes = Utils.loadTypedConfiguration(inputFile);
 		if (debug) {
 			System.err.println(String.format("nodes:\n%s\n", nodes.toString()));
 		}
-		for (Configuration node : nodes) {
-			if (matchedValue(node.getDatacenter(), dc) && matchedValue(node.getRole(), role, true)
+		for (NodeConfiguration node : nodes) {
+			if (matchedValue(node.getDatacenter(), dc)
+					&& matchedValue(node.getRole(), role, true)
 					&& matchedValue(node.getEnvironment(), env)) {
 				System.err.println(String.format("node:\n%s\n", node.toString()));
 			}
 		}
 	}
 
-	private static boolean matchedValue(final Map<String, String> row, final String key, final String value) {
+	private static boolean matchedValue(final Map<String, String> row,
+			final String key, final String value) {
 		return matchedValue(row, key, value, false);
 	}
 
-	private static boolean matchedValue(final Map<String, String> row, final String key, final String value,
-			boolean relaxedMatch) {
+	private static boolean matchedValue(final Map<String, String> row,
+			final String key, final String value, boolean relaxedMatch) {
 		if (debug) {
-			System.err.println(String.format("Comparing value of: %s with %s", key, value));
+			System.err
+					.println(String.format("Comparing value of: %s with %s", key, value));
 
 		}
 		// used for most keys except role,
 		// with which a less restrictive match is performed
-		return (row.containsKey(key)
-				&& row.get(key).matches(String.format((relaxedMatch) ? "^.*%s.*$" : "^%s.*$", value)));
+		return (row.containsKey(key) && row.get(key)
+				.matches(String.format((relaxedMatch) ? "^.*%s.*$" : "^%s.*$", value)));
 	}
 
 	private static boolean matchedValue(final String data, final String value) {
 		return matchedValue(data, value, false);
 	}
 
-	private static boolean matchedValue(final String data, final String value, boolean relaxedMatch) {
+	private static boolean matchedValue(final String data, final String value,
+			boolean relaxedMatch) {
 		if (debug) {
-			System.err.println(String.format("Comparing data: %s with %s", data, value));
+			System.err
+					.println(String.format("Comparing data: %s with %s", data, value));
 
 		}
-		return (data.matches(String.format((relaxedMatch) ? "^.*%s.*$" : "^%s.*$", value)));
+		return (data
+				.matches(String.format((relaxedMatch) ? "^.*%s.*$" : "^%s.*$", value)));
 	}
 }
