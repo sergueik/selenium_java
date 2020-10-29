@@ -1,17 +1,20 @@
 package example;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.lang.IllegalStateException;
 // package org.apache.commons.io does not exist
 // import org.apache.commons.io.FileUtils;
 
@@ -59,6 +62,43 @@ public class CommandLineParser {
 		return arguments.length;
 	}
 
+	public Map<Object, Object> parseEmbeddedMultiArg(final String data) {
+		Map<String, String> result = new HashMap<>();
+		Map<Object, Object> rawResult = new HashMap<>();
+		List<String[]> rawdata = new ArrayList<>();
+		rawdata = Arrays.asList(data.split(" *, *")).stream().map(o -> o.split(" *= *")).filter(o -> o.length == 2)
+				.collect(Collectors.toList());
+		List<String> keys = rawdata.stream().map(o -> o[0]).distinct().collect(Collectors.toList());
+		if (rawdata.size() == keys.size()) {
+			if (debug) {
+				rawdata.stream().map(o -> String.format("Collected: " + Arrays.asList(o))).forEach(System.err::println);
+			}
+
+			try {
+				// result = rawdata.stream().collect(Collectors.toMap(o -> o[0], o -> o[1]));
+				rawResult = rawdata.stream().map(o -> new AbstractMap.SimpleEntry(o[0], o[1]))
+						.collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()));
+			} catch (IllegalStateException e) {
+			}
+		} else {
+			System.err.println("Duplicate embedded argument(s) detected, aborting");
+			rawResult = null;
+		}
+		return rawResult;
+	}
+
+	public Map<String, String> parseEmbeddedMultiArg2(final String data) {
+		Map<String, String> result = new HashMap<>();
+		try {
+			result = Arrays.asList(data.split(" *, *")).stream().map(o -> o.split(" *= *")).filter(o -> o.length == 2)
+					.collect(Collectors.toMap(o -> o[0], o -> o[1]));
+		} catch (IllegalStateException e) {
+			System.err.println("Duplicate embedded argument(s) detected, aborting");
+			result = null;
+		}
+		return result;
+	}
+
 	public int getNumberOfFlags() {
 		return flags.size();
 	}
@@ -79,8 +119,7 @@ public class CommandLineParser {
 				if (debug) {
 					System.err.println("Examine: " + name);
 				}
-				if (flagsWithValues.contains(name) && n < args.length - 1
-						&& !args[n + 1].matches("^-")) {
+				if (flagsWithValues.contains(name) && n < args.length - 1 && !args[n + 1].matches("^-")) {
 					// https://www.baeldung.com/java-case-insensitive-string-matching
 					String data = args[++n];
 
@@ -92,15 +131,12 @@ public class CommandLineParser {
 						}
 					} else if (data.matches("(?i)^@[a-z_0-9.]+")) {
 						String datafilePath = Paths.get(System.getProperty("user.dir"))
-								.resolve(data.replaceFirst("^@", "")).toAbsolutePath()
-								.toString();
+								.resolve(data.replaceFirst("^@", "")).toAbsolutePath().toString();
 						if (debug) {
-							System.err.println(
-									"Reading value for: " + name + " from " + datafilePath);
+							System.err.println("Reading value for: " + name + " from " + datafilePath);
 						}
 						try {
-							value = readFile(datafilePath, Charset.forName("UTF-8"))
-									.replaceAll("\\r?\\n", ",");
+							value = readFile(datafilePath, Charset.forName("UTF-8")).replaceAll("\\r?\\n", ",");
 						} catch (IOException e) {
 							throw new RuntimeException(e);
 						}
@@ -136,8 +172,7 @@ public class CommandLineParser {
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"
 	// NOTE: not using org.json to reduce size
-	public Map<String, String> extractExtraArgs(String argument)
-			throws IllegalArgumentException {
+	public Map<String, String> extractExtraArgs(String argument) throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.trim().substring(1, argument.length() - 1);
