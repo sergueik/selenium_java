@@ -19,7 +19,7 @@ import example.Utils;
  * Unit Tests for Utils 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-
+@SuppressWarnings("deprecation")
 public class UtilsTest {
 
 	private static boolean debug = true;

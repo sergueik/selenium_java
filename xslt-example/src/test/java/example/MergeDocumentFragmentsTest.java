@@ -32,7 +32,7 @@ import example.MergeDocumentFragments;
  * Unit Tests for MergeDocumentFragments 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-
+@SuppressWarnings("deprecation")
 public class MergeDocumentFragmentsTest {
 	private static boolean debug = true;
 

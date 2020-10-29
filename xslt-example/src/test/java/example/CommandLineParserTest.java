@@ -8,6 +8,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.hamcrest.Matchers.hasItems;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,10 +26,13 @@ import example.CommandLineParser;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class CommandLineParserTest {
 
 	private static boolean debug = true;
 	private static CommandLineParser commandLineParser;
+	private String[] argsArray = {};
+	private String arg = null;
 
 	// stop keeping it
 	@Before
@@ -38,36 +42,8 @@ public class CommandLineParserTest {
 	}
 
 	@Test
-	public void embeddedArgTest1() {
-		final String embeddedMultiArg = "a=b,c=d,e=f";
-		Map<Object, Object> result = commandLineParser.parseEmbeddedMultiArg(embeddedMultiArg);
-		assertThat(result.keySet().size(), is(3));
-	}
-
-	@Test
-	public void embeddedArgTest2() {
-		final String embeddedMultiArg = "a=b,c=d,e=f";
-		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg2(embeddedMultiArg);
-		assertThat(result.keySet().size(), is(3));
-	}
-
-	@Test
-	public void embeddedArgRejectTest1() {
-		final String embeddedMultiArg = "a=1,a=2,a=3";
-		Map<Object, Object> result = commandLineParser.parseEmbeddedMultiArg(embeddedMultiArg);
-		assertThat(result, nullValue());
-	}
-
-	@Test
-	public void embeddedArgRejectTest2() {
-		final String embeddedMultiArg = "a=1,a=2,a=3";
-		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg2(embeddedMultiArg);
-		assertThat(result, nullValue());
-	}
-
-	@Test
 	public void addLoadTest() {
-		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
+		argsArray = new String[] { "-a", "42", "-b", "41" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getNumberOfFlags(), is(2));
@@ -81,72 +57,79 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("b"), is(true));
 		assertThat(commandLineParser.getFlagValue("b"), notNullValue());
 		assertThat(commandLineParser.getFlagValue("z"), nullValue());
-		System.err.println("argumentNamesValuesTest(): arguments: " + Arrays.asList(commandLineParser.getArguments()));
+		System.err.println("argumentNamesValuesTest(): arguments: "
+				+ Arrays.asList(commandLineParser.getArguments()));
 	}
 
 	@Test
 	public void blankArgumensTest() {
 		commandLineParser.parse(new String[] {});
 		if (debug) {
-			System.err.println("blankArgumensTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("blankArgumensTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 		assertThat(commandLineParser.getNumberOfFlags(), is(0));
 	}
 
 	@Test
 	public void argumentCountsTest() {
-		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
+		argsArray = new String[] { "-a", "42", "-b", "41" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getNumberOfArguments(), is(1));
 		if (debug) {
-			System.err.println("argumentCountsTest: arguments: " + Arrays.asList(commandLineParser.getArguments()));
+			System.err.println("argumentCountsTest: arguments: "
+					+ Arrays.asList(commandLineParser.getArguments()));
 		}
 		assertThat(commandLineParser.getNumberOfFlags(), is(2));
 
 		if (debug) {
-			System.err.println("argumentCountsTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("argumentCountsTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 	}
 
 	@Test
 	public void argumentNamesValuesTest() {
 
-		final String[] argsArray = new String[] { "-a", "42", "-b", "41" };
+		argsArray = new String[] { "-a", "42", "-b", "41" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 
 		assertThat(commandLineParser.hasFlag("a"), is(true));
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
 		assertThat(commandLineParser.getFlagValue("z"), nullValue());
-		System.err.println("argumentNamesValuesTest(): arguments: " + Arrays.asList(commandLineParser.getArguments()));
+		System.err.println("argumentNamesValuesTest(): arguments: "
+				+ Arrays.asList(commandLineParser.getArguments()));
 	}
 
 	@Test
 	public void argumentValueLessTest() {
-		final String[] argsArray = new String[] { "-a", "-b" };
+		argsArray = new String[] { "-a", "-b" };
 		commandLineParser.saveFlagValue("c");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.hasFlag("a"), is(true));
-		// TODO: fix processing - argument is lost
+
 		assertThat(commandLineParser.hasFlag("b"), is(true));
+		// TODO: fix processing - argument "c" is lost
 		assertThat(commandLineParser.hasFlag("c"), is(false));
 		assertThat(commandLineParser.hasFlag("d"), is(false));
 		assertThat(commandLineParser.getFlagValue("a"), nullValue());
 
 		if (debug) {
-			System.err.println("argumentValueLessTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("argumentValueLessTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 	}
 
 	@Test
 	public void argumentValueLessMixedTest() {
-		final String[] argsArray = new String[] { "-foo", "bar", "-debug", "-verbose", "-answer", "42" };
+		argsArray = new String[] { "-foo", "bar", "-debug", "-verbose", "-answer",
+				"42" };
 		commandLineParser.saveFlagValue("foo");
 		commandLineParser.saveFlagValue("answer");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.hasFlag("debug"), is(true));
-		// TODO: fix processing - argument is lost
 		assertThat(commandLineParser.hasFlag("verbose"), is(true));
 		assertThat(commandLineParser.getFlagValue("debug"), nullValue());
 		assertThat(commandLineParser.getFlagValue("verbose"), nullValue());
@@ -155,17 +138,21 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("answer"), is(true));
 
 		if (debug) {
-			System.err.println("argumentValueLessTest: flags: " + Arrays.asList(commandLineParser.getFlags()));
+			System.err.println("argumentValueLessTest: flags: "
+					+ Arrays.asList(commandLineParser.getFlags()));
 		}
 	}
 
 	@Test
 	public void extractExtraArgsTest() {
-		final String[] argsArray = new String[] { "-a", "{count:0, type: navigate, size:100.1, flag:true}" };
+		argsArray = new String[] { "-a",
+				"{count:0, type: navigate, size:100.1, flag:true}" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
-		assertThat(commandLineParser.extractExtraArgs(commandLineParser.getFlagValue("a")), notNullValue());
+		assertThat(
+				commandLineParser.extractExtraArgs(commandLineParser.getFlagValue("a")),
+				notNullValue());
 		final Map<String, String> extraArgData = commandLineParser
 				.extractExtraArgs(commandLineParser.getFlagValue("a"));
 		assertThat(extraArgData.containsKey("count"), is(true));
@@ -177,28 +164,70 @@ public class CommandLineParserTest {
 	}
 
 	// https://www.baeldung.com/junit-assert-exception
+	@SuppressWarnings("unused")
 	@Test(expected = java.lang.IllegalArgumentException.class)
 	public void argumentExtraArgsGuardTest() {
-		final String[] argsArray = new String[] { "-a", "{count:0,deep:{key:value}}" };
+		argsArray = new String[] { "-a", "{count:0,deep:{key:value}}" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		final Map<String, String> extraArgData = commandLineParser
 				.extractExtraArgs(commandLineParser.getFlagValue("a"));
 	}
+	// TODO: https://m.habr.com/ru/post/346782/
+	// Java 8 Optional: Java 8 Кот Шрёдингера
 
 	// TODO: enabling the test below leads two other tests to start failing:
 	// argumentValueLessTest, argumentCountsTest
 	@Ignore
 	@Test
 	public void argumentEnvionmentValueTest() {
-		final String[] argsArray = new String[] { "-a", "env:JAVA_HOME", "-b", "env:java_home" };
+		argsArray = new String[] { "-a", "env:JAVA_HOME", "-b", "env:java_home" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.saveFlagValue("b");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.hasFlag("a"), is(true));
-		assertThat(commandLineParser.getFlagValue("a"), is(System.getenv("JAVA_HOME")));
+		assertThat(commandLineParser.getFlagValue("a"),
+				is(System.getenv("JAVA_HOME")));
 		assertThat(commandLineParser.hasFlag("b"), is(true));
-		assertThat(commandLineParser.getFlagValue("b"), is(System.getenv("JAVA_HOME")));
+		assertThat(commandLineParser.getFlagValue("b"),
+				is(System.getenv("JAVA_HOME")));
+	}
+
+
+	@Test
+	public void embeddedArgTest1() {
+		arg = "a=b,c=d,e=f";
+		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg(arg);
+		assertThat(result.keySet().size(), is(3));
+	}
+
+	@Test
+	public void embeddedArgTest2() {
+		arg = "a = b,c  =	d, e=f";
+		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg(arg);
+		assertThat(result.keySet().size(), is(3));
+		assertThat(result.keySet(), hasItems(new String[] { "a", "c", "e" }));
+	}
+
+	@Test
+	public void embeddedArgTest3() {
+		arg = "a=b,c=d,e=f";
+		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg2(arg);
+		assertThat(result.keySet().size(), is(3));
+	}
+
+	@Test
+	public void embeddedArgRejectTest1() {
+		arg = "a=1,a=2,a=3";
+		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg(arg);
+		assertThat(result, nullValue());
+	}
+
+	@Test
+	public void embeddedArgRejectTest2() {
+		arg = "a=1,a=2,a=3";
+		Map<String, String> result = commandLineParser.parseEmbeddedMultiArg2(arg);
+		assertThat(result, nullValue());
 	}
 
 }

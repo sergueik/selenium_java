@@ -31,7 +31,7 @@ import example.MergeDocumentFragments;
  * 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-
+@SuppressWarnings("deprecation")
 public class RemoveNodeTest {
 
 	private static boolean debug = true;
@@ -49,26 +49,32 @@ public class RemoveNodeTest {
 	private static Document document;
 
 	@BeforeClass
-	public static void load() throws ParserConfigurationException, SAXException, IOException {
-		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-		final DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		document = documentBuilder.parse(new InputSource(new StringReader(resource)));
+	public static void load()
+			throws ParserConfigurationException, SAXException, IOException {
+		final DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory
+				.newInstance();
+		final DocumentBuilder documentBuilder = documentBuilderFactory
+				.newDocumentBuilder();
+		document = documentBuilder
+				.parse(new InputSource(new StringReader(resource)));
 	}
 
 	@Test
 	public void searchMissingNodeTest() {
-		assertThat(MergeDocumentFragments.searchNode(document, "filter", "filter-name", "missing"), is(false));
+		assertThat(MergeDocumentFragments.searchNode(document, "filter",
+				"filter-name", "missing"), is(false));
 	}
 
 	@Test
 	public void searchExistingNodeTest() {
-		assertThat(MergeDocumentFragments.searchNode(document, "filter", "filter-name", "responseHeadersFilter"),
-				is(true));
+		assertThat(MergeDocumentFragments.searchNode(document, "filter",
+				"filter-name", "responseHeadersFilter"), is(true));
 
 	}
 
 	@Test
 	public void searchDirtySiblingchildNodeTest() {
-		assertThat(MergeDocumentFragments.searchNode(document, "filter", "filter-name", "anotherFilter"), is(false));
+		assertThat(MergeDocumentFragments.searchNode(document, "filter",
+				"filter-name", "anotherFilter"), is(false));
 	}
 }

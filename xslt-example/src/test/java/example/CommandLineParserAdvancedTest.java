@@ -21,7 +21,7 @@ import example.CommandLineParser;
  * More advanced Unit Tests for CommandLineParser 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-
+@SuppressWarnings("deprecation")
 public class CommandLineParserAdvancedTest {
 
 	private static boolean debug = true;
