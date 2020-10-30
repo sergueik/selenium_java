@@ -94,5 +94,64 @@ hostname:
 e57fd0e12
 ```
 
+### Inventory  extraction
+
+![Inventory Example](https://github.com/sergueik/selenium_java/blob/master/launch_direct/screenshots/inventory_capture.png)
+
+```sh
+java -cp target\launchdirect-0.6-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -debug
+```
+
+will iterate over defined sheets and column headers, picking the spefic ones:
+```sh
+Using default inputFile: classification.yaml
+Read column headers: [Device ID, Hostname, Location, IP, Network, Role, Notes]
+Read sheet names: [PROD, TEST, SIT]
+Reading Excel 2007 data sheet.
+1 = B Hostname
+2 = C Location
+5 = F Role
+6 = G Notes
+=>abcprd01
+=>EAST
+=>CZK
+=>Cassandra/Zookeeper
+
+=>abcprd2
+=>EAST
+=>PG
+=>Postgres
+
+=>abcprd3
+=>EAST
+=>RMP
+=>Router/Message Processor
+
+=>abcpr5
+=>EAST
+=>RMP
+=>Router/Message Processor
+
+0 => abcprd01
+1 => EAST
+2 => CZK
+3 => Cassandra/Zookeeper
+---
+0 => abcprd2
+1 => EAST
+2 => PG
+3 => Postgres
+---
+0 => abcprd3
+1 => EAST
+2 => RMP
+3 => Router/Message Processor
+---
+0 => abcpr5
+1 => EAST
+2 => RMP
+3 => Router/Message Processor
+---
+```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

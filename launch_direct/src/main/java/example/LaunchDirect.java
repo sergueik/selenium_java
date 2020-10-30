@@ -17,17 +17,21 @@ public class LaunchDirect {
 	private static List<String> nodelist = new LinkedList<>();
 	private static String inputFile;
 	private static String outputFile;
+	private static String inventoryFile;
 	private static String role;
 	private static String dc;
 	private static String op;
 	private static String env;
 	private static String fileName = "classification.yaml";
 	private static String encoding = "UTF-8";
+	private static List<String> columnHeaders = new ArrayList<>();
+	private static String newColumnHeader = null;
 
 	public static void main(String[] args)
 			throws IOException, URISyntaxException {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.saveFlagValue("input");
+		commandLineParser.saveFlagValue("inventory");
 		commandLineParser.saveFlagValue("output");
 		// --input <classification file>
 		commandLineParser.saveFlagValue("role");
@@ -85,7 +89,7 @@ public class LaunchDirect {
 		if (op.equalsIgnoreCase("typed")) {
 			dumpTyped();
 		}
-		
+
 		if (op.matches("(?:known|unknown)")) {
 			if (commandLineParser.hasFlag("nodes")) {
 				nodelist = Arrays
@@ -112,6 +116,15 @@ public class LaunchDirect {
 						String.format("Using default output filename: %s", outputFile));
 			}
 			excel();
+		}
+		if (op.equalsIgnoreCase("import")) {
+			inventoryFile = commandLineParser.getFlagValue("inventory");
+			if (inventoryFile == null) {
+				System.err.println("Missing required argument for operation " + op
+						+ ": inventoryfile.");
+				return;
+			}
+			importExcel();
 		}
 		if (debug) {
 			System.err.println("Done: " + op);
@@ -153,8 +166,27 @@ public class LaunchDirect {
 		}
 	}
 
-	public static void excel() {
+	public static void importExcel() {
+		ExcelFileUtils excelFileUtils = new ExcelFileUtils();
+		List<Map<Integer, String>> tableData = new ArrayList<>();
+		final List<String> extractColumnHeaders = Arrays
+				.asList("Hostname,Role,Location,Notes".split(" *, *"));
+		final String sheetColumnHeader = "Env";
+		excelFileUtils.setExtractColumnHeaders(extractColumnHeaders);
+		excelFileUtils.setSheetColumnHeader(sheetColumnHeader);
+		excelFileUtils.setSpreadsheetFilePath(inventoryFile);
+		excelFileUtils.setSheetName("Data");
+		excelFileUtils.setTableData(tableData);
+		excelFileUtils.setDebug(debug);
+		columnHeaders = excelFileUtils.readColumnHeaders();
+		System.err.println("Read column headers: " + columnHeaders);
+		List<String> sheetNames = excelFileUtils.readSheetNames();
+		System.err.println("Read sheet names: " + sheetNames);
+		excelFileUtils.readSpreadsheet();
+	}
 
+	public static void excel() {
+		ExcelFileUtils excelFileUtils = new ExcelFileUtils();
 		List<Map<Integer, String>> tableData = new ArrayList<>();
 		Map<Integer, String> rowData = new HashMap<>();
 
@@ -172,13 +204,13 @@ public class LaunchDirect {
 			}
 			tableData.add(rowData);
 		}
-		Utils.setExcelFileName(outputFile);
-		Utils.setSheetName("Data");
-		Utils.setTableData(tableData);
+		excelFileUtils.setSpreadsheetFilePath(outputFile);
+		excelFileUtils.setSheetName("Data");
+		excelFileUtils.setTableData(tableData);
 
 		try {
-			Utils.setSheetFormat("Excel 2007");
-			Utils.writeXLSXFile();
+			excelFileUtils.setSheetFormat("Excel 2007");
+			excelFileUtils.writeSpreadsheet();
 		} catch (Exception e) {
 		}
 	}
