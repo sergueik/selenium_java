@@ -99,59 +99,60 @@ e57fd0e12
 ![Inventory Example](https://github.com/sergueik/selenium_java/blob/master/launch_direct/screenshots/inventory_capture.png)
 
 ```sh
-java -cp target\launchdirect-0.7-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -debug -columns Hostname,Location,Role
+java -cp target\launchdirect-0.7-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -columns Hostname,Location,Role,Notes
 ```
 
 will iterate over defined sheets and column headers, picking the spefic ones:
 ```sh
-Using default inputFile: classification.yaml
-Read column headers: [Device ID, Hostname, Location, IP, Network, Role, Notes]
-Read sheet names: [PROD, TEST, SIT]
-Reading Excel 2007 data sheet.
-1 = B Hostname
-2 = C Location
-5 = F Role
-6 = G Notes
-=>abcprd01
-=>EAST
-=>CZK
-=>Cassandra/Zookeeper
-
-=>abcprd2
-=>EAST
-=>PG
-=>Postgres
-
-=>abcprd3
-=>EAST
-=>RMP
-=>Router/Message Processor
-
-=>abcpr5
-=>EAST
-=>RMP
-=>Router/Message Processor
-
-0 => abcprd01
-1 => EAST
-2 => CZK
-3 => Cassandra/Zookeeper
----
-0 => abcprd2
-1 => EAST
-2 => PG
-3 => Postgres
----
-0 => abcprd3
-1 => EAST
-2 => RMP
-3 => Router/Message Processor
----
-0 => abcpr5
-1 => EAST
-2 => RMP
-3 => Router/Message Processor
----
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd01
+Location: EAST
+Role: CZK
+Notes: Cassandra/Zookeeper
+Env: PROD
+--------
+Hostname: abcprd2
+Location: EAST
+Role: PG
+Notes: Postgres
+Env: PROD
+--------
+...
 ```
 
 and 
@@ -161,6 +162,22 @@ java -cp target\launchdirect-0.7-SNAPSHOT.jar;target\lib\* example.LaunchDirect 
 will discover
 ```sh
 There is not enough data in the inventory file: inventory.xlsx
+```
+
+### Depedencies
+```sh
+commons-codec-1.10.jar
+commons-collections4-4.1.jar
+commons-configuration-1.10.jar
+commons-exec-1.3.jar
+commons-io-2.5.jar
+commons-lang-2.6.jar
+commons-logging-1.1.1.jar
+poi-3.17.jar
+poi-excelant-3.17.jar
+poi-ooxml-3.17.jar
+poi-ooxml-schemas-3.17.jar
+xmlbeans-2.6.0.jar
 ```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

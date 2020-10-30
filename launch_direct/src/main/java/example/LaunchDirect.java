@@ -9,6 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class LaunchDirect {
 
@@ -184,15 +185,35 @@ public class LaunchDirect {
 		excelFileUtils.setTableData(tableData);
 		excelFileUtils.setDebug(debug);
 		columnHeaders = excelFileUtils.readColumnHeaders();
-		System.err.println("Read column headers: " + columnHeaders);
+		if (debug) {
+			System.err.println("Read column headers: " + columnHeaders);
+		}
 		if (!columnHeaders.containsAll(extractColumnHeaders)) {
 			System.err.println(
 					"There is not enough data in the inventory file: " + inventoryFile);
 			return;
 		}
 		List<String> sheetNames = excelFileUtils.readSheetNames();
-		System.err.println("Read sheet names: " + sheetNames);
-		excelFileUtils.readSpreadsheet();
+		if (debug) {
+			System.err.println("Read sheet names: " + sheetNames);
+		}
+		List<Map<Integer, String>> existingData = new ArrayList<>();
+		// NOTE: no need to wrap into an Optional
+		excelFileUtils.readSpreadsheet(Optional.of(existingData));
+
+		List<String> printedColumnHeaders = new ArrayList<>();
+		for (String header : extractColumnHeaders) {
+			printedColumnHeaders.add(header);
+		}
+		// append the Column for sheet name
+		printedColumnHeaders.add(sheetColumnHeader);
+		for (Map<Integer, String> rowData : existingData) {
+			for (int cnt : rowData.keySet()) {
+				System.err.println(String.format("%s: %s",
+						printedColumnHeaders.get(cnt), rowData.get(cnt)));
+			}
+			System.err.println("--------");
+		}
 	}
 
 	public static void excel() {
