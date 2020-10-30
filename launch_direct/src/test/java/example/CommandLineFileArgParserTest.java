@@ -24,6 +24,7 @@ import example.CommandLineParser;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class CommandLineFileArgParserTest {
 
 	private static boolean debug = true;
@@ -34,6 +35,7 @@ public class CommandLineFileArgParserTest {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.setDebug(debug);
 	}
+
 	@Ignore
 	@Test
 	public void argumentDataFileValueTest() {

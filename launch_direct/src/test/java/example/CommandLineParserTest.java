@@ -4,6 +4,7 @@ package example;
  * Copyright 2020 Serguei Kouzmine
  */
 
+import java.util.AbstractMap;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
@@ -17,6 +18,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import java.lang.IllegalStateException;
+
 import example.CommandLineParser;
 
 /**
@@ -25,6 +28,7 @@ import example.CommandLineParser;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class CommandLineParserTest {
 
 	private static boolean debug = true;
@@ -189,4 +193,3 @@ public class CommandLineParserTest {
 	}
 
 }
-

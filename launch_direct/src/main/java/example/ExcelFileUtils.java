@@ -512,6 +512,7 @@ public class ExcelFileUtils {
 		return result;
 	}
 
+	// TODO: narrow to only be used for known/unknown commenting
 	public void appendColumnHeader(String columnHeader) {
 		// TODO: process Excel 2003 files
 		XSSFWorkbook workBook = null;

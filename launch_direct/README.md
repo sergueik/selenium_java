@@ -99,7 +99,7 @@ e57fd0e12
 ![Inventory Example](https://github.com/sergueik/selenium_java/blob/master/launch_direct/screenshots/inventory_capture.png)
 
 ```sh
-java -cp target\launchdirect-0.6-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -debug
+java -cp target\launchdirect-0.7-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -debug -columns Hostname,Location,Role
 ```
 
 will iterate over defined sheets and column headers, picking the spefic ones:
@@ -152,6 +152,15 @@ Reading Excel 2007 data sheet.
 2 => RMP
 3 => Router/Message Processor
 ---
+```
+
+and 
+```sh
+java -cp target\launchdirect-0.7-SNAPSHOT.jar;target\lib\* example.LaunchDirect -inventory inventory.xlsx -op import -role * -dc * -env * -debug -columns Hostname,Location,Role,Missing
+```
+will discover
+```sh
+There is not enough data in the inventory file: inventory.xlsx
 ```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

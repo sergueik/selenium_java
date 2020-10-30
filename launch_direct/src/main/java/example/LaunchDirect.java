@@ -26,6 +26,9 @@ public class LaunchDirect {
 	private static String encoding = "UTF-8";
 	private static List<String> columnHeaders = new ArrayList<>();
 	private static String newColumnHeader = null;
+	private static List<String> extractColumnHeaders = Arrays
+			.asList("Hostname,Role,Location,Notes".split(" *, *"));
+	private static String sheetColumnHeader = "Env";
 
 	public static void main(String[] args)
 			throws IOException, URISyntaxException {
@@ -39,6 +42,7 @@ public class LaunchDirect {
 		commandLineParser.saveFlagValue("dc");
 		commandLineParser.saveFlagValue("op");
 		commandLineParser.saveFlagValue("nodes");
+		commandLineParser.saveFlagValue("columns");
 		commandLineParser.saveFlagValue("if");
 		// TODO: input format
 
@@ -118,6 +122,10 @@ public class LaunchDirect {
 			excel();
 		}
 		if (op.equalsIgnoreCase("import")) {
+			if (commandLineParser.hasFlag("columns")) {
+				extractColumnHeaders = Arrays
+						.asList(commandLineParser.getFlagValue("columns").split(","));
+			}
 			inventoryFile = commandLineParser.getFlagValue("inventory");
 			if (inventoryFile == null) {
 				System.err.println("Missing required argument for operation " + op
@@ -169,9 +177,6 @@ public class LaunchDirect {
 	public static void importExcel() {
 		ExcelFileUtils excelFileUtils = new ExcelFileUtils();
 		List<Map<Integer, String>> tableData = new ArrayList<>();
-		final List<String> extractColumnHeaders = Arrays
-				.asList("Hostname,Role,Location,Notes".split(" *, *"));
-		final String sheetColumnHeader = "Env";
 		excelFileUtils.setExtractColumnHeaders(extractColumnHeaders);
 		excelFileUtils.setSheetColumnHeader(sheetColumnHeader);
 		excelFileUtils.setSpreadsheetFilePath(inventoryFile);
@@ -180,6 +185,11 @@ public class LaunchDirect {
 		excelFileUtils.setDebug(debug);
 		columnHeaders = excelFileUtils.readColumnHeaders();
 		System.err.println("Read column headers: " + columnHeaders);
+		if (!columnHeaders.containsAll(extractColumnHeaders)) {
+			System.err.println(
+					"There is not enough data in the inventory file: " + inventoryFile);
+			return;
+		}
 		List<String> sheetNames = excelFileUtils.readSheetNames();
 		System.err.println("Read sheet names: " + sheetNames);
 		excelFileUtils.readSpreadsheet();

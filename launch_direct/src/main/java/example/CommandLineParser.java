@@ -1,12 +1,14 @@
 package example;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import java.util.stream.Collectors;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -22,6 +24,8 @@ import java.nio.file.Paths;
 public class CommandLineParser {
 
 	private boolean debug = false;
+	private static final String keyValueSeparator = ":";
+	private static final String entrySeparator = ",";
 
 	public boolean isDebug() {
 		return debug;
@@ -130,8 +134,35 @@ public class CommandLineParser {
 		flagsWithValues.add(flagName);
 	}
 
-	private static final String keyValueSeparator = ":";
-	private static final String entrySeparator = ",";
+	private List<String[]> parsePairs(final String data) {
+		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream()
+				.map(o -> o.split(" *= *")).filter(o -> o.length == 2)
+				.collect(Collectors.toList());
+		return pairs;
+	}
+
+	public Map<String, String> parseEmbeddedMultiArg(final String data) {
+		Map<String, String> result = new HashMap<>();
+		List<String[]> pais = parsePairs(data);
+		List<String> keys = pais.stream().map(o -> o[0]).distinct()
+				.collect(Collectors.toList());
+		if (pais.size() == keys.size()) {
+			if (debug) {
+				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o)))
+						.forEach(System.err::println);
+			}
+
+			// result = rawdata.stream().collect(Collectors.toMap(o -> o[0], o ->
+			// o[1]));
+			result = pais.stream()
+					.map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
+					.collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()));
+		} else {
+			System.err.println("Duplicate embedded argument(s) detected, aborting");
+			result = null;
+		}
+		return result;
+	}
 
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"

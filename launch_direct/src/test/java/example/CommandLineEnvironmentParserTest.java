@@ -24,6 +24,7 @@ import example.CommandLineParser;
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class CommandLineEnvironmentParserTest {
 
 	private static boolean debug = true;
