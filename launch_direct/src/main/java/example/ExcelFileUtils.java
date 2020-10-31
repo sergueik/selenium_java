@@ -190,6 +190,7 @@ public class ExcelFileUtils {
 		try (InputStream fileInputStream = new FileInputStream(
 				spreadsheetFilePath)) {
 			HSSFWorkbook hssfWorkbook = new HSSFWorkbook(fileInputStream);
+
 			HSSFSheet sheet = hssfWorkbook.getSheetAt(0);
 			HSSFRow row;
 			HSSFCell cell;
@@ -221,9 +222,7 @@ public class ExcelFileUtils {
 						cellValue = "?";
 					}
 					if (debug) {
-						if (debug) {
-							System.err.println("=>" + cellValue + " ");
-						}
+						System.err.println("=>" + cellValue + " ");
 					}
 					rowData.put(cellNum, cellValue);
 					cellNum++;
@@ -255,72 +254,78 @@ public class ExcelFileUtils {
 		try (InputStream fileInputStream = new FileInputStream(
 				spreadsheetFilePath)) {
 			XSSFWorkbook xssfWorkbook = new XSSFWorkbook(fileInputStream);
-			XSSFSheet sheet = xssfWorkbook.getSheetAt(0);
-			XSSFRow row;
-			// Iterator<org.apache.poi.ss.usermodel.Cell> cells;
-			Iterator<Cell> cells;
-			Map<String, String> columns = new HashMap<>();
-			XSSFCell cell;
-			Iterator<Row> rows = sheet.rowIterator();
-			while (rows.hasNext()) {
-				row = (XSSFRow) rows.next();
 
-				if (row.getRowNum() == 0) {
-					cells = row.cellIterator();
-					while (cells.hasNext()) {
+			for (int cnt = 0; cnt != xssfWorkbook.getNumberOfSheets(); cnt++) {
+				XSSFSheet sheet = xssfWorkbook.getSheetAt(cnt);
+				XSSFRow row;
+				// Iterator<org.apache.poi.ss.usermodel.Cell> cells;
+				Iterator<Cell> cells;
+				Map<String, String> columns = new HashMap<>();
+				XSSFCell cell;
+				Iterator<Row> rows = sheet.rowIterator();
+				while (rows.hasNext()) {
+					row = (XSSFRow) rows.next();
 
-						cell = (XSSFCell) cells.next();
-						int columnIndex = cell.getColumnIndex();
-						String columnHeader = cell.getStringCellValue();
-						String columnName = CellReference
-								.convertNumToColString(cell.getColumnIndex());
-						if (extractColumnHeaders.contains(columnHeader)) {
-							columns.put(columnName, columnHeader);
-							if (debug) {
-								System.err.println(columnIndex + " = " + columnName + " "
-										+ columns.get(columnName));
+					if (row.getRowNum() == 0) {
+						cells = row.cellIterator();
+						while (cells.hasNext()) {
+
+							cell = (XSSFCell) cells.next();
+							int columnIndex = cell.getColumnIndex();
+							String columnHeader = cell.getStringCellValue();
+							String columnName = CellReference
+									.convertNumToColString(cell.getColumnIndex());
+							if (extractColumnHeaders.contains(columnHeader)) {
+								columns.put(columnName, columnHeader);
+								if (debug) {
+									System.err.println(columnIndex + " = " + columnName + " "
+											+ columns.get(columnName));
+								}
 							}
 						}
+						// skip the header
+						continue;
 					}
-					// skip the header
-					continue;
-				}
 
-				// Iterator<Cell> cells = row.cellIterator();
-				cells = row.cellIterator();
-				int cellNum = 0;
-				rowData = new HashMap<>();
-				while (cells.hasNext()) {
-					String cellValue = null;
-					cell = (XSSFCell) cells.next();
-					CellType type = cell.getCellTypeEnum();
+					// Iterator<Cell> cells = row.cellIterator();
+					cells = row.cellIterator();
+					int cellNum = 0;
+					rowData = new HashMap<>();
+					while (cells.hasNext()) {
+						String cellValue = null;
+						cell = (XSSFCell) cells.next();
+						CellType type = cell.getCellTypeEnum();
 
-					// TODO: switch to columnName
-					String columnName = CellReference
-							.convertNumToColString(cell.getColumnIndex());
-					if (columns.containsKey(columnName)) {
-						if (type == org.apache.poi.ss.usermodel.CellType.STRING) {
-							cellValue = cell.getStringCellValue();
-						} else if (type == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
-							cellValue = String.format("%f", cell.getNumericCellValue());
-						} else if (type == org.apache.poi.ss.usermodel.CellType.BOOLEAN) {
-							cellValue = String.format("%b", cell.getBooleanCellValue());
-						} else {
-							// NOTE: not parsing either of
-							// org.apache.poi.ss.usermodel.CellType.FORMULA
-							// org.apache.poi.ss.usermodel.CellType.ERROR
-							cellValue = "?";
+						// TODO: switch to columnName
+						String columnName = CellReference
+								.convertNumToColString(cell.getColumnIndex());
+						if (columns.containsKey(columnName)) {
+							if (type == org.apache.poi.ss.usermodel.CellType.STRING) {
+								cellValue = cell.getStringCellValue();
+							} else if (type == org.apache.poi.ss.usermodel.CellType.NUMERIC) {
+								cellValue = String.format("%f", cell.getNumericCellValue());
+							} else if (type == org.apache.poi.ss.usermodel.CellType.BOOLEAN) {
+								cellValue = String.format("%b", cell.getBooleanCellValue());
+							} else {
+								// NOTE: not parsing either of
+								// org.apache.poi.ss.usermodel.CellType.FORMULA
+								// org.apache.poi.ss.usermodel.CellType.ERROR
+								cellValue = "?";
+							}
+							if (debug) {
+								System.err.println("=>" + cellValue + " ");
+							}
+							rowData.put(cellNum, cellValue);
+							cellNum++;
 						}
-						if (debug) {
-							System.err.println("=>" + cellValue + " ");
-						}
-						rowData.put(cellNum, cellValue);
-						cellNum++;
+						// use rightmost column
+						// cellNum++;
+						rowData.put((int) cellNum, sheet.getSheetName());
+						data.add(rowData);
 					}
-				}
-				data.add(rowData);
-				if (debug) {
-					System.err.println("");
+					if (debug) {
+						System.err.println("");
+					}
 				}
 			}
 			xssfWorkbook.close();
