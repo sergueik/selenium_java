@@ -4,7 +4,7 @@
   <groupId>com.mycompany.app</groupId>
   <artifactId>jbrowser_driver_test</artifactId>
   <packaging>jar</packaging>
-  <version>2.0-SNAPSHOT</version>
+  <version>3.0-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -15,20 +15,42 @@
     <guava.version>23.0</guava.version>
     <java.version>1.8</java.version>
     <java.version>1.8</java.version>
-    <jbrowserdriver.version>1.1.1</jbrowserdriver.version>
+    <jbrowserdriver.version>1.0.1</jbrowserdriver.version>
     <junit.version>4.13.1</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
+    <slf4j.version>1.7.30</slf4j.version>
+    <log4j.version>1.2.17</log4j.version>
+    <log4j-core.version>2.13.2</log4j-core.version>
 
-    <log4j.version>2.5</log4j.version>
   </properties>
   <dependencies>
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-web</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
       <version>${log4j.version}</version>
     </dependency>
     <dependency>
@@ -71,6 +93,21 @@
       <groupId>com.machinepublishers</groupId>
       <artifactId>jbrowserdriver</artifactId>
       <version>${jbrowserdriver.version}</version>
+      <exclusions>
+          <!-- exclude possible more recent Selenium jar than we need -->
+        <exclusion>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+        </exclusion>
+        <exclusion>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-api</artifactId>
+        </exclusion>
+        <exclusion>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-remote-driver</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.codeborne</groupId>
@@ -85,22 +122,22 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-api</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-remote-driver</artifactId>
+      <version>${selenium.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-server</artifactId>
       <version>${selenium.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-firefox-driver</artifactId>
-      <version>${selenium-firefox-driver.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-remote-driver</artifactId>
       <version>${selenium.version}</version>
     </dependency>
   </dependencies>
