@@ -1,12 +1,28 @@
 #!/bin/sh
 
-LIST=${0:-list.txt}
+LIST=${1:-list.txt}
 
 # list.txt has list of urls
 # incorrect curl arguments
-cat $LIST | while read F ; do S=$(echo $F| sed 's| |0x20|g'); T=$(echo $F| sed 's|^.*/||g'); curl -O "$F" ;done
+cat $LIST | while read F
+do
+  echo "$F"
+
+  S=$(echo $F| sed 's| |0x20|g')
+  T=$(echo $S| sed 's|^.*/||g')
+  T2=$(echo $F| sed 's|^.*/||g')
+  echo wget -q -O "$T" "$F"
+  wget -q -O "$T" "$F"
+ #  mv $T "$T2"
+done
 
 # NOTE: commented
-# after copying rename the files - may need to undo URL-encoded names 
-# awaiting the check that the filename does contain a 0x20
-#for F in $(ls -1 *.mp4) ; do T=$(echo $F| sed 's|0x20| |g') ; mv $F "$T";  done
+# after copying rename the files - undo URL-encoded names
+for F in $(ls -1 *.mp4)
+do
+  T=$(echo $F| sed 's|0x20| |g')
+  if [ "$F" != "$T" ]; then
+    mv "$F" "$T"
+  fi
+done
+
