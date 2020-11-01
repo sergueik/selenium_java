@@ -62,39 +62,41 @@ public class CommandLineParser {
 		return arguments.length;
 	}
 
-	public Map<String, String> parseEmbeddedMultiArg(final String data) {
-		Map<String, String> rawResult = new HashMap<>();
-		List<String[]> rawdata = new ArrayList<>();
-		rawdata = Arrays.asList(data.split(" *, *")).stream()
+	private List<String[]> parsePairs(final String data) {
+		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream()
 				.map(o -> o.split(" *= *")).filter(o -> o.length == 2)
 				.collect(Collectors.toList());
-		List<String> keys = rawdata.stream().map(o -> o[0]).distinct()
+		return pairs;
+	}
+
+	public Map<String, String> parseEmbeddedMultiArg(final String data) {
+		Map<String, String> result = new HashMap<>();
+		List<String[]> pais = parsePairs(data);
+		List<String> keys = pais.stream().map(o -> o[0]).distinct()
 				.collect(Collectors.toList());
-		if (rawdata.size() == keys.size()) {
+		if (pais.size() == keys.size()) {
 			if (debug) {
-				rawdata.stream()
-						.map(o -> String.format("Collected: " + Arrays.asList(o)))
+				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o)))
 						.forEach(System.err::println);
 			}
 
 			// result = rawdata.stream().collect(Collectors.toMap(o -> o[0], o ->
 			// o[1]));
-			rawResult = rawdata.stream()
+			result = pais.stream()
 					.map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
 					.collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()));
 		} else {
 			System.err.println("Duplicate embedded argument(s) detected, aborting");
-			rawResult = null;
+			result = null;
 		}
-		return rawResult;
+		return result;
 	}
 
 	public Map<String, String> parseEmbeddedMultiArg2(final String data) {
 		Map<String, String> result = new HashMap<>();
 		try {
-			result = Arrays.asList(data.split(" *, *")).stream()
-					.map(o -> o.split(" *= *")).filter(o -> o.length == 2)
-					.collect(Collectors.toMap(o -> o[0], o -> o[1]));
+			List<String[]> pairs = parsePairs(data);
+			result = pairs.stream().collect(Collectors.toMap(o -> o[0], o -> o[1]));
 		} catch (IllegalStateException e) {
 			System.err.println("Duplicate embedded argument(s) detected, aborting");
 			result = null;
