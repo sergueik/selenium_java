@@ -3,6 +3,7 @@ package example;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -16,7 +17,9 @@ public class ManageConfig {
 
 	public static void main(String[] args)
 			throws IOException, URISyntaxException {
+
 		commandLineParser = new CommandLineParser();
+
 		commandLineParser.saveFlagValue("in");
 		commandLineParser.saveFlagValue("out");
 		commandLineParser.saveFlagValue("op");
@@ -63,6 +66,25 @@ public class ManageConfig {
 		}
 		if (debug) {
 			System.err.println("Done: " + op);
+		}
+	}
+
+	public static void mainYAMLTest(String[] args)
+			throws IOException, URISyntaxException {
+
+		commandLineParser = new CommandLineParser();
+
+		commandLineParser.saveFlagValue("apply");
+		commandLineParser.parse(args);
+
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
+			// snakeyaml will make the values Integer, Bolean etc
+			Map<String, Object> data = commandLineParser.processApply();
+
+			for (String key : data.keySet()) {
+				System.err.println("key: " + key + " value: " + data.get(key));
+			}
 		}
 	}
 }

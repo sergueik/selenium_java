@@ -275,6 +275,25 @@ Static error in {uuid:randomUUID()} in expression in xsl:variable/@select on lin
 Errors were reported during stylesheet compilation
 ```
 
+### New Features
+
+To pass long list of arguments, the `CommandLineParser` class allows using `YAML` file as the `-apply` argument in a kubernetes style,with the following sytnax:
+given the YAMLfile `test.yaml` with contents
+```YAML
+---
+a: 1
+b: true
+c: "string"
+```
+```sh
+java -cp target\example.xslt.jar;target\lib\* example.ManageConfig -apply @test.yaml -debug
+```
+this will priduce the debugging info:
+```sh
+key: a value: 1
+key: b value: true
+key: c value: string
+```
 ### See Also
 
   *  transforming XML to JSON using [XSLT2JSON](https://github.com/bramstein/xsltjson)
