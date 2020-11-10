@@ -15,17 +15,50 @@ import java.util.List;
 import java.nio.charset.StandardCharsets;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+import example.CommandLineParser;
 
 public class ReadingPDF {
+	private static boolean debug = true;
+	private static CommandLineParser commandLineParser;
+	private String[] argsArray = {};
+	private String arg = null;
 
-	public static void main(String argv[]) throws IOException {
+	public static void main(String args[]) throws IOException {
+
+		commandLineParser = new CommandLineParser();
+
+		commandLineParser.saveFlagValue("in");
+		commandLineParser.saveFlagValue("out");
+
+		commandLineParser.parse(args);
+
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
+		}
+		String outFile = commandLineParser.getFlagValue("out");
+		if (outFile == null) {
+			System.err.println("Missing required argument: out");
+			return;
+		}
+		// reserved to potentially be an URL
+		String inFile = commandLineParser.getFlagValue("in");
+		if (commandLineParser.getFlagValue("in") == null) {
+			System.err.println("Missing required argument: in");
+			return;
+		}
+	}
+	// based on
+	// https://stackoverflow.com/questions/5806690/is-there-an-iconv-with-translit-equivalent-in-java
+	// and
+	// http://tocrva.blogspot.com/2015/03/java-transliterate-cyrillic-to-latin.html
+
+	private static void extract(final String pdfFilepath,
+			final String outputFilepath) {
+
 		PDDocument document = null;
 		PDFTextStripper pdfStripper = null;
 		final List<String> characters = new ArrayList<>();
-		final String pdfFilepath = argv[0];
-		final String outputFilepath = argv[1];
 
-		final String outputFilepath2 = (argv.length > 2) ? argv[2] : null;
 		try {
 			File file = new File(pdfFilepath);
 			document = PDDocument.load(file);
@@ -35,7 +68,8 @@ public class ReadingPDF {
 				pdfStripper.setStartPage(1);
 				pdfStripper.setEndPage(1);
 				String rawText = pdfStripper.getText(document);
-				// System.out.println("TRANSLIT: " + Translit.toAscii(rawText));
+				if (debug)
+					System.err.println("TRANSLIT: " + Translit.toAscii(rawText));
 				for (int cnt = 0; cnt != rawText.length(); cnt++) {
 					int codePoint = Character.codePointAt(rawText, cnt);
 					// 'CYRILLIC SMALL LETTER A' (U+0430)
@@ -44,55 +78,37 @@ public class ReadingPDF {
 					// https://www.fileformat.info/info/unicode/char/044f/index.htm
 					characters.add(String.format("\\u%04x", codePoint));
 				}
-				// System.out.println("ENCODED: " + characters);
-				// System.out.println("TRANSLIT: " + Translit.toCyrillic(characters));
-
+				if (debug) {
+					System.out.println("ENCODED: " + characters);
+					System.out
+							.println("TRANSLIT (2): " + Translit.toCyrillic(characters));
+				}
 				// String parsedText = rawText.replaceAll("[^A-Za-z0-9. ]+", "");
 				// System.out.println(parsedText);
 
-				String encoding = "UTF-8";
-
-				// https://stackoverflow.com/questions/4389005/how-to-add-a-utf-8-bom-in-java
-				File textFile = new File(outputFilepath);
-				Writer outputStreamWriter = new OutputStreamWriter(
-						new FileOutputStream(textFile),
-						StandardCharsets.UTF_8 /* encoding s*/ );
-				// no need to write BOM explicitly with OutputStreamWriter
-				outputStreamWriter.write(rawText);
-				outputStreamWriter.flush();
-				outputStreamWriter.close();
-
-				// NOTE: using the PrintStream with BOM does not work
-				if (outputFilepath2 != null) {
-					textFile = new File(outputFilepath2);
-					Writer printWriter = new PrintWriter(new FileOutputStream(textFile));
-
-					byte[] BOM = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
-					// '' for (byte b : BOM) {
-					// printWriter.append((char) b);
-					// }
-					// writer.print(0xef);
-					printWriter.write(new String(BOM) + rawText);
-					printWriter.flush();
-					printWriter.close();
+				if (outputFilepath.equals("-")) {
+					System.out.println(rawText);
+				} else {
+					// https://stackoverflow.com/questions/4389005/how-to-add-a-utf-8-bom-in-java
+					File textFile = new File(outputFilepath);
+					Writer outputStreamWriter = new OutputStreamWriter(
+							new FileOutputStream(textFile), StandardCharsets.UTF_8);
+					// no need to write BOM explicitly with OutputStreamWriter
+					outputStreamWriter.write(rawText);
+					outputStreamWriter.flush();
+					outputStreamWriter.close();
 				}
-
 			} else {
 				System.out.println("Document is encrypted: " + pdfFilepath);
 			}
-		} catch (IOException e) {
-			System.err.println("Exception:" + e.toString());
-		} finally {
 			if (document != null) {
 				document.close();
 			}
+		} catch (IOException e) {
 
+			System.err.println("Exception:" + e.toString());
 		}
 	}
-	// based on
-	// https://stackoverflow.com/questions/5806690/is-there-an-iconv-with-translit-equivalent-in-java
-	// and
-	// http://tocrva.blogspot.com/2015/03/java-transliterate-cyrillic-to-latin.html
 
 	public static class Translit {
 

@@ -5,14 +5,17 @@ This directory contains basic example of [pdfbox](https://pdfbox.apache.org)-bas
 ```cmd
 mvn package
 ```
+```cmd
+chcp 65001
+java -cp target\lib\*;target\example.pdf_reader.jar example.ReadingPDF -in alphabet_ru.pdf -out a.txt
+type a.txt
 ```
-java -cp target\lib\*;target\example.pdf_reader.jar example.ReadingPDF alphabet_en.pdf
-abcdefghijklmnopqrstuvwxyz
+```sh
+абвгдежзийклмнопрстуфхцчшщъыьэюя
 ```
 ```
 set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-
-java -cp target\lib\*;target\example.pdf_reader.jar example.ReadingPDF alphabet_ru.pdf
+java -cp target\lib\*;target\example.pdf_reader.jar example.ReadingPDF alphabet_ru.pdf -out -
 ```
 Picked up JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF-8
 абвгдежзийклмнопрстуфхцчшщъыьэюя

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,8 +15,12 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.lang.IllegalStateException;
+
 // package org.apache.commons.io does not exist
 // import org.apache.commons.io.FileUtils;
+
+import org.yaml.snakeyaml.Yaml;
 
 // based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
 // see also: 
@@ -50,6 +55,18 @@ public class CommandLineParser {
 	//
 	private Set<String> flagsWithValues = new HashSet<>();
 
+	public Map<String, Object> processApply() {
+		return processApply("apply");
+	}
+
+	public Map<String, Object> processApply(String data) {
+		@SuppressWarnings("unchecked")
+		Map<String, Object> members = (flags.containsKey(data))
+				? (LinkedHashMap<String, Object>) new Yaml().load(flags.get(data))
+				: new HashMap<>();
+		return members;
+	}
+
 	public Set<String> getFlags() {
 		Set<String> result = flags.keySet();
 		return result;
@@ -74,15 +91,24 @@ public class CommandLineParser {
 	// contains no constructor nor logic to discover unknown flags
 	public void parse(String[] args) {
 		List<String> regularArgs = new ArrayList<>();
-
+		// TODO: recognize special args like k8-style "-apply" [filename]
+		// TODO: add a warning that -apply only work with a file argument
 		for (int n = 0; n < args.length; ++n) {
+			String name = null;
+			String value = null;
 			if (args[n].charAt(0) == '-') {
-				String name = args[n].replaceFirst("-", "");
-				String value = null;
+				name = args[n].replaceFirst("-", "");
+				value = null;
 				// remove the dash
 				if (debug) {
 					System.err.println("Examine: " + name);
 				}
+				// TODO: tweak to allow last arg to be the "-"
+				/*
+				if (flagsWithValues.contains(name)
+						&& (n == args.length - 2 && args[n + 1].equals("-"))
+						|| (n < args.length - 1 && !args[n + 1].matches("^-"))) {
+						*/
 				if (flagsWithValues.contains(name) && n < args.length - 1
 						&& !args[n + 1].matches("^-")) {
 					// https://www.baeldung.com/java-case-insensitive-string-matching
@@ -103,8 +129,11 @@ public class CommandLineParser {
 									"Reading value for: " + name + " from " + datafilePath);
 						}
 						try {
-							value = readFile(datafilePath, Charset.forName("UTF-8"))
-									.replaceAll("\\r?\\n", ",");
+
+							value = (name.equalsIgnoreCase("apply"))
+									? readFile(datafilePath, Charset.forName("UTF-8"))
+									: readFile(datafilePath, Charset.forName("UTF-8"))
+											.replaceAll(" *\\r?\\n *", ",");
 						} catch (IOException e) {
 							throw new RuntimeException(e);
 						}
@@ -128,6 +157,7 @@ public class CommandLineParser {
 		}
 
 		arguments = regularArgs.toArray(new String[regularArgs.size()]);
+
 	}
 
 	public void saveFlagValue(String flagName) {
@@ -164,6 +194,18 @@ public class CommandLineParser {
 		return result;
 	}
 
+	public Map<String, String> parseEmbeddedMultiArg2(final String data) {
+		Map<String, String> result = new HashMap<>();
+		try {
+			List<String[]> pairs = parsePairs(data);
+			result = pairs.stream().collect(Collectors.toMap(o -> o[0], o -> o[1]));
+		} catch (IllegalStateException e) {
+			System.err.println("Duplicate embedded argument(s) detected, aborting");
+			result = null;
+		}
+		return result;
+	}
+
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"
 	// NOTE: not using org.json to reduce size
@@ -172,6 +214,7 @@ public class CommandLineParser {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.trim().substring(1, argument.length() - 1);
+
 		if (argument.indexOf("{") > -1 || argument.indexOf("}") > -1) {
 			if (debug) {
 				System.err.println("Found invalid nested data");
