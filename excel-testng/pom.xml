@@ -15,7 +15,7 @@
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
     <junit.version>4.13.1</junit.version>
-    <log4j-core.version>2.5</log4j-core.version>
+    <log4j-core.version>2.13.2</log4j-core.version>
     <log4j.version>1.2.17</log4j.version>
     <testng.version>6.9.10</testng.version>
     <phantomjsdriver.version>1.2.1</phantomjsdriver.version>

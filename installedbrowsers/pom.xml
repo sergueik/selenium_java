@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.utils</groupId>
   <artifactId>installedbrowsers</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>installedbrowsers</name>
   <url>http://maven.apache.org</url>
@@ -16,7 +16,6 @@
     <jna-platform.version>5.4.0</jna-platform.version>
     <junit.version>4.13.1</junit.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <selenium.version>4.0.0-alpha-2</selenium.version>
  </properties>
   <dependencies>
     <dependency>
