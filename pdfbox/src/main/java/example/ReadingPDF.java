@@ -1,16 +1,18 @@
-// https://www.tutorialspoint.com/pdfbox/pdfbox_reading_text.htm
-// https://dzone.com/articles/pdfbox-java-library-to-extract-content-from-a-pdf
 package example;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.nio.charset.StandardCharsets;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
@@ -20,9 +22,12 @@ public class ReadingPDF {
 		PDDocument document = null;
 		PDFTextStripper pdfStripper = null;
 		final List<String> characters = new ArrayList<>();
-		final String filepath = argv[0];
+		final String pdfFilepath = argv[0];
+		final String outputFilepath = argv[1];
+
+		final String outputFilepath2 = (argv.length > 2) ? argv[2] : null;
 		try {
-			File file = new File(filepath);
+			File file = new File(pdfFilepath);
 			document = PDDocument.load(file);
 
 			if (!document.isEncrypted()) {
@@ -30,7 +35,7 @@ public class ReadingPDF {
 				pdfStripper.setStartPage(1);
 				pdfStripper.setEndPage(1);
 				String rawText = pdfStripper.getText(document);
-				System.out.println(rawText);
+				// System.out.println("TRANSLIT: " + Translit.toAscii(rawText));
 				for (int cnt = 0; cnt != rawText.length(); cnt++) {
 					int codePoint = Character.codePointAt(rawText, cnt);
 					// 'CYRILLIC SMALL LETTER A' (U+0430)
@@ -39,16 +44,44 @@ public class ReadingPDF {
 					// https://www.fileformat.info/info/unicode/char/044f/index.htm
 					characters.add(String.format("\\u%04x", codePoint));
 				}
-				System.out.println(Translit.toCyrillic(characters));
+				// System.out.println("ENCODED: " + characters);
+				// System.out.println("TRANSLIT: " + Translit.toCyrillic(characters));
 
 				// String parsedText = rawText.replaceAll("[^A-Za-z0-9. ]+", "");
 				// System.out.println(parsedText);
-			} else {
-				System.out.println("Document is encrypted: " + filepath);
-			}
 
-		} catch (Exception e) {
-			e.printStackTrace();
+				String encoding = "UTF-8";
+
+				// https://stackoverflow.com/questions/4389005/how-to-add-a-utf-8-bom-in-java
+				File textFile = new File(outputFilepath);
+				Writer outputStreamWriter = new OutputStreamWriter(
+						new FileOutputStream(textFile),
+						StandardCharsets.UTF_8 /* encoding s*/ );
+				// no need to write BOM explicitly with OutputStreamWriter
+				outputStreamWriter.write(rawText);
+				outputStreamWriter.flush();
+				outputStreamWriter.close();
+
+				// NOTE: using the PrintStream with BOM does not work
+				if (outputFilepath2 != null) {
+					textFile = new File(outputFilepath2);
+					Writer printWriter = new PrintWriter(new FileOutputStream(textFile));
+
+					byte[] BOM = { (byte) 0xEF, (byte) 0xBB, (byte) 0xBF };
+					// '' for (byte b : BOM) {
+					// printWriter.append((char) b);
+					// }
+					// writer.print(0xef);
+					printWriter.write(new String(BOM) + rawText);
+					printWriter.flush();
+					printWriter.close();
+				}
+
+			} else {
+				System.out.println("Document is encrypted: " + pdfFilepath);
+			}
+		} catch (IOException e) {
+			System.err.println("Exception:" + e.toString());
 		} finally {
 			if (document != null) {
 				document.close();
@@ -109,16 +142,26 @@ public class ReadingPDF {
 				")", "=", "-", ".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9" };
 
 		public static String toCyrillic(final List<String> input) {
+			return toCyrillic(input, alphabetTranslit);
+		}
+
+		public static String toCyrillic(final List<String> input,
+				final String[] translationTable) {
 			StringBuilder builder = new StringBuilder();
 
 			for (int i = 0; i < input.size(); i++) {
-				for (int x = 0; x < alphabetResources.length; x++)
-					if (input.get(i) == alphabetResources[x]) {
-						builder.append(alphabetCyrillic[x]);
+				String letter = input.get(i);
+				for (int x = 0; x < alphabetResources.length; x++) {
+					if (letter.equals(alphabetResources[x])) {
+						builder.append(translationTable[x]);
 					}
+				}
 			}
 			return builder.toString();
+		}
 
+		public static String toAscii(final String input) {
+			return toAscii(input, alphabetTranslit);
 		}
 
 		public static String toAscii(final String input,
@@ -150,10 +193,6 @@ public class ReadingPDF {
 					}
 			}
 			return builder.toString();
-		}
-
-		public static String toAscii(final String input) {
-			return toAscii(input, alphabetTranslit);
 		}
 	}
 
