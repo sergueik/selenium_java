@@ -1,8 +1,5 @@
 package org.utils;
 
-import static java.lang.System.err;
-import static java.lang.System.out;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,15 +25,14 @@ public class InstalledBrowsersTest {
 		InstalledBrowsers.setDebug(debug);
 		List<String> browsers = InstalledBrowsers.getInstalledBrowsers();
 		assertTrue(browsers.size() > 0);
-		out.println("Your browsers: " + browsers);
+		System.out.println("Your browsers: " + browsers);
 
 		for (String browserName : browserNames.keySet()) {
 			if (browsers.contains(browserName)) {
 				assertTrue(InstalledBrowsers.isInstalled(browserName));
 				assertTrue(InstalledBrowsers.getMajorVersion(browserName) > 0);
-				out.println(
-						String.format("%s version: %s", browserNames.get(browserName),
-								InstalledBrowsers.getVersion(browserName)));
+				System.out.println(String.format("%s version: %s", browserNames.get(browserName),
+						InstalledBrowsers.getVersion(browserName)));
 			} else {
 				assertFalse(InstalledBrowsers.isInstalled(browserName));
 				assertTrue(InstalledBrowsers.getMajorVersion(browserName) == 0);
