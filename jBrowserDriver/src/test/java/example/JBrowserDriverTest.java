@@ -34,13 +34,11 @@ public class JBrowserDriverTest extends BaseTest {
 	private static String selector = null;
 
 	private static String baseURL = "https://datatables.net/examples/api/form.html";
-	private static String testFileName = "test.txt";
-	private static String testFilePath = new File(testFileName).getAbsolutePath().replaceAll("\\\\", "/");
 	private static final Logger log = LogManager.getLogger(JBrowserDriverTest.class);
+	private static WebElement element;
 
 	@Before
 	public void beforeTest() {
-		// System.err.println("in beforeTest");
 		driver.get(baseURL);
 	}
 
@@ -48,6 +46,7 @@ public class JBrowserDriverTest extends BaseTest {
 	public void afterTest() {
 	}
 
+	@Ignore
 	@Test
 	public void test3() {
 
@@ -59,13 +58,20 @@ public class JBrowserDriverTest extends BaseTest {
 
 		String table_id = "example";
 		WebElement table_element;
-
-		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
-		} catch (RuntimeException timeoutException) {
-			return;
-		}
+		/*
+		 * java.lang.ClassNotFoundException:
+		 * org.openqa.selenium.interactions.internal.Locatable at
+		 * com.machinepublishers.jbrowserdriver.JBrowserDriver.findElementById(
+		 * JBrowserDriver.java:710) ... 42 more
+		 * 
+		 * https://github.com/MachinePublishers/jBrowserDriver/blob/master/src/com/
+		 * machinepublishers/jbrowserdriver/Util.java#L136
+		 * https://github.com/MachinePublishers/jBrowserDriver/blob/master/src/com/
+		 * machinepublishers/jbrowserdriver/JBrowserDriver.java#L713
+		 */
+		element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
 		// http://stackoverflow.com/questions/6198947/how-to-get-text-from-each-cell-of-an-html-table
+
 		String script = "var table_row_locator = 'div#example_wrapper table#example tbody tr';\n"
 				+ "var rows = document.querySelectorAll(table_row_locator);\n" + "var result = [];\n"
 				+ "for (row_cnt = 0; row_cnt != rows.length; row_cnt++) {\n" + "var row = rows[row_cnt];\n"
@@ -74,15 +80,15 @@ public class JBrowserDriverTest extends BaseTest {
 				+ "if (cols[check_col_num].innerHTML.match(/^Software.*/ig)) {\n"
 				+ "result.push(cols[data_col_num].innerHTML);\n" + "}\n" + "}\n" + "}\n" + "return result.join();\n";
 
-		System.out.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
+		System.err.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
 
 		// NOTE: Works in IDE, does not work with WebDriver
 		script = String.format("(function() { %s })();", script);
-		System.out.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
+		System.err.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
 
-		table_element = driver.findElement(By.id(table_id));
+		element = driver.findElement(By.id(table_id));
 		// NOTE: no leading slash in XPath
-		List<WebElement> rows = table_element.findElements(By.xpath("tbody/tr"));
+		List<WebElement> rows = element.findElements(By.xpath("tbody/tr"));
 		System.out.println("NUMBER OF ROWS IN THIS TABLE = " + rows.size());
 		int row_num, cell_num, max_rows;
 		max_rows = 3;
@@ -145,6 +151,30 @@ public class JBrowserDriverTest extends BaseTest {
 
 	}
 
+	@Test
+	public void test4() {
+		// Arrange
+		// Go to base url
+		driver.get("https://www.wikipedia.org/");
+
+		// Maximize Window
+		driver.manage().window().maximize();
+		selector = "div.search-input > input[name=\"search\"]";
+
+		try {
+			element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(selector)));
+		} catch (RuntimeException timeoutException) {
+			System.err.println("Exception in wait by css selector: " + selector);
+			return;
+			// NOTE: quits the test
+		}
+		assertThat(element, notNullValue());
+		String script = String.format("return document.querySelector('%s')", selector);
+		element = (WebElement) executeScript(script, null);
+		System.err.println("Element: " + element.getAttribute("outerHTML"));
+
+	}
+
 	@Ignore
 	@Test
 	public void test2() {
@@ -158,7 +188,6 @@ public class JBrowserDriverTest extends BaseTest {
 			table_element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
 		} catch (RuntimeException timeoutException) {
 			System.err.println("Exception in wait by id: " + table_id);
-
 			return;
 			// NOTE: quits the test
 		}
