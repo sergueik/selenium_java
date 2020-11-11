@@ -15,7 +15,7 @@
     <guava.version>23.0</guava.version>
     <java.version>1.8</java.version>
     <java.version>1.8</java.version>
-    <jbrowserdriver.version>1.1.1</jbrowserdriver.version>
+    <jbrowserdriver.version>1.0.1</jbrowserdriver.version>
     <junit.version>4.13.1</junit.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
@@ -93,8 +93,9 @@
       <groupId>com.machinepublishers</groupId>
       <artifactId>jbrowserdriver</artifactId>
       <version>${jbrowserdriver.version}</version>
+          <!-- trying exclude possible more recent Selenium jar versions than we intend -->
+       <!--
       <exclusions>
-          <!-- exclude possible more recent Selenium jar than we need -->
         <exclusion>
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-java</artifactId>
@@ -108,6 +109,7 @@
       <artifactId>selenium-remote-driver</artifactId>
         </exclusion>
       </exclusions>
+-->
     </dependency>
     <dependency>
       <groupId>com.codeborne</groupId>
@@ -132,14 +134,10 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-server</artifactId>
-      <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-support</artifactId>
       <version>${selenium.version}</version>
     </dependency>
+
   </dependencies>
   <build>
     <plugins>

@@ -12,6 +12,7 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.NoAlertPresentException;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
@@ -31,15 +33,14 @@ public class JBrowserDriverTest extends BaseTest {
 
 	private static String selector = null;
 
-	private static String baseURL = "http://www.tripadvisor.com/";
+	private static String baseURL = "https://datatables.net/examples/api/form.html";
 	private static String testFileName = "test.txt";
-	private static String testFilePath = new File(testFileName).getAbsolutePath()
-			.replaceAll("\\\\", "/");
-	private static final Logger log = LogManager
-			.getLogger(JBrowserDriverTest.class);
+	private static String testFilePath = new File(testFileName).getAbsolutePath().replaceAll("\\\\", "/");
+	private static final Logger log = LogManager.getLogger(JBrowserDriverTest.class);
 
 	@Before
 	public void beforeTest() {
+		// System.err.println("in beforeTest");
 		driver.get(baseURL);
 	}
 
@@ -47,223 +48,136 @@ public class JBrowserDriverTest extends BaseTest {
 	public void afterTest() {
 	}
 
-	// downloading test file
-	// the jquery file upload plugin issue:
-	// https://github.com/MachinePublishers/jBrowserDriver/issues/110
-	// the file upload plugin issue:
-	// https://github.com/MachinePublishers/jBrowserDriver/issues/143
-
-	@Ignore
 	@Test
-	public void test1SendKeys() {
-		System.err.println("test1SendKeys");
-		driver.get("http://blueimp.github.io/jQuery-File-Upload/basic.html");
-		element = driver.findElement(By.id("fileupload"));
-		assertThat(element, notNullValue());
-		// highlight(element);
+	public void test3() {
 
-		assertTrue(element.getAttribute("multiple") != null);
-		executeScript("$('#fileupload').removeAttr('multiple');");
-		element.sendKeys(testFilePath);
+		// Go to base url
+		driver.get("https://datatables.net/examples/api/highlight.html");
+
+		// Maximize Window
+		driver.manage().window().maximize();
+
+		String table_id = "example";
+		WebElement table_element;
+
 		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-
-		}
-		element = driver.findElement(By.className("progress-bar"));
-		assertThat(element.getAttribute("class"),
-				containsString("progress-bar-success"));
-		element = driver.findElement(By.id("files"));
-		assertThat(element.getText(), containsString(testFileName));
-	}
-
-	// downloading test file
-	@Ignore
-	@Test
-	public void test2SendKeys() {
-		System.err.println("test2SendKeys");
-		driver.get("http://siptv.eu/converter/");
-		element = driver
-				.findElement(By.cssSelector("div#container form#file_form input#file"));
-		assertThat(element, notNullValue());
-		highlight(element);
-
-		element.sendKeys(testFilePath);
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-
-		}
-		assertThat(element.getAttribute("value"), containsString(testFileName));
-
-		element = driver.findElement(
-				By.cssSelector("div#container form#file_form input#submit"));
-		element.click();
-	}
-
-	@Test
-	public void fastSetTextTest() {
-		final String url = "https://www.seleniumeasy.com/test/input-form-demo.html";
-		driver.get(url);
-		selector = "form#contact_form > fieldset div.form-group div.input-group textarea.form-control";
-		element = findElement("css_selector", selector);
-		final String text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum";
-		try {
-			log.info("running fastSetTextTest");
-			fastSetText(element, text);
-			assertEquals(text, element.getText());
-			log.info("completed fastSetTextTest");
-		} catch (Error e) {
-			log.info("failed fastSetTextTest");
-			verificationErrors
-					.append("Error in verifyTextTest() : " + e.toString() + "\n");
-		}
-	}
-
-	// @Ignore
-	@Test
-	public void verifyTextTest() throws Exception {
-		try {
-			assertEquals("Hotels", findElement("link_text", "Hotels").getText());
-			log.info("completed verifyTextTest");
-		} catch (Error e) {
-			verificationErrors
-					.append("Error in verifyTextTest() : " + e.toString() + "\n");
-		}
-	}
-
-	@Ignore
-	@Test
-	public void xpathOfElementTest() throws Exception {
-		element = findElement("link_text", "Hotels");
-		assertThat(element, notNullValue());
-		highlight(element);
-		selector = xpathOfElement(element);
-		// Assert
-		assertThat(selector, notNullValue());
-		assertEquals("//div[@id=\"HEAD\"]/div/div[2]/ul/li/span/a", selector);
-		element = findElement("xpath", selector);
-		assertThat(element, notNullValue());
-		highlight(element);
-		log.info("completed xpathOfElementTest");
-	}
-
-	// NOTE: this test is hanging the jbrowserdriver
-	// the site http://suvian.in is down
-	// after the test is run orphaned java processess require a taskkill
-	// NOTE: java.lang.NoClassDefFoundError:
-	// org/openqa/selenium/internal/WrapsDriver
-	@Ignore
-	@Test
-	public void test13_1() {
-		// Arrange
-		driver.get("http://suvian.in/selenium/2.3frame.html");
-
-		wait.until(ExpectedConditions.frameToBeAvailableAndSwitchToIt(
-				By.cssSelector(".container .row .intro-message iframe")));
-
-		// Act
-		WebElement buttonElement = wait.until(ExpectedConditions
-				.visibilityOf(driver.findElement(By.cssSelector("h3 button"))));
-
-		assertThat(buttonElement, notNullValue());
-		buttonElement.click();
-		// Assert
-		try {
-			// confirm alert
-			Alert alert = driver.switchTo().alert();
-			String alert_text = alert.getText();
-			assertThat(alert_text, containsString("You clicked on Green"));
-		} catch (NoAlertPresentException e) {
-			// Alert not present - ignore
-		} catch (WebDriverException e) {
-			System.err
-					.println("Alert was not handled : " + e.getStackTrace().toString());
+			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
+		} catch (RuntimeException timeoutException) {
 			return;
 		}
-	}
+		// http://stackoverflow.com/questions/6198947/how-to-get-text-from-each-cell-of-an-html-table
+		String script = "var table_row_locator = 'div#example_wrapper table#example tbody tr';\n"
+				+ "var rows = document.querySelectorAll(table_row_locator);\n" + "var result = [];\n"
+				+ "for (row_cnt = 0; row_cnt != rows.length; row_cnt++) {\n" + "var row = rows[row_cnt];\n"
+				+ "if (row instanceof Element) {\n" + "var cols = row.querySelectorAll('td');\n"
+				+ "var check_col_num = 1;\n" + "var data_col_num = 0;\n"
+				+ "if (cols[check_col_num].innerHTML.match(/^Software.*/ig)) {\n"
+				+ "result.push(cols[data_col_num].innerHTML);\n" + "}\n" + "}\n" + "}\n" + "return result.join();\n";
 
-	// NOTE: org.junit.ComparisonFailure
-	@Ignore
-	@Test
-	public void cssSelectorOfElementWithIdInParentTest() throws Exception {
-		element = findElement("link_text", "Hotels");
-		assertThat(element, notNullValue());
-		highlight(element);
-		selector = cssSelectorOfElement(element);
-		assertEquals(
-				"div#HEAD > div.masthead.masthead_war_dropdown_enabled.masthead_notification_enabled > div.tabsBar > ul.tabs > li.tabItem.dropDownJS.jsNavMenu.hvrIE6 > span.tabLink.arwLink > a.arrow_text.pid2972",
-				// NOTE: old script was
-				// "div#HEAD > div > div:nth-of-type(2) > ul > li > span > a",
-				selector);
-		assertThat(selector, notNullValue());
-		element = findElement("css_selector", selector);
-		assertThat(element, notNullValue());
-		highlight(element);
-	}
+		System.out.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
 
-	// @Ignore
-	@Test
-	public void cssSelectorOfElementTest() {
-		try {
-			log.info("running cssSelectorOfElementTest");
-			element = driver.findElement(By.cssSelector("input[type = 'search']"));
-			log.info("running cssSelectorOfElementTest (2)");
-			element = findElement("css_selector", "input[type = 'search']");
-			log.info("running cssSelectorOfElementTest");
-			selector = cssSelectorOfElement(element);
-			log.info("running cssSelectorOfElementTest");
-			highlight(element);
-			assertEquals("input#mainSearch", selector);
-			log.info("completed cssSelectorOfElementTest");
-		} catch (Error e) {
-			log.info("failed cssSelectorOfElementTest");
-			verificationErrors.append(
-					"Error in cssSelectorOfElementTest() : " + e.toString() + "\n");
-		}
-	}
+		// NOTE: Works in IDE, does not work with WebDriver
+		script = String.format("(function() { %s })();", script);
+		System.out.println(String.format("Script: '%s'\nResult: '%s'", script, storeEval(script)));
 
-	// @Ignore
-	@Test
-	public void cssSelectorOfElementWithIdTest() {
-		try {
-			element = findElement("id", "searchbox");
-			selector = cssSelectorOfElement(element);
-			highlight(element);
-			assertEquals("input#searchbox", selector);
-			log.info("completed cssSelectorOfElementWithIdTest");
-
-		} catch (Error e) {
-			log.info("failed cssSelectorOfElementWithIdTest");
-			verificationErrors.append(
-					"Error in cssSelectorOfElementWithIdTest() : " + e.toString() + "\n");
+		table_element = driver.findElement(By.id(table_id));
+		// NOTE: no leading slash in XPath
+		List<WebElement> rows = table_element.findElements(By.xpath("tbody/tr"));
+		System.out.println("NUMBER OF ROWS IN THIS TABLE = " + rows.size());
+		int row_num, cell_num, max_rows;
+		max_rows = 3;
+		row_num = 1;
+		String row_role_attribute = "row";
+		for (WebElement row : rows) {
+			if (row_num > max_rows) {
+				break;
+			}
+			assertTrue(
+					// String.format("Unexpected title '%s'", row.getAttribute("role")),
+					row.getAttribute("role").matches(row_role_attribute));
+			cell_num = 1;
+			List<WebElement> cells = row.findElements(By.xpath("td"));
+			String checkColumn = cells.get(cell_num).getText();
+			// System.out.println(checkColumn);
+			if (checkColumn.matches("Software.*")) {
+				// System.out.println("NUMBER OF COLUMNS=" + cells.size());
+				cell_num = 1;
+				for (WebElement cell : cells) {
+					// Hover over cell
+					// actions.moveToElement(cell).build().perform();
+					highlight(cell);
+					System.out
+							.println(String.format("row # %d, col # %d text='%s'", row_num, cell_num, cell.getText()));
+					cell_num++;
+				}
+				row_num++;
+			}
 		}
 	}
 
 	@Ignore
 	@Test
-	public void testcssSelectorOfElementAlternative() throws Exception {
+	public void test1() {
+		// Arrange
+		WebElement table_element = null;
+		String table_id = "example";
+
+		table_element = findElement("id", table_id);
+		assertThat(table_element, notNullValue());
+		try {
+			table_element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
+		} catch (RuntimeException timeoutException) {
+			return;
+		}
+		assertThat(table_element, notNullValue());
+		String text_input_css_selector = "input[id='row-5-age']";
+		WebElement text_input_element = findElements("css_selector", text_input_css_selector, table_element).get(0);
+		// table_element.findElement(By.cssSelector(text_input_css_selector));
+		String cell_text = "Software Developer";
+		text_input_element.clear();
+		// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keys.html
+		text_input_element.sendKeys(Keys.chord(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE,
+				Keys.BACK_SPACE, Keys.BACK_SPACE));
+		sleep(3000);
+		text_input_element
+				.sendKeys(Keys.chord("20", org.openqa.selenium.Keys.TAB, cell_text, org.openqa.selenium.Keys.ENTER));
+		sleep(3000);
+
+	}
+
+	@Ignore
+	@Test
+	public void test2() {
+		// Arrange
+		WebElement table_element = null;
+		String table_id = "example";
 
 		try {
-			element = findElement("id", "searchbox");
-			highlight(element);
-			selector = cssSelectorOfElementAlternative(element);
-			System.err.println("css_selector: " + selector);
-			assertEquals(
-					"form[name=\"PTPT_HAC_FORM\"] > div > label > input[name=\"q\"]",
-					selector);
-		} catch (Error e) {
-			verificationErrors
-					.append("Error in testcssSelectorOfElementAlternative() : "
-							+ e.toString() + "\n");
+			System.err.println("Using wait " + wait.hashCode());
+
+			table_element = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
+		} catch (RuntimeException timeoutException) {
+			System.err.println("Exception in wait by id: " + table_id);
+
+			return;
+			// NOTE: quits the test
 		}
-		try {
-			element = findElement("css_selector", selector);
-			highlight(element);
-		} catch (NullPointerException e) {
-			verificationErrors
-					.append("Error in testcssSelectorOfElementAlternative() : "
-							+ e.toString() + "\n");
-		}
+		assertThat(table_element, notNullValue());
+		table_element = findElement("id", table_id);
+		assertThat(table_element, notNullValue());
+		String text_input_css_selector = "input[id='row-5-age']";
+		WebElement text_input_element = findElements("css_selector", text_input_css_selector, table_element).get(0);
+		// table_element.findElement(By.cssSelector(text_input_css_selector));
+		String cell_text = "Software Developer";
+		text_input_element.clear();
+		// https://selenium.googlecode.com/svn/trunk/docs/api/java/org/openqa/selenium/Keys.html
+		text_input_element.sendKeys(Keys.chord(Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE, Keys.BACK_SPACE,
+				Keys.BACK_SPACE, Keys.BACK_SPACE));
+		sleep(3000);
+		text_input_element
+				.sendKeys(Keys.chord("20", org.openqa.selenium.Keys.TAB, cell_text, org.openqa.selenium.Keys.ENTER));
+		sleep(3000);
+
 	}
+
 }

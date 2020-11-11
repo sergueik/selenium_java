@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -33,7 +34,7 @@ public class BaseTest {
 	protected static String selector = null;
 	private static long implicit_wait_interval = 3;
 
-	private static int flexible_wait_interval = 5;
+	private static int flexible_wait_interval = 60;
 	private static long wait_polling_interval = 500;
 	private static long afterTest_interval = 1000;
 	private static long highlight_interval = 100;
@@ -47,17 +48,18 @@ public class BaseTest {
 	@BeforeClass
 	public static void setUp() throws Exception {
 		loggingSb = new StringBuilder();
-		driver = new JBrowserDriver(
-				Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
+
+		driver = new JBrowserDriver(Settings.builder().timezone(Timezone.AMERICA_NEWYORK).build());
 		// driver = new FirefoxDriver();
+		System.err.println("initialized driver " + driver);
 		wait = new WebDriverWait(driver, flexible_wait_interval);
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
-				TimeUnit.SECONDS);
-		cssSelectorOfElementFinderScript = getScriptContent(
-				"cssSelectorOfElement.js");
-		cssSelectorOfElementAlternativeFinderScript = getScriptContent(
-				"cssSelectorOfElementAlternative.js");
+		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
+		wait.pollingEvery(Duration.ofMillis(wait_polling_interval));
+		System.err.println("initialized  wait " + wait.hashCode());
+		// wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
+		driver.manage().timeouts().implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+		cssSelectorOfElementFinderScript = getScriptContent("cssSelectorOfElement.js");
+		cssSelectorOfElementAlternativeFinderScript = getScriptContent("cssSelectorOfElementAlternative.js");
 		xpathOfElementFinderScript = getScriptContent("xpathOfElement.js");
 		driver.get(baseURL);
 	}
@@ -83,8 +85,7 @@ public class BaseTest {
 			driver.quit();
 		}
 		if (verificationErrors.length() != 0) {
-			throw new Exception(
-					verificationErrors.toString());
+			throw new Exception(verificationErrors.toString());
 		}
 	}
 
@@ -93,8 +94,7 @@ public class BaseTest {
 	}
 
 	protected String cssSelectorOfElementAlternative(WebElement element) {
-		return (String) executeScript(cssSelectorOfElementAlternativeFinderScript,
-				element);
+		return (String) executeScript(cssSelectorOfElementAlternativeFinderScript, element);
 	}
 
 	protected String xpathOfElement(WebElement element) {
@@ -102,8 +102,7 @@ public class BaseTest {
 	}
 
 	// wraps the core Selenium find methods with a wait, combines xpath
-	protected List<WebElement> findElements(String strategy, String argument,
-			WebElement parent) {
+	protected List<WebElement> findElements(String strategy, String argument, WebElement parent) {
 		SearchContext finder;
 		String parent_css_selector = null;
 		String parent_xpath = null;
@@ -120,28 +119,28 @@ public class BaseTest {
 		if (parent != null) {
 			parent_css_selector = cssSelectorOfElement(parent);
 			parent_xpath = xpathOfElement(parent);
+			System.err.println("parent css selector: " + parent_css_selector);
 			finder = parent;
 		} else {
 			finder = driver;
 		}
 
 		if (strategy == "css_selector") {
-			String extended_css_selector = String.format("%s  %s",
-					parent_css_selector, argument);
+			String extended_css_selector = String.format("%s  %s", parent_css_selector, argument);
+			System.err.println("extended css selector: " + extended_css_selector);
 			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.cssSelector(extended_css_selector)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(extended_css_selector)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
 			elements = finder.findElements(By.cssSelector(argument));
+			System.err.println("found elements: " + elements.size());
 		}
 		if (strategy == "xpath") {
 			String extended_xpath = String.format("%s/%s", parent_xpath, argument);
 
 			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.xpath(extended_xpath)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(extended_xpath)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -155,7 +154,8 @@ public class BaseTest {
 	}
 
 	// wraps the core Selenium find methods with a wait
-	// Error in cssSelectorOfElementWithIdTest() : java.lang.NoClassDefFoundError: org/openqa/selenium/internal/WrapsDriver
+	// Error in cssSelectorOfElementWithIdTest() : java.lang.NoClassDefFoundError:
+	// org/openqa/selenium/internal/WrapsDriver
 	// https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/internal/WrapsDriver.html
 	protected WebElement findElement(String strategy, String argument) {
 		WebElement element = null;
@@ -172,19 +172,22 @@ public class BaseTest {
 			return null;
 		}
 		if (strategy == "id") {
+
+			System.err.println("Using wait " + wait.hashCode());
 			try {
-				wait.until(
-						ExpectedConditions.visibilityOfElementLocated(By.id(argument)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(argument)));
 			} catch (RuntimeException timeoutException) {
+				System.err.println("Exception in wait by id: " + argument);
 				return null;
 			}
+			System.err.println("finding by id after wait");
 			element = driver.findElement(By.id(argument));
+			System.err.println("found by id: " + element.getAttribute("outerHMTL"));
 		}
 		if (strategy == "classname") {
 
 			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.className(argument)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.className(argument)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -192,8 +195,7 @@ public class BaseTest {
 		}
 		if (strategy == "link_text") {
 			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.linkText(argument)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.linkText(argument)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -201,8 +203,7 @@ public class BaseTest {
 		}
 		if (strategy == "css_selector") {
 			try {
-				wait.until(ExpectedConditions
-						.visibilityOfElementLocated(By.cssSelector(argument)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(argument)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -211,8 +212,7 @@ public class BaseTest {
 		if (strategy == "xpath") {
 
 			try {
-				wait.until(
-						ExpectedConditions.visibilityOfElementLocated(By.xpath(argument)));
+				wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(argument)));
 			} catch (RuntimeException timeoutException) {
 				return null;
 			}
@@ -225,23 +225,19 @@ public class BaseTest {
 		highlight(element, highlight_interval, "yellow");
 	}
 
-	protected void highlight(WebElement element, long highlightInterval,
-			String color) {
+	protected void highlight(WebElement element, long highlightInterval, String color) {
 		System.err.println("Color: " + color);
 		if (wait == null) {
 			wait = new WebDriverWait(driver, flexible_wait_interval);
 		}
 		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
 		// https://stackoverflow.com/questions/49687699/how-to-remove-deprecation-warning-on-timeout-and-polling-in-selenium-java-client
-		// wait.pollingEvery(Duration.ofMillis(wait_polling_interval));
-		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
-
-		// wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(wait_polling_interval));
+		// wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
 
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-			executeScript(String.format("arguments[0].style.border='3px %s'", color),
-					element);
+			executeScript(String.format("arguments[0].style.border='3px %s'", color), element);
 			Thread.sleep(highlightInterval);
 			executeScript("arguments[0].style.border=''", element);
 		} catch (InterruptedException e) {
@@ -251,8 +247,7 @@ public class BaseTest {
 
 	protected Object executeScript(String script, Object... arguments) {
 		if (driver instanceof JavascriptExecutor) {
-			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class
-					.cast(driver);
+			JavascriptExecutor javascriptExecutor = JavascriptExecutor.class.cast(driver);
 			return javascriptExecutor.executeScript(script, arguments);
 		} else {
 			throw new RuntimeException("Script execution failed.");
@@ -261,8 +256,7 @@ public class BaseTest {
 
 	protected static String getScriptContent(String scriptName) {
 		try {
-			final InputStream stream = BaseTest.class.getClassLoader()
-					.getResourceAsStream(scriptName);
+			final InputStream stream = BaseTest.class.getClassLoader().getResourceAsStream(scriptName);
 			final byte[] bytes = new byte[stream.available()];
 			stream.read(bytes);
 			return new String(bytes, "UTF-8");
@@ -287,6 +281,24 @@ public class BaseTest {
 		} catch (Exception e) {
 			err.println("Ignored: " + e.toString());
 		}
+	}
+
+	public void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+	// TODO: move utils to BaseTest
+
+	protected String storeEval(String script) {
+		String result = null;
+		if (driver instanceof JavascriptExecutor) {
+			System.out.println("running the script");
+			result = (String) ((JavascriptExecutor) driver).executeScript(script);
+		}
+		return result;
 	}
 
 }
