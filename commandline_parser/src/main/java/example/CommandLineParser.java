@@ -36,8 +36,8 @@ public class CommandLineParser {
 		return debug;
 	}
 
-	public void setDebug(boolean debug) {
-		this.debug = debug;
+	public void setDebug(boolean value) {
+		debug = value;
 	}
 
 	// pass-through
@@ -72,8 +72,8 @@ public class CommandLineParser {
 		return result;
 	}
 
-	public String getFlagValue(String flagName) {
-		return flags.get(flagName);
+	public String getFlagValue(String name) {
+		return flags.get(name);
 	}
 
 	public int getNumberOfArguments() {
@@ -84,8 +84,8 @@ public class CommandLineParser {
 		return flags.size();
 	}
 
-	public boolean hasFlag(String flagName) {
-		return flags.containsKey(flagName);
+	public boolean hasFlag(String name) {
+		return flags.containsKey(name);
 	}
 
 	// contains no constructor nor logic to discover unknown flags
@@ -169,79 +169,6 @@ public class CommandLineParser {
 
 		}
 		return value;
-	}
-
-	// contains no constructor nor logic to discover unknown flags
-	public void old_parse(String[] args) {
-		List<String> regularArgs = new ArrayList<>();
-		// TODO: recognize special args like k8-style "-apply" [filename]
-		// TODO: add a warning that -apply only work with a file argument
-		for (int n = 0; n < args.length; ++n) {
-			String name = null;
-			String value = null;
-			if (args[n].charAt(0) == '-') {
-				name = args[n].replaceFirst("-", "");
-				value = null;
-				// remove the dash
-				if (debug)
-					System.err.println("About to set the flag: " + name);
-
-				// TODO: tweak to allow last arg to be the "-"
-				if (flagsWithValues.contains(name)
-						&& ((n == args.length - 2 && args[n + 1].equals("-"))
-								|| (n < args.length - 1 && !args[n + 1].matches("^-")))) {
-
-					String data = args[++n];
-
-					if (debug)
-						System.err.println("Inspecting the data argument: " + data);
-
-					// https://www.baeldung.com/java-case-insensitive-string-matching
-					if (data.matches("(?i)^env:[a-z_0-9]+")) {
-						value = System.getenv(data.replaceFirst("(?i)^env:", ""));
-						if (debug)
-							System.err.println("Evaluate data from environment for: " + name
-									+ " = " + value);
-
-					} else if (data.matches("(?i)^@[a-z_0-9.]+")) {
-						String datafilePath = Paths.get(System.getProperty("user.dir"))
-								.resolve(data.replaceFirst("^@", "")).toAbsolutePath()
-								.toString();
-						if (debug)
-							System.err.println(
-									"Reading data for: " + name + " from file: " + datafilePath);
-						try {
-
-							value = (name.equalsIgnoreCase("apply"))
-									? readFile(datafilePath, Charset.forName("UTF-8"))
-									: readFile(datafilePath, Charset.forName("UTF-8"))
-											.replaceAll(" *\\r?\\n *", ",");
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-
-					} else {
-						value = data;
-						if (debug)
-							System.err.println("Set value for: " + name + " = " + value);
-
-					}
-				} else {
-					if (debug)
-						System.err.println("Set the flag without value for " + name);
-
-				}
-				flags.put(name, value);
-			} else {
-				if (debug)
-					System.err.println("About to set the flag to true: " + args[n]);
-
-				regularArgs.add(args[n]);
-			}
-		}
-
-		arguments = regularArgs.toArray(new String[regularArgs.size()]);
-
 	}
 
 	public void saveFlagValue(String flagName) {

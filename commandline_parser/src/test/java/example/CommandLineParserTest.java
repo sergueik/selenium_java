@@ -70,7 +70,6 @@ public class CommandLineParserTest {
 			System.err.println("blankArgumensTest: pass-through arguments: "
 					+ Arrays.asList(commandLineParser.getArguments()));
 		}
-
 		assertThat(commandLineParser.getNumberOfFlags(), is(0));
 		assertThat(commandLineParser.getArguments(), is(new String[] {}));
 	}
@@ -87,24 +86,24 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.getNumberOfFlags(), is(0));
 		assertThat(commandLineParser.getArguments(), notNullValue());
 		assertThat(commandLineParser.getArguments().length, is(3));
-	}
-
+ 	}
+ 
 	@Test
 	public void argumentCountsTest() {
-		argsArray = new String[] { "-a", "100", "-b", "200" };
+		argsArray = new String[] { "-a", "42", "-b", "41" };
 		commandLineParser.saveFlagValue("a");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getNumberOfArguments(), is(1));
-		if (debug)
+		if (debug) 
 			System.err.println("argumentCountsTest: arguments: "
 					+ Arrays.asList(commandLineParser.getArguments()));
-
+		
 		assertThat(commandLineParser.getNumberOfFlags(), is(2));
 
-		if (debug)
+		if (debug) 
 			System.err.println("argumentCountsTest: flags: "
 					+ Arrays.asList(commandLineParser.getFlags()));
-
+		
 	}
 
 	@Test
@@ -152,10 +151,9 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("d"), is(false));
 		assertThat(commandLineParser.getFlagValue("a"), nullValue());
 
-		if (debug)
+		if (debug) 
 			System.err.println("argumentValueLessTest: flags: "
 					+ Arrays.asList(commandLineParser.getFlags()));
-
 	}
 
 	@Test
@@ -172,12 +170,11 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.hasFlag("dummy"), is(false));
 		assertThat(commandLineParser.hasFlag("foo"), is(true));
 		assertThat(commandLineParser.hasFlag("answer"), is(true));
-		assertThat(commandLineParser.getFlagValue("answer"), is("42"));
+		assertThat(commandLineParser.getFlagValue("answer"), is("42"));	
 
-		if (debug)
+		if (debug) 
 			System.err.println("argumentValueLessTest: flags: "
 					+ Arrays.asList(commandLineParser.getFlags()));
-
 	}
 
 	@Test
@@ -211,7 +208,7 @@ public class CommandLineParserTest {
 				.extractExtraArgs(commandLineParser.getFlagValue("a"));
 	}
 	// TODO: https://m.habr.com/ru/post/346782/
-	// Java 8 Optional
+	// Java 8 Optional: Java 8 Кот Шрёдингера
 
 	// TODO: enabling the test below leads two other tests to start failing:
 	// argumentValueLessTest, argumentCountsTest
@@ -229,6 +226,7 @@ public class CommandLineParserTest {
 		assertThat(commandLineParser.getFlagValue("b"),
 				is(System.getenv("JAVA_HOME")));
 	}
+
 
 	@Test
 	public void embeddedArgTest1() {
