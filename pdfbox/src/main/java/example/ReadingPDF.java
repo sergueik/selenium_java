@@ -15,10 +15,12 @@ import java.util.List;
 import java.nio.charset.StandardCharsets;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
+
 import example.CommandLineParser;
 
 public class ReadingPDF {
-	private static boolean debug = true;
+	private static boolean filter = false;
+	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
 	private String[] argsArray = {};
 	private String arg = null;
@@ -29,24 +31,26 @@ public class ReadingPDF {
 
 		commandLineParser.saveFlagValue("in");
 		commandLineParser.saveFlagValue("out");
+		commandLineParser.saveFlagValue("filter");
 
 		commandLineParser.parse(args);
 
 		if (commandLineParser.hasFlag("debug")) {
 			debug = true;
 		}
-		String outFile = commandLineParser.getFlagValue("out");
-		if (outFile == null) {
-			System.err.println("Missing required argument: out");
-			return;
+		if (commandLineParser.hasFlag("filter")) {
+			filter = true;
 		}
-		// reserved to potentially be an URL
+		String outFile = commandLineParser.getFlagValue("out");
+		// "in" reserved to potentially be an URL
 		String inFile = commandLineParser.getFlagValue("in");
 		if (commandLineParser.getFlagValue("in") == null) {
 			System.err.println("Missing required argument: in");
 			return;
 		}
+		extract(inFile, outFile);
 	}
+
 	// based on
 	// https://stackoverflow.com/questions/5806690/is-there-an-iconv-with-translit-equivalent-in-java
 	// and
@@ -61,6 +65,8 @@ public class ReadingPDF {
 
 		try {
 			File file = new File(pdfFilepath);
+			if (debug)
+				System.err.println("Loading: " + pdfFilepath);
 			document = PDDocument.load(file);
 
 			if (!document.isEncrypted()) {
@@ -83,11 +89,13 @@ public class ReadingPDF {
 					System.out
 							.println("TRANSLIT (2): " + Translit.toCyrillic(characters));
 				}
-				// String parsedText = rawText.replaceAll("[^A-Za-z0-9. ]+", "");
-				// System.out.println(parsedText);
 
-				if (outputFilepath.equals("-")) {
-					System.out.println(rawText);
+				if (outputFilepath == null) {
+					final String screenText = (filter)
+							? rawText.replaceAll("[^A-Za-z0-9. ]+", "").replaceAll("\r", "")
+							: rawText.replaceAll("\r", "");
+					System.out.println(
+							(debug) ? String.format("Text:\"%s\"", screenText) : screenText);
 				} else {
 					// https://stackoverflow.com/questions/4389005/how-to-add-a-utf-8-bom-in-java
 					File textFile = new File(outputFilepath);
