@@ -3,9 +3,17 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>commandline_parser</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
+  <developers>
+    <developer>
+      <name>Serguei Kouzmine</name>
+      <email>kouzmine_serguei@yahoo.com</email>
+      <organization/>
+      <organizationUrl>https://github.com/sergueik</organizationUrl>
+    </developer>
+  </developers>
   <properties>
     <mainClass>${project.groupId}.ManageConfig</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
