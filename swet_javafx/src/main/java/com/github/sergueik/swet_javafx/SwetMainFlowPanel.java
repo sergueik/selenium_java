@@ -9,9 +9,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
-import com.github.sergueik.swet_javafx.ChoicesDialog;
-import com.github.sergueik.swet_javafx.ConfigFormEx;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -38,6 +35,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import name.antonsmirnov.javafx.dialog.Dialog;
 
+import com.github.sergueik.swet_javafx.ChoicesDialog;
+import com.github.sergueik.swet_javafx.RecorderConfigurationEditor;
+import com.github.sergueik.swet_javafx.Utils;
+
 @SuppressWarnings("restriction")
 public class SwetMainFlowPanel extends Application {
 
@@ -47,7 +48,7 @@ public class SwetMainFlowPanel extends Application {
 	private Label statusLabel;
 	String configFilePath = null;
 	Scene scene = null;
-	private static String osName = getOsName();
+	private static String osName = Utils.getOsName();
 	public static WebDriver driver = null;
 
 	@Override
@@ -100,12 +101,12 @@ public class SwetMainFlowPanel extends Application {
 									String.format("%s element Locators", button.getText()));
 							Map<String, Map> inputs = new HashMap<>();
 							inputs.put("inputs", inputData); // TODO: JSON
-              // see also https://github.com/MrChebik/ControllerRelationship
+							// see also https://github.com/MrChebik/ControllerRelationship
 							scene.setUserData(inputs);
 							logger.info(
 									"launching complexFormEx for " + inputData.get("title"));
 
-							ComplexFormEx complexFormEx = new ComplexFormEx();
+							ElementAttributeEditor complexFormEx = new ElementAttributeEditor();
 							complexFormEx.setScene(scene);
 							try {
 								complexFormEx.start(new Stage());
@@ -168,6 +169,7 @@ public class SwetMainFlowPanel extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// https://docs.oracle.com/javafx/2/ui_controls/file-chooser.htm
+				// http://tutorials.jenkov.com/javafx/filechooser.html
 				FileChooser fileChooser = new FileChooser();
 				if (configFilePath != null) {
 					logger.info("Loading recording from: " + configFilePath);
@@ -265,7 +267,7 @@ public class SwetMainFlowPanel extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				Stage stage = new Stage();
-				ConfigFormEx s = new ConfigFormEx();
+				RecorderConfigurationEditor s = new RecorderConfigurationEditor();
 				s.start(stage);
 			}
 		});
@@ -325,16 +327,6 @@ public class SwetMainFlowPanel extends Application {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static String getOsName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
 	}
 
 	private void updateStatus(String status) {
