@@ -10,16 +10,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.lang.IllegalStateException;
+import java.net.URL;
 
 // package org.apache.commons.io does not exist
+
 // import org.apache.commons.io.FileUtils;
 
+import com.google.gson.Gson;
+import org.json.JSONObject;
 import org.yaml.snakeyaml.Yaml;
 
 // based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
@@ -106,9 +114,8 @@ public class CommandLineParser {
 					System.err.println("About to set the flag: " + name);
 
 				// TODO: tweak to allow last arg to be the "-"
-				if (flagsWithValues.contains(name)
-						&& ((n == args.length - 2 && args[n + 1].equals("-"))
-								|| (n < args.length - 1 && !args[n + 1].matches("^-")))) {
+				if (flagsWithValues.contains(name) && ((n == args.length - 2 && args[n + 1].equals("-"))
+						|| (n < args.length - 1 && !args[n + 1].matches("^-")))) {
 
 					String data = args[++n];
 					value = processData(name, data);
@@ -143,21 +150,25 @@ public class CommandLineParser {
 		if (data.matches("(?i)^env:[a-z_0-9]+")) {
 			value = System.getenv(data.replaceFirst("(?i)^env:", ""));
 			if (debug)
-				System.err.println(
-						"Evaluate data from environment for: " + name + " = " + value);
+				System.err.println("Evaluate data from environment for: " + name + " = " + value);
 
 		} else if (data.matches("(?i)^@[a-z_0-9.]+")) {
-			String datafilePath = Paths.get(System.getProperty("user.dir"))
-					.resolve(data.replaceFirst("^@", "")).toAbsolutePath().toString();
+			String datafilePath = Paths.get(System.getProperty("user.dir")).resolve(data.replaceFirst("^@", ""))
+					.toAbsolutePath().toString();
 			if (debug)
-				System.err.println(
-						"Reading data for: " + name + " from file: " + datafilePath);
+				System.err.println("Reading data for: " + name + " from file: " + datafilePath);
 			try {
-
-				value = (name.equalsIgnoreCase("apply"))
-						? readFile(datafilePath, Charset.forName("UTF-8"))
-						: readFile(datafilePath, Charset.forName("UTF-8"))
-								.replaceAll(" *\\r?\\n *", ",");
+				value = (name.equalsIgnoreCase("apply")) ? readFile(datafilePath, Charset.forName("UTF-8"))
+						: readFile(datafilePath, Charset.forName("UTF-8")).replaceAll(" *\\r?\\n *", ",");
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		} else if (data.matches("^(?:file|http|https)://[a-z_0-9./]+")) {
+			try {
+				// non standard format, just for trying the new option format
+				String uri = data;
+				Map<String, Object> obj = JsonReader.readJsonFromUrl(uri);
+				value = String.join("|", obj.keySet());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -176,26 +187,22 @@ public class CommandLineParser {
 	}
 
 	private List<String[]> parsePairs(final String data) {
-		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream()
-				.map(o -> o.split(" *= *")).filter(o -> o.length == 2)
-				.collect(Collectors.toList());
+		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream().map(o -> o.split(" *= *"))
+				.filter(o -> o.length == 2).collect(Collectors.toList());
 		return pairs;
 	}
 
 	public Map<String, String> parseEmbeddedMultiArg(final String data) {
 		Map<String, String> result = new HashMap<>();
 		List<String[]> pais = parsePairs(data);
-		List<String> keys = pais.stream().map(o -> o[0]).distinct()
-				.collect(Collectors.toList());
+		List<String> keys = pais.stream().map(o -> o[0]).distinct().collect(Collectors.toList());
 		if (pais.size() == keys.size()) {
 			if (debug)
-				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o)))
-						.forEach(System.err::println);
+				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o))).forEach(System.err::println);
 
 			// result = rawdata.stream().collect(Collectors.toMap(o -> o[0], o ->
 			// o[1]));
-			result = pais.stream()
-					.map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
+			result = pais.stream().map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
 					.collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()));
 		} else {
 			System.err.println("Duplicate embedded argument(s) detected, aborting");
@@ -219,8 +226,7 @@ public class CommandLineParser {
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"
 	// NOTE: not using org.json to reduce size
-	public Map<String, String> extractExtraArgs(String argument)
-			throws IllegalArgumentException {
+	public Map<String, String> extractExtraArgs(String argument) throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.trim().substring(1, argument.length() - 1);
@@ -248,4 +254,36 @@ public class CommandLineParser {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 		return new String(encoded, encoding);
 	}
+
+	// see
+	// also:https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
+
+	private static class JsonReader {
+		private static Gson gson = new Gson();
+		private JSONObject result = null;
+
+		@SuppressWarnings("unchecked")
+		public static Map<String, Object> readJsonFromUrl(String url) throws IOException {
+			InputStream is = new URL(url).openStream();
+			try {
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+				String jsonText = readAll(rd);
+				// smoke test call
+				final Map<String, Object> data = gson.fromJson(jsonText, Map.class);
+				return data;
+			} finally {
+				is.close();
+			}
+		}
+
+		private static String readAll(Reader rd) throws IOException {
+			StringBuilder sb = new StringBuilder();
+			int cp;
+			while ((cp = rd.read()) != -1) {
+				sb.append((char) cp);
+			}
+			return sb.toString();
+		}
+	}
+
 }
