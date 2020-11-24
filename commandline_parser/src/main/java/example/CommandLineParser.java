@@ -164,11 +164,17 @@ public class CommandLineParser {
 				throw new RuntimeException(e);
 			}
 		} else if (data.matches("^(?:file|http|https)://[a-z_0-9./]+")) {
+			// non standard format, just for trying the new option format
+			/*
 			try {
-				// non standard format, just for trying the new option format
-				String uri = data;
-				Map<String, Object> obj = JsonReader.readJsonFromUrl(uri);
-				value = String.join("|", obj.keySet());
+				value = getValueData(data);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			*/
+			try {
+				// enforcing no indent
+				value = JsonReader.readJSONObjectFromUrl(data).toString(0);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -180,6 +186,11 @@ public class CommandLineParser {
 
 		}
 		return value;
+	}
+
+	private String getValueData(String uri) throws IOException {
+		Map<String, Object> obj = JsonReader.readDataFromJSONfromUrl(uri);
+		return String.join("|", obj.keySet());
 	}
 
 	public void saveFlagValue(String flagName) {
@@ -257,13 +268,13 @@ public class CommandLineParser {
 
 	// see
 	// also:https://stackoverflow.com/questions/4308554/simplest-way-to-read-json-from-a-url-in-java
-
+	//
 	private static class JsonReader {
 		private static Gson gson = new Gson();
 		private JSONObject result = null;
 
 		@SuppressWarnings("unchecked")
-		public static Map<String, Object> readJsonFromUrl(String url) throws IOException {
+		public static Map<String, Object> readDataFromJSONfromUrl(String url) throws IOException {
 			InputStream is = new URL(url).openStream();
 			try {
 				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -271,6 +282,19 @@ public class CommandLineParser {
 				// smoke test call
 				final Map<String, Object> data = gson.fromJson(jsonText, Map.class);
 				return data;
+			} finally {
+				is.close();
+			}
+		}
+
+		
+		public static JSONObject readJSONObjectFromUrl(String url) throws IOException {
+			InputStream is = new URL(url).openStream();
+			try {
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+				String jsonText = readAll(rd);
+				JSONObject jsonObject = new JSONObject(jsonText);
+				return jsonObject;
 			} finally {
 				is.close();
 			}

@@ -25,6 +25,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import example.CommandLineParser;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * Unit Tests for CommandLineParser
  * 
@@ -46,8 +49,9 @@ public class CommandLineParserJSONURITest {
 		commandLineParser.setDebug(debug);
 	}
 
+	@Ignore
 	@Test
-	public void addFromFileTest() {
+	public void addDataJSONFromFileTest() {
 
 		PrintWriter out = openWriter("/tmp/a.json");
 		out.println("{\"foo\":1,\n" + "	\"bar\":2}");
@@ -62,8 +66,9 @@ public class CommandLineParserJSONURITest {
 		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
 	}
 
+	@Ignore
 	@Test
-	public void addFromUrlTest() {
+	public void addDataJSONFromUrlTest() {
 
 		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
 		commandLineParser.saveFlagValue("in");
@@ -72,6 +77,27 @@ public class CommandLineParserJSONURITest {
 		assertThat(commandLineParser.hasFlag("in"), is(true));
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
 		assertThat(commandLineParser.getFlagValue("in"), is("one|key"));
+		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
+	}
+
+	@Test
+	public void addStringJSONFromUrlTest() {
+
+		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
+		commandLineParser.saveFlagValue("in");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.getNumberOfFlags(), is(1));
+		assertThat(commandLineParser.hasFlag("in"), is(true));
+		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
+		assertThat(commandLineParser.getFlagValue("in"), is("{\"one\":\"two\",\"key\":\"value\"}"));
+		try {
+			JSONObject jsonObject = new JSONObject(commandLineParser.getFlagValue("in"));
+			assertThat(jsonObject.has("one"), is(true));
+			assertThat(jsonObject.has("key"), is(true));
+		} catch (JSONException e) {
+			System.err.println("Unexpected error: " + e.toString());
+			throw e;
+		}
 		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
 	}
 
