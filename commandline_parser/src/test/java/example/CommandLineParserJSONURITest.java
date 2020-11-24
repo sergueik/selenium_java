@@ -49,7 +49,33 @@ public class CommandLineParserJSONURITest {
 		commandLineParser.setDebug(debug);
 	}
 
-	@Ignore
+	// early tests created for GSON
+
+	@Test
+	public void addStringJSONFromUrlTest() {
+
+		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
+		commandLineParser.saveFlagValue("in");
+		commandLineParser.parse(argsArray);
+		assertThat(commandLineParser.getNumberOfFlags(), is(1));
+		assertThat(commandLineParser.hasFlag("in"), is(true));
+		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
+		// NOTE: whitespace and indent-sensitive
+		// assertThat(commandLineParser.getFlagValue("in"),
+		// is("{\"one\":\"two\",\"key\":\"value\"}"));
+		// early tests created for GSON
+		// assertThat(commandLineParser.getFlagValue("in"), is("one|key"));
+		try {
+			JSONObject jsonObject = new JSONObject(commandLineParser.getFlagValue("in"));
+			assertThat(jsonObject.has("one"), is(true));
+			assertThat(jsonObject.has("key"), is(true));
+		} catch (JSONException e) {
+			System.err.println("Unexpected error: " + e.toString());
+			throw e;
+		}
+		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
+	}
+
 	@Test
 	public void addDataJSONFromFileTest() {
 
@@ -62,38 +88,10 @@ public class CommandLineParserJSONURITest {
 		assertThat(commandLineParser.getNumberOfFlags(), is(1));
 		assertThat(commandLineParser.hasFlag("in"), is(true));
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
-		assertThat(commandLineParser.getFlagValue("in"), is("foo|bar"));
-		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
-	}
-
-	@Ignore
-	@Test
-	public void addDataJSONFromUrlTest() {
-
-		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
-		commandLineParser.saveFlagValue("in");
-		commandLineParser.parse(argsArray);
-		assertThat(commandLineParser.getNumberOfFlags(), is(1));
-		assertThat(commandLineParser.hasFlag("in"), is(true));
-		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
-		assertThat(commandLineParser.getFlagValue("in"), is("one|key"));
-		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
-	}
-
-	@Test
-	public void addStringJSONFromUrlTest() {
-
-		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
-		commandLineParser.saveFlagValue("in");
-		commandLineParser.parse(argsArray);
-		assertThat(commandLineParser.getNumberOfFlags(), is(1));
-		assertThat(commandLineParser.hasFlag("in"), is(true));
-		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
-		assertThat(commandLineParser.getFlagValue("in"), is("{\"one\":\"two\",\"key\":\"value\"}"));
 		try {
 			JSONObject jsonObject = new JSONObject(commandLineParser.getFlagValue("in"));
-			assertThat(jsonObject.has("one"), is(true));
-			assertThat(jsonObject.has("key"), is(true));
+			assertThat(jsonObject.has("foo"), is(true));
+			assertThat(jsonObject.has("bar"), is(true));
 		} catch (JSONException e) {
 			System.err.println("Unexpected error: " + e.toString());
 			throw e;

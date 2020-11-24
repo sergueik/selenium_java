@@ -165,16 +165,8 @@ public class CommandLineParser {
 			}
 		} else if (data.matches("^(?:file|http|https)://[a-z_0-9./]+")) {
 			// non standard format, just for trying the new option format
-			/*
 			try {
-				value = getValueData(data);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-			*/
-			try {
-				// enforcing no indent
-				value = JsonReader.readJSONObjectFromUrl(data).toString(0);
+				value = getValueData(data, Lib.NONE);
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
@@ -183,14 +175,22 @@ public class CommandLineParser {
 			value = data;
 			if (debug)
 				System.err.println("Set value for: " + name + " = " + value);
-
 		}
 		return value;
 	}
 
-	private String getValueData(String uri) throws IOException {
-		Map<String, Object> obj = JsonReader.readDataFromJSONfromUrl(uri);
-		return String.join("|", obj.keySet());
+	private String getValueData(String uri, Lib flag) throws IOException {
+		if (debug)
+			System.err.println("Using " + flag.name());
+		switch (flag) {
+		case JSON:
+			return JsonReader.readJSONObject(uri).toString(0);
+		case GSON:
+			Map<String, Object> obj = JsonReader.readJSONData(uri);
+			return String.join("|", obj.keySet());
+		default:
+			return JsonReader.readRawJSON(uri);
+		}
 	}
 
 	public void saveFlagValue(String flagName) {
@@ -274,21 +274,31 @@ public class CommandLineParser {
 		private JSONObject result = null;
 
 		@SuppressWarnings("unchecked")
-		public static Map<String, Object> readDataFromJSONfromUrl(String url) throws IOException {
+		public static Map<String, Object> readJSONData(String url) throws IOException {
 			InputStream is = new URL(url).openStream();
 			try {
 				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 				String jsonText = readAll(rd);
-				// smoke test call
+				// effectively parse the data
 				final Map<String, Object> data = gson.fromJson(jsonText, Map.class);
+
 				return data;
 			} finally {
 				is.close();
 			}
 		}
 
-		
-		public static JSONObject readJSONObjectFromUrl(String url) throws IOException {
+		public static String readRawJSON(String url) throws IOException {
+			InputStream is = new URL(url).openStream();
+			try {
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+				return readAll(rd);
+			} finally {
+				is.close();
+			}
+		}
+
+		public static JSONObject readJSONObject(String url) throws IOException {
 			InputStream is = new URL(url).openStream();
 			try {
 				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
@@ -310,4 +320,19 @@ public class CommandLineParser {
 		}
 	}
 
+	enum Lib {
+
+		JSON(0x01), GSON(0x02), NONE(0x04);
+
+		private int bit;
+
+		Lib(int value) {
+			bit = value;
+		}
+
+		public int getBitNumber() {
+			return (bit);
+		}
+
+	}
 }
