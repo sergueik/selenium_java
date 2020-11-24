@@ -3,12 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>pdf_reader</artifactId>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <name>pdf_reader</name>
   <properties>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.13.1</junit.version>
+    <commandline-parser.version>0.2.0-SNAPSHOT</commandline-parser.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -19,11 +20,23 @@
   </properties>
   <dependencies>
     <dependency>
-
-  <groupId>example</groupId>
-  <artifactId>commandline_parser</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
-
+      <groupId>example</groupId>
+      <artifactId>commandline-parser</artifactId>
+      <version>${commandline-parser.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.google.guava</groupId>
+          <artifactId>guava</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.json</groupId>
+          <artifactId>json</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.google.code.gson</groupId>
+          <artifactId>gson</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -87,7 +100,7 @@
         <executions>
           <execution>
             <id>copy-dependencies</id>
-               <phase>package</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
@@ -98,6 +111,6 @@
         </executions>
       </plugin>
     </plugins>
-	          <finalName>${finalName}</finalName>
+    <finalName>${finalName}</finalName>
   </build>
 </project>
