@@ -10,6 +10,7 @@ import javax.xml.transform.TransformerException;
 import example.RemoveNode;
 import example.TransformDocument;
 import example.MergeDocumentFragments;
+import example.CommandLineParser;
 
 public class ManageConfig {
 	private static boolean debug = false;
