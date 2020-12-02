@@ -27,7 +27,10 @@ import java.net.URL;
 // import org.apache.commons.io.FileUtils;
 
 import com.google.gson.Gson;
+
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 import org.yaml.snakeyaml.Yaml;
 
 // based on: http://www.java2s.com/Code/Java/Development-Class/ArepresentationofthecommandlineargumentspassedtoaJavaclassmainStringmethod.htm
@@ -283,6 +286,7 @@ public class CommandLineParser {
 
 		private static Gson gson = new Gson();
 		private static JSONObject jsonObject = null;
+		private static JSONArray jsonArray = null;
 		private static String text;
 		private static boolean debug = false;
 		// cannot access encloure class debug which is not static
@@ -313,12 +317,22 @@ public class CommandLineParser {
 			}
 		}
 
-		public static JSONObject readJSONObject(String url) throws IOException {
+		public static JSONObject readJSONObject(String url)
+				throws IOException, JSONException {
 			text = readRawJSON(url);
 			if (debug)
 				System.err.println("Read JSON data: " + text);
 			jsonObject = new JSONObject(text);
 			return jsonObject;
+		}
+
+		public static JSONArray readJSONArray(String url)
+				throws IOException, JSONException {
+			text = readRawJSON(url);
+			if (debug)
+				System.err.println("Read JSON data: " + text);
+			jsonArray = new JSONArray(text);
+			return jsonArray;
 		}
 
 		private static String readAll(Reader rd) throws IOException {
