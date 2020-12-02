@@ -8,7 +8,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 // NOTE: departure from harmcrest assertions
 import java.util.stream.Stream;
 
@@ -24,6 +26,8 @@ import com.github.sergueik.junitparams.ExcelParameters;
 import com.github.sergueik.junitparams.ExcelParametersProvider;
 
 import org.junit.runners.model.FrameworkMethod;
+
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 
 public class DataParameterTest {
@@ -83,7 +87,7 @@ public class DataParameterTest {
 	// return Collections.singleton(parameters);
 	// }
 
-	public static Stream<Object> testData() {
+	public static Stream<Object[]> testData() {
 
 		ExcelParametersProvider provider = new ExcelParametersProvider();
 
@@ -91,13 +95,13 @@ public class DataParameterTest {
 
 			provider.initialize(parametersAnnotation,
 
-					new FrameworkMethod(new DataParameterTest().getClass().getMethod("test", Object.class)
+					new FrameworkMethod(Class.forName("com.github.sergueik.junit5params.DataParameterTest")
+							.getMethod("test", Object.class)
 
 					));
-			// alternatively, can
-			// Class.forName("com.github.sergueik.junit5params.DataParameterTest").getMethod("test",
-			// Object.class)
-		} catch (NoSuchMethodException | SecurityException /* | ClassNotFoundException */ e) {
+			// TODO: alternatively, can
+			// new DataParameterTest().getClass().getMethod("test", Object.class)
+		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 			System.err.println("Exception (ignored): " + e.getMessage());
 			// e.printStackTrace();
 		} catch (java.lang.NullPointerException e) {
@@ -105,24 +109,27 @@ public class DataParameterTest {
 			e.printStackTrace();
 		}
 		Object[] parameters = provider.getParameters();
+		List<Object[]> result = new ArrayList<>();
 		if (debug) {
 			System.err.println(String.format("Received %d parameters", parameters.length));
 		}
-		if (debug) {
-			for (int cnt = 0; cnt != parameters.length; cnt++) {
-				Object[] row = (Object[]) parameters[cnt];
-				System.err.println(String.format("parameter # %d: %s", cnt, String.valueOf(row[0])));
+		for (int cnt = 0; cnt != parameters.length; cnt++) {
+			Object[] row = (Object[]) parameters[cnt];
+			result.add(row);
+			for (int cnt2 = 0; cnt2 != parameters.length; cnt2++) {
+				System.err.println(String.format("parameter %d %d: %s", cnt, cnt2, String.valueOf(row[cnt2])));
 			}
 		}
-		return Stream.of(parameters);
+		Object[][] items = new Object[result.size()][];
+		return Stream.of(result.toArray(items));
 	}
 
 	@ParameterizedTest
 	@MethodSource("testData")
-	public void test(Object param) {
+	public void test(Object param1, Object param2) {
 		// TODO: debug being called
-		assertThat(param, notNullValue());
-		System.err.println("Parameter: " + param.toString());
+		assertThat(param1, notNullValue());
+		System.err.println("Parameter: " + param1.toString());
 	}
 
 }

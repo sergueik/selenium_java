@@ -102,7 +102,7 @@ public class ExcelParametersProvider
 
 	public InputStream createProperReader() throws IOException {
 
-		// System.err.println("createProperReader: " + filepath);
+		System.err.println("createProperReader: " + filepath);
 		if (filepath.indexOf(':') < 0) {
 			return new FileInputStream(filepath);
 		}
