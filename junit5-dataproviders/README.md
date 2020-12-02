@@ -1,43 +1,47 @@
 ### Info
 
-This directory contains an [JUnit-DataProviders](https://github.com/sergueik/junit-dataproviders) adapter example of the to 
-[Junit 5]((https://junit.org/junit5/docs/current/user-guide/)) annotations.
+This directory contains an adapter example of the [JUnit-DataProviders](https://github.com/sergueik/junit-dataproviders) to 
+[Junit 5](https://junit.org/junit5/docs/current/user-guide/) annotations.
 Original project was designed for __Junit 4__ (there is also [TestNg](https://github.com/sergueik/testng-dataproviders) variation of the same data provider) and uses [JUnitParams](https://github.com/Pragmatists/JUnitParam) Junit plugin therefore implements some specfic iterfaces and the easiest way to use it with Junit 5 appears through an adapter.
 
 ### Usage
 
 Embed an [adapter](https://www.baeldung.com/java-adapter-pattern)
-into the `@MethodSource` method (for simlicity the needed arguments made class-level static)
-```
+into the `@MethodSource` method (the needed arguments initialized in the same method, for simlicity):
+```java
+public static Stream<Object[]> testData() {
+  final String filepath = "classpath:data2_2007.xlsx";
+  final String sheetName = "";
+  final String type = "Excel 2007";
+  final boolean debug = false;
+  final String controlColumn = "";
+  final String withValue = "";
 
-	public static Stream<Object[]> testData() {
-
-		ExcelParametersProvider provider = new ExcelParametersProvider();
-		try {
-			provider.initialize(parametersAnnotation,
-					new FrameworkMethod(Class.forName("com.github.sergueik.junit5params.DataParameterTest")
-							.getMethod("test", Object.class, Object.class)));
-			// TODO: alternatively, can
-			// new DataParameterTest().getClass().getMethod("test", Object.class,
-			// Object.class)
-		} catch (NoSuchMethodException | SecurityException | ClassNotFoundException e) {
-			System.err.println("Exception in initialize (ignored): " + e.getMessage());
-			e.printStackTrace();
-		} catch (java.lang.NullPointerException e) {
-			// for unsatisfied Excel Parameter properties
-			e.printStackTrace();
-		}
-		// unwind the packaging
-		Object[] parameters = provider.getParameters();
-		List<Object[]> result = new ArrayList<>();
-		for (int cnt = 0; cnt != parameters.length; cnt++) {
-			Object[] row = (Object[]) parameters[cnt];
-			result.add(row);
-		}
-		Object[][] items = new Object[result.size()][];
-		return Stream.of(result.toArray(items));
-	}
-
+  ExcelParametersProvider provider = new ExcelParametersProvider();
+  try {
+    provider.initialize(parametersAnnotation,
+        new FrameworkMethod(Class.forName("com.github.sergueik.junit5params.DataParameterTest")
+            .getMethod("test", Object.class, Object.class)));
+    // TODO: alternatively, can
+    // new DataParameterTest().getClass().getMethod("test", Object.class,
+    // Object.class)
+  } catch (NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+    System.err.println("Exception in initialize (ignored): " + e.getMessage());
+    e.printStackTrace();
+  } catch (java.lang.NullPointerException e) {
+    // for unsatisfied Excel Parameter properties
+    e.printStackTrace();
+  }
+  // unwind the packaging
+  Object[] parameters = provider.getParameters();
+  List<Object[]> result = new ArrayList<>();
+  for (int cnt = 0; cnt != parameters.length; cnt++) {
+    Object[] row = (Object[]) parameters[cnt];
+    result.add(row);
+  }
+  Object[][] items = new Object[result.size()][];
+  return Stream.of(result.toArray(items));
+}
 ```
 
 Then annotate the test method and inject paramers as [usual](https://www.baeldung.com/parameterized-tests-junit-5):

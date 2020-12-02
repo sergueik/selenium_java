@@ -1,6 +1,6 @@
 package com.github.sergueik.swet_javafx;
 /**
- * Copyright 2014 - 2018 Serguei Kouzmine
+ * Copyright 2014 - 2020 Serguei Kouzmine
  */
 
 import java.io.File;

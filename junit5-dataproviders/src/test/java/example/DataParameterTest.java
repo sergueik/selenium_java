@@ -1,7 +1,7 @@
-package com.github.sergueik.junit5params;
+package example;
 
 /**
- * Copyright 2018,2019 Serguei Kouzmine
+ * Copyright 2020 Serguei Kouzmine
  */
 import org.junit.jupiter.params.ParameterizedTest;
 
@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-// NOTE: departure from harmcrest assertions
+
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -78,18 +78,12 @@ public class DataParameterTest {
 		}
 	};
 
-	// NOTE: auto-suggested type is very wrong:
-	// private static Iterable<Object[]> testData() {
-	// ...
-	// return Collections.singleton(parameters);
-	// }
-
 	public static Stream<Object[]> testData() {
 
 		ExcelParametersProvider provider = new ExcelParametersProvider();
 		try {
 			provider.initialize(parametersAnnotation,
-					new FrameworkMethod(Class.forName("com.github.sergueik.junit5params.DataParameterTest")
+					new FrameworkMethod(Class.forName("example.DataParameterTest")
 							.getMethod("test", Object.class, Object.class)));
 			// TODO: alternatively, can
 			// new DataParameterTest().getClass().getMethod("test", Object.class,
