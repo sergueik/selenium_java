@@ -7,6 +7,7 @@ import org.junit.jupiter.params.provider.*;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 // NOTE: departure from harmcrest assertions
+import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
@@ -24,7 +25,7 @@ import java.lang.reflect.Method;
 
 // based on:
 // https://github.com/reportportal/examples-java/blob/master/example-junit5/src/test/java/com/epam/reportportal/example/junit5/ParametrizedTest.java
-public class DataTest {
+public class BrokenDataParameterTest {
 
 	private final static String filepath = "classpath:data_2007.xlsx";
 	private final static String sheetName = "";
@@ -33,7 +34,6 @@ public class DataTest {
 	private final static String controlColumn = "";
 	private final static String withValue = "";
 
-	// adapter
 	private static Iterable<Object[]> testData() {
 		ExcelParameters parametersAnnotation = new ExcelParameters() {
 			@Override
@@ -81,13 +81,15 @@ public class DataTest {
 		ExcelParametersProvider provider = new ExcelParametersProvider();
 
 		try {
-			Class<?> _class = Class.forName("com.github.sergueik.junit5params.DataTest");
+			Class<?> _class = Class
+					.forName("com.github.sergueik.junit5params.BrokenDataParameterTest");
 			Method _method = _class.getMethod("test", Object.class);
 			FrameworkMethod _frameworkMedhod = new FrameworkMethod(_method);
 			provider.initialize(parametersAnnotation, _frameworkMedhod);
-		} catch (ClassNotFoundException | NoSuchMethodException | SecurityException e) {
+		} catch (ClassNotFoundException | NoSuchMethodException
+				| SecurityException e) {
 			System.err.println("Exception (ignored): " + e.getMessage());
-			// e.printStackTrace();
+			e.printStackTrace();
 		} catch (java.lang.NullPointerException e) {
 			// for unsatisfied Excel Parameter properties
 			e.printStackTrace();
@@ -100,15 +102,20 @@ public class DataTest {
 		// below we create a dummy public method just for the adapter needs
 		Object[] parameters = provider.getParameters();
 		if (debug) {
-			System.err.println(String.format("Received %d parameters", parameters.length));
+			System.err
+					.println(String.format("Received %d parameters", parameters.length));
 		}
 		if (debug) {
 			for (int cnt = 0; cnt != parameters.length; cnt++) {
 				Object[] row = (Object[]) parameters[cnt];
-				System.err.println(String.format("parameter # %d: %s", cnt, String.valueOf(row[0])));
+				System.err.println(
+						String.format("parameter # %d: %s", cnt, String.valueOf(row[0])));
 			}
 		}
 		return Collections.singleton(parameters);
+		// TODO:
+		// return Stream.of(parameters);
+
 	}
 
 	// just to keep
@@ -125,7 +132,7 @@ public class DataTest {
 		Object[] row = (Object[]) param;
 		System.err.println(String.format("Received %d parameters", row.length));
 		for (int cnt = 0; cnt != row.length; cnt++) {
-			System.err.println("Parameter: " + row[cnt].toString());
+			System.err.println("Parameter: " + row[cnt]);
 		}
 	}
 

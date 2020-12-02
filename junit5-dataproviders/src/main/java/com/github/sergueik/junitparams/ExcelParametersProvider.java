@@ -1,4 +1,5 @@
 package com.github.sergueik.junitparams;
+
 /**
  * Copyright 2017-209 Serguei Kouzmine
  */
@@ -18,16 +19,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * ExcelParametersProvider JUnitparams data providers for MS Excel and OpenOffice spreadsheet files 
+ * ExcelParametersProvider JUnitparams data providers for MS Excel and
+ * OpenOffice spreadsheet files
+ * 
  * @author: Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 @RunWith(JUnitParamsRunner.class)
-public class ExcelParametersProvider
-		implements ParametersProvider<ExcelParameters> {
+public class ExcelParametersProvider implements ParametersProvider<ExcelParameters> {
 
-	private final static String testEnvironment = (System
-			.getenv("TEST_ENVIRONMENT") != null) ? System.getenv("TEST_ENVIRONMENT")
-					: "";
+	private final static String testEnvironment = (System.getenv("TEST_ENVIRONMENT") != null)
+			? System.getenv("TEST_ENVIRONMENT")
+			: "";
 	private Utils utils = Utils.getInstance();
 	private String filepath;
 	private String filename;
@@ -44,9 +46,9 @@ public class ExcelParametersProvider
 	// interface annotation - may be an overkill
 	// private static Boolean skipFirstRow = false;
 	@Override
-	public void initialize(ExcelParameters parametersAnnotation,
-			FrameworkMethod frameworkMethod) {
+	public void initialize(ExcelParameters parametersAnnotation, FrameworkMethod frameworkMethod) {
 		filepath = parametersAnnotation.filepath();
+		System.err.println("File path (initialize): " + filepath);
 		type = parametersAnnotation.type();
 		sheetName = parametersAnnotation.sheetName();
 		controlColumn = parametersAnnotation.controlColumn();
@@ -69,6 +71,7 @@ public class ExcelParametersProvider
 				System.err.println("Final value: " + filename);
 			}
 		}
+		System.err.println("File path (initialize): " + filepath);
 		loadEmptyColumns = parametersAnnotation.loadEmptyColumns();
 		utils.setDebug(debug);
 		utils.setSheetName(sheetName);
@@ -102,7 +105,7 @@ public class ExcelParametersProvider
 
 	public InputStream createProperReader() throws IOException {
 
-		// System.err.println("createProperReader: " + filepath);
+		System.err.println("createProperReader: " + filepath);
 		if (filepath.indexOf(':') < 0) {
 			return new FileInputStream(filepath);
 		}
@@ -113,8 +116,7 @@ public class ExcelParametersProvider
 			return new FileInputStream(filename);
 		}
 
-		throw new IllegalArgumentException(
-				"Unknown file access protocol. Only 'file' and 'classpath' are supported!");
+		throw new IllegalArgumentException("Unknown file access protocol. Only 'file' and 'classpath' are supported!");
 	}
 
 	private Object[] paramsFromFile() {
@@ -127,15 +129,12 @@ public class ExcelParametersProvider
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			throw new RuntimeException(
-					"Could not successfully read parameters from file: " + filepath, e);
+			throw new RuntimeException("Could not successfully read parameters from file: " + filepath, e);
 		}
 	}
 
-	private Object[] createDataFromOpenOfficeSpreadsheet(
-			InputStream inputStream) {
-		List<Object[]> result = utils
-				.createDataFromOpenOfficeSpreadsheet(inputStream);
+	private Object[] createDataFromOpenOfficeSpreadsheet(InputStream inputStream) {
+		List<Object[]> result = utils.createDataFromOpenOfficeSpreadsheet(inputStream);
 		return result.toArray();
 	}
 
@@ -149,8 +148,7 @@ public class ExcelParametersProvider
 		if (debug) {
 			int cnt = 0;
 			for (Object[] row : result) {
-				System.err
-						.println(String.format("Row[%d]: %s", cnt, Arrays.toString(row)));
+				System.err.println(String.format("Row[%d]: %s", cnt, Arrays.toString(row)));
 				cnt++;
 			}
 		}
@@ -159,12 +157,10 @@ public class ExcelParametersProvider
 
 	private String amendFileName(String filename) {
 		if (debug) {
-			System.err.print(
-					String.format("Amending the %s with %s", filename, testEnvironment));
+			System.err.print(String.format("Amending the %s with %s", filename, testEnvironment));
 		}
 		// Inject the directory into the file path
-		String updatedFilename = filename.replaceAll("^(.*)/([^/]+)$",
-				String.format("$1/%s/$2", testEnvironment));
+		String updatedFilename = filename.replaceAll("^(.*)/([^/]+)$", String.format("$1/%s/$2", testEnvironment));
 		if (debug) {
 			System.err.println(String.format(" => %s", updatedFilename));
 		}
