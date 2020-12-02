@@ -6,7 +6,7 @@
   <description>Parameterized Junit test annotation backed by various desktop spreadsheet Excel and Open Office data files through poi, Google sheets via their api, YAML, JSON, CSV</description>
   <url>https://github.com/sergueik/junit-dataproviders</url>
   <name>JUnit Data Providers</name>
-  <version>0.0.21-SNAPSHOT</version>
+  <version>0.0.22-SNAPSHOT</version>
   <developers>
     <developer>
       <name>Serguei Kouzmine</name>
