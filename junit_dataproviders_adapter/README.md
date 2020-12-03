@@ -43,7 +43,53 @@ public static Stream<Object[]> testData() {
   return Stream.of(result.toArray(items));
 }
 ```
+where the `parametersAnnotation` instance  is defined as
+```java
+final ExcelParameters parametersAnnotation = new ExcelParameters() {
+  @Override
+  public String filepath() {
+    return filepath;
+  }
 
+  @Override
+  public Class<? extends Annotation> annotationType() {
+    // NOTE: this method is Junit 4 legacy:
+    // Returns the annotation type of this annotation.
+    return null;
+  }
+
+  @Override
+  public String sheetName() {
+    return sheetName;
+  }
+
+  @Override
+  public String type() {
+    return type;
+  }
+
+  @Override
+  public boolean loadEmptyColumns() {
+    return false;
+  }
+
+  @Override
+  public boolean debug() {
+    return debug;
+  }
+
+  @Override
+  public String controlColumn() {
+    return controlColumn;
+  }
+
+  @Override
+  public String withValue() {
+    return withValue;
+  }
+};
+
+```
 Then annotate the test method and inject paramers as [usual](https://www.baeldung.com/parameterized-tests-junit-5):
 ```java
 @ParameterizedTest
