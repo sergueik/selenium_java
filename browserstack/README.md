@@ -132,6 +132,6 @@ running test on thread: 12
 ```
 ### See Also
 
- * [](https://stackoverflow.com/questions/26604745/parameterized-selenium-tests-in-parallel-with-testng)
- * [](https://beust.com/weblog/2009/04/22/advanced-parallel-testing-with-testng-and-data-providers/)
- * [](https://howtodoinjava.com/testng/testng-executing-parallel-tests/)
+ * [parameterized tests in selenium parallel testNg](https://stackoverflow.com/questions/26604745/parameterized-selenium-tests-in-parallel-with-testng)
+ * [advanced parallel tesing with testng data providers](https://beust.com/weblog/2009/04/22/advanced-parallel-testing-with-testng-and-data-providers/)
+ * [testng paralllel test execution](https://howtodoinjava.com/testng/testng-executing-parallel-tests/)
