@@ -1,6 +1,5 @@
 package com.github.sergueik.swet_javafx;
 
-
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,7 +36,6 @@ import com.google.common.reflect.TypeToken;
 import java.lang.reflect.Type;
 import com.google.gson.Gson;
 
-
 // https://gist.github.com/TheItachiUchiha/f5866c121571eb1fcf36
 // https://stackoverflow.com/questions/30233068/javafx-consuming-rest-service-and-displaying-the-data-in-front-end
 // https://www.oracle.com/webfolder/technetwork/tutorials/obe/java/javafx_json_tutorial/javafx_javaee7_json_tutorial.html
@@ -50,8 +48,7 @@ public class ConsumeServiceEx extends Application {
 	private ObservableList<PeopleOnSO> listOfPeople;
 	private static final String JSON_URL = "http://echo.jsontest.com/name/john/like/chess/imageUrl/a"; // "https://api.myjson.com/bins/3jwmh";
 	private static final String IMAGE_URL = "http://www.fontspring.com/presentation_20150512/images/ajax_loader_blue_512.gif";
-	private final ExecutorService executorService = Executors
-			.newCachedThreadPool();
+	private final ExecutorService executorService = Executors.newCachedThreadPool();
 	private Image loadImage;
 
 	// class variable, eager
@@ -75,8 +72,7 @@ public class ConsumeServiceEx extends Application {
 				// imitate the effort loading data
 				sleep(100);
 				if (debug)
-					System.err.println(
-							String.format("Loaded typed data %d entries.", typeData.size()));
+					System.err.println(String.format("Loaded typed data %d entries.", typeData.size()));
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -86,15 +82,15 @@ public class ConsumeServiceEx extends Application {
 
 	private class FetchImage<V> extends Task<Image> {
 
-		private String imageUrl;
+		private String url;
 
-		public FetchImage(String imageUrl) {
-			this.imageUrl = imageUrl;
+		public FetchImage(String data) {
+			url = data;
 		}
 
 		@Override
 		protected Image call() throws Exception {
-			Image image = new Image(imageUrl);
+			Image image = new Image(url);
 			return image;
 		}
 
@@ -105,8 +101,7 @@ public class ConsumeServiceEx extends Application {
 
 		// ignore the IMAGE_URL
 		loadImage = new Image(IMAGE_URL);
-		loadImage = new Image(
-				getClass().getClassLoader().getResourceAsStream("loading.jpg"));
+		loadImage = new Image(getClass().getClassLoader().getResourceAsStream("loading.jpg"));
 
 		VBox root = new VBox();
 		root.setAlignment(Pos.TOP_CENTER);
