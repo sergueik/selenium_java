@@ -4,18 +4,16 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Category;
 
-import example.CommandLineParser;
+import com.github.sergueik.swet_javafx.TemplateCache;
+
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -25,11 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.CheckBoxTableCell;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
@@ -40,9 +34,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-// https://stackoverflow.com/questions/7217625/how-to-add-checkboxs-to-a-tableview-in-javafx
-// https://stackoverflow.com/questions/26631041/javafx-combobox-with-checkboxes
-// https://stackoverflow.com/questions/52467979/checkbox-and-combobox-javafx/52469980
+
+import example.CommandLineParser;
+
 @SuppressWarnings("restriction")
 public class RecorderConfigurationEditor extends Application {
 	@SuppressWarnings("unused")
@@ -53,15 +47,16 @@ public class RecorderConfigurationEditor extends Application {
 	@SuppressWarnings("unused")
 	private String arg = null;
 
-	private static String TargetOsName = Utils.getOsName();
+	private static String osName = Utils.getOsName();
 	private static String dirPath = null;
 
 	@SuppressWarnings("deprecation")
-	static final Category logger = Category.getInstance(RecorderConfigurationEditor.class);
+	static final Category logger = Category
+			.getInstance(RecorderConfigurationEditor.class);
 
 	private static Map<String, String> configData = new HashMap<>();
 	private static Map<String, Map<String, String>> configOptions = new HashMap<>();
-	// Load the matching templates from template directory on change event
+	// Load the matching templates from templa directory on change event
 	// handler
 	private static Map<String, String> templates = new HashMap<>();
 
@@ -82,8 +77,8 @@ public class RecorderConfigurationEditor extends Application {
 	public void start(Stage primaryStage) {
 
 		Map<String, String> browserOptions = new HashMap<>();
-		for (String browser : new ArrayList<String>(
-				Arrays.asList(new String[] { "Chrome", "Firefox", "Internet Explorer", "Edge", "Safari" }))) {
+		for (String browser : new ArrayList<String>(Arrays.asList(new String[] {
+				"Chrome", "Firefox", "Internet Explorer", "Edge", "Safari" }))) {
 			browserOptions.put(browser, "unused");
 		}
 		configOptions.put("Browser", browserOptions);
@@ -96,7 +91,7 @@ public class RecorderConfigurationEditor extends Application {
 
 		primaryStage.setTitle("Session Configuration");
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 480, 350, Color.WHITE);
+		Scene scene = new Scene(root, 480, 250, Color.WHITE);
 
 		GridPane gridpane1 = new GridPane();
 
@@ -117,7 +112,8 @@ public class RecorderConfigurationEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Saved");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
 				stage.close();
 			}
 		});
@@ -128,7 +124,8 @@ public class RecorderConfigurationEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Cancel");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
 				stage.close();
 			}
 		});
@@ -176,18 +173,19 @@ public class RecorderConfigurationEditor extends Application {
 		// https://docs.oracle.com/javafx/2/ui_controls/combo-box.htm
 		// https://docs.oracle.com/javafx/2/events/convenience_methods.htm
 		// https://stackoverflow.com/questions/23968162/javafx-editable-combo-box
-		baseURLFld.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
-			@Override
-			public void handle(KeyEvent t) {
-				if (t.getCode() == KeyCode.ENTER) {
-					System.out.println("Entered");
-				} else if (t.getCode() == KeyCode.ESCAPE) {
-					System.out.println("Entered");
-				} else {
+		baseURLFld.addEventFilter(KeyEvent.KEY_PRESSED,
+				new EventHandler<KeyEvent>() {
+					@Override
+					public void handle(KeyEvent t) {
+						if (t.getCode() == KeyCode.ENTER) {
+							System.out.println("Entered");
+						} else if (t.getCode() == KeyCode.ESCAPE) {
+							System.out.println("Entered");
+						} else {
 
-				}
-			}
-		});
+						}
+					}
+				});
 
 		GridPane.setHalignment(baseURLFld, HPos.LEFT);
 		gridpane.add(baseURLFld, 1, 0);
@@ -203,28 +201,30 @@ public class RecorderConfigurationEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// https://docs.oracle.com/javase/8/javafx/api/javafx/stage/DirectoryChooser.html
-				DirectoryChooser DirectoryChooser = new DirectoryChooser();
+				DirectoryChooser directoryChooser = new DirectoryChooser();
 				// http://stackoverflow.com/questions/585534/what-is-the-best-way-to-find-the-users-home-directory-in-java
 				if (dirPath != null) {
 					logger.info("Initial templates dir: " + dirPath);
 				} else {
-					dirPath = TargetOsName.startsWith("windows") ? Utils.getDesktopPath() : System.getProperty("user.home");
+					dirPath = osName.startsWith("windows") ? Utils.getDesktopPath()
+							: System.getProperty("user.home");
 
 				}
 				try {
-					DirectoryChooser.setInitialDirectory(new File(dirPath));
-					DirectoryChooser.setTitle("Select Template Directory");
+					directoryChooser.setInitialDirectory(new File(dirPath));
+					directoryChooser.setTitle("Select Template Directory");
 				} catch (IllegalArgumentException e) {
 					logger.info("Exception (ignored): " + e.toString());
 				}
 
-				File result = DirectoryChooser.showDialog(primaryStage);
+				File result = directoryChooser.showDialog(primaryStage);
 				if (result != null) {
 					final String dir = result.getAbsolutePath();
 					if (dir != null && dir != tempalteDirFld.getText()) {
 						logger.info("Loading templates from directory: " + dir);
 						TemplateCache templateCache = TemplateCache.getInstance();
-						templateCache.fillTemplateDirectoryCache(new File(dir), "user defined", templates);
+						templateCache.fillTemplateDirectoryCache(new File(dir),
+								"user defined", templates);
 						tempalteDirFld.setText(dir);
 					}
 				}
@@ -238,17 +238,21 @@ public class RecorderConfigurationEditor extends Application {
 		gridpane.add(browseButtonbarHbox, 1, 2);
 		browseButtonbarHbox.setMaxWidth(Double.MAX_VALUE);
 
-		final String[] browsers = new String[] { "Chrome", "Firefox", "Edge", "Internet Explorer" };
+		final String[] browsers = new String[] { "Chrome", "Firefox", "Edge",
+				"Internet Explorer" };
 		@SuppressWarnings("rawtypes")
 		ChoiceBox browserChoice = new ChoiceBox();
-		browserChoice.setItems(FXCollections.observableArrayList(Arrays.asList(browsers)));
-		browserChoice.getSelectionModel().selectedIndexProperty().addListener(new ChangeListener<Number>() {
+		browserChoice
+				.setItems(FXCollections.observableArrayList(Arrays.asList(browsers)));
+		browserChoice.getSelectionModel().selectedIndexProperty()
+				.addListener(new ChangeListener<Number>() {
 
-			@SuppressWarnings("rawtypes")
-			public void changed(ObservableValue ov, Number index, Number new_index) {
-				logger.info("Browser: " + browsers[new_index.intValue()]);
-			}
-		});
+					@SuppressWarnings("rawtypes")
+					public void changed(ObservableValue ov, Number index,
+							Number new_index) {
+						logger.info("Browser: " + browsers[new_index.intValue()]);
+					}
+				});
 		browserChoice.getSelectionModel().select(0);
 		browserChoice.setMaxWidth(Double.MAX_VALUE);
 		gridpane.add(browserChoice, 1, 1);
@@ -256,7 +260,8 @@ public class RecorderConfigurationEditor extends Application {
 		Label browserLabel = new Label("Browser");
 		GridPane.setHalignment(browserLabel, HPos.RIGHT);
 		gridpane.add(browserLabel, 0, 1);
-		final String[] templates = new String[] { "mockup 1", "mockup 2", "mockup 3" };
+		final String[] templates = new String[] { "mockup 1", "mockup 2",
+				"mockup 3" };
 
 		@SuppressWarnings("rawtypes")
 		ComboBox templateChoice = new ComboBox();
@@ -264,7 +269,8 @@ public class RecorderConfigurationEditor extends Application {
 		templateChoice.setPromptText("template");
 		templateChoice.setOnAction(e -> {
 			@SuppressWarnings("unused")
-			String dummy = templateChoice.getSelectionModel().getSelectedItem().toString();
+			String dummy = templateChoice.getSelectionModel().getSelectedItem()
+					.toString();
 		});
 
 		GridPane.setHalignment(templateChoice, HPos.RIGHT);
@@ -291,70 +297,14 @@ public class RecorderConfigurationEditor extends Application {
 		GridPane.setHalignment(templateLabel, HPos.RIGHT);
 		gridpane.add(templateLabel, 0, 3);
 
-		// ===
-
-		final TableView<TargetOs> view = new TableView<>();
-		final ObservableList<TableColumn<TargetOs, ?>> columns = view.getColumns();
-
-		final TableColumn<TargetOs, Boolean> nameColumn = new TableColumn<>("Name");
-		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-		columns.add(nameColumn);
-
-		final TableColumn<TargetOs, Boolean> loadedColumn = new TableColumn<>("Delete");
-		loadedColumn.setCellValueFactory(new PropertyValueFactory<>("delete"));
-		loadedColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
-		columns.add(loadedColumn);
-
-		final ObservableList<TargetOs> items = FXCollections.observableArrayList(new TargetOs("MicrTargetOsoft Windows 3.1", true),
-				new TargetOs("MicrTargetOsoft Windows 3.11", true), new TargetOs("MicrTargetOsoft Windows 95", true),
-				new TargetOs("MicrTargetOsoft Windows NT 3.51", true), new TargetOs("MicrTargetOsoft Windows NT 4", true),
-				new TargetOs("MicrTargetOsoft Windows 2000", true), new TargetOs("MicrTargetOsoft Windows Vista", true),
-				new TargetOs("MicrTargetOsoft Windows Seven", false), new TargetOs("Linux all versions :-)", false));
-		view.setItems(items);
-		view.setEditable(true);
-		gridpane.add(view, 1, 3);
-
-		final Button delBtn = new Button("Delete");
-		delBtn.setMaxWidth(Double.MAX_VALUE);
-		delBtn.setOnAction(e -> {
-			final Set<TargetOs> del = new HashSet<>();
-			for (final TargetOs TargetOs : view.getItems()) {
-				if (TargetOs.getDelete()) {
-					del.add(TargetOs);
-				}
-			}
-			view.getItems().removeAll(del);
-		});
-
-		gridpane.add(delBtn, 0, 3);
-		
 		root.setCenter(gridpane1);
 		primaryStage.setScene(scene);
 		primaryStage.show();
-		for (String configKey : Arrays.asList("Browser", "Base URL", "Template Directory", "Template")) {
+		for (String configKey : Arrays.asList("Browser", "Base URL",
+				"Template Directory", "Template")) {
 			if (configOptions.containsKey(configKey)) {
 			} else {
 			}
 		}
 	}
-
-	public static class TargetOs {
-
-		private String name = null;
-		private boolean delete = false;
-
-		public TargetOs(String nm, boolean del) {
-			this.name = nm;
-			this.delete = del;
-		}
-
-		public String getName() {
-			return name;
-		}
-
-		public Boolean getDelete() {
-			return delete;
-		}
-	}
-
 }
