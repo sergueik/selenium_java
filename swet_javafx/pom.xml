@@ -17,7 +17,17 @@
     <mainClass>SwetMainFlowPanel</mainClass>
     <jar.final.name>swet_javafx_app</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commandline-parser.version>0.5.0-SNAPSHOT</commandline-parser.version>
+    <commandline-parser.version>0.6.0-SNAPSHOT</commandline-parser.version>
+    <controlsfx.version>9.0.0</controlsfx.version>
+    <!--
+
+   bad class file: /home/sergueik/.m2/repository/org/controlsfx/controlsfx/11.0.0/controlsfx-11.0.0.jar(impl/org/controlsfx/i18n/SimpleLocalizedStringProperty.class)
+[ERROR]     class file has wrong version 55.0, should be 52.0
+
+    -->
+
+
+
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
     <log4j.version>1.2.17</log4j.version>
     <jna-platform.version>5.4.0</jna-platform.version>
@@ -102,8 +112,19 @@
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>
+      <artifactId>controlsfx</artifactId>
+      <version>${controlsfx.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.controlsfx</groupId>
       <artifactId>controlsfx-samples</artifactId>
       <version>${controlsfx-samples.version}</version>
+      <exclusions>
+        <exclusion>
+      <groupId>org.controlsfx</groupId>
+      <artifactId>controlsfx</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
   <build>
