@@ -62,7 +62,8 @@ if "%MAIN_CLASS%"=="" set MAIN_CLASS=%DEFAULT_MAIN_CLASS%
 set APP_HOME=%CD:\=/%
 
 REM omit the extension - varies with Windows releases to be mvn.bat or mvn.cmd
-
+if /i NOT "%SKIP_BUILD%" == "true" (
+REM Compile
 if "%SKIP_TEST%"=="" (
 REM Test
 call mvn test
@@ -72,7 +73,7 @@ call mvn package install
 REM compile
 call mvn -Dmaven.test.skip=true package install
 )
-
+)
 REM Run
 REM NOTE: shift does not modify %*
 REM The log4j configuration argument seems to be ignored

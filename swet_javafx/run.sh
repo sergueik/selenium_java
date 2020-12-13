@@ -58,7 +58,9 @@ then
   fi
 fi
 
-mvn -Dmaven.test.skip=true package install
+if [[ $SKIP_BUILD != 'true' ]] ; then
+  mvn -Dmaven.test.skip=true package install
+fi
 echo "java -cp target/$APP_JAR:target/lib/* $APP_PACKAGE.$MAIN_APP_CLASS"
 java -cp target/$APP_JAR:target/lib/* $APP_PACKAGE.$MAIN_APP_CLASS
 # mvn clean spring-boot:run
