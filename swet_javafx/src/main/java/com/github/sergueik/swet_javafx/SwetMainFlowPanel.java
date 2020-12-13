@@ -1,4 +1,7 @@
 package com.github.sergueik.swet_javafx;
+/**
+ * Copyright 2020 Serguei Kouzmine
+ */
 
 import org.apache.log4j.Category;
 import org.openqa.selenium.WebDriver;

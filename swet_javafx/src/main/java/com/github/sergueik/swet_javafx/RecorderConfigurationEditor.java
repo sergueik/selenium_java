@@ -1,4 +1,7 @@
 package com.github.sergueik.swet_javafx;
+/**
+ * Copyright 2020 Serguei Kouzmine
+ */
 
 import java.io.File;
 import java.util.ArrayList;

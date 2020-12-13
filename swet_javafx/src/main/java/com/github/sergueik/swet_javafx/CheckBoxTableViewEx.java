@@ -3,8 +3,6 @@ package com.github.sergueik.swet_javafx;
  * Copyright 2020 Serguei Kouzmine
  */
 
-
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -15,7 +13,9 @@ import org.apache.log4j.Category;
 import example.CommandLineParser;
 import javafx.application.Application;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -48,8 +48,6 @@ public class CheckBoxTableViewEx extends Application {
 	private String[] args = {};
 	@SuppressWarnings("unused")
 	private String arg = null;
-
-	private static String osName = Utils.getOsName();
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category
@@ -154,11 +152,13 @@ public class CheckBoxTableViewEx extends Application {
 		tableView.setStyle("-fx-background-color: gray");
 		tableView.setMaxWidth(Double.MAX_VALUE);
 
-		final TableColumn<Resource, Boolean> loadedColumn = new TableColumn<>(
+		final TableColumn<Resource, Boolean> isSelectedColumn = new TableColumn<>(
 				"Select");
-		loadedColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
-		loadedColumn.setCellFactory(o -> new CheckBoxTableCell<>());
-		columns.add(loadedColumn);
+		isSelectedColumn
+				.setCellValueFactory(new PropertyValueFactory<>("selected"));
+		isSelectedColumn.setCellFactory(o -> new CheckBoxTableCell<>());
+		// does not storess
+		columns.add(isSelectedColumn);
 
 		final TableColumn<Resource, String> nameColumn = new TableColumn<>("Name");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
@@ -201,22 +201,46 @@ public class CheckBoxTableViewEx extends Application {
 
 	public static class Resource {
 
-		private final SimpleStringProperty name = new SimpleStringProperty();
-		private final SimpleStringProperty id = new SimpleStringProperty();
-		private final SimpleBooleanProperty selected = new SimpleBooleanProperty();
+		private final SimpleStringProperty name;
+		private final SimpleObjectProperty<Id> id;
+		private final SimpleBooleanProperty selected;
+
+		// NOTE: cannot have init method -
+		// The final field CheckBoxTableViewEx.Resource.name cannot be assigned -
+		// have to do in constructor
+		/*
+		private void init() {
+			this.name = new SimpleStringProperty();
+			this.id = new SimpleObjectProperty<Id>();		
+			this.selected = new SimpleBooleanProperty();
+		}
+		*/
 
 		public Resource(String id, String name) {
-			this.id.set(id);
+			// init();
+			this.name = new SimpleStringProperty();
+			this.id = new SimpleObjectProperty<Id>();
+			this.selected = new SimpleBooleanProperty();
+			this.id.set(new Id(id));
 			this.name.set(name);
+
 		}
 
 		public Resource(String id, String name, boolean selected) {
+			this.name = new SimpleStringProperty();
+			this.id = new SimpleObjectProperty<Id>();
+			this.selected = new SimpleBooleanProperty();
 			this.name.set(name);
-			this.id.set(id);
+			this.id.set(new Id(id));
 			this.selected.set(selected);
 		}
 
 		public Resource(String name, boolean selected) {
+			this.name = new SimpleStringProperty();
+			// The blank final field id may not have been initialized
+			this.id = new SimpleObjectProperty<Id>();
+
+			this.selected = new SimpleBooleanProperty();
 			this.name.set(name);
 			this.selected.set(selected);
 		}
@@ -225,13 +249,51 @@ public class CheckBoxTableViewEx extends Application {
 			return name;
 		}
 
-		public SimpleStringProperty idProperty() {
+		public SimpleObjectProperty<Id> idProperty() {
 			return id;
+		}
+
+		public Id getIdObj() {
+			return id.get();
+		}
+
+		public String getIdString() {
+			return id.get().toString();
+		}
+
+		public void setIdObj(Id data) {
+			this.id.set(data);
+		}
+
+		public void setIdObj(String data) {
+			this.id.set(new Id(data));
 		}
 
 		public SimpleBooleanProperty selectedProperty() {
 			return selected;
 		}
+	}
+
+	public static class Id {
+
+		private final SimpleStringProperty Id;
+
+		public Id(String Id) {
+			this.Id = new SimpleStringProperty(Id);
+		}
+
+		public String getId() {
+			return this.Id.get();
+		}
+
+		public StringProperty IdProperty() {
+			return this.Id;
+		}
+
+		public void setId(String Id) {
+			this.Id.set(Id);
+		}
+
 	}
 
 	public static void sleep(Integer milliSeconds) {

@@ -5,18 +5,23 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
 import javafx.scene.Scene;
@@ -29,6 +34,8 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
@@ -39,7 +46,8 @@ import javafx.util.Callback;
 * origin: https://gist.github.com/haisi/0a82e17daf586c9bab52
 * @author Hasan Kara <hasan.kara@fhnw.ch>
 */
-// see also: https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTableCell.html
+// see also:
+// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTableCell.html
 // https://stackoverflow.com/questions/22665322/change-itemlist-in-a-combobox-depending-from-another-combobox-choice/35590119#35590119
 // https://stackoverflow.com/questions/35131428/combobox-in-a-tableview-cell-in-javafx
 // https://gist.github.com/james-d/bf28c5d5343a8fd79b0e
@@ -79,6 +87,7 @@ public class TableViewExtendedEx extends Application {
 				TableColumn<Person, String> param) -> new EditingCell();
 		Callback<TableColumn<Person, Date>, TableCell<Person, Date>> dateCellFactory = (
 				TableColumn<Person, Date> param) -> new DateEditingCell();
+
 		Callback<TableColumn<Person, Typ>, TableCell<Person, Typ>> comboBoxCellFactory = (
 				TableColumn<Person, Typ> param) -> new ComboBoxEditingCell();
 
@@ -120,8 +129,23 @@ public class TableViewExtendedEx extends Application {
 
 		});
 
+		TableColumn<Person, Boolean> loadedCol = new TableColumn<Person, Boolean>(
+				"Select");
+		loadedCol.setMinWidth(30);
+		loadedCol.setCellValueFactory(
+				cellData -> cellData.getValue().selectedProperty());
+		loadedCol.setCellFactory(o -> new CheckBoxTableCell<>());
+		// no need to worry on edit
+		/*
+		loadedCol
+				.setOnEditCommit((TableColumn.CellEditEvent<Person, Boolean> t) -> {
+					((Boolean) t.getTableView().getItems()
+							.get(t.getTablePosition().getRow())).getBoolean(t.getNewValue());
+		
+				});
+		*/
 		table.setItems(data);
-		table.getColumns().addAll(firstNameCol, lastNameCol, emailCol);
+		table.getColumns().addAll(firstNameCol, lastNameCol, emailCol, loadedCol);
 
 		final TextField addFirstName = new TextField();
 		addFirstName.setPromptText("First Name");
@@ -143,7 +167,48 @@ public class TableViewExtendedEx extends Application {
 			addEmail.clear();
 		});
 
-		hb.getChildren().addAll(addFirstName, addLastName, addEmail, addButton);
+		final Button updateButton = new Button("Update");
+		updateButton.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
+
+				final Set<Person> delSet = new HashSet<>();
+				final Set<Person> selSet = new HashSet<>();
+				for (final Person resource : table.getItems()) {
+					if (!resource.selectedProperty().get()) {
+						delSet.add(resource);
+					} else {
+						selSet.add(resource);
+					}
+				}
+				table.getItems().removeAll(delSet);
+				System.err.println("Processing");
+				for (final Person resource : selSet) {
+					System.err.println(String.format("%s %s", resource.getFirstName(),
+							resource.selectedProperty().get()));
+				}
+				// sleep(500);
+				// stage.close();
+			}
+		});
+		updateButton.setDefaultButton(true);
+		// Cancel button
+		final Button cancelButton = new Button("Cancel");
+		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+				System.err.println("Cancel");
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
+				stage.close();
+			}
+		});
+
+		hb.getChildren().addAll(addFirstName, addLastName, addEmail, addButton,
+				updateButton, cancelButton);
 		hb.setSpacing(3);
 
 		final VBox vbox = new VBox();
@@ -456,10 +521,19 @@ public class TableViewExtendedEx extends Application {
 		private final SimpleStringProperty firstName;
 		private final SimpleObjectProperty<Typ> typ;
 		private final SimpleObjectProperty<Date> birthday;
+		private final SimpleBooleanProperty selected;
 
 		public Person(String firstName, Typ typ, Date bithday) {
 			this.firstName = new SimpleStringProperty(firstName);
 			this.typ = new SimpleObjectProperty(typ);
+			this.selected = new SimpleBooleanProperty();
+			this.birthday = new SimpleObjectProperty(bithday);
+		}
+
+		public Person(String firstName, Typ typ, Date bithday, boolean selected) {
+			this.firstName = new SimpleStringProperty(firstName);
+			this.typ = new SimpleObjectProperty(typ);
+			this.selected = new SimpleBooleanProperty(selected);
 			this.birthday = new SimpleObjectProperty(bithday);
 		}
 
@@ -499,6 +573,9 @@ public class TableViewExtendedEx extends Application {
 			this.birthday.set(birthday);
 		}
 
+		public BooleanProperty selectedProperty() {
+			return selected;
+		}
 	}
 
 }
