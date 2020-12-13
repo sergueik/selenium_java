@@ -1,19 +1,21 @@
 package com.github.sergueik.swet_javafx;
+/**
+ * Copyright 2020 Serguei Kouzmine
+ */
 
-import java.io.File;
+
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Category;
 
 import example.CommandLineParser;
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -22,23 +24,16 @@ import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
-import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 
 // https://stackoverflow.com/questions/7217625/how-to-add-checkboxs-to-a-tableview-in-javafx
@@ -60,10 +55,8 @@ public class CheckBoxTableViewEx extends Application {
 	static final Category logger = Category
 			.getInstance(CheckBoxTableViewEx.class);
 
-	private static Map<String, String> configData = new HashMap<>();
-	// TODO: add more members but show only the name
 	// http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
-	private static final TableView<TargetOs> view = new TableView<>();
+	private static final TableView<Resource> tableView = new TableView<>();
 
 	public static void main(String[] args) {
 		commandLineParser = new CommandLineParser();
@@ -96,29 +89,34 @@ public class CheckBoxTableViewEx extends Application {
 		GridPane.setRowIndex(buttonbarHbox, 1);
 		GridPane.setColumnIndex(buttonbarHbox, 0);
 
-		// Save button
-		Button saveButton = new Button("Save");
-		saveButton.setOnAction(new EventHandler<ActionEvent>() {
+		Button updateButton = new Button("Update");
+		updateButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				System.err.println("Saving");
 				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
 						.getWindow();
 
-				final Set<TargetOs> del = new HashSet<>();
-				for (final TargetOs targetOs : view.getItems()) {
-					System.err.println(
-							String.format("%s %s", targetOs.getName(), targetOs.getDelete()));
-					if (targetOs.getDelete()) {
-						del.add(targetOs);
+				final Set<Resource> delSet = new HashSet<>();
+				final Set<Resource> selSet = new HashSet<>();
+				for (final Resource Resource : tableView.getItems()) {
+					if (!Resource.selectedProperty().get()) {
+						delSet.add(Resource);
+					} else {
+						selSet.add(Resource);
 					}
 				}
-				view.getItems().removeAll(del);
-
+				tableView.getItems().removeAll(delSet);
+				System.err.println("Processing");
+				for (final Resource Resource : selSet) {
+					System.err
+							.println(String.format("%s %s", Resource.nameProperty().get(),
+									Resource.selectedProperty().get()));
+				}
+				sleep(500);
 				stage.close();
 			}
 		});
-		saveButton.setDefaultButton(true);
+		updateButton.setDefaultButton(true);
 		// Cancel button
 		Button cancelButton = new Button("Cancel");
 		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
@@ -132,7 +130,7 @@ public class CheckBoxTableViewEx extends Application {
 			}
 		});
 
-		buttonbarHbox.getChildren().addAll(saveButton, cancelButton);
+		buttonbarHbox.getChildren().addAll(updateButton, cancelButton);
 		gridpane1.getChildren().addAll(gridpane, buttonbarHbox);
 
 		gridpane.setPadding(new Insets(5));
@@ -150,57 +148,97 @@ public class CheckBoxTableViewEx extends Application {
 		column1.setHgrow(Priority.ALWAYS);
 		gridpane.getColumnConstraints().add(column1);
 
-		// ===
-		// NOTE: usine plain strings do not work
-		final ObservableList<TableColumn<TargetOs, ?>> columns = view.getColumns();
+		final ObservableList<TableColumn<Resource, ?>> columns = tableView
+				.getColumns();
 
-		view.setStyle("-fx-background-color: gray");
-		view.setMaxWidth(Double.MAX_VALUE);
+		tableView.setStyle("-fx-background-color: gray");
+		tableView.setMaxWidth(Double.MAX_VALUE);
 
-		final TableColumn<TargetOs, Boolean> nameColumn = new TableColumn<>("Name");
-		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
-		columns.add(nameColumn);
-
-		final TableColumn<TargetOs, Boolean> loadedColumn = new TableColumn<>(
-				"Delete");
-		loadedColumn.setCellValueFactory(new PropertyValueFactory<>("delete"));
-		loadedColumn.setCellFactory(tc -> new CheckBoxTableCell<>());
+		final TableColumn<Resource, Boolean> loadedColumn = new TableColumn<>(
+				"Select");
+		loadedColumn.setCellValueFactory(new PropertyValueFactory<>("selected"));
+		loadedColumn.setCellFactory(o -> new CheckBoxTableCell<>());
 		columns.add(loadedColumn);
 
-		final ObservableList<TargetOs> items = FXCollections.observableArrayList(
-				new TargetOs("discovery", false), new TargetOs("tomcat api", true),
-				new TargetOs("tomcat api", true), new TargetOs("tomcat web", true),
-				new TargetOs("load balancer", false),
-				new TargetOs("load balancer", false),
-				new TargetOs("load balancer", false));
+		final TableColumn<Resource, String> nameColumn = new TableColumn<>("Name");
+		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+		nameColumn.setEditable(false);
+		columns.add(nameColumn);
+
+		final List<Resource> resources = new ArrayList<>();
+		resources.add(new Resource("service discovery 1", false));
+		resources.add(new Resource("service discovery 2", false));
+		resources.add(new Resource("service discovery 3", false));
+		resources.add(new Resource("tomcat api 1", true));
+		resources.add(new Resource("tomcat api 2", true));
+		resources.add(new Resource("tomcat api 3", true));
+		resources.add(new Resource("tomcat api 4", true));
+		resources.add(new Resource("tomcat api 5", true));
+		resources.add(new Resource("tomcat api 6", true));
+		resources.add(new Resource("tomcat web 1", true));
+		resources.add(new Resource("tomcat web 2", true));
+		resources.add(new Resource("load balancer 1", false));
+		resources.add(new Resource("load balancer 2", false));
+		resources.add(new Resource("load balancer 3", false));
+		// final List<Resource> resources = fetchList.getValue();
+		final ObservableList<Resource> items = FXCollections.observableArrayList();
+		for (Resource resource : resources) {
+			items.add(resource);
+		}
+		// final ObservableList<Resource> items =
+		// FXCollections.observableArrayList();
 		// the "delete" member is currenly ignored
-		view.setItems(items);
-		view.setEditable(true);
-		GridPane.setHalignment(view, HPos.LEFT);
-		GridPane.setRowIndex(view, 0);
-		GridPane.setColumnIndex(view, 0);
-		gridpane.add(view, 0, 0);
+		tableView.setItems(items);
+		tableView.setEditable(true);
+		GridPane.setHalignment(tableView, HPos.LEFT);
+		GridPane.setRowIndex(tableView, 0);
+		GridPane.setColumnIndex(tableView, 0);
+		gridpane.add(tableView, 0, 0);
 		root.setCenter(gridpane1);
 		primaryStage.setScene(scene);
 		primaryStage.show();
 	}
 
-	public static class TargetOs {
+	public static class Resource {
 
-		private String name = null;
-		private boolean delete = false;
+		private final SimpleStringProperty name = new SimpleStringProperty();
+		private final SimpleStringProperty id = new SimpleStringProperty();
+		private final SimpleBooleanProperty selected = new SimpleBooleanProperty();
 
-		public TargetOs(String name, boolean delete) {
-			this.name = name;
-			this.delete = delete;
+		public Resource(String id, String name) {
+			this.id.set(id);
+			this.name.set(name);
 		}
 
-		public String getName() {
+		public Resource(String id, String name, boolean selected) {
+			this.name.set(name);
+			this.id.set(id);
+			this.selected.set(selected);
+		}
+
+		public Resource(String name, boolean selected) {
+			this.name.set(name);
+			this.selected.set(selected);
+		}
+
+		public SimpleStringProperty nameProperty() {
 			return name;
 		}
 
-		public Boolean getDelete() {
-			return delete;
+		public SimpleStringProperty idProperty() {
+			return id;
+		}
+
+		public SimpleBooleanProperty selectedProperty() {
+			return selected;
+		}
+	}
+
+	public static void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 

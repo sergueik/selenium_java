@@ -1,4 +1,4 @@
-### Info
+﻿### Info
 
 This directory contains the JavaFx port of [SWT based Selenum recorder](https://github.com/sergueik/SWET) based on basic JavaFX starter maven project
 [jesuino/jfx8-app](https://github.com/jesuino/jfx8-app) and
@@ -40,6 +40,7 @@ Bash script for Unix and Mac:
   * [javafx developer forum (in russian)](http://www.cyberforum.ru/javafx/thread1450829.html)
   * [javafx richtext control](https://github.com/FXMisc/RichTextFX#stable-release)
   * [curated list of awesome JavaFx resources](https://github.com/mhrimaz/AwesomeJavaFX)
+  * javaFX widget [detailed documentation] http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
