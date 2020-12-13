@@ -42,11 +42,9 @@ import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
 
-/**
-* origin: https://gist.github.com/haisi/0a82e17daf586c9bab52
-* @author Hasan Kara <hasan.kara@fhnw.ch>
-*/
+// based on: https://gist.github.com/haisi/0a82e17daf586c9bab52
 // see also:
+//
 // https://docs.oracle.com/javase/8/javafx/api/javafx/scene/control/cell/ComboBoxTableCell.html
 // https://stackoverflow.com/questions/22665322/change-itemlist-in-a-combobox-depending-from-another-combobox-choice/35590119#35590119
 // https://stackoverflow.com/questions/35131428/combobox-in-a-tableview-cell-in-javafx
@@ -57,18 +55,23 @@ import javafx.util.Callback;
 // http://spec-zone.ru/RU/Java/FX/8/docs/api/javafx/fxml/doc-files/introduction_to_fxml.html
 // https://vk.com/doc-80984752_367966549?hash=516410f2641275bd32&dl=0b5022d49b8697a09f
 // http://code.makery.ch/library/javafx-8-tutorial/ru/part1/
+// https://stackoverflow.com/questions/7217625/how-to-add-checkboxs-to-a-tableview-in-javafx
+// https://stackoverflow.com/questions/26631041/javafx-combobox-with-checkboxes
+// https://stackoverflow.com/questions/52467979/checkbox-and-combobox-javafx/52469980
+
 @SuppressWarnings("restriction")
 
 public class TableViewExtendedEx extends Application {
 
 	private TableView<Person> table = new TableView<>();
-	private final ObservableList<Typ> typData = FXCollections
-			.observableArrayList(new Typ("Hund"), new Typ("Fuchs"), new Typ("Esel"));
+	private final ObservableList<Choice> choiceData = FXCollections
+			.observableArrayList(new Choice("Yes"), new Choice("No"),
+					new Choice("Maybe"), new Choice("Maybe not"));
 	private final ObservableList<Person> data = FXCollections.observableArrayList(
-			new Person("Jacob", typData.get(0), new Date()),
-			new Person("Urs", typData.get(1), new Date()),
-			new Person("Hans", typData.get(2), new Date()),
-			new Person("Ueli", typData.get(2), new Date()));
+			new Person("Jacob", choiceData.get(0), new Date()),
+			new Person("Urs", choiceData.get(1), new Date()),
+			new Person("Hans", choiceData.get(2), new Date()),
+			new Person("Ueli", choiceData.get(3), new Date()));
 
 	final HBox hb = new HBox();
 
@@ -79,7 +82,8 @@ public class TableViewExtendedEx extends Application {
 		stage.setWidth(550);
 		stage.setHeight(550);
 
-		final Label label = new Label("Address Book");
+		final Label label = new Label("Component Entry");
+		// platform
 		label.setFont(new Font("Arial", 20));
 
 		table.setEditable(true);
@@ -88,91 +92,84 @@ public class TableViewExtendedEx extends Application {
 		Callback<TableColumn<Person, Date>, TableCell<Person, Date>> dateCellFactory = (
 				TableColumn<Person, Date> param) -> new DateEditingCell();
 
-		Callback<TableColumn<Person, Typ>, TableCell<Person, Typ>> comboBoxCellFactory = (
-				TableColumn<Person, Typ> param) -> new ComboBoxEditingCell();
+		Callback<TableColumn<Person, Choice>, TableCell<Person, Choice>> comboBoxCellFactory = (
+				TableColumn<Person, Choice> param) -> new ComboBoxEditingCell();
 
 		TableColumn<Person, String> firstNameCol = new TableColumn<Person, String>(
-				"Vorname");
+				"Name");
 		firstNameCol.setMinWidth(100);
-		firstNameCol.setCellValueFactory(
-				cellData -> cellData.getValue().firstNameProperty());
+		firstNameCol.setCellValueFactory(o -> o.getValue().firstNameProperty());
 		firstNameCol.setCellFactory(cellFactory);
-		firstNameCol
-				.setOnEditCommit((TableColumn.CellEditEvent<Person, String> t) -> {
-					((Person) t.getTableView().getItems()
-							.get(t.getTablePosition().getRow()))
-									.setFirstName(t.getNewValue());
-
-				});
-
-		TableColumn<Person, Typ> lastNameCol = new TableColumn<Person, Typ>(
-				"Lieblings Tier");
-		lastNameCol.setMinWidth(100);
-		lastNameCol
-				.setCellValueFactory(cellData -> cellData.getValue().typObjProperty());
-		lastNameCol.setCellFactory(comboBoxCellFactory);
-		lastNameCol.setOnEditCommit((TableColumn.CellEditEvent<Person, Typ> t) -> {
-			((Person) t.getTableView().getItems().get(t.getTablePosition().getRow()))
-					.setTypObj(t.getNewValue());
+		// NOTE: dropped specifying parameter type
+		// TableColumn.CellEditEvent<Person, String>
+		firstNameCol.setOnEditCommit(o -> {
+			((Person) o.getTableView().getItems().get(o.getTablePosition().getRow()))
+					.setFirstName(o.getNewValue());
 
 		});
 
-		TableColumn<Person, Date> emailCol = new TableColumn<Person, Date>(
-				"Geburtstag");
-		emailCol.setMinWidth(200);
-		emailCol.setCellValueFactory(
+		TableColumn<Person, Choice> choiceCol = new TableColumn<Person, Choice>(
+				"Choice");
+		choiceCol.setMinWidth(100);
+		choiceCol.setCellValueFactory(o -> o.getValue().getChoiceProperty());
+		choiceCol.setCellFactory(comboBoxCellFactory);
+		// NOTE: dropped specifying parameter type
+		// TableColumn.CellEditEvent<Person, Choice>
+		choiceCol.setOnEditCommit(o -> {
+			((Person) o.getTableView().getItems().get(o.getTablePosition().getRow()))
+					.setChoiceObj(o.getNewValue());
+
+		});
+
+		TableColumn<Person, Date> dateCol = new TableColumn<Person, Date>("Date");
+		dateCol.setMinWidth(200);
+		dateCol.setCellValueFactory(
 				cellData -> cellData.getValue().birthdayProperty());
-		emailCol.setCellFactory(dateCellFactory);
-		emailCol.setOnEditCommit((TableColumn.CellEditEvent<Person, Date> t) -> {
-			((Person) t.getTableView().getItems().get(t.getTablePosition().getRow()))
-					.setBirthday(t.getNewValue());
+		dateCol.setCellFactory(dateCellFactory);
+		// NOTE: dropped specifying parameter type
+		// TableColumn.CellEditEvent<Person, Data>
+		dateCol.setOnEditCommit(o -> {
+			((Person) o.getTableView().getItems().get(o.getTablePosition().getRow()))
+					.setBirthday(o.getNewValue());
 
 		});
 
 		TableColumn<Person, Boolean> loadedCol = new TableColumn<Person, Boolean>(
-				"Select");
+				"Include");
 		loadedCol.setMinWidth(30);
-		loadedCol.setCellValueFactory(
-				cellData -> cellData.getValue().selectedProperty());
+		loadedCol.setCellValueFactory(o -> o.getValue().selectedProperty());
 		loadedCol.setCellFactory(o -> new CheckBoxTableCell<>());
-		// no need to worry on edit
-		/*
-		loadedCol
-				.setOnEditCommit((TableColumn.CellEditEvent<Person, Boolean> t) -> {
-					((Boolean) t.getTableView().getItems()
-							.get(t.getTablePosition().getRow())).getBoolean(t.getNewValue());
-		
-				});
-		*/
+		// no need to worry on custom editor
+
 		table.setItems(data);
-		table.getColumns().addAll(firstNameCol, lastNameCol, emailCol, loadedCol);
+		table.getColumns().addAll(firstNameCol, choiceCol, dateCol, loadedCol);
 
 		final TextField addFirstName = new TextField();
-		addFirstName.setPromptText("First Name");
+		addFirstName.setPromptText("Name");
 		addFirstName.setMaxWidth(firstNameCol.getPrefWidth());
-
-		final TextField addLastName = new TextField();
-		addLastName.setPromptText("Last Name");
-		addLastName.setMaxWidth(lastNameCol.getPrefWidth());
-
-		final TextField addEmail = new TextField();
-		addEmail.setPromptText("email");
-		addEmail.setMaxWidth(emailCol.getPrefWidth());
-
+		/*
+				final TextField addLastName = new TextField();
+				addLastName.setPromptText("Last Name");
+				addLastName.setMaxWidth(choiceCol.getPrefWidth());
+		
+				final TextField addEmail = new TextField();
+				addEmail.setPromptText("date");
+				addEmail.setMaxWidth(dateCol.getPrefWidth());
+		*/
+		// NOTE: no entry edit for Choice or Date
 		final Button addButton = new Button("Add");
 		addButton.setOnAction((ActionEvent e) -> {
-			data.add(new Person(addFirstName.getText(), new Typ("Hund"), new Date()));
+			data.add(
+					new Person(addFirstName.getText(), new Choice("Yes"), new Date()));
 			addFirstName.clear();
-			addLastName.clear();
-			addEmail.clear();
+			// addLastName.clear();
+			// addEmail.clear();
 		});
 
 		final Button updateButton = new Button("Update");
 		updateButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
-						.getWindow();
 
 				final Set<Person> delSet = new HashSet<>();
 				final Set<Person> selSet = new HashSet<>();
@@ -184,12 +181,17 @@ public class TableViewExtendedEx extends Application {
 					}
 				}
 				table.getItems().removeAll(delSet);
-				System.err.println("Processing");
+				System.err.println("Processing selected rows:");
 				for (final Person resource : selSet) {
-					System.err.println(String.format("%s %s", resource.getFirstName(),
-							resource.selectedProperty().get()));
+					System.err.println(
+							String.format("name: %s choice: %s date: %s included: %s",
+									resource.getFirstName(), resource.getChoice(),
+									resource.getBirthday().toLocaleString(),
+									resource.selectedProperty().get()));
 				}
 				// sleep(500);
+				// Stage stage = (Stage) ((Button)
+				// (event.getSource())).getScene().getWindow();
 				// stage.close();
 			}
 		});
@@ -207,7 +209,7 @@ public class TableViewExtendedEx extends Application {
 			}
 		});
 
-		hb.getChildren().addAll(addFirstName, addLastName, addEmail, addButton,
+		hb.getChildren().addAll(addFirstName /*, addLastName, addEmail*/, addButton,
 				updateButton, cancelButton);
 		hb.setSpacing(3);
 
@@ -222,9 +224,6 @@ public class TableViewExtendedEx extends Application {
 		stage.show();
 	}
 
-	/**
-	 * @param args the command line arguments
-	 */
 	public static void main(String[] args) {
 		launch(args);
 	}
@@ -278,6 +277,7 @@ public class TableViewExtendedEx extends Application {
 		}
 
 		private void createTextField() {
+
 			textField = new TextField(getString());
 			textField.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
 			textField.setOnAction((e) -> commitEdit(textField.getText()));
@@ -285,7 +285,7 @@ public class TableViewExtendedEx extends Application {
 					.addListener((ObservableValue<? extends Boolean> observable,
 							Boolean oldValue, Boolean newValue) -> {
 						if (!newValue) {
-							System.out.println("Commiting " + textField.getText());
+							System.out.println("Updating: " + textField.getText());
 							commitEdit(textField.getText());
 						}
 					});
@@ -365,9 +365,9 @@ public class TableViewExtendedEx extends Application {
 		}
 	}
 
-	class ComboBoxEditingCell extends TableCell<Person, Typ> {
+	class ComboBoxEditingCell extends TableCell<Person, Choice> {
 
-		private ComboBox<Typ> comboBox;
+		private ComboBox<Choice> comboBox;
 
 		private ComboBoxEditingCell() {
 		}
@@ -386,12 +386,12 @@ public class TableViewExtendedEx extends Application {
 		public void cancelEdit() {
 			super.cancelEdit();
 
-			setText(getTyp().getTyp());
+			setText(getChoice().getChoice());
 			setGraphic(null);
 		}
 
 		@Override
-		public void updateItem(Typ item, boolean empty) {
+		public void updateItem(Choice item, boolean empty) {
 			super.updateItem(item, empty);
 
 			if (empty) {
@@ -400,21 +400,21 @@ public class TableViewExtendedEx extends Application {
 			} else {
 				if (isEditing()) {
 					if (comboBox != null) {
-						comboBox.setValue(getTyp());
+						comboBox.setValue(getChoice());
 					}
-					setText(getTyp().getTyp());
+					setText(getChoice().getChoice());
 					setGraphic(comboBox);
 				} else {
-					setText(getTyp().getTyp());
+					setText(getChoice().getChoice());
 					setGraphic(null);
 				}
 			}
 		}
 
 		private void createComboBox() {
-			comboBox = new ComboBox<>(typData);
+			comboBox = new ComboBox<>(choiceData);
 			comboBoxConverter(comboBox);
-			comboBox.valueProperty().set(getTyp());
+			comboBox.valueProperty().set(getChoice());
 			comboBox.setMinWidth(this.getWidth() - this.getGraphicTextGap() * 2);
 			comboBox.setOnAction((e) -> {
 				System.out.println(
@@ -429,52 +429,52 @@ public class TableViewExtendedEx extends Application {
 			// });
 		}
 
-		private void comboBoxConverter(ComboBox<Typ> comboBox) {
+		private void comboBoxConverter(ComboBox<Choice> comboBox) {
 			// Define rendering of the list of values in ComboBox drop down.
 			comboBox.setCellFactory((c) -> {
-				return new ListCell<Typ>() {
+				return new ListCell<Choice>() {
 					@Override
-					protected void updateItem(Typ item, boolean empty) {
+					protected void updateItem(Choice item, boolean empty) {
 						super.updateItem(item, empty);
 
 						if (item == null || empty) {
 							setText(null);
 						} else {
-							setText(item.getTyp());
+							setText(item.getChoice());
 						}
 					}
 				};
 			});
 		}
 
-		private Typ getTyp() {
-			return getItem() == null ? new Typ("") : getItem();
+		private Choice getChoice() {
+			return getItem() == null ? new Choice("") : getItem();
 		}
 	}
 
-	public static class Typ {
+	public static class Choice {
 
-		private final SimpleStringProperty typ;
+		private final SimpleStringProperty choice;
 
-		public Typ(String typ) {
-			this.typ = new SimpleStringProperty(typ);
+		public Choice(String choice) {
+			this.choice = new SimpleStringProperty(choice);
 		}
 
-		public String getTyp() {
-			return this.typ.get();
+		public String getChoice() {
+			return choice.get();
 		}
 
-		public StringProperty typProperty() {
-			return this.typ;
+		public StringProperty choiceProperty() {
+			return choice;
 		}
 
-		public void setTyp(String typ) {
-			this.typ.set(typ);
+		public void setChoice(String value) {
+			choice.set(value);
 		}
 
 		@Override
 		public String toString() {
-			return typ.get();
+			return choice.get();
 		}
 
 	}
@@ -519,22 +519,23 @@ public class TableViewExtendedEx extends Application {
 	public static class Person {
 
 		private final SimpleStringProperty firstName;
-		private final SimpleObjectProperty<Typ> typ;
+		private final SimpleObjectProperty<Choice> choice;
 		private final SimpleObjectProperty<Date> birthday;
 		private final SimpleBooleanProperty selected;
 
-		public Person(String firstName, Typ typ, Date bithday) {
+		public Person(String firstName, Choice choice, Date bithday) {
 			this.firstName = new SimpleStringProperty(firstName);
-			this.typ = new SimpleObjectProperty(typ);
+			this.choice = new SimpleObjectProperty<Choice>(choice);
 			this.selected = new SimpleBooleanProperty();
-			this.birthday = new SimpleObjectProperty(bithday);
+			this.birthday = new SimpleObjectProperty<Date>(bithday);
 		}
 
-		public Person(String firstName, Typ typ, Date bithday, boolean selected) {
+		public Person(String firstName, Choice choice, Date bithday,
+				boolean selected) {
 			this.firstName = new SimpleStringProperty(firstName);
-			this.typ = new SimpleObjectProperty(typ);
+			this.choice = new SimpleObjectProperty<Choice>(choice);
 			this.selected = new SimpleBooleanProperty(selected);
-			this.birthday = new SimpleObjectProperty(bithday);
+			this.birthday = new SimpleObjectProperty<Date>(bithday);
 		}
 
 		public String getFirstName() {
@@ -542,23 +543,27 @@ public class TableViewExtendedEx extends Application {
 		}
 
 		public StringProperty firstNameProperty() {
-			return this.firstName;
+			return firstName;
 		}
 
-		public void setFirstName(String firstName) {
-			this.firstName.set(firstName);
+		public void setFirstName(String value) {
+			firstName.set(value);
 		}
 
-		public Typ getTypObj() {
-			return typ.get();
+		public Choice getChoiceObj() {
+			return choice.get();
 		}
 
-		public ObjectProperty<Typ> typObjProperty() {
-			return this.typ;
+		public ObjectProperty<Choice> getChoiceProperty() {
+			return choice;
 		}
 
-		public void setTypObj(Typ typ) {
-			this.typ.set(typ);
+		public String getChoice() {
+			return choice.getValue().toString();
+		}
+
+		public void setChoiceObj(Choice value) {
+			choice.set(value);
 		}
 
 		public Date getBirthday() {
@@ -566,16 +571,21 @@ public class TableViewExtendedEx extends Application {
 		}
 
 		public ObjectProperty<Date> birthdayProperty() {
-			return this.birthday;
+			return birthday;
 		}
 
-		public void setBirthday(Date birthday) {
-			this.birthday.set(birthday);
+		public void setBirthday(Date value) {
+			birthday.set(value);
 		}
 
 		public BooleanProperty selectedProperty() {
 			return selected;
 		}
+
+		public void setSelected(boolean value) {
+			selected.set(value);
+		}
+
 	}
 
 }
