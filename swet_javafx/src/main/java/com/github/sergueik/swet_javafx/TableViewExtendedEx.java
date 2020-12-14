@@ -68,10 +68,10 @@ public class TableViewExtendedEx extends Application {
 			.observableArrayList(new Choice("Yes"), new Choice("No"),
 					new Choice("Maybe"), new Choice("Maybe not"));
 	private final ObservableList<Person> data = FXCollections.observableArrayList(
-			new Person("Jacob", choiceData.get(0), new Date()),
-			new Person("Urs", choiceData.get(1), new Date()),
-			new Person("Hans", choiceData.get(2), new Date()),
-			new Person("Ueli", choiceData.get(3), new Date()));
+			new Person("john", choiceData.get(0), new Date()),
+			new Person("paul", choiceData.get(1), new Date()),
+			new Person("george", choiceData.get(2), new Date()),
+			new Person("ringo", choiceData.get(3), new Date()));
 
 	final HBox hb = new HBox();
 
@@ -79,7 +79,7 @@ public class TableViewExtendedEx extends Application {
 	@Override
 	public void start(Stage stage) {
 		Scene scene = new Scene(new Group());
-		stage.setWidth(550);
+		stage.setWidth(750);
 		stage.setHeight(550);
 
 		final Label label = new Label("Component Entry");
@@ -95,14 +95,14 @@ public class TableViewExtendedEx extends Application {
 		Callback<TableColumn<Person, Choice>, TableCell<Person, Choice>> comboBoxCellFactory = (
 				TableColumn<Person, Choice> param) -> new ComboBoxEditingCell();
 
-		TableColumn<Person, String> firstNameCol = new TableColumn<Person, String>(
+		TableColumn<Person, String> nameCol = new TableColumn<Person, String>(
 				"Name");
-		firstNameCol.setMinWidth(100);
-		firstNameCol.setCellValueFactory(o -> o.getValue().firstNameProperty());
-		firstNameCol.setCellFactory(cellFactory);
+		nameCol.setMinWidth(330);
+		nameCol.setCellValueFactory(o -> o.getValue().firstNameProperty());
+		nameCol.setCellFactory(cellFactory);
 		// NOTE: dropped specifying parameter type
 		// TableColumn.CellEditEvent<Person, String>
-		firstNameCol.setOnEditCommit(o -> {
+		nameCol.setOnEditCommit(o -> {
 			((Person) o.getTableView().getItems().get(o.getTablePosition().getRow()))
 					.setFirstName(o.getNewValue());
 
@@ -134,40 +134,48 @@ public class TableViewExtendedEx extends Application {
 
 		});
 
-		TableColumn<Person, Boolean> loadedCol = new TableColumn<Person, Boolean>(
+		TableColumn<Person, Boolean> pickCol = new TableColumn<Person, Boolean>(
 				"Include");
-		loadedCol.setMinWidth(30);
-		loadedCol.setCellValueFactory(o -> o.getValue().selectedProperty());
-		loadedCol.setCellFactory(o -> new CheckBoxTableCell<>());
+		pickCol.setMinWidth(30);
+		pickCol.setCellValueFactory(o -> o.getValue().selectedProperty());
+		pickCol.setCellFactory(o -> new CheckBoxTableCell<>());
 		// no need to worry on custom editor
 
 		table.setItems(data);
-		table.getColumns().addAll(firstNameCol, choiceCol, dateCol, loadedCol);
+		table.getColumns().addAll(nameCol, choiceCol, dateCol, pickCol);
 
-		final TextField addFirstName = new TextField();
-		addFirstName.setPromptText("Name");
-		addFirstName.setMaxWidth(firstNameCol.getPrefWidth());
-		/*
-				final TextField addLastName = new TextField();
-				addLastName.setPromptText("Last Name");
-				addLastName.setMaxWidth(choiceCol.getPrefWidth());
-		
-				final TextField addEmail = new TextField();
-				addEmail.setPromptText("date");
-				addEmail.setMaxWidth(dateCol.getPrefWidth());
-		*/
-		// NOTE: no entry edit for Choice or Date
+		final TextField addNameText = new TextField();
+		addNameText.setPromptText("Name");
+		addNameText.setMaxWidth(nameCol.getPrefWidth());
+
+		final ComboBox<String> addChoiceComboBox = new ComboBox<String>();
+		for (Choice choice : choiceData) {
+			addChoiceComboBox.getItems().add(choice.getChoice());
+		}
+		// use default processing
+
+		DatePicker addDateDatePicker = new DatePicker();
+
 		final Button addButton = new Button("Add");
 		addButton.setOnAction((ActionEvent e) -> {
-			data.add(
-					new Person(addFirstName.getText(), new Choice("Yes"), new Date()));
-			addFirstName.clear();
-			// addLastName.clear();
-			// addEmail.clear();
+
+			data.add(new Person(addNameText.getText(),
+					new Choice(addChoiceComboBox.getValue().toString()),
+					// see also
+					// https://stackoverflow.com/questions/33066904/localdate-to-java-util-date-and-vice-versa-simplest-conversion
+					// https://stackoverflow.com/questions/56380472/java-time-datetimeexception-invalid-id-for-region-based-zoneid-invalid-format
+					(addDateDatePicker.getValue()) != null
+							? Date.from(addDateDatePicker.getValue()
+									.atStartOfDay(ZoneId.of("America/New_York")).toInstant())
+							: new Date()));
+			addNameText.clear();
+			addChoiceComboBox.setValue("");
+			addDateDatePicker.setValue(null);
 		});
 
 		final Button updateButton = new Button("Update");
 		updateButton.setOnAction(new EventHandler<ActionEvent>() {
+			@SuppressWarnings("deprecation")
 			@Override
 			public void handle(ActionEvent event) {
 
@@ -209,8 +217,8 @@ public class TableViewExtendedEx extends Application {
 			}
 		});
 
-		hb.getChildren().addAll(addFirstName /*, addLastName, addEmail*/, addButton,
-				updateButton, cancelButton);
+		hb.getChildren().addAll(addNameText, addChoiceComboBox, addDateDatePicker,
+				addButton, updateButton, cancelButton);
 		hb.setSpacing(3);
 
 		final VBox vbox = new VBox();

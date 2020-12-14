@@ -8,9 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Category;
+// temporarily removed dependencies
+// import org.apache.log4j.Category;
+// import example.CommandLineParser;
 
-import example.CommandLineParser;
 import javafx.application.Application;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -43,27 +44,26 @@ import javafx.stage.Stage;
 public class CheckBoxTableViewEx extends Application {
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
-	private static CommandLineParser commandLineParser;
-	@SuppressWarnings("unused")
-	private String[] args = {};
-	@SuppressWarnings("unused")
-	private String arg = null;
+	// private static CommandLineParser commandLineParser;
+	// @SuppressWarnings("unused")
+	// private String[] args = {};
+	// @SuppressWarnings("unused")
+	// private String arg = null;
 
 	@SuppressWarnings("deprecation")
-	static final Category logger = Category
-			.getInstance(CheckBoxTableViewEx.class);
+	//static final Category logger = Category.getInstance(CheckBoxTableViewEx.class);
 
 	// http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
 	private static final TableView<Resource> tableView = new TableView<>();
 
 	public static void main(String[] args) {
-		commandLineParser = new CommandLineParser();
+		// commandLineParser = new CommandLineParser();
 
-		commandLineParser.parse(args);
+		// commandLineParser.parse(args);
 
-		if (commandLineParser.hasFlag("debug")) {
-			debug = true;
-		}
+		//if (commandLineParser.hasFlag("debug")) {
+		//	debug = true;
+		// }
 		Application.launch(args);
 	}
 
@@ -72,7 +72,7 @@ public class CheckBoxTableViewEx extends Application {
 
 		primaryStage.setTitle("Agent Configuration");
 		BorderPane root = new BorderPane();
-		Scene scene = new Scene(root, 480, 350, Color.WHITE);
+		Scene scene = new Scene(root, 320, 350, Color.WHITE);
 
 		GridPane gridpane1 = new GridPane();
 
@@ -141,7 +141,7 @@ public class CheckBoxTableViewEx extends Application {
 		// see also:
 		// http://www.java2s.com/Tutorials/Java/JavaFX/0340__JavaFX_GridPane.htm
 		// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/layout/GridPane.html
-		ColumnConstraints column1 = new ColumnConstraints(400, 300,
+		ColumnConstraints column1 = new ColumnConstraints(200, 300,
 				Double.MAX_VALUE);
 		column1.setHgrow(Priority.ALWAYS);
 		gridpane.getColumnConstraints().add(column1);
@@ -163,20 +163,21 @@ public class CheckBoxTableViewEx extends Application {
 		final TableColumn<Resource, String> nameColumn = new TableColumn<>("Name");
 		nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
 		nameColumn.setEditable(false);
+		nameColumn.setMinWidth(200);
 		columns.add(nameColumn);
 
 		final List<Resource> resources = new ArrayList<>();
 		resources.add(new Resource("service discovery 1", false));
 		resources.add(new Resource("service discovery 2", false));
 		resources.add(new Resource("service discovery 3", false));
-		resources.add(new Resource("tomcat api 1", true));
-		resources.add(new Resource("tomcat api 2", true));
-		resources.add(new Resource("tomcat api 3", true));
-		resources.add(new Resource("tomcat api 4", true));
-		resources.add(new Resource("tomcat api 5", true));
-		resources.add(new Resource("tomcat api 6", true));
-		resources.add(new Resource("tomcat web 1", true));
-		resources.add(new Resource("tomcat web 2", true));
+		resources.add(new Resource("api 1", true));
+		resources.add(new Resource("api 2", true));
+		resources.add(new Resource("api 3", true));
+		resources.add(new Resource("api 4", true));
+		resources.add(new Resource("api 5", true));
+		resources.add(new Resource("api 6", true));
+		resources.add(new Resource("web 1", true));
+		resources.add(new Resource("web 2", true));
 		resources.add(new Resource("load balancer 1", false));
 		resources.add(new Resource("load balancer 2", false));
 		resources.add(new Resource("load balancer 3", false));
