@@ -7,7 +7,9 @@ and ControlsFX for JavaFX [jinghai/controlsfx](https://github.com/jinghai/contro
 
 ![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture1.png)
 
+![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture_agents.jpg)
 
+![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture_components_configuration.jpg)
 ### Run application
 
 The following `run.*` scripts provided to help compile and launch the application:
@@ -40,7 +42,7 @@ Bash script for Unix and Mac:
   * [javafx developer forum (in russian)](http://www.cyberforum.ru/javafx/thread1450829.html)
   * [javafx richtext control](https://github.com/FXMisc/RichTextFX#stable-release)
   * [curated list of awesome JavaFx resources](https://github.com/mhrimaz/AwesomeJavaFX)
-  * javaFX widget [detailed documentation] http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
+  * javaFX widget [detailed documentation](http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
