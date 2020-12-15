@@ -51,13 +51,14 @@ public class ElementAttributeEditor extends Application {
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category.getInstance(TableEditorEx.class);
 
-	private Scene primaryScene = null;
+	private Scene parentScene = null;
 
 	@SuppressWarnings({ "static-access" })
 	@Override
 	public void start(Stage stage) {
 		BorderPane root = new BorderPane();
-		stage.setTitle(inputData.containsKey("title") ? inputData.get("title") : "Element Locators");
+		stage.setTitle(inputData.containsKey("title") ? inputData.get("title")
+				: "Element Locators");
 
 		Scene scene = new Scene(root, 480, 250, Color.WHITE);
 		// stage.setScene(new Scene(root, 480, 250, Color.WHITE));
@@ -84,7 +85,8 @@ public class ElementAttributeEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Saved");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
 				stage.close();
 			}
 		});
@@ -97,7 +99,8 @@ public class ElementAttributeEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Deleted");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
 				stage.close();
 			}
 		});
@@ -108,7 +111,8 @@ public class ElementAttributeEditor extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				System.out.println("Cancel");
-				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
+				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
+						.getWindow();
 				stage.close();
 			}
 		});
@@ -170,15 +174,16 @@ public class ElementAttributeEditor extends Application {
 		gridPane.add(textFld, 1, 3);
 
 		final RowConstraints rowConstraints = new RowConstraints(64); // constant
-																		// height
-		final ColumnConstraints column1Constraints = new ColumnConstraints(100, Control.USE_COMPUTED_SIZE,
-				Control.USE_COMPUTED_SIZE);
+		// height
+		final ColumnConstraints column1Constraints = new ColumnConstraints(100,
+				Control.USE_COMPUTED_SIZE, Control.USE_COMPUTED_SIZE);
 
-		final ColumnConstraints column2Constraints = new ColumnConstraints(250, Control.USE_COMPUTED_SIZE,
-				Double.MAX_VALUE);
+		final ColumnConstraints column2Constraints = new ColumnConstraints(250,
+				Control.USE_COMPUTED_SIZE, Double.MAX_VALUE);
 		gridPane.getRowConstraints().add(rowConstraints);
 		column2Constraints.setHgrow(Priority.ALWAYS);
-		gridPane.getColumnConstraints().addAll(column1Constraints, column2Constraints);
+		gridPane.getColumnConstraints().addAll(column1Constraints,
+				column2Constraints);
 		gridPane.prefWidthProperty().bind(root.widthProperty());
 
 		gridPane1.getChildren().addAll(gridPane, buttonbarHbox);
@@ -200,7 +205,8 @@ public class ElementAttributeEditor extends Application {
 			alert.setContentText("Choose your option.");
 			// create confirm and cancel buttons
 			ButtonType buttonTypeOne = new ButtonType("Yes");
-			ButtonType buttonTypeCancel = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+			ButtonType buttonTypeCancel = new ButtonType("No",
+					ButtonBar.ButtonData.CANCEL_CLOSE);
 			alert.getButtonTypes().setAll(buttonTypeOne, buttonTypeCancel);
 			Optional<ButtonType> result = alert.showAndWait();
 			// show the confirmation dialog
@@ -212,25 +218,27 @@ public class ElementAttributeEditor extends Application {
 	}
 
 	@SuppressWarnings("unchecked")
-	public void setScene(Scene scene) {
-		this.primaryScene = scene;
-
-		if (scene != null) {
-			try {
-				inputs = (Map<String, Object>) primaryScene.getUserData();
-				inputData = (Map<String, String>) inputs.get("inputs");
-				logger.info("Loaded " + inputData.toString());
-			} catch (ClassCastException e) {
-				logger.info("Exception (ignored) " + e.toString());
-			} catch (Exception e) {
-				logger.info("Exception (rethrown) " + e.toString());
-				throw e;
+	private void loadInputData(Map<String, Object> inputs) {
+		try {
+			inputData = (Map<String, String>) inputs.get("inputs");
+			if (inputData.keySet().size() == 0) {
+				throw new IllegalArgumentException("You must provide data");
 			}
+			logger.info("Loaded " + inputData.toString());
+		} catch (ClassCastException e) {
+			logger.info("Exception (ignored) " + e.toString());
+		} catch (Exception e) {
+			logger.info("Exception (rethrown) " + e.toString());
+			throw e;
 		}
-		if (inputData.keySet().size() == 0) {
-			throw new IllegalArgumentException("You must provide data");
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setScene(Scene scene) {
+		parentScene = scene;
+		if (parentScene != null) {
+			loadInputData((Map<String, Object>) parentScene.getUserData());
 		}
-		logger.info("Loaded " + inputData);
 	}
 
 	public static void main(String[] args) {

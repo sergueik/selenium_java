@@ -16,6 +16,9 @@
     <mainClass>SwetMainFlowPanel</mainClass>
     <jar.final.name>swet_javafx_app</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!--
+     TODO:package javafx.application does not exist with JDK 11
+     -->
   </properties>
   <dependencies>
   </dependencies>

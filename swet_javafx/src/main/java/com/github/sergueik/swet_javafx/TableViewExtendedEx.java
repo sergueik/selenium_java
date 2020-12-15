@@ -5,10 +5,13 @@ import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import example.CommandLineParser;
 import javafx.application.Application;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -38,9 +41,14 @@ import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+
+// NOTE: temporarily removed dependencies - reappear in the following commit
+import org.apache.log4j.Category;
+import example.CommandLineParser;
 
 // based on: https://gist.github.com/haisi/0a82e17daf586c9bab52
 // see also:
@@ -59,9 +67,18 @@ import javafx.util.Callback;
 // https://stackoverflow.com/questions/26631041/javafx-combobox-with-checkboxes
 // https://stackoverflow.com/questions/52467979/checkbox-and-combobox-javafx/52469980
 
-@SuppressWarnings("restriction")
+@SuppressWarnings({ "restriction", "unused" })
 
 public class TableViewExtendedEx extends Application {
+
+	// connect with other widgets in the bundle
+	private Map<String, Object> inputs = new HashMap<>();
+	private Scene parentScene = null;
+	private Map<String, String> inputData = new HashMap<>();
+
+	@SuppressWarnings("unused")
+	private static boolean debug = false;
+	private static CommandLineParser commandLineParser;
 
 	private TableView<Person> table = new TableView<>();
 	private final ObservableList<Choice> choiceData = FXCollections
@@ -75,12 +92,47 @@ public class TableViewExtendedEx extends Application {
 
 	final HBox hb = new HBox();
 
+	@SuppressWarnings("deprecation")
+	static final Category logger = Category
+			.getInstance(TableViewExtendedEx.class);
+
+	@SuppressWarnings("unchecked")
+	private void loadInputData(Map<String, Object> inputs) {
+		try {
+			inputData = (Map<String, String>) inputs.get("inputs");
+			if (inputData.keySet().size() == 0) {
+				throw new IllegalArgumentException("You must provide data");
+			}
+			logger.info("Loaded " + inputData.toString());
+		} catch (ClassCastException e) {
+			logger.info("Exception (ignored) " + e.toString());
+		} catch (Exception e) {
+			logger.info("Exception (rethrown) " + e.toString());
+			throw e;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public void setScene(Scene scene) {
+		parentScene = scene;
+
+		if (parentScene != null) {
+			loadInputData((Map<String, Object>) parentScene.getUserData());
+		}
+		logger.info("Loaded " + inputData);
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void start(Stage stage) {
-		Scene scene = new Scene(new Group());
+
+		Scene scene = new Scene(new Group(), 480, 250, Color.WHITE);
 		stage.setWidth(750);
 		stage.setHeight(550);
+		stage.setScene(scene);
+
+		stage.setTitle(inputData.containsKey("title") ? inputData.get("title")
+				: "Element Locators");
 
 		final Label label = new Label("Component Entry");
 		// platform
@@ -233,6 +285,14 @@ public class TableViewExtendedEx extends Application {
 	}
 
 	public static void main(String[] args) {
+		commandLineParser = new CommandLineParser();
+
+		commandLineParser.parse(args);
+
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
+		}
+
 		launch(args);
 	}
 

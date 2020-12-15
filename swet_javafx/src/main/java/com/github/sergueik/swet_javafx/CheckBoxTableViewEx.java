@@ -4,13 +4,15 @@ package com.github.sergueik.swet_javafx;
  */
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
-// temporarily removed dependencies
-// import org.apache.log4j.Category;
-// import example.CommandLineParser;
+// NOTE: temporarily removed dependencies - reappear in the following commit
+import org.apache.log4j.Category;
+import example.CommandLineParser;
 
 import javafx.application.Application;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -44,26 +46,27 @@ import javafx.stage.Stage;
 public class CheckBoxTableViewEx extends Application {
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
-	// private static CommandLineParser commandLineParser;
+	private static CommandLineParser commandLineParser;
 	// @SuppressWarnings("unused")
 	// private String[] args = {};
 	// @SuppressWarnings("unused")
 	// private String arg = null;
 
 	@SuppressWarnings("deprecation")
-	//static final Category logger = Category.getInstance(CheckBoxTableViewEx.class);
+	static final Category logger = Category
+			.getInstance(CheckBoxTableViewEx.class);
 
 	// http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
 	private static final TableView<Resource> tableView = new TableView<>();
 
 	public static void main(String[] args) {
-		// commandLineParser = new CommandLineParser();
+		commandLineParser = new CommandLineParser();
 
-		// commandLineParser.parse(args);
+		commandLineParser.parse(args);
 
-		//if (commandLineParser.hasFlag("debug")) {
-		//	debug = true;
-		// }
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
+		}
 		Application.launch(args);
 	}
 
@@ -110,14 +113,29 @@ public class CheckBoxTableViewEx extends Application {
 							.println(String.format("%s %s", Resource.nameProperty().get(),
 									Resource.selectedProperty().get()));
 				}
-				sleep(500);
-				stage.close();
+				sleep(100);
+				Map<String, String> inputData = new HashMap<>();
+				Button button = (Button) event.getTarget();
+
+				inputData.put("dummy", "42");
+				inputData.put("title",
+						String.format("Some text: %s", button.getText()));
+				// TODO: Map<String, Object>
+				Map<String, Map<String, String>> inputs = new HashMap<>();
+				inputs.put("inputs", inputData); // TODO: JSON
+				scene.setUserData(inputs);
+				TableViewExtendedEx tableForm = new TableViewExtendedEx();
+				tableForm.setScene(scene);
+				try {
+					tableForm.start(new Stage());
+				} catch (Exception e) {
+				}
 			}
 		});
 		updateButton.setDefaultButton(true);
-		// Cancel button
-		Button cancelButton = new Button("Cancel");
-		cancelButton.setOnAction(new EventHandler<ActionEvent>() {
+		// Cancel/Close button
+		Button closeButton = new Button("Close");
+		closeButton.setOnAction(new EventHandler<ActionEvent>() {
 
 			@Override
 			public void handle(ActionEvent event) {
@@ -128,7 +146,7 @@ public class CheckBoxTableViewEx extends Application {
 			}
 		});
 
-		buttonbarHbox.getChildren().addAll(updateButton, cancelButton);
+		buttonbarHbox.getChildren().addAll(updateButton, closeButton);
 		gridpane1.getChildren().addAll(gridpane, buttonbarHbox);
 
 		gridpane.setPadding(new Insets(5));
