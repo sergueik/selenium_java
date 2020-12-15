@@ -1,4 +1,7 @@
 package com.github.sergueik.swet_javafx;
+/**
+ * Copyright 2020 Serguei Kouzmine
+ */
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -20,8 +23,10 @@ import javafx.stage.Stage;
 @SuppressWarnings("restriction")
 // parent widget
 public class ModalDialogEx extends Application {
-	private final int width = 400;
-	private final int height = 300;
+	private final int widgetWidth = 400;
+	private final int widgetHeight = 300;
+	private final int buttonWidth = 100;
+	private final int buttonHeight = 30;
 
 	public static void main(String[] args) {
 		Application.launch(args);
@@ -33,6 +38,8 @@ public class ModalDialogEx extends Application {
 		Group group = new Group();
 		HBox hbox = new HBox();
 		Button button = new Button("Close");
+		button.setPrefWidth(buttonWidth);
+		button.setPrefHeight(buttonHeight);
 		button.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent event) {
 				stage.close();
@@ -42,36 +49,22 @@ public class ModalDialogEx extends Application {
 		hbox.setSpacing(20);
 		hbox.setPadding(new Insets(10));
 		group.getChildren().add(hbox);
-		stage.setScene(new Scene(group, width, 300, Color.WHITE));
+		stage.setScene(new Scene(group, widgetWidth, widgetHeight, Color.WHITE));
 
 		stage.show();
 
-		Stage stage2 = new Stage();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-
-		}
-		// TODO: better than switching to brandh new stage
 		Stage ModalDialog = new ModalDialog(stage);
 		ModalDialog.sizeToScene();
 		ModalDialog.show();
-		// TODO: block in a SWT fashion?
+		// TODO: block in a SWT loop fashion?
 		// https://docs.oracle.com/javafx/2/swt_interoperability/jfxpub-swt_interoperability.htm
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-
-		}
-
-		// stage.close();
 	}
 }
 
 class ModalDialog extends Stage {
 
-	private final int width = 320;
-	private final int height = 150;
+	private final int dialogWidth = 320;
+	private final int dialogHeight = 150;
 
 	@SuppressWarnings("restriction")
 	public ModalDialog(Stage stage) {
@@ -80,8 +73,7 @@ class ModalDialog extends Stage {
 		setTitle("title");
 		initModality(Modality.APPLICATION_MODAL);
 		Group group = new Group();
-		// Scene scene = ;
-		setScene(new Scene(group, width, height, Color.WHITE));
+		setScene(new Scene(group, dialogWidth, dialogHeight, Color.WHITE));
 
 		GridPane gridpane = new GridPane();
 		gridpane.setPadding(new Insets(5));
@@ -100,7 +92,7 @@ class ModalDialog extends Stage {
 		passwordField.setText("password");
 		gridpane.add(passwordField, 1, 2);
 
-		Button button = new Button("Change");
+		Button button = new Button("Save");
 		button.setOnAction(new EventHandler<ActionEvent>() {
 
 			public void handle(ActionEvent event) {

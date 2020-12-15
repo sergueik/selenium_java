@@ -3,11 +3,14 @@ package com.github.sergueik.swet_javafx;
  * Copyright 2020 Serguei Kouzmine
  */
 
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 // NOTE: temporarily removed dependencies - reappear in the following commit
@@ -39,6 +42,9 @@ import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 // https://stackoverflow.com/questions/7217625/how-to-add-checkboxs-to-a-tableview-in-javafx
 // https://stackoverflow.com/questions/26631041/javafx-combobox-with-checkboxes
 // https://stackoverflow.com/questions/52467979/checkbox-and-combobox-javafx/52469980
@@ -47,10 +53,8 @@ public class CheckBoxTableViewEx extends Application {
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
-	// @SuppressWarnings("unused")
-	// private String[] args = {};
-	// @SuppressWarnings("unused")
-	// private String arg = null;
+	@SuppressWarnings("unused")
+	private String defaultKey = "sender"; // "" probably can't
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category
@@ -58,6 +62,8 @@ public class CheckBoxTableViewEx extends Application {
 
 	// http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview
 	private static final TableView<Resource> tableView = new TableView<>();
+
+	private static final Map<String, String> inputData = new HashMap<>();
 
 	public static void main(String[] args) {
 		commandLineParser = new CommandLineParser();
@@ -97,31 +103,35 @@ public class CheckBoxTableViewEx extends Application {
 				Stage stage = (Stage) ((Button) (event.getSource())).getScene()
 						.getWindow();
 
-				final Set<Resource> delSet = new HashSet<>();
-				final Set<Resource> selSet = new HashSet<>();
+				final Set<Resource> ignoredResources = new HashSet<>();
+				final Set<Resource> selectedResources = new HashSet<>();
 				for (final Resource Resource : tableView.getItems()) {
 					if (!Resource.selectedProperty().get()) {
-						delSet.add(Resource);
+						ignoredResources.add(Resource);
 					} else {
-						selSet.add(Resource);
+						selectedResources.add(Resource);
 					}
 				}
-				tableView.getItems().removeAll(delSet);
+				tableView.getItems().removeAll(ignoredResources);
 				System.err.println("Processing");
-				for (final Resource Resource : selSet) {
-					System.err
-							.println(String.format("%s %s", Resource.nameProperty().get(),
-									Resource.selectedProperty().get()));
+				inputData.clear();
+				inputData.put(defaultKey, String.format("Some text: %s",
+						((Button) event.getTarget()).getText()));
+				for (final Resource resource : selectedResources) {
+					String name = resource.nameProperty().get();
+					logger.info(String.format("Added to input data: %s %s", name,
+							resource.selectedProperty().get()));
+					// NOTE: null values
+					// inputData.put(name, null);
+					// will lead to failure to import into JSON
+					inputData.put(name, "");
 				}
-				sleep(100);
-				Map<String, String> inputData = new HashMap<>();
-				Button button = (Button) event.getTarget();
-
-				inputData.put("dummy", "42");
-				inputData.put("title",
-						String.format("Some text: %s", button.getText()));
 				// TODO: Map<String, Object>
+				// TODO: debug why not all keys are serialized
 				Map<String, Map<String, String>> inputs = new HashMap<>();
+				String jsonData = writeDataJSON(inputData, "{}");
+				logger.info(String.format("Sending the input data: %s", jsonData));
+
 				inputs.put("inputs", inputData); // TODO: JSON
 				scene.setUserData(inputs);
 				TableViewExtendedEx tableForm = new TableViewExtendedEx();
@@ -321,6 +331,59 @@ public class CheckBoxTableViewEx extends Application {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public String writeDataJSON(Map<String, String> data, String defaultPayload) {
+		String payload = defaultPayload;
+		JSONObject json = new JSONObject();
+		try {
+			for (String key : data.keySet()) {
+				json.put(key, data.get(key));
+			}
+			StringWriter wr = new StringWriter();
+			json.write(wr);
+			payload = wr.toString();
+			logger.info("Created payload: " + payload);
+		} catch (JSONException e) {
+			System.err.println("Exception (ignored): " + e);
+		}
+		return payload;
+	}
+
+	public String readData(Optional<Map<String, String>> parameters) {
+		return readData(null, parameters);
+	}
+
+	// Deserialize the hashmap from the JSON
+	// see also
+	// https://stackoverflow.com/questions/3763937/gson-and-deserializing-an-array-of-objects-with-arrays-in-it
+	// https://futurestud.io/tutorials/gson-mapping-of-arrays-and-lists-of-objects
+	public String readData(String payload,
+			Optional<Map<String, String>> parameters) {
+
+		Map<String, String> collector = (parameters.isPresent()) ? parameters.get()
+				: new HashMap<>();
+
+		String data = (payload == null) ? "{}" // empty hash
+				: payload;
+		try {
+			JSONObject elementObj = new JSONObject(data);
+			@SuppressWarnings("unchecked")
+			Iterator<String> propIterator = elementObj.keys();
+			while (propIterator.hasNext()) {
+				String propertyKey = propIterator.next();
+				String propertyVal = elementObj.getString(propertyKey);
+				// logger.info(propertyKey + ": " + propertyVal);
+				if (debug) {
+					System.err.println("readData: " + propertyKey + ": " + propertyVal);
+				}
+				collector.put(propertyKey, propertyVal);
+			}
+		} catch (JSONException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			return null;
+		}
+		return collector.get(defaultKey);
 	}
 
 }

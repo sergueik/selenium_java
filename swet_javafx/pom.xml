@@ -17,6 +17,7 @@
     <mainClass>SwetMainFlowPanel</mainClass>
     <jar.final.name>swet_javafx_app</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <json.version>20170516</json.version>
     <commandline-parser.version>0.6.0-SNAPSHOT</commandline-parser.version>
     <controlsfx.version>9.0.0</controlsfx.version>
     <!--
@@ -55,6 +56,11 @@
           <artifactId>gson</artifactId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>${json.version}</version>
     </dependency>
     <dependency>
       <groupId>org.fxmisc.richtext</groupId>

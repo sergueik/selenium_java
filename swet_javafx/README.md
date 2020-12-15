@@ -7,9 +7,8 @@ and ControlsFX for JavaFX [jinghai/controlsfx](https://github.com/jinghai/contro
 
 ![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture1.png)
 
-![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture_agents.jpg)
+![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture_agent_components_configuration.jpg)
 
-![Work in progress](https://github.com/sergueik/selenium_java/raw/master/swet_javafx/screenshots/capture_components_configuration.jpg)
 ### Run application
 
 The following `run.*` scripts provided to help compile and launch the application:

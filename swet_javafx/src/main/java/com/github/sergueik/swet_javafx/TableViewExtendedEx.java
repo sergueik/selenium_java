@@ -103,7 +103,7 @@ public class TableViewExtendedEx extends Application {
 			if (inputData.keySet().size() == 0) {
 				throw new IllegalArgumentException("You must provide data");
 			}
-			logger.info("Loaded " + inputData.toString());
+			logger.info("Loaded input data: " + inputData.toString());
 		} catch (ClassCastException e) {
 			logger.info("Exception (ignored) " + e.toString());
 		} catch (Exception e) {
