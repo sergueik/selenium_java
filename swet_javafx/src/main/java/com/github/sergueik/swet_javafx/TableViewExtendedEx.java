@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import example.CommandLineParser;
@@ -75,7 +76,8 @@ public class TableViewExtendedEx extends Application {
 	private Map<String, Object> inputs = new HashMap<>();
 	private Scene parentScene = null;
 	private Map<String, String> inputData = new HashMap<>();
-
+	private static Map<String, String> inputJSONData = new HashMap<>();
+	private static final StringBuffer dataDumper = new StringBuffer();
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
@@ -133,11 +135,21 @@ public class TableViewExtendedEx extends Application {
 
 		stage.setTitle(inputData.containsKey("title") ? inputData.get("title")
 				: "Element Locators");
+		// final StringBuffer dataDumper = new StringBuffer();
 
+		Utils.readData(inputData.get("json"), Optional.of(inputJSONData));
+
+		for (String dataKey : inputJSONData.keySet()) {
+			if (!dataKey.equals(Utils.getDefaultKey())) {
+				dataDumper.append(dataKey);
+				dataDumper.append(" ");
+			}
+		}
 		final Label label = new Label("Component Entry");
 		// platform
 		label.setFont(new Font("Arial", 20));
-
+		logger.info("json:" + inputData.get("json"));
+		label.setText("Component Entry " + dataDumper.toString());
 		table.setEditable(true);
 		Callback<TableColumn<Person, String>, TableCell<Person, String>> cellFactory = (
 				TableColumn<Person, String> param) -> new EditingCell();

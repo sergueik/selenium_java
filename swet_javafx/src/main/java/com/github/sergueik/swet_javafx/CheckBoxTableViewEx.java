@@ -53,8 +53,6 @@ public class CheckBoxTableViewEx extends Application {
 	@SuppressWarnings("unused")
 	private static boolean debug = false;
 	private static CommandLineParser commandLineParser;
-	@SuppressWarnings("unused")
-	private String defaultKey = "sender"; // "" probably can't
 
 	@SuppressWarnings("deprecation")
 	static final Category logger = Category
@@ -115,7 +113,7 @@ public class CheckBoxTableViewEx extends Application {
 				tableView.getItems().removeAll(ignoredResources);
 				System.err.println("Processing");
 				inputData.clear();
-				inputData.put(defaultKey, String.format("Some text: %s",
+				inputData.put(Utils.getDefaultKey(), String.format("Some text: %s",
 						((Button) event.getTarget()).getText()));
 				for (final Resource resource : selectedResources) {
 					String name = resource.nameProperty().get();
@@ -126,13 +124,11 @@ public class CheckBoxTableViewEx extends Application {
 					// will lead to failure to import into JSON
 					inputData.put(name, "");
 				}
-				// TODO: Map<String, Object>
-				// TODO: debug why not all keys are serialized
 				Map<String, Map<String, String>> inputs = new HashMap<>();
-				String jsonData = writeDataJSON(inputData, "{}");
+				String jsonData = Utils.writeDataJSON(inputData, "{}");
+				inputData.put("json", jsonData);
 				logger.info(String.format("Sending the input data: %s", jsonData));
-
-				inputs.put("inputs", inputData); // TODO: JSON
+				inputs.put("inputs", inputData);
 				scene.setUserData(inputs);
 				TableViewExtendedEx tableForm = new TableViewExtendedEx();
 				tableForm.setScene(scene);
@@ -323,67 +319,6 @@ public class CheckBoxTableViewEx extends Application {
 			this.Id.set(Id);
 		}
 
-	}
-
-	public static void sleep(Integer milliSeconds) {
-		try {
-			Thread.sleep((long) milliSeconds);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public String writeDataJSON(Map<String, String> data, String defaultPayload) {
-		String payload = defaultPayload;
-		JSONObject json = new JSONObject();
-		try {
-			for (String key : data.keySet()) {
-				json.put(key, data.get(key));
-			}
-			StringWriter wr = new StringWriter();
-			json.write(wr);
-			payload = wr.toString();
-			logger.info("Created payload: " + payload);
-		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e);
-		}
-		return payload;
-	}
-
-	public String readData(Optional<Map<String, String>> parameters) {
-		return readData(null, parameters);
-	}
-
-	// Deserialize the hashmap from the JSON
-	// see also
-	// https://stackoverflow.com/questions/3763937/gson-and-deserializing-an-array-of-objects-with-arrays-in-it
-	// https://futurestud.io/tutorials/gson-mapping-of-arrays-and-lists-of-objects
-	public String readData(String payload,
-			Optional<Map<String, String>> parameters) {
-
-		Map<String, String> collector = (parameters.isPresent()) ? parameters.get()
-				: new HashMap<>();
-
-		String data = (payload == null) ? "{}" // empty hash
-				: payload;
-		try {
-			JSONObject elementObj = new JSONObject(data);
-			@SuppressWarnings("unchecked")
-			Iterator<String> propIterator = elementObj.keys();
-			while (propIterator.hasNext()) {
-				String propertyKey = propIterator.next();
-				String propertyVal = elementObj.getString(propertyKey);
-				// logger.info(propertyKey + ": " + propertyVal);
-				if (debug) {
-					System.err.println("readData: " + propertyKey + ": " + propertyVal);
-				}
-				collector.put(propertyKey, propertyVal);
-			}
-		} catch (JSONException e) {
-			System.err.println("Exception (ignored): " + e.toString());
-			return null;
-		}
-		return collector.get(defaultKey);
 	}
 
 }
