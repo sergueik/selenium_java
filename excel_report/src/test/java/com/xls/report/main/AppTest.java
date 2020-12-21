@@ -1,24 +1,20 @@
 package com.xls.report.main;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.xml.sax.SAXException;
 
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 
-public class AppTest extends TestCase {
-	public AppTest(String testName) {
-		super(testName);
-	}
+// NOTE: originally class did not use any Junit annotation
+public class AppTest {
 
-	public static Test suite() {
-		return new TestSuite(AppTest.class);
-	}
-
+	@Test
 	public void testCreateReport() throws SAXException, IOException,
 			ParserConfigurationException, InterruptedException {
 		assertTrue(ExcelReport.generateReport("testngxmlfiles\\testng-results.xml")
@@ -38,9 +34,9 @@ public class AppTest extends TestCase {
 		Thread.sleep(2000);
 	}
 
+	@Test
 	public void testUpdateReport() throws SAXException, IOException,
 			ParserConfigurationException, InterruptedException {
-		Thread.sleep(2000);
 		System.out.println("=== Update ===");
 		String name = "";
 		assertTrue((name = ExcelReport.createOrUpdateReport("",
@@ -48,5 +44,6 @@ public class AppTest extends TestCase {
 		Thread.sleep(2000);
 		assertTrue((ExcelReport.createOrUpdateReport(name,
 				"testngxmlfiles\\newdptestng-results.xml")).length() > 1);
+		Thread.sleep(2000);
 	}
 }

@@ -1,8 +1,6 @@
 package com.xls.report.config;
+//based on: https://github.com/rahulrathore44/ExcelReportGenerator
 
-/**
- * @author - rahul.rathore
- */
 public class Configuration {
 	public static final String[] header = { "TestCase Method", "Status",
 			"Exception", "Exception Message", "Locator" };

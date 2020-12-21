@@ -15,6 +15,8 @@
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
+    <!-- NOTE: latest verison 3.0.0 -->
+    <maven.exec-plugin.version>1.6.0</maven.exec-plugin.version>
     <poi.version>3.17</poi.version>
     <poi-ooxml.version>3.17</poi-ooxml.version>
     <poi-ooxml-schemas.version>3.17</poi-ooxml-schemas.version>
@@ -68,7 +70,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
-        <version>1.1.1</version>
+	<version>${maven.exec-plugin.version}</version>
         <executions>
           <execution>
             <phase>install</phase>

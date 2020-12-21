@@ -1,6 +1,7 @@
 package com.xls.report.config;
 
 // based on: https://github.com/rahulrathore44/ExcelReportGenerator
+
 public class ElementLocator {
 
 	private String method = "";
