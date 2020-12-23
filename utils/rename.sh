@@ -6,12 +6,12 @@ if [[ -z "${DEBUG}" ]] ; then
 fi
 echo "DEBUG=${DEBUG}"
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vnhp:r: --long verbose,dry-run,help,path,replace: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhp:r:x: --long verbose,dry-run,help,path:,replace:,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 VERBOSE=false
 HELP=false
 DRY_RUN=false
-REPLACE='' # NOTE:  blank value will lead it to skip
+REMOVE='' # NOTE: blank value should lead it to skip
 WINDOWS_PATH='.'
 EXTENSION='flac'
 
@@ -21,7 +21,8 @@ while true; do
     -h | --help )    HELP=true; shift ;;
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -p | --path ) WINDOWS_PATH="$2"; shift; shift ;;
-    -r | --replace ) REPLACE="$2"; shift ;;
+    -r | --replace ) REMOVE="$2"; shift ; shift;;
+    -x | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
   esac
@@ -30,7 +31,8 @@ done
 if [[ ! -z "${REMOVE}" ]]; then
   REMOVE_TITLE_FRAGMENT="${REMOVE}" 
 else
-  REMOVE_TITLE_FRAGMENT=${1:- Artist Name}
+  echo 'Missing argument: --remove'
+  exit
 fi
 if [[ -z "${WINDOWS_PATH}" ]]; then
   WINDOWS_WINDOWS_PATH=${2:-C:\\Users\\Serguei\\Music\\Disk Name}
@@ -40,13 +42,14 @@ if [[ "${VERBOSE}" = "true" ]]; then
   echo HELP=$HELP
   echo DRY_RUN=$DRY_RUN
   echo WINDOWS_PATH=$WINDOWS_PATH
-  echo REPLACE=$REPLACE
+  echo REMOVE=$REMOVE
+  echo EXTENSION=$EXTENSION
 else
   STAGING=$(echo $WINDOWS_PATH| sed 's|\\|/|g;s|^\([a-z]\):|/\1|i' ) 
   echo "STAGING=${STAGING}"
   pushd "$STAGING"
   pwd
-  ls -1 *flac| while read F  
+  ls -1 *$EXTENSION| while read F
   do 
     G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||")
     mv "$F" "$G" 
