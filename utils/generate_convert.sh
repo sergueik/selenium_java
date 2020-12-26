@@ -68,11 +68,16 @@
 # 'whsxga' 6400x4096
 # 'uhd4320' 7680x4320
 # 'whuxga' 7680x4800
-
+# 
+#
 # origin: https://gist.github.com/cosimo/3760587
+
+# custom sizes:
+# '1280x800' => '852x532'
 OPTS=`getopt -o vnhibks:e: --long verbose,dry-run,help,inspect,batterycheck,keep,size,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
-
+# TODO: dirscan
+# find . -iname '*mp4' | sed 's|\([^.]\)/.*$|\1|g'|sort -u
 VERBOSE=false
 HELP=false
 DRY_RUN=false
@@ -159,7 +164,8 @@ if [[ "${INSPECT}" = 'true' ]]; then
     '1920x1080:qhd'
     '800x600:spal'
     '1278x718:qhd'
-    '1280x720:qhd')
+    '1280x720:qhd'
+    '1280x800:852x532')
   
   SIZE='?'
    
