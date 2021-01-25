@@ -1,20 +1,19 @@
 package tests;
-import org.testng.annotations.Test;
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matcher.*;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
-import contract.ResponseContainer;
-import io.restassured.path.json.JsonPath;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import org.testng.annotations.Test;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import contract.ResponseContainer;
+import io.restassured.path.json.JsonPath;
 
 // based on: https://github.com/testvagrant/RESTTests_RestAssured
 // 

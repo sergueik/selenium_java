@@ -1,8 +1,10 @@
 package tests;
+
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.useRelaxedHTTPSValidation;
+import static org.hamcrest.Matchers.hasItem;
+
 import org.testng.annotations.Test;
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-import static org.hamcrest.Matchers.*;
 
 // based on: https://github.com/damengwang/restassuredDemo
 public class XuequiTest {

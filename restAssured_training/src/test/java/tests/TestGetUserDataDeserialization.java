@@ -1,12 +1,10 @@
 package tests;
 
-import org.testng.annotations.Test;
-
-import static io.restassured.RestAssured.*;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.testng.Assert.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import org.testng.annotations.Test;
 
 public class TestGetUserDataDeserialization {
 
@@ -26,7 +24,7 @@ public class TestGetUserDataDeserialization {
 		String printUsername = userResponse.getUsername();
 		System.out.println(printUsername);
 
-		assertThat(userResponse.getUsername(),equalTo(userData.getUsername()));
+		assertThat(userResponse.getUsername(), equalTo(userData.getUsername()));
 
 	}
 

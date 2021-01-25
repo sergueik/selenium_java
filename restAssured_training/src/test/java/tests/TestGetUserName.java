@@ -1,11 +1,9 @@
 package tests;
-import org.testng.annotations.Test;
 
-import io.restassured.RestAssured;
-import static io.restassured.RestAssured.*;
-import static io.restassured.matcher.RestAssuredMatchers.*;
-
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+
+import org.testng.annotations.Test;
 
 // based on: https://github.com/balamutsj/restAssuredTraining
 public class TestGetUserName {

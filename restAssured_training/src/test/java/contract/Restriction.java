@@ -6,26 +6,27 @@ public class Restriction {
 	private String type;
 
 	public String getCountries() {
-		return this.countries;
+		return countries;
 	}
 
-	public void setCountries(String countries) {
-		this.countries = countries;
+	public void setCountries(String data) {
+		countries = data;
 	}
 
 	public String getRelationship() {
-		return this.relationship;
+		return relationship;
 	}
 
-	public void setRelationship(String relationship) {
-		this.relationship = relationship;
+	public void setRelationship(String data) {
+		relationship = data;
 	}
 
 	public String getType() {
-		return this.type;
+		return type;
 	}
 
-	public void setType(String type) {
-		this.type = type;
+	public void setType(String data) {
+		type = data;
 	}
 }
+	

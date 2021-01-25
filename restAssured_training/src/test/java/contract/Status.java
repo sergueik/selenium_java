@@ -8,15 +8,15 @@ public class Status {
 		return value;
 	}
 
-	public void setValue(String value) {
-		this.value = value;
+	public void setValue(String data) {
+		value = data;
 	}
 
 	public String getReason() {
 		return reason;
 	}
 
-	public void setReason(String reason) {
-		this.reason = reason;
+	public void setReason(String data) {
+		reason = data;
 	}
 }

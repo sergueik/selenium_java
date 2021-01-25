@@ -5,18 +5,18 @@ public class ResponseContainer {
 	private Data data;
 
 	public String getApiVersion() {
-		return this.apiVersion;
+		return apiVersion;
 	}
 
-	public void setApiVersion(String apiVersion) {
-		this.apiVersion = apiVersion;
+	public void setApiVersion(String value) {
+		apiVersion = value;
 	}
 
 	public Data getData() {
-		return this.data;
+		return data;
 	}
 
-	public void setData(Data data) {
-		this.data = data;
+	public void setData(Data value) {
+		data = value;
 	}
 }

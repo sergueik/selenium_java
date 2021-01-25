@@ -7,18 +7,18 @@ public class Thumbnail {
 	private String sqDefault;
 
 	public String getHqDefault() {
-		return this.hqDefault;
+		return hqDefault;
 	}
 
-	public void setHqDefault(String hqDefault) {
-		this.hqDefault = hqDefault;
+	public void setHqDefault(String data) {
+		hqDefault = data;
 	}
 
 	public String getSqDefault() {
-		return this.sqDefault;
+		return sqDefault;
 	}
 
-	public void setSqDefault(String sqDefault) {
-		this.sqDefault = sqDefault;
+	public void setSqDefault(String data) {
+		sqDefault = data;
 	}
 }

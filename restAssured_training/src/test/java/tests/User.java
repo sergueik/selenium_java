@@ -1,4 +1,5 @@
 package tests;
+
 public class User {
 
 	private int id;
@@ -13,43 +14,43 @@ public class User {
 	public User() {
 	}
 
-	public User setId(int id) {
-		this.id = id;
+	public User setId(int data) {
+		id = data;
 		return this;
 	}
 
-	public User setUsername(String username) {
-		this.username = username;
+	public User setUsername(String data) {
+		username = data;
 		return this;
 	}
 
-	public User setFirstName(String firstName) {
-		this.firstName = firstName;
+	public User setFirstName(String data) {
+		firstName = data;
 		return this;
 	}
 
-	public User setLastName(String lastName) {
-		this.lastName = lastName;
+	public User setLastName(String data) {
+		lastName = data;
 		return this;
 	}
 
-	public User setEmail(String email) {
-		this.email = email;
+	public User setEmail(String data) {
+		email = data;
 		return this;
 	}
 
-	public User setPassword(String password) {
-		this.password = password;
+	public User setPassword(String data) {
+		password = data;
 		return this;
 	}
 
-	public User setPhone(String phone) {
-		this.phone = phone;
+	public User setPhone(String data) {
+		phone = data;
 		return this;
 	}
 
-	public User setUserStatus(int userStatus) {
-		this.userStatus = userStatus;
+	public User setUserStatus(int data) {
+		userStatus = data;
 		return this;
 	}
 

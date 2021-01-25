@@ -11,66 +11,66 @@ public class AccessControl {
 	private String videoRespond;
 
 	public String getAutoPlay() {
-		return this.autoPlay;
+		return autoPlay;
 	}
 
-	public void setAutoPlay(String autoPlay) {
-		this.autoPlay = autoPlay;
+	public void setAutoPlay(String value) {
+		autoPlay = value;
 	}
 
 	public String getComment() {
-		return this.comment;
+		return comment;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComment(String value) {
+		comment = value;
 	}
 
 	public String getCommentVote() {
-		return this.commentVote;
+		return commentVote;
 	}
 
-	public void setCommentVote(String commentVote) {
-		this.commentVote = commentVote;
+	public void setCommentVote(String value) {
+		commentVote = value;
 	}
 
 	public String getEmbed() {
-		return this.embed;
+		return embed;
 	}
 
-	public void setEmbed(String embed) {
-		this.embed = embed;
+	public void setEmbed(String value) {
+		embed = value;
 	}
 
 	public String getList() {
-		return this.list;
+		return list;
 	}
 
-	public void setList(String list) {
-		this.list = list;
+	public void setList(String value) {
+		list = value;
 	}
 
 	public String getRate() {
-		return this.rate;
+		return rate;
 	}
 
-	public void setRate(String rate) {
-		this.rate = rate;
+	public void setRate(String value) {
+		rate = value;
 	}
 
 	public String getSyndicate() {
-		return this.syndicate;
+		return syndicate;
 	}
 
-	public void setSyndicate(String syndicate) {
-		this.syndicate = syndicate;
+	public void setSyndicate(String value) {
+		syndicate = value;
 	}
 
 	public String getVideoRespond() {
-		return this.videoRespond;
+		return videoRespond;
 	}
 
-	public void setVideoRespond(String videoRespond) {
-		this.videoRespond = videoRespond;
+	public void setVideoRespond(String value) {
+		videoRespond = value;
 	}
 }

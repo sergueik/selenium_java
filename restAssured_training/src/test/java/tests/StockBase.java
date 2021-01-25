@@ -1,12 +1,9 @@
 package tests;
+
+import org.testng.annotations.BeforeClass;
+
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
-
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.AfterSuite;
-import org.testng.annotations.AfterTest;
-import org.testng.annotations.BeforeClass;
 
 // TODO: convert parameterized test
 // https://github.com/damengwang/restassuredDemo/blob/master/src/test/java/com/api/xueqiu/stocks/TestStocks.java

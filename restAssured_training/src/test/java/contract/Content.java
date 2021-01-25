@@ -15,26 +15,26 @@ public class Content {
 	private String a6;
 
 	public String geta1() {
-		return this.a1;
+		return a1;
 	}
 
-	public void set1(String a1) {
-		this.a1 = a1;
+	public void set1(String data) {
+		a1 = data;
 	}
 
 	public String geta5() {
-		return this.a5;
+		return a5;
 	}
 
-	public void set5(String a5) {
-		this.a5 = a5;
+	public void set5(String data) {
+		a5 = data;
 	}
 
 	public String geta6() {
-		return this.a6;
+		return a6;
 	}
 
-	public void seta6(String a6) {
-		this.a6 = a6;
+	public void seta6(String data) {
+		a6 = data;
 	}
 }

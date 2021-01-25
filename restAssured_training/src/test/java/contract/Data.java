@@ -10,42 +10,42 @@ public class Data {
 	private String updated;
 
 	public List<Item> getItems() {
-		return this.items;
+		return items;
 	}
 
-	public void setItems(List<Item> items) {
-		this.items = items;
+	public void setItems(List<Item> data) {
+		items = data;
 	}
 
 	public Number getItemsPerPage() {
-		return this.itemsPerPage;
+		return itemsPerPage;
 	}
 
-	public void setItemsPerPage(Number itemsPerPage) {
-		this.itemsPerPage = itemsPerPage;
+	public void setItemsPerPage(Number data) {
+		itemsPerPage = data;
 	}
 
 	public Number getStartIndex() {
-		return this.startIndex;
+		return startIndex;
 	}
 
-	public void setStartIndex(Number startIndex) {
-		this.startIndex = startIndex;
+	public void setStartIndex(Number data) {
+		startIndex = data;
 	}
 
 	public Number getTotalItems() {
-		return this.totalItems;
+		return totalItems;
 	}
 
-	public void setTotalItems(Number totalItems) {
-		this.totalItems = totalItems;
+	public void setTotalItems(Number data) {
+		totalItems = data;
 	}
 
 	public String getUpdated() {
-		return this.updated;
+		return updated;
 	}
 
-	public void setUpdated(String updated) {
-		this.updated = updated;
+	public void setUpdated(String data) {
+		updated = data;
 	}
 }

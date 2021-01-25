@@ -10,18 +10,18 @@ public class Player {
 	private String mobile;
 
 	public String getDefault1() {
-		return this.default1;
+		return default1;
 	}
 
-	public void setDefault1(String default1) {
-		this.default1 = default1;
+	public void setDefault1(String data) {
+		default1 = data;
 	}
 
 	public String getMobile() {
-		return this.mobile;
+		return mobile;
 	}
 
-	public void setMobile(String mobile) {
-		this.mobile = mobile;
+	public void setMobile(String data) {
+		mobile = data;
 	}
 }
