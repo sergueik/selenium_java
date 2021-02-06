@@ -6,12 +6,13 @@ if [[ -z "${DEBUG}" ]] ; then
 fi
 echo "DEBUG=${DEBUG}"
 # origin: https://gist.github.com/cosimo/3760587
-OPTS=`getopt -o vnhp:r:x: --long verbose,dry-run,help,path:,replace:,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o vnhp:r:x:w: --long verbose,dry-run,help,path:,replace:,extension:i,with: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 VERBOSE=false
 HELP=false
 DRY_RUN=false
 REMOVE='' # NOTE: blank value should lead it to skip
+WITH=''
 WINDOWS_PATH='.'
 EXTENSION='flac'
 
@@ -22,6 +23,7 @@ while true; do
     -n | --dry-run ) DRY_RUN=true; shift ;;
     -p | --path ) WINDOWS_PATH="$2"; shift; shift ;;
     -r | --replace ) REMOVE="$2"; shift ; shift;;
+    -w | --with ) WITH="$2"; shift ; shift;;
     -x | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
@@ -51,7 +53,7 @@ else
   pwd
   ls -1 *$EXTENSION| while read F
   do 
-    G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||")
+    G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT|$WITH|g")
     mv "$F" "$G" 
   done
 fi
