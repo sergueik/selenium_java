@@ -11,8 +11,8 @@ do
   S=$(echo $F| sed 's| |0x20|g')
   T=$(echo $S| sed 's|^.*/||g')
   T2=$(echo $F| sed 's|^.*/||g')
-  echo wget -q -O "$T" "$F"
-  wget -q -O "$T" "$F"
+  echo wget -q --no-check-certificate -O "$T" "$F"
+  wget -q --no-check-certificate -O "$T" "$F"
  #  mv $T "$T2"
 done
 
