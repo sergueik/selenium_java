@@ -28,7 +28,9 @@ done
 
 # Remove some portion of the name
 if false ; then
-  ls -1 *mp4| while read F ; do G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||") ; mv "$F" "$G" ; done
+  if [[ '' != "${REMOVE_TITLE_FRAGMENT}"  ]]; then
+    ls -1 *mp4| while read F ; do G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||") ; mv "$F" "$G" ; done
+  fi
 fi
 # Better way is to use /usr/bin/prename
 TITLE_FRAGMENT_ARGUMENT=$(echo $REMOVE_TITLE_FRAGMENT| sed 's|-|\\-|g')
