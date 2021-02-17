@@ -19,6 +19,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -27,6 +28,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -95,11 +97,12 @@ public class StandaloneIntegrationTest {
 	private static List<WebElement> elements = new ArrayList();
 	private static WebElement element = null;
 	private static String script = null;
+	private static int cnt;
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testAddition() {
-		for (int cnt = 0; cnt != 3; cnt++) {
+		for (cnt = 0; cnt != 3; cnt++) {
 			script = getScriptContent("model.js");
 			elements = (List<WebElement>) executeScript(script, null, "first", null);
 			assertThat(elements, notNullValue());
@@ -118,14 +121,8 @@ public class StandaloneIntegrationTest {
 			assertThat(element, notNullValue());
 			element.clear();
 			element.sendKeys("2");
-			script = getScriptContent("options.js");
-			elements = (List<WebElement>) executeScript(script, null,
-					"value for (key, value) in operators", null);
-			assertThat(elements, notNullValue());
-			assertThat(elements.size(), greaterThan(0));
-
 			element = elements.get(0);
-			element.click();
+
 			script = getScriptContent("options.js");
 			elements = (List<WebElement>) executeScript(script, null,
 					"value for (key, value) in operators", null);
@@ -142,15 +139,44 @@ public class StandaloneIntegrationTest {
 			element = elements.get(0);
 			assertThat(element.getText(), containsString("Go"));
 			element.click();
-			sleep(3000);
-
-			script = getScriptContent("waitForAngular.js");
+			sleep(1000);
+			/*
+						script = getScriptContent("waitForAngular.js");
+						try {
+							executeAsyncScript(script, null, null); // does not work
+							// sleep(1000);
+						} catch (ScriptTimeoutException e) {
+							// ignore
+						}
+						*/
 			try {
-				executeAsyncScript(script, null, null); // does not work
-				// sleep(1000);
-			} catch (ScriptTimeoutException e) {
+				wait.until(new ExpectedCondition<Boolean>() {
+					// @Override
+					public Boolean apply(WebDriver d) {
+						script = getScriptContent("repeater.js");
+						elements = (List<WebElement>) executeScript(script, null,
+								"result in memory", null);
+						assertThat(elements, notNullValue());
+						Boolean result = false;
+						if (elements.size() > 0) {
+							element = elements.get(0);
+							String text = element.getText();
+							result = text.contains("40 + 2");
+							System.err.println("in apply " + cnt + ": Text = " + text
+									+ "\nresult = " + result.toString());
+						} else {
+							System.err.println("in apply " + cnt + ": elements not yet found");
+							result = false;
+						}
+						return result;
+					}
+				});
+			} catch (Exception e) {
+				System.err.println("Exception: " + e.toString());
 			}
+
 		}
+		sleep(3000);
 
 		script = getScriptContent("repeater.js");
 		elements = (List<WebElement>) executeScript(script, null,
@@ -165,7 +191,7 @@ public class StandaloneIntegrationTest {
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
 		element = elements.get(0);
-		sleep(10000);
+		// sleep(100);
 		assertThat(element.getText(), equalTo("42"));
 		highlight(element);
 	}
