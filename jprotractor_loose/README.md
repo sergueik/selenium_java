@@ -9,8 +9,7 @@ element.sendKeys("42");
 ```
 becomes
 ```java
-String	script = getScriptContent("model.js");
-List<WebElement> elements = (List<WebElement>) executeScript(script, null, "first", null);
+List<WebElement> elements = (List<WebElement>) executeScript(script, getScriptContent("model.js"), "first", null);
 assertThat(elements, notNullValue());
 assertThat(elements.size(), greaterThan(0));
 
@@ -19,6 +18,32 @@ assertThat(element, notNullValue());
 highlight(element);
 element.clear();
 element.sendKeys("42");
+```
+One can also define custom `FluentWait` by placing all the Protracror code inside the `apply` method like below
+```java
+try {
+  wait.until(new ExpectedCondition<Boolean>() {
+	  @Override
+  	public Boolean apply(WebDriver d) {
+	  	elements = (List<WebElement>) executeScript( getScriptContent("binding.js"), null, "latest", null);
+		  Boolean result = false;
+		  if (elements != null && elements.size() > 0) {
+			  element = elements.get(0);
+		  	highlight(element);
+	  		String text = element.getText();
+		  	result = !text.contains(".");
+			  System.err.println("in apply " + cnt + ": Text = " + text + "\nresult = " + result.toString());
+		  } else {
+			  System.err.println("in apply " + cnt + ": element not yet found");
+			  result = false;
+		  }
+		  return result;
+  	}
+  });
+} catch (Exception e) {
+  System.err.println("Exception in custom wait: " + e.toString());
+}
+
 ```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
