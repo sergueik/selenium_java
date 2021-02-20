@@ -4,10 +4,12 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.log4j.Category;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
@@ -15,7 +17,9 @@ import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
@@ -28,8 +32,16 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Callback;
+import javafx.stage.WindowEvent;
 
 // TODO: past month  past week past day
+// http://tutorials.jenkov.com/javafx/stage.html#close-stage-event-listener
+// see also:
+// https://github.com/dustinkredmond/FXTrayIcon/blob/main/src/test/java/com/dustinredmond/fxtrayicon/RunnableTest.java
+/**
+ * @author sergueik
+ *
+ */
 @SuppressWarnings("restriction")
 // see also:
 // http://www.java2s.com/Tutorials/Java/JavaFX/0540__JavaFX_DatePicker.htm
@@ -58,6 +70,18 @@ public class DateRangeDialog extends Application {
 
 	@Override
 	public void start(Stage stage) {
+		Platform.setImplicitExit(false);
+		stage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+			@Override
+			public void handle(WindowEvent e) {
+				System.err.println("Stage close request is processed");
+
+				// not closing
+				e.consume();
+				// Platform.exit();
+				// System.exit(0);
+			}
+		});
 
 		this.stage = stage;
 		this.stage.setTitle("Report Configuration");
@@ -200,29 +224,77 @@ public class DateRangeDialog extends Application {
 		rowSpan = 1;
 		gridpane.add(buttonBox, column, row, columnSpan, rowSpan);
 
-		saveButton.setOnAction(e -> showData());
+		saveButton.setOnAction(e -> showData(e));
 
 		closeButton.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				// do not rely on the class variable
 				Stage stage = (Stage) ((Button) (event.getSource())).getScene().getWindow();
-				stage.close();
+				// https://stackoverflow.com/questions/15520573/how-to-show-and-hide-a-window-in-javafx-2
+				// hide does not make stage invisible on Linux, works on Windows
 				stage.hide();
 				stage.close();
+				Platform.exit();
 			}
 		});
 
 		stage.sizeToScene();
+		// NOTE: the handler only gets fired when stage window is closed by window manager
+		stage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 		stage.show();
 	}
 
-	private void showData() {
+	@Override
+	public void stop() {
+		System.err.println("Stage is closing");
+		// stage.setIconified(true); // no effect
+		// TODO: how to prevent application from finishing
+
+	}
+
+	// based on:
+	// https://stackoverflow.com/questions/26619566/javafx-stage-close-handler
+	// not working
+	private void closeWindowEvent(WindowEvent event) {
+		System.err.println("Window close request ...");
+
+		Alert alert = new Alert(Alert.AlertType.INFORMATION);
+		alert.getButtonTypes().remove(ButtonType.OK);
+		alert.getButtonTypes().add(ButtonType.CANCEL);
+		alert.getButtonTypes().add(ButtonType.YES);
+		alert.setTitle("Quit application");
+		alert.setContentText(String.format("Close without saving?"));
+		Optional<ButtonType> res = alert.showAndWait();
+
+		if (res.isPresent()) {
+			if (res.get().equals(ButtonType.CANCEL)) {
+				event.consume();
+				stage.setIconified(true);
+			}
+		}
+	}
+
+	private void showData(ActionEvent event) {
 		String data = "\n" + "From=" + fromDatePicker.getValue() + "\n" + "Till=" + tillDatePicker.getValue() + "\n"
 				+ "Quick Range: " + quickRange;
 		logger.info(data);
 		// dataFld.setText(data);
+		stage.setIconified(true);
+		// https://stackoverflow.com/questions/15520573/how-to-show-and-hide-a-window-in-javafx-2
+		// NOTE: hide only works on Windows 7, does not make stage invisible on Linux  
 		stage.hide();
+		// stage.getOnCloseRequest();
 		stage.close();
+		try {
+			System.err.println("sleep");
+			Thread.sleep(10000);
+			System.err.println("done");
+		} catch (InterruptedException e) {
+			System.err.println("interrupted :" + e.toString());
+		}
+		stage.show();
+		stage.setIconified(false);
+
 	}
 }
