@@ -17,8 +17,10 @@ import java.util.concurrent.TimeUnit;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.Alert;
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.ScriptTimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -27,12 +29,14 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 /**
  * Integration tests of Calculator http://juliemr.github.io/protractor-demo/
  * without actually using NgWebDriver class at Java level
+ * but not using
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * 
  */
@@ -54,6 +58,11 @@ public class StandaloneIntegrationTest {
 	private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
 	private static final boolean headless = Boolean
 			.parseBoolean(System.getenv("HEADLESS"));
+
+	private static List<WebElement> elements = new ArrayList<>();
+	private static WebElement element = null;
+	private static String script = null;
+	private static int cnt;
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -92,14 +101,10 @@ public class StandaloneIntegrationTest {
 		driver.navigate().to(baseUrl);
 	}
 
-	private static List<WebElement> elements = new ArrayList();
-	private static WebElement element = null;
-	private static String script = null;
-
 	@SuppressWarnings("unchecked")
 	@Test
-	public void testAddition() {
-		for (int cnt = 0; cnt != 3; cnt++) {
+	public void test1() {
+		for (cnt = 0; cnt != 3; cnt++) {
 			script = getScriptContent("model.js");
 			elements = (List<WebElement>) executeScript(script, null, "first", null);
 			assertThat(elements, notNullValue());
@@ -118,56 +123,121 @@ public class StandaloneIntegrationTest {
 			assertThat(element, notNullValue());
 			element.clear();
 			element.sendKeys("2");
-			script = getScriptContent("options.js");
-			elements = (List<WebElement>) executeScript(script, null,
+
+			elements = (List<WebElement>) executeScript(
+					getScriptContent("options.js"), null,
 					"value for (key, value) in operators", null);
 			assertThat(elements, notNullValue());
 			assertThat(elements.size(), greaterThan(0));
 
 			element = elements.get(0);
 			element.click();
-			script = getScriptContent("options.js");
-			elements = (List<WebElement>) executeScript(script, null,
-					"value for (key, value) in operators", null);
-			assertThat(elements, notNullValue());
-			assertThat(elements.size(), greaterThan(0));
-
-			element = elements.get(0);
-			element.click();
-			script = getScriptContent("buttonText.js");
-			elements = (List<WebElement>) executeScript(script, null, "Go!");
+			elements = (List<WebElement>) executeScript(
+					getScriptContent("buttonText.js"), null, "Go!");
 			assertThat(elements, notNullValue());
 			assertThat(elements.size(), greaterThan(0));
 
 			element = elements.get(0);
 			assertThat(element.getText(), containsString("Go"));
 			element.click();
-			sleep(3000);
-
-			script = getScriptContent("waitForAngular.js");
+			// sleep(1000);
+			// NOTE: waitForAngular is timing out possibly due to incrorrect arguments
+			/*
+						try {
+							executeAsyncScript(getScriptContent("waitForAngular.js"), null, null); // does not work
+						} catch (ScriptTimeoutException e) {
+							// ignore
+						}
+						*/
 			try {
-				executeAsyncScript(script, null, null); // does not work
-				// sleep(1000);
-			} catch (ScriptTimeoutException e) {
+				wait.until(new ExpectedCondition<Boolean>() {
+					@Override
+					public Boolean apply(WebDriver d) {
+						elements = (List<WebElement>) executeScript(
+								getScriptContent("binding.js"), null, "latest", null);
+						Boolean result = false;
+						if (elements != null && elements.size() > 0) {
+							element = elements.get(0);
+							highlight(element);
+							String text = element.getText();
+							result = !text.contains(".");
+							System.err.println("in apply " + cnt + ": Text = " + text
+									+ "\nresult = " + result.toString());
+						} else {
+							System.err.println("in apply " + cnt + ": element not yet found");
+							result = false;
+						}
+						return result;
+					}
+				});
+			} catch (Exception e) {
+				System.err.println("Exception in custom wait: " + e.toString());
 			}
+
 		}
 
-		script = getScriptContent("repeater.js");
-		elements = (List<WebElement>) executeScript(script, null,
-				"result in memory", null);
+		elements = (List<WebElement>) executeScript(getScriptContent("repeater.js"),
+				null, "result in memory", null);
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(2));
 		element = elements.get(0);
 		System.err.println(element.getAttribute("outerHTML"));
 
-		script = getScriptContent("binding.js");
-		elements = (List<WebElement>) executeScript(script, null, "latest", null);
+		elements = (List<WebElement>) executeScript(getScriptContent("binding.js"),
+				null, "result.timestamp", null);
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(2));
+		element = elements.get(0);
+		elements.stream().map(element -> element.getText())
+				.map(o -> String.format("item: %s", o)).forEach(System.err::println);
+
+	}
+
+	// @Ignore
+	@SuppressWarnings("unchecked")
+	@Test
+	// running monolythic "clientscripts.js" - no longer works
+	public void test2() {
+		elements = (List<WebElement>) executeScript(String.format(
+				"%s\nvar using = arguments[0] || document;\n"
+						+ "var model = arguments[1];\n"
+						+ "var rootSelector = arguments[2];\n"
+						+ "window.findByModel = functions.findByModel;"
+						+ "window.findByOptions = functions.findByOptions;"
+						+ "return functions.findByModel(model, using, rootSelector);",
+				getScriptContent("clientsidescripts.js")), null, "first", null);
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+
+		element = elements.get(0);
+		assertThat(element, notNullValue());
+		element.clear();
+		element.sendKeys("19");
+		System.err.println("Found element: " + element.getAttribute("outerHTML"));
+		elements = (List<WebElement>) executeScript(
+				"var using = arguments[0] || document;\n"
+						+ "var model = arguments[1];\n"
+						+ "var rootSelector = arguments[2];\n"
+						+ "return window.findByModel(model, using, rootSelector);",
+				null, "second", null);
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
 		element = elements.get(0);
-		sleep(10000);
-		assertThat(element.getText(), equalTo("42"));
-		highlight(element);
+		assertThat(element, notNullValue());
+		element.clear();
+		element.sendKeys("23");
+		elements = (List<WebElement>) executeScript(
+				"var using = arguments[0] || document;\n"
+						+ "var options = arguments[1];\n"
+						+ "return window.findByOptions(options, using);",
+				null, "value for (key, value) in operators", null);
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+
+		element = elements.get(0);
+		System.err.println("Found element: " + element.getAttribute("outerHTML"));
+		element.click();
+
 	}
 
 	// http://www.javawithus.com/tutorial/using-ellipsis-to-accept-variable-number-of-arguments
