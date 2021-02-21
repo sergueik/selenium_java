@@ -20,12 +20,14 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DateCell;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
@@ -48,9 +50,7 @@ import javafx.stage.WindowEvent;
 //
 public class DateRangeDialog extends Application {
 
-	private static DatePicker fromDatePicker = new DatePicker();
-	private static DatePicker tillDatePicker = new DatePicker();
-
+	private static SelectionDTO caller = new SelectionDTO();
 	Stage stage;
 
 	private static int column;
@@ -96,11 +96,16 @@ public class DateRangeDialog extends Application {
 		gridpane.setVgap(8);
 
 		Label startLabel = new Label("Start range: ");
+		final DatePicker tillDatePicker = new DatePicker();
+		tillDatePicker.setOnAction((event) -> {
+			caller.setTillDate(tillDatePicker.getValue());
+		});
 		column = 0;
 		row = 0;
 		gridpane.add(startLabel, column, row);
 		column = 1;
 		row = 0;
+		final DatePicker fromDatePicker = new DatePicker();
 		gridpane.add(fromDatePicker, column, row);
 		final Callback<DatePicker, DateCell> dayCellFactory = new Callback<DatePicker, DateCell>() {
 			@Override
@@ -109,6 +114,7 @@ public class DateRangeDialog extends Application {
 					@Override
 					public void updateItem(LocalDate item, boolean empty) {
 						super.updateItem(item, empty);
+
 						if (item.isAfter(tillDatePicker.getValue())) {
 							setDisable(true);
 							setStyle("-fx-background-color: #EEEEEE;");
@@ -130,9 +136,14 @@ public class DateRangeDialog extends Application {
 		row = 1;
 		gridpane.add(tillDatePicker, column, row);
 		fromDatePicker.setDayCellFactory(dayCellFactory);
-		tillDatePicker.setValue(LocalDate.now().plusDays(1));
-		fromDatePicker.setValue(tillDatePicker.getValue().minusDays(7));
+		fromDatePicker.setOnAction((event) -> {
+			caller.setFromDate(fromDatePicker.getValue());
+		});
+		tillDatePicker.setValue(LocalDate.now());
 
+		fromDatePicker.setValue(tillDatePicker.getValue().minusDays(7));
+		caller.setFromDate(fromDatePicker.getValue());
+		caller.setTillDate(tillDatePicker.getValue());
 		Label userNameLabel = new Label("User Name: ");
 		column = 0;
 		row = 2;
@@ -140,11 +151,10 @@ public class DateRangeDialog extends Application {
 		GridPane.setRowIndex(userNameLabel, row);
 		GridPane.setColumnIndex(userNameLabel, column);
 
-		final TextField userNameFld = new TextField("Admin");
+		final TextField userNameFld = new TextField(caller.getUsername());
 
 		column = 1;
 		row = 2;
-		// gridpane.add(userNameFld, column, row);
 		GridPane.setRowIndex(userNameFld, 2);
 		GridPane.setColumnIndex(userNameFld, 1);
 		gridpane.getChildren().addAll(userNameLabel, userNameFld);
@@ -152,7 +162,6 @@ public class DateRangeDialog extends Application {
 		Label passwordLbl = new Label("Password: ");
 		column = 0;
 		row = 3;
-		// gridpane.add(passwordLbl, column, row);
 		GridPane.setRowIndex(passwordLbl, row);
 		GridPane.setColumnIndex(passwordLbl, column);
 
@@ -161,19 +170,50 @@ public class DateRangeDialog extends Application {
 		row = 3;
 		GridPane.setRowIndex(passwordField, row);
 		GridPane.setColumnIndex(passwordField, column);
-		passwordField.setText("password");
+		passwordField.setText(caller.getPassword());
 		// gridpane.add(passwordField, column, row);
 		gridpane.getChildren().addAll(passwordField, passwordLbl);
+
+		CheckBox checkBox = new CheckBox();
+		checkBox.setText("continue");
+		checkBox.setSelected(caller.isLongRun());
+		checkBox.setTooltip(new Tooltip("will run multiple times"));
+		// legacy style
+		checkBox.selectedProperty().addListener(new ChangeListener<Boolean>() {
+			@Override
+			public void changed(ObservableValue<? extends Boolean> ov, Boolean old_val, Boolean new_val) {
+				caller.setLongRun(checkBox.isSelected());
+			}
+		});
+
+		checkBox.setOnAction(event -> {
+			CheckBox owner = (CheckBox) (event.getSource());
+			System.err.println(owner.isSelected());
+		});
+
+		column = 0;
+		row = 4;
+		GridPane.setRowIndex(checkBox, row);
+		GridPane.setColumnIndex(checkBox, column);
+		gridpane.getChildren().add(checkBox);
 
 		vbox.getChildren().add(gridpane);
 
 		@SuppressWarnings("rawtypes")
+
+		Label templateLabel = new Label("Quick Range");
+		GridPane.setHalignment(templateLabel, HPos.LEFT);
+		column = 0;
+		row = 5;
+		gridpane.add(templateLabel, column, row);
+
 		ComboBox templateChoice = new ComboBox();
 		templateChoice.getItems().addAll(Arrays.asList(quickRanges));
 		templateChoice.setPromptText("template");
 		templateChoice.setOnAction(e -> {
-			@SuppressWarnings("unused")
-			String dummy = templateChoice.getSelectionModel().getSelectedItem().toString();
+
+			quickRange = templateChoice.getSelectionModel().getSelectedItem().toString();
+			caller.setQuickRange(quickRange);
 		});
 
 		GridPane.setHalignment(templateChoice, HPos.RIGHT);
@@ -195,14 +235,8 @@ public class DateRangeDialog extends Application {
 		templateChoice.setMaxWidth(Double.MAX_VALUE);
 		// setHgrow(Priority.ALWAYS);
 		column = 1;
-		row = 4;
+		row = 5;
 		gridpane.add(templateChoice, column, row);
-
-		Label templateLabel = new Label("Quick Range");
-		GridPane.setHalignment(templateLabel, HPos.LEFT);
-		column = 0;
-		row = 4;
-		gridpane.add(templateLabel, column, row);
 
 		Button saveButton = new Button("Save");
 
@@ -218,7 +252,7 @@ public class DateRangeDialog extends Application {
 		HBox.setHgrow(saveButton, Priority.ALWAYS);
 		HBox.setHgrow(closeButton, Priority.ALWAYS);
 		column = 0;
-		row = 5;
+		row = 6;
 
 		columnSpan = 2;
 		rowSpan = 1;
@@ -240,7 +274,8 @@ public class DateRangeDialog extends Application {
 		});
 
 		stage.sizeToScene();
-		// NOTE: the handler only gets fired when stage window is closed by window manager
+		// NOTE: the handler only gets fired when stage window is closed by window
+		// manager
 		stage.getScene().getWindow().addEventFilter(WindowEvent.WINDOW_CLOSE_REQUEST, this::closeWindowEvent);
 		stage.show();
 	}
@@ -276,13 +311,13 @@ public class DateRangeDialog extends Application {
 	}
 
 	private void showData(ActionEvent event) {
-		String data = "\n" + "From=" + fromDatePicker.getValue() + "\n" + "Till=" + tillDatePicker.getValue() + "\n"
+		String data = "\n" + "From=" + caller.getFromDate() + "\n" + "Till=" + caller.getTillDate() + "\n"
 				+ "Quick Range: " + quickRange;
 		logger.info(data);
 		// dataFld.setText(data);
 		stage.setIconified(true);
 		// https://stackoverflow.com/questions/15520573/how-to-show-and-hide-a-window-in-javafx-2
-		// NOTE: hide only works on Windows 7, does not make stage invisible on Linux  
+		// NOTE: hide only works on Windows 7, does not make stage invisible on Linux
 		stage.hide();
 		// stage.getOnCloseRequest();
 		stage.close();
@@ -293,8 +328,12 @@ public class DateRangeDialog extends Application {
 		} catch (InterruptedException e) {
 			System.err.println("interrupted :" + e.toString());
 		}
-		stage.show();
-		stage.setIconified(false);
-
+		if (caller.isLongRun()) {
+			stage.show();
+			stage.setIconified(false);
+		} else {
+			Platform.exit();
+		}
 	}
 }
+
