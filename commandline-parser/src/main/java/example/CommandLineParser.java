@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.lang.IllegalStateException;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 // package org.apache.commons.io does not exist
@@ -42,6 +43,23 @@ public class CommandLineParser {
 	private boolean debug = false;
 	private static final String keyValueSeparator = ":";
 	private static final String entrySeparator = ",";
+	private Lib valueFormat = Lib.NONE;
+
+	public void setValueFormat(String value) {
+		for (Lib known : Lib.values()) {
+			if (known.toString().equals(value)) {
+				if (debug)
+					System.err.println("Setting valueFormat to: " + known + "(" + known.getLibValue() + ")");
+				valueFormat = known;
+			}
+		}
+	}
+
+	public String getValueFormat() {
+		if (debug)
+			System.err.println("valueFormat is: " + this.valueFormat + "(" + this.valueFormat.getLibValue() + ")");
+		return this.valueFormat.toString();
+	}
 
 	public boolean isDebug() {
 		return debug;
@@ -117,9 +135,8 @@ public class CommandLineParser {
 					System.err.println("About to set the flag: " + name);
 
 				// TODO: tweak to allow last arg to be the "-"
-				if (flagsWithValues.contains(name)
-						&& ((n == args.length - 2 && args[n + 1].equals("-"))
-								|| (n < args.length - 1 && !args[n + 1].matches("^-")))) {
+				if (flagsWithValues.contains(name) && ((n == args.length - 2 && args[n + 1].equals("-"))
+						|| (n < args.length - 1 && !args[n + 1].matches("^-")))) {
 
 					String data = args[++n];
 					value = processData(name, data);
@@ -154,29 +171,53 @@ public class CommandLineParser {
 		if (data.matches("(?i)^env:[a-z_0-9]+")) {
 			value = System.getenv(data.replaceFirst("(?i)^env:", ""));
 			if (debug)
-				System.err.println(
-						"Evaluate data from environment for: " + name + " = " + value);
+				System.err.println("Evaluate data from environment for: " + name + " = " + value);
 
 		} else if (data.matches("(?i)^@[a-z_0-9./:]+")) {
-			String datafilePath = Paths.get(System.getProperty("user.dir"))
-					.resolve(data.replaceFirst("^@", "")).toAbsolutePath().toString();
+			String datafilePath = Paths.get(System.getProperty("user.dir")).resolve(data.replaceFirst("^@", ""))
+					.toAbsolutePath().toString();
 			if (debug)
-				System.err.println(
-						"Reading data for: " + name + " from file: " + datafilePath);
+				System.err.println("Reading data for: " + name + " from file: " + datafilePath);
 			try {
-				value = (name.equalsIgnoreCase("apply"))
-						? readFile(datafilePath, Charset.forName("UTF-8"))
-						: readFile(datafilePath, Charset.forName("UTF-8"))
-								.replaceAll(" *\\r?\\n *", ",");
+				value = (name.equalsIgnoreCase("apply")) ? readFile(datafilePath, Charset.forName("UTF-8"))
+						: readFile(datafilePath, Charset.forName("UTF-8")).replaceAll(" *\\r?\\n *", ",");
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 		} else if (data.matches("(?i)^(?:file|http|https)://[a-z_0-9./:]+")) {
 			// non standard format, just for trying the new option format
-			try {
-				value = getValueData(data, Lib.JSON);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
+			if (this.valueFormat == Lib.JSON) {
+				try {
+					value = getValueData(data, Lib.JSON);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			} else if (this.valueFormat == Lib.JSON) {
+				try {
+					value = getValueData(data, Lib.GSON);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+
+			} else {
+				try {
+					StringBuilder stringBuilder = new StringBuilder();
+					URL url = new URL(data);
+					InputStream inputStream = url.openStream();
+					BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+					String line = bufferedReader.readLine();
+					while (line != null) {
+						stringBuilder.append(line).append(System.getProperty("line.separator"));
+						;
+						line = bufferedReader.readLine();
+					}
+					bufferedReader.close();
+					value = stringBuilder.toString();
+				} catch (MalformedURLException e) {
+					throw new RuntimeException(e);
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
 			}
 
 		} else {
@@ -206,26 +247,22 @@ public class CommandLineParser {
 	}
 
 	private List<String[]> parsePairs(final String data) {
-		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream()
-				.map(o -> o.split(" *= *")).filter(o -> o.length == 2)
-				.collect(Collectors.toList());
+		List<String[]> pairs = Arrays.asList(data.split(" *, *")).stream().map(o -> o.split(" *= *"))
+				.filter(o -> o.length == 2).collect(Collectors.toList());
 		return pairs;
 	}
 
 	public Map<String, String> parseEmbeddedMultiArg(final String data) {
 		Map<String, String> result = new HashMap<>();
 		List<String[]> pais = parsePairs(data);
-		List<String> keys = pais.stream().map(o -> o[0]).distinct()
-				.collect(Collectors.toList());
+		List<String> keys = pais.stream().map(o -> o[0]).distinct().collect(Collectors.toList());
 		if (pais.size() == keys.size()) {
 			if (debug)
-				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o)))
-						.forEach(System.err::println);
+				pais.stream().map(o -> String.format("Collected: " + Arrays.asList(o))).forEach(System.err::println);
 
 			// result = rawdata.stream().collect(Collectors.toMap(o -> o[0], o ->
 			// o[1]));
-			result = pais.stream()
-					.map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
+			result = pais.stream().map(o -> new AbstractMap.SimpleEntry<String, String>(o[0], o[1]))
 					.collect(Collectors.toMap(o -> o.getKey(), o -> o.getValue()));
 		} else {
 			System.err.println("Duplicate embedded argument(s) detected, aborting");
@@ -249,8 +286,7 @@ public class CommandLineParser {
 	// Example data:
 	// -argument "{count:0, type:navigate, size:100, flag:true}"
 	// NOTE: not using org.json to reduce size
-	public Map<String, String> extractExtraArgs(String argument)
-			throws IllegalArgumentException {
+	public Map<String, String> extractExtraArgs(String argument) throws IllegalArgumentException {
 
 		final Map<String, String> extraArgData = new HashMap<>();
 		argument = argument.trim().substring(1, argument.length() - 1);
@@ -289,11 +325,10 @@ public class CommandLineParser {
 		private static JSONArray jsonArray = null;
 		private static String text;
 		private static boolean debug = false;
-		// cannot access encloure class debug which is not static
+		// cannot access enclosure class debug which is not static
 
 		@SuppressWarnings("unchecked")
-		public static Map<String, Object> readJSONData(String url)
-				throws IOException {
+		public static Map<String, Object> readJSONData(String url) throws IOException {
 			text = readRawJSON(url);
 			if (debug)
 				System.err.println("Read JSON data: " + text);
@@ -306,8 +341,7 @@ public class CommandLineParser {
 		public static String readRawJSON(String url) throws IOException {
 			InputStream is = new URL(url).openStream();
 			try {
-				BufferedReader rd = new BufferedReader(
-						new InputStreamReader(is, Charset.forName("UTF-8")));
+				BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
 				text = readAll(rd);
 				if (debug)
 					System.err.println("Read JSON data: " + text);
@@ -317,8 +351,7 @@ public class CommandLineParser {
 			}
 		}
 
-		public static JSONObject readJSONObject(String url)
-				throws IOException, JSONException {
+		public static JSONObject readJSONObject(String url) throws IOException, JSONException {
 			text = readRawJSON(url);
 			if (debug)
 				System.err.println("Read JSON data: " + text);
@@ -326,8 +359,7 @@ public class CommandLineParser {
 			return jsonObject;
 		}
 
-		public static JSONArray readJSONArray(String url)
-				throws IOException, JSONException {
+		public static JSONArray readJSONArray(String url) throws IOException, JSONException {
 			text = readRawJSON(url);
 			if (debug)
 				System.err.println("Read JSON data: " + text);
@@ -349,14 +381,14 @@ public class CommandLineParser {
 
 		JSON(0x01), GSON(0x02), NONE(0x04);
 
-		private int bit;
+		private int lib;
 
 		Lib(int value) {
-			bit = value;
+			lib = value;
 		}
 
-		public int getBitNumber() {
-			return (bit);
+		public int getLibValue() {
+			return (lib);
 		}
 
 	}

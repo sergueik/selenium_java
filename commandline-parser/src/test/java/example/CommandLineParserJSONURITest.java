@@ -51,8 +51,7 @@ public class CommandLineParserJSONURITest {
 	protected static String osName = getOSName();
 	private static final String dataFileName = "a.json";
 	private static final String dataFilePath = osName.equals("windows")
-			? Paths.get(System.getProperty("user.home")).resolve("Desktop")
-					.resolve(dataFileName).toString()
+			? Paths.get(System.getProperty("user.home")).resolve("Desktop").resolve(dataFileName).toString()
 			: "/tmp/" + dataFileName;
 
 	private static final String dataFileUri = osName.equals("windows")
@@ -64,6 +63,7 @@ public class CommandLineParserJSONURITest {
 	@Before
 	public void load() {
 		commandLineParser = new CommandLineParser();
+		commandLineParser.setValueFormat("JSON");
 		commandLineParser.setDebug(debug);
 	}
 
@@ -81,11 +81,13 @@ public class CommandLineParserJSONURITest {
 	}
 	// early tests created for GSON
 
+	@Ignore
+	// This application is temporarily over its serving quota. Please try again
+	// later.
 	@Test
 	public void addStringJSONFromUrlTest() {
 
-		argsArray = new String[] { "-in",
-				"http://echo.jsontest.com/key/value/one/two" };
+		argsArray = new String[] { "-in", "http://echo.jsontest.com/key/value/one/two" };
 		commandLineParser.saveFlagValue("in");
 		commandLineParser.parse(argsArray);
 		assertThat(commandLineParser.getNumberOfFlags(), is(1));
@@ -97,16 +99,14 @@ public class CommandLineParserJSONURITest {
 		// early tests created for GSON
 		// assertThat(commandLineParser.getFlagValue("in"), is("one|key"));
 		try {
-			JSONObject jsonObject = new JSONObject(
-					commandLineParser.getFlagValue("in"));
+			JSONObject jsonObject = new JSONObject(commandLineParser.getFlagValue("in"));
 			assertThat(jsonObject.has("one"), is(true));
 			assertThat(jsonObject.has("key"), is(true));
 		} catch (JSONException e) {
 			System.err.println("Unexpected error: " + e.toString());
 			throw e;
 		}
-		System.err.println("argumentNamesValuesTest(): flag value: "
-				+ commandLineParser.getFlagValue("in"));
+		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
 	}
 
 	@Test
@@ -126,19 +126,16 @@ public class CommandLineParserJSONURITest {
 		assertThat(commandLineParser.getNumberOfFlags(), is(1));
 		assertThat(commandLineParser.hasFlag("in"), is(true));
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
-		System.err.println("addDataJSONFromFileTest(): flag value: "
-				+ commandLineParser.getFlagValue("in"));
+		System.err.println("addDataJSONFromFileTest(): flag value: " + commandLineParser.getFlagValue("in"));
 		try {
-			JSONObject jsonObject = new JSONObject(
-					commandLineParser.getFlagValue("in"));
+			JSONObject jsonObject = new JSONObject(commandLineParser.getFlagValue("in"));
 			assertThat(jsonObject.has("foo"), is(true));
 			assertThat(jsonObject.has("bar"), is(true));
 		} catch (JSONException e) {
 			System.err.println("Unexpected error: " + e.toString());
 			throw e;
 		}
-		System.err.println("argumentNamesValuesTest(): flag value: "
-				+ commandLineParser.getFlagValue("in"));
+		System.err.println("argumentNamesValuesTest(): flag value: " + commandLineParser.getFlagValue("in"));
 	}
 
 	private static PrintWriter openWriter(String name) {
@@ -146,8 +143,7 @@ public class CommandLineParserJSONURITest {
 			boolean append = true;
 			file = new File(name);
 			OutputStream otputStream = new FileOutputStream(file, append);
-			PrintWriter out = new PrintWriter(
-					new OutputStreamWriter(otputStream, "UTF8"));
+			PrintWriter out = new PrintWriter(new OutputStreamWriter(otputStream, "UTF8"));
 			return out;
 		} catch (IOException e) {
 			System.err.println("I/O Error");
