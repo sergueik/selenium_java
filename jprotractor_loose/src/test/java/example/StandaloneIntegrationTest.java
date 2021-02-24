@@ -5,14 +5,19 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -55,7 +60,7 @@ public class StandaloneIntegrationTest {
 	static long pollingInterval = 500;
 	static int width = 600;
 	static int height = 400;
-	private static String baseUrl = "http://juliemr.github.io/protractor-demo/";
+	private static String baseUrl = "about:blank"; // "http://juliemr.github.io/protractor-demo/";
 	private static final boolean headless = Boolean
 			.parseBoolean(System.getenv("HEADLESS"));
 
@@ -101,9 +106,11 @@ public class StandaloneIntegrationTest {
 		driver.navigate().to(baseUrl);
 	}
 
+	// @Ignore
 	@SuppressWarnings("unchecked")
 	@Test
 	public void test1() {
+		driver.navigate().to("http://juliemr.github.io/protractor-demo/");
 		for (cnt = 0; cnt != 3; cnt++) {
 			script = getScriptContent("model.js");
 			elements = (List<WebElement>) executeScript(script, null, "first", null);
@@ -196,14 +203,18 @@ public class StandaloneIntegrationTest {
 	// @Ignore
 	@SuppressWarnings("unchecked")
 	@Test
-	// running monolythic "clientscripts.js" - no longer works
+	// entirely unmodified "clientscripts.js" - no longer runs due to typescript
+	// and 'require' dependencies within, but these parts can be removed with no
+	// damage to main functionality
 	public void test2() {
+		driver.navigate().to("http://juliemr.github.io/protractor-demo/");
 		elements = (List<WebElement>) executeScript(String.format(
 				"%s\nvar using = arguments[0] || document;\n"
 						+ "var model = arguments[1];\n"
 						+ "var rootSelector = arguments[2];\n"
-						+ "window.findByModel = functions.findByModel;"
-						+ "window.findByOptions = functions.findByOptions;"
+						+ "window.findByModel = functions.findByModel;\n"
+						+ "window.findByOptions = functions.findByOptions;\n"
+						+ "window.findRepeaterColumn = functions.findRepeaterColumn;\n"
 						+ "return functions.findByModel(model, using, rootSelector);",
 				getScriptContent("clientsidescripts.js")), null, "first", null);
 		assertThat(elements, notNullValue());
@@ -238,6 +249,55 @@ public class StandaloneIntegrationTest {
 		System.err.println("Found element: " + element.getAttribute("outerHTML"));
 		element.click();
 
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void test3() {
+
+		getLocalPage("ng_multi_select2.htm");
+		element = driver.findElement(By.cssSelector(
+				"multiselect-dropdown button[data-ng-click='openDropdown()']"));
+		assertThat(element, notNullValue());
+		element.click();
+		// NOTE: selectedRepeaterOption("option in options")
+		// was not working with this directive
+
+		elements = (List<WebElement>) executeScript(getScriptContent("binding.js"),
+				null, "option.name", null);
+		assertTrue(elements.size() > 0);
+
+		if (elements != null && elements.size() > 0) {
+			element = elements.get(0);
+
+			// find what is selected based on the bootstrap class attribute
+			String expression = "\\-remove\\-";
+			Pattern pattern = Pattern.compile(expression);
+			int count = 0;
+			for (WebElement element : elements) {
+				String optionName = (String) executeScript(
+						getScriptContent("evaluate.js"), element, "option.name", null);
+
+				WebElement element2 = element.findElement(By.tagName("span"));
+				assertThat(element2, notNullValue());
+				String classAttribute = element2.getAttribute("class");
+				System.err
+						.println("option.name = " + optionName + " " + classAttribute);
+				Matcher matcher = pattern.matcher(classAttribute);
+				if (!matcher.find()) {
+					System.err.println("selected: " + optionName);
+					highlight(element);
+					count++;
+				}
+			}
+			elements = (List<WebElement>) executeScript(
+					getScriptContent("repeaterColumn.js"), null,
+					"country in SelectedCountries", "country.name", null);
+
+			assertTrue(elements.size() == count);
+			elements.stream().map(o -> String.format("%s\n", o.getText()))
+					.forEach(System.err::format);
+		}
 	}
 
 	// http://www.javawithus.com/tutorial/using-ellipsis-to-accept-variable-number-of-arguments
@@ -337,4 +397,20 @@ public class StandaloneIntegrationTest {
 		}
 	}
 
+	private static void getLocalPage(String pagename) {
+		try {
+			URI uri = StandaloneIntegrationTest.class.getClassLoader()
+					.getResource(pagename).toURI();
+			System.err.println("Testing: " + uri.toString());
+			String baseUrl = uri.toString();
+			driver.navigate().to(baseUrl);
+		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
+																			// supported in -source 1.6
+			throw new RuntimeException(e);
+		}
+		try {
+			Thread.sleep(500);
+		} catch (InterruptedException e) {
+		}
+	}
 }
