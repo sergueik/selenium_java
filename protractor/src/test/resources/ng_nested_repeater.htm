@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html ng-app="app">  
+<head>
+
+<!-- based on: http://jsfiddle.net/mmacin/r96uqgxn/ -->
+<style>
+ body {font: 11px arial, sans-serif; }
+ul {
+  font-size: 20px;
+  margin-left: 20px;
+  font-weight: bold;
+  
+}
+
+ul ul {
+  font-size: 16px;
+}
+
+ul ul ul {
+  font-size: 12px;
+  font-weight: normal;
+}
+</style>
+<script type="text/javascript" ng:autobind src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js"></script> 
+<!--
+<script type="text/javascript" ng:autobind src="http://code.angularjs.org/0.9.18/angular-0.9.18.js"></script>
+-->
+<script type="text/javascript">
+angular.module('app', []).controller('ctrl', function($scope) {
+  $scope.data = [{
+    name: '1',
+    children: [{
+      name: '11',
+      children: [{ name: '111'}, { name: '112'}]
+    }, {
+      name: '12',
+      children: [{ name: '121'}, { name: '122'}]
+    }]
+  }, {
+    name: '2',
+    children: [{
+      name: '21',
+      children: [{ name: '211' }, { name: '212' }]
+    }, 
+    { name: '22' } 
+    ]
+  }];
+})
+</script>
+</script>
+</head>
+<body>
+
+<ul ng:controller="ctrl">
+  <li ng:repeat="item in data">
+    {{item.name}} has children:
+    <ul>
+      <li ng:repeat="child in item.children">{{child.name}} has grant-children: 
+        <ul><li ng:repeat="grand_child in child.children">{{grand_child.name}}</li></ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+</body>
+</html>
