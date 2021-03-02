@@ -1,4 +1,7 @@
 package example;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
