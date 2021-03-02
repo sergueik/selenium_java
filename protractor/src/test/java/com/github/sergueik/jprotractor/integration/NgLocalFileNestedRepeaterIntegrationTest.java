@@ -93,6 +93,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 			// result
 			// probably a wrong type
 			NgWebElement ngItemElement = new NgWebElement(ngDriver, itemElement);
+			highlight(ngItemElement.getWrappedElement());
 			data = ngItemElement.evaluate("item.name");
 			text = data.toString();
 			System.err.println(String.format("%s has children:", text));
@@ -114,27 +115,35 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 					.findElements(NgBy.repeater("child in item.children"));
 			for (WebElement childElement : childrenElements) {
 				NgWebElement ngChildElement = new NgWebElement(ngDriver, childElement);
+				highlight(ngChildElement.getWrappedElement());
 
 				data = ngChildElement.evaluate("child.name");
 				text = data.toString();
-				System.err.println(String.format("%s has grand-children:", text));
-				/*
-								ngElement = ngChildElement.findElement(NgBy.binding("child.name"));
-								System.err.println(
-										String.format("%s has grand-children:", ngElement.getText()));
-										*/
+
 				List<WebElement> grandchildrenElements = ngChildElement
 						.findElements(NgBy.repeater("grand_child in child.children"));
+				if (grandchildrenElements.size() == 0) {
+					System.err.println(String.format("%s has no grand-children", text));
+					continue;
+				}
+				System.err.println(String.format("%s has grand-children:", text));
 				for (WebElement grandchildElement : grandchildrenElements) {
 					NgWebElement ngGrandchildElement = new NgWebElement(ngDriver,
 							grandchildElement);
-					/*
-					element = ngGrandchildElement
-							.findElement(NgBy.binding("grand_child.name"));
-					System.err.println(String.format("name: ", element.getText()));	
-											*/
-					System.err.println("grand child element: "
-							+ grandchildElement.getAttribute("outerHTML"));
+					highlight(ngGrandchildElement.getWrappedElement());
+					try {
+						element = ngGrandchildElement
+								.findElement(NgBy.binding("grand_child.name"));
+						System.err.println(String.format("name: %s", element.getText()));
+					} catch (java.lang.AssertionError e2) {
+						System.err.println("Exception (ignored): " + e2.toString());
+
+					} catch (Exception e3) {
+						System.err.println("Exception (ignored): " + e3.toString());
+					}
+					if (debug)
+						System.err.println("grand child element: "
+								+ grandchildElement.getAttribute("outerHTML"));
 					data = ngGrandchildElement.evaluate("grand_child.name");
 					text = data.toString();
 					if (text == null)
