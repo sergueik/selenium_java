@@ -1,4 +1,7 @@
 package com.github.sergueik.jprotractor.integration;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
 import static java.lang.Boolean.parseBoolean;
 import static org.hamcrest.CoreMatchers.containsString;
@@ -76,6 +79,12 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 	}
 
 	// @Ignore
+	// TODO: report in Angular Protractor / Angular bug that a DOM element between
+	// repeater and binding is needed for the call to succeed:
+	//   <ul><li ng:repeat="item in data"><span>{{item.name}}</span></li> 
+	// searchable by repeater then by binding  
+	//  <ul><li ng:repeat="item in data">{{item.name}}</li></ul>
+	// is not
 	@Test
 	public void test1() {
 		getPageContent("ng_nested_repeater.htm");
@@ -153,6 +162,25 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 				}
 			}
 
+		}
+	}
+
+	@Test
+	public void test2() {
+		getPageContent("ng_local_service.htm");
+		for (WebElement currentElement : ngDriver
+				.findElements(NgBy.repeater("person in people"))) {
+			if (currentElement.getText().isEmpty()) {
+				break;
+			}
+			WebElement personName = new NgWebElement(ngDriver, currentElement)
+					.findElement(NgBy.binding("person.Name"));
+			assertThat(personName, notNullValue());
+			highlight(personName);
+			Object personCountry = new NgWebElement(ngDriver, currentElement)
+					.evaluate("person.Country");
+			assertThat(personCountry, notNullValue());
+			System.err.println(personName.getText() + " " + personCountry.toString());
 		}
 	}
 

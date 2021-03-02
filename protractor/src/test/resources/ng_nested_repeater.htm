@@ -53,10 +53,10 @@ angular.module('app', []).controller('ctrl', function($scope) {
 
 <ul ng:controller="ctrl">
   <li ng:repeat="item in data">
-    {{item.name}} has children:
+    <span>{{item.name}} has children:</span>
     <ul>
-      <li ng:repeat="child in item.children">{{child.name}} has grant-children: 
-        <ul><li ng:repeat="grand_child in child.children">{{grand_child.name}}</li></ul>
+      <li ng:repeat="child in item.children"><span>{{child.name}} has grant-children: </span>
+        <ul><li ng:repeat="grand_child in child.children"><span>{{grand_child.name}}</span></li></ul>
       </li>
     </ul>
   </li>
