@@ -66,6 +66,10 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 	private static String text = null;
 	private static Object data = null;
 	private static WebElement element;
+	private static WebElement element2;
+	private static WebElement element3;
+	private static List<WebElement> elements = new ArrayList<>();
+	private static List<WebElement> elements2 = new ArrayList<>();
 	private static NgWebElement ngElement;
 	private static final boolean debug = false;
 
@@ -81,9 +85,9 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 	// @Ignore
 	// TODO: report in Angular Protractor / Angular bug that a DOM element between
 	// repeater and binding is needed for the call to succeed:
-	//   <ul><li ng:repeat="item in data"><span>{{item.name}}</span></li> 
-	// searchable by repeater then by binding  
-	//  <ul><li ng:repeat="item in data">{{item.name}}</li></ul>
+	// <ul><li ng:repeat="item in data"><span>{{item.name}}</span></li>
+	// searchable by repeater then by binding
+	// <ul><li ng:repeat="item in data">{{item.name}}</li></ul>
 	// is not
 	@Test
 	public void test1() {
@@ -106,18 +110,25 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 			data = ngItemElement.evaluate("item.name");
 			text = data.toString();
 			System.err.println(String.format("%s has children:", text));
-			try {
-				ngElement = ngItemElement.findElement(NgBy.binding("item.name"));
-				assertThat(ngElement, notNullValue());
-				System.err.println("item.name ng element text: " + ngElement.getText());
-				element = ngElement.getWrappedElement();
-				assertThat(element, notNullValue());
-				System.err.println("item.name element: " + element.getText());
-			} catch (java.lang.AssertionError e2) {
-				System.err.println("Exception (ignored): " + e2.toString());
+			elements = itemElement.findElements(
+					By.xpath("./child::node()[contains(text(), '{{item.name}}') ]"));
+			// SyntaxError: The expression is not a legal expression.
+			if (elements.size() != 0) {
 
-			} catch (Exception e3) {
-				System.err.println("Exception (ignored): " + e3.toString());
+				try {
+					ngElement = ngItemElement.findElement(NgBy.binding("item.name"));
+					assertThat(ngElement, notNullValue());
+					System.err
+							.println("item.name ng element text: " + ngElement.getText());
+					element = ngElement.getWrappedElement();
+					assertThat(element, notNullValue());
+					System.err.println("item.name element: " + element.getText());
+				} catch (java.lang.AssertionError e2) {
+					System.err.println("Exception (ignored): " + e2.toString());
+
+				} catch (Exception e3) {
+					System.err.println("Exception (ignored): " + e3.toString());
+				}
 			}
 
 			List<WebElement> childrenElements = ngItemElement
@@ -184,6 +195,72 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 
+	@Test
+	public void test3() {
+		getPageContent("ng_nested_repeater2.htm");
+		for (WebElement element : ngDriver
+				.findElements(NgBy.repeater("row in data"))) {
+			if (element.getText().isEmpty()) {
+				break;
+			}
+			System.err.println("Scan child elements of " + element.getTagName());
+			String binding = "row.name";
+			ngElement = new NgWebElement(ngDriver, element);
+			// NOTE: with "./descendant::node()" and "descendant::node()"
+			// getting
+			// InvalidSelectorError: The result of the xpath expression is : [object
+			// Text]. It should be an element.
+			elements = element.findElements(By.xpath(".//*[text()!='' ]"));
+			boolean found = false;
+			for (WebElement element2 : elements) {
+				System.err.println("Descendant element text: " + element.getText());
+				// NOTE: it will never contain *the* binding
+				if (element.getText().contains(binding))
+					found = true;
+			}
+
+			if (found) {
+				System.err.println("Get data via bining search");
+				element2 = ngElement.findElement(NgBy.binding(binding));
+				assertThat(element2, notNullValue());
+				highlight(element2);
+				System.err
+						.println(String.format("row name is: %s", element2.getText()));
+			} else {
+				System.err.println("Get data via eval");
+				data = ngElement.evaluate(binding);
+				assertThat(data, notNullValue());
+				text = data.toString();
+				System.err.println(String.format("row name is: %s", text));
+
+			}
+			elements2 = ngElement
+					.findElements(NgBy.repeater("column in row.columns"));
+			for (WebElement element3 : elements2) {
+				NgWebElement ngElement = new NgWebElement(ngDriver, element3);
+				highlight(ngElement.getWrappedElement());
+				binding = "column.name";
+				System.err.println("Scan child elements of " + element3.getTagName());
+				elements = element3
+						.findElements(By.xpath("./child::node()[text()!='' ]"));
+				if (elements.size() != 0) {
+					System.err.println("Get data via bining search");
+					WebElement element2 = ngElement.findElement(NgBy.binding(binding));
+					assertThat(element2, notNullValue());
+					// highlight(element2);
+					System.err
+							.println(String.format("column name is: %s", element2.getText()));
+				} else {
+					System.err.println("Get data via eval");
+					data = ngElement.evaluate(binding);
+					assertThat(data, notNullValue());
+					text = data.toString();
+					System.err.println(String.format("column name is: %s", text));
+				}
+			}
+		}
+	}
+
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -233,3 +310,4 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 }
+
