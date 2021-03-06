@@ -1,4 +1,7 @@
 package example;
+/**
+ * Copyright 2020,2021 Serguei Kouzmine
+ */
 
 import static java.lang.System.err;
 

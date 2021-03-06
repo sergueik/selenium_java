@@ -1,6 +1,5 @@
 package example;
 
-import static java.lang.System.err;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -24,7 +23,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -35,7 +33,6 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
 import example.BaseTest;
-import example.LocalFileTest;
 
 // this test methods will get skipped when run on Firefox
 // and is skipped Travis build
@@ -48,7 +45,7 @@ public class ChromeDownloadsTest {
 	protected static final boolean debug = Boolean
 			.parseBoolean(BaseTest.getPropertyEnv("DEBUG", "false"));
 
-	private final String filePath = "download.html";
+	private static final String url = "chrome://downloads/";
 
 	protected static WebDriver driver = null;
 	protected static ShadowDriver shadowDriver = null;
@@ -65,12 +62,13 @@ public class ChromeDownloadsTest {
 	@BeforeClass
 	public static void setup() {
 		if (browser.equals("chrome")) {
-			err.println("Launching " + browser);
+			System.err.println("Launching " + browser);
 			String chromeDriverPath = null;
-			err.println("Launching " + browser);
+			System.err.println("Launching " + browser);
 			if (isCIBuild) {
 				WebDriverManager.chromedriver().setup();
-				chromeDriverPath = WebDriverManager.chromedriver().getBinaryPath();
+				chromeDriverPath = WebDriverManager.chromedriver()
+						.getDownloadedDriverPath();
 
 			} else {
 				chromeDriverPath = Paths.get(System.getProperty("user.home"))
@@ -127,30 +125,35 @@ public class ChromeDownloadsTest {
 	}
 
 	// download PDF have to be run first
-	@Test
-	public void test1() {
+	// https://stackoverflow.com/questions/20295578/difference-between-before-beforeclass-beforeeach-and-beforeall/20295618
+	@Before
+	public void download() {
+
 		Assume.assumeTrue(browserChecker.testingChrome());
 		Assume.assumeFalse(isCIBuild);
-		driver.navigate().to(ChromeDownloadsTest.getPageContent(filePath));
+		driver.navigate().to(BaseTest.getPageContent("download.html"));
 		WebElement element = driver
 				.findElement(By.xpath("//a[contains(@href, \"wikipedia.pdf\")]"));
 		element.click();
-		sleep(5000);
+		sleep(1000);
 	}
+
+	// TODO: explore Shadow DOM of "chrome://history/" of <history-app
+	// id="history-app">
 
 	// list downloads Shadow DOM
 	@Test
-	public void test2() {
+	public void test1() {
 		Assume.assumeTrue(browser.equals("chrome"));
 		Assume.assumeFalse(isCIBuild);
-		driver.navigate().to("chrome://downloads/");
+		driver.navigate().to(url);
 		WebElement element = driver.findElement(By.tagName("downloads-manager"));
 		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
 				"#downloadsList");
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
 		WebElement element2 = elements.get(0);
-		err.println(
+		System.err.println(
 				String.format("Located element:", element2.getAttribute("outerHTML")));
 		WebElement element3 = element2.findElement(By.tagName("downloads-item"));
 		assertThat(element3, notNullValue());
@@ -237,18 +240,6 @@ public class ChromeDownloadsTest {
 			Thread.sleep((long) milliSeconds);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-	}
-
-	// temporarily copied
-	protected static String getPageContent(String pagename) {
-		try {
-			URI uri = BaseTest.class.getClassLoader().getResource(pagename).toURI();
-			err.println("Testing local file: " + uri.toString());
-			return uri.toString();
-		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
-			// supported in -source 1.6
-			throw new RuntimeException(e);
 		}
 	}
 
