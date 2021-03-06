@@ -51,7 +51,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class CommonTest {
 
-	// private static NgWebDriver ngDriver;
 	protected static WebDriver driver;
 	private static String osName = getOSName();
 	protected static WebDriverWait wait;
