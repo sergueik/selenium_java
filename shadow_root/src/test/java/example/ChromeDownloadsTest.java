@@ -1,4 +1,7 @@
 package example;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
@@ -34,10 +37,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import example.BaseTest;
 
-// this test methods will get skipped when run on Firefox
-// and is skipped Travis build
-// until we figure out how to configure the Chrome browser
-// handled by WebDriverManager
+// Explore Chrome Downloads setting screen
 public class ChromeDownloadsTest {
 
 	private static boolean isCIBuild = BaseTest.checkEnvironment();
@@ -62,9 +62,9 @@ public class ChromeDownloadsTest {
 	@BeforeClass
 	public static void setup() {
 		if (browser.equals("chrome")) {
-			System.err.println("Launching " + browser);
+			System.err
+					.println("Launching " + (headless ? " headless " : "") + browser);
 			String chromeDriverPath = null;
-			System.err.println("Launching " + browser);
 			if (isCIBuild) {
 				WebDriverManager.chromedriver().setup();
 				chromeDriverPath = WebDriverManager.chromedriver()
@@ -78,7 +78,8 @@ public class ChromeDownloadsTest {
 						.toAbsolutePath().toString();
 				System.setProperty("webdriver.chrome.driver", chromeDriverPath);
 			}
-			System.err.println("Chrome Driver Path: " + chromeDriverPath);
+			if (debug)
+				System.err.println("Chrome Driver Path: " + chromeDriverPath);
 
 			// https://peter.sh/experiments/chromium-command-line-switches/
 			ChromeOptions options = new ChromeOptions();
@@ -124,7 +125,7 @@ public class ChromeDownloadsTest {
 		}
 	}
 
-	// download PDF have to be run first
+	// download a PDF file first
 	// https://stackoverflow.com/questions/20295578/difference-between-before-beforeclass-beforeeach-and-beforeall/20295618
 	@Before
 	public void download() {
@@ -138,14 +139,13 @@ public class ChromeDownloadsTest {
 		sleep(1000);
 	}
 
-	// TODO: explore Shadow DOM of "chrome://history/" of <history-app
-	// id="history-app">
-
-	// list downloads Shadow DOM
+	// Explore Shadow DOM
 	@Test
 	public void test1() {
 		Assume.assumeTrue(browser.equals("chrome"));
 		Assume.assumeFalse(isCIBuild);
+		Assume.assumeFalse(headless);
+
 		driver.navigate().to(url);
 		WebElement element = driver.findElement(By.tagName("downloads-manager"));
 		List<WebElement> elements = shadowDriver.getAllShadowElement(element,
@@ -153,8 +153,9 @@ public class ChromeDownloadsTest {
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
 		WebElement element2 = elements.get(0);
-		System.err.println(
-				String.format("Located element:", element2.getAttribute("outerHTML")));
+		if (debug)
+			System.err.println(String.format("Located element:",
+					element2.getAttribute("outerHTML")));
 		WebElement element3 = element2.findElement(By.tagName("downloads-item"));
 		assertThat(element3, notNullValue());
 		WebElement element4 = shadowDriver.getShadowElement(element3,
@@ -163,7 +164,9 @@ public class ChromeDownloadsTest {
 		System.err.println("Result element: " + element3.getAttribute("outerHTML"));
 		WebElement element5 = element4.findElement(By.cssSelector("span#name"));
 		assertThat(element5, notNullValue());
-		System.err.println("Result element: " + element5.getAttribute("outerHTML"));
+		if (debug)
+			System.err
+					.println("Result element: " + element5.getAttribute("outerHTML"));
 		final String element4HTML = element5.getAttribute("innerHTML");
 		assertThat(element4HTML, containsString("wikipedia"));
 		// NOTE: the getText() is failing
@@ -188,7 +191,8 @@ public class ChromeDownloadsTest {
 		assertThat(element7, notNullValue());
 		assertThat(shadowDriver.isVisible(element7), is(true));
 		String html = element7.getAttribute("outerHTML");
-		System.err.println("Inspecting parent element: " + html);
+		if (debug)
+			System.err.println("Inspecting parent element: " + html);
 		try {
 			assertThat(shadowDriver.getAttribute(element7, "outerHTML"),
 					notNullValue());
