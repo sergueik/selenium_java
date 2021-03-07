@@ -365,7 +365,7 @@ public class ShadowDriver {
 		return element;
 	}
 
-	public WebElement getShadowElement(WebElement parent, String selector) {
+	public WebElement getShadowElement(WebElement parent, String cssSelector) {
 		if (implicitWait > 0) {
 			try {
 				Thread.sleep(implicitWait * 1000);
@@ -376,15 +376,15 @@ public class ShadowDriver {
 		WebElement element = null;
 		element = (WebElement) executerGetObject(
 				String.format("return getShadowElement(arguments[0],\"%s\");",
-						selector.replaceAll("\"", "\\\\\"")),
+						cssSelector.replaceAll("\"", "\\\\\"")),
 				parent);
-		fixLocator(driver, selector, element);
+		fixLocator(driver, cssSelector, element);
 		return element;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<WebElement> getAllShadowElement(WebElement parent,
-			String selector) {
+			String cssSelector) {
 		if (implicitWait > 0) {
 			try {
 				Thread.sleep(implicitWait * 1000);
@@ -395,13 +395,13 @@ public class ShadowDriver {
 		List<WebElement> elements = null;
 		Object object = executerGetObject(
 				String.format("return getAllShadowElement(arguments[0],\"%s\");",
-						selector.replaceAll("\"", "\\\\\"")),
+						cssSelector.replaceAll("\"", "\\\\\"")),
 				parent);
 		if (object != null && object instanceof List<?>) {
 			elements = (List<WebElement>) object;
 		}
 		for (WebElement element : elements) {
-			fixLocator(driver, selector, element);
+			fixLocator(driver, cssSelector, element);
 		}
 		return elements;
 	}
@@ -454,7 +454,7 @@ public class ShadowDriver {
 		return elements;
 	}
 
-	public WebElement getSiblingElement(WebElement element, String selector) {
+	public WebElement getSiblingElement(WebElement element, String cssSelector) {
 		if (implicitWait > 0) {
 			try {
 				Thread.sleep(implicitWait * 1000);
@@ -464,7 +464,7 @@ public class ShadowDriver {
 		}
 		return (WebElement) executerGetObject(
 				String.format("return getSiblingElement(arguments[0],\"%s\");",
-						selector.replaceAll("\"", "\\\\\"")),
+						cssSelector.replaceAll("\"", "\\\\\"")),
 				element);
 	}
 
@@ -527,3 +527,4 @@ public class ShadowDriver {
 	}
 
 }
+	

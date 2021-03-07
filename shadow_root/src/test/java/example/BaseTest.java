@@ -3,8 +3,6 @@ package example;
  * Copyright 2020,2021 Serguei Kouzmine
  */
 
-import static java.lang.System.err;
-
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -68,7 +66,7 @@ public class BaseTest {
 	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void injectShadowJS() {
-		err.println("Launching " + browser);
+		System.err.println("Launching " + (headless ? " headless " : "") + browser);
 		if (isCIBuild) {
 			if (browser.equals("chrome")) {
 				WebDriverManager.chromedriver().setup();
@@ -216,19 +214,18 @@ public class BaseTest {
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
 		String value = System.getProperty(name);
-		if (debug) {
-			err.println("system property " + name + " = " + value);
-		}
+		if (debug)
+			System.err.println("system property " + name + " = " + value);
+
 		if (value == null || value.length() == 0) {
 			value = System.getenv(name);
-			if (debug) {
-				err.println("system env " + name + " = " + value);
-			}
+			if (debug)
+				System.err.println("system env " + name + " = " + value);
+
 			if (value == null || value.length() == 0) {
 				value = defaultValue;
-				if (debug) {
-					err.println("default value  = " + value);
-				}
+				if (debug)
+					System.err.println("default value  = " + value);
 			}
 		}
 		return value;
@@ -245,7 +242,7 @@ public class BaseTest {
 	protected static String getPageContent(String pagename) {
 		try {
 			URI uri = BaseTest.class.getClassLoader().getResource(pagename).toURI();
-			err.println("Testing local file: " + uri.toString());
+			System.err.println("Testing local file: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
 			// supported in -source 1.6
