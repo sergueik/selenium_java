@@ -37,20 +37,23 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import example.ChromeDownloadsTest.BrowserChecker;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class BaseTest {
 
 	private static Map<String, String> env = System.getenv();
-	private static boolean isCIBuild = checkEnvironment();
+	protected static boolean isCIBuild = checkEnvironment();
 
 	protected static final boolean debug = Boolean
 			.parseBoolean(getPropertyEnv("DEBUG", "false"));
 
 	protected static WebDriver driver = null;
 	protected static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("BROWSER",
+	protected static String browser = getPropertyEnv("BROWSER",
 			getPropertyEnv("webdriver.driver", "chrome"));
+	protected static final BrowserChecker browserChecker = new BrowserChecker(
+			browser);
 
 	// shadow root Python example:
 	// https://stackoverflow.com/questions/28111539/can-we-zoom-the-browser-window-in-python-selenium-webdriver
@@ -60,7 +63,7 @@ public class BaseTest {
 		return browser;
 	}
 
-	private static final boolean headless = Boolean
+	protected static final boolean headless = Boolean
 			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
@@ -191,14 +194,19 @@ public class BaseTest {
 		shadowDriver.setDebug(debug);
 	}
 
+	// NOTE: cannot use Assume in @Begin or @After
 	@After
 	public void AfterMethod() {
-		driver.get("about:blank");
+		if ((browser.equals("chrome") && !isCIBuild)) {
+			driver.get("about:blank");
+		}
 	}
 
 	@AfterClass
 	public static void tearDownAll() {
-		driver.close();
+		if (driver != null) {
+			driver.close();
+		}
 	}
 
 	// Utilities
