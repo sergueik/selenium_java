@@ -1,6 +1,7 @@
 package example;
-
-import static java.lang.System.err;
+/**
+ * Copyright 2020,2021 Serguei Kouzmine
+ */
 
 import java.io.File;
 import java.net.URI;
@@ -36,20 +37,23 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import example.ChromeDownloadsTest.BrowserChecker;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class BaseTest {
 
 	private static Map<String, String> env = System.getenv();
-	private static boolean isCIBuild = checkEnvironment();
+	protected static boolean isCIBuild = checkEnvironment();
 
 	protected static final boolean debug = Boolean
 			.parseBoolean(getPropertyEnv("DEBUG", "false"));
 
 	protected static WebDriver driver = null;
 	protected static ShadowDriver shadowDriver = null;
-	private static String browser = getPropertyEnv("BROWSER",
+	protected static String browser = getPropertyEnv("BROWSER",
 			getPropertyEnv("webdriver.driver", "chrome"));
+	protected static final BrowserChecker browserChecker = new BrowserChecker(
+			browser);
 
 	// shadow root Python example:
 	// https://stackoverflow.com/questions/28111539/can-we-zoom-the-browser-window-in-python-selenium-webdriver
@@ -59,13 +63,13 @@ public class BaseTest {
 		return browser;
 	}
 
-	private static final boolean headless = Boolean
+	protected static final boolean headless = Boolean
 			.parseBoolean(getPropertyEnv("HEADLESS", "false"));
 
 	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void injectShadowJS() {
-		err.println("Launching " + browser);
+		System.err.println("Launching " + (headless ? " headless " : "") + browser);
 		if (isCIBuild) {
 			if (browser.equals("chrome")) {
 				WebDriverManager.chromedriver().setup();
@@ -190,14 +194,19 @@ public class BaseTest {
 		shadowDriver.setDebug(debug);
 	}
 
+	// NOTE: cannot use Assume in @Begin or @After
 	@After
 	public void AfterMethod() {
-		driver.get("about:blank");
+		if ((browser.equals("chrome") && !isCIBuild)) {
+			driver.get("about:blank");
+		}
 	}
 
 	@AfterClass
 	public static void tearDownAll() {
-		driver.close();
+		if (driver != null) {
+			driver.close();
+		}
 	}
 
 	// Utilities
@@ -213,19 +222,18 @@ public class BaseTest {
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
 		String value = System.getProperty(name);
-		if (debug) {
-			err.println("system property " + name + " = " + value);
-		}
+		if (debug)
+			System.err.println("system property " + name + " = " + value);
+
 		if (value == null || value.length() == 0) {
 			value = System.getenv(name);
-			if (debug) {
-				err.println("system env " + name + " = " + value);
-			}
+			if (debug)
+				System.err.println("system env " + name + " = " + value);
+
 			if (value == null || value.length() == 0) {
 				value = defaultValue;
-				if (debug) {
-					err.println("default value  = " + value);
-				}
+				if (debug)
+					System.err.println("default value  = " + value);
 			}
 		}
 		return value;
@@ -242,7 +250,7 @@ public class BaseTest {
 	protected static String getPageContent(String pagename) {
 		try {
 			URI uri = BaseTest.class.getClassLoader().getResource(pagename).toURI();
-			err.println("Testing local file: " + uri.toString());
+			System.err.println("Testing local file: " + uri.toString());
 			return uri.toString();
 		} catch (URISyntaxException e) { // NOTE: multi-catch statement is not
 			// supported in -source 1.6

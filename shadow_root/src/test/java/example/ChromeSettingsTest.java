@@ -1,10 +1,13 @@
 package example;
 
-import static java.lang.System.err;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assume;
@@ -15,6 +18,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.ElementClickInterceptedException;
 import org.openqa.selenium.ElementNotVisibleException;
 
+// Explore Chrome Setting screen
 // this test methods will get skipped when run on Firefox
 public class ChromeSettingsTest extends BaseTest {
 
@@ -22,13 +26,8 @@ public class ChromeSettingsTest extends BaseTest {
 	private static String urlLocator = null;
 	private static String shadowLocator = null;
 	private static String shadow2Locator = null;
-
-	private static final BrowserChecker browserChecker = new BrowserChecker(getBrowser());
-
-	@Before
-	public void init() {
-		driver.navigate().to("about:blank");
-	}
+	private static List<WebElement> elements = new ArrayList<>();
+	private static WebElement element = null;
 
 	@Test
 	public void test1() {
@@ -36,15 +35,20 @@ public class ChromeSettingsTest extends BaseTest {
 		urlLocator = "#basicPage > settings-section[page-title=\"Search engine\"]";
 		shadowLocator = "#card";
 		driver.navigate().to(baseUrl);
-		List<WebElement> elements = shadowDriver.findElements(urlLocator);
+		elements = shadowDriver.findElements(urlLocator);
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(String.format("Located %d %s elements:", elements.size(), urlLocator));
+		System.err.println(
+				String.format("Located %d %s elements:", elements.size(), urlLocator));
 		// NOTE: default toString() is not be particularly useful
-		elements.stream().forEach(err::println);
-		elements.stream().map(o -> o.getTagName()).forEach(err::println);
-		elements.stream().map(o -> String.format("innerHTML: %s", o.getAttribute("innerHTML"))).forEach(err::println);
-		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
+		elements.stream().forEach(System.err::println);
+		elements.stream().map(o -> o.getTagName()).forEach(System.err::println);
+		elements.stream()
+				.map(o -> String.format("innerHTML: %s", o.getAttribute("innerHTML")))
+				.forEach(System.err::println);
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(System.err::println);
 	}
 
 	@Test
@@ -53,13 +57,16 @@ public class ChromeSettingsTest extends BaseTest {
 		urlLocator = "#basicPage > settings-section[page-title=\"Search engine\"]";
 		shadowLocator = "#card";
 		driver.navigate().to(baseUrl);
-		WebElement element = shadowDriver.findElement(urlLocator);
-		err.println(String.format("outerHTML: %s", element.getAttribute("outerHTML")));
-		List<WebElement> elements = shadowDriver.findElements(element, shadowLocator);
+		element = shadowDriver.findElement(urlLocator);
+		System.err.println(
+				String.format("outerHTML: %s", element.getAttribute("outerHTML")));
+		elements = shadowDriver.findElements(element, shadowLocator);
 		assertThat(elements, notNullValue());
 		assertThat(elements.size(), greaterThan(0));
-		err.println(String.format("Found %d elements: ", elements.size()));
-		elements.stream().map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML"))).forEach(err::println);
+		System.err.println(String.format("Found %d elements: ", elements.size()));
+		elements.stream()
+				.map(o -> String.format("outerHTML: %s", o.getAttribute("outerHTML")))
+				.forEach(System.err::println);
 	}
 
 	@Test
@@ -69,8 +76,9 @@ public class ChromeSettingsTest extends BaseTest {
 		shadowLocator = "settings-default-browser-page";
 		shadow2Locator = "div#canBeDefaultBrowser";
 		driver.navigate().to(baseUrl);
-		WebElement element = shadowDriver.findElement(urlLocator);
-		err.println(String.format("outerHTML: %s", element.getAttribute("outerHTML")));
+		element = shadowDriver.findElement(urlLocator);
+		System.err.println(
+				String.format("outerHTML: %s", element.getAttribute("outerHTML")));
 		try {
 			/*
 			 * 

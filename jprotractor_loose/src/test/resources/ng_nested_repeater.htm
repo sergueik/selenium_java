@@ -1,15 +1,20 @@
 <!DOCTYPE html>
-<html ng-app="app">  
+<html ng-app="app">
 <head>
 
-<!-- based on: http://jsfiddle.net/mmacin/r96uqgxn/ -->
+<!-- based on: http://jsfiddle.net/mmacin/r96uqgxn/
+see also:
+https://stackoverflow.com/questions/43280709/how-to-parse-out-nested-repeater-in-angular
+https://plnkr.co/edit/Wr83nz47aUJpSQgSaHL3?p=preview&preview
+https://www.c-sharpcorner.com/article/nested-component/
+-->
 <style>
  body {font: 11px arial, sans-serif; }
 ul {
   font-size: 20px;
   margin-left: 20px;
   font-weight: bold;
-  
+
 }
 
 ul ul {
@@ -21,14 +26,14 @@ ul ul ul {
   font-weight: normal;
 }
 </style>
-<script type="text/javascript" ng:autobind src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js"></script> 
+<script type="text/javascript" ng:autobind src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.3/angular.js"></script>
 <!--
 <script type="text/javascript" ng:autobind src="http://code.angularjs.org/0.9.18/angular-0.9.18.js"></script>
 -->
 <script type="text/javascript">
 angular.module('app', []).controller('ctrl', function($scope) {
   $scope.data = [{
-    name: '1',
+	    name: '1',
     children: [{
       name: '11',
       children: [{ name: '111'}, { name: '112'}]
@@ -41,12 +46,11 @@ angular.module('app', []).controller('ctrl', function($scope) {
     children: [{
       name: '21',
       children: [{ name: '211' }, { name: '212' }]
-    }, 
-    { name: '22' } 
+    },
+    { name: '22' }
     ]
   }];
 })
-</script>
 </script>
 </head>
 <body>
