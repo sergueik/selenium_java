@@ -195,6 +195,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 
+	// @Ignore
 	@Test
 	public void test3() {
 		getPageContent("ng_nested_repeater2.htm");
@@ -203,6 +204,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 			if (element.getText().isEmpty()) {
 				break;
 			}
+			System.err.println("Text of the element: " + element.getText());
 			System.err.println("Scan child elements of " + element.getTagName());
 			String binding = "row.name";
 			ngElement = new NgWebElement(ngDriver, element);
@@ -213,7 +215,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 			elements = element.findElements(By.xpath(".//*[text()!='' ]"));
 			boolean found = false;
 			for (WebElement element2 : elements) {
-				System.err.println("Descendant element text: " + element.getText());
+				System.err.println("Descendant element text:\n" + element.getText());
 				// NOTE: it will never contain *the* binding
 				if (element.getText().contains(binding))
 					found = true;
@@ -245,11 +247,19 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 						.findElements(By.xpath("./child::node()[text()!='' ]"));
 				if (elements.size() != 0) {
 					System.err.println("Get data via bining search");
-					WebElement element2 = ngElement.findElement(NgBy.binding(binding));
-					assertThat(element2, notNullValue());
-					// highlight(element2);
-					System.err
-							.println(String.format("column name is: %s", element2.getText()));
+					NgWebElement ngElement2 = ngElement
+							.findElement(NgBy.binding(binding));
+					assertThat(ngElement2, notNullValue());
+					WebElement element2 = ngElement2.getWrappedElement();
+					// NPE in the next line if not checked
+					if (element2 != null) {
+						try {
+							System.err.println(
+									String.format("column name is: %s", element2.getText()));
+							highlight(element2);
+						} catch (NullPointerException e) {
+						}
+					}
 				} else {
 					System.err.println("Get data via eval");
 					data = ngElement.evaluate(binding);

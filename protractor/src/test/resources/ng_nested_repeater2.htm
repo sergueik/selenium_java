@@ -15,20 +15,20 @@ https://www.c-sharpcorner.com/article/nested-component/
 angular.module('app', []).controller('ctrl', function($scope) {
   $scope.maxCols = 4;
   $scope.data = [
-    { "name": "First Row",
+    { "name": "Page 1",
       "columns": [
-         {"name": "col 1" }, {"name": "col 2" }, { "name": "col 3" }, { "name": "col 4" }
+         {"name": "Chrome" }, {"name": "10M" }, { "name": "Firefox" }, { "name": "4M" }
       ]
     },
-    { "name": "Second Row",
+    { "name": "Page 2",
       "columns": [
-         { "name": "col 5" }, { "name": "col 6" }, { "name": "col 7" }, { "name": "col 8" }
+         { "name": "Chrome" }, { "name": "6M" }, { "name": "Firefox" }, { "name": "4M" }
       ]
     },
     {
-      "name": "Third Row",
+      "name": "Page 3",
       "columns": [
-         { "name": "col 9" }, { "name": "col 10" }, { "name": "col 1l" }, { "name": "col 12" }
+         { "name": "Firefor" }, { "name": "10M" }, { "name": "Chrome" }, { "name": "12M" }
       ]
     }
   ];
@@ -41,12 +41,12 @@ angular.module('app', []).controller('ctrl', function($scope) {
         <p>&nbsp;</p>
         <table class="table table-striped table-hover table-condensed" ng-repeat="row in data">
           <tr>
-            <th colspan={{maxCols}}><h2>{{$index+1}} {{row.name}}</h2></th>
+            <th colspan={{maxCols}}><h2>{{row.name}} {{$index+1}}</h2></th>
           </tr>
           <tr>
             <!-- without the intermediate DOM element will only be able to eval -->
             <!-- TODO: discover -->
-            <td ng-repeat="column in row.columns">{{column.name}}<span>&nbsp;</span></td>
+            <td ng-repeat="column in row.columns"><div>{{column.name}}<span>&nbsp;</span></div></td>
           </tr>
         </table>
     </div>
