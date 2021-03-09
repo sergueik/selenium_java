@@ -35,17 +35,12 @@ angular.module('app', []).controller('ctrl', function($scope) {
 })
     </script>
   </head>
-  <body>
-  <!-- The "<div>" enclosing the inner binding makes outer repeater Text multi-line:
-Text of the element: 
-Page 1 1
-Chrome
-10M
-Firefox
-4M
---> 
-  <!-- TODO: show side by side --> 
+  <!-- The "<span>" or no element in the inner binding make outer repeater Text single-line:
+Page 3 3
+Firefor  10M  Chrome  12M
 
+--> 
+  <body>
     <div class='container-fluid' ng-controller="ctrl">
         <h1>Nested Ng Repeats</h1>
         <p>&nbsp;</p>
@@ -56,11 +51,12 @@ Firefox
           <tr>
             <!-- without the intermediate DOM element will only be able to eval -->
             <!-- TODO: discover -->
-            <td ng-repeat="column in row.columns"><div>{{column.name}}<span>&nbsp;</span></div></td>
+            <td ng-repeat="column in row.columns"><span>{{column.name}}<span>&nbsp;</span></span></td>
           </tr>
         </table>
     </div>
   </body>
 </html>
+
 
 
