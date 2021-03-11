@@ -104,6 +104,72 @@ public class ChromeHistoryTest extends BaseTest {
 		System.err.println("Element(6) text: " + element2.getText());
 	}
 
+	// the locating the shadow elements relies on querySelector, and does not
+	// support evaluate
+	// https://developer.mozilla.org/en-US/docs/Web/API/Document/evaluate
+	// https://developer.mozilla.org/en-US/docs/Web/XPath/Introduction_to_using_XPath_in_JavaScript
+	// but once into the hadow DOM, further down one can use xpath
+	@Test
+	public void test3() {
+		Assume.assumeTrue(browser.equals("chrome"));
+		Assume.assumeFalse(isCIBuild);
+		Assume.assumeFalse(headless);
+
+		driver.navigate().to(url);
+		element = driver.findElement(By.cssSelector("#history-app"));
+		elements = shadowDriver.getAllShadowElement(element,
+				"#main-container #content");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element = elements.get(0);
+		if (debug)
+			System.err
+					.println("Element(1) HTML: " + element.getAttribute("innerHTML"));
+		// NOTE: need relative XPath
+		element2 = element.findElement(By.xpath(".//*[@id='history']"));
+
+		elements = shadowDriver.getAllShadowElement(element2,
+				".history-cards history-item");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element2 = elements.get(0);
+		assertThat(element2, notNullValue());
+		if (debug)
+			System.err
+					.println("Element(2) HTML: " + element2.getAttribute("outerHTML"));
+		elements = shadowDriver.getAllShadowElement(element2, "#main-container");
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element = elements.get(0);
+		if (debug)
+			System.err
+					.println("Element(3) HTML: " + element.getAttribute("outerHTML"));
+		// NOTE: need relative XPath
+		elements = element.findElements(By.xpath(".//*[@id='date-accessed']"));
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element2 = elements.get(0);
+		assertThat(element2, notNullValue());
+		assertThat(element2.getText(), containsString("Today"));
+		System.err.println("Element(4) text: " + element2.getText());
+		// NOTE: need relative XPath
+		elements = element.findElements(By.xpath(".//*[@id='title-and-domain']"));
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element2 = elements.get(0);
+		assertThat(element2, notNullValue());
+		if (debug)
+			System.err
+					.println("Element(5) HTML: " + element2.getAttribute("outerHTML"));
+		// NOTE: need relative XPath
+		elements = element2.findElements(By.xpath(".//*[@id='domain']"));
+		assertThat(elements, notNullValue());
+		assertThat(elements.size(), greaterThan(0));
+		element2 = elements.get(0);
+		assertThat(element2.getText(), containsString(site));
+		System.err.println("Element(6) text: " + element2.getText());
+	}
+
 	// @Ignore
 	// browses through Shadow roots, but a wrong pick
 	@Test

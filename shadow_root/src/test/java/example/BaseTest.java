@@ -37,7 +37,6 @@ import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
-import example.ChromeDownloadsTest.BrowserChecker;
 import io.github.bonigarcia.wdm.WebDriverManager;
 
 public class BaseTest {
