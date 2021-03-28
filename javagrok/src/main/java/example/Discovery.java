@@ -151,7 +151,7 @@ public class Discovery {
 		}
 		// }
 
-		return texte;
+		return texte;	
 	}
 
 	/**
