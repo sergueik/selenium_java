@@ -1,5 +1,6 @@
 package example;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 
@@ -50,6 +51,11 @@ public class PatternLoadTest {
 		capture.keySet().stream().forEach(System.err::println);
 		assertThat(new HashSet<Object>(capture.keySet()),
 				containsInAnyOrder(keywordArray));
+		assertThat(new HashSet<Object>(capture.keySet()), hasItems(keywordArray));
+		assertTrue(new HashSet<Object>(capture.keySet())
+				.containsAll(new HashSet<Object>(Arrays.asList(keywordArray))));
+		assertTrue(new HashSet<Object>(Arrays.asList(keywordArray))
+				.containsAll(new HashSet<Object>(capture.keySet())));
 
 	}
 }
