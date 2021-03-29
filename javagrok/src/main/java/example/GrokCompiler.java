@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.ZoneId;
@@ -61,6 +62,16 @@ public class GrokCompiler {
 
 	public void registerPatternFromClasspath(String path) throws GrokException {
 		registerPatternFromClasspath(path, StandardCharsets.UTF_8);
+	}
+
+	//
+	public void registerPatternFromString(String payload) {
+		Reader reader = new StringReader(payload);
+		try {
+			register(reader);
+		} catch (IOException e) {
+			throw new GrokException(e.getMessage(), e);
+		}
 	}
 
 	public void registerPatternFromClasspath(String path, Charset charset)
@@ -174,3 +185,4 @@ public class GrokCompiler {
 				patternDefinitions, defaultTimeZone);
 	}
 }
+
