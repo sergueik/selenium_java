@@ -33,7 +33,7 @@
     <!-- TODO:  semantic versioning problem 
     [2.53.0,) seem to make maven attempt to install 3.0.1
      -->
-    <jetty-server.version>9.4.12.v20180830</jetty-server.version>
+    <jetty-server.version>9.4.35.v20201120</jetty-server.version>
     <testng.version>6.9.10</testng.version>
   </properties>
   <dependencies>
