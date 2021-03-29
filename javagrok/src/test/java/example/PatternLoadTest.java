@@ -21,6 +21,7 @@ import org.apache.commons.collections4.CollectionUtils;
 
 public class PatternLoadTest {
 
+	private static final boolean debug = false;
 	private static Object[] keywordArray = new Object[] { "COMBINEDAPACHELOG",
 			"COMMONAPACHELOG", "clientip", "IP", "IPV6", "IPV4", "HOSTNAME", "ident",
 			"EMAILADDRESS", "EMAILLOCALPART", "USER", "USERNAME", "auth", "timestamp",
@@ -42,13 +43,10 @@ public class PatternLoadTest {
 
 		Match gm = grok.match(log);
 
-		/* Get the map with matches */
 		final Map<String, Object> capture = gm.capture();
-		// Expected size:<22> but was:<32> in:
-		// modify test without debugging why the latest grok patterns lead to a
-		// different field count
 		Assertions.assertThat(capture).hasSize(32);
-		capture.keySet().stream().forEach(System.err::println);
+		if (debug)
+			capture.keySet().stream().map(o->String.format("%s\t",o)).forEach(System.err::println);
 		assertThat(new HashSet<Object>(capture.keySet()),
 				containsInAnyOrder(keywordArray));
 		assertThat(new HashSet<Object>(capture.keySet()), hasItems(keywordArray));
