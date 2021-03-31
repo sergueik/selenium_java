@@ -1,0 +1,29 @@
+package example;
+
+import java.lang.reflect.Method;
+
+public class GetterSetterPair {
+
+	private Method getter;
+	private Method setter;
+
+	public Method getGetter() {
+		return getter;
+	}
+
+	public Method getSetter() {
+		return setter;
+	}
+
+	public boolean hasGetterAndSetter() {
+		return getter != null && setter != null;
+	}
+
+	public void setGetter(Method data) {
+		getter = data;
+	}
+
+	public void setSetter(Method data) {
+		setter = data;
+	}
+}
