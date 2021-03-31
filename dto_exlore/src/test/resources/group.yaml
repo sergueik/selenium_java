@@ -1,0 +1,17 @@
+---
+  - artist:
+    id: 001
+    name: john
+    plays: guitar
+  - artist:
+    id: 002
+    name: ringo
+    plays: drums
+  - artist:
+    id: 003
+    name: paul
+    plays: vocals
+  - artist:
+    id: 004
+    name: george
+    plays: guitar
