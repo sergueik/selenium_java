@@ -48,7 +48,11 @@ System.err.println("JSON serialization or artist:\n" + rowJson.toString());
 ```
 it will print:
 ```json
-{"id":3,"staticInfo":"4e61c229-1555-4135-b938-4ddf4d40aa82","name":"paul"}
+{
+  "id": 1,
+  "staticInfo": "4e61c229-1555-4135-b938-4ddf4d40aa82",
+  "name": "paul"
+}
 ```
 while if
 ```java
@@ -62,7 +66,6 @@ was called then
   "name": "paul",
   "plays": "vocals"
 }
-
 ```
 will be printed
 (the `id` and `guid` fields are chosen to be shown regardless of the state of  `reportFields`

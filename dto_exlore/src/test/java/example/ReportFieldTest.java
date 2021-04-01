@@ -20,11 +20,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
 public class ReportFieldTest {
+
 	private static ArtistSerializer serializer = new ArtistSerializer();
-	private final static boolean directConvertrsion = true;
-	private static Gson gson = directConvertrsion ? new Gson()
-			: new GsonBuilder()
-					.registerTypeAdapter(Artist.class, new ArtistSerializer()).create();
 
 	private final static String fileName = "group.yaml";;
 	private ArrayList<LinkedHashMap<Object, Object>> members;
@@ -43,26 +40,21 @@ public class ReportFieldTest {
 	@Test
 	public void test1() throws Exception {
 		System.err.println("all fields: ");
-		for (LinkedHashMap<Object, Object> row : members) {
-			Artist artist = new Artist((int) row.get("id"), (String) row.get("name"),
-					(String) row.get("plays"));
+		// mockup test result constructor
+		Artist artist = new Artist(1, "paul", "vocals", "field1 data",
+				"field2 data");
 
-			JsonElement rowJson = serializer.serialize(artist, null, null);
-			group.add(rowJson);
-			System.err
-					.println("JSON serialization or artist:\n" + rowJson.toString());
-		}
-		System.err
-				.println("JSON serialization or one group:\n" + gson.toJson(group));
+		JsonElement rowJson = serializer.serialize(artist, null, null);
+		group.add(rowJson);
+		System.err.println("JSON serialization or artist:\n" + rowJson.toString());
 	}
 
 	// no fields, well, some
 	@Test
 	public void test2() throws Exception {
-		System.err.println("only \"required\" fields: ");
+		System.err.println("only \"required\" fields.");
 		serializer.setReportFields("non-existing field");
 		for (LinkedHashMap<Object, Object> row : members) {
-			// mockup test result constructor
 			Artist artist = new Artist((int) row.get("id"), (String) row.get("name"),
 					(String) row.get("plays"));
 
@@ -71,8 +63,10 @@ public class ReportFieldTest {
 			System.err
 					.println("JSON serialization or artist:\n" + rowJson.toString());
 		}
-		System.err
-				.println("JSON serialization or one group:\n" + gson.toJson(group));
+		// optionally use custom serilizer class with no fitering enforced this time
+		System.err.println("JSON serialization or one group:\n" + (new GsonBuilder()
+				.registerTypeAdapter(Artist.class, new ArtistSerializer()).create())
+						.toJson(group));
 	}
 
 	// filtered fields
@@ -90,13 +84,15 @@ public class ReportFieldTest {
 			System.err
 					.println("JSON serialization or artist:\n" + rowJson.toString());
 		}
-		System.err
-				.println("JSON serialization or one group:\n" + gson.toJson(group));
+		System.err.println(
+				"JSON serialization or one group:\n" + new Gson().toJson(group));
 	}
 
 	// same, but also save JSON to the file
 	@Test
 	public void test4() throws Exception {
+
+		final Gson gson = new Gson();
 
 		try {
 			FileOutputStream fos = new FileOutputStream("report.json");
@@ -111,9 +107,9 @@ public class ReportFieldTest {
 				System.err
 						.println("JSON serialization or artist:\n" + rowJson.toString());
 			}
-			System.err
-					.println("JSON serialization or one group:\n" + gson.toJson(group));
-			writer.write(gson.toJson(group));
+			final String payload = gson.toJson(group);
+			System.err.println("JSON serialization or one group:\n" + payload);
+			writer.write(payload);
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {

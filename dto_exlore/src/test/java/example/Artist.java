@@ -8,13 +8,15 @@ public class Artist {
 	private String plays;
 	private static String staticInfo;
 	private int id;
+	private String field1;
+	private String field2;
 
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String data) {
-		this.name = data;
+		name = data;
 	}
 
 	public String getPlays() {
@@ -22,7 +24,7 @@ public class Artist {
 	}
 
 	public void setPlays(String data) {
-		this.plays = data;
+		plays = data;
 	}
 
 	public int getId() {
@@ -30,7 +32,7 @@ public class Artist {
 	}
 
 	public void setId(int data) {
-		this.id = data;
+		id = data;
 	}
 
 	public Artist() {
@@ -49,6 +51,35 @@ public class Artist {
 		this.name = name;
 		this.id = id;
 		this.plays = plays;
+	}
+
+	public Artist(int id, String name, String plays, String field1,
+			String field2) {
+		super();
+		if (Artist.staticInfo == null) {
+			Artist.staticInfo = UUID.randomUUID().toString();
+		}
+		this.name = name;
+		this.id = id;
+		this.plays = plays;
+		this.field1 = field1;
+		this.field2 = field2;
+	}
+
+	public String getField1() {
+		return field1;
+	}
+
+	public void setField1(String data) {
+		field1 = data;
+	}
+
+	public String getField2() {
+		return field2;
+	}
+
+	public void setField2(String data) {
+		field2 = data;
 	}
 
 }

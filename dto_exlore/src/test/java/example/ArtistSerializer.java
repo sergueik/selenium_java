@@ -21,14 +21,12 @@ public class ArtistSerializer implements JsonSerializer<Artist> {
 		reportFields.clear();
 	}
 
-	// will collide ?
 	public void setReportFields(String... fields) {
 		for (int cnt = 0; cnt != fields.length; cnt++) {
 			reportFields.add(fields[cnt]);
 		}
 	}
 
-	@SuppressWarnings("unused")
 	@Override
 	public JsonElement serialize(final Artist data, final Type type,
 			final JsonSerializationContext context) {
@@ -38,7 +36,6 @@ public class ArtistSerializer implements JsonSerializer<Artist> {
 			result.add("id", new JsonPrimitive(id));
 		}
 		// added static info from the serialized class
-		// NPE
 		if (type != null) {
 			result.add("staticInfo",
 					new JsonPrimitive(((Artist) type).getStaticInfo()));
@@ -65,6 +62,19 @@ public class ArtistSerializer implements JsonSerializer<Artist> {
 			String plays = data.getPlays();
 			if (plays != null && !plays.isEmpty()) {
 				result.add("plays", new JsonPrimitive(plays));
+			}
+		}
+
+		if (reportFields.size() == 0 || reportFields.contains("field1")) {
+			String field1 = data.getField1();
+			if (field1 != null && !field1.isEmpty()) {
+				result.add("field1", new JsonPrimitive(field1));
+			}
+		}
+		if (reportFields.size() == 0 || reportFields.contains("field2")) {
+			String field2 = data.getField2();
+			if (field2 != null && !field2.isEmpty()) {
+				result.add("field2", new JsonPrimitive(field2));
 			}
 		}
 		/*
