@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -19,6 +21,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.junit.Assert.assertTrue;
+import static org.hamcrest.CoreMatchers.is;
+
 public class ReportFieldTest {
 
 	private static ArtistSerializer serializer = new ArtistSerializer();
@@ -26,6 +33,7 @@ public class ReportFieldTest {
 	private final static String fileName = "group.yaml";;
 	private ArrayList<LinkedHashMap<Object, Object>> members;
 	private static final String encoding = "UTF-8";
+
 	private List<JsonElement> group = new ArrayList<>();
 
 	@Before
@@ -46,6 +54,7 @@ public class ReportFieldTest {
 
 		JsonElement rowJson = serializer.serialize(artist, null, null);
 		group.add(rowJson);
+
 		System.err.println("JSON serialization or artist:\n" + rowJson.toString());
 	}
 
@@ -89,11 +98,16 @@ public class ReportFieldTest {
 	}
 
 	// same, but also save JSON to the file
+
+	private static Object[] fieldArray = new Object[] { "name", "id",
+			"staticInfo" };
+
+	@SuppressWarnings("unchecked")
 	@Test
 	public void test4() throws Exception {
-
+		String payload = null;
 		final Gson gson = new Gson();
-
+		serializer.setReportFields("name");
 		try {
 			FileOutputStream fos = new FileOutputStream("report.json");
 			OutputStreamWriter writer = new OutputStreamWriter(fos, encoding);
@@ -104,10 +118,24 @@ public class ReportFieldTest {
 
 				JsonElement rowJson = serializer.serialize(artist, null, null);
 				group.add(rowJson);
+				payload = rowJson.toString();
+				Map<String, Object> payloadObj = (Map<String, Object>) gson
+						.fromJson(payload, java.util.Map.class);
+				assertThat(payloadObj, notNullValue());
+				assertThat(payloadObj.keySet().containsAll(
+						new HashSet<Object>(Arrays.asList(fieldArray))), is(true));
+				assertThat(payloadObj.keySet().contains("plays"), is(false));
+
+				assertTrue(new HashSet<Object>(Arrays.asList(fieldArray))
+						.containsAll(new HashSet<Object>(payloadObj.keySet())));
 				System.err
 						.println("JSON serialization or artist:\n" + rowJson.toString());
+
+				payloadObj.keySet().stream().map(o -> String.format("%s\t", o))
+						.forEach(System.err::println);
+
 			}
-			final String payload = gson.toJson(group);
+			payload = gson.toJson(group);
 			System.err.println("JSON serialization or one group:\n" + payload);
 			writer.write(payload);
 			writer.flush();
