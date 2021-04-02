@@ -29,12 +29,12 @@ import static org.hamcrest.CoreMatchers.is;
 public class ReportFieldTest {
 
 	private static ArtistSerializer serializer = new ArtistSerializer();
-
-	private final static String fileName = "group.yaml";;
-	private ArrayList<LinkedHashMap<Object, Object>> members;
+	private final static String fileName = "group.yaml";
 	private static final String encoding = "UTF-8";
-
+	private static Artist artist = null;
+	private static JsonElement rowJson = null;
 	private List<JsonElement> group = new ArrayList<>();
+	private ArrayList<LinkedHashMap<Object, Object>> members;
 
 	@Before
 	public void setup() {
@@ -49,10 +49,9 @@ public class ReportFieldTest {
 	public void test1() throws Exception {
 		System.err.println("all fields: ");
 		// mockup test result constructor
-		Artist artist = new Artist(1, "paul", "vocals", "field1 data",
-				"field2 data");
+		artist = new Artist(1, "paul", "vocals", "field1 data", "field2 data");
 
-		JsonElement rowJson = serializer.serialize(artist, null, null);
+		rowJson = serializer.serialize(artist, null, null);
 		group.add(rowJson);
 
 		System.err.println("JSON serialization or artist:\n" + rowJson.toString());
@@ -64,10 +63,10 @@ public class ReportFieldTest {
 		System.err.println("only \"required\" fields.");
 		serializer.setReportFields("non-existing field");
 		for (LinkedHashMap<Object, Object> row : members) {
-			Artist artist = new Artist((int) row.get("id"), (String) row.get("name"),
+			artist = new Artist((int) row.get("id"), (String) row.get("name"),
 					(String) row.get("plays"));
 
-			JsonElement rowJson = serializer.serialize(artist, null, null);
+			rowJson = serializer.serialize(artist, null, null);
 			group.add(rowJson);
 			System.err
 					.println("JSON serialization or artist:\n" + rowJson.toString());
@@ -85,10 +84,10 @@ public class ReportFieldTest {
 		serializer.setReportFields("name");
 		for (LinkedHashMap<Object, Object> row : members) {
 			// mockup test result constructor
-			Artist artist = new Artist((int) row.get("id"), (String) row.get("name"),
+			artist = new Artist((int) row.get("id"), (String) row.get("name"),
 					(String) row.get("plays"));
 
-			JsonElement rowJson = serializer.serialize(artist, null, null);
+			rowJson = serializer.serialize(artist, null, null);
 			group.add(rowJson);
 			System.err
 					.println("JSON serialization or artist:\n" + rowJson.toString());
@@ -113,10 +112,10 @@ public class ReportFieldTest {
 			OutputStreamWriter writer = new OutputStreamWriter(fos, encoding);
 			for (LinkedHashMap<Object, Object> row : members) {
 				// mockup test result constructor
-				Artist artist = new Artist((int) row.get("id"),
-						(String) row.get("name"), (String) row.get("plays"));
+				artist = new Artist((int) row.get("id"), (String) row.get("name"),
+						(String) row.get("plays"));
 
-				JsonElement rowJson = serializer.serialize(artist, null, null);
+				rowJson = serializer.serialize(artist, null, null);
 				group.add(rowJson);
 				payload = rowJson.toString();
 				Map<String, Object> payloadObj = (Map<String, Object>) gson
