@@ -1,4 +1,4 @@
 module logic{
-	exports com.mhrimaz.logic;
+	exports example.logic;
 	
 }
