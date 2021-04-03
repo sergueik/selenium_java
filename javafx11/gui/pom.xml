@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
+  <artifactId>gui</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
   <parent>
     <groupId>com.mhrimaz</groupId>
     <artifactId>javafx11-demo</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>0.2.0-SNAPSHOT</version>
   </parent>
-  <artifactId>gui</artifactId>
-  <version>1.0-SNAPSHOT</version>
+  <properties>
+
+    <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <log4j.version>1.2.17</log4j.version>
+  </properties>
   <dependencies>
     <dependency>
       <groupId>com.mhrimaz</groupId>
@@ -18,6 +24,11 @@
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>11-ea+19</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>${log4j.version}</version>
     </dependency>
   </dependencies>
 </project>

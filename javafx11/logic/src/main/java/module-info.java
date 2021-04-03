@@ -1,4 +1,3 @@
 module logic{
-	exports example.logic;
-	
+	exports example.logic;	
 }
