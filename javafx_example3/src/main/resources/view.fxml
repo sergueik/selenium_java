@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="540.0" prefWidth="960.0" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="example.controler.Controller">
+   <children>
+      <TreeTableView layoutX="64.0" layoutY="28.0" prefHeight="488.0" prefWidth="593.0">
+        <columns>
+          <TreeTableColumn fx:id="columnTasks" minWidth="0.0" prefWidth="592.0" text="Date" />
+        </columns>
+      </TreeTableView>
+      <Button fx:id="previouslyButton" layoutX="23.0" layoutY="28.0" mnemonicParsing="false" text="&lt;&lt;&lt;" />
+      <Button fx:id="nextlyButton" layoutX="657.0" layoutY="28.0" mnemonicParsing="false" text="&gt;&gt;&gt;" />
+      <Label fx:id="todayLabel" alignment="CENTER" contentDisplay="CENTER" layoutX="181.0" layoutY="6.0" prefHeight="17.0" prefWidth="360.0" text="TODAY" />
+      <VBox layoutX="698.0" layoutY="26.0" prefHeight="499.0" prefWidth="251.0">
+         <children>
+            <Label fx:id="CurrentDateLabel" alignment="CENTER" prefHeight="40.0" prefWidth="261.0" text="Current Date" />
+            <Label fx:id="selectedDay" alignment="CENTER" prefHeight="40.0" prefWidth="261.0" text="Selected Day" />
+            <Label alignment="CENTER" prefHeight="40.0" prefWidth="261.0" text="Select type task below" />
+            <ChoiceBox fx:id="typeTasksCoiceBox" prefHeight="37.0" prefWidth="248.0" />
+            <Label alignment="CENTER" prefHeight="40.0" prefWidth="261.0" text="Choose hour of task below" />
+            <ChoiceBox fx:id="choooseHourChoiceBox" prefHeight="37.0" prefWidth="248.0" />
+            <Label alignment="CENTER" prefHeight="40.0" prefWidth="261.0" text="Enter bonus task description" />
+            <TextArea fx:id="descriptionTaskTextArea" prefHeight="116.0" prefWidth="242.0" />
+            <Button fx:id="addButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="236.0" text="Add" />
+            <Button fx:id="modifyButton" mnemonicParsing="false" prefHeight="29.0" prefWidth="236.0" text="Modify" />
+            <Button fx:id="deletebutton" mnemonicParsing="false" prefHeight="29.0" prefWidth="236.0" text="Delete" />
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
