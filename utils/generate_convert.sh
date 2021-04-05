@@ -74,7 +74,7 @@
 
 # custom sizes:
 # '1280x800' => '852x532'
-OPTS=`getopt -o vnhibks:e: --long verbose,dry-run,help,inspect,batterycheck,keep,size,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o dvnhibks:e: --long debug,verbose,dry-run,help,inspect,batterycheck,keep,size:,extension: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 # TODO: dirscan
 # find . -iname '*mp4' | sed 's|\([^.]\)/.*$|\1|g'|sort -u
@@ -88,6 +88,7 @@ EXTENSION='mp4'
 
 while true; do
   case "$1" in
+    -d | --debug ) DEBUG=true; shift ;;
     -v | --verbose ) VERBOSE=true; shift ;;
     -i | --inspect ) INSPECT=true; shift ;;
     -h | --help )    HELP=true; shift ;;
