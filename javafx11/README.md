@@ -4,7 +4,7 @@
 Replica of [JavaFX on JDK 11 with Maven](https://github.com/mhrimaz/javafx11-demo) project
 
 ### Usage
-
+* Download JavaFX SDK 11 (https://gluonhq.com/download/javafx-11-0-2-sdk-linux/)
 * download [zulu JDK 11](https://www.azul.com/downloads/zulu-community/?package=jdk)
 * modify `JAVA_HOME` and `PATH` to load JDK 11 first.
 ```cmd
