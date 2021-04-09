@@ -3,6 +3,12 @@
 ```
 mvn clean test
 ```
+
+it will produce binary file `target/jacoco.exec` and a regular plain HTML report rendered by __jacoco__ itself (there is a number of alternative processors)
+
+![Example](https://github.com/sergueik/selenium_java/blob/master/jacoco_examples/java/screenshots/capture.png)
+
+
 Note, it will be using an `javaagent`
 ```sh
 [INFO] argLine set to -javaagent:C:\\Users\\Serguei\\.m2\\repository\\org\\jacoc
