@@ -1,20 +1,27 @@
 #!/bin/bash
+
 # set -x
 
-SKIP_PACKAGE_VERSION=true
+SKIP_PACKAGE_VERSION=false
 # These get extracted from the pom.xml, keeping the default values for backwad compatibility
 DEFAULT_MAIN_CLASS='SwetMainFlowPanel'
 APP_NAME='swet_javafx_app'
-APP_PACKAGE='com.github.sergueik.swet_javafx'
+APP_PACKAGE='example'
 APP_VERSION='0.0.2-SNAPSHOT'
 
 which xmllint > /dev/null
 
 if [ $? -eq  0 ] ; then
+echo 0
   APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
+  echo '1' 
   APP_PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
+  echo '2' 
   APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
-  DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml 2>/dev/null)
+  echo '3' 
+  # may be empty
+  DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml 2> /dev/null)
+  echo '4' 
 fi
 
 MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_CLASS}
@@ -42,21 +49,6 @@ then
   # C  [libGL.dylib+0x1c3d]  glGetString+0x1c
   # may need to install some of https://github.com/phracker/MacOSX-SDKs
 
-fi
-
-DOWNLOAD_EXTERNAL_JAR=false
-ALIAS='richtextfx'
-JARFILE_VERSION='0.9.1'
-JARFILE="$ALIAS-$JARFILE_VERSION.jar"
-URL="https://github.com/TomasMikula/RichTextFX/releases/download/v$JARFILE_VERSION/${ALIAS}-$JARFILE_VERSION.jar?raw=true"
-if $DOWNLOAD_EXTERNAL_JAR
-then
-  if [ ! -f "src/main/resources/$JARFILE" ]
-  then
-    pushd 'src/main/resources/'
-    wget -O $JARFILE -nv $URL
-    popd
-  fi
 fi
 
 if [[ "$SKIP_BUILD" != 'true' ]]
