@@ -7,24 +7,25 @@ DEFAULT_MAIN_CLASS='SwetMainFlowPanel'
 APP_NAME='swet_javafx_app'
 APP_PACKAGE='com.github.sergueik.swet_javafx'
 APP_VERSION='0.0.2-SNAPSHOT'
-if [[ $SKIP_PACKAGE_VERSION ]] ; then
+
+which xmllint > /dev/null
+
+if [ $? -eq  0 ] ; then
+  APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
+  APP_PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
+  APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
+  DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml 2>/dev/null)
+fi
+
+MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_CLASS}
+
+for APP_CONFIG_ENTRY in 'MAIN_APP_CLASS' 'APP_PACKAGE' 'APP_VERSION' 'APP_NAME'; do echo "${APP_CONFIG_ENTRY}=$(eval echo \$$APP_CONFIG_ENTRY )" 1>& 2 ; done
+
+if $SKIP_PACKAGE_VERSION; then
   APP_JAR="$APP_NAME.jar"
 else
   APP_JAR="$APP_NAME-$APP_VERSION.jar"
 fi
-
-which xmllint > /dev/null
-
-if [  $? -eq  0 ] ; then
-  APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
-  APP_PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
-  APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
-  DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml)
-fi
-echo $
-MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_CLASS}
-
-for APP_CONFIG_ENTRY in 'MAIN_APP_CLASS' 'APP_PACKAGE' 'APP_VERSION' 'APP_NAME'; do echo "${APP_CONFIG_ENTRY}=$(eval echo \$$APP_CONFIG_ENTRY )" 1>& 2 ; done
 
 if $(uname -s | grep -qi Darwin)
 then
@@ -48,9 +49,9 @@ ALIAS='richtextfx'
 JARFILE_VERSION='0.9.1'
 JARFILE="$ALIAS-$JARFILE_VERSION.jar"
 URL="https://github.com/TomasMikula/RichTextFX/releases/download/v$JARFILE_VERSION/${ALIAS}-$JARFILE_VERSION.jar?raw=true"
-if [[ $DOWNLOAD_EXTERNAL_JAR ]]
+if $DOWNLOAD_EXTERNAL_JAR
 then
-  if [[ ! -f "src/main/resources/$JARFILE" ]]
+  if [ ! -f "src/main/resources/$JARFILE" ]
   then
     pushd 'src/main/resources/'
     wget -O $JARFILE -nv $URL
@@ -58,7 +59,8 @@ then
   fi
 fi
 
-if [[ $SKIP_BUILD != 'true' ]] ; then
+if [[ "$SKIP_BUILD" != 'true' ]]
+then
   mvn -Dmaven.test.skip=true package install
 fi
 echo "java -cp target/$APP_JAR:target/lib/* $APP_PACKAGE.$MAIN_APP_CLASS"
