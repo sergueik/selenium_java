@@ -7,9 +7,9 @@ This directory contains a replica of [FXTrayIcon](https://github.com/dustinkredm
 
 ```cmd
 mvn package
-java -cp target\FXTrayIcon-3.0.1-SNAPSHOT.jar  com.dustinredmond.fxtrayicon.applications.RunnableTest
+java -cp target\app-0.1.0-SNAPSHOT.jar example.applications.RunnableTest
 ```
 
 ```cmd
-java -cp target\FXTrayIcon-3.0.1-SNAPSHOT.jar  com.dustinredmond.fxtrayicon.applications.notaskbaricon.Main
+java -cp target\app-0.1.0-SNAPSHOT.jar example.applications.notaskbaricon.Main
 ```

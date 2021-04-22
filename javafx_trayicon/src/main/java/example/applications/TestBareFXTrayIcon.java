@@ -1,4 +1,6 @@
-package com.dustinredmond.fxtrayicon;
+package example.applications;
+
+import example.FXTrayIcon;
 
 /*
  * Copyright (c) 2021 Dustin K. Redmond & contributors
@@ -27,14 +29,15 @@ import javafx.stage.Stage;
 
 public class TestBareFXTrayIcon extends Application {
 
-    @Override
-    public void start(Stage stage) throws Exception {
-        stage.setTitle("Test FXTrayIcon with empty menu");
-        FXTrayIcon trayIcon = new FXTrayIcon(stage, getClass().getResource("icons8-link-64.png"));
-        trayIcon.show();
-    }
+	@Override
+	public void start(Stage stage) throws Exception {
+		stage.setTitle("Test FXTrayIcon with empty menu");
+		FXTrayIcon trayIcon = new FXTrayIcon(stage,
+				getClass().getResource("icons8-link-64.png"));
+		trayIcon.show();
+	}
 
-    public static void main(String[] args) {
-        Application.launch(TestBareFXTrayIcon.class);
-    }
+	public static void main(String[] args) {
+		Application.launch(TestBareFXTrayIcon.class);
+	}
 }
