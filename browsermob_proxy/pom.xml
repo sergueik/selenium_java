@@ -15,7 +15,7 @@
     <browsermob-proxy.version>2.1.2</browsermob-proxy.version>
     <browsermob-proxy.artifactId>browsermob-core</browsermob-proxy.artifactId>
     <commons-exec.version>1.3</commons-exec.version>
-    <commons-io.version>2.5</commons-io.version>
+    <commons-io.version>2.7</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <har-reader.version>2.1.3</har-reader.version>
     <java.version>1.8</java.version>
