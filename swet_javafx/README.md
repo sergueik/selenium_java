@@ -42,6 +42,7 @@ Bash script for Unix and Mac:
   * [javafx richtext control](https://github.com/FXMisc/RichTextFX#stable-release)
   * [curated list of awesome JavaFx resources](https://github.com/mhrimaz/AwesomeJavaFX)
   * javaFX widget [detailed documentation](http://tutorials.jenkov.com/javafx/tableview.html#create-a-tableview)
-
+  * [JavaFX: FXML и SceneBuilder tutorial](https://habr.com/ru/post/474982/) (translation of [JavaFX Tutorial: FXML and SceneBuilder blog](https://www.vojtechruzicka.com/javafx-fxml-scene-builder/) to Russian)
+  * another detailed [tutotial](https://habr.com/ru/post/339382/) (in Russian)
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

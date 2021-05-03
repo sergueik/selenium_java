@@ -7,8 +7,10 @@ package example;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasItems;
+// import static org.junit.Assert.assertThat;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -32,11 +34,13 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import example.CommandLineParser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 /**
  * Unit Tests for CommandLineParser
@@ -98,6 +102,9 @@ public class JSONURITest {
 		assertThat(commandLineParser.getNumberOfFlags(), is(1));
 		assertThat(commandLineParser.hasFlag("in"), is(true));
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
+		// JSON is valid
+		assertThat(new JSONObject(commandLineParser.getFlagValue("in")),
+				notNullValue());
 		// NOTE: whitespace and indent-sensitive
 		// assertThat(commandLineParser.getFlagValue("in"),
 		// is("{\"one\":\"two\",\"key\":\"value\"}"));
@@ -135,6 +142,8 @@ public class JSONURITest {
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
 		System.err.println("addDataJSONFromFileTest(): flag value: "
 				+ commandLineParser.getFlagValue("in"));
+		assertThat(new JSONObject(commandLineParser.getFlagValue("in")),
+				notNullValue());
 		try {
 			JSONObject jsonObject = new JSONObject(
 					commandLineParser.getFlagValue("in"));
@@ -146,6 +155,43 @@ public class JSONURITest {
 		}
 		System.err.println("argumentNamesValuesTest(): flag value: "
 				+ commandLineParser.getFlagValue("in"));
+	}
+
+	// Setting valueFormat to: GSON(2)
+	// @Test(expected = JsonSyntaxException.class)
+	@Test
+	public void addBadJSONFromFileTest() {
+		commandLineParser.setValueFormat("GSON");
+		if (!new File(dataFilePath).exists()) {
+			PrintWriter out = openWriter(dataFilePath);
+			out.println("\"foo\":\"bar\"");
+			out.flush();
+			out.close();
+		}
+		argsArray = new String[] { "-a", "@a.json" };
+		@SuppressWarnings("unchecked")
+		Map<String, Object> result = new Gson()
+				.fromJson(commandLineParser.getFlagValue("a"), Map.class);
+		assertThat(result, nullValue());
+	}
+
+	@Ignore
+	// @Test(expected = JSONException.class)
+	@Test
+	public void addBadJSONFromFileTest2() {
+		commandLineParser.setValueFormat("NONE");
+		if (!new File(dataFilePath).exists()) {
+			PrintWriter out = openWriter(dataFilePath);
+			out.println("\"foo\":\"bar\"");
+			out.flush();
+			out.close();
+		}
+		argsArray = new String[] { "-a", "@" + dataFilePath };
+		System.err.println("Calling with: " + Arrays.asList(argsArray));
+		assertThat(commandLineParser.getFlagValue("a"), is("foo,bar"));
+		assertThat(commandLineParser.getFlagValue("a"), notNullValue());
+		@SuppressWarnings("unchecked")
+		JSONObject result = new JSONObject(commandLineParser.getFlagValue("a"));
 	}
 
 	@Test
@@ -165,8 +211,13 @@ public class JSONURITest {
 		assertThat(commandLineParser.getFlagValue("in"), notNullValue());
 		System.err.println("addDataGSONFromFileTest(): flag value: "
 				+ commandLineParser.getFlagValue("in"));
+		assertThat(
+				new Gson().fromJson(commandLineParser.getFlagValue("in"), Map.class),
+				notNullValue());
+		Map<String, Object> result = new Gson()
+				.fromJson(commandLineParser.getFlagValue("in"), Map.class);
+		assertThat(result.keySet().size(), greaterThan(0));
 		try {
-
 			@SuppressWarnings("unchecked")
 			final Map<String, Object> data = (new Gson())
 					.fromJson(commandLineParser.getFlagValue("in"), Map.class);

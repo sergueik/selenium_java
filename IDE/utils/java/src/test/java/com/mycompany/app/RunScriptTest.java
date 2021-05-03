@@ -1,74 +1,36 @@
+import static org.openqa.selenium.By.cssSelector;
+
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
-import org.eclipse.jetty.server.handler.MovedContextHandler;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.util.log.Log;
 import org.eclipse.jetty.util.log.StdErrLog;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
-
-import java.io.IOException;
-import java.io.InputStream;
-
-import org.openqa.selenium.*;
-import static org.openqa.selenium.By.*;
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.interactions.Actions;
-import org.seleniumhq.selenium.fluent.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
-
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
-
-import org.json.*;
-
-import java.util.concurrent.TimeUnit;
-
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.endsWith;
-import static org.hamcrest.Matchers.equalTo;
-
-// NOTE: this project is not using jUnit annotations
-import static org.junit.Assert.assertThat;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotEquals;
-import static org.testng.Assert.assertFalse;
-import static org.testng.Assert.assertTrue;
-import static org.testng.AssertJUnit.fail;
 
 // Skeleton project that generates and smoke tests Javascript for IDE XML 
 public class RunScriptTest {
@@ -127,8 +89,8 @@ public class RunScriptTest {
 	@Test(enabled = true)
 	public void pageLoaded() {
 		String tableCssSelector = "html body div table.sortable";
-		wait.until(ExpectedConditions.visibilityOf(driver.findElement(By
-				.cssSelector(tableCssSelector))));
+		wait.until(ExpectedConditions
+				.visibilityOf(driver.findElement(By.cssSelector(tableCssSelector))));
 		assertTrue(driver.findElements(cssSelector(tableCssSelector)).size() > 0);
 	}
 
@@ -157,8 +119,8 @@ public class RunScriptTest {
 	// https://processing.org/reference/JSONObject.html
 	@Test(enabled = true)
 	public void findResultsDetails() {
-		JSONObject resultObj = new JSONObject(storeEval(resultFinderScript,
-				storeEval(hashesFinderScript)));
+		JSONObject resultObj = new JSONObject(
+				storeEval(resultFinderScript, storeEval(hashesFinderScript)));
 		Iterator<String> masterServerIterator = resultObj.keys();
 		while (masterServerIterator.hasNext()) {
 			String masterServer = masterServerIterator.next();

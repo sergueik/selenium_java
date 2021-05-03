@@ -1,33 +1,20 @@
 package com.mycompany.app;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import static org.junit.Assert.assertTrue;
 
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.openqa.selenium.JavascriptExecutor;
-
-import java.lang.RuntimeException;
-import java.util.concurrent.TimeUnit;
-
-import org.apache.commons.lang.exception.ExceptionUtils;
-import static org.junit.Assert.*;
 
 public class App {
 
@@ -37,12 +24,12 @@ public class App {
 	static long wait_polling_interval = 500;
 	static WebDriverWait wait;
 	static Actions actions;
-  static private Predicate<WebElement> hasClass;
-  static private Predicate<WebElement> hasAttr;
-  static private Predicate<WebElement> hasText;
+	static private Predicate<WebElement> hasClass;
+	static private Predicate<WebElement> hasAttr;
+	static private Predicate<WebElement> hasText;
 
-	public static void main(String[] args) throws InterruptedException,
-			java.io.IOException {
+	public static void main(String[] args)
+			throws InterruptedException, java.io.IOException {
 
 		String base_url = "https://datatables.net/examples/api/highlight.html";
 
@@ -50,8 +37,8 @@ public class App {
 		driver = new FirefoxDriver();
 
 		// Wait For Page To Load
-		driver.manage().timeouts()
-				.implicitlyWait(implicit_wait_interval, TimeUnit.SECONDS);
+		driver.manage().timeouts().implicitlyWait(implicit_wait_interval,
+				TimeUnit.SECONDS);
 
 		// Go to base url
 		driver.get(base_url);
@@ -65,7 +52,8 @@ public class App {
 		wait.pollingEvery(wait_polling_interval, TimeUnit.MILLISECONDS);
 
 		try {
-			wait.until(ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
+			wait.until(
+					ExpectedConditions.visibilityOfElementLocated(By.id(table_id)));
 		} catch (RuntimeException timeoutException) {
 			return;
 		}
@@ -83,22 +71,37 @@ public class App {
 			if (row_num > max_rows) {
 				break;
 			}
-			assertTrue(String.format("Unexpected title '%s'",
-					row.getAttribute("role")),
+			/*
+			assertTrue(
+					String.format("Unexpected title '%s' in row %d / %d ",
+							row.getAttribute("role"), row_num, max_rows),
+					row.getAttribute("role") != null);
+
+			assertTrue(
+					String.format("Unexpected title '%s'", row.getAttribute("role")),
 					row.getAttribute("role").matches(row_role_attribute));
-      //
-      hasText = e -> e.getText().matches("Software.*");
+					*/
+			/* 
+			 <tr class="even">
+			<td class="sorting_1 highlight">Angelica Ramos</td>
+			<td>Chief Executive Officer (CEO)</td>
+			<td>London</td>
+			<td>47</td>
+			<td>2009/10/09</td>
+			<td>$1,200,000</td>
+		</tr> 
+		*/
+			hasText = e -> e.getText().matches("Software.*");
 			List<WebElement> cells = row.findElements(By.xpath("td"));
-      List<WebElement> webElementsWithText = cells.stream()
-        .filter(hasText).collect(Collectors.toList());
-      for (WebElement e: webElementsWithText) {
+			List<WebElement> webElementsWithText = cells.stream().filter(hasText)
+					.collect(Collectors.toList());
+			for (WebElement e : webElementsWithText) {
 
-			assertTrue(String.format("Unexpected Text '%s'",
-					e.getText()),
-					e.getText().matches("Software.*"));
-			 System.out.println(e.getText());
+				assertTrue(String.format("Unexpected Text '%s'", e.getText()),
+						e.getText().matches("Software.*"));
+				System.out.println(e.getText());
 
-      }
+			}
 			cell_num = 1;
 			String checkColumn = cells.get(cell_num).getText();
 			// System.out.println(checkColumn);
@@ -122,33 +125,35 @@ public class App {
 
 	}
 
-	private static void highlight(WebElement element) throws InterruptedException {
+	private static void highlight(WebElement element)
+			throws InterruptedException {
 		highlight(element, 100);
 	}
 
 	private static void highlight(WebElement element, long highlight) {
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
-		if (driver instanceof JavascriptExecutor) {
-			((JavascriptExecutor) driver).executeScript(
-					"arguments[0].style.border='3px solid yellow'", new Object[]{ element });
-		}
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						"arguments[0].style.border='3px solid yellow'",
+						new Object[] { element });
+			}
 			Thread.sleep(highlight);
-		if (driver instanceof JavascriptExecutor) {
-			((JavascriptExecutor) driver).executeScript(
-					"arguments[0].style.border=''", new Object[]{ element });
-		}
+			if (driver instanceof JavascriptExecutor) {
+				((JavascriptExecutor) driver).executeScript(
+						"arguments[0].style.border=''", new Object[] { element });
+			}
 		} catch (InterruptedException e) {
 			// System.err.println("Ignored: " + e.toString());
 		}
 	}
 
-
 	private static String storeEval(String script) {
 		String result = null;
 		if (driver instanceof JavascriptExecutor) {
 			System.out.println("running the script");
-			result = (String) ((JavascriptExecutor) driver).executeScript(script, null);
+			result = (String) ((JavascriptExecutor) driver).executeScript(script,
+					null);
 		}
 		return result;
 	}
