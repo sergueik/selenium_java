@@ -31,7 +31,7 @@
     <jOpenDocument.version>1.3</jOpenDocument.version>
     <!-- TODO : study the version depenencies -->
     <json.version>20180813</json.version>
-    <junit.version>4.12</junit.version>
+    <junit.version>4.13.1</junit.version>
     <junit-jupiter.version>5.6.0</junit-jupiter.version>
     <junit-platform-launcher.version>1.6.0</junit-platform-launcher.version>
     <jUnitParams.version>1.1.1</jUnitParams.version>
