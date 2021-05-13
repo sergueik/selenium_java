@@ -1,0 +1,41 @@
+version: 3
+services:
+  db:
+    image: mysql
+    container_name: mysql_db
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD="secret"
+  web:
+    image: apache
+    build: ./webapp
+    depends_on:
+      - db
+    container_name: apache_web
+    restart: always
+    property: ~
+    ports:
+      - "8080:80"
+  names:
+    - first: James
+      last: Justinson
+    - first: Andrew
+      last: Armstrong
+ 
+shell_command1:  |
+    Line 1
+     Line 2
+    Line 3
+    
+# NOTE: preserve a blank line above to terminate the value
+
+shell_command2:  >-
+    Line 1
+     Line 2
+    Line 3
+
+
+# NOTE: need two blank lines above to terminate
+  
+  
+      
