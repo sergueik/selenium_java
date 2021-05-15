@@ -39,7 +39,27 @@ public class YamlConfigTest {
 	}
 
 	@Test
-	public void load() {
+	public void loadfromThread() {
+		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile, true);
+		assertThat(value, notNullValue());
+	}
+
+	@Test
+	public void loadfromResourcePath() {
+		String propertiesFilePath = String.format("%s/src/test/resources",
+				System.getProperty("user.dir"));
+		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile,
+				propertiesFilePath);
+		assertThat(value, notNullValue());
+	}
+
+	@Test
+	public void loadfromInvalidResourcePath() {
+		String propertiesFilePath = String.format("%s/src/main/resources",
+				System.getProperty("user.dir"));
+		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile,
+				propertiesFilePath);
+		assertThat(value, nullValue());
 	}
 
 	@Test
