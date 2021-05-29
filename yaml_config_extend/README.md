@@ -6,4 +6,5 @@ extended
 by adding methods to load Maps and Arrays wholesale into subject Java application Properties
 
 
-### 
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
