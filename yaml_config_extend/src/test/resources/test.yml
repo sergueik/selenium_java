@@ -36,6 +36,15 @@ shell_command2:  >-
 
 
 # NOTE: need two blank lines above to terminate
-  
-  
-      
+shell_command3: >
+    Line 1
+    Line 2
+    Line 3
+    
+# NOTE: preserve a blank line above to terminate the value
+
+# https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+compact: ["a","b","c"]
+compact_array: ["a"]
+info: {name: John Doe, job: Java Developer, skill: interm} 
+ 

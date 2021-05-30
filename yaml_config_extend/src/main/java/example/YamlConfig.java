@@ -16,7 +16,7 @@ public class YamlConfig {
 	private static boolean debug = false;
 
 	private final static Pattern arrayKeyPattern = Pattern
-			.compile("^([a-zA-Z][a-zA-Z0-9]+)\\[([0-9]+)]$");
+			.compile("^([a-zA-Z][a-zA-Z0-9_.]+)\\[([0-9]+)]$");
 
 	public static boolean isDebug() {
 		return debug;
