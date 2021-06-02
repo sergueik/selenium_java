@@ -23,8 +23,8 @@
     <!--
     <selenium-drivers-download-plugin.groupId>com.adsingh.plugin</selenium-drivers-download-plugin.groupId>
     -->
-    <selenium-drivers-download-plugin.groupId>com.github.abhishek8908</selenium-drivers-download-plugin.groupId>
-    <selenium-drivers-download-plugin.version>1.4-SNAPSHOT</selenium-drivers-download-plugin.version>
+    <selenium-drivers-download-plugin.groupId>example</selenium-drivers-download-plugin.groupId>
+    <selenium-drivers-download-plugin.version>1.5-SNAPSHOT</selenium-drivers-download-plugin.version>
     <testng.version>6.13.1</testng.version>
   </properties>
   <dependencies>
@@ -168,9 +168,9 @@
     <pluginManagement>
       <plugins>
         <plugin>
-          <groupId>com.github.abhishek8908</groupId>
+          <groupId>example</groupId>
           <artifactId>selenium-drivers-download-plugin</artifactId>
-          <version>1.0-SNAPSHOT</version>
+          <version>1.5-SNAPSHOT</version>
         </plugin>
       </plugins>
     </pluginManagement>

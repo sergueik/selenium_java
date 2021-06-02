@@ -14,14 +14,10 @@ which xmllint > /dev/null
 if [ $? -eq  0 ] ; then
 echo 0
   APP_VERSION=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'version' ]/text()" pom.xml)
-  echo '1' 
   APP_PACKAGE=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'groupId' ]/text()" pom.xml)
-  echo '2' 
   APP_NAME=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'artifactId' ]/text()" pom.xml)
-  echo '3' 
   # may be empty
   DEFAULT_MAIN_CLASS=$(xmllint -xpath "/*[local-name() = 'project' ]/*[local-name() = 'properties' ]/*[local-name() = 'mainClass']/text()" pom.xml 2> /dev/null)
-  echo '4' 
 fi
 
 MAIN_APP_CLASS=${1:-$DEFAULT_MAIN_CLASS}

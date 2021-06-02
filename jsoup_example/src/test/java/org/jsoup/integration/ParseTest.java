@@ -25,7 +25,8 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 /**
- * Integration test: parses download links for from download page HTML  selecting by combination ofcriteria.
+ * Integration test: parses download links for from download page HTML selecting
+ * by combination ofcriteria.
  *
  */
 public class ParseTest {
@@ -37,11 +38,12 @@ public class ParseTest {
 	@Test
 	public void fetchURL() throws IOException {
 		Document doc = Jsoup.parse(new URL(edgedriverDownloadURL), 10 * 1000);
-		assertTrue(doc.title().contains("WebDriver - Microsoft Edge Development"));
+		assertTrue(doc.title().contains("Microsoft Edge Driver"));
+		assertTrue(doc.title().contains("Microsoft Edge Developer"));
 	}
 
 	@Test
-	public void edgeDownloadPageTest() throws IOException {
+	public void edgeDownloadCachedPageTest() throws IOException {
 		File file = getFile(filename);
 		Document doc = Jsoup.parse(file, "UTF-8", edgedriverDownloadURL);
 		assertEquals("WebDriver - Microsoft Edge Development", doc.title());
@@ -54,11 +56,9 @@ public class ParseTest {
 		File file = getFile(filename);
 		Document doc = Jsoup.parse(file, "UTF-8", edgedriverDownloadURL);
 
-		Elements downloadLinks = doc
-				.select("ul.driver-downloads li.driver-download > a");
+		Elements downloadLinks = doc.select("ul.driver-downloads li.driver-download > a");
 		assertEquals(6, downloadLinks.size());
-		Elements versionParagraphs = doc.select(
-				"ul.driver-downloads li.driver-download p.driver-download__meta");
+		Elements versionParagraphs = doc.select("ul.driver-downloads li.driver-download p.driver-download__meta");
 		assertEquals(9, versionParagraphs.size());
 	}
 
@@ -70,27 +70,24 @@ public class ParseTest {
 		// cssSelector
 		// section#downloads ul[class *= 'driver-downloads']
 
-		org.jsoup.select.Elements downloadLinks = doc
-				.select("ul.driver-downloads li.driver-download > a");
+		org.jsoup.select.Elements downloadLinks = doc.select("ul.driver-downloads li.driver-download > a");
 		assertEquals(6, downloadLinks.size());
 		for (int cnt = 0; cnt < downloadLinks.size(); cnt++) {
 			org.jsoup.nodes.Element downloadLink = downloadLinks.get(cnt);
-			System.err.println(String.format("# %d|TEXT: %s|URL: %s", cnt,
-					downloadLink.text(), downloadLink.attr("href")));
+			System.err.println(
+					String.format("# %d|TEXT: %s|URL: %s", cnt, downloadLink.text(), downloadLink.attr("href")));
 		}
-		org.jsoup.select.Elements downloadFilteredLinks = doc.select(
-				String.format("ul.driver-downloads li.driver-download > a:contains(%s)",
-						buildNumber));
+		org.jsoup.select.Elements downloadFilteredLinks = doc
+				.select(String.format("ul.driver-downloads li.driver-download > a:contains(%s)", buildNumber));
 		assertEquals(1, downloadFilteredLinks.size());
-		System.err.println(String.format("Filtered|TEXT: %s|URL: %s",
-				downloadFilteredLinks.get(0).text(),
+		System.err.println(String.format("Filtered|TEXT: %s|URL: %s", downloadFilteredLinks.get(0).text(),
 				downloadFilteredLinks.get(0).attr("href")));
 
 		// The following code replicates what currently is done in
 		// https://github.com/bonigarcia/webdrivermanager
 		// src/main/java/io/github/bonigarcia/wdm/EdgeDriverManager.java
-		Elements versionParagraphs = doc.select(String.format(
-				"ul.driver-downloads li.driver-download p:contains(%s)", buildNumber));
+		Elements versionParagraphs = doc
+				.select(String.format("ul.driver-downloads li.driver-download p:contains(%s)", buildNumber));
 		assertEquals(1, versionParagraphs.size());
 		System.err.println("Element HTML:" + versionParagraphs.get(0).hasText());
 	}

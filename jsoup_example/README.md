@@ -1,6 +1,6 @@
 ### Info
 
-This directory contains a fix to Erge Driver selection code for [bonigarcia/webdrivermanager](https://github.com/bonigarcia/webdrivermanager).
+This directory contains a fix to Edge Driver selection code for [bonigarcia/webdrivermanager](https://github.com/bonigarcia/webdrivermanager).
 
 It serving to prepare a fork.
 

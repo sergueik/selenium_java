@@ -124,16 +124,14 @@ public class DriverUtil extends Logger {
 			String responseBody = client.execute(getMethod, responseHandler);
 			GsonBuilder gsonBuilder = new GsonBuilder();
 			Gson gson = gsonBuilder.create();
-			releaseArray = gson.fromJson(new StringReader(responseBody),
-					GeckoDriverReleases[].class);
+			releaseArray = gson.fromJson(new StringReader(responseBody), GeckoDriverReleases[].class);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 		for (GeckoDriverReleases release : releaseArray) {
 			if (release != null) {
 				List<LinkedTreeMap<String, Object>> assets = release.getAssets();
-				Pattern pattern = Pattern.compile(
-						"(?:" + System.getProperty("os") + ")", Pattern.CASE_INSENSITIVE);
+				Pattern pattern = Pattern.compile("(?:" + System.getProperty("os") + ")", Pattern.CASE_INSENSITIVE);
 				for (LinkedTreeMap<String, Object> asset : assets) {
 					try {
 						String path = asset.get("browser_download_url").toString();
@@ -153,16 +151,14 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/WebDriverManager.java
-	public static List<URL> getDriversFromXml(String releaseUrl)
-			throws IOException {
+	public static List<URL> getDriversFromXml(String releaseUrl) throws IOException {
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
 		HttpGet getMethod = new HttpGet(releaseUrl);
 		String responseBody = client.execute(getMethod, responseHandler);
 		List<URL> urls = new ArrayList<>();
 		try {
-			DocumentBuilder db = DocumentBuilderFactory.newInstance()
-					.newDocumentBuilder();
+			DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			InputSource is = new InputSource();
 			is.setCharacterStream(new StringReader(responseBody));
 
@@ -171,12 +167,11 @@ public class DriverUtil extends Logger {
 			Element documentElement = doc.getDocumentElement();
 			NodeList nodes = (org.w3c.dom.NodeList) newInstance().newXPath().evaluate(
 					String.format("//Contents/Key[contains(text(), '%s')]",
-							"chromedriver" /* readProperty(driverNames.get(browserDriver));  */),
+							"chromedriver" /* readProperty(driverNames.get(browserDriver)); */),
 					documentElement, javax.xml.xpath.XPathConstants.NODESET);
 
 			// TODO: OS filtering does not apply to IE and Edge driver
-			Pattern pattern = Pattern.compile("(?:" + System.getProperty("os") + ")",
-					Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile("(?:" + System.getProperty("os") + ")", Pattern.CASE_INSENSITIVE);
 
 			for (int i = 0; i < nodes.getLength(); ++i) {
 				Element e = (Element) nodes.item(i);
@@ -195,9 +190,8 @@ public class DriverUtil extends Logger {
 
 	// based on:
 	// https://github.com/bonigarcia/webdrivermanager/blob/master/src/main/java/io/github/bonigarcia/wdm/EdgeDriverManager.java
-	public static List<URL> getDriversFromHTML(String releaseUrl)
-			throws IOException {
-		
+	public static List<URL> getDriversFromHTML(String releaseUrl) throws IOException {
+
 		String buildNumber = "15063"; // "17134"
 		DefaultHttpClient client = new DefaultHttpClient();
 		ResponseHandler<String> responseHandler = new BasicResponseHandler();
@@ -206,26 +200,21 @@ public class DriverUtil extends Logger {
 		List<URL> urls = new ArrayList<>();
 		Map<String, URL> versions = new HashMap<>();
 
-		log.info(String.format(
-				"Reading \"%s\" to find out the latest version of Edge driver",
-				releaseUrl));
+		log.info(String.format("Reading \"%s\" to find out the latest version of Edge driver", releaseUrl));
 		org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(responseBody);
-		org.jsoup.select.Elements downloadLinks = doc
-				.select("ul.driver-downloads li.driver-download > a");
+		org.jsoup.select.Elements downloadLinks = doc.select("ul.driver-downloads li.driver-download > a");
 		assertEquals(6, downloadLinks.size());
 		for (int cnt = 0; cnt < downloadLinks.size(); cnt++) {
 			org.jsoup.nodes.Element downloadLink = downloadLinks.get(cnt);
-			log.info("Found edge driver: " + String.format("# %d|TEXT: %s|URL: %s",
-					cnt, downloadLink.text(), downloadLink.attr("href")));
+			log.info("Found edge driver: "
+					+ String.format("# %d|TEXT: %s|URL: %s", cnt, downloadLink.text(), downloadLink.attr("href")));
 			versions.put(downloadLink.text(), new URL(downloadLink.attr("href")));
 			urls.add(new URL(downloadLink.attr("href")));
 		}
-		org.jsoup.select.Elements downloadFilteredLinks = doc.select(
-				String.format("ul.driver-downloads li.driver-download > a:contains(%s)",
-						buildNumber));
+		org.jsoup.select.Elements downloadFilteredLinks = doc
+				.select(String.format("ul.driver-downloads li.driver-download > a:contains(%s)", buildNumber));
 		assertEquals(1, downloadFilteredLinks.size());
-		System.err.println(String.format("Filtered|TEXT: %s|URL: %s",
-				downloadFilteredLinks.get(0).text(),
+		System.err.println(String.format("Filtered|TEXT: %s|URL: %s", downloadFilteredLinks.get(0).text(),
 				downloadFilteredLinks.get(0).attr("href")));
 		return urls;
 	}
@@ -234,14 +223,13 @@ public class DriverUtil extends Logger {
 		DriverUtil.useEmbeddedResource = useEmbeddedResource;
 	}
 
-	public static void download(String driverName, String targetDirectory,
-			String version) throws IOException, ConfigurationException {
+	public static void download(String driverName, String targetDirectory, String version)
+			throws IOException, ConfigurationException {
 		// TODO: alternatively can probe version to be null
 		download(driverName, null, targetDirectory, version);
 	}
 
-	public static void download(String driverName, String sourceURL,
-			String targetDirectory, String version)
+	public static void download(String driverName, String sourceURL, String targetDirectory, String version)
 			throws IOException, ConfigurationException {
 
 		if (sourceURL == null) {
@@ -259,8 +247,7 @@ public class DriverUtil extends Logger {
 		cleanDir(targetDirectory);
 	}
 
-	public static void unzipFile(String source, String destinationPath)
-			throws IOException {
+	public static void unzipFile(String source, String destinationPath) throws IOException {
 		if (source.contains(".zip")) {
 			Archiver archiver = ArchiverFactory.createArchiver("zip");
 			archiver.extract(new File(source), new File(destinationPath));
@@ -271,20 +258,17 @@ public class DriverUtil extends Logger {
 		log.info("Decompressing file: " + source);
 	}
 
-	public static void changeFileName(String fileName, String newFileName)
-			throws IOException {
+	public static void changeFileName(String fileName, String newFileName) throws IOException {
 		changeFileName(fileName, newFileName, false);
 	}
 
-	public static void changeFileName(String fileName, String newFileName,
-			boolean createLink) throws IOException {
+	public static void changeFileName(String fileName, String newFileName, boolean createLink) throws IOException {
 		// TODO: use os property of the driver class
 		String os = System.getProperty("os"); //
-		String ext = (os.toLowerCase().contains("win")) ? ".exe" : "";
+		String ext = (os != null && os.toLowerCase().contains("win")) ? ".exe" : "";
 
 		Path filePath = Paths.get(fileName + ext).toAbsolutePath();
-		Path fileLinkPath = Paths.get(newFileName + "-" + os + ext)
-				.toAbsolutePath();
+		Path fileLinkPath = Paths.get(newFileName + "-" + os + ext).toAbsolutePath();
 		if (createLink) {
 			try {
 				Files.createSymbolicLink(fileLinkPath, filePath);
@@ -297,8 +281,7 @@ public class DriverUtil extends Logger {
 			}
 		} else {
 			try {
-				FileUtils.moveFile(FileUtils.getFile(fileName + ext),
-						FileUtils.getFile(newFileName + "-" + os + ext));
+				FileUtils.moveFile(FileUtils.getFile(fileName + ext), FileUtils.getFile(newFileName + "-" + os + ext));
 				log.info("File: " + fileName + " renameded to " + newFileName);
 			} catch (FileExistsException e) {
 				// silently ignore
@@ -328,13 +311,12 @@ public class DriverUtil extends Logger {
 
 	// currently plugin extracts os and version of the driver from the filename
 	// alternatively one can make a soft link to the same
-	public static boolean checkDriverVersionExists(String driverName,
-			String version, String dir) throws IOException {
+	public static boolean checkDriverVersionExists(String driverName, String version, String dir) throws IOException {
 		boolean fileExists = false;
 		String os = System.getProperty("os");
 
-		final DirectoryStream<Path> stream = Files.newDirectoryStream(
-				Paths.get(dir), driverName + "-" + version + "-" + os + "{,.*}");
+		final DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dir),
+				driverName + "-" + version + "-" + os + "{,.*}");
 		for (final Path entry : stream) {
 			if (!entry.toString().isEmpty()) {
 				fileExists = true;
@@ -345,24 +327,19 @@ public class DriverUtil extends Logger {
 
 	public static void cleanDir(String dir) {
 		File folder = new File(dir);
-		Arrays.stream(folder.listFiles((f, p) -> p.endsWith(".zip")))
-				.forEach(File::delete);
-		Arrays.stream(folder.listFiles((f, p) -> p.endsWith(".tar.gz")))
-				.forEach(File::delete);
+		Arrays.stream(folder.listFiles((f, p) -> p.endsWith(".zip"))).forEach(File::delete);
+		Arrays.stream(folder.listFiles((f, p) -> p.endsWith(".tar.gz"))).forEach(File::delete);
 		log.info("Clean Dir:" + dir);
 	}
 
-	public static String readProperty(String propertyName)
-			throws ConfigurationException {
+	public static String readProperty(String propertyName) throws ConfigurationException {
 		if (properties.isEmpty()) {
-			properties = PropertiesParser.getProperties("driver.properties",
-					useEmbeddedResource);
+			properties = PropertiesParser.getProperties("driver.properties", useEmbeddedResource);
 		}
 		return properties.get(propertyName);
 	}
 
-	public static String getSourceUrl(String browserDriver)
-			throws ConfigurationException {
+	public static String getSourceUrl(String browserDriver) throws ConfigurationException {
 		return readProperty(downloadURLs.get(browserDriver));
 	}
 

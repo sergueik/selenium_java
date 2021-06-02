@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>example</groupId>
+  <artifactId>yaml_config_extend</artifactId>
+  <version>0.1.0-SNASHOT</version>
+  <name>yamlconfig</name>
+  <description>serialize application configuration in YAML file and support classpath-style dotted notation.</description>
+  <properties>
+    <hamcrest-all.version>1.3</hamcrest-all.version>
+    <junit.version>4.13.1</junit.version>
+    <snakeyaml.version>1.28</snakeyaml.version>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.yaml</groupId>
+      <artifactId>snakeyaml</artifactId>
+      <version>${snakeyaml.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <version>${hamcrest-all.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
