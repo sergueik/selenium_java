@@ -23,8 +23,7 @@ import static org.junit.Assert.assertThat;
 public class YamlConfigTest {
 
 	private final String yamlFile = "test.yml";
-	private final InputStream resource = getClass().getClassLoader()
-			.getResourceAsStream(yamlFile);
+	private final InputStream resource = getClass().getClassLoader().getResourceAsStream(yamlFile);
 	private final YamlConfig config = YamlConfig.load(resource);
 
 	@Before
@@ -93,11 +92,28 @@ public class YamlConfigTest {
 	}
 
 	@Test
+	public void getQuotesRemovedString() {
+		String value1 = config.getString("key1");
+		assertThat(value1, notNullValue());
+
+		String value2 = config.getString("key2");
+		assertThat(value2, notNullValue());
+		assertThat(value1, is(value2));
+		String value3 = config.getString("key3");
+		assertThat(value3, notNullValue());
+		assertThat(value3, is(value1));
+		String value4 = config.getString("key4");
+		assertThat(value4, notNullValue());
+		assertThat(value4, is(value1));
+
+	}
+
+	@Test
 	public void getMap() {
 		Map<String, Object> value = config.getMap("services.web");
 		assertThat(value, notNullValue());
-		assertThat(value.keySet(), hasItems(new String[] { "property", "ports",
-				"build", "image", "restart", "depends_on", "container_name" }));
+		assertThat(value.keySet(), hasItems(
+				new String[] { "property", "ports", "build", "image", "restart", "depends_on", "container_name" }));
 	}
 
 	@Test
@@ -178,8 +194,7 @@ public class YamlConfigTest {
 		}
 		assertThat(value, not(containsString(">")));
 		// NOTE: has single newline at the end
-		assertThat(value.substring(0, value.length() - 2),
-				not(containsString("\n")));
+		assertThat(value.substring(0, value.length() - 2), not(containsString("\n")));
 		System.err.println(String.format("getDocString3: \"%s\"", value));
 	}
 }

@@ -1,3 +1,5 @@
+---
+
 version: 3
 services:
   db:
@@ -47,4 +49,12 @@ shell_command3: >
 compact: ["a","b","c"]
 compact_array: ["a"]
 info: {name: John Doe, job: Java Developer, skill: interm} 
+
+
+key1: data 
+key2: 'data'
+key3: "data"
+# trailing space
+key4: data    
  
+
