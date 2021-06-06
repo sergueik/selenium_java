@@ -1,6 +1,5 @@
-package com.sandec.mdfx.impl;
+package example;
 
-import com.sandec.mdfx.MarkdownView;
 import com.vladsch.flexmark.ast.*;
 import com.vladsch.flexmark.ext.attributes.AttributeNode;
 import com.vladsch.flexmark.ext.attributes.AttributesExtension;

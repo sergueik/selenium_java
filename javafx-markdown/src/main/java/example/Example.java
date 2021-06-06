@@ -1,6 +1,5 @@
-package com.sandec.mdfx.example;
+package example;
 
-import com.sandec.mdfx.MarkdownView;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
@@ -14,16 +13,15 @@ import org.apache.commons.io.IOUtils;
 import org.fxmisc.cssfx.CSSFX;
 
 @SuppressWarnings("restriction")
-public class ExampleMDFX extends Application {
+public class Example extends Application {
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 
 		CSSFX.start();
 
-		String mdfxTxt = IOUtils.toString(
-				getClass().getResourceAsStream("/com/sandec/mdfx/example/sample.md"),
-				"UTF-8");
+		String mdfxTxt = IOUtils
+				.toString(getClass().getResourceAsStream("/syntax.md"), "UTF-8");
 
 		MarkdownView markdownView = new MarkdownView(mdfxTxt) {
 			// @Override
@@ -53,8 +51,7 @@ public class ExampleMDFX extends Application {
 		TextArea textArea = new TextArea(mdfxTxt);
 
 		markdownView.mdStringProperty().bind(textArea.textProperty());
-		markdownView.getStylesheets()
-				.add("/com/sandec/mdfx/example/mdfx-sample.css");
+		markdownView.getStylesheets().add("/css/mdfx-sample.css");
 
 		ScrollPane content = new ScrollPane(markdownView);
 

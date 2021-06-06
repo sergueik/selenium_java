@@ -9,5 +9,5 @@ converted temporarily to maven and Java 1.8. Also switched to classic `pom.xml` 
 
 ```cmd
 mvn clean package
-java -cp target/javafx_markdown.jar;target/lib/* com.sandec.mdfx.example.ExampleMDFX
+java -cp target/javafx_markdown.jar;target/lib/* example.Example
 ```

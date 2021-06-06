@@ -1,6 +1,5 @@
-package com.sandec.mdfx;
+package example;
 
-import com.sandec.mdfx.impl.MDFXNodeHelper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.Group;
@@ -17,7 +16,7 @@ public class MarkdownView extends VBox {
 	public MarkdownView(String mdString) {
 		this.mdString.set(mdString);
 		this.mdString.addListener((p, o, n) -> updateContent());
-		getStylesheets().add("/com/sandec/mdfx/mdfx.css");
+		getStylesheets().add("/css/mdfx.css");
 		updateContent();
 	}
 
