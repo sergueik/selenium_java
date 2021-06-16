@@ -64,7 +64,7 @@ set LAUNCHER_OPTS=-XX:MaxPermSize=1028M -Xmn128M
 set LAUNCHER_OPTS=%MAX_MEMORY% %STACK_SIZE%
 
 
-java -XX:MaxPermSize=1028M -Xmn128M -jar selenium-server-standalone-%SELENIUM_VERSION%.jar -role node -host SERGUEIK53 -port 5555 -hub http://127.0.0.1:4444/hub/register
+java -XX:MaxPermSize=1028M -Xmn128M -jar selenium-server-standalone-%SELENIUM_VERSION%.jar -role node -host SERGUEIK53 -port %NODE_HTTP_PORT% -hub http://127.0.0.1:4444/hub/register
 
 goto :EOF
 

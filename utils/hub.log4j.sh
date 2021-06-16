@@ -1,15 +1,26 @@
 #!/bin/bash
 # Standalone Selenium hub launcher script The bub is listening to 4444
 
-HUB_PORT=4444
-HUB_IP_ADDRESS=127.0.0.1
-SELENIUM_VERSION=2.47.1
-LOG4J_VERSION=1.2.17
+HUB_IP_ADDRESS=${1:-127.0.0.1}
+HUB_PORT=${2:-4444}
+if [ -z "${SELENIUM_VERSION}" ] ; then
+  SELENIUM_VERSION=2.53.0
+fi
+if [ -z "${LOG4J_VERSION}" ] ; then
+  LOG4J_VERSION=1.2.17
+fi
 # Verify that `selenium-sever-standalone.jar` points to the correct version of `selenium jar`.
+# to install the selenium-server-standalone.jar easiest is through a dummy pom.xml dependency
+#+ <dependency>
+#+    <groupId>org.seleniumhq.selenium</groupId>
+#+    <artifactId>selenium-server-standalone</artifactId>
+#+    <version>2.53.0</version>
+#+</dependency>
+# find ~/.m2/repository/ -iname 'selenium-server-standalone*jar' -a -name "*${SELENIUM_VERSION}*" | xargs -IX  ln -s X selenium-server-standalone.jar
 /bin/readlink selenium-server-standalone.jar | grep -in $SELENIUM_VERSION
 if [ $? != 0 ]
 then
-  echo "The Selenium version is incorrect: need version '$SELENIUM_VERSION'"
+  echo "The Selenium version is incorrect: need version $SELENIUM_VERSION"
   ls -l selenium*jar
   exit 0
 fi
