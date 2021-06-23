@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>elementary</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -16,10 +16,8 @@
     <commons-collections4.version>4.2</commons-collections4.version>
     <junit.version>4.13.1</junit.version>
     <selenium.version>3.13.0</selenium.version>
-    <selenium.version>2.53.0</selenium.version>
-    <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
+    <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <java.version>1.8</java.version> 
-    <!-- NOTE: jenkins hpi may require 1.6 -->
   </properties>
   <dependencies>
     <dependency>
@@ -141,3 +139,4 @@
     </plugins>
   </build>
 </project>
+

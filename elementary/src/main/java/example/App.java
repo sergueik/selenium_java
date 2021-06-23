@@ -1,6 +1,7 @@
 package example;
 
 import java.io.File;
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
@@ -25,6 +26,8 @@ public class App {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.saveFlagValue("url");
 		commandLineParser.saveFlagValue("browser");
+		commandLineParser.saveFlagValue("host");
+		commandLineParser.saveFlagValue("port");
 		if (debug) {
 			System.err.println("parse args");
 		}
@@ -39,6 +42,10 @@ public class App {
 			System.err.println("Missing required argument: browser");
 			return;
 		}
+		String port = commandLineParser.hasFlag("port")
+				? commandLineParser.getFlagValue("port") : "4444";
+		String host = commandLineParser.hasFlag("host")
+				? commandLineParser.getFlagValue("host") : "localhost";
 
 		if (commandLineParser.getFlagValue("url") == null) {
 			System.err.println("Missing required argument: url");
@@ -46,13 +53,14 @@ public class App {
 		}
 		String url = commandLineParser.getFlagValue("url");
 		// need to handle prefix
-		if (debug) {
-			System.err.println("launching browser");
-		}
 		final DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setBrowserName(browser);
 		capabilities.setPlatform(org.openqa.selenium.Platform.ANY);
-		final WebDriver driver = new RemoteWebDriver(capabilities);
+		String hub = String.format("http://%s:%s/wd/hub", host, port);
+		if (debug) {
+			System.err.println("launching browser on hub " + hub);
+		}
+		final WebDriver driver = new RemoteWebDriver(new URL(hub), capabilities);
 
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 
