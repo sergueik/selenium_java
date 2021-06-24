@@ -91,7 +91,7 @@ public class App {
 
 		// Go to URL
 		// "http://www.hollandamerica.com/"
-		driver.get(String.format("http://%s", url));
+		driver.get(url);
 
 		// Maximize Window
 		driver.manage().window().maximize();
