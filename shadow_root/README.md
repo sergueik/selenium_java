@@ -92,6 +92,10 @@ The custom ShadowDriver class injects a Javascript library implementing a big nu
 from file `querySelector.js`.
 
 ### See Also:
+  * [Shadow DOM traversal support discussion on SeleniumHQ](https://github.com/SeleniumHQ/selenium/issues/5869)
+  * [shadow DOM intro](https://javascript.info/shadow-dom)
+  * [shadow DOM introduction](https://developers.google.com/web/fundamentals/web-components/shadowdom)
+  * [using shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
   * [documentation](https://habr.com/ru/company/ruvds/blog/415881/) covering Shadow DOM (in Russian)
   * [blog](https://webdevblog.ru/chto-takoe-shadow-dom/) covering Shadow DOM (in Russian)
   * a collection of [example projects](https://github.com/bonigarcia/mastering-junit5) for junit5 conversion
