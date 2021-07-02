@@ -18,7 +18,7 @@ choose to invoke straight vanilla Javascript `querySelector(selector)` and  `que
 instead of `findElement` and `findElements` with an `By.cssSelector(...))` argument.
 
 However being a Javascript testing tool, depreated or not, genuine __Protractor__ does force one to fully buy in
-by (re)writing the entire test suite in Javascript which few find an acceptable price.
+by (re)writing the entire test suite in Javascript which price only few agree to be reasonable.
 
 This project and its twins [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
 and [pytractor](https://github.com/kpodl/pytractor) manage to make such sacrifice unnecessary.
