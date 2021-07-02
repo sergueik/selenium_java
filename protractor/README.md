@@ -4,13 +4,27 @@ This github project is the 'development branch' of the collaborated project
 [__jProtractor__](https://github.com/caarlos0/jProtractor). It may be few commits ahead.
 
 #### Info
-The [__Angular Protractor__](https://github.com/angular/protractor) is a very popular Selenium Web Driver based project.
-However being a Javascript testing tool, __Protractor__ enforces one to (re)write the whole test suite in Javascript which some may find not acceptable solution.
 
-This project and the sibling [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net) tries to make such conversion unnecessary.
+The [__Angular Protractor__](https://github.com/angular/protractor)
+is a very popular Selenium Web Driver based project.
 
-On the other hand __Angular 1.x__  a.k.a. __AngularJS__ offered unique features: `ng-repeat` and `ng_model`,
-which __Protractor__ takes advantage of by providing unique MVC-style [locator strategies](http://www.protractortest.org/#/api?view=ProtractorBy)
+There have been recenly few some deeply pessimistic posts about
+the Google Angular team plans to __end the development of Protractor at the end of 2022__
+(links at the end of the README) and a number of older debates of (dis) advantages of
+various asyncronuos syntaxes intrinsic to Javascipt, this project is not about specifics of Javascript testsute development
+but constructs a set of plain Java `By`-alike classes
+on top of the 4-year old Protractor's own vanilla Javascript [Client Script Library](https://github.com/angular/protractor/blob/master/lib/clientsidescripts.js) in much the same way one may
+choose to invoke straight vanilla Javascript `querySelector(selector)` and  `querySelectorAll(selector)`
+instead of `findElement` and `findElements` with an `By.cssSelector(...))` argument.
+
+However being a Javascript testing tool, depreated or not, genuine __Protractor__ does force one to fully buy in
+by (re)writing the entire test suite in Javascript which price only few agree to be reasonable.
+
+This project and its twins [C# Protractor Client Framework](https://github.com/sergueik/powershell_selenium/tree/master/csharp/protractor-net)
+and [pytractor](https://github.com/kpodl/pytractor) manage to make such sacrifice unnecessary.
+
+__Angular 1.x__  a.k.a. __AngularJS__ did introduce few unique (from tester perspective) features:
+ `ng-repeat` and `ng_model`, which __Protractor__ takes advantage of by providing unique MVC-style [locator strategies](http://www.protractortest.org/#/api?view=ProtractorBy)
 
 The __jProtractor__ project makes these, plus few extra, locator extensions available to Java:
 
@@ -399,6 +413,14 @@ to the  browser.  The __ngWebDriver__ always sends the whole library.
 This also allows one to patch the individual api (it was important a few years ago) and adding new api (currently, only one such API was added, the `selectedRepeaterOption`. This of course comes at a
 higher cost of integrating the "upstream" changes, but the genuine Protracror project is
 no longer evolving as quickly as it used to.
+### See Also
+
+ * [curious Case of Protractor and Page Synchronization](https://jarifibrahim.github.io/blog/protractor-and-page-synchronization/) blog
+ * older post on [deprecation ana soon future removal of the WebDriverJS promise manager from SelnoumHQ](https://github.com/SeleniumHQ/selenium/issues/2969)
+ * post on [Protractor end of life or support what next Future of Angular E2E](https://ganeshsirsi.medium.com/protractor-end-of-life-what-next-can-cypress-replace-the-protractor-3c58c0ecbb1c)
+ * issue on SeleniumHQ on [future of Angular E2E & Plans for Protractor](https://github.com/angular/protractor/issues/5502)
+
 ### Authors
-[Carlos Alexandro Becker](caarlos0@gmail.com)
-[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+* [Carlos Alexandro Becker](caarlos0@gmail.com)
+* [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
