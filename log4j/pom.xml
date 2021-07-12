@@ -20,7 +20,7 @@
     <org.apache.commons.version>3.1</org.apache.commons.version>
     <org.apache.commons.collections.version>3.2.2</org.apache.commons.collections.version>
     <slf4j.version>1.7.6</slf4j.version>
-    <logback.version>1.1.1</logback.version>
+    <logback.version>1.2.0</logback.version>
   </properties>
   <dependencies>
     <dependency>
