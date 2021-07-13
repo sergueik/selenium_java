@@ -38,15 +38,21 @@ public class App {
 
 	protected static boolean local = false;
 
-	public static void main(String[] args) throws InterruptedException, IOException {
+	public static void main(String[] args)
+			throws InterruptedException, IOException {
 
-		options.addOption(Option.builder("u").longOpt("url").hasArg(true).desc("url to open").required().build());
-		options.addOption(Option.builder("h").longOpt("host").hasArg(true).desc("hub host").required(false).build());
-		options.addOption(Option.builder("p").longOpt("port").hasArg(true).desc("hub port").required(false).build());
-		options.addOption(
-				Option.builder("b").longOpt("browser").hasArg(true).desc("browser to run").required(false).build());
-		options.addOption(Option.builder("d").longOpt("debug").hasArg(false).desc("debug").required(false).build());
-		options.addOption(Option.builder("l").longOpt("local").hasArg(false).desc("localt").required(false).build());
+		options.addOption(Option.builder("u").longOpt("url").hasArg(true)
+				.desc("url to open").required().build());
+		options.addOption(Option.builder("h").longOpt("host").hasArg(true)
+				.desc("hub host").required(false).build());
+		options.addOption(Option.builder("p").longOpt("port").hasArg(true)
+				.desc("hub port").required(false).build());
+		options.addOption(Option.builder("b").longOpt("browser").hasArg(true)
+				.desc("browser to run").required(false).build());
+		options.addOption(Option.builder("d").longOpt("debug").hasArg(false)
+				.desc("debug").required(false).build());
+		options.addOption(Option.builder("l").longOpt("local").hasArg(false)
+				.desc("localt").required(false).build());
 
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = null;
@@ -84,8 +90,8 @@ public class App {
 
 		if (local) {
 			ChromeOptions options = new ChromeOptions();
-			for (String optionAgrument : (new String[] { 
-					// @formatter:off
+			// @formatter:off
+			for (String optionAgrument : (new String[] {
 					"--allow-insecure-localhost",
 					"--allow-running-insecure-content", 
 					"--browser.download.folderList=2",
@@ -119,11 +125,14 @@ public class App {
 			}
 			options.addArguments();
 			System.setProperty("webdriver.chrome.driver",
-					Paths.get(System.getProperty("user.home")).resolve("Downloads")
-							.resolve(
-									System.getProperty("os.name").toLowerCase().contains("windows") ? "chromedriver.exe"
-											: "chromedriver")
-							.toAbsolutePath().toString());
+					System.getProperty("os.name").toLowerCase().contains("windows")
+							? Paths.get(System.getProperty("user.home")).resolve("Downloads")
+									.resolve("chromedriver.exe").toAbsolutePath().toString()
+							: new File("/usr/local/chromedriver").exists()
+									? "/usr/local/chromedriver"
+									: Paths.get(System.getProperty("user.home"))
+											.resolve("Downloads").resolve("chromedriver")
+											.toAbsolutePath().toString());
 			driver = new ChromeDriver(options);
 		} else {
 			final DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -153,7 +162,8 @@ public class App {
 		File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 		String currentDir = System.getProperty("user.dir");
 		// save the screenshot in png format on the disk.
-		FileUtils.copyFile(scrFile, new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+		FileUtils.copyFile(scrFile,
+				new File(FilenameUtils.concat(currentDir, "screenshot.png")));
 		driver.close();
 		driver.quit();
 
