@@ -128,8 +128,8 @@ public class App {
 					System.getProperty("os.name").toLowerCase().contains("windows")
 							? Paths.get(System.getProperty("user.home")).resolve("Downloads")
 									.resolve("chromedriver.exe").toAbsolutePath().toString()
-							: new File("/usr/local/chromedriver").exists()
-									? "/usr/local/chromedriver"
+							: new File("/usr/local/bin/chromedriver").exists()
+									? "/usr/local/bin/chromedriver"
 									: Paths.get(System.getProperty("user.home"))
 											.resolve("Downloads").resolve("chromedriver")
 											.toAbsolutePath().toString());
