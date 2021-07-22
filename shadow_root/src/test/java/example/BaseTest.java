@@ -51,6 +51,7 @@ public class BaseTest {
 	protected static ShadowDriver shadowDriver = null;
 	protected static String browser = getPropertyEnv("BROWSER",
 			getPropertyEnv("webdriver.driver", "chrome"));
+
 	protected static final BrowserChecker browserChecker = new BrowserChecker(
 			browser);
 
@@ -68,6 +69,9 @@ public class BaseTest {
 	@SuppressWarnings("deprecation")
 	@BeforeClass
 	public static void injectShadowJS() {
+		System.err.println("The system properties: " + "\n" + "webdriver.driver="
+				+ System.getProperty("webdriver.driver") + "\n" + "browser.name="
+				+ System.getProperty("browser.name"));
 		System.err.println("Launching " + (headless ? " headless " : "") + browser);
 		if (isCIBuild) {
 			if (browser.equals("chrome")) {
@@ -117,6 +121,8 @@ public class BaseTest {
 										"c:/Program Files (x86)/Mozilla Firefox/firefox.exe")
 												.getAbsolutePath()
 										: "/usr/bin/firefox");
+				System.err.println("webdriver.firefox.bin="
+						+ System.getProperty("webdriver.firefox.bin"));
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
 				// use legacy FirefoxDriver
@@ -126,7 +132,8 @@ public class BaseTest {
 				// org.openqa.selenium.WebDriverException: Timed out waiting 45 seconds
 				// for Firefox to start.
 
-				capabilities.setCapability("marionette", true);
+				// capabilities.setCapability("marionette", true);
+				//
 				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
 				capabilities.setCapability("locationContextEnabled", false);
 				capabilities.setCapability("acceptSslCerts", true);

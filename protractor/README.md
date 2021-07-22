@@ -423,4 +423,3 @@ no longer evolving as quickly as it used to.
 ### Authors
 * [Carlos Alexandro Becker](caarlos0@gmail.com)
 * [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
-
