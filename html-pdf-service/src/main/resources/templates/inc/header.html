@@ -1,0 +1,26 @@
+<head xmlns:th="http://www.thymeleaf.org">
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+	<meta name="description" content="A free (LGPL) HTML to PDF conversion service that uses FlyingSaucer library under LGPL License." />
+	<meta name="keywords" content="PDF, HTML, HTML Template, CSS, FlyingSaucer, iText" />
+	<meta name="author" content="Farrukh Mirza" />
+
+    <title th:text="${@environment.getProperty('application.name')}"></title>
+    
+    
+	<link th:href="@{/public/lib/bootstrap/css/bootstrap.css}" rel="stylesheet"/>
+	<!-- link th:href="@{/public/lib/bootstrap/css/bootstrap-theme.css}" rel="stylesheet"/ -->
+	<link th:href="@{/public/lib/bootstrap/css/bootstrap-theme-darkly.css}" rel="stylesheet"/>
+	<link th:href="@{/public/lib/radioButton/css/radioButton.css}" rel="stylesheet"/>
+    
+    
+    <script th:src="@{/public/lib/jquery/js/jquery.js}"></script>
+    <script th:src="@{/public/lib/bootstrap/js/bootstrap.js}"></script>
+    <script th:src="@{/public/lib/radioButton/js/radioButton.js}"></script>
+    <script th:src="@{/public/lib/custom/js/util.js}"></script>
+
+	    
+</head>

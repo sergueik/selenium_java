@@ -1,0 +1,34 @@
+h1 {color: blue;text-align: center;}strong {color: red;}p {font-family: verdana;font-size: 20px;}
+
+table{
+    margin: 50px 0;
+    text-align: left;
+    border-collapse: separate;
+    border: 1px solid #ddd;
+    border-spacing: 10px;
+    border-radius: 3px;
+    background: #fdfdfd;
+    font-size: 14px;
+    width: auto;
+  }
+  td,th{
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 3px;
+  }
+  th{
+    background: #E4E4E4;
+  }
+  caption{
+    font-style: italic;
+    text-align: right;
+    color: #547901;
+  }
+
+table, th, td {
+  border: 1px solid black;
+}
+table {
+  width: 100%;
+border-collapse: collapse;
+}

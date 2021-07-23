@@ -1,0 +1,28 @@
+<footer class="footer" xmlns:th="http://www.thymeleaf.org">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<hr />
+				<span th:text="${@environment.getProperty('application.name')}"></span>&nbsp;&#45;&nbsp;
+				Farrukh Mirza &copy; (<span th:text="${#dates.format(#calendars.createToday(), 'yyyy')}"></span>)&nbsp;&#45;&nbsp;
+				v&nbsp;<span th:text="${@environment.getProperty('application.version')}"></span>&nbsp;
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<span th:text="${@environment.getProperty('application.description')}"></span>&nbsp;
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<span><a href="https://github.com/farrukhmpk/html-pdf-service" target="_blank">GitHub Repository (Source Code)</a></span>&nbsp;
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<span><a href="http://www.gnu.org/licenses/lgpl.html" target="_blank">GNU Lesser General Public License (LGPL), version 3 or later</a></span>&nbsp;
+			</div>
+		</div>
+	</div>
+</footer>
+	
