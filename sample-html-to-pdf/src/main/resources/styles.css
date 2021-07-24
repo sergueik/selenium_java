@@ -1,0 +1,82 @@
+@font-face {
+    font-family: "HabraFont";
+    src: url(file:///home/sergueik/src/selenium_java/sample-html-to-pdf/src/main/webapp/resources/fonts/tahoma.ttf);
+    -fs-pdf-font-embed: embed;
+    -fs-pdf-font-encoding: Identity-H;
+}
+
+@page {
+    margin: 0px;
+    padding: 0px;
+    size: A4 portrait;
+}
+
+@media print {
+    .new_page {
+        page-break-after: always;
+    }
+}
+
+body *{
+    padding: 0;
+    margin: 0;
+}
+
+* {
+    font-family: HabraFont;
+}
+
+#block {
+    width: 90%;
+    margin: auto;
+    background-color: white;
+    border: dashed #dbdbdb 1px;
+}
+
+#logo {
+    margin-top: 5px;
+    width: 100%;
+    text-align: center;
+    border-bottom: dashed #dbdbdb 1px;
+}
+
+#content {
+    padding-left: 10px;
+}
+
+h1 {color: blue;text-align: center;}
+strong {color: red;}
+p {font-family: verdana;font-size: 20px;}
+
+table{
+    margin: 50px 0;
+    text-align: left;
+    border-collapse: separate;
+    border: 1px solid #ddd;
+    border-spacing: 10px;
+    border-radius: 3px;
+    background: #fdfdfd;
+    font-size: 14px;
+    width: auto;
+  }
+  td,th{
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 3px;
+  }
+  th{
+    background: #E4E4E4;
+  }
+  caption{
+    font-style: italic;
+    text-align: right;
+    color: #547901;
+  }
+
+table, th, td {
+  border: 1px solid black;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
