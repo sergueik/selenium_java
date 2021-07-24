@@ -6,7 +6,6 @@
   <artifactId>web-to-pdf</artifactId>
   <version>1.0</version>
   <dependencies>
-    <!-- Servlet Api -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -24,7 +23,6 @@
       <artifactId>jstl</artifactId>
       <version>1.2</version>
     </dependency>
-    <!-- DEPENDENCIES FOR PDF -->
     <dependency>
       <groupId>org.xhtmlrenderer</groupId>
       <artifactId>flying-saucer-pdf</artifactId>
@@ -54,9 +52,6 @@
           <compilerArgument>-Xlint:all</compilerArgument>
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
-          <!--
-          <compilerArgument>-verbose</compilerArgument>
-          -->
         </configuration>
       </plugin>
       <plugin>
@@ -64,7 +59,7 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <version>${maven-assembly-plugin.version}</version>
         <configuration>
-          <finalName>SWTsample</finalName>
+          <finalName>web-to-pdf</finalName>
           <appendAssemblyId>false</appendAssemblyId>
           <descriptorRefs>
             <descriptorRef>jar-with-dependencies</descriptorRef>
@@ -92,10 +87,7 @@
         <executions>
           <execution>
             <id>copy-dependencies</id>
-            <!--
-               <phase>package</phase>
-             -->
-            <phase>install</phase>
+              <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>
@@ -125,8 +117,6 @@
   <properties>
     <java.version>1.8</java.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
-    <!-- runs ant build.xml scripts embedded in the POM -->
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
