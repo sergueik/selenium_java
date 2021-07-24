@@ -15,47 +15,114 @@ import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 public class App {
 
 	private static final String PAGE_TO_PARSE = "file:///home/sergueik/src/selenium_java/sample-html-to-pdf/example1.html";
 	private static final String CHARSET = "UTF-8";
+	private final static Options options = new Options();
+	private static CommandLineParser commandLineparser = new DefaultParser();
+	private static CommandLine commandLine = null;
+	private static String inputUri;
+	private static String outputFile;
+	private static HtmlCleaner cleaner;
+	private static CleanerProperties props;
+	private static ITextRenderer renderer;
+	private static TagNode node;
+	private static ByteArrayOutputStream pdfOutputStream;
+	private static ByteArrayOutputStream htmlOutputStream;
+	private static FileOutputStream pdfFileOutputStream;
 
-	public static void main(String[] args) {
+	private static boolean debug = false;
 
+	public static void main(String[] args) throws ParseException {
+		options.addOption("h", "help", false, "Help");
+		options.addOption("d", "debug", false, "Help");
+		options.addOption("i", "in", true, "page to print");
+		options.addOption("o", "out", true, "file to save");
+		commandLine = commandLineparser.parse(options, args);
+		if (commandLine.hasOption("h")) {
+			help();
+		}
+		if (commandLine.hasOption("d")) {
+			debug = true;
+		}
+		outputFile = commandLine.getOptionValue("out");
+		inputUri = Paths.get(commandLine.getOptionValue("in")).toUri().toString();
+		if (debug) {
+			System.err.println("Reading: " + inputUri);
+		}
 		try {
-			byte[] pdfDoc = performPdfDocument(args.length > 0 ? args[0] : PAGE_TO_PARSE);
-			System.out.write(pdfDoc);
-		} catch (Exception ex) {
+			byte[] pdfDoc = performPdfDocument(
+					inputUri != null ? inputUri : PAGE_TO_PARSE);
 
-			System.out.println("<strong>Something wrong</strong><br /><br />");
-			ex.printStackTrace();
+			if (outputFile != null) {
+				if (debug) {
+					System.err.println("Writing: " + outputFile);
+				}
+				try {
+					pdfFileOutputStream = new FileOutputStream(new File(outputFile));
+					pdfFileOutputStream.write(pdfDoc);
+					pdfFileOutputStream.close();
+				} catch (IOException e) {
+					System.err.println("Exception: ");
+					e.printStackTrace();
+				}
+			} else {
+				System.out.write(pdfDoc);
+			}
+		} catch (Exception e) {
+			System.err.println("Exception: ");
+			e.printStackTrace();
 		}
 	}
 
-	private static byte[] performPdfDocument(String path) throws IOException, DocumentException {
+	private static byte[] performPdfDocument(String path)
+			throws IOException, DocumentException {
 		String html = getHtml(path);
+		/*
+		if (debug) {
+			System.err.println("Read HTML: " + html.substring(0, 100));
+		}
+		*/
+		htmlOutputStream = new ByteArrayOutputStream();
 
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-
-		HtmlCleaner cleaner = new HtmlCleaner();
-		CleanerProperties props = cleaner.getProperties();
+		cleaner = new HtmlCleaner();
+		props = cleaner.getProperties();
 		props.setCharset(CHARSET);
-		TagNode node = cleaner.clean(html);
-		new PrettyXmlSerializer(props).writeToStream(node, out);
+		node = cleaner.clean(html);
+		new PrettyXmlSerializer(props).writeToStream(node, htmlOutputStream);
 
-		ITextRenderer renderer = new ITextRenderer();
-		renderer.setDocumentFromString(new String(out.toByteArray(), CHARSET));
+		renderer = new ITextRenderer();
+		/*
+		if (debug) {
+			System.err
+					.println("Cleaned HTML: " + out.toString(CHARSET).substring(0, 100));
+		}
+		*/
+		renderer.setDocumentFromString(
+				new String(htmlOutputStream.toByteArray(), CHARSET));
 		renderer.layout();
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-		renderer.createPDF(outputStream);
+		pdfOutputStream = new ByteArrayOutputStream();
+		renderer.createPDF(pdfOutputStream);
 
 		renderer.finishPDF();
-		out.flush();
-		out.close();
+		htmlOutputStream.flush();
+		htmlOutputStream.close();
 
-		byte[] result = outputStream.toByteArray();
-		outputStream.close();
+		byte[] result = pdfOutputStream.toByteArray();
+		pdfOutputStream.close();
 
 		return result;
 	}
@@ -70,13 +137,16 @@ public class App {
 			HttpURLConnection.setFollowRedirects(true);
 
 			int status = ((HttpURLConnection) urlConnection).getResponseCode();
-			if (HttpURLConnection.HTTP_OK != status && (HttpURLConnection.HTTP_MOVED_TEMP == status
-					|| HttpURLConnection.HTTP_MOVED_PERM == status || HttpURLConnection.HTTP_SEE_OTHER == status)) {
+			if (HttpURLConnection.HTTP_OK != status
+					&& (HttpURLConnection.HTTP_MOVED_TEMP == status
+							|| HttpURLConnection.HTTP_MOVED_PERM == status
+							|| HttpURLConnection.HTTP_SEE_OTHER == status)) {
 
 				redirect = true;
 			}
 		} catch (ClassCastException e) {
-			// java.lang.ClassCastException: sun.net.www.protocol.file.FileURLConnection
+			// java.lang.ClassCastException:
+			// sun.net.www.protocol.file.FileURLConnection
 			// cannot be cast to java.net.HttpURLConnection
 			// ignore
 		}
@@ -88,7 +158,8 @@ public class App {
 		urlConnection.setConnectTimeout(30000);
 		urlConnection.setReadTimeout(30000);
 
-		BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), CHARSET));
+		BufferedReader in = new BufferedReader(
+				new InputStreamReader(urlConnection.getInputStream(), CHARSET));
 
 		StringBuilder sb = new StringBuilder();
 		String line;
@@ -99,6 +170,10 @@ public class App {
 		in.close();
 
 		return sb.toString().trim();
+	}
+
+	public static void help() {
+		System.exit(1);
 	}
 
 }

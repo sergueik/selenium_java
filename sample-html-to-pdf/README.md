@@ -1,4 +1,4 @@
-### Info
+﻿### Info
 
   Replica of [ruslanys/sample-html-to-pdf](https://github.com/ruslanys/sample-html-to-pdf) converted to standalone console applicatiion
 
@@ -7,6 +7,11 @@
 
 ```sh
 mvn clean package
+java -cp target/web-to-pdf.jar example.App --in src/main/resources/example.html -d --out z.pdf
+```
+(can use Unix or Windows path separators on Windows machine)
+alternatively
+```sh
 java -cp target/web-to-pdf.jar example.App file:///home/sergueik/src/selenium_java/sample-html-to-pdf/src/main/resources/example.html  >a.pdf
 ```
 ### Note
@@ -23,7 +28,51 @@ Style have to be embedded (styles are critical for locale support):
   font-family: HabraFont;
 }
 ```
-Attempt to print the following sample
+
+The path to the font has to be updated to match the actual path, e.g. 
+on Linux host:
+```css
+src: url(file:///home/sergueik/src/selenium_java/sample-html-to-pdf/src/main/webapp/resources/fonts/Montserrat-Medium.ttf);
+```
+on Windows host
+```css
+src: url(file:///C:/developer/sergueik/selenium_java/sample-html-to-pdf/src/main/webapp/resources/fonts/tahoma.ttf);
+```
+Windows system fonts work fine, e.g.
+```css
+src: url(file:///C:/windows/fonts/times.ttf);
+```
+or 
+```css
+src: url(file:///usr/share/fonts/truetype/Montserrat-Regular.ttf);
+```
+The "unicode fonts" like
+__Arial Unicode MS Regular__ from [FreeFontsDownload.net](https://freefontsdownload.net/free-arial-unicode-ms-font-36926.htm):
+```css
+@font-face {
+  font-family: 'Arial Unicode MS Regular';
+  src: url(file:///home/sergueik/src/selenium_java/sample-html-to-pdf/src/main/webapp/resources/fonts/ArialUnicodeMS.ttf);
+  -fs-pdf-font-embed: embed;
+  -fs-pdf-font-encoding: Identity-H;
+}
+```
+do not work: the pdf silently fails to render cyrillic text (must be encoding-sensitive)
+
+The incorrect URI syntax in font resource leads to an exception:
+```sh
+java.lang.NullPointerException
+  at org.xhtmlrenderer.swing.NaiveUserAgent.getBinaryResource(NaiveUserAgent.java:229)
+  at org.xhtmlrenderer.pdf.ITextFontResolver.importFontFaces(ITextFontResolver.java:114)
+  at org.xhtmlrenderer.pdf.ITextRenderer.setDocument(ITextRenderer.java:177)
+  at org.xhtmlrenderer.pdf.ITextRenderer.setDocument(ITextRenderer.java:143)
+  at org.xhtmlrenderer.pdf.ITextRenderer.setDocumentFromString(ITextRenderer.java:160)
+  at org.xhtmlrenderer.pdf.ITextRenderer.setDocumentFromString(ITextRenderer.java:153)
+  at example.App.performPdfDocument(App.java:93)
+  at example.App.main(App.java:60)
+```
+* the HTML file has to be encoded in UTF-8 (important with cyrillic).
+
+* Style has to be embedded. Ab attempt to print the following sample
 ```html
 <!doctype html>
 <html>
@@ -78,17 +127,7 @@ Using the __Fira Sans__ woff fonts from [хабр](https://habr.com/ru) from loc
 }
 
 ```
-
-or downloading __Arial Unicode MS Regular__ from [FreeFontsDownload.net](https://freefontsdownload.net/free-arial-unicode-ms-font-36926.htm):
-```css
-@font-face {
-  font-family: 'Arial Unicode MS Regular';
-  src: url(file:///home/sergueik/src/selenium_java/sample-html-to-pdf/src/main/webapp/resources/fonts/ArialUnicodeMS.ttf);
-  -fs-pdf-font-embed: embed;
-  -fs-pdf-font-encoding: Identity-H;
-}
-```
-silently fails to render cyrillic text (must be encoding-sensitive)
+does not work 
 ### See Also
 
   * the original [post](https://habrahabr.ru/post/217561/) (in Russian)
