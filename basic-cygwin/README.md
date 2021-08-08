@@ -50,7 +50,20 @@ Running the command: c:\cygwin\bin\bash.exe -c  "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6
 Process exit code: 2
 <ERROR>/bin/ls: cannot access "/baddir": No such file or directory</ERROR>
 ```
-
+* test on linux:
+```sh
+mvn package
+java -cp target/cygwin-0.1.0-SNAPSHOT.jar:target/lib/* example.App $(pwd)
+```
+this produces
+```sh
+Listing the dirs: [/home/sergueik/src/selenium_java/basic-cygwin]
+Running the command: ls -Q /home/sergueik/src/selenium_java/basic-cygwin
+<OUTPUT>pom.xml
+README.md
+src
+target</OUTPUT>
+```
 ### See Also
   * https://stackoverflow.com/questions/6751944/how-to-execute-unix-commands-through-windows-cygwin-using-java
 

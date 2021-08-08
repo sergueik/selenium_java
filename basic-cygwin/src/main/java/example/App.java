@@ -35,17 +35,16 @@ public class App {
 	private boolean debug = false;
 
 	public void saveFlagValue(String flagName, String longFlagNAme) {
-		options.addRequiredOption(flagName, "action", true,
-				String.format("%s option", longFlagNAme));
+		options.addRequiredOption(flagName, "action", true, String.format("%s option", longFlagNAme));
 	}
 
 	public App() {
 		options.addOption("h", "help", false, "Help");
 		/*
-		options.addOption(Option.builder("d").longOpt("data").required(true)
-				.hasArg(true).desc("Data option").build());
-		options.addRequiredOption("a", "action", true, "Action option");
-		*/
+		 * options.addOption(Option.builder("d").longOpt("data").required(true)
+		 * .hasArg(true).desc("Data option").build()); options.addRequiredOption("a",
+		 * "action", true, "Action option");
+		 */
 	}
 
 	public boolean isDebug() {
@@ -78,15 +77,12 @@ public class App {
 				help();
 			}
 
-			Arrays.asList(commandLine.getOptions()).stream()
-					.forEach(o -> flags.put(o.getArgName(), o.getValue()));
-			flags.keySet().stream().forEach(
-					o -> System.err.println(String.format("%s", o, flags.get(o))));
+			Arrays.asList(commandLine.getOptions()).stream().forEach(o -> flags.put(o.getArgName(), o.getValue()));
+			flags.keySet().stream().forEach(o -> System.err.println(String.format("%s", o, flags.get(o))));
 		} catch (ParseException e) {
 			System.err.println("Exception parsing command line: " + e.toString());
 
-			new HelpFormatter().printHelp(this.getClass().getSimpleName() + " [args]",
-					options);
+			new HelpFormatter().printHelp(this.getClass().getSimpleName() + " [args]", options);
 			System.exit(INVALID_OPTION);
 		}
 		System.exit(0);
@@ -108,8 +104,8 @@ public class App {
 			return;
 		}
 		String command = (osName.toLowerCase().startsWith("windows"))
-				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s",
-						"/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9", String.join(" ", dirs))
+				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s", "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9",
+						String.join(" ", dirs))
 				: String.format("ls %s", String.join(" ", dirs));
 		err.println("Running the command: " + command);
 		try {
@@ -117,36 +113,34 @@ public class App {
 			Process process = runtime.exec(command);
 			// process.redirectErrorStream( true);
 
-			BufferedReader stdoutBufferedReader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
+			BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-			BufferedReader stderrBufferedReader = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
+			BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line = null;
 
 			StringBuffer processOutput = new StringBuffer();
 			while ((line = stdoutBufferedReader.readLine()) != null) {
 				processOutput.append(line);
+				processOutput.append("\n");
 			}
 			StringBuffer processError = new StringBuffer();
 			while ((line = stderrBufferedReader.readLine()) != null) {
 				processError.append(line);
+				processOutput.append("\n");
 			}
 			int exitCode = process.waitFor();
 			// ignore exit code 128: the process "<browser driver>" not found.
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					err.println(
-							"<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
+					err.println("<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
 				}
 				if (processError.length() > 0) {
 					err.println("<ERROR>" + processError.toString() + "</ERROR>");
 				}
 			} else {
 				if (processOutput.length() > 0) {
-					err.println(
-							"<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
+					err.println("<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
 				}
 			}
 		} catch (Exception e) {
@@ -165,10 +159,13 @@ public class App {
 	}
 
 	private static String fixOutput(String data) {
-		String value = null;
+		String value = data;
+
+		char[] chars = data.toCharArray();
+		System.err.println(Arrays.toString(chars));
+
 		Pattern p = Pattern.compile("\"([^\"]+)\"");
-		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n")
-				.replaceAll("\"\"", "\"\r\n\""));
+		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n").replaceAll("\"\"", "\"\r\n\""));
 		if (m.find()) {
 			value = m.replaceAll("$1");
 			// if (debug) {
