@@ -7,19 +7,21 @@ Replica of [project](https://github.com/dariusz-szczepaniak/java.jna.WindowsCred
 
 ```sh
 mvn clean package
-java -jar target/example.credential-manager.jar example.ListCredentials
+java -cp target/example.credential-manager.jar example.App -a
 ```
 will show all credentials
 * add some credntials, e.g.
 ![credentials](https://github.com/sergueik/selenium_jav/blob/master/credential_manager/screenshots/capture.png)
 and read them
 ```sh
-java -jar target\example.credential-manager.jar some_user
+java -jar target\example.credential-manager.jar -t some_user
 ```
 will respond with
 ```sh
 address:[some_user], username:[null], password:[super_secret]
 ```
+Multiple 'targets' values can be passed comma-separated 
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
