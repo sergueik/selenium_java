@@ -1,14 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>example</groupId>
-	<artifactId>credential-manager</artifactId>
-	<version>0.1.0-SNAPSHOT</version>
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>example</groupId>
+  <artifactId>credential-manager</artifactId>
+  <version>0.2.0-SNAPSHOT</version>
   <properties>
     <!-- NOTE: do not use dot in the mainClass property -->
-    <mainClass>ListCredentials</mainClass>
+    <mainClass>App</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commandline-parser.version>0.8.0-SNAPSHOT</commandline-parser.version>
     <commons-configuration.version>1.10</commons-configuration.version>
     <commons-collections4.version>4.2</commons-collections4.version>
     <commons-exec.version>1.3</commons-exec.version>
@@ -28,23 +27,21 @@
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
   </properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna</artifactId>
+  <dependencies>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
       <version>${jna-platform.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>net.java.dev.jna</groupId>
-			<artifactId>jna-platform</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna-platform</artifactId>
       <version>${jna-platform.version}</version>
-		</dependency>
-	</dependencies>
-
+    </dependency>
+  </dependencies>
   <build>
-    <sourceDirectory>src</sourceDirectory>
-    <testSourceDirectory>src</testSourceDirectory>
+    <sourceDirectory>src/main/java</sourceDirectory>
+    <testSourceDirectory>src/test/java</testSourceDirectory>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -95,7 +92,7 @@
         <executions>
           <execution>
             <id>copy-dependencies</id>
-               <phase>package</phase>
+            <phase>package</phase>
             <goals>
               <goal>copy-dependencies</goal>
             </goals>

@@ -7,7 +7,7 @@ import com.sun.jna.Pointer;
 import com.sun.jna.ptr.IntByReference;
 import com.sun.jna.ptr.PointerByReference;
 
-public class ListCredentials {
+public class App {
 
 	public static void main(String[] args) {
 		if (args.length > 0) {
