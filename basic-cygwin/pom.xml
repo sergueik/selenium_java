@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>cygwin</artifactId>
   <packaging>jar</packaging>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <name>cygwin</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -19,7 +19,6 @@
     <encoding>UTF-8</encoding>
     <project.build.sourceEncoding>${encoding}</project.build.sourceEncoding>
     <project.reporting.outputEncoding>${encoding}</project.reporting.outputEncoding>
-    <commandline-parser.version>0.7.0-SNAPSHOT</commandline-parser.version>
     <commons-cli.version>1.4</commons-cli.version>
     <commons-configuration.version>1.10</commons-configuration.version>
     <commons-exec.version>1.3</commons-exec.version>
@@ -40,17 +39,6 @@
     <finalName>${project.groupId}.${project.artifactId}</finalName>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>example</groupId>
-      <artifactId>commandline-parser</artifactId>
-      <version>${commandline-parser.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     <dependency>
       <groupId>org.exparity</groupId>
       <artifactId>hamcrest-date</artifactId>

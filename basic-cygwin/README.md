@@ -108,8 +108,15 @@ one can pass multiple dirs separated by commans via `-arguments`:
 ```sh
 java -cp target/example.cygwin.jar:target/lib/* example.App -command ls -arguments $(pwd),/tmp -quote
 ```
+
+To list regular Windows directories, use cygwin paths like
+
+```cmd
+java -cp target\example.cygwin.jar;target\lib\* example.App -c ls -a /cygdrive/c/Users/sergueik/Desktop
+```
 ### See Also
   * https://stackoverflow.com/questions/6751944/how-to-execute-unix-commands-through-windows-cygwin-using-java
 
 ### Author
-[Serguei Kouzmine](kouzmine_serguei@yahoc.com)
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+

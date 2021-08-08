@@ -1,19 +1,26 @@
 package example;
 
-import static java.lang.System.err;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import example.CommandLineParser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class App {
 
@@ -23,34 +30,37 @@ public class App {
 	private static boolean useQuoteArg = false;
 
 	private static boolean debug = false;
-	private static CommandLineParser commandLineParser;
+	private final static Options options = new Options();
+	private static CommandLineParser commandLineparser = new DefaultParser();
+	private static CommandLine commandLine = null;
 
-	public static void main(String args[]) {
-		commandLineParser = new CommandLineParser();
-
-		commandLineParser.saveFlagValue("quote");
-		commandLineParser.saveFlagValue("command");
-		commandLineParser.saveFlagValue("arguments");
-		commandLineParser.parse(args);
-
-		if (commandLineParser.hasFlag("debug")) {
+	public static void main(String args[]) throws ParseException {
+		options.addOption("d", "debug", false, "Help");
+		options.addOption("q", "quote", false, "quote");
+		options.addOption("c", "command", true, "command");
+		options.addOption("a", "arguments", true, "arguments");
+		commandLine = commandLineparser.parse(options, args);
+		if (commandLine.hasOption("h")) {
+			help();
+		}
+		if (commandLine.hasOption("d")) {
 			debug = true;
 		}
-		if (commandLineParser.hasFlag("quote")) {
+		if (commandLine.hasOption("q")) {
 			useQuoteArg = true;
 		}
-		String arguments = commandLineParser.getFlagValue("arguments");
-		if (arguments == null) {
-			System.err.println("Missing required argument: arguments");
-			return;
-		}
-		String command = commandLineParser.getFlagValue("command");
-		if (command == null) {
-			System.err.println("Missing required argument: command");
-			return;
-		}
-		if (command.equalsIgnoreCase("ls")) {
+		String arguments = commandLine.getOptionValue("arguments");
 
+		// TODO:
+		List<String> argumentsFixed = Arrays.asList(arguments.split(",")).stream()
+				.map(f -> Paths.get(f).toUri().toString()).collect(Collectors.toList());
+
+		String command = commandLine.getOptionValue("command");
+		if (debug) {
+			System.err.println("Listing the dirs: " + arguments);
+		}
+
+		if (command.equalsIgnoreCase("ls")) {
 			String[] argumentsArray = arguments.split(",");
 			runProcessls(Arrays.asList(argumentsArray));
 		}
@@ -62,16 +72,15 @@ public class App {
 
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void runProcessls(List<String> dirs) {
-		err.println("Listing the dirs: " + dirs);
 		final String quoteArg = (useQuoteArg) ? "-Q" : "";
 		if (dirs.isEmpty()) {
 			return;
 		}
-		String command = (osName.toLowerCase().startsWith("windows"))
-				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s", "/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9",
-						quoteArg, String.join(" ", dirs))
+		String command = osName.toLowerCase().startsWith("windows")
+				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s",
+						String.format("/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9", quoteArg), String.join(" ", dirs))
 				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
-		err.println("Running the command: " + command);
+		System.err.println("Running the command: " + command);
 		try {
 			Runtime runtime = Runtime.getRuntime();
 			Process process = runtime.exec(command);
@@ -95,22 +104,24 @@ public class App {
 			int exitCode = process.waitFor();
 			// ignore exit code 128 on Windows: the process "<browser driver>" not found.
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
-				err.println("Process exit code: " + exitCode);
+				System.err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					err.println("<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
-							+ "</OUTPUT>");
+					System.err.println(
+							"<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
+									+ "</OUTPUT>");
 				}
 				if (processError.length() > 0) {
-					err.println("<ERROR>" + processError + "</ERROR>");
+					System.err.println("<ERROR>" + processError + "</ERROR>");
 				}
 			} else {
 				if (processOutput.length() > 0) {
-					err.println("<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
-							+ "</OUTPUT>");
+					System.err.println(
+							"<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
+									+ "</OUTPUT>");
 				}
 			}
 		} catch (Exception e) {
-			err.println("Exception (ignored): " + e.getMessage());
+			System.err.println("Exception (ignored): " + e.getMessage());
 		}
 	}
 
@@ -134,4 +145,9 @@ public class App {
 		}
 		return value;
 	}
+
+	public static void help() {
+		System.exit(1);
+	}
+
 }
