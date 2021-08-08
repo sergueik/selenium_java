@@ -104,6 +104,10 @@ src
 target
 </OUTPUT>
 ```
+one can pass multiple dirs separated by commans via `-arguments`:
+```sh
+java -cp target/example.cygwin.jar:target/lib/* example.App -command ls -arguments $(pwd),/tmp -quote
+```
 ### See Also
   * https://stackoverflow.com/questions/6751944/how-to-execute-unix-commands-through-windows-cygwin-using-java
 

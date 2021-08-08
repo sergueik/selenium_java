@@ -15,14 +15,6 @@ import example.CommandLineParser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-// import org.apache.commons.cli.CommandLine;
-// import org.apache.commons.cli.CommandLineParser;
-// import org.apache.commons.cli.DefaultParser;
-// import org.apache.commons.cli.HelpFormatter;
-// import org.apache.commons.cli.Option;
-// import org.apache.commons.cli.Options;
-// import org.apache.commons.cli.ParseException;
-
 public class App {
 
 	protected static String osName = getOSName();
@@ -58,8 +50,9 @@ public class App {
 			return;
 		}
 		if (command.equalsIgnoreCase("ls")) {
-			// TODO: Break into array
-			runProcessls(Arrays.asList(arguments));
+
+			String[] argumentsArray = arguments.split(",");
+			runProcessls(Arrays.asList(argumentsArray));
 		}
 		if (debug) {
 			System.err.println("Done: " + command + " " + arguments);
@@ -134,16 +127,10 @@ public class App {
 	private static String fixQuotedOutput(String data) {
 		String value = data;
 
-		// char[] chars = data.toCharArray();
-		// System.err.println(Arrays.toString(chars));
-
 		Pattern p = Pattern.compile("\"([^\"]+)\"");
 		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n").replaceAll("\"\"", "\"\r\n\""));
 		if (m.find()) {
 			value = m.replaceAll("$1");
-			// if (debug) {
-			// System.err.println("Fixed: " + value);
-			// }
 		}
 		return value;
 	}
