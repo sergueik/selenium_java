@@ -10,103 +10,74 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import example.CommandLineParser;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+// import org.apache.commons.cli.CommandLine;
+// import org.apache.commons.cli.CommandLineParser;
+// import org.apache.commons.cli.DefaultParser;
+// import org.apache.commons.cli.HelpFormatter;
+// import org.apache.commons.cli.Option;
+// import org.apache.commons.cli.Options;
+// import org.apache.commons.cli.ParseException;
 
 public class App {
 
 	protected static String osName = getOSName();
 	public static final int INVALID_OPTION = 42;
-	private final Options options = new Options();
-	private CommandLineParser commandLineparser = new DefaultParser();
-	private CommandLine commandLine = null;
 	private Map<String, String> flags = new HashMap<>();
+	private static boolean useQuoteArg = false;
 
-	private HelpFormatter helpFormatter = new HelpFormatter();
-	private boolean debug = false;
-
-	public void saveFlagValue(String flagName, String longFlagNAme) {
-		options.addRequiredOption(flagName, "action", true, String.format("%s option", longFlagNAme));
-	}
-
-	public App() {
-		options.addOption("h", "help", false, "Help");
-		/*
-		 * options.addOption(Option.builder("d").longOpt("data").required(true)
-		 * .hasArg(true).desc("Data option").build()); options.addRequiredOption("a",
-		 * "action", true, "Action option");
-		 */
-	}
-
-	public boolean isDebug() {
-		return debug;
-	}
-
-	public void setDebug(boolean value) {
-		debug = value;
-	}
-
-	public Set<String> getFlags() {
-		Set<String> result = flags.keySet();
-		return result;
-	}
-
-	public String getFlagValue(String name) {
-		return flags.get(name);
-	}
+	private static boolean debug = false;
+	private static CommandLineParser commandLineParser;
 
 	public static void main(String args[]) {
-		runProcessls(Arrays.asList(args));
-	}
+		commandLineParser = new CommandLineParser();
 
-	// https://www.programcreek.com/java-api-examples/org.apache.commons.cli.CommandLineParser
-	public void run(String... args) {
+		commandLineParser.saveFlagValue("quote");
+		commandLineParser.saveFlagValue("command");
+		commandLineParser.saveFlagValue("arguments");
+		commandLineParser.parse(args);
 
-		try {
-			commandLine = commandLineparser.parse(options, args);
-			if (commandLine.hasOption("h")) {
-				help();
-			}
-
-			Arrays.asList(commandLine.getOptions()).stream().forEach(o -> flags.put(o.getArgName(), o.getValue()));
-			flags.keySet().stream().forEach(o -> System.err.println(String.format("%s", o, flags.get(o))));
-		} catch (ParseException e) {
-			System.err.println("Exception parsing command line: " + e.toString());
-
-			new HelpFormatter().printHelp(this.getClass().getSimpleName() + " [args]", options);
-			System.exit(INVALID_OPTION);
+		if (commandLineParser.hasFlag("debug")) {
+			debug = true;
 		}
-		System.exit(0);
-	}
+		if (commandLineParser.hasFlag("quote")) {
+			useQuoteArg = true;
+		}
+		String arguments = commandLineParser.getFlagValue("arguments");
+		if (arguments == null) {
+			System.err.println("Missing required argument: arguments");
+			return;
+		}
+		String command = commandLineParser.getFlagValue("command");
+		if (command == null) {
+			System.err.println("Missing required argument: command");
+			return;
+		}
+		if (command.equalsIgnoreCase("ls")) {
+			// TODO: Break into array
+			runProcessls(Arrays.asList(arguments));
+		}
+		if (debug) {
+			System.err.println("Done: " + command + " " + arguments);
+		}
 
-	public void help() {
-		System.exit(1);
-	}
-
-	public void help(int status) {
-		System.exit(status);
 	}
 
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void runProcessls(List<String> dirs) {
 		err.println("Listing the dirs: " + dirs);
-
+		final String quoteArg = (useQuoteArg) ? "-Q" : "";
 		if (dirs.isEmpty()) {
 			return;
 		}
 		String command = (osName.toLowerCase().startsWith("windows"))
-				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s", "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9",
-						String.join(" ", dirs))
-				: String.format("ls %s", String.join(" ", dirs));
+				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s", "/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9",
+						quoteArg, String.join(" ", dirs))
+				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
 		err.println("Running the command: " + command);
 		try {
 			Runtime runtime = Runtime.getRuntime();
@@ -129,18 +100,20 @@ public class App {
 				processOutput.append("\n");
 			}
 			int exitCode = process.waitFor();
-			// ignore exit code 128: the process "<browser driver>" not found.
+			// ignore exit code 128 on Windows: the process "<browser driver>" not found.
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					err.println("<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
+					err.println("<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
+							+ "</OUTPUT>");
 				}
 				if (processError.length() > 0) {
-					err.println("<ERROR>" + processError.toString() + "</ERROR>");
+					err.println("<ERROR>" + processError + "</ERROR>");
 				}
 			} else {
 				if (processOutput.length() > 0) {
-					err.println("<OUTPUT>" + fixOutput(processOutput.toString()) + "</OUTPUT>");
+					err.println("<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
+							+ "</OUTPUT>");
 				}
 			}
 		} catch (Exception e) {
@@ -158,11 +131,11 @@ public class App {
 		return osName;
 	}
 
-	private static String fixOutput(String data) {
+	private static String fixQuotedOutput(String data) {
 		String value = data;
 
-		char[] chars = data.toCharArray();
-		System.err.println(Arrays.toString(chars));
+		// char[] chars = data.toCharArray();
+		// System.err.println(Arrays.toString(chars));
 
 		Pattern p = Pattern.compile("\"([^\"]+)\"");
 		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n").replaceAll("\"\"", "\"\r\n\""));
