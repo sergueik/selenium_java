@@ -4,7 +4,7 @@
   <groupId>com.mycompany.app</groupId>
   <artifactId>headless-chrome</artifactId>
   <packaging>jar</packaging>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.4-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -26,7 +26,7 @@
     <java.version>1.8</java.version>
     <json.version>20170516</json.version>
     <junit.version>4.13.1</junit.version>
-    <log4j.version>2.5</log4j.version>
+    <log4j.version>[2.13.2,)</log4j.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
