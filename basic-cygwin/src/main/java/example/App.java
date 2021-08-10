@@ -24,19 +24,19 @@ import java.util.stream.Collectors;
 
 public class App {
 
-	protected static String osName = getOSName();
-	public static final int INVALID_OPTION = 42;
-	private Map<String, String> flags = new HashMap<>();
-	private static boolean useQuoteArg = false;
-	private static boolean useBash = false;
-	private static boolean useInline = false;
+protected static String osName = getOSName();
+public static final int INVALID_OPTION = 42;
+private Map<String, String> flags = new HashMap<>();
+private static boolean useQuoteArg = false;
+private static boolean useBash = false;
+private static boolean useInline = false;
 
-	private static boolean debug = false;
-	private final static Options options = new Options();
-	private static CommandLineParser commandLineparser = new DefaultParser();
-	private static CommandLine commandLine = null;
+private static boolean debug = false;
+private final static Options options = new Options();
+private static CommandLineParser commandLineparser = new DefaultParser();
+private static CommandLine commandLine = null;
 
-	public static void main(String args[]) throws ParseException {
+public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("q", "quote", false, "Enclose entry names in double quotes");
