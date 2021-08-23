@@ -25,7 +25,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jsoup.version>1.11.3</jsoup.version>
+        <jsoup.version>1.14.2</jsoup.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven-core.version>3.3.1</maven-core.version>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>    
