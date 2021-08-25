@@ -3,10 +3,9 @@
 Invoking [rrd4j/rrd4j](https://github.com/rrd4j/rrd4j) `Converter` __API__ to generate catalog of ds in [RRD](https://oss.oetiker.ch/rrdtool/)
 within a directory. Many tools produce RRD files with just 2 data sources, __DS0__ and __DS1__ however there is no limit to the number of entries, hence the code
 ```java
-URL url = new URL(dataFileUri);
 RrdDb rrd = RrdDb.getBuilder()
    .setPath("test")
-  .setRrdToolImporter(url.getFile())
+  .setRrdToolImporter(new URL(dataFileUri).getFile())
   .setBackendFactory(new RrdMemoryBackendFactory()).build();
 for (int cnt = 0; cnt != rrd.getDsCount(); cnt++) {
   String ds = rrd.getDatasource(cnt).getName();
@@ -16,94 +15,55 @@ is iterated for every file matching `*.rrd` filemask
 ### Usage
 * build
 ```cmd
-mvn package
+mvn -Dmaven.test.skip=true package
 ```
 * run via `CLASSPATH`:
 ```
-java -cp target\example.rrd-cachedb.jar;target\lib\* example.App -p rrdtool
+java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --path data --save
 ```
-where the `.rrd` files are put into `rrdtool`, `rrdool\web` and `rrdtool\app` folders
+or just
+```
+java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --p data --s
+```
+
+where the `sample.rrd` file was placed into `rrdool\web` (more folders are not shown)
+
 this outputs
 ```cmd
-Scanning path: rrdtool
-Reading RRD file: 0001b328
-Exception (ignored): java.lang.IllegalArgumentException
-Reading RRD file: 0001b648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0001l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0001l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0003b328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0003l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0003l328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: 0003l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0001b328
-Exception (ignored): java.lang.IllegalArgumentException
-Reading RRD file: app:0001b648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0001l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0001l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0003b328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0003l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0003l328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:0003l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: app:rrdtool
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: rrdtool
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0001b328
-Exception (ignored): java.lang.IllegalArgumentException
-Reading RRD file: web:0001b648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0001l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0001l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0003b328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0003l324
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0003l328
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:0003l648
-ds[0]= "speed"
-ds[1]= "weight"
-Reading RRD file: web:rrdtool
-ds[0]= "speed"
-ds[1]= "weight"
+Scanning path: /C:/developer/sergueik/selenium_java/rrd-cachedb/data/
+Reading RRD file: web:sample
+ds[0]= "ClientGlideIdle"
+ds[1]= "ClientGlideRunning"
+ds[2]= "ClientGlideTotal"
+ds[3]= "ClientInfoAge"
+ds[4]= "ClientJobsIdle"
+ds[5]= "ClientJobsRunning"
+ds[6]= "ReqIdle"
+ds[7]= "ReqMaxRun"
+ds[8]= "StatusHeld"
+ds[9]= "StatusIdle"
+ds[10]= "StatusIdleOther"
+ds[11]= "StatusPending"
+ds[12]= "StatusRunning"
+ds[13]= "StatusStageIn"
+ds[14]= "StatusStageOut"
+ds[15]= "StatusWait"
+fname = web:sample      ds = ClientGlideIdle
+fname = web:sample      ds = ClientGlideRunning
+fname = web:sample      ds = ClientGlideTotal
+fname = web:sample      ds = ClientInfoAge
+fname = web:sample      ds = ClientJobsIdle
+fname = web:sample      ds = ClientJobsRunning
+fname = web:sample      ds = ReqIdle
+fname = web:sample      ds = ReqMaxRun
+fname = web:sample      ds = StatusHeld
+fname = web:sample      ds = StatusIdle
+fname = web:sample      ds = StatusIdleOther
+fname = web:sample      ds = StatusPending
+fname = web:sample      ds = StatusRunning
+fname = web:sample      ds = StatusStageIn
+fname = web:sample      ds = StatusStageOut
+fname = web:sample      ds = StatusWait
 ```
 
 ### See Also

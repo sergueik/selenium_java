@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>rrd-cachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>rrd-cachedb</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -29,23 +29,22 @@
     <junit.version>4.13.2</junit.version>
     <log4j.version>2.13.2</log4j.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
-
     <java.version>1.8</java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <rrd4j.version>3.8</rrd4j.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
+    <version.sqlite-jdbc>3.8.7</version.sqlite-jdbc>
     <testng.version>6.14.3</testng.version>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
   </properties>
   <dependencies>
-<dependency>
-    <groupId>org.rrd4j</groupId>
-    <artifactId>rrd4j</artifactId>
-    <version>${rrd4j.version}</version>
-</dependency>
-
+    <dependency>
+      <groupId>org.rrd4j</groupId>
+      <artifactId>rrd4j</artifactId>
+      <version>${rrd4j.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.exparity</groupId>
       <artifactId>hamcrest-date</artifactId>
@@ -103,6 +102,12 @@
         </exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+      <groupId>org.xerial</groupId>
+      <artifactId>sqlite-jdbc</artifactId>
+      <version>${version.sqlite-jdbc}</version>
+      <scope>runtime</scope>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${finalName}</finalName>
@@ -118,29 +123,8 @@
           <source>${java.version}</source>
           <target>${java.version}</target>
           <encoding>${encoding}</encoding>
-          <!-- On windows one needs to update console code page outside of maven
-to work with cyrillic pages:
-chcp 65001
-set JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF-8
-rem ${encoding}
- -->
           <compilerArgument>-Xlint:all</compilerArgument>
           <compilerArgument>-Xlint:-processing</compilerArgument>
-		  <!-- NOTE: some compiler optimizatino flags not recognized on JDK 1.8.0.101 and were added in later builds e.g. 1.8.0.151:  
-                  Fatal error compiling: 
-                  invalid flag: -XX:+AggressiveUnboxing
-                  invalid flag: -XX:+AggressiveOpts
-                  invalid flag: -XX:+UnlockExperimentalVMOptions
-                  -->
-          <!--
-          <compilerArgument>-XX:+UnlockExperimentalVMOptions</compilerArgument>
-          <compilerArgument>-XX:+AggressiveOpts</compilerArgument>
-	  <compilerArgument>-XX:+AggressiveUnboxing</compilerArgument>
-	  -->
-          <!--
-   <compilerArgument>-Dfile.encoding=${encoding}</compilerArgument>
-Fatal error compiling: invalid flag: -Dfile.encoding=UTF-8 -> [Help 1]
--->
           <showWarnings>true</showWarnings>
           <showDeprecation>true</showDeprecation>
         </configuration>

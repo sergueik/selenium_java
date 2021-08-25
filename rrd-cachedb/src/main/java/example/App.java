@@ -40,6 +40,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -49,15 +51,29 @@ import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.equalTo;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.RowId;
+
+// https://bitbucket.org/xerial/sqlite-jdbc
+// https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
+
 public class App {
 
-	protected static String osName = getOSName();
+	private static final Random r = new Random();
+	private static Connection connection = null;
+	private static String osName = getOSName();
 	public static final int INVALID_OPTION = 42;
 	private Map<String, String> flags = new HashMap<>();
-	private final static Map<String, List<String>> dsMap = new HashMap<>();
+	private static Map<String, List<String>> dsMap = new HashMap<>();
 	private static List<Path> result = new ArrayList<>();
 
 	private static boolean debug = false;
+	private static boolean save = false;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
@@ -65,6 +81,7 @@ public class App {
 	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
+		options.addOption("s", "save", false, "Save");
 		options.addOption("p", "path", true, "Path to scan");
 		commandLine = commandLineparser.parse(options, args);
 		if (commandLine.hasOption("h")) {
@@ -73,15 +90,24 @@ public class App {
 		if (commandLine.hasOption("d")) {
 			debug = true;
 		}
+		if (commandLine.hasOption("save")) {
+			save = true;
+		}
 		String path = commandLine.getOptionValue("path");
 		if (path == null) {
 			System.err.println("Missing required argument: path");
 			return;
 		}
-		try {
-			listFilesDsNames(path);
-		} catch (IOException e) {
 
+		try {
+			dsMap = listFilesDsNames(path);
+		} catch (IOException e) {
+		}
+
+		if (save) {
+			createTable();
+			saveData(dsMap);
+			displayData();
 		}
 		if (debug) {
 			System.err.println("Done: " + path);
@@ -89,12 +115,80 @@ public class App {
 
 	}
 
-	public static void help() {
-		System.exit(1);
+	private static void displayData() {
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+
+			ResultSet rs = statement.executeQuery(
+					"SELECT DISTINCT fname, ds FROM cache ORDER BY fname, ds");
+			while (rs.next()) {
+				System.err.println("fname = " + rs.getString("fname") + "\t" + "ds = "
+						+ rs.getString("ds"));
+			}
+			statement.close();
+			statement = connection.createStatement();
+			statement.executeUpdate("delete from cache");
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				System.err.println(e);
+			}
+		}
 	}
 
-	public static void listFilesDsNames(String path) throws IOException {
+	private static void createTable() {
 
+		try {
+			Class.forName("org.sqlite.JDBC");
+			connection = DriverManager.getConnection("jdbc:sqlite::memory:");
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			String sql = String.format(
+					"CREATE TABLE IF NOT EXISTS %s "
+							+ "(id INT PRIMARY KEY NOT NULL, ds CHAR(50) NOT NULL, fname CHAR(50) NOT NULL)",
+					"cache");
+			statement.executeUpdate(sql);
+			statement.close();
+
+		} catch (ClassNotFoundException | SQLException e) {
+			System.err.println(e.getMessage());
+			return;
+		}
+	}
+
+	private static void saveData(Map<String, List<String>> dsMap) {
+		dsMap.entrySet().stream().forEach(o -> {
+			String fname = o.getKey();
+			o.getValue().stream().forEach(ds -> {
+				try {
+					Statement statement = connection.createStatement();
+					statement.setQueryTimeout(30);
+
+					PreparedStatement preparedStatement = connection.prepareStatement(
+							"INSERT INTO cache (id, fname, ds) VALUES (?, ?, ?)");
+					int id = r.nextInt(100000);
+					preparedStatement.setInt(1, id);
+					preparedStatement.setString(2, fname);
+					preparedStatement.setString(3, ds);
+					preparedStatement.execute();
+
+				} catch (SQLException e) {
+					System.err.println(e.getMessage());
+				}
+
+			});
+		});
+
+	}
+
+	private static Map<String, List<String>> listFilesDsNames(String path)
+			throws IOException {
+		final Map<String, List<String>> dsMap = new HashMap<>();
 		Path basePath = Paths.get(path);
 		// NOTE: do not use File.separator
 		final String basePathUri = new URL(
@@ -108,38 +202,37 @@ public class App {
 					.collect(Collectors.toList());
 		}
 		// NOTE: streams are not meant to be reused
-		final boolean debug = false;
-		if (debug)
+		if (debug) {
 			System.err.println("RRD File paths: "
 					+ result.stream().map(o -> o.toAbsolutePath().toString())
 							.collect(Collectors.toList()).toString());
+			return null;
+		} else {
+			result.stream().forEach(o -> {
+				try {
+					List<String> dsList = new ArrayList<>();
 
-		result.stream().forEach(o -> {
-			try {
-				List<String> dsList = new ArrayList<>();
-
-				final String key = o.getFileName().toString();
-				final String dataFilePath = o.toAbsolutePath().toString();
-				final String dataFileUri = getDataFileUri(dataFilePath);
-				URL url = new URL(dataFileUri);
-				System.err.println(
-						"Reading RRD file: " + url.getFile().replaceFirst(basePathUri, "")
-								.replaceAll("/", ":").replaceFirst(".rrd$", ""));
-				RrdDb rrd = RrdDb.getBuilder().setPath("test")
-						.setRrdToolImporter(url.getFile())
-						.setBackendFactory(new RrdMemoryBackendFactory()).build();
-				for (int cnt = 0; cnt != rrd.getDsCount(); cnt++) {
-					String ds = rrd.getDatasource(cnt).getName();
-					System.err.println(String.format("ds[%d]= \"%s\"", cnt, ds));
-					assertThat(ds, notNullValue());
-					dsList.add(ds);
+					URL url = new URL(getDataFileUri(o.toAbsolutePath().toString()));
+					final String key = url.getFile().replaceFirst(basePathUri, "")
+							.replaceAll("/", ":").replaceFirst(".rrd$", "");
+					System.err.println("Reading RRD file: " + key);
+					RrdDb rrd = RrdDb.getBuilder().setPath("test")
+							.setRrdToolImporter(url.getFile())
+							.setBackendFactory(new RrdMemoryBackendFactory()).build();
+					for (int cnt = 0; cnt != rrd.getDsCount(); cnt++) {
+						String ds = rrd.getDatasource(cnt).getName();
+						System.err.println(String.format("ds[%d]= \"%s\"", cnt, ds));
+						assertThat(ds, notNullValue());
+						dsList.add(ds);
+					}
+					dsMap.put(key, dsList);
+				} catch (IllegalArgumentException | IOException e) {
+					System.err.println("Exception (ignored): " + e.toString());
 				}
-				dsMap.put(key, dsList);
-			} catch (IllegalArgumentException | IOException e) {
-				System.err.println("Exception (ignored): " + e.toString());
-			}
-		});
-		assertThat(dsMap, notNullValue());
+			});
+			assertThat(dsMap, notNullValue());
+			return dsMap;
+		}
 	}
 
 	private static String getOSName() {
@@ -156,6 +249,10 @@ public class App {
 		return osName.equals("windows")
 				? "file:///" + dataFilePath.replaceAll("\\\\", "/")
 				: "file://" + dataFilePath;
+	}
+
+	public static void help() {
+		System.exit(1);
 	}
 
 }
