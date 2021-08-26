@@ -1,4 +1,4 @@
-package sqlite_test;
+package example;
 
 import java.io.File;
 import java.sql.Connection;
