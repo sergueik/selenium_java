@@ -70,7 +70,6 @@ public class App {
 	public static final int INVALID_OPTION = 42;
 	private Map<String, String> flags = new HashMap<>();
 	private static Map<String, List<String>> dsMap = new HashMap<>();
-	private static List<Path> result = new ArrayList<>();
 
 	private static boolean debug = false;
 	private static boolean save = false;
@@ -83,6 +82,8 @@ public class App {
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("s", "save", false, "Save");
 		options.addOption("p", "path", true, "Path to scan");
+		options.addOption("c", "collect", true, "folder(s) to collect");
+		options.addOption("r", "reject", true, "folder(s) to reject");
 		commandLine = commandLineparser.parse(options, args);
 		if (commandLine.hasOption("h")) {
 			help();
@@ -98,9 +99,19 @@ public class App {
 			System.err.println("Missing required argument: path");
 			return;
 		}
+		String collect = commandLine.getOptionValue("collect");
+		String reject = commandLine.getOptionValue("reject");
 
 		try {
-			dsMap = listFilesDsNames(path);
+			List<String> collectFolders = collect == null ? new ArrayList<>()
+					: Arrays.asList(collect.split(","));
+			List<String> rejectFolders = reject == null ? new ArrayList<>()
+					: Arrays.asList(reject.split(","));
+			if (collectFolders.size() != 0 || rejectFolders.size() != 0) {
+				dsMap = listFilesDsNames(path, collectFolders, rejectFolders);
+			} else {
+				dsMap = listFilesDsNames(path);
+			}
 		} catch (IOException e) {
 		}
 
@@ -171,7 +182,7 @@ public class App {
 
 					PreparedStatement preparedStatement = connection.prepareStatement(
 							"INSERT INTO cache (id, fname, ds) VALUES (?, ?, ?)");
-					int id = r.nextInt(100000);
+					int id = r.nextInt(1_000_000_000);
 					preparedStatement.setInt(1, id);
 					preparedStatement.setString(2, fname);
 					preparedStatement.setString(3, ds);
@@ -186,8 +197,74 @@ public class App {
 
 	}
 
+	@SuppressWarnings("unused")
+	private static Map<String, List<String>> listFilesDsNames(String path,
+			List<String> collectFolders, List<String> rejectFolders)
+			throws IOException {
+
+		final List<Path> result = new ArrayList<>();
+		final Map<String, List<String>> dsMap = new HashMap<>();
+		Path basePath = Paths.get(path);
+		final String basePathUri = new URL(
+				getDataFileUri(basePath.toAbsolutePath().toString())).getFile() + "/";
+		System.err.println("Scanning path: " + basePathUri);
+		List<Path> folders = new ArrayList<>();
+		// Probably quite sub-optimal
+		try (Stream<Path> walk = Files.walk(basePath)) {
+
+			folders = walk.filter(Files::isDirectory).filter(o -> {
+				String key = o.getFileName().toString();
+				System.err.println("inspect: " + key);
+				boolean status = true;
+				if ((collectFolders.size() > 0 && !collectFolders.contains(key))
+						|| rejectFolders.size() > 0 && rejectFolders.contains(key)) {
+					status = false;
+				}
+				System.err.println("status: " + status);
+				return status;
+			}).collect(Collectors.toList());
+		}
+
+		for (Path folder : folders) {
+			Stream<Path> walk = Files.walk(folder);
+			walk.filter(Files::isRegularFile)
+					.filter(o -> o.getFileName().toString().matches(".*rrd$"))
+					.forEach(o -> {
+						System.err.println("add: " + o.getFileName().toString());
+						result.add(o);
+					});
+		}
+		result.stream().forEach(o -> {
+			try {
+				List<String> dsList = new ArrayList<>();
+				URL url = new URL(getDataFileUri(o.toAbsolutePath().toString()));
+				final String key = url.getFile().replaceFirst(basePathUri, "")
+						.replaceAll("/", ":").replaceFirst(".rrd$", "");
+				System.err.println("Reading RRD file: " + key);
+				RrdDb rrd = RrdDb.getBuilder().setPath("test")
+						.setRrdToolImporter(url.getFile())
+						.setBackendFactory(new RrdMemoryBackendFactory()).build();
+				for (int cnt = 0; cnt != rrd.getDsCount(); cnt++) {
+					String ds = rrd.getDatasource(cnt).getName();
+					System.err.println(String.format("ds[%d]= \"%s\"", cnt, ds));
+					assertThat(ds, notNullValue());
+					dsList.add(ds);
+				}
+				dsMap.put(key, dsList);
+			} catch (IllegalArgumentException | IOException e) {
+				System.err.println("Exception (ignored): " + e.toString());
+			}
+		});
+		assertThat(dsMap, notNullValue());
+		return dsMap;
+	}
+
 	private static Map<String, List<String>> listFilesDsNames(String path)
 			throws IOException {
+		/*		return listFilesDsNames(path, new ArrayList<String>(),
+						new ArrayList<String>());
+						*/
+
 		final Map<String, List<String>> dsMap = new HashMap<>();
 		Path basePath = Paths.get(path);
 		// NOTE: do not use File.separator
@@ -196,6 +273,8 @@ public class App {
 		System.err.println("Scanning path: " + basePathUri);
 		// origin:
 		// https://github.com/mkyong/core-java/blob/master/java-io/src/main/java/com/mkyong/io/api/FilesWalkExample.java
+		// sub-optimal
+		List<Path> result;
 		try (Stream<Path> walk = Files.walk(basePath)) {
 			result = walk.filter(Files::isRegularFile)
 					.filter(o -> o.getFileName().toString().matches(".*rrd$"))
@@ -211,7 +290,6 @@ public class App {
 			result.stream().forEach(o -> {
 				try {
 					List<String> dsList = new ArrayList<>();
-
 					URL url = new URL(getDataFileUri(o.toAbsolutePath().toString()));
 					final String key = url.getFile().replaceFirst(basePathUri, "")
 							.replaceAll("/", ":").replaceFirst(".rrd$", "");
@@ -233,6 +311,7 @@ public class App {
 			assertThat(dsMap, notNullValue());
 			return dsMap;
 		}
+
 	}
 
 	private static String getOSName() {

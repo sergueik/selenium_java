@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>rrd-cachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.2.0-SNAPSHOT</version>
+  <version>0.3.0-SNAPSHOT</version>
   <name>rrd-cachedb</name>
   <url>http://maven.apache.org</url>
   <developers>

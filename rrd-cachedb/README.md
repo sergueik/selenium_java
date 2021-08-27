@@ -18,15 +18,18 @@ is iterated for every file matching `*.rrd` filemask
 mvn -Dmaven.test.skip=true package
 ```
 * run via `CLASSPATH`:
-```
+```sh
 java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --path data --save
 ```
 or just
-```
+```sh
 java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --p data --s
 ```
-
-where the `sample.rrd` file was placed into `rrdool\web` (more folders are not shown)
+or to collect the subset of folders:
+```sh
+java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --path data --save --collect web,app --reject util
+```
+where the `sample.rrd` file was placed into `data\web` (additional folders used to test the `collect` and `reject` processing are not shown)
 
 this outputs
 ```cmd
