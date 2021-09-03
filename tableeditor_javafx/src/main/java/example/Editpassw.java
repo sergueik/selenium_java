@@ -6,6 +6,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.application.Application;
+import javafx.application.Platform;
 
 import org.sqlite.SQLiteConfig;
 
@@ -15,7 +17,8 @@ import java.sql.*;
 
 public class Editpassw implements AddChangePasswAbstr {
 
-	@SuppressWarnings("restriction")
+	private Controller controller = GlobalData.getController();
+
 	@FXML
 	private Button AddButtonChange;
 
@@ -66,8 +69,9 @@ public class Editpassw implements AddChangePasswAbstr {
 		website.setNotes(txtnotes.getText());
 
 		System.err.println("Sqlupdate");
-		sqlupdate(website.getId(), website.getSite(), website.getSiteLogin(), website.getSitePass(), website.getFtp(),
-				website.getFtpLogin(), website.getFtpPass(), website.getPort(), website.getNotes());
+		sqlupdate(website.getId(), website.getSite(), website.getSiteLogin(),
+				website.getSitePass(), website.getFtp(), website.getFtpLogin(),
+				website.getFtpPass(), website.getPort(), website.getNotes());
 
 		AddButtonCancel(actionEvent);
 	}
@@ -76,6 +80,21 @@ public class Editpassw implements AddChangePasswAbstr {
 	public void AddButtonCancel(ActionEvent actionEvent) {
 		Node source = (Node) actionEvent.getSource();
 		Stage changestage = (Stage) source.getScene().getWindow();
+		if (controller != null) {
+			try {
+				System.err
+						.println("Completed for: " + controller.changeButton.getText());
+				// Update the Label on the JavaFx Application Thread
+				Platform.runLater(new Runnable() {
+					@Override
+					public void run() {
+						controller.changeButton.setText(controller.changeButton.getText());
+					}
+				});
+			} catch (NullPointerException e) {
+				// ignore
+			}
+		}
 		changestage.hide();
 	}
 
@@ -97,10 +116,11 @@ public class Editpassw implements AddChangePasswAbstr {
 
 	}
 
-	public void sqlupdate(int id, String site, String siteLogin, String sitePass, String ftp, String ftpLogin,
-			String ftpPass, String port, String notes) {
-		String updatesql = "UPDATE data SET site = ? , " + " siteLogin = ? ," + " sitePass = ?, " + " ftp = ?,"
-				+ " ftpLogin = ?," + " ftpPass = ?," + "port = ?" + "WHERE id = ?";
+	public void sqlupdate(int id, String site, String siteLogin, String sitePass,
+			String ftp, String ftpLogin, String ftpPass, String port, String notes) {
+		String updatesql = "UPDATE data SET site = ? , " + " siteLogin = ? ,"
+				+ " sitePass = ?, " + " ftp = ?," + " ftpLogin = ?," + " ftpPass = ?,"
+				+ "port = ?" + "WHERE id = ?";
 		try {
 			@SuppressWarnings("unused")
 			SQLiteConfig config = new SQLiteConfig();
@@ -117,8 +137,9 @@ public class Editpassw implements AddChangePasswAbstr {
 			// pstmt.setInt(7, port);
 			pstmt.setInt(8, id);
 			System.err.println(String.format(
-					"UPDATE data SET site=%s , " + " siteLogin = %s ," + " sitePass = %s, " + " ftp = %s,"
-							+ " ftpLogin = %s," + " ftpPass = %s," + "port = %s," + "WHERE id = %d",
+					"UPDATE data SET site=%s , " + " siteLogin = %s ,"
+							+ " sitePass = %s, " + " ftp = %s," + " ftpLogin = %s,"
+							+ " ftpPass = %s," + "port = %s," + "WHERE id = %d",
 					site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, id));
 
 			// update
@@ -130,5 +151,16 @@ public class Editpassw implements AddChangePasswAbstr {
 			System.out.println("Exception " + ex.toString());
 		}
 
+	}
+
+	@FXML
+	void initialize() {
+		if (controller != null) {
+			try {
+				System.err.println("Launched by: " + controller.changeButton.getText());
+			} catch (NullPointerException e) {
+				// ignore
+			}
+		}
 	}
 }

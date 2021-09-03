@@ -35,9 +35,9 @@ public class Controller {
 	private Stage mainStage;
 
 	@FXML
-	private Button addButton;
+	public Button addButton;
 	@FXML
-	private Button changeButton;
+	public Button changeButton;
 	@FXML
 	private Button delButton;
 
@@ -79,21 +79,31 @@ public class Controller {
 		this.mainStage = mainStage;
 	}
 
-	FilteredList<Website> filteredData = new FilteredList<>(passbookimpl.getPassbook(), p -> true);
+	FilteredList<Website> filteredData = new FilteredList<>(
+			passbookimpl.getPassbook(), p -> true);
 
 	@FXML
 	private void initialize() {
-
-		columnSite.setCellValueFactory(new PropertyValueFactory<Website, String>("site"));
-		columnSiteLogin.setCellValueFactory(new PropertyValueFactory<Website, String>("siteLogin"));
-		columnSitePass.setCellValueFactory(new PropertyValueFactory<Website, String>("sitePass"));
-		columnFtp.setCellValueFactory(new PropertyValueFactory<Website, String>("ftp"));
-		columnFtpLogin.setCellValueFactory(new PropertyValueFactory<Website, String>("ftpLogin"));
-		columnFtpPass.setCellValueFactory(new PropertyValueFactory<Website, String>("ftpPass"));
-		columnPort.setCellValueFactory(new PropertyValueFactory<Website, String>("port"));
-		columnNotes.setCellValueFactory(new PropertyValueFactory<Website, String>("notes"));
+		GlobalData.setController(this);
+		columnSite
+				.setCellValueFactory(new PropertyValueFactory<Website, String>("site"));
+		columnSiteLogin.setCellValueFactory(
+				new PropertyValueFactory<Website, String>("siteLogin"));
+		columnSitePass.setCellValueFactory(
+				new PropertyValueFactory<Website, String>("sitePass"));
+		columnFtp
+				.setCellValueFactory(new PropertyValueFactory<Website, String>("ftp"));
+		columnFtpLogin.setCellValueFactory(
+				new PropertyValueFactory<Website, String>("ftpLogin"));
+		columnFtpPass.setCellValueFactory(
+				new PropertyValueFactory<Website, String>("ftpPass"));
+		columnPort
+				.setCellValueFactory(new PropertyValueFactory<Website, String>("port"));
+		columnNotes.setCellValueFactory(
+				new PropertyValueFactory<Website, String>("notes"));
 
 		try {
+			@SuppressWarnings("unused")
 			SQLiteConfig config = new SQLiteConfig();
 			c = DB.getInstance().getConnection();
 			stat = c.createStatement();
@@ -132,7 +142,7 @@ public class Controller {
 		try {
 			c = DB.getInstance().getConnection();
 			ResultSet rs = c.createStatement().executeQuery(
-					"SELECT id, site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, person, personEmail, personPass, personPhone, dbName, dbUser, dbPass, dbHost, hostingUrl, hostingLogin, hostingPass, providerUrl, providerLogin, providerPass, otherUrl, otherLogin, otherPass, notes FROM data");
+					"SELECT id, site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, notes FROM data");
 			while (rs.next()) {
 				int id;
 				String site;
@@ -142,23 +152,6 @@ public class Controller {
 				String ftpLogin;
 				String ftpPass;
 				String port;
-				String person;
-				String personEmail;
-				String personPass;
-				String personPhone;
-				String dbName;
-				String dbUser;
-				String dbPass;
-				String dbHost;
-				String hostingUrl;
-				String hostingLogin;
-				String hostingPass;
-				String providerUrl;
-				String providerLogin;
-				String providerPass;
-				String otherUrl;
-				String otherLogin;
-				String otherPass;
 				String notes;
 				id = rs.getInt("id");
 				site = rs.getString("site");
@@ -168,26 +161,10 @@ public class Controller {
 				ftpLogin = rs.getString("ftpLogin");
 				ftpPass = rs.getString("ftpPass");
 				port = rs.getString("port");
-				person = rs.getString("person");
-				personEmail = rs.getString("personEmail");
-				personPass = rs.getString("personPass");
-				personPhone = rs.getString("personPhone");
-				dbName = rs.getString("dbName");
-				dbUser = rs.getString("dbUser");
-				dbPass = rs.getString("dbPass");
-				dbHost = rs.getString("dbHost");
-				hostingUrl = rs.getString("hostingUrl");
-				hostingLogin = rs.getString("hostingLogin");
-				hostingPass = rs.getString("hostingPass");
-				providerUrl = rs.getString("providerUrl");
-				providerLogin = rs.getString("providerLogin");
-				providerPass = rs.getString("providerPass");
-				otherUrl = rs.getString("otherUrl");
-				otherLogin = rs.getString("otherLogin");
-				otherPass = rs.getString("otherPass");
 				notes = rs.getString("notes");
 
-				Website website = new Website(id, site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, notes);
+				Website website = new Website(id, site, siteLogin, sitePass, ftp,
+						ftpLogin, ftpPass, port, notes);
 				// System.out.println(website);
 				passbookimpl.getPassbook().add(website);
 			}
@@ -196,7 +173,13 @@ public class Controller {
 		}
 	}
 
-	public void actionButtonPressed(ActionEvent actionEvent) {
+	// https://stackoverflow.com/questions/44807580/javafx-access-parent-controller-class-from-fxml-child?rq=1
+	// TODO:
+	// https://stackoverflow.com/questions/35372236/how-to-pass-paremeter-with-an-event-in-javafx/35373298
+	// swing:
+	// http://www.java2s.com/Code/Java/Event/CreatingaCustomEvent.htm
+
+	public void buttonPressed(ActionEvent actionEvent) {
 
 		Object source = actionEvent.getSource();
 
@@ -204,27 +187,33 @@ public class Controller {
 			return;
 		}
 
-		Button clickedButton = (Button) source;
-		Website selectedWebsite = (Website) tablePassBook.getSelectionModel().getSelectedItem();
-		Window parentWindow = ((Node) actionEvent.getSource()).getScene().getWindow();
+		Button button = (Button) source;
+		Website selectedWebsite = (Website) tablePassBook.getSelectionModel()
+				.getSelectedItem();
+		Window parentWindow = ((Node) actionEvent.getSource()).getScene()
+				.getWindow();
 
-		switch (clickedButton.getId()) {
+		switch (button.getId()) {
 		case "addButton":
 			addpassw.setWebsite(new Website());
 			showDialog();
 			passbookimpl.add(addpassw.getWebsite());
 			break;
 		case "changeButton":
+
 			if (tablePassBook.getSelectionModel().getSelectedItem() != null) {
-				editpassw.setWebsite((Website) tablePassBook.getSelectionModel().getSelectedItem());
+				editpassw.setWebsite(
+						(Website) tablePassBook.getSelectionModel().getSelectedItem());
 				changeDialog();
 			}
 			break;
 		case "delButton":
-			passbookimpl.delete((Website) tablePassBook.getSelectionModel().getSelectedItem());
+			passbookimpl.delete(
+					(Website) tablePassBook.getSelectionModel().getSelectedItem());
 			try {
 				c = DB.getInstance().getConnection();
-				PreparedStatement statement = c.prepareStatement("DELETE FROM data WHERE id = ?");
+				PreparedStatement statement = c
+						.prepareStatement("DELETE FROM data WHERE id = ?");
 				statement.setInt(1, selectedWebsite.getId());
 				statement.executeUpdate();
 			} catch (SQLException ex) {
@@ -263,7 +252,7 @@ public class Controller {
 		changestage.showAndWait();
 	}
 
-	@SuppressWarnings("restriction")
+	@SuppressWarnings("unchecked")
 	public void filterField(KeyEvent keyEvent) {
 		filterField.textProperty().addListener((observable, oldValue, newValue) -> {
 
@@ -276,11 +265,13 @@ public class Controller {
 
 				if (website.getSite().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
-				} else if (website.getSiteLogin().toLowerCase().contains(lowerCaseFilter)) {
+				} else if (website.getSiteLogin().toLowerCase()
+						.contains(lowerCaseFilter)) {
 					return true;
 				} else if (website.getFtp().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
-				} else if (website.getFtpLogin().toLowerCase().contains(lowerCaseFilter)) {
+				} else if (website.getFtpLogin().toLowerCase()
+						.contains(lowerCaseFilter)) {
 					return true;
 				} else if (website.getNotes().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
@@ -297,7 +288,8 @@ public class Controller {
 	}
 
 	public static class TableKeyEventHandler implements EventHandler<KeyEvent> {
-		KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
+		KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(
+				KeyCode.C, KeyCombination.CONTROL_ANY);
 
 		public void handle(final KeyEvent keyEvent) {
 			if (copyKeyCodeCompination.match(keyEvent)) {
@@ -310,7 +302,8 @@ public class Controller {
 		}
 	}
 
-	public static class TableMouseEventHandler implements EventHandler<MouseEvent> {
+	public static class TableMouseEventHandler
+			implements EventHandler<MouseEvent> {
 
 		public void handle(final MouseEvent mouseEvent) {
 			if (mouseEvent.getClickCount() == 2) {
@@ -324,9 +317,11 @@ public class Controller {
 
 	}
 
+	@SuppressWarnings("rawtypes")
 	public static void copySelectionToClipboard(TableView<?> table) {
 		StringBuilder clipboardString = new StringBuilder();
-		ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
+		ObservableList<TablePosition> positionList = table.getSelectionModel()
+				.getSelectedCells();
 		int prevRow = -1;
 		for (TablePosition position : positionList) {
 			int row = position.getRow();
@@ -348,4 +343,5 @@ public class Controller {
 		clipboardContent.putString(clipboardString.toString());
 		Clipboard.getSystemClipboard().setContent(clipboardContent);
 	}
+
 }

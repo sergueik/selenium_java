@@ -14,6 +14,8 @@ import java.sql.*;
 
 public class Addpassw implements AddChangePasswAbstr {
 
+	private Controller controller = GlobalData.getController();
+
 	@FXML
 	private Button AddButtonAdd;
 
@@ -69,8 +71,9 @@ public class Addpassw implements AddChangePasswAbstr {
 
 			PreparedStatement stat = c.prepareStatement(
 					"INSERT INTO data (site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, notes) VALUES ('"
-							+ website.getSite() + "','" + website.getSiteLogin() + "','" + website.getSitePass() + "','"
-							+ website.getFtp() + "','" + website.getFtpLogin() + "','" + website.getFtpPass() + "','"
+							+ website.getSite() + "','" + website.getSiteLogin() + "','"
+							+ website.getSitePass() + "','" + website.getFtp() + "','"
+							+ website.getFtpLogin() + "','" + website.getFtpPass() + "','"
 							+ website.getPort() + "','" + website.getNotes() + "')");
 			stat.executeUpdate();
 
@@ -90,6 +93,15 @@ public class Addpassw implements AddChangePasswAbstr {
 	public void AddButtonCancel(ActionEvent actionEvent) {
 		Node source = (Node) actionEvent.getSource();
 		Stage stage = (Stage) source.getScene().getWindow();
+		if (controller != null) {
+			try {
+				System.err.println("Completed for: " + controller.addButton.getText());
+				// controller.changeButton.setText("xxxx");
+			} catch (NullPointerException e) {
+				// ignore
+			}
+		}
+
 		stage.hide();
 	}
 
@@ -108,6 +120,17 @@ public class Addpassw implements AddChangePasswAbstr {
 		txtftppass.setText(website.getFtpPass());
 		txtport.setText(website.getPort());
 		txtnotes.setText(website.getNotes());
+	}
+
+	@FXML
+	void initialize() {
+		if (controller != null) {
+			try {
+				System.err.println("Launched by: " + controller.addButton.getText());
+			} catch (NullPointerException e) {
+				// ignore
+			}
+		}
 	}
 
 }
