@@ -72,6 +72,14 @@ public class App {
 	private static boolean debug = false;
 	private static boolean save = false;
 	private static boolean verifylinks = false;
+
+	private static String dbhost = null;
+	private static String database = null;
+	private static int dbport = 3306;
+	private static String database_table = null;
+	private static String database_user = null;
+	private static String database_password = null;
+
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
@@ -85,6 +93,14 @@ public class App {
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
+
+		options.addOption("z", "dbhost", true, "database host");
+		options.addOption("y", "dbport", true, "database port");
+		options.addOption("w", "database", true, "database");
+		options.addOption("u", "user", true, "database user");
+		options.addOption("t", "table", true, "database table");
+		options.addOption("z", "password", true, "database password");
+
 		commandLine = commandLineparser.parse(options, args);
 		if (commandLine.hasOption("h")) {
 			help();
@@ -98,6 +114,48 @@ public class App {
 
 		if (commandLine.hasOption("save")) {
 			save = true;
+		}
+
+		dbhost = commandLine.getOptionValue("dbhost");
+		if (dbhost == null) {
+			System.err.println("Missing argument: dbhost. Using default");
+			dbhost = "localhost";
+		}
+
+		try {
+			dbport = Integer.parseInt(commandLine.getOptionValue("dbport"));
+		} catch (Exception e) {
+			System.err.println("Missing argument: dbport. Using default");
+			dbport = 3306;
+		}
+
+		database = commandLine.getOptionValue("database");
+		if (database == null) {
+			System.err.println("Missing argument: database. Using default");
+			database = "test";
+		}
+
+		database_user = commandLine.getOptionValue("user");
+		if (database_user == null) {
+			System.err.println("Missing argument: database_user. Using default");
+			database_user = "java";
+		}
+
+		database_table = commandLine.getOptionValue("table");
+		if (database_table == null) {
+			System.err.println("Missing argument: database_table. Using default");
+			database_table = "cache_table";
+		}
+
+		database_password = commandLine.getOptionValue("password");
+		if (database_password == null) {
+			System.err.println("Missing argument: database_password. Using default");
+			database_password = "password";
+		}
+		try {
+			testJDBCConnection();
+		} catch (Exception e) {
+			System.err.println("Excetpion (ignored)" + e.toString());
 		}
 		String path = commandLine.getOptionValue("path");
 		if (path == null) {
@@ -358,6 +416,52 @@ public class App {
 		return osName.equals("windows")
 				? "file:///" + dataFilePath.replaceAll("\\\\", "/")
 				: "file://" + dataFilePath;
+	}
+
+	public static void testJDBCConnection() throws Exception {
+		try {
+			Class driverObject = Class.forName("org.gjt.mm.mysql.Driver");
+			System.out.println("driverObject=" + driverObject);
+
+			final String url = "jdbc:mysql://" + dbhost + ":" + dbport + "/"
+					+ database;
+			Connection connection = DriverManager.getConnection(url, database_user,
+					database_password);
+			if (connection != null) {
+				System.out.println("Connected to product: "
+						+ connection.getMetaData().getDatabaseProductName());
+				System.out.println("Connected to catalog: " + connection.getCatalog());
+				// System.out.println("Connected to: " + connection.getSchema());
+				// java.sql.SQLFeatureNotSupportedException: Not supported
+
+				PreparedStatement preparedStatement = connection.prepareStatement(String
+						.format("INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
+								database_table));
+
+				preparedStatement.setString(1, "fname");
+				preparedStatement.setString(2, "ds0");
+				// preparedStatement.setInt(2, 2);
+				// preparedStatement.setInt(3, 42);
+				preparedStatement.execute();
+
+				Statement statement = connection.createStatement();
+				statement.setQueryTimeout(30);
+				ResultSet resultSet = statement.executeQuery(String
+						.format("SELECT id, fname, ds, expose FROM %s", database_table));
+				while (resultSet.next()) {
+					System.out.println("fname = " + resultSet.getString("fname") + "\\t"
+							+ "ds = " + resultSet.getString("ds") + "\\t" + "expose = "
+							+ resultSet.getString("expose") + "\\t" + "id = "
+							+ resultSet.getInt("id"));
+				}
+
+			} else {
+				System.out.println("Failed to connect");
+			}
+		} catch (Exception e) {
+			System.out.println("Exception: " + e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 	public static void help() {
