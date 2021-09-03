@@ -12,10 +12,10 @@ Original archive: [Yandex disk link](https://yadi.sk/d/VClTsgSI3PpY2j)
 
 ```cmd
 mvn clean package
-java -cp  target\PasswordKeeper-2.0-snapshot.jar;target\lib\* passwordkeeper.Main
+java -cp  target\example.editor.jar;target\lib\* example.Main
 ```
 ```sh
-java -cp target/paswkeeper.PasswordKeeper.jar:target/lib/* passwordkeeper.Main
+java -cp target/example.editor.jar:target/lib/* example.Main
 ```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

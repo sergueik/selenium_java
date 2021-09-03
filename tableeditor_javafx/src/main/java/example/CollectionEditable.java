@@ -1,10 +1,11 @@
-package passwordkeeper;
+package example;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import passwordkeeper.Editpassw.*;
 
 import org.sqlite.SQLiteConfig;
+
+import example.Editpassw.*;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

@@ -1,4 +1,4 @@
-package passwordkeeper;
+package example;
 
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -20,9 +20,9 @@ import java.sql.*;
 
 import org.sqlite.SQLiteConfig;
 
+import example.AddChangePasswAbstr.*;
 import javafx.scene.Node;
 import javafx.stage.Window;
-import passwordkeeper.AddChangePasswAbstr.*;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 

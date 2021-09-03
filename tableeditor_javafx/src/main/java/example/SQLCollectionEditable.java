@@ -1,4 +1,4 @@
-package passwordkeeper;
+package example;
 
 public class SQLCollectionEditable implements Editable {
 

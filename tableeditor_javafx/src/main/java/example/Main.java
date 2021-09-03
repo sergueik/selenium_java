@@ -1,4 +1,4 @@
-package passwordkeeper;
+package example;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;

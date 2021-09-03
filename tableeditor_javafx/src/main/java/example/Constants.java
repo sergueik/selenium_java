@@ -1,4 +1,4 @@
-package passwordkeeper;
+package example;
 
 import java.nio.file.Paths;
 
