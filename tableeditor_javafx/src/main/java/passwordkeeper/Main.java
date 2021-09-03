@@ -12,7 +12,7 @@ import java.sql.*;
 /**
  *
  * ToDo - Add Apache POI (import / Export data to xls/xlsx)
- * ToDo - Repare addpassw.fxml
+ * ToDo - Repair addpassw.fxml
  * ToDo - Add password protection (md5)
  * ToDo - Add sync options drive || && yandex
  * ToDo - Create exe file
@@ -47,6 +47,7 @@ public class Main extends Application {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void SQLdata() {
 		SQLCollectionEditable editable = new SQLCollectionEditable();
 		editable.printFromSql();

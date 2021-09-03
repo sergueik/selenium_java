@@ -26,6 +26,8 @@ import passwordkeeper.AddChangePasswAbstr.*;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 
+@SuppressWarnings("restriction")
+
 public class Controller {
 
 	private CollectionEditable passbookimpl = new CollectionEditable();
@@ -56,40 +58,6 @@ public class Controller {
 	@FXML
 	private TableColumn<Website, String> columnPort;
 	@FXML
-	private TableColumn<Website, String> columnPerson;
-	@FXML
-	private TableColumn<Website, String> columnPersonEmail;
-	@FXML
-	private TableColumn<Website, String> columnPersonPass;
-	@FXML
-	private TableColumn<Website, String> columnPersonPhone;
-	@FXML
-	private TableColumn<Website, String> columnDbName;
-	@FXML
-	private TableColumn<Website, String> columnDbUser;
-	@FXML
-	private TableColumn<Website, String> columnDbPass;
-	@FXML
-	private TableColumn<Website, String> columnDbHost;
-	@FXML
-	private TableColumn<Website, String> columnHostingUrl;
-	@FXML
-	private TableColumn<Website, String> columnHostingLogin;
-	@FXML
-	private TableColumn<Website, String> columnHostingPass;
-	@FXML
-	private TableColumn<Website, String> columnProviderUrl;
-	@FXML
-	private TableColumn<Website, String> columnProviderLogin;
-	@FXML
-	private TableColumn<Website, String> columnProviderPass;
-	@FXML
-	private TableColumn<Website, String> columnOtherUrl;
-	@FXML
-	private TableColumn<Website, String> columnOtherLogin;
-	@FXML
-	private TableColumn<Website, String> columnOtherPass;
-	@FXML
 	private TableColumn<Website, String> columnNotes;
 	@FXML
 	private TextField filterField;
@@ -111,69 +79,26 @@ public class Controller {
 		this.mainStage = mainStage;
 	}
 
-	FilteredList<Website> filteredData = new FilteredList<>(
-			passbookimpl.getPassbook(), p -> true);
+	FilteredList<Website> filteredData = new FilteredList<>(passbookimpl.getPassbook(), p -> true);
 
 	@FXML
 	private void initialize() {
 
-		columnSite
-				.setCellValueFactory(new PropertyValueFactory<Website, String>("site"));
-		columnSiteLogin.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("siteLogin"));
-		columnSitePass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("sitePass"));
-		columnFtp
-				.setCellValueFactory(new PropertyValueFactory<Website, String>("ftp"));
-		columnFtpLogin.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("ftpLogin"));
-		columnFtpPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("ftpPass"));
-		columnPort
-				.setCellValueFactory(new PropertyValueFactory<Website, String>("port"));
-		columnPerson.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("person"));
-		columnPersonEmail.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("personEmail"));
-		columnPersonPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("personPass"));
-		columnPersonPhone.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("personPhone"));
-		columnDbName.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("dbName"));
-		columnDbUser.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("dbUser"));
-		columnDbPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("dbPass"));
-		columnDbHost.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("dbHost"));
-		columnHostingUrl.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("hostingUrl"));
-		columnHostingLogin.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("hostingLogin"));
-		columnHostingPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("hostingPass"));
-		columnProviderUrl.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("providerUrl"));
-		columnProviderLogin.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("providerLogin"));
-		columnProviderPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("providerPass"));
-		columnOtherUrl.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("otherUrl"));
-		columnOtherLogin.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("otherLogin"));
-		columnOtherPass.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("otherPass"));
-		columnNotes.setCellValueFactory(
-				new PropertyValueFactory<Website, String>("notes"));
+		columnSite.setCellValueFactory(new PropertyValueFactory<Website, String>("site"));
+		columnSiteLogin.setCellValueFactory(new PropertyValueFactory<Website, String>("siteLogin"));
+		columnSitePass.setCellValueFactory(new PropertyValueFactory<Website, String>("sitePass"));
+		columnFtp.setCellValueFactory(new PropertyValueFactory<Website, String>("ftp"));
+		columnFtpLogin.setCellValueFactory(new PropertyValueFactory<Website, String>("ftpLogin"));
+		columnFtpPass.setCellValueFactory(new PropertyValueFactory<Website, String>("ftpPass"));
+		columnPort.setCellValueFactory(new PropertyValueFactory<Website, String>("port"));
+		columnNotes.setCellValueFactory(new PropertyValueFactory<Website, String>("notes"));
 
 		try {
 			SQLiteConfig config = new SQLiteConfig();
 			c = DB.getInstance().getConnection();
 			stat = c.createStatement();
 			stat.execute(
-					"CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTOINCREMENT, site VARCHAR(255), siteLogin VARCHAR(255), sitePass VARCHAR(255), ftp VARCHAR(255), ftpLogin VARCHAR(255), ftpPass VARCHAR(255), port VARCHAR(255), person VARCHAR(255), personEmail VARCHAR(255), personPass VARCHAR(255), personPhone VARCHAR(255), dbName VARCHAR(255), dbUser VARCHAR(255), dbPass VARCHAR(255), dbHost VARCHAR(255), hostingUrl VARCHAR(255), hostingLogin VARCHAR(255), hostingPass VARCHAR(255), providerUrl VARCHAR(255), providerLogin VARCHAR(255), providerPass VARCHAR(255), otherUrl VARCHAR(255), otherLogin VARCHAR(255), otherPass VARCHAR(255), notes VARCHAR(255));");
+					"CREATE TABLE IF NOT EXISTS data(id INTEGER PRIMARY KEY AUTOINCREMENT, site VARCHAR(255), siteLogin VARCHAR(255), sitePass VARCHAR(255), ftp VARCHAR(255), ftpLogin VARCHAR(255), ftpPass VARCHAR(255), port VARCHAR(255),  notes VARCHAR(255));");
 		} catch (SQLException ex) {
 			System.out.println("test");
 		}
@@ -262,11 +187,7 @@ public class Controller {
 				otherPass = rs.getString("otherPass");
 				notes = rs.getString("notes");
 
-				Website website = new Website(id, site, siteLogin, sitePass, ftp,
-						ftpLogin, ftpPass, port, person, personEmail, personPass,
-						personPhone, dbName, dbUser, dbPass, dbHost, hostingUrl,
-						hostingLogin, hostingPass, providerUrl, providerLogin, providerPass,
-						otherUrl, otherLogin, otherPass, notes);
+				Website website = new Website(id, site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, notes);
 				// System.out.println(website);
 				passbookimpl.getPassbook().add(website);
 			}
@@ -284,10 +205,8 @@ public class Controller {
 		}
 
 		Button clickedButton = (Button) source;
-		Website selectedWebsite = (Website) tablePassBook.getSelectionModel()
-				.getSelectedItem();
-		Window parentWindow = ((Node) actionEvent.getSource()).getScene()
-				.getWindow();
+		Website selectedWebsite = (Website) tablePassBook.getSelectionModel().getSelectedItem();
+		Window parentWindow = ((Node) actionEvent.getSource()).getScene().getWindow();
 
 		switch (clickedButton.getId()) {
 		case "addButton":
@@ -297,18 +216,15 @@ public class Controller {
 			break;
 		case "changeButton":
 			if (tablePassBook.getSelectionModel().getSelectedItem() != null) {
-				editpassw.setWebsite(
-						(Website) tablePassBook.getSelectionModel().getSelectedItem());
+				editpassw.setWebsite((Website) tablePassBook.getSelectionModel().getSelectedItem());
 				changeDialog();
 			}
 			break;
 		case "delButton":
-			passbookimpl.delete(
-					(Website) tablePassBook.getSelectionModel().getSelectedItem());
+			passbookimpl.delete((Website) tablePassBook.getSelectionModel().getSelectedItem());
 			try {
 				c = DB.getInstance().getConnection();
-				PreparedStatement statement = c
-						.prepareStatement("DELETE FROM data WHERE id = ?");
+				PreparedStatement statement = c.prepareStatement("DELETE FROM data WHERE id = ?");
 				statement.setInt(1, selectedWebsite.getId());
 				statement.executeUpdate();
 			} catch (SQLException ex) {
@@ -360,49 +276,11 @@ public class Controller {
 
 				if (website.getSite().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
-				} else if (website.getSiteLogin().toLowerCase()
-						.contains(lowerCaseFilter)) {
+				} else if (website.getSiteLogin().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
 				} else if (website.getFtp().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
-				} else if (website.getFtpLogin().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getPerson().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getPersonEmail().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getPersonPhone().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getDbName().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getDbUser().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getDbHost().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getHostingUrl().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getHostingLogin().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getProviderUrl().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getProviderLogin().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getOtherUrl().toLowerCase()
-						.contains(lowerCaseFilter)) {
-					return true;
-				} else if (website.getOtherLogin().toLowerCase()
-						.contains(lowerCaseFilter)) {
+				} else if (website.getFtpLogin().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
 				} else if (website.getNotes().toLowerCase().contains(lowerCaseFilter)) {
 					return true;
@@ -419,8 +297,7 @@ public class Controller {
 	}
 
 	public static class TableKeyEventHandler implements EventHandler<KeyEvent> {
-		KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(
-				KeyCode.C, KeyCombination.CONTROL_ANY);
+		KeyCodeCombination copyKeyCodeCompination = new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_ANY);
 
 		public void handle(final KeyEvent keyEvent) {
 			if (copyKeyCodeCompination.match(keyEvent)) {
@@ -433,8 +310,7 @@ public class Controller {
 		}
 	}
 
-	public static class TableMouseEventHandler
-			implements EventHandler<MouseEvent> {
+	public static class TableMouseEventHandler implements EventHandler<MouseEvent> {
 
 		public void handle(final MouseEvent mouseEvent) {
 			if (mouseEvent.getClickCount() == 2) {
@@ -450,8 +326,7 @@ public class Controller {
 
 	public static void copySelectionToClipboard(TableView<?> table) {
 		StringBuilder clipboardString = new StringBuilder();
-		ObservableList<TablePosition> positionList = table.getSelectionModel()
-				.getSelectedCells();
+		ObservableList<TablePosition> positionList = table.getSelectionModel().getSelectedCells();
 		int prevRow = -1;
 		for (TablePosition position : positionList) {
 			int row = position.getRow();

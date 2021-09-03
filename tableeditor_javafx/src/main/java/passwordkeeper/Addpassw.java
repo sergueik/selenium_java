@@ -10,6 +10,8 @@ import org.sqlite.SQLiteConfig;
 
 import java.sql.*;
 
+@SuppressWarnings("restriction")
+
 public class Addpassw implements AddChangePasswAbstr {
 
 	@FXML
@@ -40,61 +42,11 @@ public class Addpassw implements AddChangePasswAbstr {
 	private TextField txtport;
 
 	@FXML
-	private TextField txtperson;
-
-	@FXML
-	private TextField txtpersonEmail;
-
-	@FXML
-	private TextField txtpersonPass;
-
-	@FXML
-	private TextField txtpersonPhone;
-
-	@FXML
-	private TextField txtdbName;
-
-	@FXML
-	private TextField txtdbUser;
-
-	@FXML
-	private TextField txtdbPass;
-
-	@FXML
-	private TextField txtdbHost;
-
-	@FXML
-	private TextField txthostingUrl;
-
-	@FXML
-	private TextField txthostingLogin;
-
-	@FXML
-	private TextField txthostingPass;
-
-	@FXML
-	private TextField txtproviderUrl;
-
-	@FXML
-	private TextField txtproviderLogin;
-
-	@FXML
-	private TextField txtproviderPass;
-
-	@FXML
-	private TextField txtotherUrl;
-
-	@FXML
-	private TextField txtotherLogin;
-
-	@FXML
-	private TextField txtotherPass;
-
-	@FXML
 	private TextField txtnotes;
 
 	private Website website;
 
+	@SuppressWarnings("unused")
 	private static Statement stat;
 	private static Connection c;
 
@@ -108,45 +60,18 @@ public class Addpassw implements AddChangePasswAbstr {
 		website.setFtpLogin(txtftplogin.getText());
 		website.setFtpPass(txtftppass.getText());
 		website.setPort(txtport.getText());
-		website.setPerson(txtperson.getText());
-		website.setPersonEmail(txtpersonEmail.getText());
-		website.setPersonPass(txtpersonPass.getText());
-		website.setPersonPhone(txtpersonPhone.getText());
-		website.setDbName(txtdbName.getText());
-		website.setDbUser(txtdbUser.getText());
-		website.setDbPass(txtdbPass.getText());
-		website.setDbHost(txtdbHost.getText());
-		website.setHostingUrl(txthostingUrl.getText());
-		website.setHostingLogin(txthostingLogin.getText());
-		website.setHostingPass(txthostingPass.getText());
-		website.setProviderUrl(txtproviderUrl.getText());
-		website.setProviderLogin(txtproviderLogin.getText());
-		website.setProviderPass(txtproviderPass.getText());
-		website.setOtherUrl(txtotherUrl.getText());
-		website.setOtherLogin(txtotherLogin.getText());
-		website.setOtherPass(txtotherPass.getText());
 		website.setNotes(txtnotes.getText());
 
 		try {
+			@SuppressWarnings("unused")
 			SQLiteConfig config = new SQLiteConfig();
 			c = DB.getInstance().getConnection();
 
 			PreparedStatement stat = c.prepareStatement(
-					"INSERT INTO data (site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, person, personEmail, personPass, personPhone, dbName, dbUser, dbPass, dbHost, hostingUrl, hostingLogin, hostingPass, providerUrl, providerLogin, providerPass, otherUrl, otherLogin, otherPass, notes) VALUES ('"
-							+ website.getSite() + "','" + website.getSiteLogin() + "','"
-							+ website.getSitePass() + "','" + website.getFtp() + "','"
-							+ website.getFtpLogin() + "','" + website.getFtpPass() + "','"
-							+ website.getPort() + "','" + website.getPerson() + "','"
-							+ website.getPersonEmail() + "','" + website.getPersonPass()
-							+ "','" + website.getPersonPhone() + "','" + website.getDbName()
-							+ "','" + website.getDbUser() + "','" + website.getDbPass()
-							+ "','" + website.getDbHost() + "','" + website.getHostingUrl()
-							+ "','" + website.getHostingLogin() + "','"
-							+ website.getHostingPass() + "','" + website.getProviderUrl()
-							+ "','" + website.getProviderLogin() + "','"
-							+ website.getProviderPass() + "','" + website.getOtherUrl()
-							+ "','" + website.getOtherLogin() + "','" + website.getOtherPass()
-							+ "','" + website.getNotes() + "')");
+					"INSERT INTO data (site, siteLogin, sitePass, ftp, ftpLogin, ftpPass, port, notes) VALUES ('"
+							+ website.getSite() + "','" + website.getSiteLogin() + "','" + website.getSitePass() + "','"
+							+ website.getFtp() + "','" + website.getFtpLogin() + "','" + website.getFtpPass() + "','"
+							+ website.getPort() + "','" + website.getNotes() + "')");
 			stat.executeUpdate();
 
 		} catch (SQLException ex) {
@@ -182,25 +107,7 @@ public class Addpassw implements AddChangePasswAbstr {
 		txtftplogin.setText(website.getFtpLogin());
 		txtftppass.setText(website.getFtpPass());
 		txtport.setText(website.getPort());
-		txtperson.setText(website.getPerson());
-		txtpersonEmail.setText(website.getPersonEmail());
-		txtpersonPass.setText(website.getPersonPass());
-		txtpersonPhone.setText(website.getPersonPhone());
-		txtdbName.setText(website.getDbName());
-		txtdbUser.setText(website.getDbUser());
-		txtdbPass.setText(website.getDbPass());
-		txtdbHost.setText(website.getDbHost());
-		txthostingUrl.setText(website.getHostingUrl());
-		txthostingLogin.setText(website.getHostingLogin());
-		txthostingPass.setText(website.getHostingPass());
-		txtproviderUrl.setText(website.getProviderUrl());
-		txtproviderLogin.setText(website.getProviderLogin());
-		txtproviderPass.setText(website.getProviderPass());
-		txtotherUrl.setText(website.getOtherUrl());
-		txtotherLogin.setText(website.getOtherLogin());
-		txtotherPass.setText(website.getOtherPass());
 		txtnotes.setText(website.getNotes());
-
 	}
 
 }

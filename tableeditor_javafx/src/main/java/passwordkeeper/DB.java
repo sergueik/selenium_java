@@ -17,12 +17,11 @@ public class DB {
 		return DBInstance;
 	}
 
-	public static Connection getConnection() {
+	public Connection getConnection() {
 		if (con == null) {
 			try {
 				Class.forName("org.sqlite.JDBC");
-				con = DriverManager
-						.getConnection("jdbc:sqlite:" + Constants.PATH_TO_DB);
+				con = DriverManager.getConnection("jdbc:sqlite:" + Constants.PATH_TO_DB);
 			} catch (ClassNotFoundException | SQLException e) {
 				System.out.println(e.getMessage());
 			}

@@ -49,23 +49,6 @@
             <TableColumn fx:id="columnFtpLogin" prefWidth="100" text="FTP логин" />
             <TableColumn fx:id="columnFtpPass" prefWidth="100" text="FTP пароль" />
             <TableColumn fx:id="columnPort" prefWidth="100" text="Порт" />
-            <TableColumn fx:id="columnPerson" prefWidth="100" text="Владелец" />
-            <TableColumn fx:id="columnPersonEmail" prefWidth="100" text="Email" />
-            <TableColumn fx:id="columnPersonPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnPersonPhone" prefWidth="100" text="Телефон" />
-            <TableColumn fx:id="columnDbName" prefWidth="100" text="Имя БД" />
-            <TableColumn fx:id="columnDbUser" prefWidth="100" text="Имя пользователя" />
-            <TableColumn fx:id="columnDbPass" prefWidth="100" text="Пароль БД" />
-            <TableColumn fx:id="columnDbHost" prefWidth="100" text="Сервер БД" />
-            <TableColumn fx:id="columnHostingUrl" prefWidth="100" text="Хостинг" />
-            <TableColumn fx:id="columnHostingLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnHostingPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnProviderUrl" prefWidth="100" text="Домен" />
-            <TableColumn fx:id="columnProviderLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnProviderPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnOtherUrl" prefWidth="100" text="Др.аккаунт" />
-            <TableColumn fx:id="columnOtherLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnOtherPass" prefWidth="100" text="Пароль" />
             <TableColumn fx:id="columnNotes" prefWidth="100" text="Заметки" />
         </columns>
          <BorderPane.margin>
