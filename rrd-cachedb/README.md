@@ -68,8 +68,32 @@ fname = web:sample      ds = StatusStageIn
 fname = web:sample      ds = StatusStageOut
 fname = web:sample      ds = StatusWait
 ```
-
+### Processing Symbolic Links
+prepare
+```sh
+cd data/web/
+ln -fs sample.rrd  link.rrd
+touch none.rrd
+ln -fs none.rrd  badlink.rrd
+rm none.rrd
+```
+run
+```sh
+ java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save
+```
+NOTE: even without any code changes the `data/web/link.rrd` willbe added and `data/web/badlink.rrd` will be not. However to try manual validation of the link target run as:
+```sh
+ java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --verifylinks
+```
+this will print among oher things,
+```text
+Testing link link.rrd target path sample.rrd
+Valid link link.rrd target path /home/sergueik/rrd-cachedb/data/web/sample.rrd
+Testing link badlink.rrd target path none.rrd
+```
+illustrating the process
 ### See Also
+
 
   * https://github.com/mkyong/core-java/blob/master/java-io/src/main/java/com/mkyong/io/api/FilesWalkExample.java
   [Walking the File Tree - Essential Java Classes](https://docs.oracle.com/javase/tutorial/essential/io/walk.html)

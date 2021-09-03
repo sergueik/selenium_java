@@ -7,22 +7,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.junit.Assert;
-import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import org.rrd4j.ConsolFun;
 import org.rrd4j.DsType;
 import org.rrd4j.core.RrdDb;
@@ -32,18 +20,28 @@ import java.lang.IllegalArgumentException;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.ArrayList;
 import java.util.Random;
-
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.junit.Assert;
+import org.junit.Test;
+
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -73,6 +71,7 @@ public class App {
 
 	private static boolean debug = false;
 	private static boolean save = false;
+	private static boolean verifylinks = false;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
@@ -81,8 +80,10 @@ public class App {
 		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("s", "save", false, "Save");
+		options.addOption("s", "save", false, "Save");
 		options.addOption("p", "path", true, "Path to scan");
-		options.addOption("c", "collect", true, "folder(s) to collect");
+		options.addOption("v", "verifylinks", false,
+				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
 		commandLine = commandLineparser.parse(options, args);
 		if (commandLine.hasOption("h")) {
@@ -91,6 +92,10 @@ public class App {
 		if (commandLine.hasOption("d")) {
 			debug = true;
 		}
+		if (commandLine.hasOption("verifylinks")) {
+			verifylinks = true;
+		}
+
 		if (commandLine.hasOption("save")) {
 			save = true;
 		}
@@ -275,10 +280,35 @@ public class App {
 		// https://github.com/mkyong/core-java/blob/master/java-io/src/main/java/com/mkyong/io/api/FilesWalkExample.java
 		// sub-optimal
 		List<Path> result;
+		List<Path> result2;
+		//
 		try (Stream<Path> walk = Files.walk(basePath)) {
 			result = walk.filter(Files::isRegularFile)
 					.filter(o -> o.getFileName().toString().matches(".*rrd$"))
 					.collect(Collectors.toList());
+		}
+		// NOTE: streams are not meant to be reused
+		if (verifylinks) {
+			try (Stream<Path> walk = Files.walk(basePath)) {
+				result2 = walk.filter(Files::isSymbolicLink).filter(o -> {
+					try {
+						Path targetPath = Files.readSymbolicLink(o.toAbsolutePath());
+						System.err.println("Testing link " + o.getFileName().toString()
+								+ " target path " + targetPath.toString());
+
+						File target = new File(String.format("%s/%s",
+								o.getParent().toAbsolutePath(), targetPath.toString()));
+						if (target.exists() && target.isFile())
+							System.err.println("Valid link " + o.getFileName().toString()
+									+ " target path " + target.getCanonicalPath());
+						return true;
+					} catch (IOException e) {
+						// fall through
+					}
+					return false;
+				}).filter(o -> o.getFileName().toString().matches(".*rrd$"))
+						.collect(Collectors.toList());
+			}
 		}
 		// NOTE: streams are not meant to be reused
 		if (debug) {
