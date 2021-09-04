@@ -25,10 +25,10 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jsoup.version>1.11.3</jsoup.version>
+    <jsoup.version>1.14.2</jsoup.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven-core.version>3.3.1</maven-core.version>
-    <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>    
+    <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <commons-exec.version>1.3.2</commons-exec.version>
     <commons-configuration.version>1.10</commons-configuration.version>
     <commons-io.version>2.7</commons-io.version>
@@ -37,24 +37,21 @@
     <httpclient.version>4.5.13</httpclient.version>
   </properties>
   <dependencies>
-	  <!-- https://mvnrepository.com/artifact/commons-httpclient/commons-httpclient -->
-<dependency>
-    <groupId>commons-httpclient</groupId>
-    <artifactId>commons-httpclient</artifactId>
-    <version>3.1</version>
-</dependency>
-
+    <dependency>
+      <groupId>commons-httpclient</groupId>
+      <artifactId>commons-httpclient</artifactId>
+      <version>3.1</version>
+    </dependency>
     <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>${gson.version}</version>
     </dependency>
-        <dependency>
-            <groupId>org.jsoup</groupId>
-            <artifactId>jsoup</artifactId>
-            <version>${jsoup.version}</version>
-        </dependency>
-    <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
+    <dependency>
+      <groupId>org.jsoup</groupId>
+      <artifactId>jsoup</artifactId>
+      <version>${jsoup.version}</version>
+    </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
@@ -76,13 +73,11 @@
       <artifactId>jarchivelib</artifactId>
       <version>0.7.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/commons-configuration/commons-configuration -->
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
       <version>${commons-configuration.version}</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-io -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-io</artifactId>
