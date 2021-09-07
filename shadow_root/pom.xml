@@ -28,7 +28,7 @@
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
-    <webdrivermanager.version>4.3.1</webdrivermanager.version>
+    <webdrivermanager.version>5.0.1</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>
@@ -182,6 +182,20 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-help-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>show-profiles</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>active-profiles</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <resources>
       <resource>
@@ -212,7 +226,36 @@
       <id>firefox</id>
       <properties>
         <browser.name>firefox</browser.name>
+        <webdriver.driver>${browser.name}</webdriver.driver>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>${maven-surefire-plugin.version}</version>
+            <configuration>
+              <trimStackTrace>false</trimStackTrace>
+              <encoding>${project.build.sourceEncoding}</encoding>
+              <argLine>-Dfile.encoding=${project.build.sourceEncoding}</argLine>
+            </configuration>
+            <executions>
+              <execution>
+                <id>unit-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <systemPropertyVariables>
+                    <webdriver.driver>${browser.name}</webdriver.driver>
+                  </systemPropertyVariables>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
   </profiles>
 </project>
