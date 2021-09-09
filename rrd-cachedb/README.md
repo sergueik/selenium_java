@@ -23,13 +23,30 @@ java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --path data --s
 ```
 or just
 ```sh
-java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --p data --s
+java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --s
+```
+validate explcitly via
+```sh
+sqlite3 $HOME/cache.db "select count(*) from cache;"
+```
+returning the number of inserted rows
+```sh
+16
 ```
 or to collect the subset of folders:
 ```sh
+test -d data/web || cp -R data/* data/web
+```
+```
 java -cp target\example.rrd-cachedb.jar;target\lib\* example.App --path data --save --collect web,app --reject util
 ```
-where the `sample.rrd` file was placed into `data\web` (additional folders used to test the `collect` and `reject` processing are not shown)
+followed with
+
+```sh
+sqlite3 $HOME/cache.db "select distinct(fname) from cache;"
+```
+
+where re the `sample.rrd` file was placed into `data\web` (additional folders used to test the `collect` and `reject` processing are not shown)
 
 this outputs
 ```cmd
@@ -67,6 +84,20 @@ fname = web:sample      ds = StatusRunning
 fname = web:sample      ds = StatusStageIn
 fname = web:sample      ds = StatusStageOut
 fname = web:sample      ds = StatusWait
+```
+### Saving on  MySQL server
+
+* start mysql server which access credentials are known:
+```sh
+docker start mysql-server
+```
+*  run with the flag
+verify explicitly
+```sh
+java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --s --vendor mysql
+```
+```sh
+docker exec -it mysql-server mysql -P 3306 -h localhost -u java -ppassword -e  "use test; SELECT * FROM cache;"
 ```
 ### Processing Symbolic Links
 prepare

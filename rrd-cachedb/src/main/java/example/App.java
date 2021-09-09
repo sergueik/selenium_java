@@ -50,6 +50,7 @@ import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.equalTo;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -62,10 +63,12 @@ import java.sql.RowId;
 
 public class App {
 
-	private static final Random r = new Random();
+	private static final Random randomId = new Random();
 	private static Connection connection = null;
 	private static String osName = getOSName();
 	public static final int INVALID_OPTION = 42;
+
+	final static Map<String, String> env = System.getenv();
 	private Map<String, String> flags = new HashMap<>();
 	private static Map<String, List<String>> dsMap = new HashMap<>();
 
@@ -76,7 +79,7 @@ public class App {
 	private static String dbhost = null;
 	private static String database = null;
 	private static int dbport = 3306;
-	private static String database_table = null;
+	private static String database_table = "cache_table";
 	private static String database_user = null;
 	private static String database_password = null;
 
@@ -93,6 +96,9 @@ public class App {
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
+		options.addOption("i", "collect", true, "folder(s) to collect");
+
+		options.addOption("q", "vendor", true, "database kind");
 
 		options.addOption("z", "dbhost", true, "database host");
 		options.addOption("y", "dbport", true, "database port");
@@ -115,48 +121,57 @@ public class App {
 		if (commandLine.hasOption("save")) {
 			save = true;
 		}
+		String vendor = commandLine.getOptionValue("vendor");
+		if (vendor == null) {
+			System.err.println("Missing argument: vendor. Using default");
+			vendor = "sqlite";
+		}
+		if (vendor.equals("mysql")) {
 
-		dbhost = commandLine.getOptionValue("dbhost");
-		if (dbhost == null) {
-			System.err.println("Missing argument: dbhost. Using default");
-			dbhost = "localhost";
+			dbhost = commandLine.getOptionValue("dbhost");
+			if (dbhost == null) {
+				System.err.println("Missing argument: dbhost. Using default");
+				dbhost = "localhost";
+			}
+
+			try {
+				dbport = Integer.parseInt(commandLine.getOptionValue("dbport"));
+			} catch (Exception e) {
+				System.err.println("Missing argument: dbport. Using default");
+				dbport = 3306;
+			}
+
+			database = commandLine.getOptionValue("database");
+			if (database == null) {
+				System.err.println("Missing argument: database. Using default");
+				database = "test";
+			}
+
+			database_user = commandLine.getOptionValue("user");
+			if (database_user == null) {
+				System.err.println("Missing argument: database_user. Using default");
+				database_user = "java";
+			}
+
+			database_table = commandLine.getOptionValue("table");
+			if (database_table == null) {
+				System.err.println("Missing argument: database_table. Using default");
+				database_table = "cache_table";
+			}
+
+			database_password = commandLine.getOptionValue("password");
+			if (database_password == null) {
+				System.err
+						.println("Missing argument: database_password. Using default");
+				database_password = "password";
+			}
+			try {
+				testJDBCConnection(vendor);
+			} catch (Exception e) {
+				System.err.println("Excetpion (ignored)" + e.toString());
+			}
 		}
 
-		try {
-			dbport = Integer.parseInt(commandLine.getOptionValue("dbport"));
-		} catch (Exception e) {
-			System.err.println("Missing argument: dbport. Using default");
-			dbport = 3306;
-		}
-
-		database = commandLine.getOptionValue("database");
-		if (database == null) {
-			System.err.println("Missing argument: database. Using default");
-			database = "test";
-		}
-
-		database_user = commandLine.getOptionValue("user");
-		if (database_user == null) {
-			System.err.println("Missing argument: database_user. Using default");
-			database_user = "java";
-		}
-
-		database_table = commandLine.getOptionValue("table");
-		if (database_table == null) {
-			System.err.println("Missing argument: database_table. Using default");
-			database_table = "cache_table";
-		}
-
-		database_password = commandLine.getOptionValue("password");
-		if (database_password == null) {
-			System.err.println("Missing argument: database_password. Using default");
-			database_password = "password";
-		}
-		try {
-			testJDBCConnection();
-		} catch (Exception e) {
-			System.err.println("Excetpion (ignored)" + e.toString());
-		}
 		String path = commandLine.getOptionValue("path");
 		if (path == null) {
 			System.err.println("Missing required argument: path");
@@ -189,20 +204,37 @@ public class App {
 
 	}
 
+	private static void clearData() {
+		try {
+			System.err.println("Querying data");
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.executeUpdate("delete from " + database_table);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+
+	}
+
 	private static void displayData() {
 		try {
+
+			System.err.println(
+					"Querying data : " + connection.getMetaData().getDatabaseProductName()
+							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
+							+ connection.getSchema());
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 
 			ResultSet rs = statement.executeQuery(
-					"SELECT DISTINCT fname, ds FROM cache ORDER BY fname, ds");
+					String.format("SELECT DISTINCT fname, ds FROM %s ORDER BY fname, ds",
+							database_table));
 			while (rs.next()) {
 				System.err.println("fname = " + rs.getString("fname") + "\t" + "ds = "
 						+ rs.getString("ds"));
 			}
 			statement.close();
 			statement = connection.createStatement();
-			statement.executeUpdate("delete from cache");
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		} finally {
@@ -215,37 +247,84 @@ public class App {
 		}
 	}
 
-	private static void createTable() {
+	private final static String sqliteDatabaseName = "cache.db";
 
+	private static void createTable() {
+		connection = null;
+
+		final String databasePath = String.format("%s%s%s",
+				env.get(osName.equals("windows") ? "USERPROFILE" : "HOME"),
+				File.separator, sqliteDatabaseName);
+		try {
+			connection = DriverManager
+					.getConnection("jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/"));
+			System.out
+					.println("Opened database connection successfully: " + databasePath);
+
+			System.out.println("Connected to product: "
+					+ connection.getMetaData().getDatabaseProductName() + "\t"
+					+ "catalog: " + connection.getCatalog() + "\t" + "schema: "
+					+ connection.getSchema());
+
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			String sql = String.format(
+					"CREATE TABLE IF NOT EXISTS %s " + "( "
+							+ "id INT PRIMARY KEY NOT NULL," + "ds CHAR(50) NOT NULL, "
+							+ "fname TEXT NOT NULL," + "expose CHAR(50)" + ");",
+					database_table);
+			System.out.println("Running SQL: " + sql);
+			statement.executeUpdate(sql);
+			statement.close();
+
+		} catch (SQLException e) {
+			System.err.println("Exception (ignored)" + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
+					+ e.getMessage());
+			System.exit(1);
+		}
+		// TOTO: add flag for in-memory
+		/*
 		try {
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite::memory:");
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s "
-							+ "(id INT PRIMARY KEY NOT NULL, ds CHAR(50) NOT NULL, fname CHAR(50) NOT NULL)",
-					"cache");
+			String sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
+					+ "id INT PRIMARY KEY NOT NULL," + "ds CHAR(50) NOT NULL, "
+					+ "fname CHAR(255) NOT NULL," + " expose CHAR(50) NOT NULL " + ")",
+					database_table);
 			statement.executeUpdate(sql);
 			statement.close();
-
+		
 		} catch (ClassNotFoundException | SQLException e) {
 			System.err.println(e.getMessage());
 			return;
 		}
+		*/
 	}
 
 	private static void saveData(Map<String, List<String>> dsMap) {
+		System.err.println("Saving data");
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.executeUpdate("delete from " + database_table);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+
 		dsMap.entrySet().stream().forEach(o -> {
 			String fname = o.getKey();
 			o.getValue().stream().forEach(ds -> {
 				try {
-					Statement statement = connection.createStatement();
-					statement.setQueryTimeout(30);
 
 					PreparedStatement preparedStatement = connection.prepareStatement(
-							"INSERT INTO cache (id, fname, ds) VALUES (?, ?, ?)");
-					int id = r.nextInt(1_000_000_000);
+							String.format("INSERT INTO %s (id, fname, ds) VALUES (?, ?, ?)",
+									database_table));
+					int id = randomId.nextInt(1_000_000_000);
 					preparedStatement.setInt(1, id);
 					preparedStatement.setString(2, fname);
 					preparedStatement.setString(3, ds);
@@ -418,49 +497,66 @@ public class App {
 				: "file://" + dataFilePath;
 	}
 
-	public static void testJDBCConnection() throws Exception {
-		try {
-			Class driverObject = Class.forName("org.gjt.mm.mysql.Driver");
-			System.out.println("driverObject=" + driverObject);
+	public static void testJDBCConnection(String vendor) throws Exception {
+		if (vendor.equals("mysql")) {
+			try {
+				// TODO: refactor
 
-			final String url = "jdbc:mysql://" + dbhost + ":" + dbport + "/"
-					+ database;
-			Connection connection = DriverManager.getConnection(url, database_user,
-					database_password);
-			if (connection != null) {
-				System.out.println("Connected to product: "
-						+ connection.getMetaData().getDatabaseProductName());
-				System.out.println("Connected to catalog: " + connection.getCatalog());
-				// System.out.println("Connected to: " + connection.getSchema());
-				// java.sql.SQLFeatureNotSupportedException: Not supported
+				Class driverObject = Class.forName(
+						"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */);
+				System.out.println("driverObject=" + driverObject);
 
-				PreparedStatement preparedStatement = connection.prepareStatement(String
-						.format("INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
-								database_table));
+				final String url = "jdbc:mysql://" + dbhost + ":" + dbport + "/"
+						+ database;
+				connection = DriverManager.getConnection(url, database_user,
+						database_password);
+				if (connection != null) {
+					System.out.println("Connected to product: "
+							+ connection.getMetaData().getDatabaseProductName());
+					System.out
+							.println("Connected to catalog: " + connection.getCatalog());
+					// System.out.println("Connected to: " + connection.getSchema());
+					// java.sql.SQLFeatureNotSupportedException: Not supported
+					Statement statement = connection.createStatement();
+					statement.setQueryTimeout(30);
+					// TODO: check syntax, removed "IF EXISTS"
+					String sql = String.format("DROP TABLE %s", database_table);
+					statement.executeUpdate(sql);
 
-				preparedStatement.setString(1, "fname");
-				preparedStatement.setString(2, "ds0");
-				// preparedStatement.setInt(2, 2);
-				// preparedStatement.setInt(3, 42);
-				preparedStatement.execute();
+					sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
+							+ "id MEDIUMINT PRIMARY KEY NOT NULL AUTO_INCREMENT,"
+							+ "ins_date datetime NOT NULL," + "ds VARCHAR(50) NOT NULL, "
+							+ "fname VARCHAR(255) NOT NULL,"
+							+ "expose VARCHAR(50) DEFAULT NULL " + " )", database_table);
+					System.out.println("Running SQL: " + sql);
+					statement.executeUpdate(sql);
 
-				Statement statement = connection.createStatement();
-				statement.setQueryTimeout(30);
-				ResultSet resultSet = statement.executeQuery(String
-						.format("SELECT id, fname, ds, expose FROM %s", database_table));
-				while (resultSet.next()) {
-					System.out.println("fname = " + resultSet.getString("fname") + "\\t"
-							+ "ds = " + resultSet.getString("ds") + "\\t" + "expose = "
-							+ resultSet.getString("expose") + "\\t" + "id = "
-							+ resultSet.getInt("id"));
+					PreparedStatement preparedStatement = connection
+							.prepareStatement(String.format(
+									"INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
+									database_table));
+
+					preparedStatement.setString(1, "fname");
+					preparedStatement.setString(2, "ds0");
+					preparedStatement.execute();
+
+					ResultSet resultSet = statement.executeQuery(String
+							.format("SELECT id, fname, ds, expose FROM %s", database_table));
+					while (resultSet.next()) {
+						System.out.println("fname = " + resultSet.getString("fname") + "\t"
+								+ "ds = " + resultSet.getString("ds") + "\t" + "expose = "
+								+ resultSet.getString("expose") + "\t" + "id = "
+								+ resultSet.getInt("id"));
+					}
+					connection.close();
+				} else {
+					System.out.println("Failed to connect");
 				}
-
-			} else {
-				System.out.println("Failed to connect");
+			} catch (Exception e) {
+				// java.lang.ClassNotFoundException
+				System.out.println("Exception: " + e.getMessage());
+				e.printStackTrace();
 			}
-		} catch (Exception e) {
-			System.out.println("Exception: " + e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -469,3 +565,4 @@ public class App {
 	}
 
 }
+
