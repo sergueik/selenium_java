@@ -85,19 +85,15 @@ fname = web:sample      ds = StatusStageIn
 fname = web:sample      ds = StatusStageOut
 fname = web:sample      ds = StatusWait
 ```
+* to specify alternative SQLite filename, use `--file` option
+```sh
+java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --file my.db
+```
 ### Saving on  MySQL server
 
 * start mysql server which access credentials are known:
 ```sh
 docker start mysql-server
-```
-*  run with the flag
-verify explicitly
-```sh
-java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --s --vendor mysql
-```
-```sh
-docker exec -it mysql-server mysql -P 3306 -h localhost -u java -ppassword -e  "use test; SELECT * FROM cache;"
 ```
 ### Processing Symbolic Links
 prepare

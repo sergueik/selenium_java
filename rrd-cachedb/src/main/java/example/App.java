@@ -1,62 +1,41 @@
 package example;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-import org.rrd4j.ConsolFun;
-import org.rrd4j.DsType;
-import org.rrd4j.core.RrdDb;
-import org.rrd4j.core.RrdMemoryBackendFactory;
-import java.lang.IllegalArgumentException;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
+
 import java.net.URL;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.junit.Assert;
-import org.junit.Test;
-
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasKey;
-import static org.hamcrest.Matchers.equalTo;
-
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.RowId;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
+import org.rrd4j.core.RrdDb;
+import org.rrd4j.core.RrdMemoryBackendFactory;
 
 // https://bitbucket.org/xerial/sqlite-jdbc
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
@@ -76,32 +55,34 @@ public class App {
 	private static boolean save = false;
 	private static boolean verifylinks = false;
 
-	private static String dbhost = null;
+	private static String databaseHost = null;
 	private static String database = null;
-	private static int dbport = 3306;
-	private static String database_table = "cache_table";
-	private static String database_user = null;
-	private static String database_password = null;
+	private static int databasePort = 3306;
+	private static String sqliteDatabaseName = "cache.db";
+	private static String databaseTable = "cache_table";
+	private static String databaseUser = null;
+	private static String databasePassword = null;
 
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
 
 	public static void main(String args[]) throws ParseException {
-		options.addOption("h", "help", false, "Help");
-		options.addOption("d", "debug", false, "Debug");
-		options.addOption("s", "save", false, "Save");
-		options.addOption("s", "save", false, "Save");
-		options.addOption("p", "path", true, "Path to scan");
+		options.addOption("h", "help", false, "help");
+		options.addOption("d", "debug", false, "debug");
+		options.addOption("s", "save", false, "save");
+		options.addOption("p", "path", true, "path to scan");
+		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
 		options.addOption("i", "collect", true, "folder(s) to collect");
 
-		options.addOption("q", "vendor", true, "database kind");
+		options.addOption("q", "vendor", true,
+				"database kind. surrently supported sqlite and mysql (partially)");
 
-		options.addOption("z", "dbhost", true, "database host");
-		options.addOption("y", "dbport", true, "database port");
+		options.addOption("z", "host", true, "database host");
+		options.addOption("y", "port", true, "database port");
 		options.addOption("w", "database", true, "database");
 		options.addOption("u", "user", true, "database user");
 		options.addOption("t", "table", true, "database table");
@@ -126,19 +107,24 @@ public class App {
 			System.err.println("Missing argument: vendor. Using default");
 			vendor = "sqlite";
 		}
+		if (!vendor.matches("(?i)(mysql|sqlite)")) {
+			System.err.printf("Unrecognized argument: vendor %s. Using default\n",
+					vendor);
+			vendor = "sqlite";
+		}
 		if (vendor.equals("mysql")) {
-
-			dbhost = commandLine.getOptionValue("dbhost");
-			if (dbhost == null) {
-				System.err.println("Missing argument: dbhost. Using default");
-				dbhost = "localhost";
+			databaseHost = commandLine.getOptionValue("databaseHost");
+			if (databaseHost == null) {
+				System.err.println("Missing argument: databaseHost. Using default");
+				databaseHost = "localhost";
 			}
 
 			try {
-				dbport = Integer.parseInt(commandLine.getOptionValue("dbport"));
+				databasePort = Integer
+						.parseInt(commandLine.getOptionValue("databasePort"));
 			} catch (Exception e) {
-				System.err.println("Missing argument: dbport. Using default");
-				dbport = 3306;
+				System.err.println("Missing argument: databasePort. Using default");
+				databasePort = 3306;
 			}
 
 			database = commandLine.getOptionValue("database");
@@ -147,29 +133,34 @@ public class App {
 				database = "test";
 			}
 
-			database_user = commandLine.getOptionValue("user");
-			if (database_user == null) {
-				System.err.println("Missing argument: database_user. Using default");
-				database_user = "java";
+			databaseUser = commandLine.getOptionValue("user");
+			if (databaseUser == null) {
+				System.err.println("Missing argument: databaseUser. Using default");
+				databaseUser = "java";
 			}
 
-			database_table = commandLine.getOptionValue("table");
-			if (database_table == null) {
-				System.err.println("Missing argument: database_table. Using default");
-				database_table = "cache_table";
+			databaseTable = commandLine.getOptionValue("table");
+			if (databaseTable == null) {
+				System.err.println("Missing argument: databaseTable. Using default");
+				databaseTable = "cache_table";
 			}
 
-			database_password = commandLine.getOptionValue("password");
-			if (database_password == null) {
-				System.err
-						.println("Missing argument: database_password. Using default");
-				database_password = "password";
+			databasePassword = commandLine.getOptionValue("password");
+			if (databasePassword == null) {
+				System.err.println("Missing argument: databasePassword. Using default");
+				databasePassword = "password";
 			}
 			try {
 				testJDBCConnection(vendor);
 			} catch (Exception e) {
 				System.err.println("Excetpion (ignored)" + e.toString());
 			}
+		}
+
+		sqliteDatabaseName = commandLine.getOptionValue("file");
+		if (sqliteDatabaseName == null) {
+			System.err.println("Missing argument: sqliteDatabaseName. Using default");
+			sqliteDatabaseName = "cache.db";
 		}
 
 		String path = commandLine.getOptionValue("path");
@@ -209,7 +200,7 @@ public class App {
 			System.err.println("Querying data");
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + database_table);
+			statement.executeUpdate("delete from " + databaseTable);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -228,7 +219,7 @@ public class App {
 
 			ResultSet rs = statement.executeQuery(
 					String.format("SELECT DISTINCT fname, ds FROM %s ORDER BY fname, ds",
-							database_table));
+							databaseTable));
 			while (rs.next()) {
 				System.err.println("fname = " + rs.getString("fname") + "\t" + "ds = "
 						+ rs.getString("ds"));
@@ -246,8 +237,6 @@ public class App {
 			}
 		}
 	}
-
-	private final static String sqliteDatabaseName = "cache.db";
 
 	private static void createTable() {
 		connection = null;
@@ -272,7 +261,7 @@ public class App {
 					"CREATE TABLE IF NOT EXISTS %s " + "( "
 							+ "id INT PRIMARY KEY NOT NULL," + "ds CHAR(50) NOT NULL, "
 							+ "fname TEXT NOT NULL," + "expose CHAR(50)" + ");",
-					database_table);
+					databaseTable);
 			System.out.println("Running SQL: " + sql);
 			statement.executeUpdate(sql);
 			statement.close();
@@ -295,7 +284,7 @@ public class App {
 			String sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
 					+ "id INT PRIMARY KEY NOT NULL," + "ds CHAR(50) NOT NULL, "
 					+ "fname CHAR(255) NOT NULL," + " expose CHAR(50) NOT NULL " + ")",
-					database_table);
+					databaseTable);
 			statement.executeUpdate(sql);
 			statement.close();
 		
@@ -311,7 +300,7 @@ public class App {
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + database_table);
+			statement.executeUpdate("delete from " + databaseTable);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -323,7 +312,7 @@ public class App {
 
 					PreparedStatement preparedStatement = connection.prepareStatement(
 							String.format("INSERT INTO %s (id, fname, ds) VALUES (?, ?, ?)",
-									database_table));
+									databaseTable));
 					int id = randomId.nextInt(1_000_000_000);
 					preparedStatement.setInt(1, id);
 					preparedStatement.setString(2, fname);
@@ -506,10 +495,10 @@ public class App {
 						"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */);
 				System.out.println("driverObject=" + driverObject);
 
-				final String url = "jdbc:mysql://" + dbhost + ":" + dbport + "/"
-						+ database;
-				connection = DriverManager.getConnection(url, database_user,
-						database_password);
+				final String url = "jdbc:mysql://" + databaseHost + ":" + databasePort
+						+ "/" + database;
+				connection = DriverManager.getConnection(url, databaseUser,
+						databasePassword);
 				if (connection != null) {
 					System.out.println("Connected to product: "
 							+ connection.getMetaData().getDatabaseProductName());
@@ -520,28 +509,28 @@ public class App {
 					Statement statement = connection.createStatement();
 					statement.setQueryTimeout(30);
 					// TODO: check syntax, removed "IF EXISTS"
-					String sql = String.format("DROP TABLE %s", database_table);
+					String sql = String.format("DROP TABLE %s", databaseTable);
 					statement.executeUpdate(sql);
 
 					sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
 							+ "id MEDIUMINT PRIMARY KEY NOT NULL AUTO_INCREMENT,"
 							+ "ins_date datetime NOT NULL," + "ds VARCHAR(50) NOT NULL, "
 							+ "fname VARCHAR(255) NOT NULL,"
-							+ "expose VARCHAR(50) DEFAULT NULL " + " )", database_table);
+							+ "expose VARCHAR(50) DEFAULT NULL " + " )", databaseTable);
 					System.out.println("Running SQL: " + sql);
 					statement.executeUpdate(sql);
 
 					PreparedStatement preparedStatement = connection
 							.prepareStatement(String.format(
 									"INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
-									database_table));
+									databaseTable));
 
 					preparedStatement.setString(1, "fname");
 					preparedStatement.setString(2, "ds0");
 					preparedStatement.execute();
 
 					ResultSet resultSet = statement.executeQuery(String
-							.format("SELECT id, fname, ds, expose FROM %s", database_table));
+							.format("SELECT id, fname, ds, expose FROM %s", databaseTable));
 					while (resultSet.next()) {
 						System.out.println("fname = " + resultSet.getString("fname") + "\t"
 								+ "ds = " + resultSet.getString("ds") + "\t" + "expose = "
@@ -561,6 +550,8 @@ public class App {
 	}
 
 	public static void help() {
+		System.err.println("Usage:\n"
+				+ "java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --file my.db --collect file1,file2 --reject file3,file4");
 		System.exit(1);
 	}
 
