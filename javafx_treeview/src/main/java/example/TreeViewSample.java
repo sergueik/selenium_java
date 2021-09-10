@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-// origin: 
 /**
  * based on Oracle's example at
  * http://docs.oracle.com/javafx/2/ui_controls/tree-view.htm
@@ -69,12 +68,6 @@ public class TreeViewSample extends Application {
 				return;
 			}
 			rootNode = new TreeItem<>("RRD Resource Directory", rootIcon);
-			/*
-			employees = Arrays.asList(new Employee("server 1", "web"), new Employee("server 2", "web"),
-					new Employee("server 3", "web"), new Employee("server 4", "web"), new Employee("server 1", "db"),
-					new Employee("server 2", "db"), new Employee("server 3", "db"), new Employee("server 1", "app"),
-					new Employee("server 2", "app"));
-					*/
 			for (String resource : resources.split(",")) {
 				String[] details = resource.split(":");
 				String file = details[2];
