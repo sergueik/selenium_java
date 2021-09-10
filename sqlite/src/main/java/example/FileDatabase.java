@@ -15,6 +15,7 @@ import java.sql.RowId;
 // https://www.sqlitetutorial.net/sqlite-java/sqlite-jdbc-driver/
 
 public class FileDatabase {
+
 	public static void main(String[] args) throws ClassNotFoundException {
 
 		Class.forName("org.sqlite.JDBC");
@@ -28,7 +29,12 @@ public class FileDatabase {
 		try {
 			connection = DriverManager
 					.getConnection("jdbc:sqlite:" + databaseName.replaceAll("\\\\", "/"));
-			System.out.println("Opened database connection successfully");
+			System.out.println(
+					"Opened database connection successfully to " + databaseName);
+			System.err.println(
+					"Querying data : " + connection.getMetaData().getDatabaseProductName()
+							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
+							+ connection.getSchema());
 
 			Statement statement = connection.createStatement();
 			String sql = String.format(
@@ -36,6 +42,7 @@ public class FileDatabase {
 							+ "ADDRESS CHAR(50), SALARY REAL)",
 					tableName);
 			statement.executeUpdate(sql);
+			statement.executeUpdate("delete from COMPANY");
 			statement.close();
 
 			PreparedStatement preparedStatement = connection.prepareStatement(
@@ -60,7 +67,6 @@ public class FileDatabase {
 			}
 
 			statement = connection.createStatement();
-			statement.executeUpdate("delete from COMPANY");
 
 		} catch (SQLException e) {
 			System.err.println("Exception (ignored)" + e.getMessage());
