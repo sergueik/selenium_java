@@ -26,6 +26,11 @@ java -cp target/treeview.jar;target/lib/* example.%CLASS% -r sample:web:server1,
 java -jar target/treeview.jar
 ```
 
+### Chart
+
+```cmd
+java -cp target/treeview.jar;target/lib/* example.ChartEx -resource data.csv
+```
 ### See Also
 
 
