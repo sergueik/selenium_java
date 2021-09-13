@@ -6,25 +6,24 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+// import org.apache.commons.cli.CommandLine;
+// import org.apache.commons.cli.CommandLineParser;
+// import org.apache.commons.cli.DefaultParser;
+// import org.apache.commons.cli.Options;
+// import org.apache.commons.cli.ParseException;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-import example.TreeViewSample.Employee;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.TreeItem;
 import javafx.stage.Stage;
 
-// import org.apache.common.commons-csv.*;
-// https://www.baeldung.com/apache-commons-csv
+import example.CommandLineParser;
+
 /**
  * based on Oracle's example at
  * https://docs.oracle.com/javafx/2/charts/line-chart.htm#CIHGBCFI
@@ -33,21 +32,27 @@ import javafx.stage.Stage;
 @SuppressWarnings("restriction")
 public class ChartEx extends Application {
 	private static String[] HEADERS = { "column1", "column2" };
-	private static CommandLineParser commandLineparser = new DefaultParser();
-	private static CommandLine commandLine = null;
-	private final static Options options = new Options();
+	// problamatic with JDK 11
+	// private static CommandLineParser commandLineparser = new DefaultParser();
+	// private static CommandLine commandLine = null;
+	// private final static Options options = new Options();
 	private final static List<List<Float>> data = new ArrayList<>();
+	private static CommandLineParser commandLineParser;
+	private static String resource = "data.csv";
 
 	public static void main(String[] args) {
-		options.addOption("h", "help", false, "Help");
-		options.addOption("d", "debug", false, "Debug");
-		options.addOption("r", "resource", true, "Resource");
+		// options.addOption("h", "help", false, "Help");
+		// options.addOption("d", "debug", false, "Debug");
+		// options.addOption("r", "resource", true, "Resource");
+		commandLineParser = new CommandLineParser();
+		commandLineParser.saveFlagValue("resource");
+
+		commandLineParser.parse(args);
+
 		try {
-			commandLine = commandLineparser.parse(options, args);
-			if (commandLine.hasOption("h")) {
-				help();
-			}
-			String resource = commandLine.getOptionValue("resource");
+			// commandLine = commandLineparser.parse(options, args);
+			resource = commandLineParser.getFlagValue("resource");
+			// String resource = commandLine.getOptionValue("resource");
 			if (resource == null) {
 				System.err.println("Missing required argument: resource");
 				return;
@@ -79,7 +84,7 @@ public class ChartEx extends Application {
 			}
 			System.err.println("data: " + data);
 			launch(args);
-		} catch (ParseException e) {
+		// } catch (ParseException e) {
 		} catch (IOException e) {
 		}
 	}
