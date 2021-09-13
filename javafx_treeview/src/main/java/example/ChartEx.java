@@ -22,6 +22,11 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
+// import org.slf4j.Logger;
+// import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import example.CommandLineParser;
 
 /**
@@ -31,8 +36,9 @@ import example.CommandLineParser;
 
 @SuppressWarnings("restriction")
 public class ChartEx extends Application {
+	private static Logger logger = LogManager.getLogger(ChartEx.class.getName());
 	private static String[] HEADERS = { "column1", "column2" };
-	// problamatic with JDK 11
+	
 	// private static CommandLineParser commandLineparser = new DefaultParser();
 	// private static CommandLine commandLine = null;
 	// private final static Options options = new Options();
@@ -54,7 +60,7 @@ public class ChartEx extends Application {
 			resource = commandLineParser.getFlagValue("resource");
 			// String resource = commandLine.getOptionValue("resource");
 			if (resource == null) {
-				System.err.println("Missing required argument: resource");
+				logger.info("Missing required argument: resource");
 				return;
 			}
 
@@ -82,9 +88,9 @@ public class ChartEx extends Application {
 				row.add(Float.parseFloat(columnTwo));
 				data.add(row);
 			}
-			System.err.println("data: " + data);
+			logger.info("data: " + data);
 			launch(args);
-		// } catch (ParseException e) {
+			// } catch (ParseException e) {
 		} catch (IOException e) {
 		}
 	}

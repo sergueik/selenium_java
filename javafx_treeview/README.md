@@ -36,6 +36,7 @@ java -cp target/treeview.jar;target/lib/* example.ChartEx -resource data.csv
  * [creating simple javafx app in plain Java code and in Scene Builder](https://sites.google.com/a/athaydes.com/renato-athaydes/posts/usingautomatontotestajavafx8app)
  * https://github.com/ethanp/programming/tree/master/Educational/Java/JavaFX/OracleTreeView/src/sample
  * https://www.baeldung.com/apache-commons-csv
+ * [example](https://www.toolbox.com/tech/programming/question/how-to-implement-log4j-in-java-application-050809/) adding `log4j2` without `slf4j`
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
