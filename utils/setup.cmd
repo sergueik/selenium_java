@@ -21,7 +21,7 @@ REM if "%JAVA_VERSION%"=="" set JAVA_VERSION=9.0.4
 
 REM Currently only supporting JDK up to 1.8
 if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
-set JAVA_HOME=%TOOL_HOME%\jdk%JAVA_VERSION%
+if "%JAVA_HOME%"=="" set JAVA_HOME=%TOOL_HOME%\jdk%JAVA_VERSION%
 set JAVA_OPTS=-Xms256m -Xmx512m
 
 if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.6.1

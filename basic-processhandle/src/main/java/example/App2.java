@@ -3,17 +3,11 @@ package example;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import java.lang.reflect.Field;
 import java.util.Optional;
-
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -49,72 +43,8 @@ import com.sun.jna.win32.W32APITypeMapper;
  * based on Baeldung's example at https://www.baeldung.com/java-9-process-api
  */
 
-public class App {
+public class App2 {
 	private static Logger logger = LogManager.getLogger(App.class.getName());
-	private static CommandLineParser commandLineparser = new DefaultParser();
-	private static CommandLine commandLine = null;
-	private final static Options options = new Options();
-	private final static List<List<Float>> data = new ArrayList<>();
-
-	public static void help() {
-		System.exit(1);
-	}
-
-	public static void main(String[] args) {
-		options.addOption("h", "help", false, "Help");
-		options.addOption("d", "debug", false, "Debug");
-		options.addOption("a", "action", true, "Action");
-		options.addOption("p", "pid", true, "Pid");
-		try {
-			commandLine = commandLineparser.parse(options, args);
-			if (commandLine.hasOption("h")) {
-				help();
-			}
-			String action = commandLine.getOptionValue("action");
-			if (action == null) {
-				System.err.println("Missing required argument: action");
-
-			}
-			if (action.equals("list")) {
-				infoOfLiveProcesses();
-			}
-			/*
-			 * if (action.equals("current")) { Process process =
-			 * Process.getCurrentProcess(); getWindowsProcessId(process,
-			 * logger); logger.info(process.toHandle().pid()); }
-			 */
-			if (action.equals("check")) {
-				String resource = commandLine.getOptionValue("pid");
-				if (resource == null) {
-					System.err.println("Missing required argument: pid");
-				} else {
-					Integer pid = Integer.parseInt(resource);
-					logger.info("looking pid " + pid);
-					// Returns an Optional<ProcessHandle> for an existing native process.
-					Optional<ProcessHandle> result = ProcessHandle.of(pid);
-					ProcessHandle processHandle = result.isPresent() ? result.get() : null;
-					logger.info(processHandle);
-					Boolean status = (processHandle == null) ? false : processHandle.isAlive();
-					String extraInfo = status ? "(" + "command: " + processHandle.info().command().get() + " started:" + processHandle.info().startInstant​().get() +  " " + "pid:" + processHandle.pid() + ")"   : "";
-					logger.info("Process pid (via ProcessHandle): " + pid + " is: "
-					
-							+ (status ? "alive" : "not alive") + " "+ extraInfo );
-					status = isProcessIdRunningOnWindows(pid);
-					logger.info("Process pid (via tasklist): " + pid + " is: " + (status ? "alive" : "not alive"));							
-				}
-			}
-		} catch (ParseException e) {
-		}
-	}
-
-	private static void infoOfLiveProcesses() {
-		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		liveProcesses.filter(ProcessHandle::isAlive).forEach(ph -> {
-			logger.info("PID: " + ph.pid());
-			logger.info("Instance: " + ph.info().startInstant());
-			logger.info("User: " + ph.info().user());
-		});
-	}
 
 	// https://stackoverflow.com/questions/2533984/java-checking-if-any-process-id-is-currently-running-on-windows/41489635
 	public static boolean isProcessIdRunningOnWindows(int pid) {
@@ -122,7 +52,7 @@ public class App {
 			Runtime runtime = Runtime.getRuntime();
 			String cmds[] = { "cmd", "/c", "tasklist /FI \"PID eq " + pid + "\"" };
 			Process proc = runtime.exec(cmds);
-			logger.info("Running the command: " + Arrays.asList( cmds));
+
 			InputStream inputstream = proc.getInputStream();
 			InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
 			BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
@@ -146,7 +76,6 @@ public class App {
 
 	}
 
-
 	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
 	private static Long getWindowsProcessId(final Process process, final Logger logger) {
 		/* determine the pid on windows platforms */
@@ -165,5 +94,4 @@ public class App {
 		}
 		return null;
 	}
-
 }
