@@ -10,9 +10,11 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.lang.reflect.Field;
 import java.util.Optional;
+import java.util.NoSuchElementException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -91,16 +93,41 @@ public class App {
 					Integer pid = Integer.parseInt(resource);
 					logger.info("looking pid " + pid);
 					// Returns an Optional<ProcessHandle> for an existing native process.
-					Optional<ProcessHandle> result = ProcessHandle.of(pid);
-					ProcessHandle processHandle = result.isPresent() ? result.get() : null;
-					logger.info(processHandle);
-					Boolean status = (processHandle == null) ? false : processHandle.isAlive();
-					String extraInfo = status ? "(" + "command: " + processHandle.info().command().get() + " started:" + processHandle.info().startInstant​().get() +  " " + "pid:" + processHandle.pid() + ")"   : "";
-					logger.info("Process pid (via ProcessHandle): " + pid + " is: "
-					
-							+ (status ? "alive" : "not alive") + " "+ extraInfo );
-					status = isProcessIdRunningOnWindows(pid);
-					logger.info("Process pid (via tasklist): " + pid + " is: " + (status ? "alive" : "not alive"));							
+					Optional<ProcessHandle> result = Optional.empty();
+					ProcessHandle processHandle = null;
+					try {
+						result = ProcessHandle.of(pid);
+						processHandle = result.isPresent() ? result.get() : null;
+						logger.info(processHandle);
+					} catch (NoSuchElementException e1) {
+					}
+					boolean status = (processHandle == null) ? false
+							: processHandle.isAlive();
+					String extraInfo = null;
+					if (status)
+						try {
+							extraInfo = "(" + "command: "
+									+ processHandle.info().command().get() + " started:"
+									+ processHandle.info().startInstant().get() + " " + "pid:"
+									+ processHandle.pid() + ")";
+						} catch (NoSuchElementException e1) {
+						}
+					logger.info("Process pid (via ProcessHandle.of): " + pid + " is: "
+
+							+ (status ? "alive" : "not alive") + " " + extraInfo);
+					status = isProcessIdRunningOnWindows((int) pid);
+					logger.info("Process pid (via tasklist): " + pid + " is: "
+							+ (status ? "alive" : "not alive"));
+
+					Stream<ProcessHandle> processes = ProcessHandle.allProcesses();
+					processHandle = null;
+					processHandle = processes.filter(o -> o.pid() == pid).findFirst()
+							.orElse(null);
+					status = (processHandle == null) ? false : processHandle.isAlive();
+					logger.info(
+							"Process pid (via ProcessHandle.allProcesses): " + pid + " is: "
+
+									+ (status ? "alive" : "not alive"));
 				}
 			}
 		} catch (ParseException e) {
@@ -122,7 +149,7 @@ public class App {
 			Runtime runtime = Runtime.getRuntime();
 			String cmds[] = { "cmd", "/c", "tasklist /FI \"PID eq " + pid + "\"" };
 			Process proc = runtime.exec(cmds);
-			logger.info("Running the command: " + Arrays.asList( cmds));
+			logger.info("Running the command: " + Arrays.asList(cmds));
 			InputStream inputstream = proc.getInputStream();
 			InputStreamReader inputstreamreader = new InputStreamReader(inputstream);
 			BufferedReader bufferedreader = new BufferedReader(inputstreamreader);
@@ -146,9 +173,9 @@ public class App {
 
 	}
 
-
 	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
-	private static Long getWindowsProcessId(final Process process, final Logger logger) {
+	private static Long getWindowsProcessId(final Process process,
+			final Logger logger) {
 		/* determine the pid on windows platforms */
 		try {
 			Field f = process.getClass().getDeclaredField("handle");
