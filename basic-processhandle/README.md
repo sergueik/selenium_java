@@ -2,7 +2,7 @@
 
 
 This directory contains example code based on [Java 9 Process API Improvements](https://www.baeldung.com/java-9-process-api)
-The jna is still in the dependencies to have the legacy JNA based code snippets for
+The [jna](https://en.wikipedia.org/wiki/Java_Native_Access) is still in the dependencies to have the legacy JNA based code snippets for
 
 * `GetProcessId` [example](https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId)
 * `getCurrentProcessId` [example](https://www.tabnine.com/code/java/methods/com.metamx.metrics.SigarUtil/getCurrentProcessId)
@@ -22,6 +22,65 @@ java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 
 2021-09-14 15:37:48  [main] - INFO  2562
 2021-09-14 15:37:48  [main] - INFO  Process pid: 2562 is: alive(C:\Program Files\Git\git-bash.exe)
 ````
+
+### Note
+
+Some test errors: `ProcessHandle` reposting `active` pids which have no running processes.
+* start with a pid that has a process running e.g. any from `tasklist` output
+```cmd
+tasklist /FO TABLE /NH /M kernel32.dll
+
+taskhost.exe                   344 kernel32.dll
+dwm.exe                       2008 kernel32.dll
+explorer.exe                  1648 kernel32.dll
+VBoxTray.exe                   872 kernel32.dll
+powershell.exe                1140 kernel32.dll
+conhost.exe                   1168 kernel32.dll
+cmd.exe                       1028 kernel32.dll
+conhost.exe                    944 kernel32.dll
+notepad.exe                   3228 kernel32.dll
+notepad++.exe                 3260 kernel32.dll
+cmd.exe                       4092 kernel32.dll
+conhost.exe                   1452 kernel32.dll
+notepad.exe                   2500 kernel32.dll
+tasklist.exe                  2340 kernel32.dll
+```
+* comfirm only one process e.g. `taskhost.exe` is executing:
+```cmd
+tasklist /fi "imagename eq taskhost.exe" /nh
+```
+```text
+taskhost.exe                   344 Console                    1      6,892 K
+```
+* run positive check test of the pid above
+```cmd
+java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 344
+2021-09-14 20:11:32  [main] - INFO  looking pid 344
+2021-09-14 20:11:32  [main] - INFO  344
+2021-09-14 20:11:32  [main] - INFO  Process pid (via ProcessHandle): 344 is: alive (command: C:\Windows\System32\taskhost.exe started:2021-09-15T02:46:16.513Z pid:344)
+2021-09-14 20:11:33  [main] - INFO  Running the command: [cmd, /c, tasklist /FI"PID eq 344"]
+2021-09-14 20:11:33  [main] - INFO  Process pid (via tasklist): 344 is: alive
+```
+followed by same command but with a  different pid argument, e.g. by one
+```cmd
+java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 345
+2021-09-14 20:13:13  [main] - INFO  looking pid 345
+2021-09-14 20:13:13  [main] - INFO  345
+2021-09-14 20:13:13  [main] - INFO  Process pid (via ProcessHandle): 345 is: alive (command: C:\Windows\System32\taskhost.exe started:2021-09-15T02:46:16.513Z pid:345)
+2021-09-14 20:13:13  [main] - INFO  Running the command: [cmd, /c, tasklist /FI"PID eq 345"]
+2021-09-14 20:13:14  [main] - INFO  Process pid (via tasklist): 345 is: not alive
+```
+Clearly the `ProcessHandle` result is wrong.
+Probably error in some properties not cleared (?), but how can it be true - the Java applicaton is finishing execution after each test
+
+Tested on several environments, seen in all variations of OS / JDK on Windows, not reproroducedd on Linux:
+
+   * Windows 10 64 bit Oracle JDK 11.0.x Enterprise
+   * Windows 7 32 bit JDK 11.0.12 "Temurin-11.0.12+7" (Oracle is not offering 32 JDK starting with Java 9)
+   * Windows 7 32 bit JDK 11.0.10 "Azul Systems, Inc."
+   * Ubuntu 16.04 LTS Xenial openjdk version "11.0.2" OpenJDK Runtime Environment 18.9 (build 11.0.2+9) - not reproduced
+   * Alpine 9 ZULU JDK 11 (details TBD)
+
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html
