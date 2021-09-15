@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>processhandle</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <properties>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>

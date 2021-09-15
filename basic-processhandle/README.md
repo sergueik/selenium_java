@@ -52,7 +52,15 @@ tasklist /fi "imagename eq taskhost.exe" /nh
 ```text
 taskhost.exe                   344 Console                    1      6,892 K
 ```
-* run positive check test of the pid above
+
+if there are multiple, e.g. 
+```cmd
+mintty.exe                    4664 Console                    1     12,784 K
+mintty.exe                    1876 Console                    1     12,652 K
+```
+take note of PIDs.
+
+* run positive check test of the known running PID from above command
 ```cmd
 java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 344
 2021-09-14 20:11:32  [main] - INFO  looking pid 344
@@ -73,12 +81,13 @@ java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 
 Clearly the `ProcessHandle` result is wrong.
 Probably error in some properties not cleared (?), but how can it be true - the Java applicaton is finishing execution after each test
 
-Tested on several environments, seen in all variations of OS / JDK on Windows, not reproroducedd on Linux:
+Tested on several environments, seen in all variations of OS / JDK on Windows, not reproroducedd on Linux (but maybe not tried enough):
 
    * Windows 10 64 bit Oracle JDK 11.0.x Enterprise
+   * Windows 8 64 bit openjdk "11.0.10" "Azul Systems, Inc."
    * Windows 7 32 bit JDK 11.0.12 "Temurin-11.0.12+7" (Oracle is not offering 32 JDK starting with Java 9)
    * Windows 7 32 bit JDK 11.0.10 "Azul Systems, Inc."
-   * Ubuntu 16.04 LTS Xenial openjdk version "11.0.2" OpenJDK Runtime Environment 18.9 (build 11.0.2+9) - not reproduced
+   * Ubuntu 16.04 LTS Xenial openjdk version "11.0.2" OpenJDK Runtime Environment 18.9 (build 11.0.2+9)
    * Alpine 9 ZULU JDK 11 (details TBD)
 
 ### See Aso

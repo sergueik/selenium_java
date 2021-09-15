@@ -1,4 +1,4 @@
-﻿package example;
+package example;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -80,10 +80,15 @@ public class AppLinux {
 
 					Boolean status = (processHandle == null) ? false : processHandle.isAlive();
 					String extraInfo = null;
-					try {
-						extraInfo = status ? "(" + "command: " + processHandle.info().command().get() + " started:" + processHandle.info().startInstant​().get() +  " " + "pid:" + processHandle.pid() + ")"   : "";
-					} catch (NoSuchElementException e1) { 
-					}
+					if (status) 
+						try {
+							extraInfo = "(" + "command: " + 	
+								processHandle.info().command().get() + 
+								" started:" + processHandle.info().startInstant().get() +  
+								" " + 
+								"pid:" + processHandle.pid() + ")" ;
+						} catch (NoSuchElementException e1) { 
+						}
 					logger.info("Process pid (via ProcessHandle): " + pid + " is: "
 					
 							+ (status ? "alive" : "not alive") + " "+ extraInfo );
