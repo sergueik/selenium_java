@@ -89,9 +89,12 @@ public class App {
 						"java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar");
 			}
 			if (action.equals("powershell")) {
+				String command = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
+				Launcher.buildCommand(command);
 				Launcher.launchPowershell1();
-				sleep(5000);
-				int pid = Integer.parseInt(readFile("C:\\TEMP\\a123.txt"));
+				sleep(10000);
+				int pid = Launcher.getPid();
+				// int pid = Integer.parseInt(readFile("C:\\TEMP\\a123.txt"));
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
 						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
@@ -217,31 +220,6 @@ public class App {
 		}
 		return null;
 	}
-
-	public static String readFile(final String filePath) {
-		String result = null;
-		StringBuffer contents = new StringBuffer();
-		BufferedReader reader = null;
-		try {
-			File file = new File(filePath);
-			reader = new BufferedReader(new FileReader(file));
-			String text = null;
-
-			// repeat until all lines is read
-			while ((text = reader.readLine()) != null) {
-				contents.append(text).append(System.getProperty("line.separator"));
-			}
-			reader.close();
-			result = contents.toString().replaceAll("\r?\n", "").replaceAll("Pid=",
-					"");
-			logger.info(String.format("%s data:%s", filePath, result));
-
-		} catch (Exception e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
-		return result;
-	}
-
 	public static void sleep(Integer milliSeconds) {
 		try {
 			Thread.sleep((long) milliSeconds);
