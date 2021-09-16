@@ -19,6 +19,10 @@ public class Launcher {
 	private final static String pidfilePath = "C:\\TEMP\\a123.txt";
 	private final static String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
 
+	public static String getDemocommand() {
+		return demoCommand;
+	}
+
 	public static void launchCmd2() {
 		launchCmd2(demoCommand);
 	}
