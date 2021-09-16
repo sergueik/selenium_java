@@ -12,60 +12,15 @@ import org.apache.logging.log4j.Logger;
 
 public class Launcher {
 	private static Logger logger = LogManager.getLogger(Launcher.class.getName());
+	private final static String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
 
-	public static void launch() {
-		ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "start",
-				"/low", "java.exe", "-jar",
-				"c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar");
-		Map<String, String> env = processBuilder.environment();
-		env.put("PATH",
-				String.format("%s;%s", env.get("PATH"), "c:\\java\\jdk1.8.0_101\\bin"));
-		try {
-			Process process = processBuilder.start();
-		} catch (IOException e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
-	}
-
-	public static void launch2() {
-
-		ProcessBuilder processBuilder = new ProcessBuilder(Arrays.asList(
-				new String[] { "cmd.exe", "/c", "start", "/low", "java.exe", "-jar",
-						"c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar" }));
-		Map<String, String> env = processBuilder.environment();
-		env.put("PATH",
-				String.format("%s;%s", env.get("PATH"), "c:\\java\\jdk1.8.0_101\\bin"));
-		try {
-			Process process = processBuilder.start();
-		} catch (IOException e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
-	}
-
-	public static void launch3() {
-		List<String> arguments = Arrays.asList(new String[] { "cmd.exe", "/c",
-				"start", "/low", "java.exe", "-jar",
-				"c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar" });
-		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
-		Map<String, String> env = processBuilder.environment();
-		env.put("PATH",
-				String.format("%s;%s", env.get("PATH"), "c:\\java\\jdk1.8.0_101\\bin"));
-		try {
-			Process process = processBuilder.start();
-		} catch (IOException e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
-	}
-
-	public static void launch5() {
+	public static void launchCmd2() {
 		String command = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		// String command = "java.exe -jar
-		// c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		launch5(command);
+		launchCmd2(command);
 	}
 
 	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
-	public static void launch5(final String command) {
+	public static void launchCmd2(final String command) {
 
 		List<String> arguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
@@ -97,26 +52,50 @@ public class Launcher {
 		
 		   
 		 */
+		launch(arguments);
+	}
+
+	// https://www.baeldung.com/java-lang-processbuilder-api
+	public static void launch(List<String> arguments) {
+		logger.info("Launching: " + arguments);
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
 		Map<String, String> env = processBuilder.environment();
-		env.put("PATH",
-				String.format("%s;%s", env.get("PATH"), "c:\\java\\jdk1.8.0_101\\bin"));
+		env.put("PATH", String.format("%s;%s", env.get("PATH"), javaPath));
 		try {
 			Process process = processBuilder.start();
 		} catch (IOException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
+
 	}
 
-	public static void launch4() {
+	public static void launchPowershell1() {
+		final int timeout = 10;
+		String command = "$info = 'test'; write-output $info | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -append; "
+				+ String.format("start-sleep -seconds %d", timeout);
+		command = "$info = start-process 'java.exe' -argumentlist '-jar','c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar' -passthru; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; "
+				+ String.format("start-sleep -seconds %d", timeout);
+		launchPowershell1(command);
+	}
+
+	public static void launchPowershell1(String command) {
+
+		List<String> commandArguments = new ArrayList<>(
+				Arrays.asList(command.split("\\s+")));
+		List<String> arguments = new ArrayList<>(
+				Arrays.asList(new String[] { "powershell.exe", "/noprofile",
+						"/executionpolicy", "bypass", "\"&{" }));
+		arguments.addAll(commandArguments);
+		arguments.add("}\"");
+		launch(arguments);
+	}
+
+	public static void launchCmd1() {
 		String command = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		// String command = "java.exe -jar
-		// c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		launch4(command);
+		launchCmd1(command);
 	}
 
-	// https://www.baeldung.com/java-lang-processbuilder-api
-	public static void launch4(String command) {
+	public static void launchCmd1(String command) {
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
 		List<String> arguments = new ArrayList<>(
@@ -124,33 +103,9 @@ public class Launcher {
 		try {
 			arguments.addAll(commandArguments);
 		} catch (UnsupportedOperationException e) {
-			// ignore
 			logger.info("Exception (ignored): " + e.toString());
 		}
-
-		arguments = new ArrayList<>(
-				Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" }));
-		for (String arg : commandArguments) {
-			try {
-				arguments.add(arg);
-			} catch (UnsupportedOperationException e) {
-				// ignore
-				logger.info("Exception (ignored): " + e.toString());
-			}
-		}
-
-		logger.info("Launching: " + arguments);
-		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
-		Map<String, String> env = processBuilder.environment();
-		env.put("PATH",
-				String.format("%s;%s", env.get("PATH"), "c:\\java\\jdk1.8.0_101\\bin"));
-		try {
-			Process process = processBuilder.start();
-		} catch (IOException e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
+		launch(arguments);
 	}
-	// $info = start-process "java.exe" -argumentlist
-	// "-jar","c:\developer\sergueik\springboot_study\basic-rrd4j\target\rrd4j-3.9-SNAPSHOT-inspector.jar"
-	// -passthru; write-output $info.id
+
 }
