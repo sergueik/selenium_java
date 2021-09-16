@@ -154,6 +154,11 @@ try {
 ```
 to retrieve status of operating system process with pid `pid`.
 
+### Windows Launcher Testing
+```
+set JAVA_HOME=C:\java\zulu11.45.27-ca-jdk11.0.10-win_x64
+call ..\utils\setup.cmd
+```
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html

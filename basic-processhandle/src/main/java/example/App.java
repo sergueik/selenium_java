@@ -77,6 +77,17 @@ public class App {
 				System.err.println("Missing required argument: action");
 
 			}
+			if (action.equals("cmd")) {
+				Launcher.launch5();
+			}
+			if (action.equals("cmd2")) {
+				Launcher.launch4();
+			}
+			if (action.equals("powershell")) {
+				// String command = "$info = start-process \"java.exe\" -argumentlist
+				// \"-jar\",\"c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar\"
+				// -passthru; write-output $info.id"
+			}
 			if (action.equals("list")) {
 				infoOfLiveProcesses();
 			}
