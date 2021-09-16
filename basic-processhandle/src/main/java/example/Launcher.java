@@ -17,10 +17,10 @@ public class Launcher {
 	private static Logger logger = LogManager.getLogger(Launcher.class.getName());
 	private final static String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
 	private final static String pidfilePath = "C:\\TEMP\\a123.txt";
+	private final static String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
 
 	public static void launchCmd2() {
-		String command = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		launchCmd2(command);
+		launchCmd2(demoCommand);
 	}
 
 	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
@@ -81,7 +81,7 @@ public class Launcher {
 
 		command = "$info = start-process -filepath 'java.exe' -argumentlist '-jar','c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar' -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; "
 				+ String.format("start-sleep -seconds %d", timeout);
-		String javaCommand = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
+		String javaCommand = demoCommand;
 		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; ";
 		command = String.format(commandTemplate, buildCommand(javaCommand));
 		launchPowershell1(command);
@@ -129,8 +129,7 @@ public class Launcher {
 	}
 
 	public static void launchCmd1() {
-		String command = "java.exe -jar c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar";
-		launchCmd1(command);
+		launchCmd1(demoCommand);
 	}
 
 	public static void launchCmd1(String command) {

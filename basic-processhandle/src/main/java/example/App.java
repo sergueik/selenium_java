@@ -94,7 +94,6 @@ public class App {
 				Launcher.launchPowershell1();
 				sleep(10000);
 				int pid = Launcher.getPid();
-				// int pid = Integer.parseInt(readFile("C:\\TEMP\\a123.txt"));
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
 						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
@@ -220,6 +219,7 @@ public class App {
 		}
 		return null;
 	}
+
 	public static void sleep(Integer milliSeconds) {
 		try {
 			Thread.sleep((long) milliSeconds);
@@ -228,4 +228,10 @@ public class App {
 		}
 	}
 
+	private static boolean isAlive(int pid) {
+		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
+		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
+				.filter(ph -> ph.pid() == pid).findFirst().orElse(null);
+		return (processHandle == null) ? false : processHandle.isAlive();
+	}
 }
