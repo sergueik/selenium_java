@@ -54,6 +54,7 @@ import com.sun.jna.win32.W32APITypeMapper;
 
 public class App {
 	private static Logger logger = LogManager.getLogger(App.class.getName());
+	private static Launcher launcher = Launcher.getInstance();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
 	private final static Options options = new Options();
@@ -79,20 +80,20 @@ public class App {
 
 			}
 			if (action.equals("cmd1")) {
-				Launcher.launchCmd1();
+				launcher.launchCmd1();
 			}
 			if (action.equals("cmd2")) {
-				Launcher.launchCmd2();
+				launcher.launchCmd2();
 			}
 			if (action.equals("cmd3")) {
-				Launcher.launchCmd2(Launcher.getDemoCommand());
+				launcher.launchCmd2(launcher.getDemoCommand());
 			}
 			if (action.equals("powershell")) {
-				String command = Launcher.getDemoCommand();
-				Launcher.buildCommand(command);
-				Launcher.launchPowershell1();
+				String command = launcher.getDemoCommand();
+				launcher.buildCommand(command);
+				launcher.launchPowershell1();
 				sleep(10000);
-				int pid = Launcher.getPid();
+				int pid = launcher.getPid();
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
 						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)

@@ -14,17 +14,31 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Launcher {
-	private static Logger logger = LogManager.getLogger(Launcher.class.getName());
-	private final static String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
-	private final static String pidfilePath = "C:\\TEMP\\a123.txt";
-	private final static String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
+	private static Launcher instance = new Launcher();
+	private boolean debug = false;
 
-	public static String getDemoCommand() {
+	public void setDebug(boolean value) {
+		debug = value;
+	}
+
+	private Launcher() {
+	}
+
+	public static Launcher getInstance() {
+		return instance;
+	}
+
+	private Logger logger = LogManager.getLogger(Launcher.class.getName());
+	private final String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
+	private final String pidfilePath = "C:\\TEMP\\a123.txt";
+	private final String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
+
+	public String getDemoCommand() {
 		return demoCommand;
 	}
 
 	// https://www.baeldung.com/java-lang-processbuilder-api
-	public static void launch(List<String> arguments) {
+	public void launch(List<String> arguments) {
 		logger.info("Launching: " + arguments);
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
 		Map<String, String> env = processBuilder.environment();
@@ -36,12 +50,12 @@ public class Launcher {
 		}
 	}
 
-	public static void launchPowershell1() {
+	public void launchPowershell1() {
 		launchPowershell1(getDemoCommand());
 	}
 
 	// https://stackoverflow.com/questions/7486717/finding-parent-process-id-on-windows
-	public static void launchPowershell1(final String javaCommand) {
+	public void launchPowershell1(final String javaCommand) {
 		final int timeout = 10;
 		// dummy
 
@@ -58,7 +72,7 @@ public class Launcher {
 	}
 
 	// https://stackoverflow.com/questions/19250927/in-powershell-set-affinity-in-start-process
-	public static String buildCommand(final String command) {
+	public String buildCommand(final String command) {
 		String newCommand = null;
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.replaceAll("\\s+", " ").split("\\s+")));
@@ -80,12 +94,12 @@ public class Launcher {
 		return newCommand;
 	}
 
-	public static int getPid() {
+	public int getPid() {
 		final int pid = Integer.parseInt(readFile(pidfilePath));
 		return pid;
 	}
 
-	public static String readFile(final String filePath) {
+	private String readFile(final String filePath) {
 		String result = null;
 		StringBuffer contents = new StringBuffer();
 		BufferedReader reader = null;
@@ -108,11 +122,11 @@ public class Launcher {
 		return result;
 	}
 
-	public static void launchCmd1() {
+	public void launchCmd1() {
 		launchCmd1(getDemoCommand());
 	}
 
-	public static void launchCmd1(String command) {
+	public void launchCmd1(String command) {
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
 		List<String> arguments = new ArrayList<>(
@@ -125,12 +139,12 @@ public class Launcher {
 		launch(arguments);
 	}
 
-	public static void launchCmd2() {
+	public void launchCmd2() {
 		launchCmd2(getDemoCommand());
 	}
 
 	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
-	public static void launchCmd2(final String command) {
+	public void launchCmd2(final String command) {
 
 		List<String> arguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
