@@ -56,6 +56,7 @@ public class Launcher {
 	}
 
 	private final String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
+
 	private String javaCommand = demoCommand;
 
 	public String getJavaCommand() {
@@ -64,6 +65,17 @@ public class Launcher {
 
 	public void setJavaCommand(String data) {
 		javaCommand = data;
+	}
+
+	private List<String> specialOptions = new ArrayList<>();
+
+	public List<String> getSpecialOptions() {
+		return specialOptions;
+	}
+
+	public void setSpecialOptions(List<String> data) {
+		logger.info("setting special Options: " + data);
+		specialOptions = data;
 	}
 
 	private Process process = null;
@@ -113,8 +125,19 @@ public class Launcher {
 		}
 		StringBuffer contents = new StringBuffer();
 		contents.append("-filepath 'java.exe' -argumentlist ");
-		// note trailing space
 		List<String> newCommandArguments = new ArrayList<>();
+
+		// note trailing space
+		// usually options are provided before jar or class argument, whoch is the
+		// last one
+		if (!specialOptions.isEmpty()) {
+			List<String> specialOptionsArguments = new ArrayList<>();
+			for (String arg : specialOptions) {
+				specialOptionsArguments.add(String.format("'%s'", arg));
+			}
+			newCommandArguments.addAll(specialOptionsArguments);
+		}
+
 		for (String arg : commandArguments) {
 			newCommandArguments.add(String.format("'%s'", arg));
 		}

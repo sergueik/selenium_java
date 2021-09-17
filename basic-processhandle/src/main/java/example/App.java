@@ -106,24 +106,29 @@ public class App {
 				String options = utils.getPropertyEnv("options", "");
 				logger.info("Added options: " + options);
 				String special_options = utils.getPropertyEnv("special_options", "");
-				if (special_options != null && special_options.isEmpty())
-					logger.info("Added special options: " + special_options);
+				if (special_options != null && !special_options.isEmpty()) {
+					logger.info(
+							String.format("Added special options: \"%s\" ", special_options));
+					launcher.setSpecialOptions(new ArrayList<String>(
+							Arrays.asList(new String[] { special_options })));
 
+				}
 				String command = String.format(
 						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog",
 						options);
 				launcher.buildCommand(command);
 				launcher.setJavaCommand(command);
 				launcher.launchPowershell1();
+				logger.info(String.format("Waiting for %d millisecond ", delay));
 				sleep(delay);
 				int pid = launcher.getPid();
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
 						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
 						.findFirst().orElse(null);
-				boolean status = (processHandle == null) ? false
+				boolean isAlive = (processHandle == null) ? false
 						: processHandle.isAlive();
-				logger.info("status : " + status);
+				logger.info("is alive: " + isAlive);
 				killProcess(pid);
 			}
 			if (action.equals("list")) {
