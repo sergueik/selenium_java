@@ -53,11 +53,15 @@ import com.sun.jna.win32.W32APITypeMapper;
  */
 
 public class App {
+
 	private static Logger logger = LogManager.getLogger(App.class.getName());
 	private static Launcher launcher = Launcher.getInstance();
+	private static Utils utils = Utils.getInstance();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
+	private static String pidfile = "c:\\temp\\pidfile";
 	private final static Options options = new Options();
+	private static int delay = 10000;
 	private final static List<List<Float>> data = new ArrayList<>();
 
 	public static void help() {
@@ -68,11 +72,23 @@ public class App {
 		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("a", "action", true, "Action");
+		options.addOption("w", "wait", true, "Wait Timeout before killing");
 		options.addOption("p", "pid", true, "Pid");
+		options.addOption("f", "file", true, "Pid File");
 		try {
 			commandLine = commandLineparser.parse(options, args);
 			if (commandLine.hasOption("h")) {
 				help();
+			}
+
+			String wait = commandLine.getOptionValue("wait");
+			if (wait != null)
+				delay = Integer.parseInt(wait);
+			String file = commandLine.getOptionValue("file");
+			if (file != null) {
+				pidfile = utils.resolveEnvVars(file);
+				logger.info("Use pid file: " + pidfile);
+				launcher.setPidfilePath(pidfile);
 			}
 			String action = commandLine.getOptionValue("action");
 			if (action == null) {
@@ -85,14 +101,17 @@ public class App {
 			if (action.equals("cmd2")) {
 				launcher.launchCmd2();
 			}
-			if (action.equals("cmd3")) {
-				launcher.launchCmd2(launcher.getDemoCommand());
-			}
 			if (action.equals("powershell")) {
-				String command = launcher.getDemoCommand();
+				utils.setDebug(true);
+				String options = utils.getPropertyEnv("options", "");
+				logger.info("Added options: " + options);
+				String command = String.format(
+						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog",
+						options);
 				launcher.buildCommand(command);
+				launcher.setJavaCommand(command);
 				launcher.launchPowershell1();
-				sleep(10000);
+				sleep(delay);
 				int pid = launcher.getPid();
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
