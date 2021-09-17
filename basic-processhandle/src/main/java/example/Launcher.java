@@ -14,12 +14,18 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class Launcher {
-	private static Launcher instance = new Launcher();
+
 	private boolean debug = false;
+
+	public boolean isDebug() {
+		return debug;
+	}
 
 	public void setDebug(boolean value) {
 		debug = value;
 	}
+
+	private static Launcher instance = new Launcher();
 
 	private Launcher() {
 	}
@@ -29,38 +35,63 @@ public class Launcher {
 	}
 
 	private Logger logger = LogManager.getLogger(Launcher.class.getName());
-	private final String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
-	private final String pidfilePath = "C:\\TEMP\\a123.txt";
-	private final String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
+	private String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
 
-	public String getDemoCommand() {
-		return demoCommand;
+	public String getJavaPath() {
+		return javaPath;
 	}
+
+	public void setJavaPath(String data) {
+		javaPath = data;
+	}
+
+	private String pidfilePath = "C:\\TEMP\\a123.txt";
+
+	public String getPidfilePath() {
+		return pidfilePath;
+	}
+
+	public void setPidfilePath(String data) {
+		pidfilePath = data;
+	}
+
+	private final String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
+	private String javaCommand = demoCommand;
+
+	public String getJavaCommand() {
+		return javaCommand;
+	}
+
+	public void setJavaCommand(String data) {
+		javaCommand = data;
+	}
+
+	private Process process = null;
 
 	// https://www.baeldung.com/java-lang-processbuilder-api
 	public void launch(List<String> arguments) {
-		logger.info("Launching: " + arguments);
+		logger.info("ProcessBuilder arguments:  %s\n" + arguments,
+				"NOTE the doubled commas in the above is expected");
+		logger.info("Launching command: " + String.join(" ", arguments));
+
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
 		Map<String, String> env = processBuilder.environment();
 		env.put("PATH", String.format("%s;%s", env.get("PATH"), javaPath));
 		try {
-			Process process = processBuilder.start();
+			process = processBuilder.start();
 		} catch (IOException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
 	}
 
-	public void launchPowershell1() {
-		launchPowershell1(getDemoCommand());
-	}
-
 	// https://stackoverflow.com/questions/7486717/finding-parent-process-id-on-windows
-	public void launchPowershell1(final String javaCommand) {
+	public void launchPowershell1() {
 		final int timeout = 10;
 		// dummy
 
-		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; ";
-		String command = String.format(commandTemplate, buildCommand(javaCommand));
+		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii; ";
+		String command = String.format(commandTemplate, buildCommand(javaCommand),
+				pidfilePath);
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
 		List<String> arguments = new ArrayList<>(Arrays.asList(new String[] {
@@ -73,13 +104,13 @@ public class Launcher {
 
 	// https://stackoverflow.com/questions/19250927/in-powershell-set-affinity-in-start-process
 	public String buildCommand(final String command) {
+		logger.info("processing command: " + command);
 		String newCommand = null;
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.replaceAll("\\s+", " ").split("\\s+")));
 		if (commandArguments.get(0).contains("java")) {
 			commandArguments.remove(0);
 		}
-		// List<String> newCommandArguments = new ArrayList<>();
 		StringBuffer contents = new StringBuffer();
 		contents.append("-filepath 'java.exe' -argumentlist ");
 		// note trailing space
@@ -87,6 +118,7 @@ public class Launcher {
 		for (String arg : commandArguments) {
 			newCommandArguments.add(String.format("'%s'", arg));
 		}
+		logger.info("New Command Arguments:" + newCommandArguments);
 		contents.append(String.join(", ", newCommandArguments));
 		// note trailing space after each arg
 		newCommand = contents.toString();
@@ -123,12 +155,8 @@ public class Launcher {
 	}
 
 	public void launchCmd1() {
-		launchCmd1(getDemoCommand());
-	}
-
-	public void launchCmd1(String command) {
 		List<String> commandArguments = new ArrayList<>(
-				Arrays.asList(command.split("\\s+")));
+				Arrays.asList(javaCommand.split("\\s+")));
 		List<String> arguments = new ArrayList<>(
 				Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" }));
 		try {
@@ -139,23 +167,17 @@ public class Launcher {
 		launch(arguments);
 	}
 
-	public void launchCmd2() {
-		launchCmd2(getDemoCommand());
-	}
-
 	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
-	public void launchCmd2(final String command) {
+	public void launchCmd2() {
 
 		List<String> arguments = new ArrayList<>(
-				Arrays.asList(command.split("\\s+")));
+				Arrays.asList(javaCommand.split("\\s+")));
 		try {
 			arguments.addAll(0, new ArrayList<>(
 					Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" })));
 		} catch (java.lang.UnsupportedOperationException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
-		logger.info("Launching: " + arguments);
-		arguments = new ArrayList<>(Arrays.asList(command.split("\\s+")));
 		launch(arguments);
 	}
 
