@@ -11,14 +11,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+// origin: http://www.java2s.com/Tutorial/Java/0240__Swing/ASimpleModalDialog.htm
 public class Dialog extends JDialog implements ActionListener {
 	public Dialog(JFrame parent, String title, String message) {
 		super(parent, title, true);
-		if (parent != null) {
-			Dimension parentSize = parent.getSize();
-			Point p = parent.getLocation();
-			setLocation(p.x + parentSize.width / 4, p.y + parentSize.height / 4);
-		}
 		JPanel messagePane = new JPanel();
 		messagePane.add(new JLabel(message));
 		getContentPane().add(messagePane);
@@ -34,14 +30,11 @@ public class Dialog extends JDialog implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		setVisible(false);
-		System.err.println("disposing");
 		dispose();
-		System.err.println("done");
 	}
 
 	public static void main(String[] a) {
-		var dlg = new Dialog(new JFrame(), "title", "message");
-		System.err.println("done main");
+		new Dialog(new JFrame(), "title", "message");
 		System.exit(0);
 	}
 }

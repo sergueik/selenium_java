@@ -58,7 +58,6 @@ public class App {
 	private static CommandLine commandLine = null;
 	private final static Options options = new Options();
 	private final static List<List<Float>> data = new ArrayList<>();
-	protected static String osName = getOSName();
 
 	public static void help() {
 		System.exit(1);
@@ -86,10 +85,10 @@ public class App {
 				Launcher.launchCmd2();
 			}
 			if (action.equals("cmd3")) {
-				Launcher.launchCmd2(Launcher.getDemocommand());
+				Launcher.launchCmd2(Launcher.getDemoCommand());
 			}
 			if (action.equals("powershell")) {
-				String command = Launcher.getDemocommand();
+				String command = Launcher.getDemoCommand();
 				Launcher.buildCommand(command);
 				Launcher.launchPowershell1();
 				sleep(10000);
@@ -236,6 +235,9 @@ public class App {
 		return (processHandle == null) ? false : processHandle.isAlive();
 	}
 
+	// origin:
+	// https://github.com/sergueik/selenium_tests/blob/master/src/test/java/com/github/sergueik/selenium/BaseTest.java
+	// based on:
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void killProcess(final int pid) {
 		logger.info("Killing the process pid: " + pid);
@@ -243,24 +245,7 @@ public class App {
 		if (pid <= 0) {
 			return;
 		}
-		// on Windows OS the only way to get the parentprocessid of a processid is
-		// through wmi
-		// https://stackoverflow.com/questions/33911332/powershell-how-to-get-the-parentprocessid-by-the-processid
-		// that implies switch from wrapping System.Diagnostics.Proces to
-		// https://docs.microsoft.com/en-us/windows/desktop/cimwin32prov/win32-process
-		// the latter does not appear to be easily wrappable through jni
-		// NOTE: for chrome-specific quirks for finding related processes see:
-		// https://automated-testing.info/t/selenium-webdriver-ubit-proczessy-chrome-i-chromedriver-pri-ostanovki-abort-dzhoby-na-jenkins-cherez-postbildstep/22341/11
-		/*
-		 * 
-		 * <# $process_id=5308
-		 * 
-		 * (get-cimInstance -class Win32_Process -filter "parentprocessid = $process_id"
-		 * ).processid 4736 9496 9536 9120 1996 8876 10188 (get-process -id 4736 )
-		 * .processname 'chrome' #>
-		 */
-		String command = String.format((osName.toLowerCase().startsWith("windows"))
-				? "taskkill.exe /T /F /FI \"pid eq %s\"" : "killall %s", pid);
+		String command = String.format("taskkill.exe /T /F /FI \"pid eq %s\"", pid);
 		// /T Terminates the specified process and any child processes which were
 		// started by it
 		try {
@@ -301,17 +286,6 @@ public class App {
 		} catch (Exception e) {
 			logger.error("Exception (ignored): " + e.getMessage());
 		}
-	}
-
-	// Utilities
-	public static String getOSName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
 	}
 
 }

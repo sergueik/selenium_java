@@ -19,48 +19,8 @@ public class Launcher {
 	private final static String pidfilePath = "C:\\TEMP\\a123.txt";
 	private final static String demoCommand = "java.exe -cp target\\example.processhandle.jar;target\\lib\\* example.Dialog";
 
-	public static String getDemocommand() {
+	public static String getDemoCommand() {
 		return demoCommand;
-	}
-
-	public static void launchCmd2() {
-		launchCmd2(demoCommand);
-	}
-
-	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
-	public static void launchCmd2(final String command) {
-
-		List<String> arguments = new ArrayList<>(
-				Arrays.asList(command.split("\\s+")));
-		try {
-			arguments.addAll(0, new ArrayList<>(
-					Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" })));
-		} catch (java.lang.UnsupportedOperationException e) {
-			logger.info("Exception (ignored): " + e.toString());
-		}
-		logger.info("Launching: " + arguments);
-		arguments = new ArrayList<>(Arrays.asList(command.split("\\s+")));
-		// NOTE: need to reverse
-		// https://www.geeksforgeeks.org/collections-reverseorder-java-examples/
-		// TODO: prepended in wrong order
-		/*
-		List<String> extraarguments = new ArrayList<>(
-				Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" }));
-		Collections.sort(extraarguments, Collections.reverseOrder());
-		for (String arg : extraarguments) {
-			try {
-				arguments.add(0, arg);
-			} catch (UnsupportedOperationException e) {
-				// ignore
-				logger.info("Exception (ignored): " + e.toString());
-			}
-		}
-		
-		logger.info("Launching: " + arguments);
-		
-		   
-		 */
-		launch(arguments);
 	}
 
 	// https://www.baeldung.com/java-lang-processbuilder-api
@@ -74,21 +34,27 @@ public class Launcher {
 		} catch (IOException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
-
 	}
 
 	public static void launchPowershell1() {
+		launchPowershell1(getDemoCommand());
+	}
+
+	// https://stackoverflow.com/questions/7486717/finding-parent-process-id-on-windows
+	public static void launchPowershell1(final String javaCommand) {
 		final int timeout = 10;
 		// dummy
-		String command = "$info = 'test'; write-output $info | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -append; "
-				+ String.format("start-sleep -seconds %d", timeout);
 
-		command = "$info = start-process -filepath 'java.exe' -argumentlist '-jar','c:\\developer\\sergueik\\springboot_study\\basic-rrd4j\\target\\rrd4j-3.9-SNAPSHOT-inspector.jar' -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; "
-				+ String.format("start-sleep -seconds %d", timeout);
-		String javaCommand = demoCommand;
 		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath 'C:\\TEMP\\a123.txt' -encoding ascii; ";
-		command = String.format(commandTemplate, buildCommand(javaCommand));
-		launchPowershell1(command);
+		String command = String.format(commandTemplate, buildCommand(javaCommand));
+		List<String> commandArguments = new ArrayList<>(
+				Arrays.asList(command.split("\\s+")));
+		List<String> arguments = new ArrayList<>(Arrays.asList(new String[] {
+				"powershell.exe", "/noprofile", "/executionpolicy", "bypass" }));
+		arguments.add("\"&{");
+		arguments.addAll(commandArguments);
+		arguments.add("}\"");
+		launch(arguments);
 	}
 
 	// https://stackoverflow.com/questions/19250927/in-powershell-set-affinity-in-start-process
@@ -106,34 +72,44 @@ public class Launcher {
 		List<String> newCommandArguments = new ArrayList<>();
 		for (String arg : commandArguments) {
 			newCommandArguments.add(String.format("'%s'", arg));
-			// contents.append(String.format("'%s'", arg)).append(", ");
-			// note trailing space after each arg
 		}
 		contents.append(String.join(", ", newCommandArguments));
-		// wrong: trailing comma
+		// note trailing space after each arg
 		newCommand = contents.toString();
-		newCommand.replaceAll(",\\s*$", " ");
-		// remove the trailing comma
 		logger.info(String.format("New Command: \"%s\"", newCommand));
 		return newCommand;
 	}
 
-	// https://stackoverflow.com/questions/7486717/finding-parent-process-id-on-windows
-	public static void launchPowershell1(String command) {
+	public static int getPid() {
+		final int pid = Integer.parseInt(readFile(pidfilePath));
+		return pid;
+	}
 
-		List<String> commandArguments = new ArrayList<>(
-				Arrays.asList(command.split("\\s+")));
-		List<String> arguments = new ArrayList<>(
-				Arrays.asList(new String[] { "powershell.exe", "/noprofile",
-						"/executionpolicy", "bypass", "\"&{" }));
+	public static String readFile(final String filePath) {
+		String result = null;
+		StringBuffer contents = new StringBuffer();
+		BufferedReader reader = null;
+		try {
+			File file = new File(filePath);
+			reader = new BufferedReader(new FileReader(file));
+			String text = null;
 
-		arguments.addAll(commandArguments);
-		arguments.add("}\"");
-		launch(arguments);
+			while ((text = reader.readLine()) != null) {
+				contents.append(text).append(System.getProperty("line.separator"));
+			}
+			reader.close();
+			result = contents.toString().replaceAll("\r?\n", "").replaceAll("Pid=",
+					"");
+			logger.info(String.format("%s data:%s", filePath, result));
+
+		} catch (Exception e) {
+			logger.info("Exception (ignored): " + e.toString());
+		}
+		return result;
 	}
 
 	public static void launchCmd1() {
-		launchCmd1(demoCommand);
+		launchCmd1(getDemoCommand());
 	}
 
 	public static void launchCmd1(String command) {
@@ -149,34 +125,24 @@ public class Launcher {
 		launch(arguments);
 	}
 
-	public static int getPid() {
-
-		final int pid = Integer.parseInt(readFile(pidfilePath));
-		return pid;
+	public static void launchCmd2() {
+		launchCmd2(getDemoCommand());
 	}
 
-	public static String readFile(final String filePath) {
-		String result = null;
-		StringBuffer contents = new StringBuffer();
-		BufferedReader reader = null;
+	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
+	public static void launchCmd2(final String command) {
+
+		List<String> arguments = new ArrayList<>(
+				Arrays.asList(command.split("\\s+")));
 		try {
-			File file = new File(filePath);
-			reader = new BufferedReader(new FileReader(file));
-			String text = null;
-
-			// repeat until all lines is read
-			while ((text = reader.readLine()) != null) {
-				contents.append(text).append(System.getProperty("line.separator"));
-			}
-			reader.close();
-			result = contents.toString().replaceAll("\r?\n", "").replaceAll("Pid=",
-					"");
-			logger.info(String.format("%s data:%s", filePath, result));
-
-		} catch (Exception e) {
+			arguments.addAll(0, new ArrayList<>(
+					Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" })));
+		} catch (java.lang.UnsupportedOperationException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
-		return result;
+		logger.info("Launching: " + arguments);
+		arguments = new ArrayList<>(Arrays.asList(command.split("\\s+")));
+		launch(arguments);
 	}
 
 }
