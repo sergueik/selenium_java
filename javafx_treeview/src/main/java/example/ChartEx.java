@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -43,6 +44,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
  * based on Oracle's example at
  * https://docs.oracle.com/javafx/2/charts/line-chart.htm#CIHGBCFI
@@ -56,7 +61,8 @@ public class ChartEx extends Application {
 	// private static CommandLineParser commandLineparser = new DefaultParser();
 	// private static CommandLine commandLine = null;
 	// private final static Options options = new Options();
-	private final static List<List<Float>> data = new ArrayList<>();
+	private static List<List<Float>> data = new ArrayList<>();
+	private static List<List<Object>> data2 = new ArrayList<>();
 	private static CommandLineParser commandLineParser;
 	private static String resource = "data.csv";
 
@@ -78,6 +84,7 @@ public class ChartEx extends Application {
 				return;
 			}
 			Reader in;
+			/*
 			Iterable<CSVRecord> records;
 			in = new FileReader(resource);
 			records = CSVFormat.DEFAULT.withHeader(HEADERS).parse(in);
@@ -103,37 +110,105 @@ public class ChartEx extends Application {
 			}
 			logger.info("data: " + data);
 			data.clear();
+						*/
+
 			// https://stackoverflow.com/questions/17613363/gson-deserializing-an-array-of-objects
 			final Gson gson = new Gson();
-			String datafilePath = "data.json";
+			String datafilePath = System.getProperty("user.dir")
+					+ System.getProperty("file.separator") + "data.json";
 			String payload = readFile(datafilePath, Charset.forName("UTF-8"));
-			QueryTimeserieResponse[] payloadObj = (QueryTimeserieResponse[]) gson
-					.fromJson(payload, QueryTimeserieResponse[].class);
-			for (QueryTimeserieResponse entry : payloadObj) {
-				if (!entry.getTarget().equals("test")) {
-					continue;
-				}
-				// logger.info(entry.getDatapoints());
-				List<List<Float>> datapoints = (List<List<Float>>) entry
-						.getDatapoints();
-				float x = datapoints.get(0).get(1);
-				for (int cnt = 0; cnt != datapoints.size(); cnt++) {
-					List<Float> dataentry = datapoints.get(cnt);
-					List<Float> row = new ArrayList<>();
-					logger.info("loading row: " + dataentry);
-					// swap columns
-					row.add((dataentry.get(1) - x) / 1000);
-					row.add(dataentry.get(0));
+			logger.info("payload: " + payload);
+			try {
+				JSONArray p1 = new JSONArray(payload);
+				int l1 = p1.length();
+				for (int i1 = 0; i1 < l1; i1++) {
+					JSONObject p2 = p1.getJSONObject(i1);
+					// logger.info("Can process object: " + p2.toString());
 
-					logger.info("Reading datapoint: " + row);
-					data.add(row);
+					Iterator<String> p2Iterator = p2.keys();
+
+					while (p2Iterator.hasNext()) {
+						String p2Key = p2Iterator.next();
+						// logger.info("Processing Row key: " + p2Key);
+					}
+					// Float.parseFloat("1450754160000");
+					// 1450754179072.000000
+					String target = p2.getString("target");
+					JSONArray p3 = p2.getJSONArray("datapoints");
+					int l3 = p3.length();
+					for (int i3 = 0; i3 < l3; i3++) {
+						JSONArray p4 = p3.getJSONArray(i3);
+						String p5 = p4.get(1).toString().replaceAll("0000$", "");
+						// logger.info("Can process object: " + p4.toString());
+						// logger.info("Can process object: " + p4.get(0) + "," + p4.get(1)
+						// + " | " + p5);
+
+						List<Float> row = new ArrayList<>();
+
+						row.add(Float.parseFloat(p4.get(0).toString()));
+						// row.add((float) Long.parseLong(p5));
+						row.add(1.0f * Integer.parseInt(p5));
+						logger.info(String.format("loading datapoints: %f, %d %9d %f ",
+								Float.parseFloat(p4.get(0).toString()), Integer.parseInt(p5),
+								Long.parseLong(p5), (0.1f + Long.parseLong(p5))));
+						// row.get(1),
+						data.add(row);
+						data2.add(new ArrayList(Arrays
+								.asList(new Object[] { Float.parseFloat(p4.get(0).toString()),
+										Integer.parseInt(p5) })));
+					}
 				}
+			} catch (JSONException e) {
 			}
+			/*
+						QueryTimeserieResponse[] payloadObj = (QueryTimeserieResponse[]) gson
+								.fromJson(payload, QueryTimeserieResponse[].class);
+						for (QueryTimeserieResponse entry : payloadObj) {
+							if (!entry.getTarget().equals("test")) {
+								continue;
+							}
+							// logger.info(entry.getDatapoints());
+							List<List<Float>> datapoints = (List<List<Float>>) entry
+									.getDatapoints();
+							for (List<Float> dataentry : datapoints) {
+								logger.info(String.format("loading datapoints: %f, %f",
+										dataentry.get(1), dataentry.get(0)));
+								data.add(dataentry);
+							}
+						}
+						*/
+			data = formatDataetries(data);
 			logger.info("data: " + data);
+			logger.info("data2: " + data2);
+			for (int cnt = 0; cnt != data2.size(); cnt++) {
+				List<Object> row = (List<Object>) data2.get(cnt);
+				float y = (float) row.get(0);
+				int x = (int) row.get(1);
+				logger.info("processed row: " + row);
+				logger.info(String.format("processed row: %d,%f", x, y));
+			}
 			launch(args);
 			// } catch (ParseException e) {
 		} catch (IOException e) {
 		}
+	}
+
+	private static List<List<Float>> formatDataetries(List<List<Float>> data) {
+		List<List<Float>> result = new ArrayList<>();
+		float x = data.get(0).get(1);
+		for (int cnt = 0; cnt != data.size(); cnt++) {
+			List<Float> dataentry = data.get(cnt);
+			List<Float> row = new ArrayList<>();
+			logger.info(String.format("loading row: %f, %f", dataentry.get(1),
+					dataentry.get(0)));
+			// swap columns
+			row.add((dataentry.get(1) - x) / 1000);
+			row.add(dataentry.get(0));
+
+			logger.info("processed row: " + row);
+			result.add(row);
+		}
+		return result;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -151,11 +226,22 @@ public class ChartEx extends Application {
 		lineChart.setTitle("Chart");
 		XYChart.Series series = new XYChart.Series();
 		series.setName("test");
+		/*
 		for (int cnt = 0; cnt != data.size(); cnt++) {
 			List<Float> row = data.get(cnt);
 			float x = row.get(0);
 			float y = row.get(1);
 			logger.info(String.format("data point %d (%f %f)", cnt, x, y));
+			series.getData().add(new XYChart.Data(x, y));
+		}
+		*/
+		int x0 = (int) data2.get(0).get(1);
+		for (int cnt = 0; cnt != data2.size(); cnt++) {
+			List<Object> row = data2.get(cnt);
+			float y = (float) row.get(0);
+			int x = (int) row.get(1) - x0;
+			logger.info("processed row: " + row);
+			logger.info(String.format("processed row: %d,%f", x, y));
 			series.getData().add(new XYChart.Data(x, y));
 		}
 		/*
