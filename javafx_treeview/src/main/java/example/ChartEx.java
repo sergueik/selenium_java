@@ -123,22 +123,28 @@ public class ChartEx extends Application {
 				int l1 = p1.length();
 				for (int i1 = 0; i1 < l1; i1++) {
 					JSONObject p2 = p1.getJSONObject(i1);
-					// logger.info("Can process object: " + p2.toString());
+					logger.info("Can process object: " + p2.toString());
 
 					Iterator<String> p2Iterator = p2.keys();
 
 					while (p2Iterator.hasNext()) {
 						String p2Key = p2Iterator.next();
-						// logger.info("Processing Row key: " + p2Key);
+						logger.info("Processing Row key: " + p2Key);
 					}
 					// Float.parseFloat("1450754160000");
 					// 1450754179072.000000
 					String target = p2.getString("target");
+					if (!target.equals("test"))
+						continue;
+					logger.info("Processing target: " + target);
 					JSONArray p3 = p2.getJSONArray("datapoints");
 					int l3 = p3.length();
 					for (int i3 = 0; i3 < l3; i3++) {
 						JSONArray p4 = p3.getJSONArray(i3);
-						String p5 = p4.get(1).toString().replaceAll("0000$", "");
+						// String p5 = p4.get(1).toString().replaceAll("0000$", "");
+						// java.lang.NumberFormatException: For input string:
+						// "1450754160000"
+						String p5 = p4.get(1).toString();
 						// logger.info("Can process object: " + p4.toString());
 						// logger.info("Can process object: " + p4.get(0) + "," + p4.get(1)
 						// + " | " + p5);
@@ -147,15 +153,14 @@ public class ChartEx extends Application {
 
 						row.add(Float.parseFloat(p4.get(0).toString()));
 						// row.add((float) Long.parseLong(p5));
-						row.add(1.0f * Integer.parseInt(p5));
-						logger.info(String.format("loading datapoints: %f, %d %9d %f ",
-								Float.parseFloat(p4.get(0).toString()), Integer.parseInt(p5),
-								Long.parseLong(p5), (0.1f + Long.parseLong(p5))));
+						row.add(1.0f * Long.parseLong(p5));
+						logger.info(String.format("loading datapoints: %f, %9d %f ",
+								Float.parseFloat(p4.get(0).toString()), Long.parseLong(p5),
+								(0.1f + Long.parseLong(p5))));
 						// row.get(1),
 						data.add(row);
-						data2.add(new ArrayList(Arrays
-								.asList(new Object[] { Float.parseFloat(p4.get(0).toString()),
-										Integer.parseInt(p5) })));
+						data2.add(new ArrayList(Arrays.asList(new Object[] {
+								Float.parseFloat(p4.get(0).toString()), Long.parseLong(p5) })));
 					}
 				}
 			} catch (JSONException e) {
@@ -183,8 +188,8 @@ public class ChartEx extends Application {
 			for (int cnt = 0; cnt != data2.size(); cnt++) {
 				List<Object> row = (List<Object>) data2.get(cnt);
 				float y = (float) row.get(0);
-				int x = (int) row.get(1);
-				logger.info("processed row: " + row);
+				long x = (long) row.get(1);
+				// logger.info("processed row: " + row);
 				logger.info(String.format("processed row: %d,%f", x, y));
 			}
 			launch(args);
@@ -235,12 +240,12 @@ public class ChartEx extends Application {
 			series.getData().add(new XYChart.Data(x, y));
 		}
 		*/
-		int x0 = (int) data2.get(0).get(1);
+		long x0 = (long) data2.get(0).get(1);
 		for (int cnt = 0; cnt != data2.size(); cnt++) {
 			List<Object> row = data2.get(cnt);
 			float y = (float) row.get(0);
-			int x = (int) row.get(1) - x0;
-			logger.info("processed row: " + row);
+			long x = ((long) row.get(1) - x0) / 1000;
+			// logger.info("processed row: " + row);
 			logger.info(String.format("processed row: %d,%f", x, y));
 			series.getData().add(new XYChart.Data(x, y));
 		}
