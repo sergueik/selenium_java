@@ -27,7 +27,6 @@ import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 
-
 public class App {
 
 	private static Logger logger = LogManager.getLogger(App.class.getName());
@@ -40,12 +39,7 @@ public class App {
 	private static int delay = 10000;
 	private final static List<List<Float>> data = new ArrayList<>();
 
-	public static void help() {
-		System.exit(1);
-	}
-
 	public static void main(String[] args) {
-		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("a", "action", true, "Action");
 		options.addOption("w", "wait", true, "Wait Timeout before killing");
@@ -53,9 +47,6 @@ public class App {
 		options.addOption("f", "file", true, "Pid File");
 		try {
 			commandLine = commandLineparser.parse(options, args);
-			if (commandLine.hasOption("h")) {
-				help();
-			}
 
 			String wait = commandLine.getOptionValue("wait");
 			if (wait != null)
@@ -63,13 +54,12 @@ public class App {
 			String file = commandLine.getOptionValue("file");
 			if (file != null) {
 				pidfile = utils.resolveEnvVars(file);
-				logger.info("Use pid file: " + pidfile);
+				logger.info("Use pidfile: " + pidfile);
 				launcher.setPidfilePath(pidfile);
 			}
 			String action = commandLine.getOptionValue("action");
 			if (action == null) {
 				System.err.println("Missing required argument: action");
-
 			}
 			if (action.equals("cmd1")) {
 				launcher.launchCmd1();
@@ -79,16 +69,21 @@ public class App {
 			}
 			if (action.equals("powershell")) {
 				utils.setDebug(true);
+				launcher.setJavaPath(System.getenv("JAVA_HOME")
+						+ System.getProperty("file.separator") + "bin");
 				String options = utils.getPropertyEnv("options", "");
 				logger.info("Added options: " + options);
 				String special_options = utils.getPropertyEnv("special_options", "");
 				if (special_options != null && !special_options.isEmpty()) {
-					logger.info(String.format("Added special options: \"%s\" ", special_options));
-					launcher.setSpecialOptions(new ArrayList<String>(Arrays.asList(new String[] { special_options })));
+					logger.info(
+							String.format("Added special options: \"%s\" ", special_options));
+					launcher.setSpecialOptions(new ArrayList<String>(
+							Arrays.asList(new String[] { special_options })));
 
 				}
 				String command = String.format(
-						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog", options);
+						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog",
+						options);
 				launcher.buildCommand(command);
 				launcher.setJavaCommand(command);
 				launcher.launchPowershell1();
@@ -96,59 +91,16 @@ public class App {
 				sleep(delay);
 				int pid = launcher.getPid();
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-				ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
+				ProcessHandle processHandle = liveProcesses
+						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
 						.findFirst().orElse(null);
-				boolean isAlive = (processHandle == null) ? false : processHandle.isAlive();
+				boolean isAlive = (processHandle == null) ? false
+						: processHandle.isAlive();
 				logger.info("is alive: " + isAlive);
 				killProcess(pid);
 			}
 			if (action.equals("list")) {
 				infoOfLiveProcesses();
-			}
-			/*
-			 * if (action.equals("current")) { Process process =
-			 * Process.getCurrentProcess(); getWindowsProcessId(process, logger);
-			 * logger.info(process.toHandle().pid()); }
-			 */
-			if (action.equals("check")) {
-				String resource = commandLine.getOptionValue("pid");
-				if (resource == null) {
-					System.err.println("Missing required argument: pid");
-				} else {
-					Integer pid = Integer.parseInt(resource);
-					logger.info("looking pid " + pid);
-					// Returns an Optional<ProcessHandle> for an existing native process.
-					Optional<ProcessHandle> result = Optional.empty();
-					ProcessHandle processHandle = null;
-					try {
-						result = ProcessHandle.of(pid);
-						processHandle = result.isPresent() ? result.get() : null;
-						logger.info(processHandle);
-					} catch (NoSuchElementException e1) {
-					}
-					boolean status = (processHandle == null) ? false : processHandle.isAlive();
-					String extraInfo = null;
-					if (status)
-						try {
-							extraInfo = "(" + "command: " + processHandle.info().command().get() + " started:"
-									+ processHandle.info().startInstant().get() + " " + "pid:" + processHandle.pid()
-									+ ")";
-						} catch (NoSuchElementException e1) {
-						}
-					logger.info("Process pid (via ProcessHandle.of): " + pid + " is: "
-
-							+ (status ? "alive" : "not alive") + " " + extraInfo);
-					status = isProcessIdRunningOnWindows((int) pid);
-					logger.info("Process pid (via tasklist): " + pid + " is: " + (status ? "alive" : "not alive"));
-
-					Stream<ProcessHandle> processes = ProcessHandle.allProcesses();
-					processHandle = null;
-					processHandle = processes.filter(o -> o.pid() == pid).findFirst().orElse(null);
-					status = (processHandle == null) ? false : processHandle.isAlive();
-					logger.info("Process pid (via ProcessHandle.allProcesses): " + pid + " is: "
-
-							+ (status ? "alive" : "not alive"));
-				}
 			}
 		} catch (
 
@@ -195,7 +147,8 @@ public class App {
 	}
 
 	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
-	private static Long getWindowsProcessId(final Process process, final Logger logger) {
+	private static Long getWindowsProcessId(final Process process,
+			final Logger logger) {
 		/* determine the pid on windows platforms */
 		try {
 			Field f = process.getClass().getDeclaredField("handle");
@@ -223,8 +176,8 @@ public class App {
 
 	private static boolean isAlive(int pid) {
 		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
-				.findFirst().orElse(null);
+		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
+				.filter(ph -> ph.pid() == pid).findFirst().orElse(null);
 		return (processHandle == null) ? false : processHandle.isAlive();
 	}
 
@@ -246,9 +199,11 @@ public class App {
 			Process process = runtime.exec(command);
 			// process.redirectErrorStream( true);
 
-			BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader stdoutBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
 
-			BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			BufferedReader stderrBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getErrorStream()));
 			String line = null;
 
 			StringBuffer processOutput = new StringBuffer();
@@ -264,14 +219,13 @@ public class App {
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				logger.info("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					logger.info("<OUTPUT>" + processOutput + "</OUTPUT>");
+					logger.info("Output: " + processOutput);
 				}
 				if (processError.length() > 0) {
-					// e.g.
-					// The process "chromedriver.exe"
+					// e.g. The process "chromedriver.exe"
 					// with PID 5540 could not be terminated.
 					// Reason: Access is denied.
-					logger.info("<ERROR>" + processError + "</ERROR>");
+					logger.info("Error: " + processError);
 				}
 			}
 		} catch (Exception e) {

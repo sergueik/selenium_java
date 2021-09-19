@@ -48,7 +48,7 @@ public class Launcher {
 		javaPath = data;
 	}
 
-	private String pidfilePath = "C:\\TEMP\\a123.txt";
+	private String pidfilePath = "C:\\TEMP\\pidfile.txt";
 
 	public String getPidfilePath() {
 		return pidfilePath;
@@ -85,7 +85,8 @@ public class Launcher {
 
 	// https://www.baeldung.com/java-lang-processbuilder-api
 	public void launch(List<String> arguments) {
-		logger.info("ProcessBuilder arguments:  %s\n" + arguments, "NOTE the doubled commas in the above is expected");
+		logger.info("ProcessBuilder arguments:\n" + String.join(",\n", arguments)); 
+		// NOTE the doubled commas in the above is expected
 		logger.info("Launching command: " + String.join(" ", arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
@@ -103,7 +104,8 @@ public class Launcher {
 		final int timeout = 10;
 		// dummy
 
-		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii; ";
+		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -FilePath '%s' -encoding ascii; ";
+		// NOTE: Powershell Version 2.0 does not understand LiteralPath
 		String command = String.format(commandTemplate, buildCommand(javaCommand), pidfilePath);
 		List<String> commandArguments = new ArrayList<>(Arrays.asList(command.split("\\s+")));
 		List<String> arguments = new ArrayList<>(
@@ -149,7 +151,12 @@ public class Launcher {
 	}
 
 	public int getPid() {
-		final int pid = Integer.parseInt(readFile(pidfilePath));
+		int pid = -1;
+		try {
+			pid = Integer.parseInt(readFile(pidfilePath));
+		} catch (NumberFormatException e) {
+
+		}
 		return pid;
 	}
 

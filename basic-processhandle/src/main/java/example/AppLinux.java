@@ -23,20 +23,13 @@ public class AppLinux {
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
 	private final static Options options = new Options();
-	public static void help() {
-		System.exit(1);
-	}
 
 	public static void main(String[] args) {
-		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("a", "action", true, "Action");
 		options.addOption("p", "pid", true, "Pid");
 		try {
 			commandLine = commandLineparser.parse(options, args);
-			if (commandLine.hasOption("h")) {
-				help();
-			}
 			String action = commandLine.getOptionValue("action");
 			if (action == null) {
 				System.err.println("Missing required argument: action");
@@ -58,6 +51,7 @@ public class AppLinux {
 					Integer pid = Integer.parseInt(resource);
 					logger.info("looking pid " + pid);
 					// Returns an Optional<ProcessHandle> for an existing native process.
+					// should be only called through future	
 					Optional<ProcessHandle> result = ProcessHandle.of(pid);
 					ProcessHandle processHandle = null;
 					try {
@@ -75,7 +69,7 @@ public class AppLinux {
 									+ ")";
 						} catch (NoSuchElementException e1) {
 						}
-					logger.info("Process pid (via ProcessHandle): " + pid + " is: "
+					logger.info("Information by ProcessHandle.of: " + pid + " is: "
 
 							+ (status ? "alive" : "not alive") + " " + extraInfo);
 				}

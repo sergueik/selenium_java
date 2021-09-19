@@ -20,7 +20,7 @@ public class Dialog extends JDialog implements ActionListener {
 		JPanel buttonPane = new JPanel();
 		JButton button = new JButton("OK");
 		buttonPane.add(button);
-		button.addActionListener(this);
+		button.addActionListener(this::actionPerformed);
 		getContentPane().add(buttonPane, BorderLayout.SOUTH);
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		pack();

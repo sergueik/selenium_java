@@ -1,8 +1,12 @@
 ### Info
 
 
-This directory contains example code based on [Java 9 Process API Improvements](https://www.baeldung.com/java-9-process-api)
-The [jna](https://en.wikipedia.org/wiki/Java_Native_Access) is still in the dependencies to have the legacy JNA based code snippets for
+![launch capture](https://github.com/sergueik/selenium_java/blob/master/basic-processhandle/screenshots/capture-launch.png)
+
+This directory contains example code to launch the java jar in background process and get the process PID. The Java 11 `ProcessHandle.of` method was found to be unreliable, so th get the Java process pid, a small inline Powershell script is launched
+and java PID is written to a pidfile by that script allowing the calling Java program to read the pid.
+
+The [jna](https://en.wikipedia.org/wiki/Java_Native_Access) is still added the dependencies to have the legacy JNA based code snippets for
 
 * `GetProcessId` [example](https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId)
 * `getCurrentProcessId` [example](https://www.tabnine.com/code/java/methods/com.metamx.metrics.SigarUtil/getCurrentProcessId)
@@ -12,6 +16,64 @@ examples available in the same application  for comparison
 
 ### Usage 
 
+```sh
+mvn package
+```
+
+```cmd
+java -cp target\example.processhandle.jar;target\lib\* example.App --action powershell --wait 30000
+```
+This will launch a mini Swing App to test itself. It will log to console:
+```cmd
+2021-09-19 18:41:39  [main] - INFO  processing command: java.exe -cp target\example.processhandle.jar;target\lib\* -XX:+UseG1GC -Xms512m -Xmx512m -XX:ParallelGCThreads=6 -Xlog:gc* -XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default example.Dialog
+2021-09-19 18:41:39  [main] - INFO  New Command Arguments:['-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog']
+2021-09-19 18:41:39  [main] - INFO  New Command: "-filepath 'java.exe' -argumentlist '-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog'"
+2021-09-19 18:41:39  [main] - INFO  processing command: java.exe -cp target\example.processhandle.jar;target\lib\* -XX:+UseG1GC -Xms512m -Xmx512m -XX:ParallelGCThreads=6 -Xlog:gc* -XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default example.Dialog
+2021-09-19 18:41:39  [main] - INFO  New Command Arguments:['-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog']
+2021-09-19 18:41:39  [main] - INFO  New Command: "-filepath 'java.exe' -argumentlist '-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog'"
+2021-09-19 18:41:39  [main] - INFO  ProcessBuilder arguments: 
+powershell.exe,
+/noprofile,
+/executionpolicy,
+bypass,
+"&{,
+$info,
+=,
+start-process,
+-filepath,
+'java.exe',
+-argumentlist,
+'-cp',,
+'target\example.processhandle.jar;target\lib\*',,
+'-XX:+UseG1GC',,
+'-Xms512m',,
+'-Xmx512m',,
+'-XX:ParallelGCThreads=6',,
+'-Xlog:gc*',,
+'-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,setti
+ngs=default',,
+'example.Dialog',
+-passthru;,
+$info.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal;,
+write-output,
+('Pid={0}',
+-f,
+$info.id),
+|,
+out-file,
+-FilePath,
+'C:\TEMP\pidfile.txt',
+-encoding,
+ascii;,
+}"
+2021-09-19 18:41:39  [main] - INFO  Launching command: powershell.exe /noprofile /executionpolicy bypass "&{ $info = start-process -filepath 'java.exe' -argumentlist '-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog' -passthru; $info.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -FilePath 'C:\TEMP\a123.txt' -encoding ascii; }"
+2021-09-19 18:41:39  [main] - INFO  Waiting for 30000 millisecond
+2021-09-19 18:42:09  [main] - INFO  C:\TEMP\pidfile.txt data:2832
+2021-09-19 18:42:09  [main] - INFO  is alive: true
+2021-09-19 18:42:09  [main] - INFO  Killing the process pid: 2832
+```
+NOTE the doubled commas in the `ProcessBuilder arguments` above is expected
+### Old Testing of Challenges With Finding PID by Exploring Parent / Child Process from on Windows Java.
 ```sh
 mvn package
 ```

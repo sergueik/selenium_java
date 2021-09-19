@@ -1,4 +1,7 @@
 package example;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
