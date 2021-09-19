@@ -1,56 +1,32 @@
 package example;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.InputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.InputStreamReader;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.lang.reflect.Field;
-import java.util.Optional;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-// https://en.wikipedia.org/wiki/Java_Native_Access
-import com.sun.jna.Library;
-import com.sun.jna.Memory;
-import com.sun.jna.Native;
-import com.sun.jna.NativeMapped;
 import com.sun.jna.Pointer;
-import com.sun.jna.PointerType;
-// https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/Advapi32Util.java
-import com.sun.jna.platform.win32.Advapi32Util;
-
-import com.sun.jna.platform.win32.VerRsrc.VS_FIXEDFILEINFO;
-// https://github.com/java-native-access/jna/blob/master/contrib/platform/src/com/sun/jna/platform/win32/WinReg.java
-import com.sun.jna.platform.win32.WinReg;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
-import com.sun.jna.ptr.IntByReference;
-import com.sun.jna.ptr.PointerByReference;
-import com.sun.jna.win32.W32APIFunctionMapper;
-import com.sun.jna.win32.W32APITypeMapper;
 
-/**
- * based on Baeldung's example at https://www.baeldung.com/java-9-process-api
- */
 
 public class App {
 
@@ -107,15 +83,12 @@ public class App {
 				logger.info("Added options: " + options);
 				String special_options = utils.getPropertyEnv("special_options", "");
 				if (special_options != null && !special_options.isEmpty()) {
-					logger.info(
-							String.format("Added special options: \"%s\" ", special_options));
-					launcher.setSpecialOptions(new ArrayList<String>(
-							Arrays.asList(new String[] { special_options })));
+					logger.info(String.format("Added special options: \"%s\" ", special_options));
+					launcher.setSpecialOptions(new ArrayList<String>(Arrays.asList(new String[] { special_options })));
 
 				}
 				String command = String.format(
-						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog",
-						options);
+						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog", options);
 				launcher.buildCommand(command);
 				launcher.setJavaCommand(command);
 				launcher.launchPowershell1();
@@ -123,11 +96,9 @@ public class App {
 				sleep(delay);
 				int pid = launcher.getPid();
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-				ProcessHandle processHandle = liveProcesses
-						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
+				ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
 						.findFirst().orElse(null);
-				boolean isAlive = (processHandle == null) ? false
-						: processHandle.isAlive();
+				boolean isAlive = (processHandle == null) ? false : processHandle.isAlive();
 				logger.info("is alive: " + isAlive);
 				killProcess(pid);
 			}
@@ -136,8 +107,8 @@ public class App {
 			}
 			/*
 			 * if (action.equals("current")) { Process process =
-			 * Process.getCurrentProcess(); getWindowsProcessId(process,
-			 * logger); logger.info(process.toHandle().pid()); }
+			 * Process.getCurrentProcess(); getWindowsProcessId(process, logger);
+			 * logger.info(process.toHandle().pid()); }
 			 */
 			if (action.equals("check")) {
 				String resource = commandLine.getOptionValue("pid");
@@ -155,33 +126,28 @@ public class App {
 						logger.info(processHandle);
 					} catch (NoSuchElementException e1) {
 					}
-					boolean status = (processHandle == null) ? false
-							: processHandle.isAlive();
+					boolean status = (processHandle == null) ? false : processHandle.isAlive();
 					String extraInfo = null;
 					if (status)
 						try {
-							extraInfo = "(" + "command: "
-									+ processHandle.info().command().get() + " started:"
-									+ processHandle.info().startInstant().get() + " " + "pid:"
-									+ processHandle.pid() + ")";
+							extraInfo = "(" + "command: " + processHandle.info().command().get() + " started:"
+									+ processHandle.info().startInstant().get() + " " + "pid:" + processHandle.pid()
+									+ ")";
 						} catch (NoSuchElementException e1) {
 						}
 					logger.info("Process pid (via ProcessHandle.of): " + pid + " is: "
 
 							+ (status ? "alive" : "not alive") + " " + extraInfo);
 					status = isProcessIdRunningOnWindows((int) pid);
-					logger.info("Process pid (via tasklist): " + pid + " is: "
-							+ (status ? "alive" : "not alive"));
+					logger.info("Process pid (via tasklist): " + pid + " is: " + (status ? "alive" : "not alive"));
 
 					Stream<ProcessHandle> processes = ProcessHandle.allProcesses();
 					processHandle = null;
-					processHandle = processes.filter(o -> o.pid() == pid).findFirst()
-							.orElse(null);
+					processHandle = processes.filter(o -> o.pid() == pid).findFirst().orElse(null);
 					status = (processHandle == null) ? false : processHandle.isAlive();
-					logger.info(
-							"Process pid (via ProcessHandle.allProcesses): " + pid + " is: "
+					logger.info("Process pid (via ProcessHandle.allProcesses): " + pid + " is: "
 
-									+ (status ? "alive" : "not alive"));
+							+ (status ? "alive" : "not alive"));
 				}
 			}
 		} catch (
@@ -224,14 +190,12 @@ public class App {
 			System.out.println("Cannot query the tasklist for some reason.");
 			System.exit(0);
 		}
-
 		return false;
 
 	}
 
 	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
-	private static Long getWindowsProcessId(final Process process,
-			final Logger logger) {
+	private static Long getWindowsProcessId(final Process process, final Logger logger) {
 		/* determine the pid on windows platforms */
 		try {
 			Field f = process.getClass().getDeclaredField("handle");
@@ -259,8 +223,8 @@ public class App {
 
 	private static boolean isAlive(int pid) {
 		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
-				.filter(ph -> ph.pid() == pid).findFirst().orElse(null);
+		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
+				.findFirst().orElse(null);
 		return (processHandle == null) ? false : processHandle.isAlive();
 	}
 
@@ -282,11 +246,9 @@ public class App {
 			Process process = runtime.exec(command);
 			// process.redirectErrorStream( true);
 
-			BufferedReader stdoutBufferedReader = new BufferedReader(
-					new InputStreamReader(process.getInputStream()));
+			BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
 
-			BufferedReader stderrBufferedReader = new BufferedReader(
-					new InputStreamReader(process.getErrorStream()));
+			BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 			String line = null;
 
 			StringBuffer processOutput = new StringBuffer();

@@ -1,12 +1,15 @@
 package example;
 
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -82,8 +85,7 @@ public class Launcher {
 
 	// https://www.baeldung.com/java-lang-processbuilder-api
 	public void launch(List<String> arguments) {
-		logger.info("ProcessBuilder arguments:  %s\n" + arguments,
-				"NOTE the doubled commas in the above is expected");
+		logger.info("ProcessBuilder arguments:  %s\n" + arguments, "NOTE the doubled commas in the above is expected");
 		logger.info("Launching command: " + String.join(" ", arguments));
 
 		ProcessBuilder processBuilder = new ProcessBuilder(arguments);
@@ -102,12 +104,10 @@ public class Launcher {
 		// dummy
 
 		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii; ";
-		String command = String.format(commandTemplate, buildCommand(javaCommand),
-				pidfilePath);
-		List<String> commandArguments = new ArrayList<>(
-				Arrays.asList(command.split("\\s+")));
-		List<String> arguments = new ArrayList<>(Arrays.asList(new String[] {
-				"powershell.exe", "/noprofile", "/executionpolicy", "bypass" }));
+		String command = String.format(commandTemplate, buildCommand(javaCommand), pidfilePath);
+		List<String> commandArguments = new ArrayList<>(Arrays.asList(command.split("\\s+")));
+		List<String> arguments = new ArrayList<>(
+				Arrays.asList(new String[] { "powershell.exe", "/noprofile", "/executionpolicy", "bypass" }));
 		arguments.add("\"&{");
 		arguments.addAll(commandArguments);
 		arguments.add("}\"");
@@ -118,8 +118,7 @@ public class Launcher {
 	public String buildCommand(final String command) {
 		logger.info("processing command: " + command);
 		String newCommand = null;
-		List<String> commandArguments = new ArrayList<>(
-				Arrays.asList(command.replaceAll("\\s+", " ").split("\\s+")));
+		List<String> commandArguments = new ArrayList<>(Arrays.asList(command.replaceAll("\\s+", " ").split("\\s+")));
 		if (commandArguments.get(0).contains("java")) {
 			commandArguments.remove(0);
 		}
@@ -167,8 +166,7 @@ public class Launcher {
 				contents.append(text).append(System.getProperty("line.separator"));
 			}
 			reader.close();
-			result = contents.toString().replaceAll("\r?\n", "").replaceAll("Pid=",
-					"");
+			result = contents.toString().replaceAll("\r?\n", "").replaceAll("Pid=", "");
 			logger.info(String.format("%s data:%s", filePath, result));
 
 		} catch (Exception e) {
@@ -178,10 +176,8 @@ public class Launcher {
 	}
 
 	public void launchCmd1() {
-		List<String> commandArguments = new ArrayList<>(
-				Arrays.asList(javaCommand.split("\\s+")));
-		List<String> arguments = new ArrayList<>(
-				Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" }));
+		List<String> commandArguments = new ArrayList<>(Arrays.asList(javaCommand.split("\\s+")));
+		List<String> arguments = new ArrayList<>(Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" }));
 		try {
 			arguments.addAll(commandArguments);
 		} catch (UnsupportedOperationException e) {
@@ -193,11 +189,9 @@ public class Launcher {
 	// https://howtodoinjava.com/java/collections/arraylist/merge-arraylists/
 	public void launchCmd2() {
 
-		List<String> arguments = new ArrayList<>(
-				Arrays.asList(javaCommand.split("\\s+")));
+		List<String> arguments = new ArrayList<>(Arrays.asList(javaCommand.split("\\s+")));
 		try {
-			arguments.addAll(0, new ArrayList<>(
-					Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" })));
+			arguments.addAll(0, new ArrayList<>(Arrays.asList(new String[] { "cmd.exe", "/c", "start", "/low" })));
 		} catch (java.lang.UnsupportedOperationException e) {
 			logger.info("Exception (ignored): " + e.toString());
 		}
