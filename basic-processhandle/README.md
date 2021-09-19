@@ -1,7 +1,7 @@
 ### Info
 
 
-![launch capture](https://github.com/sergueik/selenium_java/blob/master/basic-processhandle/screenshots/capture-launch.png)
+![launch capture](https://github.com/sergueik/selenium_java/blob/master/basic-processhandle/screenshots/capture-launch.jpg)
 
 This directory contains example code to launch the java jar in background process and get the process PID. The Java 11 `ProcessHandle.of` method was found to be unreliable, so th get the Java process pid, a small inline Powershell script is launched
 and java PID is written to a pidfile by that script allowing the calling Java program to read the pid.
@@ -23,7 +23,7 @@ mvn package
 ```cmd
 java -cp target\example.processhandle.jar;target\lib\* example.App --action powershell --wait 30000
 ```
-This will launch a mini Swing App to test itself. It will log to console:
+This will launch a mini Swing App to test itself. It passes a lot of Java options (to test ability). It waits a  litle bit (configurable) then reads the java process PID from `pidfile` and kills that process. It will log the following to the console:
 ```cmd
 2021-09-19 18:41:39  [main] - INFO  processing command: java.exe -cp target\example.processhandle.jar;target\lib\* -XX:+UseG1GC -Xms512m -Xmx512m -XX:ParallelGCThreads=6 -Xlog:gc* -XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default example.Dialog
 2021-09-19 18:41:39  [main] - INFO  New Command Arguments:['-cp', 'target\example.processhandle.jar;target\lib\*', '-XX:+UseG1GC', '-Xms512m', '-Xmx512m', '-XX:ParallelGCThreads=6', '-Xlog:gc*', '-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default', 'example.Dialog']
@@ -50,8 +50,7 @@ start-process,
 '-Xmx512m',,
 '-XX:ParallelGCThreads=6',,
 '-Xlog:gc*',,
-'-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,setti
-ngs=default',,
+'-XX:StartFlightRecording=disk=true,delay=30s,maxsize=100m,name=continuous,settings=default',,
 'example.Dialog',
 -passthru;,
 $info.PriorityClass=[System.Diagnostics.ProcessPriorityClass]::BelowNormal;,
@@ -72,11 +71,22 @@ ascii;,
 2021-09-19 18:42:09  [main] - INFO  is alive: true
 2021-09-19 18:42:09  [main] - INFO  Killing the process pid: 2832
 ```
-NOTE the doubled commas in the `ProcessBuilder arguments` above is expected
+NOTE the doubled commas in the `ProcessBuilder arguments` above is expected - needed to build Powershell's `start-process` `ArgumentListt` part:
+```cmd
+    Start-Process [-FilePath] <string> [[-ArgumentList] <string[]>]
+    [-WorkingDirectory <string>] [-PassThru] [-Verb <string>] [-WindowStyle
+    <ProcessWindowStyle> {Normal | Hidden | Minimized | Maximized}] [-Wait]
+    [<CommonParameters>]
+```
+An alternative option (WIP) is to use `invoke-expression`
+
 ### Old Testing of Challenges With Finding PID by Exploring Parent / Child Process from on Windows Java.
+Note: this is obsolete and will be removed soon.
+* building
 ```sh
 mvn package
 ```
+* running
 ```cmd
 java -cp target\example.processhandle.jar;target\lib\* example.App -a  check -p 2562
 ```
