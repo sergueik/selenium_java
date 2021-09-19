@@ -155,10 +155,25 @@ try {
 to retrieve status of operating system process with pid `pid`.
 
 ### Windows Launcher Testing
+
+* specify the JDK
 ```
 set JAVA_HOME=C:\java\zulu11.45.27-ca-jdk11.0.10-win_x64
 call ..\utils\setup.cmd
 ```
+
+* write `application.properties`
+```java
+options=-XX:+UseG1GC -Xms512m -Xmx512m -XX:ParallelGCThreads=6 -Xlog:gc*
+
+special_options=-XX:StartFlightRecording=disk=true,delay=3-s,maxsize=100m,name=continuous,settings=default
+```
+NOTE: Unrecognized option e.g. -Xmm512m will lead to hard to debug failures
+* launch
+```cmd
+java -cp target\example.processhandle.jar;target\lib\* example.App -a powershell -w 5000 -file %TEMP%\pidfile.txt
+```
+NOTE: specify the pid file path, using Windows environment notation e.g. `%TEMP%`
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html
