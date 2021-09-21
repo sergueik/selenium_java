@@ -33,10 +33,9 @@ public class AppLinux {
 			String action = commandLine.getOptionValue("action");
 			if (action == null) {
 				System.err.println("Missing required argument: action");
-
 			}
 			if (action.equals("list")) {
-				infoOfLiveProcesses();
+				// infoOfLiveProcesses();
 			}
 			/*
 			 * if (action.equals("current")) { Process process =
@@ -51,7 +50,9 @@ public class AppLinux {
 					Integer pid = Integer.parseInt(resource);
 					logger.info("looking pid " + pid);
 					// Returns an Optional<ProcessHandle> for an existing native process.
-					// should be only called through future	
+					// should be only called through future
+					// JDK 11
+					/*
 					Optional<ProcessHandle> result = ProcessHandle.of(pid);
 					ProcessHandle processHandle = null;
 					try {
@@ -59,7 +60,7 @@ public class AppLinux {
 					} catch (NoSuchElementException e1) {
 					}
 					logger.info(processHandle);
-
+					
 					Boolean status = (processHandle == null) ? false : processHandle.isAlive();
 					String extraInfo = null;
 					if (status)
@@ -70,21 +71,23 @@ public class AppLinux {
 						} catch (NoSuchElementException e1) {
 						}
 					logger.info("Information by ProcessHandle.of: " + pid + " is: "
-
+					
 							+ (status ? "alive" : "not alive") + " " + extraInfo);
+							*/
 				}
 			}
 		} catch (ParseException e) {
 		}
 	}
-
+	// JDK 11
+	/*
 	private static void infoOfLiveProcesses() {
 		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		liveProcesses.filter(ProcessHandle::isAlive).forEach(ph -> {
-			logger.info("PID: " + ph.pid());
-			logger.info("Instance: " + ph.info().startInstant());
-			logger.info("User: " + ph.info().user());
+		liveProcesses.filter(ProcessHandle::isAlive).forEach(o -> {
+			logger.info("PID: " + o.pid());
+			logger.info("Instance: " + o.info().startInstant());
+			logger.info("User: " + o.info().user());
 		});
 	}
-
+	*/
 }

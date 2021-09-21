@@ -90,17 +90,22 @@ public class App {
 				logger.info(String.format("Waiting for %d millisecond ", delay));
 				sleep(delay);
 				int pid = launcher.getPid();
+				boolean isAlive = isProcessIdRunningOnWindows(pid);
+				// JDK 11
+				/*
 				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 				ProcessHandle processHandle = liveProcesses
 						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
 						.findFirst().orElse(null);
 				boolean isAlive = (processHandle == null) ? false
 						: processHandle.isAlive();
+						*/
 				logger.info("is alive: " + isAlive);
 				killProcess(pid);
 			}
 			if (action.equals("list")) {
-				infoOfLiveProcesses();
+				// infoOfLiveProcesses();
+				// infoOfLiveProcessesLegacy();
 			}
 		} catch (
 
@@ -108,15 +113,17 @@ public class App {
 		}
 	}
 
-	private static void infoOfLiveProcesses() {
-		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		liveProcesses.filter(ProcessHandle::isAlive).forEach(ph -> {
-			logger.info("PID: " + ph.pid());
-			logger.info("Instance: " + ph.info().startInstant());
-			logger.info("User: " + ph.info().user());
-		});
-	}
-
+	// JDK 11
+	/*
+		private static void infoOfLiveProcesses() {
+			Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
+			liveProcesses.filter(ProcessHandle::isAlive).forEach(o -> {
+				logger.info("PID: " + o.pid());
+				logger.info("Instance: " + o.info().startInstant());
+				logger.info("User: " + o.info().user());
+			});
+		}
+	*/
 	// https://stackoverflow.com/questions/2533984/java-checking-if-any-process-id-is-currently-running-on-windows/41489635
 	public static boolean isProcessIdRunningOnWindows(int pid) {
 		try {
@@ -174,13 +181,16 @@ public class App {
 		}
 	}
 
+	// JDK 11
+
+	/*
 	private static boolean isAlive(int pid) {
 		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
 		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
-				.filter(ph -> ph.pid() == pid).findFirst().orElse(null);
+				.filter(o -> o.pid() == pid).findFirst().orElse(null);
 		return (processHandle == null) ? false : processHandle.isAlive();
 	}
-
+	*/
 	// origin:
 	// https://github.com/sergueik/selenium_tests/blob/master/src/test/java/com/github/sergueik/selenium/BaseTest.java
 	// based on:
