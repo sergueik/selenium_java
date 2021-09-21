@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 @SuppressWarnings("restriction")
 public class ChartEx extends Application {
 	private static Logger logger = LogManager.getLogger(ChartEx.class.getName());
-	
+
 	// private static CommandLineParser commandLineparser = new DefaultParser();
 	// private static CommandLine commandLine = null;
 	// private final static Options options = new Options();
@@ -43,6 +43,7 @@ public class ChartEx extends Application {
 		commandLineParser = new CommandLineParser();
 		commandLineParser.saveFlagValue("resource");
 		commandLineParser.saveFlagValue("type");
+		commandLineParser.saveFlagValue("target");
 
 		commandLineParser.parse(args);
 
@@ -54,11 +55,17 @@ public class ChartEx extends Application {
 			logger.info("Missing required argument: resource");
 			return;
 		}
+		String target = commandLineParser.getFlagValue("target");
+		if (target == null) {
+			logger.info("Missing required argument: target");
+			return;
+		}
 		String type = commandLineParser.getFlagValue("type");
 		if (type == null || !type.matches("csv|json")) {
 			logger.info("Missing required argument: type");
 			return;
 		}
+		parser.setTarget(target);
 		if (type.equals("csv")) {
 			data = parser.parseCSV(System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + resource);
@@ -68,11 +75,11 @@ public class ChartEx extends Application {
 		if (type.equals("json")) {
 			data2 = parser.parseJSON(System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + resource);
-			data3 = parser.parseJSON2(System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + resource);
 		}
-		logger.info("data3 (bad): " + data3);
-		data3.clear();
+		if (data2.isEmpty()) {
+			logger.info("There is no data");
+			return;
+		}
 		logger.info("data2: " + data2);
 		data3 = parser.formatData(data2);
 		logger.info("data3: " + data3);

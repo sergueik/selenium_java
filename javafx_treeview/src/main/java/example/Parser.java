@@ -57,6 +57,12 @@ public class Parser {
 
 	private boolean debug = false;
 
+	private String target = "test";
+
+	public void setTarget(String value) {
+		target = value;
+	}
+
 	public void setDebug(boolean value) {
 		debug = value;
 	}
@@ -114,48 +120,52 @@ public class Parser {
 	}
 
 	List<List<Object>> parseJSON(String resource) {
-		List<List<Object>> data2 = new ArrayList<>();
+		List<List<Object>> data = new ArrayList<>();
 		final Gson gson = new Gson();
 		String payload = null;
 		String datafilePath = System.getProperty("user.dir")
-				+ System.getProperty("file.separator") + "data.json";
+				+ System.getProperty("file.separator") + resource;
 		try {
 			payload = readFile(resource, Charset.forName("UTF-8"));
 			logger.info("payload: " + payload);
 		} catch (IOException e) {
-			data2.clear();
+			return data;
 		}
 		try {
 			JSONArray p1 = new JSONArray(payload);
 			int l1 = p1.length();
 			for (int i1 = 0; i1 < l1; i1++) {
-				JSONObject p2 = p1.getJSONObject(i1);
-				logger.info("Can process object: " + p2.toString());
+				JSONObject json = p1.getJSONObject(i1);
+				logger.info("Can process object: " + json.toString());
 
-				Iterator<String> p2Iterator = p2.keys();
+				@SuppressWarnings("unchecked")
+				Iterator<String> p2Iterator = json.keys();
 
 				while (p2Iterator.hasNext()) {
 					String p2Key = p2Iterator.next();
-					logger.info("Processing Row key: " + p2Key);
+					logger.info("observed row key: " + p2Key);
 				}
 				// Float.parseFloat("1450754160000");
 				// 1450754179072.000000
-				String target = p2.getString("target");
-				if (!target.equals("test"))
+				String p5 = json.getString("target");
+				if (!p5.equals(target)) {
+					logger.info("Skipping target:  " + p5);
 					continue;
-				logger.info("Processing target: " + target);
-				JSONArray p3 = p2.getJSONArray("datapoints");
-				int l3 = p3.length();
-				for (int i3 = 0; i3 < l3; i3++) {
-					JSONArray p4 = p3.getJSONArray(i3);
-					data2.add(new ArrayList(Arrays
-							.asList(new Object[] { Float.parseFloat(p4.get(0).toString()),
-									Long.parseLong(p4.get(1).toString()) })));
+				} else {
+					logger.info("Processing target: " + p5);
+					JSONArray datapoints = json.getJSONArray("datapoints");
+					int l3 = datapoints.length();
+					for (int i3 = 0; i3 < l3; i3++) {
+						JSONArray datapoint = datapoints.getJSONArray(i3);
+						data.add(new ArrayList(Arrays.asList(
+								new Object[] { Float.parseFloat(datapoint.get(0).toString()),
+										Long.parseLong(datapoint.get(1).toString()) })));
+					}
 				}
 			}
 		} catch (JSONException e) {
 		}
-		return data2;
+		return data;
 	}
 
 	// https://stackoverflow.com/questions/17613363/gson-deserializing-an-array-of-objects
