@@ -3,18 +3,29 @@ package example;
  * Copyright 2021 Serguei Kouzmine
  */
 
-import java.io.FileNotFoundException;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Utils {
 	private Logger logger = LogManager.getLogger(Utils.class.getName());
@@ -34,14 +45,24 @@ public class Utils {
 		return instance;
 	}
 
+	// TODO: fix woth absolute path in filename
 	public Map<String, String> getProperties(final String fileName) {
 		Properties p = new Properties();
 		final InputStream stream;
 		Map<String, String> propertiesMap = new HashMap<>();
 		if (debug) {
-			System.err.println(String.format("Reading properties file: '%s'", fileName));
+			System.err
+					.println(String.format("Reading properties file: '%s'", fileName));
 		}
-		stream = Utils.class.getClassLoader().getResourceAsStream(fileName);
+		if (new File(fileName).exists()) {
+			try {
+				stream = new FileInputStream(fileName);
+			} catch (FileNotFoundException e) {
+				return (propertiesMap);
+			}
+		} else {
+			stream = Utils.class.getClassLoader().getResourceAsStream(fileName);
+		}
 
 		try {
 			p.load(stream);
@@ -57,9 +78,11 @@ public class Utils {
 			}
 
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(String.format("Properties file was not found: '%s'", fileName));
+			throw new RuntimeException(
+					String.format("Properties file was not found: '%s'", fileName));
 		} catch (IOException e) {
-			throw new RuntimeException(String.format("Properties file is not readable: '%s'", fileName));
+			throw new RuntimeException(
+					String.format("Properties file is not readable: '%s'", fileName));
 		}
 		return (propertiesMap);
 	}
@@ -74,7 +97,8 @@ public class Utils {
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
 			String envVarValue = getPropertyEnv(envVarName, "");
-			m.appendReplacement(sb, null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
 		}
 		m.appendTail(sb);
 		return sb.toString();
@@ -88,17 +112,11 @@ public class Utils {
 		if (debug)
 			logger.info("system property: " + value);
 		if (value == null) {
-			Map<String, String> propertiesMap = getProperties("application.properties");
-			value = propertiesMap.get(name);
-
-			logger.info("application.properties property: " + value);
+			value = System.getenv(name);
+			if (debug)
+				logger.info("environment property: " + value);
 			if (value == null) {
-				value = System.getenv(name);
-				if (debug)
-					logger.info("environment property: " + value);
-				if (value == null) {
-					value = defaultValue;
-				}
+				value = defaultValue;
 			}
 		}
 		return value;

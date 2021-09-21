@@ -11,8 +11,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
@@ -38,6 +37,7 @@ public class App {
 	private final static Options options = new Options();
 	private static int delay = 10000;
 	private final static List<List<Float>> data = new ArrayList<>();
+	private static Map<String, String> propertiesMap;
 
 	public static void main(String[] args) {
 		options.addOption("d", "debug", false, "Debug");
@@ -71,7 +71,16 @@ public class App {
 				utils.setDebug(true);
 				launcher.setJavaPath(System.getenv("JAVA_HOME")
 						+ System.getProperty("file.separator") + "bin");
-				String options = utils.getPropertyEnv("options", "");
+				// set to JDK 1.8 path to observe the format error
+				// private String javaPath = "c:\\java\\jdk1.8.0_101\\bin";
+
+				propertiesMap = utils
+						.getProperties(String.format("%s\\src\\main\\resources\\%s",
+								System.getProperty("user.dir"), "application.properties"));
+				// propertiesMap = utils.getProperties("application.properties");
+				// TODO: cyclic call
+				String options = propertiesMap.get("options");
+				// expands environment
 				logger.info("Added options: " + options);
 				String special_options = utils.getPropertyEnv("special_options", "");
 				if (special_options != null && !special_options.isEmpty()) {
@@ -89,41 +98,43 @@ public class App {
 				launcher.launchPowershell1();
 				logger.info(String.format("Waiting for %d millisecond ", delay));
 				sleep(delay);
+
 				int pid = launcher.getPid();
-				boolean isAlive = isProcessIdRunningOnWindows(pid);
-				// JDK 11
-				/*
-				Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-				ProcessHandle processHandle = liveProcesses
-						.filter(ProcessHandle::isAlive).filter(ph -> ph.pid() == pid)
-						.findFirst().orElse(null);
-				boolean isAlive = (processHandle == null) ? false
-						: processHandle.isAlive();
-						*/
+				boolean isAlive = isProcessIdRunning(pid);
 				logger.info("is alive: " + isAlive);
 				killProcess(pid);
 			}
-			if (action.equals("list")) {
-				// infoOfLiveProcesses();
-				// infoOfLiveProcessesLegacy();
-			}
-		} catch (
-
-		ParseException e) {
+		} catch (ParseException e) {
 		}
 	}
 
-	// JDK 11
-	/*
-		private static void infoOfLiveProcesses() {
-			Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-			liveProcesses.filter(ProcessHandle::isAlive).forEach(o -> {
-				logger.info("PID: " + o.pid());
-				logger.info("Instance: " + o.info().startInstant());
-				logger.info("User: " + o.info().user());
-			});
+	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
+	private static Long getWindowsProcessId(final Process process,
+			final Logger logger) {
+		/* determine the pid on windows platforms */
+		try {
+			Field f = process.getClass().getDeclaredField("handle");
+			f.setAccessible(true);
+			long handl = f.getLong(process);
+			Kernel32 kernel = Kernel32.INSTANCE;
+			HANDLE handle = new HANDLE();
+			handle.setPointer(Pointer.createConstant(handl));
+			int ret = kernel.GetProcessId(handle);
+			logger.debug("Detected pid: {}", ret);
+			return Long.valueOf(ret);
+		} catch (final IllegalAccessException | NoSuchFieldException nsfe) {
+			logger.debug("Could not find PID for child process due to {}", nsfe);
 		}
-	*/
+		return null;
+	}
+
+	public static boolean isProcessIdRunning(int pid) {
+		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
+		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
+				.filter(o -> o.pid() == pid).findFirst().orElse(null);
+		return (processHandle == null) ? false : processHandle.isAlive();
+	}
+
 	// https://stackoverflow.com/questions/2533984/java-checking-if-any-process-id-is-currently-running-on-windows/41489635
 	public static boolean isProcessIdRunningOnWindows(int pid) {
 		try {
@@ -153,46 +164,6 @@ public class App {
 
 	}
 
-	// https://www.tabnine.com/code/java/methods/com.sun.jna.platform.win32.Kernel32/GetProcessId
-	private static Long getWindowsProcessId(final Process process,
-			final Logger logger) {
-		/* determine the pid on windows platforms */
-		try {
-			Field f = process.getClass().getDeclaredField("handle");
-			f.setAccessible(true);
-			long handl = f.getLong(process);
-			Kernel32 kernel = Kernel32.INSTANCE;
-			HANDLE handle = new HANDLE();
-			handle.setPointer(Pointer.createConstant(handl));
-			int ret = kernel.GetProcessId(handle);
-			logger.debug("Detected pid: {}", ret);
-			return Long.valueOf(ret);
-		} catch (final IllegalAccessException | NoSuchFieldException nsfe) {
-			logger.debug("Could not find PID for child process due to {}", nsfe);
-		}
-		return null;
-	}
-
-	public static void sleep(Integer milliSeconds) {
-		try {
-			Thread.sleep((long) milliSeconds);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-	// JDK 11
-
-	/*
-	private static boolean isAlive(int pid) {
-		Stream<ProcessHandle> liveProcesses = ProcessHandle.allProcesses();
-		ProcessHandle processHandle = liveProcesses.filter(ProcessHandle::isAlive)
-				.filter(o -> o.pid() == pid).findFirst().orElse(null);
-		return (processHandle == null) ? false : processHandle.isAlive();
-	}
-	*/
-	// origin:
-	// https://github.com/sergueik/selenium_tests/blob/master/src/test/java/com/github/sergueik/selenium/BaseTest.java
 	// based on:
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void killProcess(final int pid) {
@@ -243,4 +214,11 @@ public class App {
 		}
 	}
 
+	public static void sleep(Integer milliSeconds) {
+		try {
+			Thread.sleep((long) milliSeconds);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
 }
