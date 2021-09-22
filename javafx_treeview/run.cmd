@@ -11,4 +11,4 @@ if "%TARGET%" equ "" set TARGET=test
 call mvn package
 
 REM if /I "%PROCESSOR_ARCHITECTURE%" neq "AMD64" echo OPENJAVAFX 32 bit is not working&& goto :EOF
-java -cp target\treeview.jar;target\lib\* example.%CLASS% -target gaps -resource %RESOURCE% -type json
+java -cp target\treeview.jar;target\lib\* example.%CLASS% -target %TARGET% -resource %RESOURCE% -type json
