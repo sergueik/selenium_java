@@ -7,7 +7,7 @@ REM run.cmd "" gaps
 REM to pass the second argument
 set TARGET=%2
 if "%TARGET%" equ "" set TARGET=test
-if "%TARGET%" equ "?" call :EXPLORE && exit /b 0
+if "%TARGET%" equ "?" call :EXPLORE %RESOURCE% && exit /b 0
 
 call mvn package
 
@@ -15,6 +15,15 @@ REM if /I "%PROCESSOR_ARCHITECTURE%" neq "AMD64" echo OPENJAVAFX 32 bit is not w
 java -cp target\treeview.jar;target\lib\* example.%CLASS% -target %TARGET% -resource %RESOURCE% -type json
 goto :EOF
 :EXPLORE
+set RESOURCE=%~1
+set DEFAULT_RESOURCE=data.json
+if "%RESOURCE%" equ "" set RESOURCE=%DEFAULT_RESOURCE%
+set JQ=jq-win64.exe
+>NUL 2>NUL where.exe %JQ%
+if ERRORLEVEL 1 goto :NOJQ
+type %RESOURCE% | %JQ% ".[].target"
+goto :EOF
+:NOJQ
 REM based on: https://stackoverflow.com/questions/44547979/batch-parsing-json-file-with-colons-in-value
 
 SETLOCAL enableDelayedExpansion
@@ -22,9 +31,6 @@ SETLOCAL enableDelayedExpansion
 if "%DEBUG%" equ "" set DEBUG=false
 if "%DEBUG%" equ "1" set DEBUG=true
 
-set DATAFILE=%1
-set DEFAULT_DATAFILE=data.json
-if "%DATAFILE%" equ "" set DATAFILE=%DEFAULT_DATAFILE%
 set CURRENT_DIR=%CD%
 
 REM Extension should be "cmd"
@@ -48,18 +54,18 @@ echo>>%GENERATED_SCRIPT% var _fh = new ActiveXObject("Scripting.FileSystemObject
 echo>>%GENERATED_SCRIPT% var json = JSON.parse(_fh.ReadAll()); _fh.Close();
 echo>>%GENERATED_SCRIPT% for (i in json) {
 echo>>%GENERATED_SCRIPT% var target = json[i]['target'];
-echo>>%GENERATED_SCRIPT%    _out.Write( 'target: ' + target + '\n');
+echo>>%GENERATED_SCRIPT%    _out.Write( '"' + target + '"\n');
 echo>>%GENERATED_SCRIPT% }	
 echo>>%GENERATED_SCRIPT% window.close();
 echo ^</script^>>>%GENERATED_SCRIPT%
 if /i "%DEBUG%" equ "true" 1>&2 type %GENERATED_SCRIPT%
 
-if /i "%DEBUG%" equ "true" 1>&2 echo Parsing "%DATAFILE%"
-if NOT EXIST "%DATAFILE%"  echo Report does not exist %DATAFILE% && exit /b 1
-if /i "%DEBUG%" equ "true" 1>&2 echo echo %DATAFILE%^|mshta.exe "%GENERATED_SCRIPT%"
+if /i "%DEBUG%" equ "true" 1>&2 echo Parsing "%RESOURCE%"
+if NOT EXIST "%RESOURCE%"  echo Report does not exist %RESOURCE% && exit /b 1
+if /i "%DEBUG%" equ "true" 1>&2 echo echo %RESOURCE%^|mshta.exe "%GENERATED_SCRIPT%"
 
 REM collect the output from mstha.exe
-for /f "tokens=* delims=" %%_ in ('echo %DATAFILE%^|mshta.exe "%GENERATED_SCRIPT%"') do echo %%_
-if ERRORLEVEL 1 echo Error processing %DATAFILE% && exit /b 1
+for /f "tokens=* delims=" %%_ in ('echo %RESOURCE%^|mshta.exe "%GENERATED_SCRIPT%"') do echo %%_
+if ERRORLEVEL 1 echo Error processing %RESOURCE% && exit /b 1
 del /q %GENERATED_SCRIPT%
 goto :EOF
