@@ -1,9 +1,13 @@
 package example;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -12,41 +16,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.google.gson.Gson;
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
-
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.chart.LineChart;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
-import javafx.stage.Stage;
 
 public class Parser {
 
@@ -72,51 +41,6 @@ public class Parser {
 
 	public static Parser getInstance() {
 		return instance;
-	}
-
-	public List<List<Float>> parseCSV(String resource) {
-		List<List<Float>> data = new ArrayList<>();
-		Iterable<CSVRecord> records;
-		try {
-			Reader in;
-			in = new FileReader(resource);
-			records = CSVFormat.DEFAULT.withHeader(HEADERS).parse(in);
-			for (CSVRecord record : records) {
-				String columnOne = record.get("column1");
-				String columnTwo = record.get("column2");
-				List<Float> row = new ArrayList<>();
-				row.add(Float.parseFloat(columnOne));
-				row.add(Float.parseFloat(columnTwo));
-				data.add(row);
-			}
-		} catch (IOException e) {
-			data.clear();
-		}
-		return data;
-	}
-
-	public List<List<Float>> parseCSV2(String resource) {
-		List<List<Float>> data = new ArrayList<>();
-		Iterable<CSVRecord> records;
-		Reader in;
-		try {
-			in = new FileReader(resource);
-			data.clear();
-			records = CSVFormat.DEFAULT.parse(in);
-			for (CSVRecord record : records) {
-				String columnOne = record.get(0);
-				String columnTwo = record.get(1);
-				List<Float> row = new ArrayList<>();
-				row.add(Float.parseFloat(columnOne));
-				row.add(Float.parseFloat(columnTwo));
-				data.add(row);
-			}
-			in.close();
-			logger.info("data: " + data);
-		} catch (IOException e) {
-			data.clear();
-		}
-		return data;
 	}
 
 	List<List<Object>> parseJSON(String resource) {
