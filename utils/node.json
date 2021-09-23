@@ -7,6 +7,12 @@
       "maxInstances": 1
     },
     {
+      "browserName": "chromium",
+      "version": "",
+      "platform": "LINUX",
+      "maxInstances": 1
+    },
+    {
       "browserName": "chrome",
       "version": "",
       "platform": "WINDOWS",

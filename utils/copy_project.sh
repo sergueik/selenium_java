@@ -6,7 +6,7 @@ REMOTE_USER=${2:-sergueik}
 # unfortunately `whoami` in Windows in git bash can be different from
 # target unix machine user
 
-tar czvf ../$PROJECT.tar.gz .
+tar czvf ../$PROJECT.tar.gz  --exclude='.git*' --exclude='target' .
 if [[ $DEBUG == 'true' ]] ; then
   echo scp ../$PROJECT.tar.gz $REMOTE_USER@${REMOTE_HOST}:
 fi
