@@ -33,7 +33,7 @@ public class ChartEx extends Application {
 	private static List<List<Object>> data2 = new ArrayList<>();
 	private static List<List<Object>> data3 = new ArrayList<>();
 	private static CommandLineParser commandLineParser;
-	private static String resource = "data.csv";
+	private static String resource = "data.json";
 	private static Parser parser = Parser.getInstance();
 
 	public static void main(String[] args) {
@@ -61,17 +61,11 @@ public class ChartEx extends Application {
 			return;
 		}
 		String type = commandLineParser.getFlagValue("type");
-		if (type == null || !type.matches("csv|json")) {
-			logger.info("Missing required argument: type");
+		if (type == null || !type.matches("json")) {
+			logger.info("Missing / unrecognized required argument: type");
 			return;
 		}
 		parser.setTarget(target);
-		if (type.equals("csv")) {
-			data = parser.parseCSV(System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + resource);
-			data = parser.parseCSV2(System.getProperty("user.dir")
-					+ System.getProperty("file.separator") + resource);
-		}
 		if (type.equals("json")) {
 			data2 = parser.parseJSON(System.getProperty("user.dir")
 					+ System.getProperty("file.separator") + resource);
