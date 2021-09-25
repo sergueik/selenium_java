@@ -14,58 +14,58 @@ call mvn package
 REM if /I "%PROCESSOR_ARCHITECTURE%" neq "AMD64" echo OPENJAVAFX 32 bit is not working&& goto :EOF
 java -cp target\treeview.jar;target\lib\* example.%CLASS% -target %TARGET% -resource %RESOURCE% -type json
 goto :EOF
+
 :EXPLORE
+REM based on: https://stackoverflow.com/questions/44547979/batch-parsing-json-file-with-colons-in-value
+
 set RESOURCE=%~1
 set DEFAULT_RESOURCE=data.json
 if "%RESOURCE%" equ "" set RESOURCE=%DEFAULT_RESOURCE%
+if /i "%DEBUG%" equ "true" 1>&2 echo Parsing "%RESOURCE%"
+
+REM if jq.exe is available use it
 set JQ=jq-win64.exe
 >NUL 2>NUL where.exe %JQ%
 if ERRORLEVEL 1 goto :NOJQ
 type %RESOURCE% | %JQ% ".[].target"
 goto :EOF
 :NOJQ
-REM based on: https://stackoverflow.com/questions/44547979/batch-parsing-json-file-with-colons-in-value
 
 SETLOCAL enableDelayedExpansion
+if "%DEBUG%" neq "" set DEBUG=true
 
-if "%DEBUG%" equ "" set DEBUG=false
-if "%DEBUG%" equ "1" set DEBUG=true
+set TMPFILE=%TEMP%\script%RANDOM%.html
 
-set CURRENT_DIR=%CD%
+REM NOTE temporaty page file extension does not have to be "cmd"
 
-REM Extension should be "cmd"
+if /i "%DEBUG%" equ "true" 1>&2 echo Generating %TMPFILE%
 
-if "%DEBUG%" equ "" set DEBUG=false
-
-set GENERATED_SCRIPT=%TEMP%\script%RANDOM%.cmd
-if /i "%DEBUG%" equ "true" 1>&2 echo Generating %GENERATED_SCRIPT%
 REM https://docs.microsoft.com/en-us/previous-versions/ms536494(v=vs.85)
 REM NOTE: the link https://samples.msdn.microsoft.com/workshop/samples/author/hta/hta_allex.hta is 404
-echo. >%GENERATED_SCRIPT%
-echo ^<HTA:Application ShowInTaskbar=no WindowsState=Minimize SysMenu=No ShowInTaskbar=No Caption=No Border=Thin^>>>%GENERATED_SCRIPT%
-echo ^<^^!-- TODO^: switch IE to standards-mode by adding a valid doctype. --^>>>%GENERATED_SCRIPT%
-echo ^<meta http-equiv="x-ua-compatible" content="ie=edge" /^>>>%GENERATED_SCRIPT%
-echo ^<script language="javascript" type="text/javascript"^>>>%GENERATED_SCRIPT%
-echo>>%GENERATED_SCRIPT% window.visible = false;
-echo>>%GENERATED_SCRIPT% var debug = false;
-echo>>%GENERATED_SCRIPT% var _out = new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(1);
-echo>>%GENERATED_SCRIPT% var _in = new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(0).ReadLine();
-echo>>%GENERATED_SCRIPT% var _fh = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(_in, 1);
-echo>>%GENERATED_SCRIPT% var json = JSON.parse(_fh.ReadAll()); _fh.Close();
-echo>>%GENERATED_SCRIPT% for (i in json) {
-echo>>%GENERATED_SCRIPT% var target = json[i]['target'];
-echo>>%GENERATED_SCRIPT%    _out.Write( '"' + target + '"\n');
-echo>>%GENERATED_SCRIPT% }	
-echo>>%GENERATED_SCRIPT% window.close();
-echo ^</script^>>>%GENERATED_SCRIPT%
-if /i "%DEBUG%" equ "true" 1>&2 type %GENERATED_SCRIPT%
 
-if /i "%DEBUG%" equ "true" 1>&2 echo Parsing "%RESOURCE%"
+echo. >%TMPFILE%
+echo ^<HTA:Application ShowInTaskbar=no WindowsState=Minimize SysMenu=No ShowInTaskbar=No Caption=No Border=Thin^>>>%TMPFILE%
+echo ^<^^!-- TODO^: switch IE to standards-mode by adding a valid doctype. --^>>>%TMPFILE%
+echo ^<meta http-equiv="x-ua-compatible" content="ie=edge" /^>>>%TMPFILE%
+echo ^<script language="javascript" type="text/javascript"^>>>%TMPFILE%
+echo>>%TMPFILE% window.visible = false;
+echo>>%TMPFILE% var debug = false;
+echo>>%TMPFILE% var _out = new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(1);
+echo>>%TMPFILE% var _in = new ActiveXObject('Scripting.FileSystemObject').GetStandardStream(0).ReadLine();
+echo>>%TMPFILE% var _fh = new ActiveXObject("Scripting.FileSystemObject").OpenTextFile(_in, 1);
+echo>>%TMPFILE% var json = JSON.parse(_fh.ReadAll()); _fh.Close();
+echo>>%TMPFILE% for (i in json) {
+echo>>%TMPFILE% var target = json[i]['target'];
+echo>>%TMPFILE%    _out.Write( '"' + target + '"\n');
+echo>>%TMPFILE% }	
+echo>>%TMPFILE% window.close();
+echo ^</script^>>>%TMPFILE%
+if /i "%DEBUG%" equ "true" 1>&2 type %TMPFILE%
+
 if NOT EXIST "%RESOURCE%"  echo Report does not exist %RESOURCE% && exit /b 1
-if /i "%DEBUG%" equ "true" 1>&2 echo echo %RESOURCE%^|mshta.exe "%GENERATED_SCRIPT%"
+if /i "%DEBUG%" equ "true" 1>&2 echo echo %RESOURCE%^|mshta.exe "%TMPFILE%"
 
-REM collect the output from mstha.exe
-for /f "tokens=* delims=" %%_ in ('echo %RESOURCE%^|mshta.exe "%GENERATED_SCRIPT%"') do echo %%_
+for /f "tokens=* delims=" %%_ in ('echo %RESOURCE%^|mshta.exe "%TMPFILE%"') do echo %%_
 if ERRORLEVEL 1 echo Error processing %RESOURCE% && exit /b 1
-del /q %GENERATED_SCRIPT%
+del /q %TMPFILE%
 goto :EOF
