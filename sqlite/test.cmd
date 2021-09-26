@@ -8,7 +8,7 @@ set PACKAGE=%GROUP%.%ARTIFACT%
 
 set CLASS=%1
 echo CLASS=[%CLASS%]
-if /I "%CLASS%" equ "" (  for %%. in  (MemoryDatabase FileDatabase) do call :TEST %%. ) else call :TEST %CLASS%
+if /I "%CLASS%" equ "" (  for %%. in  (TwoJDBCEx MemoryDatabase FileDatabase) do call :TEST %%. ) else call :TEST %CLASS%
 
 goto :EOF
 :TEST
