@@ -20,6 +20,7 @@ import java.net.URL;
 
 import example.FXTrayIcon;
 
+@SuppressWarnings("restriction")
 public class RunnableTest extends Application {
 
 	@Override
