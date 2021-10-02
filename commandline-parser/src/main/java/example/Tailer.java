@@ -5,8 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-// based on: http://www.java2s.com/Tutorial/Java/0180__File/ReadingaFileintoaByteArrayreadstheentirecontentsofafileintoabytearray.htm
+// based on: https://docs.oracle.com/javase/6/docs/api/java/io/RandomAccessFile.html
+//see also: http://www.java2s.com/Tutorial/Java/0180__File/ReadingaFileintoaByteArrayreadstheentirecontentsofafileintoabytearray.htm
 public class Tailer {
 
 	private String filePath = null;
@@ -22,9 +25,41 @@ public class Tailer {
 			tailer.offset = Integer.parseInt(args[1]);
 			tailer.tail();
 			System.out.println(tailer.data);
-			System.out.println(tailer.data.length());
-			System.out.println(tailer.bytes.length);
+			// System.out.println(tailer.data.length());
+			// System.out.println(tailer.bytes.length);
+			System.out.println(
+					String.format("RPM(1): %d /%d ", tailer.rpm(), tailer.rpm(false)));
+			String fragment = "<version>";
+			System.out.println(
+					String.format("RPM(%s): %d", fragment, tailer.rpm(fragment)));
+
 		}
+	}
+
+	public int rpm() {
+		int result = 0;
+		for (int cnt = 0; cnt != bytes.length; cnt++)
+			if (bytes[cnt] == '\n')
+				result++;
+		return result;
+	}
+
+	// NOTE: flag is not used
+	public int rpm(boolean flag) {
+		int result = data.split("\r?\n").length;
+		return result;
+	}
+
+	public int rpm(String fragment) {
+		int result = 0;
+		String[] lines = data.split("\r?\n");
+		Pattern pattern = Pattern.compile(Pattern.quote(fragment),
+				Pattern.CASE_INSENSITIVE);
+
+		for (int cnt = 0; cnt != lines.length; cnt++)
+			if (pattern.matcher(lines[cnt]).find())
+				result++;
+		return result;
 	}
 
 	public void tail() {
