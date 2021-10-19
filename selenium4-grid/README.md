@@ -14,17 +14,28 @@ https://mvnrepository.com/repos/central/org/seleniumhq/selenium/selenium-server/
 
 on Windows
 ```cmd
-move  selenium-server-4.0.0.jar %USERPROFILE%\DOWNLOADS
+move /y selenium-server-4.0.0.jar %USERPROFILE%\DOWNLOADS
 cd %USERPROFILE%\DOWNLOADS
 java -jar selenium-server-4.0.0.jar standalone
 ```
 on Linux
 
-```cmd
-mv  selenium-server-4.0.0.jar ~/Downloads
+```sh
+mv selenium-server-4.0.0.jar ~/Downloads
 cd ~/Downloads
 java -jar selenium-server-4.0.0.jar standalone
 ```
+
+* test local driver
+```java
+mvn clean test
+```
+
+* test through grid in standalone mode
+```java
+mvn -Pgrid clean test
+```
+
 The test accesses `devTools` and performs `Browser.getVersion` [API call](https://chromedevtools.github.io/devtools-protocol/tot/Browser/#method-getVersion):
 ```java
 GetVersionResponse response = devTools.send(Browser.getVersion());
@@ -41,4 +52,7 @@ when the `devTools` construction was not successful, test just logs the exceptio
  * selenium 4 grid [documentation](https://www.selenium.dev/documentation/grid/)
  * https://www.browserstack.com/guide/selenium-grid-4-tutorial
  * https://www.lambdatest.com/blog/selenium-grid-4-tutorial-for-distributed-testing/
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
 

@@ -3,9 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>selenium-grid</artifactId>
-  <version>0.2.0-SNAPSHOT</version>
-  <name>selenium-grid</name>
+  <version>0.3.0-SNAPSHOT</version>
+  <name>selenium4-grid</name>
   <properties>
+    <suite>src/test/resources/TestSuites/LoginTestsLocal.xml</suite>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <guava.version>30.1-jre</guava.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
@@ -89,7 +90,7 @@
         <configuration>
           <suiteXmlFiles>
             <!-- <suiteXmlFile>src/test/resources/TestSuites/LoginTestsLocal.xml</suiteXmlFile> -->
-            <suiteXmlFile>src/test/resources/TestSuites/LoginTestsGrid.xml</suiteXmlFile>
+            <suiteXmlFile>${suite}</suiteXmlFile>
           </suiteXmlFiles>
         </configuration>
       </plugin>
@@ -128,4 +129,27 @@
       <url>https://repo1.maven.org/maven2/</url>
     </repository>
   </repositories>
+  <profiles>
+    <profile>
+      <id>local</id>
+      <properties>
+    <suite>src/test/resources/TestSuites/LoginTestsLocal.xml</suite>
+
+      </properties>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+    </profile>
+    <profile>
+      <id>grid</id>
+      <properties>
+    <suite>src/test/resources/TestSuites/LoginTestsGrid.xml</suite>
+
+      </properties>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+    </profile>
+  </profiles>
 </project>
+

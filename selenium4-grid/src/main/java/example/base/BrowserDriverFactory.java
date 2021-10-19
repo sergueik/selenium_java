@@ -40,11 +40,10 @@ public class BrowserDriverFactory {
 			// Make sure to upgrade chromedriver to work with your browser version:
 			// https://chromedriver.chromium.org/downloads
 			System.setProperty("webdriver.chrome.driver",
-					osName.equals("windows")
-							? (new File("c:/java/selenium/chromedriver.exe"))
-									.getAbsolutePath()
-							: Paths.get(System.getProperty("user.home")).resolve("Downloads")
-									.resolve("chromedriver").toAbsolutePath().toString());
+					Paths.get(System.getProperty("user.home"))
+							.resolve("Downloads").resolve(osName.equals("windows")
+									? "chromedriver.exe" : "chromedriver")
+							.toAbsolutePath().toString());
 			System.setProperty(
 					ChromeDriverService.CHROME_DRIVER_SILENT_OUTPUT_PROPERTY, "true");
 			driver.set(new ChromeDriver());
@@ -54,10 +53,10 @@ public class BrowserDriverFactory {
 			// Make sure to upgrade geckodriver to work with your browser version:
 			// https://github.com/mozilla/geckodriver/releases
 			System.setProperty("webdriver.gecko.driver",
-					osName.equals("windows")
-							? new File("c:/java/selenium/geckodriver.exe").getAbsolutePath()
-							: Paths.get(System.getProperty("user.home")).resolve("Downloads")
-									.resolve("geckodriver").toAbsolutePath().toString());
+					Paths.get(System.getProperty("user.home")).resolve("Downloads")
+							.resolve(
+									osName.equals("windows") ? "geckodriver.exe" : "geckodriver")
+							.toAbsolutePath().toString());
 			System
 					.setProperty("webdriver.firefox.bin",
 							osName.equals("windows") ? new File(

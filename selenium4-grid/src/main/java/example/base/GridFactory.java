@@ -82,11 +82,15 @@ public class GridFactory {
 				results.put("devtools", devTools.get());
 
 			} catch (DevToolsException e) {
-				logger.info("Exception: " + e.toString());
+				logger.info(
+						"Exception: " + e.toString() + "\n" + e.getAdditionalInformation()
+								+ "\n" + e.getRawMessage() + "\n" + e.getStackTrace());
+
 				results.put("devtools", null);
 			}
 			// set additional logging in Selenium
-			java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(Level.SEVERE);
+			java.util.logging.Logger.getLogger("org.openqa.selenium")
+					.setLevel(Level.SEVERE);
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
