@@ -1,0 +1,45 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd" >
+
+<suite name="LoginTestsSuite">
+	<parameter name="environment" value="local" />
+
+	<test name="PositiveTests-Chrome">
+		<parameter name="browser" value="chrome" />
+		<classes>
+			<class name="com.practicetestautomation.tests.LoginTests">
+				<methods>
+					<include name="logInTest"></include>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+	<test name="NegativeUsernameTests">
+		<parameter name="browser" value="chrome" />
+		<parameter name="username" value="incorrectUsername" />
+		<parameter name="password" value="Password123" />
+		<parameter name="expectedMessage" value="Your username is invalid!" />
+		<classes>
+			<class name="com.practicetestautomation.tests.LoginTests">
+				<methods>
+					<include name="negativeLoginTest"></include>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+	<test name="NegativePasswordTests">
+		<parameter name="browser" value="firefox" />
+		<parameter name="username" value="student" />
+		<parameter name="password" value="incorrectPassword!" />
+		<parameter name="expectedMessage" value="Your password is invalid!" />
+		<classes>
+			<class name="com.practicetestautomation.tests.LoginTests">
+				<methods>
+					<include name="negativeLoginTest"></include>
+				</methods>
+			</class>
+		</classes>
+	</test>
+
+</suite>
