@@ -3,6 +3,7 @@ package example.base;
 import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.devtools.DevTools;
+import org.openqa.selenium.devtools.DevToolsException;
 import org.openqa.selenium.devtools.HasDevTools;
 import org.openqa.selenium.remote.Augmenter;
 import org.openqa.selenium.remote.DesiredCapabilities;
@@ -10,6 +11,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.slf4j.Logger;
@@ -22,6 +25,7 @@ public class GridFactory {
 	private String browser;
 	private String platform;
 	private Logger logger = LoggerFactory.getLogger(GridFactory.class);
+	private Map<String, Object> results = new HashMap<>();
 
 	public GridFactory(String browser, String platform, Logger logger) {
 		this.browser = browser.toLowerCase();
@@ -29,7 +33,7 @@ public class GridFactory {
 		this.logger = logger;
 	}
 
-	public WebDriver createDriver() {
+	public Map<String, Object> createDriver() {
 		logger.info("Connecting to the node with: : " + browser);
 
 		DesiredCapabilities capabilities = new DesiredCapabilities();
@@ -49,8 +53,8 @@ public class GridFactory {
 		}
 
 		switch (platform) {
-		case "WIN10":
-			capabilities.setPlatform(Platform.WIN10);
+		case "WINDOWS":
+			capabilities.setPlatform(Platform.WINDOWS);
 			break;
 
 		case "MAC":
@@ -70,16 +74,22 @@ public class GridFactory {
 			URL url = new URL("http://localhost:4444");
 			WebDriver webDriver = new RemoteWebDriver(url, capabilities);
 			webDriver = new Augmenter().augment(webDriver);
-			DevTools chromeDevTools = ((HasDevTools) webDriver).getDevTools();
-
 			driver.set(webDriver);
-			devTools.set(chromeDevTools);
+			results.put("driver", driver.get());
+			try {
+				DevTools chromeDevTools = ((HasDevTools) webDriver).getDevTools();
+				devTools.set(chromeDevTools);
+				results.put("devtools", devTools.get());
+
+			} catch (DevToolsException e) {
+				logger.info("Exception: " + e.toString());
+				results.put("devtools", null);
+			}
 			// set additional logging in Selenium
 			java.util.logging.Logger.getLogger("org.openqa.selenium").setLevel(Level.SEVERE);
-			return driver.get();
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return results;
 	}
 }
