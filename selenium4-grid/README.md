@@ -53,6 +53,3 @@ when the `devTools` construction was not successful, test just logs the exceptio
  * https://www.browserstack.com/guide/selenium-grid-4-tutorial
  * https://www.lambdatest.com/blog/selenium-grid-4-tutorial-for-distributed-testing/
 
-### Author
-[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
-
