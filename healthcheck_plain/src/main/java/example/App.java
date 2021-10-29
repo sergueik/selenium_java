@@ -15,6 +15,9 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -50,6 +53,7 @@ public class App {
 		String url = "http://localhost:4444/grid/console";
 		String host = "localhost";
 		int port = 4444;
+		String list = null;
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
 		options.addOption("u", "url", true, "url");
@@ -65,6 +69,10 @@ public class App {
 			}
 			if (commandLine.hasOption("url")) {
 				url = commandLine.getOptionValue("url");
+			}
+
+			if (commandLine.hasOption("list")) {
+				list = getValue(commandLine.getOptionValue("list"));
 			}
 
 			App app = new App();
@@ -190,5 +198,31 @@ public class App {
 
 	public static void help() {
 		System.exit(1);
+	}
+
+	public static String readFile(String path, Charset encoding)
+			throws IOException {
+		byte[] encoded = Files.readAllBytes(Paths.get(path));
+		return new String(encoded, encoding);
+	}
+
+	public static String getValue(String data) {
+		String value = null;
+		if (data.matches("(?i)^@[a-z_0-9./:]+")) {
+			String datafilePath = Paths.get(System.getProperty("user.dir"))
+					.resolve(data.replaceFirst("^@", "")).toAbsolutePath().toString();
+
+			try {
+				value = readFile(datafilePath, Charset.forName("UTF-8"))
+						.replaceAll(" *\\r?\\n *", ",");
+			} catch (IOException e) {
+
+			}
+		} else {
+			value = data;
+		}
+		if (debug)
+			System.err.println("Got value: " + value);
+		return value;
 	}
 }
