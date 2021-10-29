@@ -1,12 +1,12 @@
 package example;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+/**
+ * Copyright 2021 Serguei Kouzmine
+ */
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.greaterThan;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,48 +18,29 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.FailingHttpStatusCodeException;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.DomNode;
-import com.gargoylesoftware.htmlunit.html.DomNodeList;
-import com.gargoylesoftware.htmlunit.html.HtmlAnchor;
-import com.gargoylesoftware.htmlunit.html.HtmlElement;
-import com.gargoylesoftware.htmlunit.html.HtmlInput;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.nodes.Node;
-import org.jsoup.select.Elements;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 public class App {
-	private static WebClient client = new WebClient();
-	private static HtmlPage page;
-	private static HtmlElement element;
-	private static boolean useHtmlUnit = false;
+
 	private static Document jsoupDocument;
 	private static List<String> jsoupSelectors = Arrays
 			.asList(new String[] { "#leftColumn", "#rightColumn" });
-	private static Document parentDocument;
 	private static Elements jsoupElements;
 	private static Elements jsoupElements2;
 	private static Element jsoupElement;
 	private static Element jsoupElement2;
-	private static Document childDocument;
 
-	private static String attributeName;
-	private static String attributeValue;
 	private static boolean debug = false;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
@@ -72,6 +53,7 @@ public class App {
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
 		options.addOption("u", "url", true, "url");
+		options.addOption("l", "list", true, "expected list");
 		try {
 
 			commandLine = commandLineparser.parse(options, args);
@@ -89,58 +71,63 @@ public class App {
 
 			Pattern pattern = Pattern
 					.compile("http://([^:/]+):([0-9]+)/grid/console");
-			System.err.println("Pattern:\n" + pattern.toString());
+			if (debug) {
+				System.err.println("Pattern:\n" + pattern.toString());
+			}
 			Matcher matcher = pattern.matcher(url);
 			assertThat(matcher.find(), is(true));
 			host = matcher.group(1);
 			port = Integer.parseInt(matcher.group(2));
-			System.err.println("open Socket : " + host + " " + port);
-
-			boolean status = app.connectionCheck(host, port);
-			System.err.println("Socket status: " + status);
-			int statusCode = app.getResponseCodeForURLUsingHead(url);
-			System.err.println(url + " HTTP status code: " + statusCode);
-			String html = app.getPage(url);
-			System.err.println("Page HTML: " + html.substring(0, 20) + "...");
-			if (useHtmlUnit) {
-				page = client.getPage(url);
-				// WARNING: Expected content type of 'application/javascript' or
-				// 'application/ecmascript' for remotely loaded JavaScript element at
-				// 'http://localhost:4444/grid/resources/org/openqa/grid/images/console-beta.js',
-				// but got ''.
-				assertThat(page, notNullValue());
-				System.err
-						.println("Page as XML: " + page.asXml().substring(0, 20) + "...");
-				System.err.println("Looking individual elements");
-
-				element = (HtmlElement) (page.getElementsById("rightColumn").get(0));
-				assertThat(element, notNullValue());
-				System.err.println("Element: " + element.asXml());
+			if (debug) {
+				System.err.println("open Socket : " + host + " " + port);
 			}
-
+			boolean status = app.connectionCheck(host, port);
+			if (debug) {
+				System.err.println("Socket status: " + status);
+			}
+			int statusCode = app.getResponseCodeForURLUsingHead(url);
+			if (debug) {
+				System.err.println(url + " HTTP status code: " + statusCode);
+			}
+			String html = app.getPage(url);
+			if (debug) {
+				System.err.println("Page HTML: " + html.substring(0, 20) + "...");
+			}
 			jsoupDocument = Jsoup.parse(html);
-			System.err.println(
-					"Page as Jsoup: " + jsoupDocument.html().substring(0, 20) + "...");
+			if (debug) {
+				System.err.println(
+						"Page as Jsoup: " + jsoupDocument.html().substring(0, 20) + "...");
+			}
 			for (String jsoupSelector : jsoupSelectors) {
 				jsoupElements = jsoupDocument.select(jsoupSelector);
 
-				System.err.println(String.format("Searching  via jsoup selector \"%s\"",
-						jsoupSelector));
+				if (debug) {
+					System.err.println(String
+							.format("Searching  via jsoup selector \"%s\"", jsoupSelector));
+
+				}
 				assertThat(jsoupElements, notNullValue());
 				assertThat(jsoupElements.iterator().hasNext(), is(true));
-				// assertThat(jsoupElements.eachText().size(), greaterThan(1));
-				// System.err.println(String.format("Processing jsoup selector \"%s\"
-				// %s",
-				// jsoupSelector, jsoupElements.first().html()));
 				jsoupElement = jsoupElements.first();
-				// String tagName = "p";
 				jsoupElements2 = jsoupElement.getElementsByAttributeValue("class",
 						"proxyid");
 				Iterator<Element> iterator = jsoupElements2.iterator();
 				while (iterator.hasNext()) {
 					jsoupElement2 = iterator.next();
-					System.err.println("Processing element:" + jsoupElement2.text());
-
+					// contains few "p" inside
+					String text = jsoupElement2.text();
+					if (debug) {
+						System.err
+								.println(String.format("Processing element:\"%s\"", text));
+					}
+					pattern = Pattern.compile("^.*\\s+http://([^:/]+):([0-9]+).*");
+					if (debug) {
+						System.err.println("Pattern:\n" + pattern.toString());
+					}
+					matcher = pattern.matcher(text);
+					assertThat(matcher.find(), is(true));
+					String node = matcher.group(1);
+					System.err.println("Identified node:" + node);
 				}
 			}
 		} catch (ParseException e) {
