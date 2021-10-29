@@ -1,5 +1,8 @@
 package example;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -32,6 +35,14 @@ import org.jsoup.nodes.Element;
 import org.jsoup.nodes.Node;
 import org.jsoup.select.Elements;
 
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
+import org.apache.commons.cli.ParseException;
+
 public class App {
 	private static WebClient client = new WebClient();
 	private static HtmlPage page;
@@ -49,17 +60,46 @@ public class App {
 
 	private static String attributeName;
 	private static String attributeValue;
+	private static boolean debug = false;
+	private final static Options options = new Options();
+	private static CommandLineParser commandLineparser = new DefaultParser();
+	private static CommandLine commandLine = null;
 
 	public static void main(String[] args) {
+		String url = "http://localhost:4444/grid/console";
 		String host = "localhost";
 		int port = 4444;
-		String url = "http://localhost:4444/grid/console";
-		App app = new App();
-		boolean status = app.connectionCheck("localhost", 4444);
-		System.err.println("Status: " + status);
+		options.addOption("h", "help", false, "help");
+		options.addOption("d", "debug", false, "debug");
+		options.addOption("u", "url", true, "url");
 		try {
+
+			commandLine = commandLineparser.parse(options, args);
+			if (commandLine.hasOption("h")) {
+				help();
+			}
+			if (commandLine.hasOption("d")) {
+				debug = true;
+			}
+			if (commandLine.hasOption("url")) {
+				url = commandLine.getOptionValue("url");
+			}
+
+			App app = new App();
+
+			Pattern pattern = Pattern
+					.compile("http://([^:/]+):([0-9]+)/grid/console");
+			System.err.println("Pattern:\n" + pattern.toString());
+			Matcher matcher = pattern.matcher(url);
+			assertThat(matcher.find(), is(true));
+			host = matcher.group(1);
+			port = Integer.parseInt(matcher.group(2));
+			System.err.println("open Socket : " + host + " " + port);
+
+			boolean status = app.connectionCheck(host, port);
+			System.err.println("Socket status: " + status);
 			int statusCode = app.getResponseCodeForURLUsingHead(url);
-			System.err.println("Status Code: " + statusCode);
+			System.err.println(url + " HTTP status code: " + statusCode);
 			String html = app.getPage(url);
 			System.err.println("Page HTML: " + html.substring(0, 20) + "...");
 			if (useHtmlUnit) {
@@ -103,6 +143,7 @@ public class App {
 
 				}
 			}
+		} catch (ParseException e) {
 
 		} catch (IOException e) {
 		}
@@ -160,4 +201,7 @@ public class App {
 		return content.toString();
 	}
 
+	public static void help() {
+		System.exit(1);
+	}
 }
