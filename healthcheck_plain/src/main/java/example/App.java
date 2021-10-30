@@ -18,17 +18,21 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -48,6 +52,11 @@ public class App {
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
+	private static List<String> expectedNodes = new ArrayList<>();
+
+	public static void setExpectedNodes(List<String> value) {
+		App.expectedNodes = value;
+	}
 
 	public static void main(String[] args) {
 		String url = "http://localhost:4444/grid/console";
@@ -76,7 +85,7 @@ public class App {
 			}
 
 			App app = new App();
-
+			App.setExpectedNodes(Arrays.asList(list.split(",")));
 			Pattern pattern = Pattern
 					.compile("http://([^:/]+):([0-9]+)/grid/console");
 			if (debug) {
@@ -102,6 +111,8 @@ public class App {
 				System.err.println("Page HTML: " + html.substring(0, 20) + "...");
 			}
 			jsoupDocument = Jsoup.parse(html);
+			List<String> foundNodes = new ArrayList<>();
+
 			if (debug) {
 				System.err.println(
 						"Page as Jsoup: " + jsoupDocument.html().substring(0, 20) + "...");
@@ -136,8 +147,15 @@ public class App {
 					assertThat(matcher.find(), is(true));
 					String node = matcher.group(1);
 					System.err.println("Identified node:" + node);
+					foundNodes.add(node);
 				}
 			}
+			// see also:
+			// https://stackoverflow.com/questions/9933403/subtracting-one-arraylist-from-another-arraylist
+			// expectedNodes.removeAll(foundNodes);
+			// java.lang.UnsupportedOperationException
+			System.err.println("Missing nodes:"
+					+ CollectionUtils.subtract(expectedNodes, foundNodes));
 		} catch (ParseException e) {
 
 		} catch (IOException e) {

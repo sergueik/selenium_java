@@ -17,12 +17,11 @@ mvn package
 ```
 run app
 ```cmd
-java -cp target\example.healthcheck.jar;target\lib\* example.App -debug -list @nodes.txt
+java -cp target\example.healthcheck.jar;target\lib\* example.App -debug
 ```
 this will print the findings
 
 ```txt
-Got value: SERGUEIK1,SERGUEIK2,SERGUEIK3
 Status: true
 Status Code: 200
 Page HTML: <html><head><script ...
