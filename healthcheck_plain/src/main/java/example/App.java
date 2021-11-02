@@ -41,8 +41,8 @@ import org.jsoup.select.Elements;
 public class App {
 
 	private static Document jsoupDocument;
-	private static List<String> jsoupSelectors = Arrays
-			.asList(new String[] { "#leftColumn", "#rightColumn" });
+	private static List<String> selectors = Arrays.asList(new String[] {
+			"#leftColumn", "#rightColumn", "#left-column", "#right-column" });
 	private static Elements jsoupElements;
 	private static Elements jsoupElements2;
 	private static Element jsoupElement;
@@ -79,13 +79,14 @@ public class App {
 			if (commandLine.hasOption("url")) {
 				url = commandLine.getOptionValue("url");
 			}
-
+			List<String> nodes = new ArrayList<>();
 			if (commandLine.hasOption("list")) {
 				list = getValue(commandLine.getOptionValue("list"));
+				nodes = Arrays.asList(list.split(","));
 			}
 
 			App app = new App();
-			App.setExpectedNodes(Arrays.asList(list.split(",")));
+			App.setExpectedNodes(nodes);
 			Pattern pattern = Pattern
 					.compile("http://([^:/]+):([0-9]+)/grid/console");
 			if (debug) {
@@ -102,9 +103,17 @@ public class App {
 			if (debug) {
 				System.err.println("Socket status: " + status);
 			}
+			if (!status) {
+				System.err.println("Hub is down: " + host);
+				return;
+			}
 			int statusCode = app.getResponseCodeForURLUsingHead(url);
 			if (debug) {
 				System.err.println(url + " HTTP status code: " + statusCode);
+			}
+			if (statusCode == 404) {
+				System.err.println("Hub page is not found: " + url);
+				return;
 			}
 			String html = app.getPage(url);
 			if (debug) {
@@ -117,37 +126,39 @@ public class App {
 				System.err.println(
 						"Page as Jsoup: " + jsoupDocument.html().substring(0, 20) + "...");
 			}
-			for (String jsoupSelector : jsoupSelectors) {
-				jsoupElements = jsoupDocument.select(jsoupSelector);
+			for (String selector : selectors) {
+				jsoupElements = jsoupDocument.select(selector);
 
 				if (debug) {
-					System.err.println(String
-							.format("Searching  via jsoup selector \"%s\"", jsoupSelector));
+					System.err.println(
+							String.format("Searching with selector \"%s\"", selector));
 
 				}
-				assertThat(jsoupElements, notNullValue());
-				assertThat(jsoupElements.iterator().hasNext(), is(true));
-				jsoupElement = jsoupElements.first();
-				jsoupElements2 = jsoupElement.getElementsByAttributeValue("class",
-						"proxyid");
-				Iterator<Element> iterator = jsoupElements2.iterator();
-				while (iterator.hasNext()) {
-					jsoupElement2 = iterator.next();
-					// contains few "p" inside
-					String text = jsoupElement2.text();
-					if (debug) {
-						System.err
-								.println(String.format("Processing element:\"%s\"", text));
+				if (jsoupElements != null && jsoupElements.iterator().hasNext()) {
+					assertThat(jsoupElements, notNullValue());
+					assertThat(jsoupElements.iterator().hasNext(), is(true));
+					jsoupElement = jsoupElements.first();
+					jsoupElements2 = jsoupElement.getElementsByAttributeValue("class",
+							"proxyid");
+					Iterator<Element> iterator = jsoupElements2.iterator();
+					while (iterator.hasNext()) {
+						jsoupElement2 = iterator.next();
+						// contains few "p" inside
+						String text = jsoupElement2.text();
+						if (debug) {
+							System.err
+									.println(String.format("Processing element:\"%s\"", text));
+						}
+						pattern = Pattern.compile("^.*\\s+http://([^:/]+):([0-9]+).*");
+						if (debug) {
+							System.err.println("Pattern:\n" + pattern.toString());
+						}
+						matcher = pattern.matcher(text);
+						assertThat(matcher.find(), is(true));
+						String node = matcher.group(1);
+						System.err.println("Identified node: " + node);
+						foundNodes.add(node);
 					}
-					pattern = Pattern.compile("^.*\\s+http://([^:/]+):([0-9]+).*");
-					if (debug) {
-						System.err.println("Pattern:\n" + pattern.toString());
-					}
-					matcher = pattern.matcher(text);
-					assertThat(matcher.find(), is(true));
-					String node = matcher.group(1);
-					System.err.println("Identified node:" + node);
-					foundNodes.add(node);
 				}
 			}
 			// see also:
@@ -162,8 +173,8 @@ public class App {
 		}
 	}
 
-	public boolean connectionCheck(String host /* can be a host address */,
-			int port) {
+	// accepts a host address
+	public boolean connectionCheck(String host, int port) {
 		boolean status = false;
 		try {
 			Socket clientSocket = new Socket(host, port);
@@ -172,9 +183,11 @@ public class App {
 			status = true;
 		} catch (ConnectException e) {
 			// host and port combination not valid / host is down
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
+			if (debug) {
+				System.err.println("Host is down: " + e.getMessage());
+			}
+		} catch (IOException e) {
+			// ignore
 		}
 		return status;
 	}
