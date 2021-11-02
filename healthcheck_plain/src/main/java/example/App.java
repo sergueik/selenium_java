@@ -20,8 +20,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -82,7 +84,10 @@ public class App {
 			List<String> nodes = new ArrayList<>();
 			if (commandLine.hasOption("list")) {
 				list = getValue(commandLine.getOptionValue("list"));
-				nodes = Arrays.asList(list.split(","));
+				nodes = removeDups(Arrays.asList(list.split(",")));
+				if (debug) {
+					System.err.println("Expected Nodes:\n" + nodes);
+				}
 			}
 
 			App app = new App();
@@ -252,8 +257,21 @@ public class App {
 		} else {
 			value = data;
 		}
+
 		if (debug)
 			System.err.println("Got value: " + value);
 		return value;
+	}
+
+	// origin:
+	// http://www.java2s.com/Code/Java/Collections-Data-Structure/Removeduplicateelementfromarray.htm
+	private static List<String> removeDups(List<String> elements) {
+		final Set<String> elementset = new HashSet<String>(elements);
+		final String[] result = new String[elementset.size()];
+		if (debug)
+			System.err.println(String.format("Removed %d duplicates",
+					elements.size() - elementset.size()));
+		elementset.toArray(result);
+		return Arrays.asList(result);
 	}
 }

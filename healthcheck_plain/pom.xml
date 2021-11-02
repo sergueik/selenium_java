@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>healthcheck</artifactId>
   <packaging>jar</packaging>
-  <version>0.5-SNAPSHOT</version>
+  <version>0.6-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <developers>
