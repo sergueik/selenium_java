@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2020 Serguei Kouzmine
+ * Copyright 2020,2021 Serguei Kouzmine
  */
 
 import static org.hamcrest.CoreMatchers.is;
@@ -12,13 +12,19 @@ import static org.hamcrest.Matchers.hasItems;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import example.CommandLineParser;
+
 
 /**
  * Unit Tests for CommandLineParser
@@ -280,6 +286,31 @@ public class BasicTest {
 	public void valueFormatTest3() {
 		commandLineParser.setValueFormat(example.CommandLineParser.Lib.GSON);
 		assertThat(commandLineParser.getValueFormat(), is("GSON"));
+	}
+
+	// https://qna.habr.com/q/1072080
+	@Test
+	public void valueFormatTest4() {
+		final Map<String, Long> freq = new HashMap<>();
+		List<String> data = Arrays.asList("a", "d", "a", "d", "a", "b", "a", "c", "d", "b", "c", "c", "d", "d");
+		data.stream().forEach(e -> {
+			if (freq.containsKey(e)) {
+				freq.put(e, freq.get(e) + 1);
+			} else {
+				freq.put(e, (long) 1);
+			}
+		});
+		Map<String, Long> freq2 = data.stream()
+				.collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+		List<String> results = freq2.entrySet().stream().sorted(Map.Entry.comparingByValue()).map(Map.Entry::getKey)
+				.collect(Collectors.toList());
+		String result = results.get(results.size() - 1);
+		System.err.println(results);
+		assertThat(result, is("d"));
+
+		Optional<String> result2 = freq2.entrySet().stream().max(Map.Entry.comparingByValue()).map(Map.Entry::getKey);
+		assertThat(result2.get(), is("d"));
 	}
 
 }
