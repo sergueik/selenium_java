@@ -27,6 +27,7 @@ import example.FXTrayIcon;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
+@SuppressWarnings("restriction")
 public class TestAddDefaultMenuItem extends Application {
 
 	@Override
@@ -34,7 +35,7 @@ public class TestAddDefaultMenuItem extends Application {
 		primaryStage.setTitle("My App");
 
 		FXTrayIcon icon = new FXTrayIcon(primaryStage,
-				getClass().getResource("icons8-link-64.png"));
+				getClass().getResource("/icons8-link-64.png"));
 		icon.addTitleItem(true);
 		icon.addExitItem(true);
 		icon.show();

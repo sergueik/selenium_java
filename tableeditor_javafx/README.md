@@ -11,8 +11,11 @@ Original archive: [Yandex disk link](https://yadi.sk/d/VClTsgSI3PpY2j)
 ### Running
 
 ```cmd
-mvn clean  install
-java -cp  target\PasswordKeeper-1.0-snapshot.jar;target\lib\* passwordkeeper.Main
+mvn clean package
+java -cp  target\example.editor.jar;target\lib\* example.Main
+```
+```sh
+java -cp target/example.editor.jar:target/lib/* example.Main
 ```
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

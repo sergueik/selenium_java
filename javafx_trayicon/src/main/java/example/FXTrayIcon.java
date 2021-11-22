@@ -1,18 +1,5 @@
 package example;
 
-import javafx.application.Platform;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.scene.control.Menu;
-import javafx.stage.Stage;
-
-import javax.imageio.ImageIO;
-import javax.swing.SwingUtilities;
-import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
-
-import example.annotations.API;
-
 import java.awt.AWTException;
 import java.awt.Desktop;
 import java.awt.EventQueue;
@@ -32,6 +19,19 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import javax.imageio.ImageIO;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
+
+import example.annotations.API;
+import javafx.application.Platform;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Menu;
+import javafx.stage.Stage;
+
+@SuppressWarnings("restriction")
 public class FXTrayIcon {
 
 	@API

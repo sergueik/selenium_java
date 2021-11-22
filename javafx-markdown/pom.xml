@@ -6,7 +6,6 @@
   <version>0.1.0-SNAPSHOT</version>
   <properties>
     <mainClass>Example</mainClass>
-    <jar.final.name>javafx_markdown</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <flexmark-java.version>0.62.2</flexmark-java.version>
     <commons-configuration.version>1.10</commons-configuration.version>
@@ -14,6 +13,8 @@
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.7</commons-io.version>
     <commons-lang3.version>3.3.1</commons-lang3.version>
+    <finalName>${project.groupId}.${project.artifactId}</finalName>
+    <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -53,7 +54,7 @@
     </dependency>
   </dependencies>
   <build>
-    <finalName>${jar.final.name}</finalName>
+    <finalName>${finalName}</finalName>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -63,6 +64,32 @@
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>${maven-assembly-plugin.version}</version>
+        <configuration>
+          <finalName>${finalName}</finalName>
+          <appendAssemblyId>false</appendAssemblyId>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>${project.groupId}.${mainClass}</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

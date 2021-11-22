@@ -87,4 +87,4 @@ the Kubernetes-stye YAML support is a work in progres, see the details in the co
   * Apache CLI CommandLineParser [tutorial](https://commons.apache.org/proper/commons-cli/usage.html)
   
 ### Author
-[Serguei Kouzmine](kouzmine_serguei@yahoc.com)
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)

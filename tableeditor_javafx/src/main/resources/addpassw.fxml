@@ -15,7 +15,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="passwordkeeper.Addpassw">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="example.Addpassw">
    <center>
       <HBox prefHeight="100.0" prefWidth="200.0" BorderPane.alignment="CENTER">
          <children>
@@ -24,7 +24,7 @@
                   <Insets />
                </HBox.margin>
                <children>
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Информация о сайте" wrappingWidth="800.0">
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Row detals" wrappingWidth="800.0">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -33,65 +33,21 @@
                      </VBox.margin></Text>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
                      <children>
-                        <TextField fx:id="txtsite" promptText="Вставьте URL сайта">
+                        <TextField fx:id="txtsite" promptText="Name">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <HBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin></TextField>
-                        <TextField fx:id="txtsitelogin" promptText="Имя пользователя">
+                        <TextField fx:id="txtsitelogin" promptText="User">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <HBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin></TextField>
-                        <TextField fx:id="txtsitepass" promptText="Пароль">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="FTP данные" wrappingWidth="800.0">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
-                     <children>
-                        <TextField fx:id="txtftp" promptText="FTP сервер">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtftplogin" promptText="Имя пользователя">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtftppass" promptText="Пароль">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtport" promptText="Порт">
+                        <TextField fx:id="txtsitepass" promptText="Password">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -104,7 +60,7 @@
                      </VBox.margin>
                   </HBox>
                   <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="135.0" strokeType="OUTSIDE" strokeWidth="0.0" text="База данных" wrappingWidth="800.0">
+                  <Text layoutX="10.0" layoutY="57.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Database Configuration" wrappingWidth="800.0">
                      <font>
                         <Font size="18.0" />
                      </font>
@@ -114,184 +70,28 @@
                   </Text>
                   <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
                      <children>
-                        <TextField fx:id="txtdbName" promptText="Имя БД">
+                        <TextField fx:id="txtftp" promptText="DB Server">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <HBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin></TextField>
-                        <TextField fx:id="txtdbUser" promptText="Имя пользователя">
+                        <TextField fx:id="txtftplogin" promptText="DB User">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <HBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin></TextField>
-                        <TextField fx:id="txtdbPass" promptText="Пароль БД">
+                        <TextField fx:id="txtftppass" promptText="DB Password">
                            <font>
                               <Font size="14.0" />
                            </font>
                            <HBox.margin>
                               <Insets left="10.0" right="10.0" />
                            </HBox.margin></TextField>
-                        <TextField fx:id="txtdbHost" promptText="Сервер">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="202.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Владелец" wrappingWidth="800.0">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
-                     <children>
-                        <TextField fx:id="txtperson" promptText="Владелец">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtpersonEmail" promptText="Email">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtpersonPass" promptText="Пароль">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtpersonPhone" promptText="Телефон">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="264.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Хостинг-провайдер" wrappingWidth="800.0">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
-                     <children>
-                        <TextField fx:id="txthostingUrl" promptText="Хостинг">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txthostingLogin" promptText="Логин">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin>
-                        </TextField>
-                        <TextField fx:id="txthostingPass" promptText="Пароль">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="320.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Регистратор домена" wrappingWidth="800.0">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
-                     <children>
-                        <TextField fx:id="txtproviderUrl" promptText="Регистратор домена">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtproviderLogin" promptText="Логин">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtproviderPass" promptText="Пароль">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                     </children>
-                     <VBox.margin>
-                        <Insets bottom="5.0" top="5.0" />
-                     </VBox.margin>
-                  </HBox>
-                  <Separator prefWidth="800.0" />
-                  <Text layoutX="10.0" layoutY="370.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Дополнительный аккаунт" wrappingWidth="800.0">
-                     <font>
-                        <Font size="18.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="10.0" />
-                     </VBox.margin>
-                  </Text>
-                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="800.0">
-                     <children>
-                        <TextField fx:id="txtotherUrl" promptText="Другой аккаунт">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtotherLogin" promptText="Логин">
-                           <font>
-                              <Font size="14.0" />
-                           </font>
-                           <HBox.margin>
-                              <Insets left="10.0" right="10.0" />
-                           </HBox.margin></TextField>
-                        <TextField fx:id="txtotherPass" promptText="Пароль">
+                        <TextField fx:id="txtport" promptText="DB Port">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -305,7 +105,7 @@
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="800.0">
                      <children>
-                        <TextField fx:id="txtnotes" prefWidth="800.0" promptText="Заметка">
+                        <TextField fx:id="txtnotes" prefWidth="800.0" promptText="Notes">
                            <font>
                               <Font size="14.0" />
                            </font>
@@ -326,8 +126,8 @@
    <bottom>
       <HBox prefHeight="32.0" prefWidth="800.0" BorderPane.alignment="CENTER">
          <children>
-            <Button fx:id="AddButtonAdd" mnemonicParsing="false" onAction="#AddButtonAdd" prefHeight="31.0" prefWidth="400.0" text="Добавить" />
-            <Button fx:id="AddButtonCancel" cancelButton="true" mnemonicParsing="false" onAction="#AddButtonCancel" prefHeight="31.0" prefWidth="400.0" text="Отмена" />
+            <Button fx:id="AddButtonAdd" mnemonicParsing="false" onAction="#AddButtonAdd" prefHeight="31.0" prefWidth="400.0" text="Save" />
+            <Button fx:id="AddButtonCancel" cancelButton="true" mnemonicParsing="false" onAction="#AddButtonCancel" prefHeight="31.0" prefWidth="400.0" text="Cancel" />
          </children>
       </HBox>
    </bottom>

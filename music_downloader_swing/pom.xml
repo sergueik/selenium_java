@@ -3,27 +3,24 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>me.ruslanys.vkmusic</groupId>
   <artifactId>vkmusic</artifactId>
-
   <version>2.1.2</version>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
+    <jsoup.version>1.14.2</jsoup.version>
     <lombok.version>1.16.18</lombok.version>
-
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
   </properties>
-
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.4.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
-
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>1.5.4.RELEASE</version>
+    <relativePath/>
+    <!-- lookup parent from repository -->
+  </parent>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -67,12 +64,11 @@
         </exclusion>
       </exclusions>
     </dependency>
-<!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
-<dependency>
-    <groupId>org.projectlombok</groupId>
-    <artifactId>lombok</artifactId>
-    <version>${lombok.version}</version>
-</dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -255,7 +251,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>23.0</version>
+      <version>30.0-jre</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -275,7 +271,7 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.10.3</version>
+      <version>${jsoup.version}</version>
       <scope>compile</scope>
       <exclusions>
         <exclusion>
@@ -348,6 +344,6 @@
           <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
-      </plugins>
+    </plugins>
   </build>
 </project>

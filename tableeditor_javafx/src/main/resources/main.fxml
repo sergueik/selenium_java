@@ -13,15 +13,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="passwordkeeper.Controller">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="700.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="example.Controller">
    <top>
       <VBox prefHeight="89.0" prefWidth="700.0" BorderPane.alignment="CENTER">
          <children>
             <HBox prefHeight="37.0" prefWidth="742.0">
                <children>
-                  <Button fx:id="addButton" mnemonicParsing="false" onAction="#actionButtonPressed" prefHeight="31.0" prefWidth="255.0" text="Добавить" />
-                  <Button fx:id="changeButton" mnemonicParsing="false" onAction="#actionButtonPressed" prefHeight="31.0" prefWidth="255.0" text="Изменить" />
-                  <Button fx:id="delButton" mnemonicParsing="false" onAction="#actionButtonPressed" prefHeight="31.0" prefWidth="255.0" text="Удалить" />
+                  <Button fx:id="addButton" mnemonicParsing="false" onAction="#buttonPressed" prefHeight="31.0" prefWidth="255.0" text="Create" />
+                  <Button fx:id="changeButton" mnemonicParsing="false" onAction="#buttonPressed" prefHeight="31.0" prefWidth="255.0" text="Modify" />
+                  <Button fx:id="delButton" mnemonicParsing="false" onAction="#buttonPressed" prefHeight="31.0" prefWidth="255.0" text="Remove" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
@@ -29,7 +29,7 @@
             </HBox>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="filterField" onKeyReleased="#filterField" prefHeight="31.0" prefWidth="683.0" promptText="Введите ключевое слово для поиска">
+                  <TextField fx:id="filterField" onKeyReleased="#filterField" prefHeight="31.0" prefWidth="683.0" promptText="Search">
                      <HBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" />
                      </HBox.margin>
@@ -42,31 +42,14 @@
    <center>
       <TableView fx:id="tablePassBook" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
         <columns>
-            <TableColumn fx:id="columnSite" prefWidth="100" text="Сайт" />
-            <TableColumn fx:id="columnSiteLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnSitePass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnFtp" prefWidth="100" text="FTP сервер" />
-            <TableColumn fx:id="columnFtpLogin" prefWidth="100" text="FTP логин" />
-            <TableColumn fx:id="columnFtpPass" prefWidth="100" text="FTP пароль" />
-            <TableColumn fx:id="columnPort" prefWidth="100" text="Порт" />
-            <TableColumn fx:id="columnPerson" prefWidth="100" text="Владелец" />
-            <TableColumn fx:id="columnPersonEmail" prefWidth="100" text="Email" />
-            <TableColumn fx:id="columnPersonPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnPersonPhone" prefWidth="100" text="Телефон" />
-            <TableColumn fx:id="columnDbName" prefWidth="100" text="Имя БД" />
-            <TableColumn fx:id="columnDbUser" prefWidth="100" text="Имя пользователя" />
-            <TableColumn fx:id="columnDbPass" prefWidth="100" text="Пароль БД" />
-            <TableColumn fx:id="columnDbHost" prefWidth="100" text="Сервер БД" />
-            <TableColumn fx:id="columnHostingUrl" prefWidth="100" text="Хостинг" />
-            <TableColumn fx:id="columnHostingLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnHostingPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnProviderUrl" prefWidth="100" text="Домен" />
-            <TableColumn fx:id="columnProviderLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnProviderPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnOtherUrl" prefWidth="100" text="Др.аккаунт" />
-            <TableColumn fx:id="columnOtherLogin" prefWidth="100" text="Логин" />
-            <TableColumn fx:id="columnOtherPass" prefWidth="100" text="Пароль" />
-            <TableColumn fx:id="columnNotes" prefWidth="100" text="Заметки" />
+            <TableColumn fx:id="columnSite" prefWidth="100" text="Title" />
+            <TableColumn fx:id="columnSiteLogin" prefWidth="100" text="Username" />
+            <TableColumn fx:id="columnSitePass" prefWidth="100" text="Password" />
+            <TableColumn fx:id="columnFtp" prefWidth="100" text="DB Server" />
+            <TableColumn fx:id="columnFtpLogin" prefWidth="100" text="DB User" />
+            <TableColumn fx:id="columnFtpPass" prefWidth="100" text="DB Pass" />
+            <TableColumn fx:id="columnPort" prefWidth="100" text="DB Port" />
+            <TableColumn fx:id="columnNotes" prefWidth="100" text="Notes" />
         </columns>
          <BorderPane.margin>
             <Insets bottom="10.0" left="10.0" right="10.0" />

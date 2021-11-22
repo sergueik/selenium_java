@@ -17,13 +17,13 @@
     <commons-io.version>2.7</commons-io.version>
     <commons-lang.version>2.6</commons-lang.version>
     <compiler.version>1.8</compiler.version>
-    <guava.version>23.0</guava.version>
+    <guava.version>30.0-jre</guava.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <junit.version>4.13.1</junit.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <selenium-chromedriver.version>${selenium.version}</selenium-chromedriver.version>
-    <webdrivermanager.version>3.3.0</webdrivermanager.version>
+    <webdrivermanager.version>5.0.1</webdrivermanager.version>
   </properties>
   <dependencies>
     <dependency>

@@ -96,7 +96,7 @@
         <version>2.18</version>
         <configuration>
           <suiteXmlFiles>
-            <suiteXmlFile>testng.config</suiteXmlFile>
+            <suiteXmlFile>testng.xml</suiteXmlFile>
           </suiteXmlFiles>
         </configuration>
       </plugin>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
+<head th:replace="inc/header"></head>
+<body>
+
+
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12">
+				<h1 th:text="#{view.home.heading}">Hello world</h1>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-12">
+				<div class="alert alert-info" role="alert">
+					<span th:utext="#{view.home.info}"></span>
+				</div>
+			</div>
+		</div>
+		<form>
+			<fieldset>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">Input Test Data Control</h3>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-6">
+										<label for="inputType">HTML Input Type</label>
+										<div class="input-group">
+											<div id="inputType" class="radioBtn btn-group">
+												<a class="btn btn-primary btn-sm active" data-toggle="htmlTemplate" data-title="HTML">HTML</a> 
+												<a class="btn btn-primary btn-sm notActive" data-toggle="htmlTemplate" data-title="TEMPLATE">HTML TEMPLATE</a>
+											</div>
+											<input type="hidden" name="htmlTemplate" id="htmlTemplate" />
+										</div>
+									</div>
+									<div class="col-md-6">
+										<label for="inputType">Use CSS Style</label>
+										<div class="input-group">
+											<div id="inputCss" class="radioBtn btn-group">
+												<a class="btn btn-primary btn-sm active" data-toggle="htmlCss" data-title="Y">YES</a> 
+												<a class="btn btn-primary btn-sm notActive" data-toggle="htmlCss" data-title="N">NO</a>
+											</div>
+											<input type="hidden" name="htmlCss" id="htmlCss" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="panel panel-primary">
+							<div class="panel-heading">
+								<h3 class="panel-title">Transport Request and Response Type</h3>
+							</div>
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-6">
+										<label for="responseType">Request Data to Sent In</label>
+										<div class="input-group">
+											<div id="requestType" class="radioBtn btn-group">
+												<a class="btn btn-primary btn-sm active" data-toggle="reqParamBody" data-title="REQ_PARAM">Params</a> 
+												<a class="btn btn-primary btn-sm notActive" data-toggle="reqParamBody" data-title="REQ_BODY">Body (Json)</a>
+											</div>
+											<input type="hidden" name="reqParamBody" id="reqParamBody" />
+										</div>
+									</div>
+									<div class="col-md-6 pull-right">
+										<label for="responseType">Response Type</label>
+										<div class="input-group">
+											<div id="responseType" class="radioBtn btn-group">
+												<a class="btn btn-primary btn-sm active" data-toggle="httpByte" data-title="HTTP">HTTP</a> 
+												<a class="btn btn-primary btn-sm notActive" data-toggle="httpByte" data-title="BYTE">BYTE</a> 
+											</div>
+											<input type="hidden" name="httpByte" id="httpByte" />
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<label for="html">HTML BODY</label>
+						<textarea class="form-control" rows="10" id="htmlData"></textarea>
+					</div>
+					<div class="col-md-6">
+						<label for="css">CSS</label>
+						<textarea class="form-control" rows="10" id="cssData"></textarea>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-6">
+						<label for="json">JSON Data</label>
+						<textarea class="form-control" rows="10" id="jsonData"></textarea>
+					</div>
+					<div class="col-md-6">
+						<div class="row">
+							<div class="col-md-12">
+								<div class="panel panel-primary">
+									<div class="panel-heading">
+										<h3 class="panel-title">Information/Action</h3>
+									</div>
+									<div class="panel-body">
+										<div class="row">
+											<div class="col-md-12">
+												<label for="url">Service URL</label> 
+												<input class="form-control" id="serviceUrl" readonly="readonly" />
+											</div>
+										</div>
+										<div class="row">
+											<div class="col-md-12">
+												<button class="btn btn-primary" id="generatePdf">Generate PDF</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+
+
+
+	<footer th:replace="inc/footer"></footer>
+	<script th:src="@{/public/lib/downloader/js/html.ajax.binary.downloader.js}"></script>
+	<script th:src="@{/public/lib/downloader/js/xhr.ajax.binary.downloader.js}"></script>
+	<script th:src="@{/public/pages/index/js/index.js}"></script>
+
+</body>
+</html>

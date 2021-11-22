@@ -9,5 +9,28 @@ converted temporarily to maven and Java 1.8. Also switched to classic `pom.xml` 
 
 ```cmd
 mvn clean package
-java -cp target/javafx_markdown.jar;target/lib/* example.Example
+java -jar target\example.javafx_markdown.jar
 ```
+or if you need to explicitly load assemblies
+```cmd
+java -cp target\example.javafx_markdown.jar;target\lib\* example.Example
+```
+and
+```sh
+mvn clean package
+java -jar target/example.javafx_markdown.jar
+```
+or if you need to explicitly load assemblies
+```sh
+java -cp target/example.javafx_markdown.jar:target/lib/* example.Example
+```
+
+NOTE: on Windows, uses `;` as class path argument separator. For unix do `:`
+
+### See Also
+   * javascript and JavaFX powered [Markdown Editor](https://github.com/arildyk/simple-markdown-editor) (need to convert from visual studio code project)
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
+
+

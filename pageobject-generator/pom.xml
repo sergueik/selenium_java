@@ -8,6 +8,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.version>1.8</java.version>
+    <jsoup.version>1.14.2</jsoup.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
@@ -31,7 +32,7 @@
     <dependency>
       <groupId>org.jsoup</groupId>
       <artifactId>jsoup</artifactId>
-      <version>1.10.1</version>
+      <version>${jsoup.version}</version>
     </dependency>
     <dependency>
       <groupId>org.freemarker</groupId>

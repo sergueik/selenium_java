@@ -15,23 +15,23 @@ do
   wget -q --no-check-certificate -O "$T" "$F"
  #  mv $T "$T2"
 done
-
-# NOTE: commented
 # after copying rename the files - undo URL-encoded names
-for F in $(ls -1 *.mp4)
-do
-  T=$(echo $F| sed 's|0x20| |g')
+for F in $(ls -1 *.mp4); do
+  T=$(echo $F| sed 's|0x20| |g'| sed 's|%20| |g')
   if [ "$F" != "$T" ]; then
     mv "$F" "$T"
   fi
 done
 
+
 # Remove some portion of the name
-if false ; then
-  if [[ '' != "${REMOVE_TITLE_FRAGMENT}"  ]]; then
-    ls -1 *mp4| while read F ; do G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||") ; mv "$F" "$G" ; done
+ls -1 *mp4| while read F ; do
+  G=$(echo $F|sed "s|$REMOVE_TITLE_FRAGMENT||") ;
+  if [ "$F" != "$G" ]; then
+    mv "$F" "$G" ;
   fi
-fi
+done
+
 # Better way is to use /usr/bin/prename
 TITLE_FRAGMENT_ARGUMENT=$(echo $REMOVE_TITLE_FRAGMENT| sed 's|-|\\-|g')
 prename -v "s|$TITLE_FRAGMENT_ARGUMENT||" *mp4

@@ -5,6 +5,7 @@ package example.applications.notaskbaricon;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import java.lang.IllegalAccessError;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,9 +19,13 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import java.net.URL;
 
+import com.sun.javafx.application.PlatformImpl;
+// example.applications.notaskbaricon -> com.sun.javafx.application.PlatformImpl 
+// JDK internal API (JDK removed internal API)
 import example.FXTrayIcon;
 import example.applications.RunnableTest;
 
+@SuppressWarnings("restriction")
 public class Main extends Application {
 
 	@Override
@@ -54,20 +59,47 @@ public class Main extends Application {
 		if (FXTrayIcon.isSupported()) {
 			icon = new FXTrayIcon(stage, iconFile);
 
+			// toggle taskbarapplication
+
 			MenuItem menuShowStage = new MenuItem("Show Stage");
 			MenuItem menuHideStage = new MenuItem("Hide Stage");
 			MenuItem menuShowMessage = new MenuItem("Show Message");
 			MenuItem menuExit = new MenuItem("Exit");
-			menuShowStage.setOnAction(e -> {
-				Platform.runLater(() -> com.sun.javafx.application.PlatformImpl
-						.setTaskbarApplication(false));
+			// Exception in thread "JavaFX Application Thread"
+			// java.lang.IllegalAccessError:
+			// module javafx.graphics does not export com.sun.javafx.application
+			// https://code.yawk.at/org.openjfx/javafx-graphics/11/com/sun/javafx/application/PlatformImpl.java
+
+			menuShowStage.setOnAction(event -> {
+
+				Platform.runLater(() -> {
+					try {
+						PlatformImpl.setTaskbarApplication(false);
+					} catch (Exception exception) {
+						// ignore
+						// mainStage.initStyle(StageStyle.UTILITY);
+						// mainStage.setMaxHeight(0);
+						// mainStage.setMaxWidth(0);
+						// mainStage.setX(Double.MAX_VALUE);
+					}
+				});
+				System.err.println("Show mainstage");
 				mainStage.show();
 			});
-			menuHideStage.setOnAction(e -> {
-				Platform.runLater(() -> com.sun.javafx.application.PlatformImpl
-						.setTaskbarApplication(true));
+			menuHideStage.setOnAction(event -> {
+				Platform.runLater(() -> {
+					try {
+
+						PlatformImpl.setTaskbarApplication(true);
+					} catch (Exception exception) {
+						// IllegalAccessError?
+						// ignore
+					}
+				});
+				System.err.println("Hide mainstage");
 				mainStage.hide();
 			});
+
 			menuShowMessage.setOnAction(e -> showMessage());
 			menuExit.setOnAction(e -> System.exit(0));
 			icon.addMenuItem(menuShowStage);

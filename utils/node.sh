@@ -1,14 +1,18 @@
 #!/bin/bash
 
-NODE_PORT=5555
+NODE_PORT=${1:-5555}
 NODE_HOST=$(ip addr | sed -En '/scope global/s/inet (([0-9]*\.){3}[0-9]*).*/\1/p')
 # http://stackoverflow.com/questions/13322485/how-to-i-get-the-primary-ip-address-of-the-local-machine-on-linux-and-os-x
 # export NODE_HOST=$(ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p')
 # export NODE_HOST=$(hostname -I)
-HUB_IP_ADDRESS=127.0.0.1
-HUB_PORT=4444
-SELENIUM_VERSION=2.47.1
-LOG4J_VERSION=1.2.17
+HUB_IP_ADDRESS=${2:-127.0.0.1}
+HUB_PORT=${3:-4444}
+if [ -z "${SELENIUM_VERSION}" ] ; then
+  SELENIUM_VERSION=2.53.0
+fi
+if [ -z "${LOG4J_VERSION}" ] ; then
+  LOG4J_VERSION=1.2.17
+fi
 ROLE=node
 SELENIUM_HOME=`pwd`
 # configuration

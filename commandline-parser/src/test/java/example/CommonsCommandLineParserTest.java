@@ -19,6 +19,8 @@ import junit.framework.TestCase;
 @SuppressWarnings("deprecation")
 public class CommonsCommandLineParserTest extends TestCase {
 
+	private CommonsCommandLineParser sut;
+
 	protected static class ExitException extends SecurityException {
 		public final int status;
 
@@ -43,8 +45,6 @@ public class CommonsCommandLineParserTest extends TestCase {
 			throw new ExitException(status);
 		}
 	}
-
-	private CommonsCommandLineParser sut;
 
 	@Override
 	protected void setUp() throws Exception {
@@ -107,9 +107,56 @@ public class CommonsCommandLineParserTest extends TestCase {
 			sut.run("-d", "data (required) here");
 		} catch (ExitException e) {
 			final int status = e.status;
-			assertThat(String.format("Unexpected Exit status", status), status,
+			assertThat(String.format("Unexpected Exit status %d", status), status,
 					is(CommonsCommandLineParser.INVALID_OPTION));
 		}
 	}
 
+	@Test
+	// handling url
+	public void test6() throws Exception {
+		try {
+			String data = "http://www.google.com";
+			sut.run("-d", data, "-o", "operation");
+			String value = sut.getFlagValue("d");
+			assertThat(String.format("Unexpected value %s", value), value, is(data));
+		} catch (ExitException e) {
+			final int status = e.status;
+			assertThat(String.format("Unexpected Exit status", status), status,
+					is(0));
+		}
+	}
+
+	@Test
+	// handling long option names
+	// NOTE: the test has to catch exitexception, even there is no real exception
+	// TODO: the option is not working
+	public void test7() throws Exception {
+		try {
+			sut.run("--data", "data", "--o", "operation");
+			String value = sut.getFlagValue("d");
+			assertThat(String.format("Unexpected value %s", value), value,
+					is("data"));
+		} catch (ExitException e) {
+			final int status = e.status;
+			assertThat(String.format("Unexpected Exit status %d", status), status,
+					is(42));
+		}
+	}
+
+	@Test
+	// handling long option names
+	// NOTE: the test has to catch exitexception, even there is no real exception
+	public void test8() throws Exception {
+		try {
+			sut.run("--data", "data", "-d", "different data");
+			String value = sut.getFlagValue("d");
+			assertThat(String.format("Unexpected value %s", value), value,
+					is("data"));
+		} catch (ExitException e) {
+			final int status = e.status;
+			assertThat(String.format("Unexpected Exit status %d", status), status,
+					is(42));
+		}
+	}
 }

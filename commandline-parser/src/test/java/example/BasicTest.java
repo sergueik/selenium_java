@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2020 Serguei Kouzmine
+ * Copyright 2020,2021 Serguei Kouzmine
  */
 
 import static org.hamcrest.CoreMatchers.is;
@@ -9,10 +9,21 @@ import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.collection.IsArrayContaining.hasItemInArray;
+import static org.hamcrest.Matchers.arrayContainingInAnyOrder;
+import static org.hamcrest.Matchers.hasItems;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -282,4 +293,83 @@ public class BasicTest {
 		assertThat(commandLineParser.getValueFormat(), is("GSON"));
 	}
 
+	private final static List<String> data = Arrays.asList("a", "d", "a", "d",
+			"a", "b", "a", "c", "d", "b", "c", "c", "d", "e", "f", "f");
+	private static Map<String, Long> freq = new HashMap<>();
+	private static LinkedHashMap<String, Long> results2 = new LinkedHashMap<>();
+	private static List<String> results = new ArrayList<>();
+	private static Map<String, Long> results3 = new HashMap<>();
+	private static String result = null;
+	private Optional<String> result2 = Optional.empty();
+
+	// https://qna.habr.com/q/1072080
+	@Test
+	public void valueFormatTest4() {
+		data.stream().forEach(e -> {
+			if (freq.containsKey(e)) {
+				freq.put(e, freq.get(e) + 1);
+			} else {
+				freq.put(e, (long) 1);
+			}
+		});
+		freq = data.stream().collect(
+				Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+		results = freq.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.map(Map.Entry::getKey).collect(Collectors.toList());
+		System.err.println(results);
+		result = results.get(results.size() - 1);
+		assertThat(result, is("d"));
+
+		// sorting example from
+		// http://stackoverflow.com/questions/109383/sort-a-mapkey-value-by-values-java
+		// https://www.baeldung.com/java-collectors-tomap
+		results2 = freq.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+						(e1, e2) -> e1, LinkedHashMap::new));
+
+		results3 = freq.entrySet().stream().sorted(Map.Entry.comparingByValue())
+				.collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()));
+
+		System.err.println("Results3: " + Arrays.asList(results3.keySet()));
+		System.err.println("Ordered? : ");
+		results3.entrySet().stream().forEach(o -> System.err
+				.println(String.format("%s %d", o.getKey(), o.getValue())));
+
+		System.err.println("Grouping by value (brute force) : ");
+		results3.values().stream().distinct().forEach(value -> {
+			List<String> keys = results3.keySet().stream()
+					.filter(key -> results3.get(key) == value)
+					.collect(Collectors.toList());
+			System.err.println(String.format("%s %s", value, keys));
+		});
+
+		Optional<String> result2 = freq.entrySet().stream()
+				.max(Map.Entry.comparingByValue()).map(Map.Entry::getKey);
+		// assertThat(result2.get(), is("d"));
+		// https://stackoverflow.com/questions/59708926/grouping-values-in-hash-map-in-java-stream-using-custom-collector-object
+		assertThat(new HashSet<Object>(Arrays.asList("a", "d")),
+				hasItems(result2.get()));
+
+	}
+
+	// https://stackoverflow.com/questions/59708926/grouping-values-in-hash-map-in-java-stream-using-custom-collector-object
+	@Test
+	public void valueFormatTest5() {
+		freq = data.stream().collect(
+				Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+		Long top = freq.entrySet().stream().max(Map.Entry.comparingByValue())
+				.map(Map.Entry::getValue).get();
+		System.err.println("Top frequency: " + top);
+
+		results = freq.entrySet().stream().filter(e -> e.getValue().equals(top))
+				.map(Map.Entry::getKey).collect(Collectors.toList());
+		assertThat(results, notNullValue());
+		assertThat(results.size(), greaterThan(0));
+		System.err.println("Top elements : " + results);
+		assertThat(results.toArray(),
+				arrayContainingInAnyOrder(new String[] { "d", "a" }));
+
+	}
 }

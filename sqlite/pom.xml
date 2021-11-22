@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>sqlite_test</groupId>
-  <artifactId>sqlite_test</artifactId>
+  <groupId>example</groupId>
+  <artifactId>sqlite</artifactId>
   <packaging>jar</packaging>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.5-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <properties>
@@ -15,6 +15,7 @@
     <version.maven-compiler-plugin>2.0.2</version.maven-compiler-plugin>
     <version.sqlite-jdbc>3.8.7</version.sqlite-jdbc>
     <java.version>1.8</java.version>
+    <finalName>${project.groupId}.${project.artifactId}</finalName>
   </properties>
   <dependencies>
     <dependency>
@@ -79,5 +80,6 @@
         </executions>
       </plugin>
     </plugins>
+    <finalName>${finalName}</finalName>
   </build>
 </project>

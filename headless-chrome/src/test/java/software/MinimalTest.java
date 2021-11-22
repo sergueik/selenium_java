@@ -1,12 +1,13 @@
 package software;
 
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.CoreMatchers.containsString;
-import static org.hamcrest.CoreMatchers.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -17,26 +18,21 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
-
+import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import org.openqa.selenium.By;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 public class MinimalTest {
 
@@ -47,13 +43,13 @@ public class MinimalTest {
 	private static final boolean useChromiumSendCommand = true;
 	private static final String chomeDriverPath = osName.equals("windows")
 			? (new File("c:/java/selenium/chromedriver.exe")).getAbsolutePath()
-			: "/home/vagrant/chromedriver";
-	private static final String downloadFilepath = String.format("%s\\Downloads",
-			osName.equals("windows")
-					? getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei")
-					: getPropertyEnv("HOME", "/home/serguei"));
-	private static String tmpDir = (getOSName().equals("windows")) ? "c:\\temp"
-			: "/tmp";
+			: Paths.get(System.getProperty("user.home")).resolve("Downloads")
+					.resolve("chromedriver").toAbsolutePath().toString();
+	private static final String downloadFilepath = osName.equals("windows")
+			? String.format("%s\\Downloads",
+					getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"))
+			: String.format("%s/Downloads", getPropertyEnv("HOME", "/home/serguei"));
+	private final String version = "3.150.2";
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -62,10 +58,12 @@ public class MinimalTest {
 		System.setProperty("webdriver.chrome.driver", chomeDriverPath);
 
 		ChromeOptions options = new ChromeOptions();
-		options.setBinary(osName.equals("windows") ? (new File(
-				"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
-						.getAbsolutePath()
-				: "/usr/bin/google-chrome");
+		options.setBinary(osName.equals("windows")
+				? (new File(
+						"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
+								.getAbsolutePath()
+				// TODO: determine on the fly
+				: "/usr/bin/chromium-browser" /* "/usr/bin/google-chrome" */ );
 		for (String optionAgrument : (new String[] { "headless",
 				"--window-size=1200x800", "disable-gpu" })) {
 			options.addArguments(optionAgrument);
@@ -125,7 +123,11 @@ public class MinimalTest {
 	@Test
 	public void testDownload() throws Exception {
 		driver.get("http://www.seleniumhq.org/download/");
+		System.err.println("Downloading:" + driver
+				.findElement(By.linkText("32 bit Windows IE")).getAttribute("href"));
+
 		driver.findElement(By.linkText("32 bit Windows IE")).click();
+
 		int downloadInterval = 1000;
 		try {
 			Thread.sleep(downloadInterval);
@@ -135,10 +137,10 @@ public class MinimalTest {
 
 		boolean fileExists = false;
 		for (String filename : (new String[] {
-				"IEDriverServer_Win32_3.13.0.zip.crdownload",
-				"IEDriverServer_Win32_3.13.0.zip" })) {
+				String.format("IEDriverServer_Win32_%s.zip.crdownload", version),
+				String.format("IEDriverServer_Win32_%s.zip", version) })) {
 			String filePath = downloadFilepath + File.separator + filename;
-			System.err.println("Probing " + filePath);
+			System.err.println("Probing: " + filePath);
 			if ((new File(filePath)).exists()) {
 				fileExists = true;
 				System.err.println("Found " + filePath);
