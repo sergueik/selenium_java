@@ -76,6 +76,7 @@ public class Main extends Application {
 					try {
 						PlatformImpl.setTaskbarApplication(false);
 					} catch (Exception exception) {
+						System.err.println("Exception (ignored): " + exception.toString());
 						// ignore
 						// mainStage.initStyle(StageStyle.UTILITY);
 						// mainStage.setMaxHeight(0);
@@ -94,6 +95,7 @@ public class Main extends Application {
 					} catch (Exception exception) {
 						// IllegalAccessError?
 						// ignore
+						System.err.println("Exception (ignored): " + exception.toString());
 					}
 				});
 				System.err.println("Hide mainstage");
