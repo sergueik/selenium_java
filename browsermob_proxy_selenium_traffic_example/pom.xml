@@ -16,7 +16,7 @@
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <java.version>1.8</java.version>
     <json.version>20170516</json.version>
-    <jsoup.version>1.9.2</jsoup.version>
+    <jsoup.version>1.14.2</jsoup.version>
     <junit.version>4.13.1</junit.version>
     <log4j.version>1.2.17</log4j.version>
     <log4j-core.version>2.13.2</log4j-core.version>
