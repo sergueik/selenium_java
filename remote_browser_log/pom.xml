@@ -44,7 +44,7 @@ s-2.10.0-20190601.024115-4.pom
     <jackson-databind.version>2.9.10.7</jackson-databind.version>
     <jsoup.version>1.14.2</jsoup.version>
     <junit.version>4.13.2</junit.version>
-    <log4j.version>2.13.2</log4j.version>
+    <log4j.version>2.15.0</log4j.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
