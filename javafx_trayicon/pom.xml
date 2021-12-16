@@ -13,6 +13,7 @@
     <openjfx.version>11.0.1</openjfx.version>
     <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
+    <javafx.plugin.version>0.0.6</javafx.plugin.version>
   </properties>
   <dependencies>
     <dependency>
@@ -35,7 +36,6 @@
       <artifactId>javafx-controls</artifactId>
       <version>${openjfx.version}</version>
     </dependency>
-
   </dependencies>
   <distributionManagement>
     <snapshotRepository>
@@ -75,27 +75,34 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>${javafx.plugin.version}</version>
+        <configuration>
+          <mainClass>example.applications.notaskbaricon.Main</mainClass>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
   <profiles>
     <profile>
       <id>jdk11</id>
       <activation>
-	 <activeByDefault>false</activeByDefault>
-     </activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
       <properties>
         <java.version>11</java.version>
       </properties>
     </profile>
-    
     <profile>
       <id>jdk1.8</id>
       <activation>
-	 <activeByDefault>true</activeByDefault>
-     </activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <properties>
         <java.version>1.8</java.version>
       </properties>
     </profile>
-</profiles>
+  </profiles>
 </project>

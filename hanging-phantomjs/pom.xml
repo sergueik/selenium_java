@@ -26,7 +26,7 @@
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
     <java.version>1.8</java.version>
     <phantomjsdriver.version>1.3.0</phantomjsdriver.version>
-    <log4j.version>2.5</log4j.version>
+    <log4j.version>2.16.0</log4j.version>
   </properties>
   <dependencies>
     <dependency>
