@@ -20,7 +20,7 @@
     <selenium-java.version>3.11.0</selenium-java.version>
     <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
     <htmlunit-driver.version>2.29.3</htmlunit-driver.version>
-    <guava.version>24.1-jre</guava.version>
+    <guava.version>29.0-jre</guava.version>
     <mockito-core.version>2.17.1</mockito-core.version>
     <maven-release-plugin.version>2.5.1</maven-release-plugin.version>
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
