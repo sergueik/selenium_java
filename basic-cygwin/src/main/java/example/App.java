@@ -1,36 +1,29 @@
 package example;
+/**
+ * Copyright 2021-2022 Serguei Kouzmine
+ */
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
+import org.apache.commons.cli.MissingArgumentException;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class App {
 
 	protected static String osName = getOSName();
-	public static final int INVALID_OPTION = 42;
-	private Map<String, String> flags = new HashMap<>();
+	private static String cygwinHome = System.getenv().containsKey("CYGWIN_HOME")
+			? System.getenv("CYGWIN_HOME") : "c:\\cygwin";
 	private static boolean useQuoteArg = false;
 	private static boolean useBash = false;
-	private static boolean useInline = false;
-
 	private static boolean debug = false;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
@@ -41,16 +34,30 @@ public class App {
 		options.addOption("d", "debug", false, "Debug");
 		options.addOption("q", "quote", false,
 				"Enclose entry names in double quotes");
-		options.addOption("i", "inline", false, "Pass arguments inline");
 		options.addOption("b", "bash", false, "Use bash to run command ");
 		options.addOption("c", "command", true, "Command to run");
 		options.addOption("a", "arguments", true, "Command Arguments");
-		commandLine = commandLineparser.parse(options, args);
+		try {
+			commandLine = commandLineparser.parse(options, args);
+		} catch (MissingArgumentException e) {
+			System.err.println("Aborting after exception " + e.toString());
+			return;
+		}
 		if (commandLine.hasOption("h")) {
 			help();
 		}
 		if (commandLine.hasOption("d")) {
 			debug = true;
+			System.err.println(
+					"command: " + commandLine.getParsedOptionValue("command") + "\n"
+							+ "arguments: " + commandLine.getParsedOptionValue("arguments"));
+			System.err.println(String.format("args: %s", commandLine.getArgList()));
+			System.err.println("All optons: ");
+			Arrays.asList(commandLine.getOptions()).stream().map(o -> o.getValue())
+					.forEach(System.err::println);
+
+			// System.err.println("optons: " +
+			// Arrays.print(commandLine.getOptions()));
 		}
 		if (commandLine.hasOption("quote")) {
 			useQuoteArg = true;
@@ -59,7 +66,6 @@ public class App {
 			useBash = true;
 		}
 		if (commandLine.hasOption("inline")) {
-			useInline = true;
 		}
 		String arguments = commandLine.getOptionValue("arguments");
 		if (arguments == null) {
@@ -84,6 +90,7 @@ public class App {
 			String[] argumentsArray = arguments.split(",");
 			runProcessls(Arrays.asList(argumentsArray));
 		} else {
+			// generic command
 			runProcess(String.format("%s %s", command, arguments));
 		}
 		if (debug) {
@@ -92,16 +99,13 @@ public class App {
 
 	}
 
-	// NOTE: there may be a challenge with escqping quotes on Windows host
-	// c:\Python381\python.exe -c "print('test')"
-
 	private static String buildLsBashcommand(List<String> dirs) {
 		final String quoteArg = (useQuoteArg) ? "-Q" : "";
 		if (dirs.isEmpty()) {
 			return null;
 		}
 		String command = osName.toLowerCase().startsWith("windows")
-				? String.format("c:\\cygwin\\bin\\bash.exe -c \"%s\" %s",
+				? String.format("%s\\bin\\bash.exe -c \"%s\" %s", cygwinHome,
 						String.format("/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9", quoteArg),
 						String.join(" ", dirs))
 				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
@@ -114,7 +118,7 @@ public class App {
 			return null;
 		}
 		String command = osName.toLowerCase().startsWith("windows")
-				? String.format("c:\\cygwin\\bin\\ls.exe %s %s", quoteArg,
+				? String.format("%s\\bin\\ls.exe %s %s", cygwinHome, quoteArg,
 						String.join(" ", dirs))
 				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
 		return command;

@@ -174,7 +174,7 @@ java -cp target\example.cygwin.jar;target\lib\* example.App --command "c:\Python
 ```
 
 ```text
-Exception in thread "main" org.apache.commons.cli.MissingArgumentException: Missing argument for option: a
+Aborting after exception org.apache.commons.cli.MissingArgumentException: Missing argument for option: a
 ```
 ```cmd
 "c:\Python381\python.exe" -c "print( 123)"
@@ -184,7 +184,7 @@ Exception in thread "main" org.apache.commons.cli.MissingArgumentException: Miss
 123
 ```
 
-See Also ()[https://qna.habr.com/q/1098350]
+See Also (incorrect exaple disussion)[https://qna.habr.com/q/1098350]
 ### Notes
 
 One can override the default path to cygwin via
