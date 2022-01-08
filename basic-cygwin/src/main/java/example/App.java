@@ -24,22 +24,23 @@ import java.util.stream.Collectors;
 
 public class App {
 
-protected static String osName = getOSName();
-public static final int INVALID_OPTION = 42;
-private Map<String, String> flags = new HashMap<>();
-private static boolean useQuoteArg = false;
-private static boolean useBash = false;
-private static boolean useInline = false;
+	protected static String osName = getOSName();
+	public static final int INVALID_OPTION = 42;
+	private Map<String, String> flags = new HashMap<>();
+	private static boolean useQuoteArg = false;
+	private static boolean useBash = false;
+	private static boolean useInline = false;
 
-private static boolean debug = false;
-private final static Options options = new Options();
-private static CommandLineParser commandLineparser = new DefaultParser();
-private static CommandLine commandLine = null;
+	private static boolean debug = false;
+	private final static Options options = new Options();
+	private static CommandLineParser commandLineparser = new DefaultParser();
+	private static CommandLine commandLine = null;
 
-public static void main(String args[]) throws ParseException {
+	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "Help");
 		options.addOption("d", "debug", false, "Debug");
-		options.addOption("q", "quote", false, "Enclose entry names in double quotes");
+		options.addOption("q", "quote", false,
+				"Enclose entry names in double quotes");
 		options.addOption("i", "inline", false, "Pass arguments inline");
 		options.addOption("b", "bash", false, "Use bash to run command ");
 		options.addOption("c", "command", true, "Command to run");
@@ -82,6 +83,8 @@ public static void main(String args[]) throws ParseException {
 			}
 			String[] argumentsArray = arguments.split(",");
 			runProcessls(Arrays.asList(argumentsArray));
+		} else {
+			runProcess(String.format("%s %s", command, arguments));
 		}
 		if (debug) {
 			System.err.println("Done: " + command + " " + arguments);
@@ -89,14 +92,18 @@ public static void main(String args[]) throws ParseException {
 
 	}
 
+	// NOTE: there may be a challenge with escqping quotes on Windows host
+	// c:\Python381\python.exe -c "print('test')"
+
 	private static String buildLsBashcommand(List<String> dirs) {
 		final String quoteArg = (useQuoteArg) ? "-Q" : "";
 		if (dirs.isEmpty()) {
 			return null;
 		}
 		String command = osName.toLowerCase().startsWith("windows")
-				? String.format("c:\\cygwin\\bin\\bash.exe -c  \"%s\" %s",
-						String.format("/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9", quoteArg), String.join(" ", dirs))
+				? String.format("c:\\cygwin\\bin\\bash.exe -c \"%s\" %s",
+						String.format("/bin/ls %s $0 $1 $2 $3 $4 $5 $6 $7 $8 $9", quoteArg),
+						String.join(" ", dirs))
 				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
 		return command;
 	}
@@ -107,23 +114,30 @@ public static void main(String args[]) throws ParseException {
 			return null;
 		}
 		String command = osName.toLowerCase().startsWith("windows")
-				? String.format("c:\\cygwin\\bin\\ls.exe %s %s", quoteArg, String.join(" ", dirs))
+				? String.format("c:\\cygwin\\bin\\ls.exe %s %s", quoteArg,
+						String.join(" ", dirs))
 				: String.format("ls %s %s", quoteArg, String.join(" ", dirs));
 		return command;
 	}
 
-	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
 	public static void runProcessls(List<String> dirs) {
-		final String command = useBash ?  buildLsBashcommand(dirs): buildLscommand(dirs);
-		System.err.println("Running the command: " + command);
+		final String command = useBash ? buildLsBashcommand(dirs)
+				: buildLscommand(dirs);
+		runProcess(command);
+	}
+
+	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
+	public static void runProcess(String command) {
 		try {
 			Runtime runtime = Runtime.getRuntime();
 			Process process = runtime.exec(command);
 			// process.redirectErrorStream( true);
 
-			BufferedReader stdoutBufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			BufferedReader stdoutBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getInputStream()));
 
-			BufferedReader stderrBufferedReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+			BufferedReader stderrBufferedReader = new BufferedReader(
+					new InputStreamReader(process.getErrorStream()));
 			String line = null;
 
 			StringBuffer processOutput = new StringBuffer();
@@ -137,22 +151,23 @@ public static void main(String args[]) throws ParseException {
 				processOutput.append("\n");
 			}
 			int exitCode = process.waitFor();
-			// ignore exit code 128 on Windows: the process "<browser driver>" not found.
+			// ignore exit code 128 on Windows: the process "<browser driver>" not
+			// found.
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				System.err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
-					System.err.println(
-							"<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
-									+ "</OUTPUT>");
+					System.err.println("<OUTPUT>" + ((useQuoteArg)
+							? fixQuotedOutput(processOutput.toString()) : processOutput)
+							+ "</OUTPUT>");
 				}
 				if (processError.length() > 0) {
 					System.err.println("<ERROR>" + processError + "</ERROR>");
 				}
 			} else {
 				if (processOutput.length() > 0) {
-					System.err.println(
-							"<OUTPUT>" + ((useQuoteArg) ? fixQuotedOutput(processOutput.toString()) : processOutput)
-									+ "</OUTPUT>");
+					System.err.println("<OUTPUT>" + ((useQuoteArg)
+							? fixQuotedOutput(processOutput.toString()) : processOutput)
+							+ "</OUTPUT>");
 				}
 			}
 		} catch (Exception e) {
@@ -174,7 +189,8 @@ public static void main(String args[]) throws ParseException {
 		String value = data;
 
 		Pattern p = Pattern.compile("\"([^\"]+)\"");
-		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n").replaceAll("\"\"", "\"\r\n\""));
+		Matcher m = p.matcher(data.replaceAll("\0", "\r\n").replaceAll("\n", "\r\n")
+				.replaceAll("\"\"", "\"\r\n\""));
 		if (m.find()) {
 			value = m.replaceAll("$1");
 		}

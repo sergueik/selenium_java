@@ -3,6 +3,7 @@
 Invoking cygwin commands on Windows host from Java `Runtime.getRuntime().exec(command)`.
 
 ### Usage
+#### Legacy Argument Procesing
 * build
 ```cmd
 mvn package
@@ -14,7 +15,7 @@ java -cp target\example.cygwin.jar;target\lib\* example.App /var/log
 this outputs
 ```cmd
 Listing the dirs: [/var/log]
-Running the command: c:\cygwin\bin\bash.exe -c  "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9" /var/log
+Running the command: c:\cygwin\bin\bash.exe -c "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9" /var/log
 ```
 ```cmd
 <OUTPUT>lastlog
@@ -36,14 +37,14 @@ setup.log.full
 sshd.log
 ```
 
-* run bad example, to trigger error:
+* try non existent dir, to trigger error:
 ```cmd
 java -cp target\example.cygwin.jar;target\lib\* example.App /baddir
 ```
 
 ```cmd
 Listing the dirs: [/baddir]
-Running the command: c:\cygwin\bin\bash.exe -c  "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6
+Running the command: c:\cygwin\bin\bash.exe -c "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6
  $7 $8 $9" /baddir
 ```
 ```cmd
@@ -64,7 +65,7 @@ README.md
 src
 target</OUTPUT>
 ```
-### New Version
+#### New Argument Processing
 
 * in version __0.2.0-SNAPSHOT__ introduced arguments parser. The invocation becomes:
 ```sh
@@ -73,7 +74,7 @@ java -cp target/example.cygwin.jar:target/lib/* example.App -command ls -argumen
 this outputs
 ```sh
 Listing the dirs: [/home/sergueik/src/selenium_java/basic-cygwin]
-Running the command: ls  /home/sergueik/src/selenium_java/basic-cygwin
+Running the command: ls /home/sergueik/src/selenium_java/basic-cygwin
 <OUTPUT>pom.xml
 README.md
 repo
@@ -122,7 +123,7 @@ java -cp target\example.cygwin.jar;target\lib\* example.App -a /var/l*g -c ls -b
 ```
 this results in
 ```cmd
-Running the command: c:\cygwin\bin\bash.exe -c  "/bin/ls  $0 $1 $2 $3 $4 $5 $6 $
+Running the command: c:\cygwin\bin\bash.exe -c "/bin/ls $0 $1 $2 $3 $4 $5 $6 $
 7 $8 $9" /var/l*g
 <OUTPUT>lastlog
 setup.log
@@ -143,14 +144,54 @@ java -cp target\example.cygwin.jar;target\lib\* example.App -a /var/l*g -c ls
 ```
  the arguments are passed to `ls.exe`:
 ```cmd
-Running the command: c:\cygwin\bin\ls.exe  /var/l*g
+Running the command: c:\cygwin\bin\ls.exe /var/l*g
 <OUTPUT>lastlog
 setup.log
 setup.log.full
 sshd.log
 </OUTPUT>
 ```
+### Run General Command, Python Script From Java
 
+```python
+print(123)
+```
+pass the path to the script as `arguments` argument:
+```cmd
+java -cp target\example.cygwin.jar;target\lib\* example.App -c c:\Python381\python.exe -a "%CD%\test.py" -d
+```
+```text
+<OUTPUT>123
+</OUTPUT>
+```
+```text
+Done: c:\Python381\python.exe c:\developer\sergueik\selenium_java\basic-cygwin\test.py
+```
+
+NOTE: trouble passing inline commands
+```cmd
+java -cp target\example.cygwin.jar;target\lib\* example.App --command "c:\Python381\python.exe" --arguments "-c ""print 123"""
+```
+
+```text
+Exception in thread "main" org.apache.commons.cli.MissingArgumentException: Missing argument for option: a
+```
+```cmd
+"c:\Python381\python.exe" -c "print( 123)"
+```
+
+```text
+123
+```
+
+See Also ()[https://qna.habr.com/q/1098350]
+### Notes
+
+One can override the default path to cygwin via
+```cmd
+set CYGWIN_HOME=c:\cygwin
+```
+ 
 ### See Also
   * https://stackoverflow.com/questions/6751944/how-to-execute-unix-commands-through-windows-cygwin-using-java
 
