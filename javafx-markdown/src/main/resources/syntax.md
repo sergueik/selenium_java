@@ -27,8 +27,14 @@ asdf | asdfsdf | asdf
 
 ## Pictures
 ```
+![Image](local_image.jpg)
+```
+![Image](local_image.jpg)
+
+```
 ![Image](https://www.jpro.one/app/default/resourcesencoded/jar:file:/home/ubuntu/jpro/jpro.one-jpro/libs/jpro.one.jar!/one/jpro/img/landing/Java-Logo.png)
 ```
+
 ![Image](https://www.jpro.one/app/default/resourcesencoded/jar:file:/home/ubuntu/jpro/jpro.one-jpro/libs/jpro.one.jar!/one/jpro/img/landing/Java-Logo.png)
 
 ## Headline:
