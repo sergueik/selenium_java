@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>cygwin</artifactId>
   <packaging>jar</packaging>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <name>cygwin</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -27,7 +27,7 @@
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <hamcrest-date.version>2.0.4</hamcrest-date.version>
     <junit.version>4.13.2</junit.version>
-    <log4j.version>2.16.0</log4j.version>
+    <log4j.version>2.17.1</log4j.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
 
     <java.version>1.8</java.version>

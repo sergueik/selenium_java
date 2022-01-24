@@ -25,6 +25,11 @@ or just
 ```sh
 java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --s
 ```
+alternatively
+```sh
+export CLASSPATH=target/example.rrd-cachedb.jar:target/lib/\*
+java example.App --path data --save
+```
 validate explcitly via
 ```sh
 sqlite3 $HOME/cache.db "select count(*) from cache;"
