@@ -1,6 +1,6 @@
 package example;
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2022 Serguei Kouzmine
  */
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -137,6 +138,23 @@ public class ChromeDownloadsTest {
 				.findElement(By.xpath("//a[contains(@href, \"wikipedia.pdf\")]"));
 		element.click();
 		sleep(1000);
+	}
+
+	// Explore Shadow DOM to get the download status (questionalbe)
+	// see also:
+	// https://automated-testing.info/t/problema-vzaimodejstviya-s-shadowdom-v-headless-rezhime/26307
+	// https://stackoverflow.com/questions/57780426/selenium-headless-chrome-how-to-query-status-of-downloads
+	// The chrome://downloads is simply not available in headless mode
+	@Test
+	public void test2() {
+		Assume.assumeTrue(browser.equals("chrome"));
+		Assume.assumeFalse(isCIBuild);
+		Assume.assumeFalse(headless);
+		driver.navigate().to(url);
+		String result = (String) ((JavascriptExecutor) driver).executeScript(
+				"return document.querySelector('downloads-manager').shadowRoot.getElementById('downloadsList').items[0].state");
+		System.err.println("result: " + result);
+		assertThat(result, is("COMPLETE"));
 	}
 
 	// Explore Shadow DOM
