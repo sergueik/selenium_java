@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2022 Serguei Kouzmine
  */
 
 import java.io.BufferedReader;
@@ -105,7 +105,7 @@ public class Launcher {
 		final int timeout = 10;
 		// dummy
 
-		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii; ";
+		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii;";
 		String command = String.format(commandTemplate, buildCommand(javaCommand),
 				pidfilePath);
 		List<String> commandArguments = new ArrayList<>(

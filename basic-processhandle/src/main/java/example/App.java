@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2022 Serguei Kouzmine
  */
 
 import java.io.BufferedReader;
@@ -93,6 +93,7 @@ public class App {
 				String command = String.format(
 						"java.exe -cp target\\example.processhandle.jar;target\\lib\\* %s example.Dialog",
 						options);
+				command = propertiesMap.get("demo_command");
 				launcher.buildCommand(command);
 				launcher.setJavaCommand(command);
 				launcher.launchPowershell1();
