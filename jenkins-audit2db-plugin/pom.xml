@@ -33,7 +33,7 @@
 	    <!-- Versions of project dependencies -->
 	    <version.cglib>2.2</version.cglib>
 	    <version.commons-io>2.5</version.commons-io>
-		<version.hibernate>3.5.6-Final</version.hibernate>
+		<version.hibernate>5.4.24.Final</version.hibernate>
 		<version.hibernate-annotations>3.2.0.Final</version.hibernate-annotations>
 		<version.hibernate-jpa>1.0.0.Final</version.hibernate-jpa>
 		<version.c3p0>0.9.1.2</version.c3p0>
