@@ -1,5 +1,7 @@
 ### Info
-a fragment of the testsuite of [jna](https://github.com/java-native-access/jna/tree/master/test/com/sun/jna) project focusing on collecting the ``
+this directory contains
+a fragment of the `PDHTest.java` [test class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/PdhTest.java) from
+[jna](https://github.com/java-native-access/jna) project focusing on collecting the `System\Processor Queue Length` performance metric
 
 The code was modeled after the native app implementation found in [host-sflow](https://github.com/sflow/host-sflow):
 ```c
@@ -69,7 +71,7 @@ the test copied from existing JNA PDH tests:
 ```
 ### Usage
 
-The easiest way to see a non zero value of the Processor Queue is to run the test in the underpowered VM.
+The easiest way to see a non-zero value of the Processor Queue is to run the test in the underpowered VM.
 
 ```sh
 mvn test
