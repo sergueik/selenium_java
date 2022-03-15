@@ -49,7 +49,7 @@ public class HtmlResultTest extends TestBase {
         new File(root, "img").mkdir();
         Runner runner = new Runner();
         WebDriverManager wdm = WebDriverManager.newInstance();
-        wdm.setWebDriverFactory(WebDriverManager.PHANTOMJS);
+        wdm.setWebDriverFactory(WebDriverManager.HTMLUNIT);
         WebDriver driver = null;
         try {
             driver = wdm.get();
@@ -77,6 +77,7 @@ public class HtmlResultTest extends TestBase {
         s2.addSelenese(c2);
         s1.addSelenese(c1);
         s1.addSelenese(s2);
+        s1.addSelenese(c2);
         runner.execute(s1);
         runner.finish();
     }

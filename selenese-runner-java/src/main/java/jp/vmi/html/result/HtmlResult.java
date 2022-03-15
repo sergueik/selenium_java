@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,10 +48,15 @@ public class HtmlResult {
         public String eval(AnnotationToken token, TemplateContext context) {
             String[] args = token.getArguments().split("\\s+");
             TestCase testCase = (TestCase) context.model.get(args[1]);
-            CommandResultList cresultList = testCase.getResultList();
-            ICommand command = (ICommand) context.model.get(args[2]);
-            List<CommandResult> results = cresultList.getResults(command);
-            context.model.put(args[0], results);
+            if (testCase != null) {
+                CommandResultList cresultList = testCase.getResultList();
+                ICommand command = (ICommand) context.model.get(args[2]);
+                List<CommandResult> results = cresultList.getResults(command);
+                context.model.put(args[0], results);
+            } else {
+                log.debug("\"testCase\" is unexpectedly null. It may be a JMTE bug.");
+                context.model.put(args[0], Collections.emptyList());
+            }
             return null;
         }
     }
@@ -98,7 +104,7 @@ public class HtmlResult {
 
     private Engine getEngine() {
         if (engine == null) {
-            engine = Engine.createCompilingEngine();
+            engine = Engine.createEngine();
             engine.registerNamedRenderer(new HtmlEscapeRenderer());
             engine.registerNamedRenderer(new LogRenderer(this));
             engine.registerNamedRenderer(new IndexRenderer());
@@ -109,6 +115,8 @@ public class HtmlResult {
             engine.registerRenderer(Result.class, new ResultRenderer());
             engine.registerRenderer(Node.class, new NodeRenderer(engine, getTemplate("index-node.html")));
             engine.registerAnnotationProcessor(new AnnoCommandResults());
+            // for debugging jmte template.
+            engine.registerAnnotationProcessor(new JmteDebug());
         }
         return engine;
     }
@@ -193,6 +201,7 @@ public class HtmlResult {
         model.put("sysInfo", SystemInformation.getInstance());
         model.put("testSuite", testSuite);
         model.put("seleneseList", seleneseList);
+        model.put("testCaseList", testSuite.getTestCaseList());
         model.put("numTestTotal", summary.numTestTotal);
         model.put("numTestPasses", summary.numTestPasses);
         model.put("numTestFailures", summary.numTestFailures);

@@ -323,7 +323,10 @@ public interface Context extends WrapsDriver, SubCommandMapProvider {
      * Get interactive.
      *
      * @return interactive.
+     *
+     * @deprecated use {@link InteractiveModeHandler#isEnabled()} with {@link #getInteractiveModeHandler()} instead.
      */
+    @Deprecated
     boolean isInteractive();
 
     /**
@@ -419,5 +422,29 @@ public interface Context extends WrapsDriver, SubCommandMapProvider {
      * @param maxRetries the maximum number of retries allowed for a given test.
      */
     default void setMaxRetries(int maxRetries) {
+    }
+
+    /**
+     * Setup MaxTimeActiveTimer.
+     * @param maxTime the maxTime in milliseconds.
+     */
+    default void setupMaxTimeTimer(long maxTime) {
+    }
+
+    /**
+     * Return whether to replace alert methods.
+     * @return <code>true</code> to replace alert method, <code>false</code> otherwise.
+     */
+    default boolean isReplaceAlertMethod() {
+        return true;
+    }
+
+    /**
+     * Get interactive mode handler.
+     *
+     * @return interactive mode handler.
+     */
+    default InteractiveModeHandler getInteractiveModeHandler() {
+        return InteractiveModeHandler.ALWAYS_NON_INTERACTIVE;
     }
 }

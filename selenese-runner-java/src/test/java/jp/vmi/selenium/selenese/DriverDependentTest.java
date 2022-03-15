@@ -18,10 +18,11 @@ import jp.vmi.selenium.selenese.result.Result;
 import jp.vmi.selenium.selenese.result.Success;
 import jp.vmi.selenium.selenese.result.Warning;
 import jp.vmi.selenium.testutils.DriverDependentTestCaseTestBase;
+import jp.vmi.selenium.testutils.TestUtils;
 
 import static jp.vmi.selenium.webdriver.WebDriverManager.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
 import static org.junit.Assume.*;
 
 /**
@@ -272,6 +273,8 @@ public class DriverDependentTest extends DriverDependentTestCaseTestBase {
     @Test
     public void issue99() {
         assumeNot(HTMLUNIT);
+        if (TestUtils.isHeadlessMode)
+            assumeNot(CHROME);
         execute("issue99");
         assertThat(result, is(instanceOf(Success.class)));
     }
@@ -417,7 +420,14 @@ public class DriverDependentTest extends DriverDependentTestCaseTestBase {
     public void test282() {
         execute("testcase_issue282");
         assertThat(result, is(instanceOf(Failure.class)));
-        assertThat(result.getMessage(), containsString("Cannot locate element with text: 40"));
+        assertThat(result.getMessage(), containsString("Cannot locate option with text: 40"));
+    }
+
+    @Test
+    public void test330() {
+        execute("testcase_issue330.side");
+        assertThat(result, is(instanceOf(Failure.class)));
+        assertThat(result.getMessage(), containsString("Element id=status_ng not found"));
     }
 
     @Test
@@ -428,14 +438,14 @@ public class DriverDependentTest extends DriverDependentTestCaseTestBase {
 
     @Test
     public void testContextMenu() {
-        assumeNot(HTMLUNIT, PHANTOMJS);
+        assumeNot(HTMLUNIT);
         execute("contextMenu");
         assertThat(result, is(instanceOf(Success.class)));
     }
 
     @Test
     public void testNativeAlert() {
-        assumeNot(PHANTOMJS, FIREFOX);
+        assumeNot(FIREFOX);
         execute("testcase_native_alert");
         assertThat(result, is(instanceOf(Success.class)));
     }
@@ -478,7 +488,6 @@ public class DriverDependentTest extends DriverDependentTestCaseTestBase {
 
     @Test
     public void testSideSetWindowSize() {
-        assumeNot(PHANTOMJS);
         execute("testcase_setwindowsize.side");
         assertThat(result, is(instanceOf(Success.class)));
     }
@@ -487,6 +496,30 @@ public class DriverDependentTest extends DriverDependentTestCaseTestBase {
     public void testIE() {
         assumeThat(currentFactoryName, is(IE));
         execute("testcase_ie");
+        assertThat(result, is(instanceOf(Success.class)));
+    }
+
+    @Test
+    public void testNoReplaceAlertMethod() {
+        runner.setReplaceAlertMethod(false);
+
+        execute("testcase_no_replace_alert_method");
+        assertThat(result, is(instanceOf(Success.class)));
+
+        runner.setReplaceAlertMethod(true);
+    }
+
+    @Test
+    public void issue324() {
+        assumeNot(HTMLUNIT, IE);
+        execute("testcase_issue324.side");
+        assertThat(result, is(instanceOf(Success.class)));
+    }
+
+    @Test
+    public void alerts() {
+        assumeNot(HTMLUNIT);
+        execute("testcase_alerts.side");
         assertThat(result, is(instanceOf(Success.class)));
     }
 }

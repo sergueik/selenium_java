@@ -138,6 +138,7 @@ public class CommandFactory implements ICommandFactory {
         addConstructor(SetWindowSize.class);
         addConstructor(Run.class);
         addConstructor(StoreJson.class);
+        addConstructor(Debugger.class);
 
         // commands for comment
         addConstructor(Comment.class);
@@ -265,7 +266,11 @@ public class CommandFactory implements ICommandFactory {
             boolean isInverse = matcher.group(NOT1) != null || matcher.group(NOT2) != null;
             return new Assertion(index, name, args, assertion, getterSubCommand, isBoolean, isInverse);
         } else { // matcher.group(STORE) != null
-            return new Store(index, name, args, getterSubCommand);
+            if ("storeTitle".equals(realName)) {
+                return new StoreTitle(index, name, args, getterSubCommand);
+            } else {
+                return new Store(index, name, args, getterSubCommand);
+            }
         }
     }
 

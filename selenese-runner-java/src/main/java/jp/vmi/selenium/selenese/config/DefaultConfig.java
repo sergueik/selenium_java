@@ -92,8 +92,7 @@ public class DefaultConfig implements IConfig {
 
     // ### BEGIN FIELDS GENERATED FROM config.groovy (*** DO NOT EDIT DIRECTLY ***)
 
-    @Option(name = "--" + DRIVER, aliases = "-d", metaVar = "<driver>",
-        usage = "firefox (default) | chrome | ie | edge | safari | htmlunit | phantomjs | remote | appium | FQCN-of-WebDriverFactory")
+    @Option(name = "--" + DRIVER, aliases = "-d", metaVar = "<driver>", usage = "firefox (default) | chrome | ie | edge | safari | htmlunit | remote | appium | FQCN-of-WebDriverFactory")
     private String driver;
 
     @Option(name = "--" + HEADLESS, usage = "use headless mode if driver is supported (currently, Chrome and Firefox)")
@@ -180,9 +179,6 @@ public class DefaultConfig implements IConfig {
     @Option(name = "--" + EDGEDRIVER, metaVar = "<path>", usage = "path to Edge 'WebDriver' binary. (implies '--driver edge')")
     private String edgedriver;
 
-    @Option(name = "--" + PHANTOMJS, metaVar = "<path>", usage = "path to 'phantomjs' binary. (implies '--driver phantomjs')")
-    private String phantomjs;
-
     @Option(name = "--" + XML_RESULT, metaVar = "<dir>", usage = "output XML JUnit results to specified directory.")
     private String xmlResult;
 
@@ -235,6 +231,9 @@ public class DefaultConfig implements IConfig {
 
     @Option(name = "--" + MAX_TIME, metaVar = "<max-time>", usage = "Maximum time in seconds that you allow the entire operation to take.")
     private String maxTime;
+
+    @Option(name = "--" + NO_REPLACE_ALERT_METHOD, usage = "disable replacement of alert methods")
+    private Boolean noReplaceAlertMethod;
 
     @Option(name = "--" + HELP, aliases = "-h", usage = "show this message.")
     private Boolean help;
@@ -527,15 +526,6 @@ public class DefaultConfig implements IConfig {
     }
 
     @Override
-    public String getPhantomjs() {
-        return phantomjs != null ? phantomjs : (parentOptions != null ? parentOptions.getPhantomjs() : null);
-    }
-
-    public void setPhantomjs(String phantomjs) {
-        this.phantomjs = phantomjs;
-    }
-
-    @Override
     public String getXmlResult() {
         return xmlResult != null ? xmlResult : (parentOptions != null ? parentOptions.getXmlResult() : null);
     }
@@ -686,6 +676,15 @@ public class DefaultConfig implements IConfig {
 
     public void setMaxTime(String maxTime) {
         this.maxTime = maxTime;
+    }
+
+    @Override
+    public boolean isNoReplaceAlertMethod() {
+        return noReplaceAlertMethod != null ? noReplaceAlertMethod : (parentOptions != null ? parentOptions.isNoReplaceAlertMethod() : false);
+    }
+
+    public void setNoReplaceAlertMethod(boolean noReplaceAlertMethod) {
+        this.noReplaceAlertMethod = noReplaceAlertMethod;
     }
 
     @Override

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
@@ -14,7 +15,6 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -31,8 +31,8 @@ import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.assertthat.selenium_shutterbug.core.Capture;
 import com.assertthat.selenium_shutterbug.core.Shutterbug;
-import com.assertthat.selenium_shutterbug.utils.web.ScrollStrategy;
 import com.google.common.base.Strings;
 
 import jp.vmi.html.result.HtmlResult;
@@ -72,7 +72,7 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
 
     private static final DateTimeFormatter FILE_DATE_TIME = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmssSSS");
 
-    private static PrintStream DEFAULT_PRINT_STREAM = new PrintStream(new NullOutputStream());
+    private static PrintStream DEFAULT_PRINT_STREAM = new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM);
 
     private PrintStream ps;
     private WebDriver driver = null;
@@ -84,7 +84,8 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
     private String screenshotOnFailDir = null;
     private boolean isIgnoredScreenshotCommand = false;
     private boolean isHighlight = false;
-    private boolean isInteractive = false;
+    private boolean isReplaceAlertMethod = true;
+    private InteractiveModeHandler interactiveModeHandler = new SimpleInteractiveModeHandler();
     private Boolean isW3cAction = null;
     private int timeout = 30 * 1000; /* ms */
     private int retries = 0;
@@ -225,13 +226,6 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
         if (tss == null)
             throw new UnsupportedOperationException("webdriver does not support capturing screenshot.");
         file = file.getAbsoluteFile();
-        try {
-            // cf. http://prospire-developers.blogspot.jp/2013/12/selenium-webdriver-tips.html (Japanese)
-            driver.switchTo().defaultContent();
-        } catch (Exception e) {
-            // some times switching to default context throws exceptions like:
-            // Method threw 'org.openqa.selenium.UnhandledAlertException' exception.
-        }
         File tmp;
         try {
             File dir = file.getParentFile();
@@ -247,7 +241,7 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
 
                 Map<?, ?> initialCoord = (Map<?, ?>) je.executeScript(getScrollCoord);
 
-                Shutterbug.shootPage((WebDriver) tss, ScrollStrategy.WHOLE_PAGE, screenshotScrollTimeout)
+                Shutterbug.shootPage((WebDriver) tss, Capture.FULL_SCROLL, screenshotScrollTimeout)
                     .withName(FilenameUtils.removeExtension(tmp.getName()))
                     .save(dir.getPath());
 
@@ -498,7 +492,7 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
 
     @Override
     public boolean isInteractive() {
-        return isInteractive;
+        return interactiveModeHandler.isEnabled();
     }
 
     @Override
@@ -563,14 +557,17 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
      * Set interactive.
      *
      * @param isInteractive true if Runner executes test step-by-step upon user key stroke.
+     *
+     * @deprecated use {@link InteractiveModeHandler#setEnabled(boolean)} with {@link #getInteractiveModeHandler()} instead.
      */
+    @Deprecated
     public void setInteractive(boolean isInteractive) {
-        this.isInteractive = isInteractive;
-        log.info("Interactive mode: {}", isInteractive ? "enabled" : "disabled");
+        interactiveModeHandler.setEnabled(isInteractive);
+        log.info("Interactive mode: {}", interactiveModeHandler.isEnabled() ? "enabled" : "disabled");
     }
 
     private void setDriverTimeout() {
-        driver.manage().timeouts().pageLoadTimeout(timeout, TimeUnit.MILLISECONDS);
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofMillis(timeout));
     }
 
     @Override
@@ -943,11 +940,35 @@ public class Runner implements Context, ScreenshotHandler, HighlightHandler, JUn
         }
     }
 
-    /**
-     * Setup MaxTimeActiveTimer.
-     * @param maxTime the maxTime in milliseconds.
-     */
-    void setupMaxTimeTimer(long maxTime) {
+    @Override
+    public void setupMaxTimeTimer(long maxTime) {
         this.maxTimeTimer = new MaxTimeActiveTimer(maxTime);
+    }
+
+    @Override
+    public boolean isReplaceAlertMethod() {
+        return this.isReplaceAlertMethod;
+    }
+
+    /**
+     * Set whether to repalce alert methods.
+     * @param replaceAlertMethod replace alert methods or not.
+     */
+    public void setReplaceAlertMethod(boolean replaceAlertMethod) {
+        this.isReplaceAlertMethod = replaceAlertMethod;
+    }
+
+    @Override
+    public InteractiveModeHandler getInteractiveModeHandler() {
+        return interactiveModeHandler;
+    }
+
+    /**
+     * Set interactive mode handler.
+     *
+     * @param interactiveModeHandler interactive mode handler.
+     */
+    public void setInteractiveMode(InteractiveModeHandler interactiveModeHandler) {
+        this.interactiveModeHandler = interactiveModeHandler;
     }
 }

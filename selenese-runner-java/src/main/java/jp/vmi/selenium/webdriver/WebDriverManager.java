@@ -60,12 +60,6 @@ public class WebDriverManager implements WebDriverPreparator {
      */
     public static final String APPIUM = AppiumWebDriverFactory.BROWSER_NAME;
 
-    /**
-     * PhantomJS
-     */
-    @SuppressWarnings("deprecation")
-    public static final String PHANTOMJS = PhantomJSDriverFactory.BROWSER_NAME;
-
     private static class Builder {
 
         private final WebDriverFactory factory;
@@ -169,7 +163,6 @@ public class WebDriverManager implements WebDriverPreparator {
      *
      * @return WebDriverFactory instance.
      */
-    @SuppressWarnings("deprecation")
     public WebDriverFactory lookupWebDriverFactory(String factoryName) {
         if (LangUtils.isBlank(factoryName))
             factoryName = FIREFOX;
@@ -190,8 +183,6 @@ public class WebDriverManager implements WebDriverPreparator {
             return new RemoteWebDriverFactory();
         case APPIUM:
             return new AppiumWebDriverFactory();
-        case PHANTOMJS:
-            return new PhantomJSDriverFactory();
         default:
             try {
                 return (WebDriverFactory) Class.forName(factoryName).newInstance();
@@ -266,7 +257,7 @@ public class WebDriverManager implements WebDriverPreparator {
             builder = new Builder(factory, driverOptions);
         } else {
             if (isDriverReusable()) {
-                log.info("Existing driver found.");
+                log.info("Existing driver found: {}", getDriverName(driver));
                 return driver;
             } else {
                 log.info("Restart driver.");

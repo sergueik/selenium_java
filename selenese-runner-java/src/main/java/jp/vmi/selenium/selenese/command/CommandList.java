@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jp.vmi.selenium.selenese.Context;
+import jp.vmi.selenium.selenese.InteractiveModeHandler;
 import jp.vmi.selenium.selenese.SeleneseCommandErrorException;
 import jp.vmi.selenium.selenese.inject.DoCommand;
 import jp.vmi.selenium.selenese.result.CommandResult;
@@ -24,7 +24,6 @@ public class CommandList implements Iterable<ICommand> {
 
     private final Map<Object, Integer> indexCache = new HashMap<>();
     private final List<ICommand> commandList = new ArrayList<>();
-    private static final Scanner systemInReader = new Scanner(System.in);
 
     /**
      * Returns {@code true} if this list contains no elements.
@@ -104,10 +103,6 @@ public class CommandList implements Iterable<ICommand> {
     @DoCommand
     protected Result doCommand(Context context, ICommand command, String... curArgs) {
         try {
-            if (context.isInteractive()) {
-                System.out.println(">>> Press ENTER to continue <<<");
-                systemInReader.nextLine();
-            }
             return command.execute(context, curArgs);
         } catch (SeleneseCommandErrorException e) {
             return e.getError();
@@ -142,20 +137,22 @@ public class CommandList implements Iterable<ICommand> {
         CommandListIterator commandListIterator = iterator(parentIterator);
         context.pushCommandListIterator(commandListIterator);
         CommandSequence sequence = commandListIterator.getCommandSequence();
+        InteractiveModeHandler interactiveModeHandler = context.getInteractiveModeHandler();
         boolean isContinued = true;
         try {
             while (isContinued && commandListIterator.hasNext()) {
-                ICommand command = commandListIterator.next();
-                sequence.increment(command);
-                List<Screenshot> ss = command.getScreenshots();
+                CurrentCommand curCmd = new CurrentCommand(context, commandListIterator.next());
+                sequence.increment(curCmd.command);
+                List<Screenshot> ss = curCmd.command.getScreenshots();
                 int prevSSIndex = (ss == null) ? 0 : ss.size();
-                String[] curArgs = command.getVariableResolvedArguments(context.getCurrentTestCase().getSourceType(), context.getVarsMap());
-                evalCurArgs(context, curArgs);
+                evalCurArgs(context, curCmd.curArgs);
                 Result result = null;
                 context.resetRetries();
                 while (true) {
-                    result = doCommand(context, command, curArgs);
-                    if (result.isSuccess() || context.hasReachedMaxRetries())
+                    interactiveModeHandler.enableIfBreakpointReached(curCmd);
+                    curCmd = interactiveModeHandler.handle(context, commandListIterator, curCmd);
+                    result = doCommand(context, curCmd.command, curCmd.curArgs);
+                    if (result.isSuccess() || curCmd.command.isComposite() || context.hasReachedMaxRetries())
                         break;
                     context.incrementRetries();
                     context.waitSpeed();
@@ -164,13 +161,13 @@ public class CommandList implements Iterable<ICommand> {
                     isContinued = false;
                 else
                     context.waitSpeed();
-                ss = command.getScreenshots();
+                ss = curCmd.command.getScreenshots();
                 List<Screenshot> newSS;
                 if (ss == null || prevSSIndex == ss.size())
                     newSS = null;
                 else
                     newSS = new ArrayList<>(ss.subList(prevSSIndex, ss.size()));
-                CommandResult cresult = new CommandResult(sequence.toString(), command, newSS, result, cresultList.getEndTime(), System.currentTimeMillis());
+                CommandResult cresult = new CommandResult(sequence.toString(), curCmd.command, newSS, result, cresultList.getEndTime(), System.currentTimeMillis());
                 cresultList.add(cresult);
 
             }
