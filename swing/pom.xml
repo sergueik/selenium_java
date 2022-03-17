@@ -8,16 +8,13 @@
   <name>${project.artifactId}</name>
   <description></description>
   <url></url>
-  <prerequisites>
-    <maven>3.5</maven>
-  </prerequisites>
   <properties>
     <main.class>example.SampleGui</main.class>
     <source.version>1.8</source.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <log4j.version>1.2.17</log4j.version>
     <log4j-core.version>2.17.1</log4j-core.version>
+    <slf4j.version>1.7.5</slf4j.version>
   </properties>
   <dependencies>
     <dependency>
@@ -31,9 +28,9 @@
       <version>${log4j-core.version}</version>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
   </dependencies>
   <build>
@@ -60,10 +57,4 @@
       </plugin>
     </plugins>
   </build>
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>http://www.opensource.org/licenses/mit-license.php</url>
-    </license>
-  </licenses>
 </project>
