@@ -7,24 +7,14 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-// bases on: 
+// based on: 
 // https://riptutorial.com/javafx/example/7291/updating-the-ui-using-platform-runlater
 @SuppressWarnings("restriction")
 public class BackgroundProcessCountdownAppEx extends Application {
 
-	private static int count = 0;
+	private static int count = 10;;
+	private static int delay = 1000;
 	private final Text text = new Text(Integer.toString(count));
-
-	private void decrementCount() {
-		count--;
-		if (count > 0) {
-			text.setText(Integer.toString(count));
-		} else {
-			Platform.exit();
-			System.exit(0);
-		}
-
-	}
 
 	@Override
 	public void start(Stage primaryStage) {
@@ -33,30 +23,34 @@ public class BackgroundProcessCountdownAppEx extends Application {
 
 		Scene scene = new Scene(root, 200, 200);
 
-		// longrunning operation runs on different thread
+		// thread to run time consuming operation on
 		Thread thread = new Thread(new Runnable() {
 
 			@Override
 			public void run() {
-				Runnable updater = new Runnable() {
-
-					@Override
-					public void run() {
-						decrementCount();
-					}
-				};
 
 				while (true) {
 					try {
-						Thread.sleep(1000);
+						Thread.sleep(delay);
 					} catch (InterruptedException ex) {
 					}
 
 					// UI update is run on the Application thread
-					Platform.runLater(updater);
+					Platform.runLater(new Runnable() {
+
+						@Override
+						public void run() {
+							count--;
+							if (count > 0) {
+								text.setText(Integer.toString(count));
+							} else {
+								Platform.exit();
+								System.exit(0);
+							}
+						}
+					});
 				}
 			}
-
 		});
 		// don't let thread prevent JVM shutdown
 		thread.setDaemon(true);
@@ -67,10 +61,11 @@ public class BackgroundProcessCountdownAppEx extends Application {
 	}
 
 	public static void main(String[] args) {
-		try {
-			count = Integer.parseInt(args[0]);
-		} catch (Exception e) {
-			count = 5;
+		if (args.length > 0) {
+			try {
+				count = Integer.parseInt(args[0]);
+			} catch (Exception e) {
+			}
 		}
 		launch(args);
 	}
