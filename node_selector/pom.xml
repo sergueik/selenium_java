@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>node_selector</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <description>Role URL laucher</description>
@@ -30,19 +30,15 @@
     <jna-platform.version>4.5.1</jna-platform.version>
     <json.version>20170516</json.version>
     <junit.version>4.13.1</junit.version>
-    <log4j.version>1.2.17</log4j.version>
+    <log4j-core.version>2.17.1</log4j-core.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <slf4j.version>1.7.30</slf4j.version>
     <snakeyaml.version>1.26</snakeyaml.version>
     <build_os>win64</build_os>
   </properties>
   <dependencies>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
-    </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
@@ -94,6 +90,31 @@
       <artifactId>json</artifactId>
       <version>${json.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-web</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+ <dependency>
+    <groupId>org.apache.logging.log4j</groupId>
+    <artifactId>log4j-1.2-api</artifactId>
+      <version>${log4j-core.version}</version>
+ </dependency>	    
   </dependencies>
   <build>
     <plugins>
@@ -212,7 +233,7 @@
       </activation>
       <properties>
         <build_os>unix32</build_os>
-        <selenium.version>2.53.1</selenium.version>
+        <selenium.version>2.17.13.1</selenium.version>
         <eclipse.swt.artifactId>org.eclipse.swt.gtk.linux.x86</eclipse.swt.artifactId>
       </properties>
     </profile>
