@@ -23,7 +23,7 @@
 om/fasterxml/jackson/core/jackson-annotations/2.10.0-SNAPSHOT/jackson-annotatio
 s-2.10.0-20190601.024115-4.pom
     which will lead to quickly polluting the maven local repository cache ~/.m2/repository/com/fasterxml/jackson with snapshot versions. -->
-    <jackson-databind.version>2.9.10.8</jackson-databind.version>
+    <jackson-databind.version>2.13.2.1</jackson-databind.version>
     <jsoup.version>1.14.2</jsoup.version>
     <junit.version>4.13.1</junit.version>
     <log4j.version>2.17.1</log4j.version>
