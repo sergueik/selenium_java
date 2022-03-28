@@ -1,7 +1,6 @@
 ### Info
 
-This project shows custom with
-custom property
+This project shows filtering JSON in a customized fashion e.g. before loading the test results into Elastic Search with custom property
 ```java
 public class ArtistSerializer implements JsonSerializer<Artist> {
 	private List<String> reportFields = new ArrayList<>();
@@ -68,14 +67,11 @@ was called then
 }
 ```
 will be printed
-(the `id` and `guid` fields are chosen to be shown regardless of the state of  `reportFields`
+(the `id` and `guid` fields are shown by default and do not need to ne added to the `reportFields`
 ### TODO
 
 The names  of getter methods may be funky.
-One may [Determine method name through reflection](https://github.com/Blastman/DtoTester/blob/master/src/test/java/com/objectpartners/DtoTest.java
-), and once caching is implement, improve the class above
-(repeated discovery could be expensive)
-
+One may [Determine method name through reflection](https://github.com/Blastman/DtoTester/blob/master/src/test/java/com/objectpartners/DtoTest.java), and once caching is implement, improve the class above (repeated discovery could be expensive)
 ### See Also
 
 
