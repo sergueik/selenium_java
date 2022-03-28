@@ -10,7 +10,10 @@ import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
@@ -22,7 +25,7 @@ import static org.apache.commons.io.FileUtils.copyInputStreamToFile;
 
 public class FileDownloader {
 
-    private static final Logger LOG = Logger.getLogger(FileDownloader.class);
+    private static final Logger LOG = LogManager.getLogger(FileDownloader.class);
     private int fileDownloadReadTimeout;
     private int fileDownloadConnectTimeout;
     private boolean useSystemProxy = true;

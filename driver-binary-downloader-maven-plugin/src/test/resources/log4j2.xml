@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<Configuration status="WARN" strict="true">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+	  <PatternLayout pattern="%-5p %c{1} - %m%n"/>
+    </Console>
+  </Appenders>
+  <Loggers>
+     <!-- All plugin INFO log messages will go to console -->
+    <Logger name="com.lazerycode.selenium" additivity="false" level="info">
+      <AppenderRef ref="Console"/>
+    </Logger>
+  
+    <Root level="fatal">
+      <AppenderRef ref="Console"/>
+    </Root>
+  </Loggers>
+</Configuration>

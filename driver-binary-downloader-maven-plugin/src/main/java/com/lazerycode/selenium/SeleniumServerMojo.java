@@ -2,8 +2,11 @@ package com.lazerycode.selenium;
 
 import com.lazerycode.selenium.download.DownloadHandler;
 import com.lazerycode.selenium.repository.*;
+
 import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -192,7 +195,7 @@ public class SeleniumServerMojo extends AbstractMojo {
     private ResourceManager locator;
 
     protected InputStream xmlRepositoryMap = null;
-    private static final Logger LOG = Logger.getLogger(SeleniumServerMojo.class);
+    private static final Logger LOG = LogManager.getLogger(SeleniumServerMojo.class);
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {

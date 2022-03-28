@@ -10,7 +10,10 @@ import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.input.CloseShieldInputStream;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.maven.plugin.MojoFailureException;
 
 import java.io.File;
@@ -25,7 +28,7 @@ import static com.lazerycode.selenium.extract.DownloadableFileType.TAR;
 
 public class FileExtractor {
 
-    private static final Logger LOG = Logger.getLogger(FileExtractor.class);
+    private static final Logger LOG = LogManager.getLogger(FileExtractor.class);
     private final boolean overwriteFilesThatExist;
 
     /**

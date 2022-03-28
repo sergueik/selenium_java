@@ -2,7 +2,10 @@ package com.lazerycode.selenium.download;
 
 import com.lazerycode.selenium.hash.HashType;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.maven.plugin.MojoExecutionException;
 
 import java.io.File;
@@ -11,7 +14,7 @@ import java.io.IOException;
 
 public class FileHashChecker {
 
-    private static final Logger LOG = Logger.getLogger(FileHashChecker.class);
+    private static final Logger LOG = LogManager.getLogger(FileHashChecker.class);
 
     private File fileToCheck;
     private HashType hashType;

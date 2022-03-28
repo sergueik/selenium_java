@@ -4,7 +4,9 @@ import com.lazerycode.selenium.exceptions.InvalidFileTypeException;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +18,7 @@ import static com.lazerycode.selenium.extract.DownloadableFileType.GZ;
 
 class CompressedFile {
 
-    private static final Logger LOG = Logger.getLogger(FileExtractor.class);
+    private static final Logger LOG = LogManager.getLogger(FileExtractor.class);
     private File compressedFile;
     private String decompressedFilename;
     private DownloadableFileType filetype = null;
