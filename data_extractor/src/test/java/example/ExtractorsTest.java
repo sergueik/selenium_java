@@ -15,11 +15,18 @@ import org.junit.Test;
 import example.Utils;
 import im.nll.data.extractor.Extractors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+
 import static im.nll.data.extractor.Extractors.*;
+
+import example.Utils;
 
 public class ExtractorsTest {
 	private String jsonString;
 	private Extractors extractors = null;
+	private static final Logger logger = LogManager.getLogger(ExtractorsTest.class);
 
 	@Before
 	public void before() {
@@ -30,26 +37,23 @@ public class ExtractorsTest {
 	// loosely typed de-serialization with some com.jayway.jsonpath paths
 	@Test
 	public void basicTest1ByJson() throws Exception {
-		String store = extractors.extract("store", Extractors.json("$[\"store\"]"))
-				.asJSONString();
+		String store = extractors.extract("store", Extractors.json("$[\"store\"]")).asJSONString();
 		assertThat(store, notNullValue());
-		System.err.println("Store: " + store);
+		logger.log(Level.INFO, "Store: " + store);
 	}
 
 	@Test
 	public void basicTest2ByJson() throws Exception {
-		Map<String, String> store = extractors
-				.extract("store", Extractors.json("$[\"store\"]")).asMap();
-		System.err.println("Store:" + store);
+		Map<String, String> store = extractors.extract("store", Extractors.json("$[\"store\"]")).asMap();
+		logger.log(Level.INFO, "Store:" + store);
 		assertThat(store, hasKey("store"));
-		System.err.println("Store: " + store.get("store"));
+		logger.log(Level.INFO, "Store: " + store.get("store"));
 	}
 
 	// strongly typed de-serialization with some jq paths
 	@Test
 	public void testToBeanListByJson() throws Exception {
-		List<Book> books = extractors.split(json("$..book.*"))
-				.extract("category", json("$..category"))
+		List<Book> books = extractors.split(json("$..book.*")).extract("category", json("$..category"))
 				.extract("author", json("$..author")).extract("title", json("$..title"))
 				.extract("price", json("$..price")).asBeanList(Book.class);
 		isValidBooks(books);
@@ -57,10 +61,9 @@ public class ExtractorsTest {
 
 	@Test
 	public void testToBeanListByJsonString() throws Exception {
-		List<Book> books = extractors.split("json:$..book.*")
-				.extract("category", "json:$..category")
-				.extract("author", "json:$..author").extract("title", "json:$..title")
-				.extract("price", "json:$..price").asBeanList(Book.class);
+		List<Book> books = extractors.split("json:$..book.*").extract("category", "json:$..category")
+				.extract("author", "json:$..author").extract("title", "json:$..title").extract("price", "json:$..price")
+				.asBeanList(Book.class);
 		isValidBooks(books);
 	}
 
