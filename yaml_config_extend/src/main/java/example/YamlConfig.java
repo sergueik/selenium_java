@@ -29,11 +29,6 @@ public class YamlConfig {
 	private YamlConfig() {
 	}
 
-	/**
-	 * Create configuration from Reader
-	 * @param reader the reader to read config from
-	 * @return YamlConfig instance
-	 */
 	public static YamlConfig load(Reader reader) {
 		YamlConfig instance = new YamlConfig();
 		Yaml yml = new Yaml();
@@ -42,11 +37,6 @@ public class YamlConfig {
 		return instance;
 	}
 
-	/**
-	 * Create configuration from input stream
-	 * @param in the Input stream to read from
-	 * @return YamlConfig instance
-	 */
 	public static YamlConfig load(InputStream in) {
 		YamlConfig instance = new YamlConfig();
 		Yaml yml = new Yaml();
@@ -54,14 +44,6 @@ public class YamlConfig {
 		return instance;
 	}
 
-	/**
-	 * Gets the String value for the specified key from the config.
-	 *
-	 * @param key Key in dotted notation like <code>first.second[2].third</code>
-	 * @return  The String value of property. <br ><code>null</code> if the key is not present
-	 *          or not a leaf node. <code>Boolean</code> or <code>Integer</code> or other format
-	 *          are converted to String.
-	 */
 	public String getString(String key) {
 		Object foundNode = getNode(key, content);
 		if (foundNode != null && !(foundNode instanceof Collection)) {
@@ -108,13 +90,11 @@ public class YamlConfig {
 		return null;
 	}
 
-	/**
-	 * Gets the Integer value for the specified key from the config.
-	 *
-	 * @param key Key in dotted notation like <code>first.second[2].third</code>
-	 * @return  The Integer value of property. <br ><code>null</code> if the key is not present
-	 *          or not a leaf node.
-	 */
+	public Boolean getBoolean(String key) {
+		Object foundNode = getNode(key, content);
+		return Boolean.parseBoolean(foundNode.toString());
+	}
+
 	public Integer getInt(String key) {
 		Object foundNode = getNode(key, content);
 		if (foundNode instanceof Integer) {

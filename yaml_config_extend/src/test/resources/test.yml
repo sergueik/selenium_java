@@ -23,7 +23,13 @@ services:
       last: Justinson
     - first: Andrew
       last: Armstrong
- 
+# NOTE: currently failing with boolean_setting_5 and boolean_setting_2
+boolean_setting_1: yes
+boolean_setting_2: 1
+boolean_setting_3: true
+boolean_setting_4: ''
+boolean_setting_5: ~
+
 shell_command1:  |
     Line 1
      Line 2
@@ -54,7 +60,7 @@ info: {name: John Doe, job: Java Developer, skill: interm}
 key1: data 
 key2: 'data'
 key3: "data"
-# trailing space
+# NOTE: trailing space
 key4: data    
  
 

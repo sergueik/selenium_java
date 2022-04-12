@@ -11,10 +11,9 @@ import org.junit.Test;
 
 @SuppressWarnings("deprecation")
 public class YamlConfigLoaderTest {
+
+	private YamlConfig config;
 	private final String yamlFile = "test.yml";
-	private final InputStream resource = getClass().getClassLoader()
-			.getResourceAsStream(yamlFile);
-	private final YamlConfig config = YamlConfig.load(resource);
 	private final String propertiesFilePath = String
 			.format("%s/src/test/resources", System.getProperty("user.dir"));
 	private final String invalidPropertiesFilePath = String
@@ -27,22 +26,21 @@ public class YamlConfigLoaderTest {
 
 	@Test
 	public void loadfromThread() {
-		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile, true);
-		assertThat(value, notNullValue());
+		config = YamlConfigLoader.getYamlConfig(yamlFile, true);
+		assertThat(config, notNullValue());
 	}
 
 	@Test
 	public void loadfromResourcePath() {
-		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile,
-				propertiesFilePath);
-		assertThat(value, notNullValue());
+		config = YamlConfigLoader.getYamlConfig(yamlFile, propertiesFilePath);
+		assertThat(config, notNullValue());
 	}
 
 	@Test
 	public void loadfromInvalidResourcePath() {
-		YamlConfig value = YamlConfigLoader.getYamlConfig(yamlFile,
+		config = YamlConfigLoader.getYamlConfig(yamlFile,
 				invalidPropertiesFilePath);
-		assertThat(value, nullValue());
+		assertThat(config, nullValue());
 	}
 
 }
