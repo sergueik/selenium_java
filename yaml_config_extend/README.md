@@ -27,7 +27,32 @@ names:
     last: Armstrong
 ```
 - or more complex structures
-as a whole into matching type subject Java application Properties
+as a whole into matching type subject Java application Properties:
+e.g. with 
+```YAML
+map_setting:
+  boolean_setting: true
+  integer_setting: 42
+  string_setting: somethings
+```
 
+one knows the keys of
+```java
+String key = "map_setting";
+Map<String, Object> map_value = config.getMap(key);
+map_value.keySet();
+```
+
+and then one can either do
+```java
+boolean boolean_value = Boolean.parseBoolean(map_value.get("boolean_setting").toString());
+```
+or
+
+```java
+boolean boolean_value = config.getBoolean("map_setting.boolean_setting");
+```
+
+and similarly with other sub keys
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

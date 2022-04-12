@@ -150,6 +150,28 @@ public class YamlConfigTest {
 	}
 
 	@Test
+	public void getMap2() {
+		String key = "map_setting";
+		Map<String, Object> value = config.getMap(key);
+		assertThat(value, notNullValue());
+		assertThat(value.keySet(), hasItems(new String[] { "boolean_setting",
+				"integer_setting", "string_setting" }));
+		for (String subkey : Arrays.asList("boolean_setting", "integer_setting",
+				"string_setting")) {
+			String compound_key = String.format("%s.%s", key, subkey);
+			assertThat("expect the classpath notation to work for " + compound_key,
+					config.getString(compound_key), notNullValue());
+
+		}
+		assertThat(Boolean.parseBoolean(value.get("boolean_setting").toString()),
+				equalTo(config.getBoolean("map_setting.boolean_setting")));
+		assertThat(Integer.valueOf(value.get("integer_setting").toString()),
+				equalTo(config.getInt("map_setting.integer_setting")));
+		assertThat((String) value.get("string_setting"),
+				equalTo(config.getString("map_setting.string_setting")));
+	}
+
+	@Test
 	public void getNullInMap() {
 		Map<String, Object> value = config.getMap("services.web");
 		assertThat(value, notNullValue());
