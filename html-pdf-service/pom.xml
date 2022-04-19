@@ -1,11 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
-
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-<!-- NOTE: compilation errors with SpringBot parent 1.5.4.RELEASE :
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <!-- NOTE: compilation errors with SpringBot parent 1.5.4.RELEASE :
 [ERROR] Failed to execute goal org.apache.maven.plugins:maven-compiler-plugin:3.1:compile (default-compile) on project html-pdf-service: Compilation failure: Compilation failure:
 [ERROR] /C:/developer/sergueik/selenium_java/html-pdf-service/src/main/java/org/farrukh/mirza/pdf/Application.java:[31,44] package org.springframework.boot.context.web does not exist
 [ERROR] /C:/developer/sergueik/selenium_java/html-pdf-service/src/main/java/org/farrukh/mirza/pdf/Application.java:[34,34] cannot find symbol
@@ -17,73 +15,65 @@
 [ERROR]   reason: actual and formal argument lists differ in length
 
 -->
-<!-- 		<version>1.5.4.RELEASE</version> -->
-<version>1.3.6.RELEASE</version>
-	</parent>
-
-
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.mirza.farrukh</groupId>
-	<artifactId>html-pdf-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>HTML to PDF Service</name>
-	<description>Convert HTML to PDF using Flying-Saucer-PDF library</description>
-
-	<packaging>war</packaging>
-
-	<scm>
-		<connection>scm:git:git://github.com/farrukhmpk/html-pdf-service.git</connection>
-		<developerConnection>scm:git:git@github.com:farrukhmpk/html-pdf-service.git</developerConnection>
-		<url>git://github.com/farrukhmpk/html-pdf-service.git</url>
-		<tag>HEAD</tag>
-	</scm>
-
-	<developers>
-		<developer>
-			<id>farrukhmpk</id>
-			<name>Farrukh Mirza</name>
-		</developer>
-	</developers>
-
-	<licenses>
-		<license>
-			<name>GNU Lesser General Public License (LGPL), version 3 or later</name>
-			<url>http://www.gnu.org/licenses/lgpl.html</url>
-		</license>
-	</licenses>
-
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<skipTests>${test.skip}</skipTests>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.spotify</groupId>
-				<artifactId>dockerfile-maven-plugin</artifactId>
-				<version>1.3.6</version>
-				<configuration>
-					<repository>${docker.image.prefix}/${project.build.finalName}</repository>
-					<buildArgs>
-						<JAR_FILE>target/${project.build.finalName}.war</JAR_FILE>
-					</buildArgs>
-				</configuration>
-			</plugin>
-
-			<!-- 
+    <!-- 		<version>1.5.4.RELEASE</version> -->
+    <version>1.3.6.RELEASE</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.mirza.farrukh</groupId>
+  <artifactId>html-pdf-service</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>HTML to PDF Service</name>
+  <description>Convert HTML to PDF using Flying-Saucer-PDF library</description>
+  <packaging>war</packaging>
+  <scm>
+    <connection>scm:git:git://github.com/farrukhmpk/html-pdf-service.git</connection>
+    <developerConnection>scm:git:git@github.com:farrukhmpk/html-pdf-service.git</developerConnection>
+    <url>git://github.com/farrukhmpk/html-pdf-service.git</url>
+    <tag>HEAD</tag>
+  </scm>
+  <developers>
+    <developer>
+      <id>farrukhmpk</id>
+      <name>Farrukh Mirza</name>
+    </developer>
+  </developers>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL), version 3 or later</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+    </license>
+  </licenses>
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>${test.skip}</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.spotify</groupId>
+        <artifactId>dockerfile-maven-plugin</artifactId>
+        <version>1.3.6</version>
+        <configuration>
+          <repository>${docker.image.prefix}/${project.build.finalName}</repository>
+          <buildArgs>
+            <JAR_FILE>target/${project.build.finalName}.war</JAR_FILE>
+          </buildArgs>
+        </configuration>
+      </plugin>
+      <!-- 
 				https://docs.microsoft.com/en-us/azure/app-service/containers/quickstart-java?view=azure-java-stable
 				https://docs.microsoft.com/en-us/java/azure/spring-framework/deploy-spring-boot-java-app-with-maven-plugin?view=azure-java-stable
 				https://docs.microsoft.com/en-us/java/api/overview/azure/maven/azure-webapp-maven-plugin/readme?view=azure-java-stable#supported-regions
@@ -93,189 +83,166 @@
 				az login
 				az account set &dash;&dash; subscription &lt;subscription Id&gt; 
 			-->
-
-			<plugin>
-				<groupId>com.microsoft.azure</groupId>
-				<artifactId>azure-webapp-maven-plugin</artifactId>
-				<version>1.1.0</version>
-				<configuration>
-					<resourceGroup>farrukh-html-pdf-test</resourceGroup>
-					<appName>${project.artifactId}-farrukh-test</appName>
-					<linuxRuntime>tomcat 9.0-jre8</linuxRuntime>
-					<!-- <deploymentType>ftp</deploymentType> -->
-					<deploymentType>war</deploymentType>
-					<region>northeurope</region>
-					<path>${project.artifactId}</path>
-					<resources>
-						<resource>
-							<directory>${project.basedir}/target</directory>
-							<targetPath>webapps</targetPath>
-							<includes>
-								<include>*.war</include>
-							</includes>
-							<excludes>
-								<exclude>*.xml</exclude>
-							</excludes>
-						</resource>
-					</resources>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
-
-	<dependencies>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<!-- Include some default rest resources for monitoring -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
-		</dependency>
-
-		<!-- Log4J -->
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<exclusions>
-				<exclusion>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-logging</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-<!--
+      <plugin>
+        <groupId>com.microsoft.azure</groupId>
+        <artifactId>azure-webapp-maven-plugin</artifactId>
+        <version>1.1.0</version>
+        <configuration>
+          <resourceGroup>farrukh-html-pdf-test</resourceGroup>
+          <appName>${project.artifactId}-farrukh-test</appName>
+          <linuxRuntime>tomcat 9.0-jre8</linuxRuntime>
+          <!-- <deploymentType>ftp</deploymentType> -->
+          <deploymentType>war</deploymentType>
+          <region>northeurope</region>
+          <path>${project.artifactId}</path>
+          <resources>
+            <resource>
+              <directory>${project.basedir}/target</directory>
+              <targetPath>webapps</targetPath>
+              <includes>
+                <include>*.war</include>
+              </includes>
+              <excludes>
+                <exclude>*.xml</exclude>
+              </excludes>
+            </resource>
+          </resources>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <!-- Include some default rest resources for monitoring -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-thymeleaf</artifactId>
+    </dependency>
+    <!-- Log4J -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!--
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-log4j</artifactId>
 		</dependency>
 -->
-		<!-- PDF dependencies -->
-
-		<dependency>
-			<groupId>org.xhtmlrenderer</groupId>
-			<artifactId>flying-saucer-pdf</artifactId>
-			<version>${flyingsaucer.version}</version>
-			<exclusions>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcprov-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>bouncycastle</groupId>
-					<artifactId>bcmail-jdk14</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.bouncycastle</groupId>
-					<artifactId>bctsp-jdk14</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-
-
-
-		<dependency>
-			<groupId>org.apache.pdfbox</groupId>
-			<artifactId>pdfbox</artifactId>
-			<version>${pdf.box.version}</version>
-		</dependency>
-
-
-		<!-- Utils -->
-		<dependency>
-			<groupId>org.apache.commons</groupId>
-			<artifactId>commons-lang3</artifactId>
-			<version>3.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-web-api</artifactId>
-			<version>7.0</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.4</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.jayway.jsonpath</groupId>
-			<artifactId>json-path</artifactId>
-			<version>2.2.0</version>
-		</dependency>
-
-		<!-- JUnit -->
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-	</dependencies>
-
-	<profiles>
-		<profile>
-			<id>standalone</id>
-			<properties>
-				<log.location>logs</log.location>
-			</properties>
-		</profile>
-		<profile>
-			<id>tomcat</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
-			<properties>
-				<log.location>${d}{catalina.home}/logs</log.location>
-			</properties>
-			<dependencies>
-				<!-- Removing embedded tomcat -->
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-		<profile>
-			<id>wildfly</id>
-			<properties>
-				<log.location>${d}{jboss.server.log.dir}</log.location>
-			</properties>
-			<dependencies>
-				<!-- Removing embedded tomcat -->
-				<dependency>
-					<groupId>org.springframework.boot</groupId>
-					<artifactId>spring-boot-starter-tomcat</artifactId>
-					<scope>provided</scope>
-				</dependency>
-			</dependencies>
-		</profile>
-	</profiles>
-
-	<properties>
-		<d>$</d>
-		<test.skip>true</test.skip>
-		<log.location>logs</log.location>
-		<docker.image.prefix>farrukhmpk</docker.image.prefix>
-
-		<flyingsaucer.version>9.0.9</flyingsaucer.version>
-		<pdf.box.version>2.0.2</pdf.box.version>
-
-		<application.debug>true</application.debug>
-		<java.version>1.8</java.version>
-	</properties>
-
-
+    <!-- PDF dependencies -->
+    <dependency>
+      <groupId>org.xhtmlrenderer</groupId>
+      <artifactId>flying-saucer-pdf</artifactId>
+      <version>${flyingsaucer.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcprov-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>bouncycastle</groupId>
+          <artifactId>bcmail-jdk14</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bctsp-jdk14</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.pdfbox</groupId>
+      <artifactId>pdfbox</artifactId>
+      <version>${pdf.box.version}</version>
+    </dependency>
+    <!-- Utils -->
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.4</version>
+    </dependency>
+    <dependency>
+      <groupId>javax</groupId>
+      <artifactId>javaee-web-api</artifactId>
+      <version>7.0</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.4</version>
+    </dependency>
+    <dependency>
+      <groupId>com.jayway.jsonpath</groupId>
+      <artifactId>json-path</artifactId>
+      <version>2.2.0</version>
+    </dependency>
+    <!-- JUnit -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+  <profiles>
+    <profile>
+      <id>standalone</id>
+      <properties>
+        <log.location>logs</log.location>
+      </properties>
+    </profile>
+    <profile>
+      <id>tomcat</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <log.location>${d}{catalina.home}/logs</log.location>
+      </properties>
+      <dependencies>
+        <!-- Removing embedded tomcat -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>wildfly</id>
+      <properties>
+        <log.location>${d}{jboss.server.log.dir}</log.location>
+      </properties>
+      <dependencies>
+        <!-- Removing embedded tomcat -->
+        <dependency>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+  <properties>
+    <d>$</d>
+    <test.skip>true</test.skip>
+    <log.location>logs</log.location>
+    <docker.image.prefix>farrukhmpk</docker.image.prefix>
+    <flyingsaucer.version>9.0.9</flyingsaucer.version>
+    <pdf.box.version>2.0.2</pdf.box.version>
+    <application.debug>true</application.debug>
+    <java.version>1.8</java.version>
+  </properties>
 </project>

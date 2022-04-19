@@ -24,7 +24,7 @@
  * Repeat view implementation on 27/09/2018
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.service;
+package example.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,13 +36,14 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
-import org.farrukh.mirza.pdf.spi.CustomHtmlTagsEnum;
-import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.jayway.jsonpath.JsonPath;
+
+import example.spi.CustomHtmlTagsEnum;
+import example.spi.TemplateDataTransformer;
 
 @Service
 public class TemplateDataTransformerImpl extends BaseImpl implements TemplateDataTransformer {

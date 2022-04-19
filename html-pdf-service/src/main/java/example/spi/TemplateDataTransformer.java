@@ -23,7 +23,7 @@
  * @date 8 Jul 2016
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.spi;
+package example.spi;
 
 import java.util.List;
 

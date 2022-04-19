@@ -23,18 +23,19 @@
  * 24/06/2016 
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.spi;
+package example.spi;
 
-public interface TestDataProvider {
+import java.io.OutputStream;
+import java.util.List;
 
-	public String getTestDataObject();
+public interface Converter {
 
-	public String getTestDataArray();
+	public void convertHtmlToPdf(List<String> htmls, OutputStream out);
 
-	public String getHtmlTemplateDoc();
+	public void convertHtmlToPdf(List<String> htmls, String css, OutputStream out);
 
-	public String getHtmlDoc();
+	
+	public void convertHtmlToPdf(String html, OutputStream out);
 
-	public String getCssDoc();
-
+	public void convertHtmlToPdf(String html, String css, OutputStream out);
 }

@@ -209,3 +209,6 @@ docker run -e "SPRING_PROFILES_ACTIVE=DEVELOPMENT" –p 8080:8080 -v /opt/html-p
 ### See Also
 
   * [itext documentation](https://devcolibri.com/%D0%BA%D0%BE%D0%BD%D0%B2%D0%B5%D1%80%D1%82%D0%B0%D1%86%D0%B8%D1%8F-html-%D0%B2-pdf-%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D1%83%D1%8F-java/) (in Russian)
+  * https://github.com/caireserison/spring-html-pdf-flying-saucer
+
+

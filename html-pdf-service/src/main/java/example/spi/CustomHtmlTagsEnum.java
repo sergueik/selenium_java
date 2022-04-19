@@ -18,7 +18,7 @@
  * }}}
  */
 
-package org.farrukh.mirza.pdf.spi;
+package example.spi;
 
 /**
  * @author Farrukh Mirza

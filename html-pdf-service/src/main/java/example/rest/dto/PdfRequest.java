@@ -23,7 +23,7 @@
  * 24/06/2016 
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.rest.dto;
+package example.rest.dto;
 
 import java.io.Serializable;
 

@@ -23,10 +23,11 @@
  * 24/06/2016 
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.service;
+package example.service;
 
-import org.farrukh.mirza.pdf.spi.TestDataProvider;
 import org.springframework.stereotype.Service;
+
+import example.spi.TestDataProvider;
 
 @Service
 public class TestDataProviderImpl implements TestDataProvider {

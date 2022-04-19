@@ -24,7 +24,7 @@
  * 24/06/2016 
  * Dublin, Ireland
  */
-package org.farrukh.mirza.pdf.service;
+package example.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -34,11 +34,12 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.pdfbox.multipdf.PDFMergerUtility;
-import org.farrukh.mirza.pdf.spi.Converter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.xhtmlrenderer.pdf.ITextRenderer;
+
+import example.spi.Converter;
 
 @Service
 public class ConverterImpl extends BaseImpl implements Converter {

@@ -1,4 +1,4 @@
-package org.farrukh.mirza.pdf.rest;
+package example.rest;
 
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
@@ -9,9 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.farrukh.mirza.pdf.rest.dto.PdfRequest;
-import org.farrukh.mirza.pdf.spi.Converter;
-import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +18,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import example.rest.dto.PdfRequest;
+import example.spi.Converter;
+import example.spi.TemplateDataTransformer;
 
 @RestController
 @RequestMapping("service/template/html")
