@@ -23,7 +23,13 @@ services:
       last: Justinson
     - first: Andrew
       last: Armstrong
- 
+
+boolean_setting_1: yes
+boolean_setting_2: 1
+boolean_setting_3: true
+boolean_setting_4: ''
+boolean_setting_5: ~
+
 shell_command1:  |
     Line 1
      Line 2
@@ -50,6 +56,10 @@ compact: ["a","b","c"]
 compact_array: ["a"]
 info: {name: John Doe, job: Java Developer, skill: interm} 
 
+map_setting:
+  boolean_setting: true
+  integer_setting: 42
+  string_setting: somethings
 
 key1: data 
 key2: 'data'

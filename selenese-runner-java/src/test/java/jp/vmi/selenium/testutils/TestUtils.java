@@ -17,6 +17,9 @@ import static jp.vmi.selenium.webdriver.WebDriverManager.*;
  */
 public final class TestUtils {
 
+    /** true if use headless mode. */
+    public static final boolean isHeadlessMode = Boolean.valueOf(System.getProperty("test.headless"));
+
     /**
      * Runnable with Throwable.
      */
@@ -78,7 +81,6 @@ public final class TestUtils {
                 HTMLUNIT,
                 FIREFOX,
                 CHROME,
-                PHANTOMJS,
                 IE,
                 // SAFARI, // FIXME: On Selenium 2.46.0, SafariDriver does not work.
             };
@@ -104,4 +106,5 @@ public final class TestUtils {
             return t;
         }
     }
+
 }

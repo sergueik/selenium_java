@@ -16,14 +16,17 @@ import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.Filter;
 import com.jayway.jsonpath.JsonPath;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Level;
+
 import example.Utils;
 
 public class JsonPathExpressionTest {
-	private DocumentContext jsonContext;
 
-	// https://qna.habr.com/q/777357
-	// https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html
-	// https://support.smartbear.com/alertsite/docs/dashboards/dashboard.html
+	private DocumentContext jsonContext;
+	private static final Logger logger = LogManager.getLogger(JsonPathExpressionTest.class);
+
 	@Before
 	public void before() {
 		jsonContext = JsonPath.parse(Utils.getScriptContent("goal_exclude.json"));
@@ -31,14 +34,12 @@ public class JsonPathExpressionTest {
 
 	@Test
 	public void test1() {
-		List<Map<String, Object>> data = jsonContext
-				.read("$.[?(@.acc != 'Not Found')]");
+		List<Map<String, Object>> data = jsonContext.read("$.[?(@.acc != 'Not Found')]");
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		List<Integer> ids = data.stream()
-				.map(o -> Integer.parseInt(o.get("id").toString()))
+		List<Integer> ids = data.stream().map(o -> Integer.parseInt(o.get("id").toString()))
 				.collect(Collectors.toList());
-		System.err.println("test1 results(ids): " + ids);
+		logger.info("test1 results(ids): " + ids);
 	}
 
 	@Test
@@ -46,7 +47,7 @@ public class JsonPathExpressionTest {
 		List<String> data = jsonContext.read("$.[?(@.acc != 'Not Found')].acc");
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		System.err.println("test2 results(acc): " + data);
+		logger.log(Level.INFO, "test2 results(acc): " + data);
 	}
 
 	@Test
@@ -54,7 +55,7 @@ public class JsonPathExpressionTest {
 		List<String> data = jsonContext.read("$.[?(@.id > 1)][?(@.pass)].acc");
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		System.err.println("test3 results(acc): " + data);
+		logger.info("test3 results(acc): " + data);
 	}
 
 	@Test
@@ -62,22 +63,20 @@ public class JsonPathExpressionTest {
 		List<String> data = jsonContext.read("$.[?(@.id < 3 && @.pass)].acc");
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		System.err.println("test4 results(acc): " + data);
+		logger.info("test4 results(acc): " + data);
 	}
 
 	// @Ignore
 	@Test
 	public void test5() {
-		Filter categoryFilter = Filter
-				.filter(Criteria.where("acc").eq("Not Found"));
+		Filter categoryFilter = Filter.filter(Criteria.where("acc").eq("Not Found"));
 		// java.lang.IllegalArgumentException: path can not be null or empty
 		List<Map<String, Object>> data = jsonContext.read("$.[?]", categoryFilter);
 		assertThat(data, notNullValue());
 		assertThat(data.size(), greaterThan(0));
-		System.err.println("test5 results(acc): ");
+		logger.info("test5 results(acc): ");
 		for (int cnt = 0; cnt != data.size(); cnt++) {
-			System.err.println(
-					String.format("Books[%d]: %s ", cnt, data.get(cnt).toString()));
+			logger.info(String.format("Books[%d]: %s ", cnt, data.get(cnt).toString()));
 		}
 	}
 

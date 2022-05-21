@@ -25,18 +25,19 @@
 
 package org.farrukh.mirza.pdf.test;
 
-import org.farrukh.mirza.pdf.service.ConverterImpl;
-import org.farrukh.mirza.pdf.service.TemplateDataTransformerImpl;
-import org.farrukh.mirza.pdf.service.TestDataProviderImpl;
-import org.farrukh.mirza.pdf.spi.Converter;
-import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
-import org.farrukh.mirza.pdf.spi.TestDataProvider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.web.SpringBootServletInitializer;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import example.service.ConverterImpl;
+import example.service.TemplateDataTransformerImpl;
+import example.service.TestDataProviderImpl;
+import example.spi.Converter;
+import example.spi.TemplateDataTransformer;
+import example.spi.TestDataProvider;
 
 @SpringBootApplication
 public class Application extends SpringBootServletInitializer {

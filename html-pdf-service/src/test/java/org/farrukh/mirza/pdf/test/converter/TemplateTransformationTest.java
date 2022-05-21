@@ -33,15 +33,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.farrukh.mirza.pdf.spi.Converter;
-import org.farrukh.mirza.pdf.spi.TemplateDataTransformer;
-import org.farrukh.mirza.pdf.spi.TestDataProvider;
 import org.farrukh.mirza.pdf.test.Application;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import example.spi.Converter;
+import example.spi.TemplateDataTransformer;
+import example.spi.TestDataProvider;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // @SpringApplicationConfiguration(classes=Application.class)

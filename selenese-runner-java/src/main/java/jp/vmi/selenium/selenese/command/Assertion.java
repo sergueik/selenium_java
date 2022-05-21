@@ -70,6 +70,11 @@ public class Assertion extends AbstractCommand {
         this.isInverse = isInverse;
     }
 
+    @Override
+    public boolean mayUpdateScreen() {
+        return false;
+    }
+
     private int getTimeout(Context context, String[] args) {
         if (type != Type.WAIT_FOR || args.length < 2)
             return context.getTimeout();
@@ -137,7 +142,11 @@ public class Assertion extends AbstractCommand {
         case VERIFY:
             return found ? new Warning(message) : new Failure(message);
         default: // == WAIT_FOR
-            return new Warning(String.format("Timed out after %dms (%s)", timeout, message));
+            String m = String.format("Timed out after %dms (%s)", timeout, message);
+            if (getSideCommand() != null)
+                return new Failure(m);
+            else
+                return new Warning(m);
         }
     }
 

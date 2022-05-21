@@ -1,6 +1,6 @@
-FROM openjdk:8-jdk-alpine
+FROM openjdk:8-jre-alpine3.9
+ARG app_jar="html-pdf-service.war"
+ADD "target/${app_jar}" app.war
 VOLUME /logs
 EXPOSE 8080
-ARG JAR_FILE
-ADD ${JAR_FILE} html-pdf-service.war
-ENTRYPOINT ["java","-jar","/html-pdf-service.war"]
+ENTRYPOINT ["java","-jar","app.war"]

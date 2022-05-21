@@ -1,14 +1,9 @@
 package example;
 
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2022 Serguei Kouzmine
  */
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -47,7 +42,7 @@ public class AppLinux {
 				if (resource == null) {
 					System.err.println("Missing required argument: pid");
 				} else {
-					Integer pid = Integer.parseInt(resource);
+					int pid = Integer.parseInt(resource);
 					logger.info("looking pid " + pid);
 					// Returns an Optional<ProcessHandle> for an existing native process.
 					// should be only called through future

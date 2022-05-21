@@ -14,7 +14,6 @@
     <mongo-java-driver.version>3.2.0</mongo-java-driver.version>    
     <embedmongo.version>1.18</embedmongo.version>    
     <junit.version>4.13.1</junit.version>
-    <log4j.version>2.5</log4j.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>

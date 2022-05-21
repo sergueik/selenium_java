@@ -4,7 +4,7 @@
   <!-- change it according your app configuration -->
   <groupId>com.github.sergueik.swet_javafx</groupId>
   <artifactId>swet_javafx_app</artifactId>
-  <version>0.5.0-SNAPSHOT</version>
+  <version>0.6.0-SNAPSHOT</version>
   <developers>
     <developer>
       <name>Serguei Kouzmine</name>
@@ -30,7 +30,8 @@
 
 
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
-    <log4j.version>1.2.17</log4j.version>
+    <log4j-core.version>2.17.1</log4j-core.version>
+    <slf4j.version>1.7.5</slf4j.version>
     <jna-platform.version>5.4.0</jna-platform.version>
     <richtextfx.version>0.9.1</richtextfx.version>
     <selenium.version>3.13.0</selenium.version>
@@ -112,9 +113,24 @@
       <version>${selenium.version}</version>
     </dependency>
     <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>

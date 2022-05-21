@@ -2,13 +2,15 @@ package com.mycompany.app
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
-import org.apache.log4j.LogManager
-import org.apache.log4j.Logger
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.BeforeClass
-import org.junit.Test
-import org.junit.runner.RunWith
+
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
+
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.By;
 import org.openqa.selenium.interactions.Actions;
 

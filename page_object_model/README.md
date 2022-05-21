@@ -1,7 +1,7 @@
 ### Info
 
 This directory contains a replica of [WebMailRuAutomatizationTests](https://github.com/aleks70694/WebMailRuAutomatizationTests)
-Selenium Page object mpdel project (quite greately bloated over plain Selenium) refactored in search of best practices.
+Selenium Page object model project (greately bloated compered plain Selenium) refactored in search of best practices.
 
 ### See Also:
 

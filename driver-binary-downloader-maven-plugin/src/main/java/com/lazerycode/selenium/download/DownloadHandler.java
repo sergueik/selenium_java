@@ -6,7 +6,9 @@ import com.lazerycode.selenium.repository.DriverContext;
 import com.lazerycode.selenium.repository.DriverDetails;
 import com.lazerycode.selenium.repository.DriverMap;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 
@@ -17,7 +19,7 @@ import java.net.URL;
 
 public class DownloadHandler {
 
-    private static final Logger LOG = Logger.getLogger(DownloadHandler.class);
+    private static final Logger LOG = LogManager.getLogger(DownloadHandler.class);
     private final DriverMap filesToDownload;
     private final File rootStandaloneServerDirectory;
     private final File downloadedZipFileDirectory;

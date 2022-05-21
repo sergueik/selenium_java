@@ -1,7 +1,7 @@
 driver {
     aliases = "-d"
     metaVar = "<driver>"
-    usage = "firefox (default) | chrome | ie | edge | safari | htmlunit | phantomjs | remote | appium | FQCN-of-WebDriverFactory"
+    usage = "firefox (default) | chrome | ie | edge | safari | htmlunit | remote | appium | FQCN-of-WebDriverFactory"
 }
 
 headless {
@@ -174,12 +174,6 @@ edgedriver {
     driverOption = true
 }
 
-phantomjs {
-    metaVar = "<path>"
-    usage = "path to 'phantomjs' binary. (implies '--driver phantomjs')"
-    driverOption = true
-}
-
 xml_result {
     metaVar = "<dir>"
     usage = "output XML JUnit results to specified directory."
@@ -273,6 +267,11 @@ strict_exit_code {
 max_time {
     metaVar = "<max-time>"
     usage = "Maximum time in seconds that you allow the entire operation to take."
+}
+
+no_replace_alert_method {
+    usage = "disable replacement of alert methods"
+    type = "Boolean"
 }
 
 help {

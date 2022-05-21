@@ -26,7 +26,6 @@
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <snakeyaml.version>1.24</snakeyaml.version>
   </properties>
   <dependencies>
     <dependency>
@@ -81,11 +80,6 @@
       <artifactId>junit</artifactId>
       <version>${junit.version}</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.yaml</groupId>
-      <artifactId>snakeyaml</artifactId>
-      <version>${snakeyaml.version}</version>
     </dependency>
   </dependencies>
   <build>

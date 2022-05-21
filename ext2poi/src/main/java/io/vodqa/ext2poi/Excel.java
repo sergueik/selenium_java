@@ -6,8 +6,10 @@ package io.vodqa.ext2poi;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
 
@@ -21,9 +23,10 @@ import java.util.regex.Pattern;
  * Class with static methods for manipulating data in MS Excel sheets.
  * Simply import static method from this class to use it and provide necessary parameters.
  */
-public class Excel {
-	private static Logger log = LogManager.getLogger(Excel.class.getName());
 
+public class Excel {
+	private static final Logger log = LoggerFactory
+			.getLogger(Excel.class.getName());
 	private static String formattedDateValue = "";
 	private static boolean bClosedWorkbook;
 	private static Sheet sheet = null;
@@ -2572,14 +2575,13 @@ public class Excel {
 
 			for (int l = 0; l < length; l++) {
 				chars.add(columnName.charAt(l));
-				log.debug(chars.get(l));
 				char character = chars.get(l);
-				log.debug("Char at: " + l + " is: " + character);
-
+				// log.debug("Char at: " + l + " is: " + character);
+				log.debug(String.format("Char at: %d is: %c", l, chars.get(l)));
 				for (char col = 'A'; col <= 'Z'; col++) {
 					if (col == character) {
 						log.debug("Success");
-						log.debug(i);
+						log.debug(String.format("%d", i));
 						innerIndex = i;
 						break;
 					} else {

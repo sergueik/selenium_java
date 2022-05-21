@@ -24,14 +24,14 @@
     <json.version>20170516</json.version>
     <jtwig-core.version>5.87.0.RELEASE</jtwig-core.version>
     <junit.version>4.13.1</junit.version>
-    <log4j-core.version>2.13.3</log4j-core.version>
+    <log4j.version>2.17.1</log4j.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
-    <snakeyaml.version>1.24</snakeyaml.version>
+    <snakeyaml.version>1.26</snakeyaml.version>
   </properties>
   <dependencies>
     <dependency>
@@ -62,12 +62,12 @@
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-core</artifactId>
-      <version>${log4j-core.version}</version>
+      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-api</artifactId>
-      <version>${log4j-core.version}</version>
+      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>

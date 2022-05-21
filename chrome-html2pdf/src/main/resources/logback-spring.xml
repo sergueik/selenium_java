@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <!-- 日志存放路径 -->
+  <springProfile name="dev">
+    <property name="log.path" value="logs"/>
+  </springProfile>
+  <springProfile name="!dev">
+    <property name="log.path" value="logs"/>
+  </springProfile>
+
+  <!-- 日志输出格式 -->
+  <property name="log.pattern" value="%d{HH:mm:ss.SSS} [%thread] %-5level %logger{20} - [%method,%line] - %msg%n"/>
+
+  <!-- 控制台输出 -->
+  <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+      <pattern>${log.pattern}</pattern>
+    </encoder>
+  </appender>
+
+  <!-- 非生产环境info日志输出,输出info级别及以上内容 -->
+  <springProfile name="!pro">
+    <appender name="file_info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${log.path}/downloader-info.log</file>
+      <!-- 循环政策：基于时间创建日志文件 -->
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- 日志文件名格式 -->
+        <fileNamePattern>${log.path}/downloader-info.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <!-- 日志最大的历史 60天 -->
+        <maxHistory>60</maxHistory>
+      </rollingPolicy>
+      <encoder>
+        <pattern>${log.pattern}</pattern>
+      </encoder>
+      <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+        <level>INFO</level>
+      </filter>
+    </appender>
+  </springProfile>
+
+  <!-- 生产环境warn日志输出，只输出warn级别日志 -->
+  <springProfile name="pro">
+    <appender name="file_warn" class="ch.qos.logback.core.rolling.RollingFileAppender">
+      <file>${log.path}/downloader-warn.log</file>
+      <!-- 循环政策：基于时间创建日志文件 -->
+      <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        <!-- 日志文件名格式 -->
+        <fileNamePattern>${log.path}/downloader-warn.%d{yyyy-MM-dd}.log</fileNamePattern>
+        <!-- 日志最大的历史 60天 -->
+        <maxHistory>60</maxHistory>
+      </rollingPolicy>
+      <encoder>
+        <pattern>${log.pattern}</pattern>
+      </encoder>
+      <filter class="ch.qos.logback.classic.filter.LevelFilter">
+        <!-- 过滤的级别 -->
+        <level>WARN</level>
+        <!-- 匹配时的操作：接收（记录） -->
+        <onMatch>ACCEPT</onMatch>
+        <!-- 不匹配时的操作：拒绝（不记录） -->
+        <onMismatch>DENY</onMismatch>
+      </filter>
+    </appender>
+  </springProfile>
+
+  <!-- 所有环境error日志输出，只输出error级别日志 -->
+  <appender name="file_error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <file>${log.path}/downloader-error.log</file>
+    <!-- 循环政策：基于时间创建日志文件 -->
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <!-- 日志文件名格式 -->
+      <fileNamePattern>${log.path}/downloader-error.%d{yyyy-MM-dd}.log</fileNamePattern>
+      <!-- 日志最大的历史 60天 -->
+      <maxHistory>60</maxHistory>
+    </rollingPolicy>
+    <encoder>
+      <pattern>${log.pattern}</pattern>
+    </encoder>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <!-- 过滤的级别 -->
+      <level>ERROR</level>
+      <!-- 匹配时的操作：接收（记录） -->
+      <onMatch>ACCEPT</onMatch>
+      <!-- 不匹配时的操作：拒绝（不记录） -->
+      <onMismatch>DENY</onMismatch>
+    </filter>
+  </appender>
+
+  <logger name="java.io.mina" level="ERROR"/>
+  <logger name="org" level="ERROR"/>
+  <logger name="net" level="ERROR"/>
+  <logger name="com.hyd.simplecache" level="ERROR"/>
+  <logger name="org.springframework" level="ERROR"/>
+  <logger name="com.hyd.dao" level="DEBUG"/>
+  <logger name="com.xz.sell" level="DEBUG"/>
+  <logger name="com.xz" level="DEBUG"/>
+
+  <!--系统操作日志-->
+  <root level="info">
+    <appender-ref ref="console"/>
+    <!-- 非生产环境 输出info日志 -->
+    <springProfile name="!pro">
+      <appender-ref ref="file_info"/>
+    </springProfile>
+    <!-- 生产环境 输出warn日志 -->
+    <springProfile name="pro">
+      <appender-ref ref="file_warn"/>
+    </springProfile>
+    <appender-ref ref="file_error"/>
+  </root>
+
+</configuration> 

@@ -10,7 +10,6 @@
     <jar.final.name>simple_app</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
-    <log4j.version>1.2.17</log4j.version>
     <richtextfx.version>0.9.1</richtextfx.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
@@ -60,11 +59,6 @@
       <groupId>org.seleniumhq.selenium</groupId>
       <artifactId>selenium-remote-driver</artifactId>
       <version>${selenium.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>

@@ -13,12 +13,11 @@
     </developer>
   </developers>
   <properties>
-    <mainClass>SwetMainFlowPanel</mainClass>
-    <jar.final.name>swet_javafx_app</jar.final.name>
+    <mainClass>DataForm</mainClass>
+    <jar.final.name>${project.artifactId}</jar.final.name>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <commandline-parser.version>0.5.0-SNAPSHOT</commandline-parser.version>
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
-    <log4j.version>1.2.17</log4j.version>
     <jna-platform.version>5.4.0</jna-platform.version>
     <richtextfx.version>0.9.1</richtextfx.version>
   </properties>
@@ -55,11 +54,6 @@
       <groupId>net.java.dev.jna</groupId>
       <artifactId>jna-platform</artifactId>
       <version>${jna-platform.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>
@@ -117,3 +111,4 @@
     </plugins>
   </build>
 </project>
+

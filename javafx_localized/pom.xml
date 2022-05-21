@@ -15,8 +15,7 @@
     <controlsfx-samples.version>8.20.7</controlsfx-samples.version>
     <richtextfx.version>0.9.1</richtextfx.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <log4j.version>1.2.17</log4j.version>
-    <log4j-core.version>2.13.2</log4j-core.version>
+    <log4j-core.version>2.17.1</log4j-core.version>
   </properties>
   <dependencies>
     <dependency>
@@ -46,11 +45,6 @@
       <groupId>org.apache.logging.log4j</groupId>
       <artifactId>log4j-web</artifactId>
       <version>${log4j-core.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>log4j</groupId>
-      <artifactId>log4j</artifactId>
-      <version>${log4j.version}</version>
     </dependency>
     <dependency>
       <groupId>org.controlsfx</groupId>

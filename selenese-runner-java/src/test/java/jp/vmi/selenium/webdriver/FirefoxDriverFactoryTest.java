@@ -6,8 +6,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExternalResource;
 import org.junit.rules.TemporaryFolder;
-import org.openqa.selenium.SessionNotCreatedException;
+import org.openqa.selenium.WebDriverException;
 
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.*;
 import static org.openqa.selenium.firefox.FirefoxDriver.SystemProperty.*;
 
 /**
@@ -52,14 +54,15 @@ public class FirefoxDriverFactoryTest {
      * Test of not finding Firefox binary.
      *
      * @throws IOException exception.
-     * @throws IllegalArgumentException exception.
      */
-    @Test(expected = IllegalStateException.class)
-    public void firefoxNotFoundIn_webdriver_firefox_bin() throws IOException, IllegalArgumentException {
+    @Test
+    public void firefoxNotFoundIn_webdriver_firefox_bin() throws IOException {
+        String message = null;
         try {
             new FirefoxDriverFactory().newInstance(new DriverOptions());
-        } catch (SessionNotCreatedException e) {
-            throw new IllegalStateException(e);
+        } catch (WebDriverException e) {
+            message = e.getMessage();
         }
+        assertThat(message, containsString("'webdriver.firefox.bin' property set, but unable to locate the requested binary:"));
     }
 }

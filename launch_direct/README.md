@@ -2,7 +2,7 @@
 
 ```sh
 mvn package
-java -cp target/launchdirect-0.5-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -dc westcoast -env test -op dump
+java -cp target/launchdirect-0.9-SNAPSHOT.jar:target/lib/* example.LaunchDirect -role integration-server -dc westcoast -env test -op dump
 ```
 this will produce
 ```sh
@@ -48,6 +48,20 @@ Role: integration-server-2
 Environment: test
 DC: westcoast
 ...
+```
+
+
+```cmd
+java -cp target/launchdirect-0.9-SNAPSHOT.jar;target/lib/* example.LaunchDirect -role service-discovery-server -dc westcoast -env test  -op dump
+```
+will print
+```text
+Using default inputFile: C:\developer\sergueik\selenium_java\launch_direct\src\main\resources\classification.yaml
+```
+```text
+host:
+
+{datacenter=westcoast, role=service-discovery-server-0, branch=test, environment=test, unused1=null, unused2=null, unused3=null, unused4=null}
 ```
 
 The operation `op` has to be supplied and the following is supported:

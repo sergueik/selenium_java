@@ -19,8 +19,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 
-import org.apache.log4j.Category;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.apache.logging.log4j.Level;
 import org.apache.log4j.PropertyConfigurator;
+
 import org.eclipse.jface.layout.GridDataFactory;
 import org.eclipse.jface.layout.GridLayoutFactory;
 import org.eclipse.swt.SWT;
@@ -109,7 +113,8 @@ public class NodeSelector {
 	private static Map<String, String> roles = new HashMap<>();
 
 	@SuppressWarnings("deprecation")
-	static final Category logger = Category.getInstance(NodeSelector.class);
+	private static final Logger logger = LogManager.getLogger(NodeSelector.class);
+
 	private static StringBuilder loggingSb = new StringBuilder();
 	private static Formatter formatter = new Formatter(loggingSb, Locale.US);
 
@@ -557,6 +562,15 @@ public class NodeSelector {
 		} catch (IOException e) {
 			throw new RuntimeException("Fail to load: " + log4J_properties);
 		}
+		// alternatively, 
+		// https://stackoverflow.com/questions/32043770/propertyconfigurator-in-log4j2
+		/*
+		LoggerContext context = (org.apache.logging.log4j.core.LoggerContext) LogManager
+				.getContext(false);
+		File file = new File(log4J_properties);
+		// this will force a reconfiguration
+		context.setConfigLocation(file.toURI());
+		*/
 	}
 
 	public String readData(Optional<Map<String, String>> parameters) {

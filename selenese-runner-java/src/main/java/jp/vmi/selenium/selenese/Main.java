@@ -131,8 +131,6 @@ public class Main {
                 driverName = WebDriverManager.IE;
             else if (driverOptions.has(DriverOption.EDGEDRIVER))
                 driverName = WebDriverManager.EDGE;
-            else if (driverOptions.has(DriverOption.PHANTOMJS))
-                driverName = WebDriverManager.PHANTOMJS;
         }
         WebDriverManager manager = WebDriverManager.newInstance();
         manager.setWebDriverFactory(driverName);
@@ -155,7 +153,7 @@ public class Main {
         if (config.isHighlight())
             runner.setHighlight(true);
         if (config.isInteractive())
-            runner.setInteractive(true);
+            runner.getInteractiveModeHandler().setEnabled(true);
         if (config.getScreenshotDir() != null)
             runner.setScreenshotDir(config.getScreenshotDir());
         if (config.getScreenshotAll() != null)
@@ -233,6 +231,8 @@ public class Main {
         if (sstimeout < 0)
             throw new IllegalArgumentException("Invalid screenshot scroll timeout value. (" + config.getScreenshotScrollTimeout() + ")");
         runner.setScreenshotScrollTimeout(sstimeout);
+        if (config.isNoReplaceAlertMethod())
+            runner.setReplaceAlertMethod(false);
         runner.setPrintStream(System.out);
     }
 

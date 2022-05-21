@@ -3,12 +3,15 @@ package example;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.greaterThan;
+
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import org.junit.Before;
@@ -16,14 +19,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import example.YamlConfig;
-
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 @SuppressWarnings("deprecation")
 public class YamlConfigTest {
 
 	private final String yamlFile = "test.yml";
-	private final InputStream resource = getClass().getClassLoader().getResourceAsStream(yamlFile);
+	private final InputStream resource = getClass().getClassLoader()
+			.getResourceAsStream(yamlFile);
 	private final YamlConfig config = YamlConfig.load(resource);
 
 	@Before
@@ -87,6 +90,36 @@ public class YamlConfigTest {
 	}
 
 	@Test
+	public void getBoolean() {
+		// Failed tests:
+		// boolean_setting_2 1 is
+		// expected to be true but is false
+
+		for (String key : Arrays.asList(
+				"boolean_setting_1", /* "boolean_setting_2", */
+				"boolean_setting_3")) {
+			boolean value = config.getBoolean(key);
+			assertThat(value, notNullValue());
+			// the method assertThat(String, boolean) in the type MatcherAssert is not
+			// applicable for the arguments (String, Matcher<Boolean>)
+			// assertThat(value, is(Boolean.TRUE));
+			// assertThat(value, is(true));
+			// assertThat(value, true);
+			assertThat(
+					String.format(key + " ( = " + config.getString(key)
+							+ ") is expected to be true but is " + value),
+					value, equalTo(true));
+		}
+		// NPE with null value
+		for (String key : Arrays
+				.asList("boolean_setting_4" /*, "boolean_setting_5" */)) {
+			boolean value = config.getBoolean(key);
+			assertThat(value, notNullValue());
+			assertThat(value, equalTo(false));
+		}
+	}
+
+	@Test
 	public void getNullString() {
 		assertThat(config.getString("services.web.property"), nullValue());
 	}
@@ -112,8 +145,30 @@ public class YamlConfigTest {
 	public void getMap() {
 		Map<String, Object> value = config.getMap("services.web");
 		assertThat(value, notNullValue());
-		assertThat(value.keySet(), hasItems(
-				new String[] { "property", "ports", "build", "image", "restart", "depends_on", "container_name" }));
+		assertThat(value.keySet(), hasItems(new String[] { "property", "ports",
+				"build", "image", "restart", "depends_on", "container_name" }));
+	}
+
+	@Test
+	public void getMap2() {
+		String key = "map_setting";
+		Map<String, Object> value = config.getMap(key);
+		assertThat(value, notNullValue());
+		assertThat(value.keySet(), hasItems(new String[] { "boolean_setting",
+				"integer_setting", "string_setting" }));
+		for (String subkey : Arrays.asList("boolean_setting", "integer_setting",
+				"string_setting")) {
+			String compound_key = String.format("%s.%s", key, subkey);
+			assertThat("expect the classpath notation to work for " + compound_key,
+					config.getString(compound_key), notNullValue());
+
+		}
+		assertThat(Boolean.parseBoolean(value.get("boolean_setting").toString()),
+				equalTo(config.getBoolean("map_setting.boolean_setting")));
+		assertThat(Integer.valueOf(value.get("integer_setting").toString()),
+				equalTo(config.getInt("map_setting.integer_setting")));
+		assertThat((String) value.get("string_setting"),
+				equalTo(config.getString("map_setting.string_setting")));
 	}
 
 	@Test
@@ -190,11 +245,11 @@ public class YamlConfigTest {
 		assertThat(value, notNullValue());
 		for (int cnt = 1; cnt != 4; cnt++) {
 			assertThat(value, containsString(String.format("Line %s", cnt)));
-
 		}
 		assertThat(value, not(containsString(">")));
 		// NOTE: has single newline at the end
-		assertThat(value.substring(0, value.length() - 2), not(containsString("\n")));
+		assertThat(value.substring(0, value.length() - 2),
+				not(containsString("\n")));
 		System.err.println(String.format("getDocString3: \"%s\"", value));
 	}
 }
