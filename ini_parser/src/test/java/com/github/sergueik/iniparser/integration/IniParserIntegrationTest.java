@@ -2,6 +2,7 @@ package com.github.sergueik.iniparser.integration;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
 // NOTE:
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -61,22 +65,6 @@ public class IniParserIntegrationTest {
 		parser.parseFile(iniFile);
 		data = parser.getData();
 		sectionData = data.get("Section1");
-	}
-
-	@Test
-	public void usageTest() {
-		String section = "Metrics";
-		sectionData = data.get(section);
-		for (String referencedSection : sectionData.keySet()) {
-			Map<String, Object> referencedSectionData = data.get(referencedSection);
-			String tag = (String) referencedSectionData.get("tag");
-			assertThat(tag, notNullValue());
-			String name = (String) referencedSectionData.get("name");
-			assertThat(name, notNullValue());
-			String expression = (String) referencedSectionData.get("expression");
-			assertThat(expression, notNullValue());
-		}
-		// assertFalse(keywordTable.keySet().containsAll(supportedKeywords));
 	}
 
 	@Test
