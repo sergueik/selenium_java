@@ -52,7 +52,9 @@ public class PageObjectFactoryTest {
 		// Create a new instance of a driver
 		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
 				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+    // DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setBrowserName("chrome");
 
 		driver = new ChromeDriver(capabilities);
 		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

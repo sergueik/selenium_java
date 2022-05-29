@@ -29,11 +29,12 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
+// import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 // NOTE: http://jaykanakiya.com/demos/angular-js-todolist/ is down
 // need to integrate https://github.com/kanakiyajay/Angular-js-todolist
+@SuppressWarnings("deprecation")
 public class TodoListTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -55,7 +56,10 @@ public class TodoListTest {
 		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
 				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
 
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setBrowserName("chrome");
+
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");

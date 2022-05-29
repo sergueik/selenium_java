@@ -29,9 +29,10 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
+// import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+@SuppressWarnings("deprecation")
 public class NgScrollableTableTest {
 	private NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -55,7 +56,8 @@ public class NgScrollableTableTest {
 						? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath()
 						: resolveEnvVars(chromeDriverPath));
 
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");
