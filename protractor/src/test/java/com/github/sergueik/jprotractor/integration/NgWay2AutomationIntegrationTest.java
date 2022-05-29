@@ -41,6 +41,7 @@ import com.github.sergueik.jprotractor.NgBy;
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
 
+@SuppressWarnings("deprecation")
 public class NgWay2AutomationIntegrationTest {
 
 	private static NgWebDriver ngDriver;
@@ -65,7 +66,8 @@ public class NgWay2AutomationIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);

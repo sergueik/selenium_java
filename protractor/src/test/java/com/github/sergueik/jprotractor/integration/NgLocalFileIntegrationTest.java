@@ -54,6 +54,7 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class NgLocalFileIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -82,7 +83,9 @@ public class NgLocalFileIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
@@ -788,6 +791,7 @@ public class NgLocalFileIntegrationTest {
 	}
 
 	// @Ignore
+
 	@Test
 	public void testFindElementByModel() {
 		// NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
@@ -1155,7 +1159,9 @@ public class NgLocalFileIntegrationTest {
 		highlight(element);
 		actions.moveToElement(element).build().perform();
 		// Wait for the Angular 'hovering' property to get evaluated to true
-		WebDriverWait wait2 = new WebDriverWait(seleniumDriver, 120);
+		// WebDriverWait wait2 = new WebDriverWait(seleniumDriver, 120);
+		WebDriverWait wait2 = new WebDriverWait(seleniumDriver, Duration.ofSeconds(120));
+
 		wait2.pollingEvery(Duration.ofMillis(pollingInterval));
 		wait2.until(new ExpectedCondition<Boolean>() {
 			// NOTE: 'until' only prints "hovering: true" and never "hovering: false"

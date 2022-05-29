@@ -10,8 +10,8 @@ import org.openqa.selenium.Point;
 import org.openqa.selenium.Rectangle;
 import org.openqa.selenium.WebElement;
 
-import org.openqa.selenium.internal.WrapsElement;
-
+// import org.openqa.selenium.internal.WrapsElement;
+import org.openqa.selenium.WrapsElement;
 import com.github.sergueik.jprotractor.scripts.Evaluate;
 
 /**
@@ -37,7 +37,7 @@ public class NgWebElement implements WebElement, WrapsElement {
 	public NgWebElement(final NgWebDriver drv, final WebElement elm) {
 		this.driver = drv;
 		this.element = elm;
-  }
+	}
 
 	@Override
 	public WebElement getWrappedElement() {
@@ -147,7 +147,7 @@ public class NgWebElement implements WebElement, WrapsElement {
 		this.element.submit();
 	}
 
-  // http://stackoverflow.com/questions/39310090/selenium-upgrade-error
+	// http://stackoverflow.com/questions/39310090/selenium-upgrade-error
 	@Override
 	public Rectangle getRect() {
 		return this.element.getRect();

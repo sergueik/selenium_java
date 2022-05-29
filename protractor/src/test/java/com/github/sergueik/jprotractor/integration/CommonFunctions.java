@@ -77,7 +77,9 @@ public class CommonFunctions {
 										? "C:\\java\\selenium\\chromedriver.exe"
 										: "/tmp/chromedriver"
 								: chromeDriverPath).getAbsolutePath());
-				DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+				// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+				DesiredCapabilities capabilities = new DesiredCapabilities();
+				capabilities.setBrowserName("chrome");
 				ChromeOptions options = new ChromeOptions();
 
 				Map<String, Object> chromePrefs = new HashMap<>();
@@ -98,8 +100,11 @@ public class CommonFunctions {
 						"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
 				options.addArguments("browser.download.dir=" + downloadFilepath);
 				// options.addArguments("user-data-dir=/path/to/your/custom/profile");
-				capabilities
-						.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+				// capabilities
+				// .setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+
+				capabilities.setBrowserName("chrome");
+
 				capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 				capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 				seleniumDriver = new ChromeDriver(capabilities);
@@ -108,7 +113,10 @@ public class CommonFunctions {
 				System.setProperty("webdriver.gecko.driver",
 						"c:/java/selenium/geckodriver.exe");
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
-				DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+				// DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+				DesiredCapabilities capabilities = new DesiredCapabilities();
+				capabilities.setBrowserName("firefox");
+
 				// use legacy FirefoxDriver
 				capabilities.setCapability("marionette", false);
 				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
@@ -122,7 +130,9 @@ public class CommonFunctions {
 				// profile.setEnableNativeEvents(false);
 
 				System.out.println(System.getProperty("user.dir"));
-				capabilities.setCapability(FirefoxDriver.PROFILE, profile);
+				// TODO: probably won't work with simply "profile"
+				capabilities.setCapability("profile", profile);
+				// capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 				try {
 					// java.lang.ClassCastException:
 					// org.openqa.selenium.remote.service.DriverCommandExecutor cannot be
@@ -190,7 +200,9 @@ public class CommonFunctions {
 
 	public static void highlight(WebElement element) {
 		if (wait == null) {
-			wait = new WebDriverWait(seleniumDriver, flexibleWait);
+			// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+			wait = new WebDriverWait(seleniumDriver,
+					Duration.ofSeconds(flexibleWait));
 			wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		}
 		try {
@@ -215,7 +227,9 @@ public class CommonFunctions {
 	// custom wait e.g. while Login light box is visible
 	public static void waitWhileElementIsVisible(By locator) {
 		final By _locator = locator;
-		new WebDriverWait(seleniumDriver, flexibleWait)
+		// new WebDriverWait(seleniumDriver, flexibleWait)
+		new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait))
+
 				.pollingEvery(Duration.ofMillis(pollingInterval))
 				.until(new ExpectedCondition<Boolean>() {
 					@Override

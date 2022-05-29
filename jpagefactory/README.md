@@ -273,6 +273,9 @@ To check how __JPageFactory__ work on mobile channel, run example tests on Googl
 private boolean isMobile = false;
 ```
 
+### Note
+   * [announcement](https://github.com/angular/protractor/issues/5502) of end of the development of Protractor by the end of 2022 in conjunction with Angular v15.of end of the development of Protractor by the end of 2022 in conjunction with Angular v15. by Angular team 
+
 ### Authors
 
 * [He Huang](huanghe389@gmail.com)

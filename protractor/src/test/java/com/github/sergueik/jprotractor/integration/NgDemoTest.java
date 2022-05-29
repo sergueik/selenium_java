@@ -33,7 +33,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import com.github.sergueik.jprotractor.NgBy;
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
-
+@SuppressWarnings("deprecation")
 public class NgDemoTest {
 
 	private static NgWebDriver ngDriver;
@@ -45,6 +45,7 @@ public class NgDemoTest {
 	private LocalDate today = LocalDate.now();
 	private SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yy");
 	public static String baseUrl = "http://www.way2automation.com/angularjs-protractor/banking";
+
 
 	@Test
 	public void testCustomerLogin() {
@@ -151,7 +152,8 @@ public class NgDemoTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);

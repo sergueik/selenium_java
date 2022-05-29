@@ -43,7 +43,9 @@ try {
 } catch (Exception e) {
   System.err.println("Exception in custom wait: " + e.toString());
 }
-
 ```
+
+### See Also
+   * [announcement](https://github.com/angular/protractor/issues/5502) of end of the development of Protractor by the end of 2022 in conjunction with Angular v15.of end of the development of Protractor by the end of 2022 in conjunction with Angular v15. by Angular team 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
