@@ -73,7 +73,9 @@ public class CommonTest {
 
 	@BeforeClass
 	public static void setup() throws IOException {
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setBrowserName("chrome");
 		ChromeOptions options = new ChromeOptions();
 		// options for headless
 		if (headless) {
@@ -89,10 +91,13 @@ public class CommonTest {
 										? "chromedriver.exe" : "chromedriver")
 								.toAbsolutePath().toString());
 
-		capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+		// capabilities.setBrowserName(DesiredCapabilities.chrome().getBrowserName());
+		capabilities.setBrowserName("chrome");
 		driver = new ChromeDriver(options);
-		wait = new WebDriverWait(driver, flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		// wait = new WebDriverWait(driver, flexibleWait);
+		wait = new WebDriverWait(driver, Duration.ofSeconds(flexibleWait));
+		// wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(driver);
 	}
 
@@ -169,7 +174,10 @@ public class CommonTest {
 			String color) {
 		// err.println("Color: " + color);
 		if (wait == null) {
-			wait = new WebDriverWait(driver, flexibleWait);
+
+			// wait = new WebDriverWait(driver, flexibleWait);
+			wait = new WebDriverWait(driver, Duration.ofSeconds(flexibleWait));
+
 		}
 		// Selenium Driver version sensitive code: 3.13.0 vs. 3.8.0 and older
 		// https://stackoverflow.com/questions/49687699/how-to-remove-deprecation-warning-on-timeout-and-polling-in-selenium-java-client
