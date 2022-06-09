@@ -49,24 +49,36 @@ public class MinimalTest {
 			? String.format("%s\\Downloads",
 					getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"))
 			: String.format("%s/Downloads", getPropertyEnv("HOME", "/home/serguei"));
-	private final String version = "3.150.2";
+	private final String version = "4.2.0"; // "3.150.2";
+
+	private static boolean headless = false;
 
 	@BeforeClass
 	public static void setup() throws IOException {
 		getOSName();
-
+		headless = setHeadless();
 		System.setProperty("webdriver.chrome.driver", chomeDriverPath);
 
 		ChromeOptions options = new ChromeOptions();
-		options.setBinary(osName.equals("windows")
-				? (new File(
-						"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
-								.getAbsolutePath()
+		// TODO: 64 bit
+		// PROCESSOR_ARCHITECTURE=AMD64
+		options.setBinary(osName.equals("windows") ? (new File(
+
+				(System.getenv().containsKey("PROCESSOR_ARCHITECTURE")
+						&& System.getenv("PROCESSOR_ARCHITECTURE").matches("(?:AMD64)"))
+								? "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+								: "C:/Program Files/Google/Chrome/Application/chrome.exe"))
+										.getAbsolutePath()
 				// TODO: determine on the fly
 				: "/usr/bin/chromium-browser" /* "/usr/bin/google-chrome" */ );
-		for (String optionAgrument : (new String[] { "headless",
-				"--window-size=1200x800", "disable-gpu" })) {
-			options.addArguments(optionAgrument);
+		if (headless) {
+			for (String optionAgrument : (new String[] { "headless",
+					"--window-size=1200x800", "disable-gpu" })) {
+				options.addArguments(optionAgrument);
+			}
+			System.out.println("Switching to headless");
+		} else {
+			System.out.println("Switching to / staying visible");
 		}
 
 		// based on:
@@ -90,6 +102,7 @@ public class MinimalTest {
 		// driver = new ChromeDriver(options);
 
 		driver = new ChromeDriver(chromeDriverSevice, options);
+		assertThat(driver, notNullValue());
 		if (useChromiumSendCommand) {
 			Map<String, Object> commandParams = new HashMap<>();
 			commandParams.put("cmd", "Page.setDownloadBehavior");
@@ -113,13 +126,6 @@ public class MinimalTest {
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
 
-	@Ignore
-	@Test
-	public void testChromeDriver() throws Exception {
-		assertThat(driver, notNullValue());
-	}
-
-	// @Ignore
 	@Test
 	public void testDownload() throws Exception {
 		driver.get("http://www.seleniumhq.org/download/");
@@ -146,7 +152,10 @@ public class MinimalTest {
 				System.err.println("Found " + filePath);
 			}
 		}
-		assertThat(fileExists, is(true));
+		assertThat(
+				"Fileshoulr be present: "
+						+ String.format("IEDriverServer_Win32_%s.zip", version),
+				fileExists, is(true));
 	}
 
 	@Test
@@ -220,6 +229,7 @@ public class MinimalTest {
 				// take screenshot in teardown.
 				System.err.println("Taking a screenshot");
 				File scrFile = ((TakesScreenshot) driver)
+
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
 				FileUtils.copyFile(scrFile,
@@ -242,6 +252,52 @@ public class MinimalTest {
 			}
 		}
 		return osName;
+	}
+
+	public static boolean setHeadless() {
+		boolean headless = false;
+		if (System.getenv().containsKey("HEADLESS")
+				&& System.getenv("HEADLESS").matches("(?:true|yes|1)")) {
+			headless = true;
+		}
+		if (!(getOSName().equals("windows"))
+				&& !(System.getenv().containsKey("DISPLAY"))) {
+			headless = true;
+		}
+
+		// alternatively not even add the environment variable WINDOWS_NO_DISPLAY
+		if (getOSName().equals("windows")) {
+			headless = false;
+			System.out
+					.println("Observed environment keys: " + System.getenv().keySet());
+
+			for (String key : (new String[] { "JAVA_OPTS", "MAVEN_OPTS",
+					"JAVA_TOOL_OPTIONS" })) {
+				System.out.println(String.format("Checking environment %s: %s", key,
+						System.getenv(key)));
+			}
+
+			// NOTE: when set through batch file the new environment variable
+			// WINDOWS_NO_DISPLAY
+			// remains undiscovered
+			if (System.getenv().containsKey("WINDOWS_NO_DISPLAY")
+					&& System.getenv("WINDOWS_NO_DISPLAY").matches("(?:true|yes|1)")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY");
+				headless = true;
+			}
+			if (getPropertyEnv("WINDOWS_NO_DISPLAY", "").matches("(?:true|yes|1)")) {
+				System.out
+						.println("Detected WINDOWS_NO_DISPLAY environment or property");
+				headless = true;
+			}
+			if (System.getenv().containsKey("JAVA_TOOL_OPTIONS")
+					&& System.getenv("JAVA_TOOL_OPTIONS")
+							.matches(".*WINDOWS_NO_DISPLAY=(?:true|yes|1).*")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY in JAVA_TOOL_OPTIONS");
+				headless = true;
+			}
+		}
+		return headless;
 	}
 
 	// origin:
