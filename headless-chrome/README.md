@@ -3,6 +3,9 @@
 This directory contains headless Chrome wrapper Java helper class and example
 based on [ldaume/headless-chrome](https://github.com/ldaume/headless-chrome)
 
+The project has been stale for some time, then tested with Chrome __101__ (64 bit) running on Windows __10__ VM. To detect the headless run, an environment variable `WINDOWS_NO_DISPLAY` is set by the launcher script which itself is run by [Windowws Scheduled Task](https://www.windowscentral.com/how-create-automated-task-using-task-scheduler-windows-10) with one minute delay after the reboot event.
+
+
 ![visual run](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-visual.png)
 
 ![task actions](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task.png)
@@ -84,7 +87,7 @@ Switching to / staying visible
 ```
 #### See also
 
-* [Getting Started with Headless Chrome] (developers.google.com/web/updates/2017/04/headless-chrome)
+* [getting started with headless Chrome](developers.google.com/web/updates/2017/04/headless-chrome)
 * [in russian, Javascript port](https://habrahabr.ru/post/329660/)
 * [minimal project](https://github.com/WeikeDu/HeadlessChrome)
 * [tips regarding reducing additioan lattency because of chomedriver (in Russian)](http://internetka.in.ua/selenium-chrome-driver/)

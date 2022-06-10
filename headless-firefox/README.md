@@ -3,7 +3,9 @@
 This directory contains an example headless Fifefox project
 based on https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/
 
-Tested with Ubuntu 16.04 x64, Firefox 59 geckoDriver 20.
+The code originally tested with Ubuntu __16.04__ __x64__, Firefox __59__ geckoDriver __20__. 
+
+The project has been stale for some time, then tested with Firefox __101__ (32 bit) running on Windows __10__ VM. To detect the headless run, an environment variable `WINDOWS_NO_DISPLAY` is set by the launcher script which itself is run by [Windowws Scheduled Task](https://www.windowscentral.com/how-create-automated-task-using-task-scheduler-windows-10) with one minute delay after the reboot event.
 
 ### Note
 
