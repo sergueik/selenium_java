@@ -16,7 +16,7 @@ The project has been stale for some time, then tested with Chrome __101__ (64 bi
 
 ![results](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-results.png)
 
-the log of the headless run ( from the logfile)
+the log of the headless run ( from the logfile). 
 ```txt
 running by app 
 checking display 
@@ -24,6 +24,11 @@ setting WINDOWS_NO_DISPLAY to true
 1 
 setting WINDOWS_NO_DISPLAY to true
 WINDOWS_NO_DISPLAY=true  
+
+Downloaded from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-resources-plugin/2.6/maven-resources-plugin-2.6.pom (8.1 kB at 8.7 kB/s)
+Downloading from central: https://repo.maven.apache.org/maven2/org/apache/maven/plugins/maven-plugins/23/maven-plugins-23.pom
+Progress (1): 2.7/9.2 kBProgress (1): 5.5/9.2 kBProgress (1): 8.2/9.2 kBProgress (1): 9.2 kB    
+...
 [INFO] Scanning for projects...
 ...
 -------------------------------------------------------
@@ -61,8 +66,16 @@ Tests run: 3, Failures: 0, Errors: 0, Skipped: 1
 [INFO] ------------------------------------------------------------------------
 Done. 
 ```
+NOTE: - the  maven dependencies will be downloaded into the user profile in the first run
+If the scheduled task is configured to run under `NT AUTHORIRY\SYSTEM` account 
 
-the log from the call of the launcher interactively:
+![task account](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task-user2.png)
+
+the jars will go into `c:\Windows\SysWOW64\config\systemprofile\.m2\repository` for 32 bit task on 64 bit system and into 
+`c:\Windows\System32\config\systemprofile\.m2\repository` otherwise.
+
+
+The log from the call of the launcher interactively:
 ```cmd
 client.cmd
 ```

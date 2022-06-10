@@ -34,6 +34,10 @@ import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+
 public class MinimalTest {
 
 	// public static WebDriver driver;
@@ -298,6 +302,8 @@ public class MinimalTest {
 				headless = true;
 			}
 		}
+		if (readProperty("headless", "").equalsIgnoreCase("true"))
+			headless = true;
 		return headless;
 	}
 
@@ -312,6 +318,49 @@ public class MinimalTest {
 			}
 		}
 		return value;
+	}
+
+	// based on:
+	// https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/src/main/java/com/github/abhishek8908/util/DriverUtil.java
+	public static String readProperty(String propertyName, String propertyFile,
+			String defaultValue) {
+		String resourcePath = "";
+		try {
+			resourcePath = Thread.currentThread().getContextClassLoader()
+					.getResource("").getPath();
+			// will be target/test-classes during surefire run
+			System.err.println(String.format(
+					"The running application resource path: \"%s\"", resourcePath));
+		} catch (NullPointerException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			/*
+			 * if (debug) { e.printStackTrace(); }
+			 */
+		}
+		Configuration config = null;
+		try {
+			System.err
+					.println(String.format("Trying to read config from path: \"%s\"",
+							resourcePath + propertyFile));
+			config = new PropertiesConfiguration(resourcePath + propertyFile);
+
+			Configuration extConfig = ((PropertiesConfiguration) config)
+					.interpolatedConfiguration();
+			final String value = extConfig.getProperty(propertyName).toString();
+			return (value == null) ? defaultValue : value;
+		} catch (ConfigurationException e) {
+			return null;
+		}
+	}
+
+	public static String readProperty(String propertyName) {
+		return readProperty(propertyName, "application.properties", null);
+	}
+
+	public static String readProperty(String propertyName, String defaultValue) {
+		final String value = readProperty(propertyName, "application.properties",
+				defaultValue);
+		return value == null ? defaultValue : value;
 	}
 
 }
