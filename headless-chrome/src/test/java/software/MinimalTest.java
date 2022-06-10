@@ -194,12 +194,12 @@ public class MinimalTest {
 			// obscures it (the name of obscuring element varies)
 			try {
 				// take screenshot in catch block.
-				System.err.println("Taking a screenshot");
 				File scrFile = ((TakesScreenshot) driver)
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot1.png");
+				System.err.println("Taking a screenshot " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());
@@ -232,8 +232,9 @@ public class MinimalTest {
 
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot2.png");
+				System.err.println("Taking a screenshot " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());

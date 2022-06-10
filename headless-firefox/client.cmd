@@ -1,7 +1,7 @@
 @echo OFF
 set LOG=a.log
 cd %~dp0
-REM cd c:\developer\sergueik\selenium_java\headless-chrome
+REM cd c:\developer\sergueik\selenium_java\headless-firefox
 1>NUL 2>NUL copy NUL %LOG%
 echo running by %USERNAME% >>%LOG%
 echo checking display >>%LOG%

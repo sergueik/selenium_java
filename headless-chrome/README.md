@@ -5,7 +5,9 @@ based on [ldaume/headless-chrome](https://github.com/ldaume/headless-chrome)
 
 ![visual run](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-visual.png)
 
-![task setup Page](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task.png)
+![task actions](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task.png)
+
+![task trigger](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task-trigger.png)
 
 ![processes](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-processes.png)
 

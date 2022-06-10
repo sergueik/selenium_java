@@ -5,9 +5,8 @@ REM cd c:\developer\sergueik\selenium_java\headless-chrome
 1>NUL 2>NUL copy NUL %LOG%
 echo running by %USERNAME% >>%LOG%
 echo checking display >>%LOG%
-REM calling headless_detector.cmd
-call headless_detector.cmd >>%LOG%
-if ERRORLEVEL 1 set WINDOWS_NO_DISPLAY=true
+REM sourcing headless_detector.cmd
+headless_detector.cmd >>%LOG%
 echo WINDOWS_NO_DISPLAY=%WINDOWS_NO_DISPLAY% >>%LOG% 
 set JAVA_TOOL_OPTIONS=-DWINDOWS_NO_DISPLAY=%WINDOWS_NO_DISPLAY% >>%LOG% 
 call c:\java\init.cmd >>%LOG%
