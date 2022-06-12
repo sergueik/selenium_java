@@ -98,6 +98,53 @@ Switching to / staying visible
 
 Switching to / staying visible
 ```
+### Note
+
+* About autoadminlogon setting:
+
+[Winlogon](https://docs.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina), the GINA, and network providers are the parts of the interactive logon model. The interactive logon procedure is normally controlled by Winlogon, MSGina.dll, and network providers. To change the interactive logon procedure, MSGina.dll can be replaced with a customized GINA DLL.
+
+[GINA](https://en.wikipedia.org/wiki/Graphical_identification_and_authentication) is a replaceable dynamically linked library that is loaded early in the boot process in the context of Winlogon
+
+The [Windows shell](https://en.wikipedia.org/wiki/Windows_shell), as it is known today, is an evolution of what began with Windows 95, released in 1995. It is intimately identified with File Explorer, 
+a Windows component that can browse the whole shell namespace.
+
+
+
+The password for the account [can](https://docs.microsoft.com/en-us/windows/win32/secauthn/msgina-dll-features) be specified in one of two ways. 
+For computers running one of the Windows Server 2003 or Windows XP operating systems, 
+the password should be stored as a secret using the LsaStorePrivateData function. 
+For details, see Protecting the Automatic Logon Password. The other way to store the password [plaintext](https://docs.microsoft.com/en-us/troubleshoot/windows-server/user-profiles-and-logon/turn-on-automatic-logon) in the Registry.
+
+
+
+If no DefaultPassword string is specified, Windows automatically changes the value of the AutoAdminLogon key from 1 (true) to 0 (false), disabling the AutoAdminLogon feature.
+
+The __SAS__ (Secure Attention Sequence) in __Reactos__
+and __CSRSS__ ([Client Server Runtime Subsystem](https://en.wikipedia.org/wiki/Client/Server_Runtime_Subsystem)) in Windows are similar [roles](https://www.howtogeek.com/321581/what-is-client-server-runtime-process-csrss.exe-and-why-is-it-running-on-my-pc/)
+[sas.c](https://github.com/reactos/reactos/blob/master/base/system/winlogon/sas.c#L80) 
+```c
+static BOOL
+ StartUserShell(
+     IN OUT PWLSESSION Session)
+```
+[msgina.c](https://github.com/reactos/reactos/blob/master/dll/win32/msgina/msgina.c#L167)
+```c
+static BOOL GetRegistrySettings(PGINA_CONTEXT pgContext) {    
+ rc = RegOpenKeyExW(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon", 0, KEY_QUERY_VALUE, &hKey);
+  rc = ReadRegSzValue(hKey, L"AutoAdminLogon", &lpAutoAdminLogon);
+  if (rc == ERROR_SUCCESS)
+    if (wcscmp(lpAutoAdminLogon, L"1") == 0)
+      pgContext->bAutoAdminLogon = TRUE;
+```
+[msgina.c](https://github.com/reactos/reactos/blob/master/dll/win32/msgina/msgina.c#L907)
+```c
+if (pgContext->bAutoAdminLogon) {
+  if (pgContext->bIgnoreShiftOverride || (GetKeyState(VK_SHIFT) >= 0)) {
+     /* Don't display the window, we want to do an automatic logon */
+     pgContext->pWlxFuncs->WlxSasNotify(pgContext->hWlx, WLX_SAS_TYPE_CTRL_ALT_DEL);
+```            
+
 #### See also
 
 * [getting started with headless Chrome](developers.google.com/web/updates/2017/04/headless-chrome)
