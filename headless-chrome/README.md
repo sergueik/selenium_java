@@ -98,18 +98,35 @@ Switching to / staying visible
 
 Switching to / staying visible
 ```
-### Note
-
-* About autoadminlogon setting:
+### Note About autoadminlogon setting:
 
 [Winlogon](https://docs.microsoft.com/en-us/windows/win32/secauthn/winlogon-and-gina), the GINA, and network providers are the parts of the interactive logon model. The interactive logon procedure is normally controlled by Winlogon, MSGina.dll, and network providers. To change the interactive logon procedure, MSGina.dll can be replaced with a customized GINA DLL.
 
 [GINA](https://en.wikipedia.org/wiki/Graphical_identification_and_authentication) is a replaceable dynamically linked library that is loaded early in the boot process in the context of Winlogon
 
+![bypass credential](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-bypass.png)
+
 The [Windows shell](https://en.wikipedia.org/wiki/Windows_shell), as it is known today, is an evolution of what began with Windows 95, released in 1995. It is intimately identified with File Explorer, 
 a Windows component that can browse the whole shell namespace.
 
-
+The `headless_detector.cmd` script used in this project is checking if the shell process is running by the account that runs the detector script:
+```cmd
+tasklist.exe /FI "USERNAME eq %USERNAME%" /FI "IMAGENAME EQ explorer.exe"
+```
+when the output shows the process:
+```text
+Image Name                     PID Session Name        Session#    Mem Usage
+========================= ======== ================ =========== ============
+explorer.exe                  3912 Console                    1    143,648 K
+```
+the environment variable `WINDOWS_NO_DISPLAY` is cleared. Otherwise it is set. There are  two alternative ways to do it in Powershell. One requires elevation:
+```powershell
+$processname = 'explorer'
+get-process -name $processname -includeusername
+Get-Process : The 'IncludeUserName' parameter requires elevated user rights.
+Try running the command again in a session that has been opened with elevated user rights (that is, Run as Administrator).
+```
+the other uses [performs p/invoke](https://www.codeproject.com/Articles/14828/How-To-Get-Process-Owner-ID-and-Current-User-SID) into `advapi32.dll` and contains substantial amount of inline C# code (see `headless_detector.ps1` [script](https://github.com/sergueik/powershell_ui_samples/blob/master/headless_detector.ps1)).
 
 The password for the account [can](https://docs.microsoft.com/en-us/windows/win32/secauthn/msgina-dll-features) be specified in one of two ways. 
 For computers running one of the Windows Server 2003 or Windows XP operating systems, 
@@ -147,12 +164,15 @@ if (pgContext->bAutoAdminLogon) {
 
 #### See also
 
-* [getting started with headless Chrome](developers.google.com/web/updates/2017/04/headless-chrome)
-* [in russian, Javascript port](https://habrahabr.ru/post/329660/)
-* [minimal project](https://github.com/WeikeDu/HeadlessChrome)
-* [tips regarding reducing additioan lattency because of chomedriver (in Russian)](http://internetka.in.ua/selenium-chrome-driver/)
-* [Selenium JsonWire Protocol](https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol)
-* [Chrome Devkit Protocol](https://github.com/ChromeDevTools/awesome-chrome-devtools)
+  * [getting started with headless Chrome](developers.google.com/web/updates/2017/04/headless-chrome)
+  * [in russian, Javascript port](https://habrahabr.ru/post/329660/)
+  * [minimal project](https://github.com/WeikeDu/HeadlessChrome)
+  * [tips regarding reducing additioan lattency because of chomedriver (in Russian)](http://internetka.in.ua/selenium-chrome-driver/)
+  * [Selenium JsonWire Protocol](https://github.com/SeleniumHQ/selenium/wiki/JsonWireProtocol)
+  * [Chrome Devkit Protocol](https://github.com/ChromeDevTools/awesome-chrome-devtools)
+  * [article](https://www.codeproject.com/Articles/14828/How-To-Get-Process-Owner-ID-and-Current-User-SID) on how to get process owner
+  * known [SID](http://support.microsoft.com/kb/243330) list
+
 
 ### Author
 
