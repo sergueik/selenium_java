@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import org.apache.commons.configuration.Configuration;
@@ -98,15 +100,33 @@ public class MinimalTest {
 			options.setExperimentalOption("prefs", chromePrefs);
 		}
 		// configuration state support like remote driver
+		/*
 		ChromeDriverService chromeDriverSevice = new ChromeDriverService.Builder()
 				.usingDriverExecutable(new File(chomeDriverPath)).usingAnyFreePort()
 				.build();
 		chromeDriverSevice.start();
-
-		// driver = new ChromeDriver(options);
-
 		driver = new ChromeDriver(chromeDriverSevice, options);
+		* */
+		// driver = new ChromeDriver(options);
+		// RemoteWebDriver driver = new RemoteWebDriver( new
+		// URL("http://localhost:4444/wd/hub"), capabilities);
+
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		capabilities.setCapability("headless", true);
+		capabilities.setCapability("platform", "WINDOWS");
+		capabilities.setCapability("version", "latest");
+		
+		// driver = new RemoteWebDriver(new URL("https://localhost:4444/"),
+		// capabilities);
+		/* "http://localhost:4444/wd/hub" for 3.x  but it does not honor headless option*/
+		// fails to set headless...
+
+		driver = new RemoteWebDriver(new URL("http://localhost:4444"),
+				options);
+		/* "http://localhost:4444/wd/hub" for 3.x  but it does not honor headless option*/
+
 		assertThat(driver, notNullValue());
+		/*
 		if (useChromiumSendCommand) {
 			Map<String, Object> commandParams = new HashMap<>();
 			commandParams.put("cmd", "Page.setDownloadBehavior");
@@ -115,7 +135,7 @@ public class MinimalTest {
 			params.put("downloadPath", downloadFilepath);
 			commandParams.put("params", params);
 			JSONObject commandParamsObj = new JSONObject(commandParams);
-
+		
 			HttpClient httpClient = HttpClientBuilder.create().build();
 			String payload = commandParamsObj.toString();
 			System.err.println("Posting: " + payload);
@@ -126,7 +146,7 @@ public class MinimalTest {
 			request.setEntity(new StringEntity(payload));
 			httpClient.execute(request);
 		}
-
+		*/
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
 
