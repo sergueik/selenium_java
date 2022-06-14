@@ -161,61 +161,6 @@ if (pgContext->bAutoAdminLogon) {
      /* Don't display the window, we want to do an automatic logon */
      pgContext->pWlxFuncs->WlxSasNotify(pgContext->hWlx, WLX_SAS_TYPE_CTRL_ALT_DEL);
 ```            
-```text
-214794369
-The process hosting the driver for this device has been terminated. (Exception f
-rom HRESULT: 0x8007050B)
-```
-### Grid
-
-
-![grid task actions](https://github.com/sergueik/selenium_java/blob/master/headless-chrome/screenshots/capture-task-grid.png)
-
-these tasks launch hub
-```cmd
-hub4.cmd
-```
-
-node
-
-```
-node4.cmd
-```
-
-and test
-
-```
-client.cmd
-```
-
-
-Note:  only tested with Selenium standalone __4.0__ this far - unknown if works with downlevel Selenium __3.x__
-
-for the sake of passing all options  through selenium hub pipeline:
-```java
-ChromeOptions options = new ChromeOptions();
-options.setBinary(osName.equals("windows") ? (new File(
-	(System.getenv().containsKey("PROCESSOR_ARCHITECTURE")
-	&& System.getenv("PROCESSOR_ARCHITECTURE").matches("(?:AMD64)")) ?
-	"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe" : "C:/Program Files/Google/Chrome/Application/chrome.exe")) .getAbsolutePath() : "/usr/bin/chromium-browser" /* "/usr/bin/google-chrome" */ );
-if (headless) {
-	for (String optionAgrument : (new String[] { "headless", "--window-size=1200x800", "disable-gpu" })) {
-	options.addArguments(optionAgrument);
-}
-
-driver = new RemoteWebDriver(new URL("http://localhost:4444"), options);
-
-```
-the legacy invocation
-```java
-DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-capabilities.setCapability("headless", true);
-capabilities.setCapability("platform", "WINDOWS");
-capabilities.setCapability("version", "latest");
-driver = new RemoteWebDriver(new URL("https://localhost:4444/wd/hub"), capabilities);
-```
-was not found to work (more testing is pending)
-
 #### See also
 
   * [getting started with headless Chrome](developers.google.com/web/updates/2017/04/headless-chrome)

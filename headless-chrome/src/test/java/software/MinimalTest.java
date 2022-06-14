@@ -115,15 +115,15 @@ public class MinimalTest {
 		capabilities.setCapability("headless", true);
 		capabilities.setCapability("platform", "WINDOWS");
 		capabilities.setCapability("version", "latest");
-		
+
 		// driver = new RemoteWebDriver(new URL("https://localhost:4444/"),
 		// capabilities);
-		/* "http://localhost:4444/wd/hub" for 3.x  but it does not honor headless option*/
-		// fails to set headless...
+		/* "http://localhost:4444/wd/hub" for 3.x but it does not honor headless option - fails to set headless...*/
+		//
 
-		driver = new RemoteWebDriver(new URL("http://localhost:4444"),
+		driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),
 				options);
-		/* "http://localhost:4444/wd/hub" for 3.x  but it does not honor headless option*/
+		/* "http://localhost:4444" for 4.x */
 
 		assertThat(driver, notNullValue());
 		/*
@@ -265,6 +265,7 @@ public class MinimalTest {
 				// ignore
 			}
 			driver.quit();
+			// should we just close it ?
 		}
 	}
 
