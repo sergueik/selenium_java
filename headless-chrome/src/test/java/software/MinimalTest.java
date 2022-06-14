@@ -108,21 +108,21 @@ public class MinimalTest {
 		driver = new ChromeDriver(chromeDriverSevice, options);
 		* */
 		// driver = new ChromeDriver(options);
-		// RemoteWebDriver driver = new RemoteWebDriver( new
-		// URL("http://localhost:4444/wd/hub"), capabilities);
 
 		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-		capabilities.setCapability("headless", true);
+		// capabilities.setCapability("headless", true);
 		capabilities.setCapability("platform", "WINDOWS");
 		capabilities.setCapability("version", "latest");
+		RemoteWebDriver driver = new RemoteWebDriver(
+				new URL("http://localhost:4444/wd/hub"), capabilities);
 
 		// driver = new RemoteWebDriver(new URL("https://localhost:4444/"),
 		// capabilities);
 		/* "http://localhost:4444/wd/hub" for 3.x but it does not honor headless option - fails to set headless...*/
 		//
 
-		driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),
-				options);
+		// driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),
+		// 		options);
 		/* "http://localhost:4444" for 4.x */
 
 		assertThat(driver, notNullValue());
