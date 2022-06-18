@@ -239,6 +239,9 @@ along with that error, the hub console logs the attempt:
 
 while if in foreground
 ```text
+06:10:43.595 INFO [LocalDistributor.newSession] - Session request received by the distributor:
+ [Capabilities {browserName: chrome, goog:chromeOptions: {args: [headless], extensions: []}}]
+06:10:43.595 INFO [LocalDistributor.newSession] - Unable to find slot for request 22073277-e9a3-4701-a62d-15d597cfc43f. May retry: Capabilities {browserName: chrome, goog:chromeOptions: {args: [headless], extensions: []}}6:10:43.595 INFO [LocalDistributor$NewSessionRunnable.handleNewSessionRequest] - Retrying
 ```
 #### See also
 

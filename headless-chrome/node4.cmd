@@ -71,7 +71,8 @@ type NUL  > %LOGFILE%
 java %LAUNCHER_OPTS% ^
 -jar selenium-server-%SELENIUM_VERSION%.jar ^
 node ^
---grid-url http://%HUB_HOST%:%HUB_HTTP_PORT%
+--grid-url http://%HUB_HOST%:%HUB_HTTP_PORT% ^
+--port %NODE_HTTP_PORT% 
 
 REM Keep the Blank line above intact
 goto :EOF
