@@ -17,7 +17,7 @@
     <maven.compiler.target>1.8</maven.compiler.target>
     <!-- NOTE: latest verison 3.0.0 -->
     <maven.exec-plugin.version>1.6.0</maven.exec-plugin.version>
-    <poi.version>3.17</poi.version>
+    <poi.version>4.1.1</poi.version>
     <poi-ooxml.version>3.17</poi-ooxml.version>
     <poi-ooxml-schemas.version>3.17</poi-ooxml-schemas.version>
   </properties>
