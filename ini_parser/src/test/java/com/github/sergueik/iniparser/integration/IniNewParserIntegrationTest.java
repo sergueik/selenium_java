@@ -10,9 +10,10 @@ import static org.junit.Assert.assertTrue;
 // import static com.jcabi.matchers.RegexMatchers;
 
 import java.io.IOException;
-
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -34,9 +35,11 @@ import com.github.sergueik.iniparser.IniNewParser;
 @SuppressWarnings("deprecation")
 public class IniNewParserIntegrationTest {
 
+	private static String iniFilename = "data.ini";
 	private static IniNewParser parser = IniNewParser.getInstance();
 	private static String iniFile = String.format("%s/src/main/resources/%s",
-			System.getProperty("user.dir"), "data.ini");
+			System.getProperty("user.dir"), iniFilename).replaceAll("\\\\", "/");
+
 	private static Map<String, Map<String, Object>> data = new HashMap<>();
 	private static Map<String, Object> sectionData = new HashMap<>();
 	private static String[] entries = { "message", "flag", "number", "empty" };
@@ -50,8 +53,30 @@ public class IniNewParserIntegrationTest {
 	@Before
 	public void loadIniFileResource() throws IOException {
 		parser.parseFile(iniFile);
+
 		data = parser.getData();
 		sectionData = data.get("Section1");
+	}
+
+	@Test
+	public void printResourcePathTest() throws IOException {
+		List<String> paths = new ArrayList<>();
+		Enumeration<URL> urls = IniNewParser.class.getClassLoader()
+				.getResources(iniFilename);
+		while (urls.hasMoreElements()) {
+			paths.add(urls.nextElement().getPath());
+
+		}
+		System.err.println("Resource " + iniFilename + " paths: " + paths);
+		String resourcePathCurrentThread = Thread.currentThread()
+				.getContextClassLoader().getResource(iniFilename).getPath();
+		System.err.println("Resource " + iniFilename + " Current Thread Path: "
+				+ resourcePathCurrentThread);
+		// will end with be ".../test-classes"
+		String resourceUserDirPath = String.format("%s/src/main/resources/%s",
+				System.getProperty("user.dir"), iniFilename).replaceAll("\\\\", "/");
+		System.err.println(
+				"resource " + iniFilename + " user.dir Path: " + resourceUserDirPath);
 	}
 
 	@Test
