@@ -1,11 +1,12 @@
 package example;
 
+import sun.net.util.IPAddressUtil;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.net.InetAddress;
 import java.net.URL;
 
 import java.nio.file.Files;
@@ -59,6 +60,8 @@ public class App {
 	private Map<String, String> flags = new HashMap<>();
 	private static Map<String, List<String>> dsMap = new HashMap<>();
 
+	private static List<Map<String, String>> metricsData = new ArrayList<>();
+
 	private static boolean noop = false;
 	private static boolean debug = false;
 	private static boolean legacy = false;
@@ -70,6 +73,7 @@ public class App {
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
 	private static String databaseTable = "cache_table";
+	private static String databaseTable2 = "metric_table";
 	private static String databaseUser = null;
 	private static String databasePassword = null;
 
@@ -77,12 +81,17 @@ public class App {
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
 
+	private static String hostname = null;
+
 	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
+
 		options.addOption("s", "save", false, "save");
 		options.addOption("l", "legacy", false, "legacy");
 		options.addOption("p", "path", true, "path to scan");
+
+		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
@@ -122,6 +131,17 @@ public class App {
 		if (commandLine.hasOption("legacy")) {
 			legacy = true;
 		}
+
+		// NOTE; some challenge with hostname argument added to within some other
+		// argument check
+		hostname = commandLine.getOptionValue("x");
+		if (hostname == null) {
+			System.err.println("Missing argument: hostname. Using default");
+			hostname = "hostname";
+		} else {
+			System.err.println("hostname: " + hostname);
+		}
+
 		String vendor = commandLine.getOptionValue("vendor");
 		if (vendor == null) {
 			System.err.println("Missing argument: vendor. Using default");
@@ -207,7 +227,7 @@ public class App {
 		if (save) {
 			if (legacy) {
 				createTableForLegacyData();
-				saveLegacyData(dsMap);
+				saveLegacyData(metricsData);
 				displayLegacyData();
 			} else {
 				createTable();
@@ -233,8 +253,41 @@ public class App {
 
 	}
 
+	// NOTE: close replica of displayData method
 	private static void displayLegacyData() {
-		// TODO
+
+		try {
+			System.err.println(
+					"Querying data : " + connection.getMetaData().getDatabaseProductName()
+							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
+							+ connection.getSchema());
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+
+			ResultSet rs = statement.executeQuery(String.format(
+					"SELECT DISTINCT hostname" + "," + "timestamp" + "," + "memory" + ","
+							+ "cpu" + "," + "disk" + ","
+							+ "load_average FROM %s ORDER BY hostname, timestamp",
+					databaseTable2));
+			while (rs.next()) {
+				System.err.println("hostname = " + rs.getString("hostname") + "\t"
+						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
+						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
+						+ "\t" + "memory = " + rs.getString("memory") + "\t"
+						+ "load_average = " + rs.getString("load_average"));
+			}
+			statement.close();
+			statement = connection.createStatement();
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		} finally {
+			try {
+				if (connection != null)
+					connection.close();
+			} catch (SQLException e) {
+				System.err.println(e);
+			}
+		}
 	}
 
 	private static void displayData() {
@@ -273,7 +326,27 @@ public class App {
 		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
 		// KEY(`id`) )
 		// NOTE:
-		createTableCommon();
+		try {
+			createTableCommon();
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			String sql = String.format(
+					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
+							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
+							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
+							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
+					databaseTable2);
+			System.out.println("Running SQL: " + sql);
+			statement.executeUpdate(sql);
+			statement.close();
+
+		} catch (SQLException e) {
+			System.err.println("Exception (ignored)" + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
+					+ e.getMessage());
+			System.exit(1);
+		}
 	}
 
 	private static void createTableCommon() {
@@ -346,8 +419,64 @@ public class App {
 		*/
 	}
 
-	private static void saveLegacyData(Map<String, List<String>> dsMap) {
-		// TODO
+	// origin:
+	// http://www.java2s.com/example/java/network/given-an-ip-in-a-numeric-string-format-return-the-inetaddress.html
+	/**
+	 * Given an ip in numeric format, return the InetAddress.
+	 * @param ip the ip address in long (such as 3232235780)
+	 * @return the InetAddress object (such as the object representing 192.168.1.4)
+	 */
+	@SuppressWarnings("restriction")
+	public static byte[] parseNumericIp(String ipAddress) {
+
+		byte[] addressBytes = null;
+		addressBytes = IPAddressUtil.textToNumericFormatV4(ipAddress);
+		return addressBytes;
+
+	}
+
+	// NOTE: largely a replica of "saveData"
+	private static void saveLegacyData(List<Map<String, String>> metricsData) {
+		// System.err.println("xxx" + parseNumericIp("10.82.212.300"));
+		System.err.println("Saving data");
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.executeUpdate("delete from " + databaseTable);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		metricsData.stream().forEach(row -> {
+			String hostname = row.get("hostname");
+			String timestamp = row.get("timestamp");
+			String memory = row.get("memory");
+			String cpu = row.get("cpu");
+			String disk = row.get("disk");
+			String load_average = row.get("load_average");
+			try {
+
+				// TODO
+				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
+						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
+						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
+						+ " VALUES (?, ?, ?,?, ?, ?, ?);", databaseTable2);
+				PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+				int id = randomId.nextInt(1_000_000_000);
+				preparedStatement.setInt(1, id);
+				preparedStatement.setString(2, hostname);
+				preparedStatement.setString(3, timestamp);
+				preparedStatement.setString(4, memory);
+				preparedStatement.setString(5, cpu);
+				preparedStatement.setString(6, disk);
+				preparedStatement.setString(7, load_average);
+				preparedStatement.execute();
+
+			} catch (SQLException e) {
+				System.err.println(e.getMessage());
+			}
+		});
+
 	}
 
 	private static void saveData(Map<String, List<String>> dsMap) {
@@ -441,7 +570,7 @@ public class App {
 			// if (debug)
 			System.err.println(String.format("Ingesting %d files: ", result.size()));
 			result.stream().forEach(o -> {
-				String hostname = "hostname";
+
 				hostData = new HostData(hostname, basePath.toAbsolutePath().toString(),
 						o.getFileName().toString());
 
@@ -463,6 +592,7 @@ public class App {
 						System.err.println("added data: " + data.keySet());
 					data.put("timestamp", Long.toString(timestamp, 10));
 					data.put("hostname", hostname);
+					metricsData.add(data);
 				} else {
 					if (debug)
 						System.err.println("data is empty: " + o.getFileName().toString());
