@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,6 +36,8 @@ import org.apache.commons.cli.ParseException;
 
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdMemoryBackendFactory;
+
+import example.HostData;
 
 // https://bitbucket.org/xerial/sqlite-jdbc
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
@@ -59,6 +61,7 @@ public class App {
 
 	private static boolean noop = false;
 	private static boolean debug = false;
+	private static boolean legacy = false;
 	private static boolean save = false;
 	private static boolean verifylinks = false;
 
@@ -78,6 +81,7 @@ public class App {
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
 		options.addOption("s", "save", false, "save");
+		options.addOption("l", "legacy", false, "legacy");
 		options.addOption("p", "path", true, "path to scan");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
@@ -113,6 +117,10 @@ public class App {
 
 		if (commandLine.hasOption("save")) {
 			save = true;
+		}
+
+		if (commandLine.hasOption("legacy")) {
+			legacy = true;
 		}
 		String vendor = commandLine.getOptionValue("vendor");
 		if (vendor == null) {
@@ -197,9 +205,15 @@ public class App {
 		}
 
 		if (save) {
-			createTable();
-			saveData(dsMap);
-			displayData();
+			if (legacy) {
+				createTableForLegacyData();
+				saveLegacyData(dsMap);
+				displayLegacyData();
+			} else {
+				createTable();
+				saveData(dsMap);
+				displayData();
+			}
 		}
 		if (debug) {
 			System.err.println("Done: " + path);
@@ -219,9 +233,12 @@ public class App {
 
 	}
 
+	private static void displayLegacyData() {
+		// TODO
+	}
+
 	private static void displayData() {
 		try {
-
 			System.err.println(
 					"Querying data : " + connection.getMetaData().getDatabaseProductName()
 							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
@@ -250,7 +267,16 @@ public class App {
 		}
 	}
 
-	private static void createTable() {
+	private static void createTableForLegacyData() {
+		// TODO - join with hostname/appid/invironment
+		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
+		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
+		// KEY(`id`) )
+		// NOTE:
+		createTableCommon();
+	}
+
+	private static void createTableCommon() {
 		connection = null;
 
 		final String databasePath = String.format("%s%s%s",
@@ -267,6 +293,19 @@ public class App {
 					+ "catalog: " + connection.getCatalog() + "\t" + "schema: "
 					+ connection.getSchema());
 
+		} catch (SQLException e) {
+			System.err.println("Exception (ignored)" + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
+					+ e.getMessage());
+			System.exit(1);
+		}
+
+	}
+
+	private static void createTable() {
+		try {
+			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			String sql = String.format(
@@ -307,6 +346,10 @@ public class App {
 		*/
 	}
 
+	private static void saveLegacyData(Map<String, List<String>> dsMap) {
+		// TODO
+	}
+
 	private static void saveData(Map<String, List<String>> dsMap) {
 		System.err.println("Saving data");
 		try {
@@ -340,6 +383,23 @@ public class App {
 
 	}
 
+	private static HostData hostData = null;
+	private static Map<String, String> data = new HashMap<>();
+	private static Map<String, String> metricExtractors = new HashMap<>();
+	// TODO: initialize
+	// {'load_average':'\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*',
+	// rpm:'\\b(\\d+)\\b', rpm_custom_name:'\\b(\\d+)\\b'}
+
+	private static String[] labelNames = { "instance", "dc", "app", "env" };
+
+	private static String[] metricNames = { "memory", "cpu", "disk",
+			"load_average" };
+
+	private static Map<String, String> extractedMetricNames = new HashMap<>();
+	// TODO: initialize
+
+	// { 'load_average': 'loadaverage'}
+
 	private static Map<String, List<String>> listFilesDsNames(String path,
 			List<String> collectFolders, List<String> rejectFolders)
 			throws IOException {
@@ -372,12 +432,42 @@ public class App {
 			walk.filter(Files::isRegularFile)
 					.filter(o -> o.getFileName().toString().matches(filemask))
 					.forEach(o -> {
-						System.err.println("add: " + o.getFileName().toString());
+						if (debug)
+							System.err.println("found file: " + o.getFileName().toString());
 						result.add(o);
 					});
 		}
 		if (noop) {
-			System.err.println("Files: " + result);
+			// if (debug)
+			System.err.println(String.format("Ingesting %d files: ", result.size()));
+			result.stream().forEach(o -> {
+				String hostname = "hostname";
+				hostData = new HostData(hostname, basePath.toAbsolutePath().toString(),
+						o.getFileName().toString());
+
+				hostData.setMetrics(Arrays.asList(metricNames));
+				if (debug)
+					System.err
+							.println("about to add data: " + Arrays.asList(metricNames));
+				hostData.setExtractedMetricNames(extractedMetricNames);
+				hostData.setMetricExtractors(metricExtractors);
+				hostData.readData();
+				long timestamp = hostData.getTimestamp();
+				if (timestamp == 0)
+					timestamp = Instant.now().toEpochMilli();
+				if (debug)
+					System.err.println("adding timestamp: " + timestamp);
+				data = hostData.getData();
+				if (data != null && !data.isEmpty()) {
+					if (debug)
+						System.err.println("added data: " + data.keySet());
+					data.put("timestamp", Long.toString(timestamp, 10));
+					data.put("hostname", hostname);
+				} else {
+					if (debug)
+						System.err.println("data is empty: " + o.getFileName().toString());
+				}
+			});
 			return new HashMap<>();
 		}
 		result.stream().forEach(o -> {
@@ -402,6 +492,7 @@ public class App {
 				System.err.println("Exception (ignored): " + e.toString());
 			}
 		});
+
 		assertThat(dsMap, notNullValue());
 		return dsMap;
 	}
@@ -568,6 +659,8 @@ public class App {
 	public static void help() {
 		System.err.println("Usage:\n"
 				+ "java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --file my.db --collect file1,file2 --reject file3,file4");
+		System.err
+				.println("use --legacy to import metrics from legacy plain text files");
 		System.exit(0);
 	}
 
