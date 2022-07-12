@@ -1,7 +1,9 @@
 #!/usr/bin/bash
-YEAR=2022
-MONTH=06
-DAY=29
+YEAR=${1:-2022}
+MONTH=${2:-06}
+DAY=${3:-30}
+
+
 date="$YEAR$MONTH$DAY" # no separators
 datadir=$date
 mkdir $datadir

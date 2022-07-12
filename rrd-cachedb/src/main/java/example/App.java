@@ -62,6 +62,13 @@ public class App {
 
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
 
+	private static HostData hostData = null;
+	private static Map<String, String> data = new HashMap<>();
+	private static Map<String, String> metricExtractors = new HashMap<>();
+	// TODO: initialize
+	// {'load_average':'\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*',
+	// rpm:'\\b(\\d+)\\b', rpm_custom_name:'\\b(\\d+)\\b'}
+
 	private static boolean noop = false;
 	private static boolean debug = false;
 	private static boolean legacy = false;
@@ -228,7 +235,8 @@ public class App {
 			if (legacy) {
 				createTableForLegacyData();
 				saveLegacyData(metricsData);
-				displayLegacyData();
+				// uncomment to run select with output to the console
+				// displayLegacyData();
 			} else {
 				createTable();
 				saveData(dsMap);
@@ -320,35 +328,6 @@ public class App {
 		}
 	}
 
-	private static void createTableForLegacyData() {
-		// TODO - join with hostname/appid/invironment
-		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
-		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
-		// KEY(`id`) )
-		// NOTE:
-		try {
-			createTableCommon();
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
-							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
-							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
-							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable2);
-			System.out.println("Running SQL: " + sql);
-			statement.executeUpdate(sql);
-			statement.close();
-
-		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
-			System.exit(1);
-		}
-	}
-
 	private static void createTableCommon() {
 		connection = null;
 
@@ -419,30 +398,42 @@ public class App {
 		*/
 	}
 
-	// origin:
-	// http://www.java2s.com/example/java/network/given-an-ip-in-a-numeric-string-format-return-the-inetaddress.html
-	/**
-	 * Given an ip in numeric format, return the InetAddress.
-	 * @param ip the ip address in long (such as 3232235780)
-	 * @return the InetAddress object (such as the object representing 192.168.1.4)
-	 */
-	@SuppressWarnings("restriction")
-	public static byte[] parseNumericIp(String ipAddress) {
+	private static void createTableForLegacyData() {
+		// TODO - join with hostname/appid/invironment:
+		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
+		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
+		// KEY(`id`) )
+		// NOTE:
+		try {
+			createTableCommon();
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			String sql = String.format(
+					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
+							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
+							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
+							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
+					databaseTable2);
+			System.out.println("Running SQL: " + sql);
+			statement.executeUpdate(sql);
+			statement.close();
 
-		byte[] addressBytes = null;
-		addressBytes = IPAddressUtil.textToNumericFormatV4(ipAddress);
-		return addressBytes;
-
+		} catch (SQLException e) {
+			System.err.println("Exception (ignored)" + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
+					+ e.getMessage());
+			System.exit(1);
+		}
 	}
 
 	// NOTE: largely a replica of "saveData"
 	private static void saveLegacyData(List<Map<String, String>> metricsData) {
-		// System.err.println("xxx" + parseNumericIp("10.82.212.300"));
 		System.err.println("Saving data");
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable);
+			statement.executeUpdate("delete from " + databaseTable2);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -506,18 +497,10 @@ public class App {
 				} catch (SQLException e) {
 					System.err.println(e.getMessage());
 				}
-
 			});
 		});
 
 	}
-
-	private static HostData hostData = null;
-	private static Map<String, String> data = new HashMap<>();
-	private static Map<String, String> metricExtractors = new HashMap<>();
-	// TODO: initialize
-	// {'load_average':'\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*',
-	// rpm:'\\b(\\d+)\\b', rpm_custom_name:'\\b(\\d+)\\b'}
 
 	private static String[] labelNames = { "instance", "dc", "app", "env" };
 
@@ -547,6 +530,7 @@ public class App {
 				String key = o.getFileName().toString();
 				System.err.println("inspect: " + key);
 				boolean status = true;
+				// NOTE: exact match required
 				if ((collectFolders.size() > 0 && !collectFolders.contains(key))
 						|| rejectFolders.size() > 0 && rejectFolders.contains(key)) {
 					status = false;
@@ -571,7 +555,8 @@ public class App {
 			System.err.println(String.format("Ingesting %d files: ", result.size()));
 			result.stream().forEach(o -> {
 
-				hostData = new HostData(hostname, basePath.toAbsolutePath().toString(),
+				hostData = new HostData(hostname,
+						o.getParent().toAbsolutePath().toString(),
 						o.getFileName().toString());
 
 				hostData.setMetrics(Arrays.asList(metricNames));

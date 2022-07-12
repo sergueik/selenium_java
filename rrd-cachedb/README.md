@@ -189,12 +189,44 @@ illustrating the process
 ### Legacy Data Files Inventory
 * prepare directory
 ```sh
-./mkdatafiles.sh
+./mkdatafiles.sh 2022 06 28
+./mkdatafiles.sh 2022 06 29
+./mkdatafiles.sh 2022 06 30
+```
+```
+mv 2022028/ host1
+mv 2022029/ host1
+mv 2022030/ host1
 ```
 NOTE: building a one day worth of data takes approx 5 minute on Windows machine, git bash. It is significantly faster to touch files instead of storing a metric in each
 * run the scanner to inventory 
 ```cmd
 java -cp target\example.rrd-cachedb.jar;target\lib\* example.App -p 20220629 -s -i 20220629 -n
+```
+```
+java -cp target\example.rrd-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220628,20220629,20220630  -n -legacy --hostname host1
+```
+
+will print to console
+
+```text
+hostname: host1
+Missing argument: vendor. Using default
+Missing argument: sqliteDatabaseName. Using default
+Scanning path: /C:/developer/sergueik/selenium_java/rrd-cachedb/host1/
+inspect: host1
+status: false
+inspect: 20220629
+status: true
+inspect: 20220630
+status: true
+Ingesting 2880 files:
+Opened database connection successfully: C:\Users\Serguei\cache.db
+Connected to product: SQLite    catalog: null   schema: null
+Running SQL: CREATE TABLE IF NOT EXISTS metric_table ( `id` INTEGER,`hostname` T
+EXT NOT NULL,`timestamp` TEXT,`memory` TEXT,`cpu` TEXT,`disk` TEXT,`load_average
+` TEXT,PRIMARY KEY(`id`));
+Saving data
 ```
 
 ### See Also
