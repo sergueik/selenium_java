@@ -147,7 +147,6 @@ public class HostData {
 			BufferedReader bufferedReader = new BufferedReader(
 					new InputStreamReader(in));
 
-			// NOTE: too comples logic - needs review
 			while ((line = bufferedReader.readLine()) != null) {
 
 				Pattern pattern = Pattern.compile("timestamp: " + "([^ ]*)$");
@@ -156,7 +155,6 @@ public class HostData {
 					this.timestamp = Long.parseLong(matcher.group(1));
 				}
 
-				// System.err.println("reading the data: " + line);
 				key = null;
 				value = null;
 				// collect metrics with non-blank values
@@ -166,8 +164,9 @@ public class HostData {
 				if (matcher.find()) {
 					key = matcher.group(1);
 					value = matcher.group(2);
-					// System.err.println("reading the data: " + key + " = " + value);
-					// data.put(key, value);
+					if (debug)
+						System.err.println(
+								String.format("reading data for metric %s = %s", key, value));
 				}
 				// NOTE: "mKey" to prevent duplicate variable compiler error
 				for (String mKey : metricExtractors.keySet()) {
@@ -181,8 +180,12 @@ public class HostData {
 						key = mKey;
 						value = matcher.group(1);
 						if (debug)
-							logger.info(
-									String.format("Found data for metric %s: %s", key, value));
+							System.err.println(
+									String.format("reading data for metric %s = %s", key, value));
+
+						// NOTE: in the absence of logback.xml no console logging
+						// logger.info( String.format("Found data for metric %s: %s", key,
+						// value));
 					}
 				}
 				// NOTE: hack
@@ -190,9 +193,10 @@ public class HostData {
 					String realKey = extractedMetricNames != null
 							&& extractedMetricNames.containsKey(key)
 									? extractedMetricNames.get(key) : key;
-					if (debug)
-						logger.info(String.format("Adding data for metric %s(%s): %s", key,
-								realKey, value));
+					// if (debug)
+						// NOTE: in the absence of logback.xml no console logging
+						// logger.info(String.format("Adding data for metric %s(%s): %s", key,
+						//		realKey, value));
 					data.put(realKey, value);
 				}
 			}

@@ -207,7 +207,7 @@ java -cp target\example.rrd-cachedb.jar;target\lib\* example.App -p 20220629 -s 
 java -cp target\example.rrd-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220628,20220629,20220630  -n -legacy --hostname host1
 ```
 
-will print to console
+will print to console (output is truncated):
 
 ```text
 hostname: host1
@@ -216,17 +216,41 @@ Missing argument: sqliteDatabaseName. Using default
 Scanning path: /C:/developer/sergueik/selenium_java/rrd-cachedb/host1/
 inspect: host1
 status: false
+inspect: 20220628
+status: false
 inspect: 20220629
 status: true
 inspect: 20220630
-status: true
-Ingesting 2880 files:
-Opened database connection successfully: C:\Users\Serguei\cache.db
-Connected to product: SQLite    catalog: null   schema: null
-Running SQL: CREATE TABLE IF NOT EXISTS metric_table ( `id` INTEGER,`hostname` T
-EXT NOT NULL,`timestamp` TEXT,`memory` TEXT,`cpu` TEXT,`disk` TEXT,`load_average
-` TEXT,PRIMARY KEY(`id`));
+status: false
+found file: data.txt.202206290000
+found file: data.txt.202206290001
+found file: data.txt.202206290002
+found file: data.txt.202206290003
+...
+Ingesting 1440 files: 
+about to add data: [memory, cpu, disk, load_average]
+reading data for metric cpu = 12
+reading data for metric memory = 22
+reading data for metric disk = 42.5
+reading data for metric load_average = 6
+reading data for metric rpm = 102
+adding timestamp: 1656475200000
+added data: [disk, memory, load_average, cpu, rpm]
+...
 Saving data
+about to insert data row: [host1, 1656475200000, 22, 12, 42.5, 6]
+about to insert data row: [host1, 1656475260000, 22, 12, 42.5, 6]
+about to insert data row: [host1, 1656475320000, 22, 12, 42.5, 6]
+about to insert data row: [host1, 1656475380000, 22, 12, 42.5, 6]
+about to insert data row: [host1, 1656475440000, 22, 12, 42.5, 6]
+...
+Querying data : SQLite	catalog: null	schema: null
+hostname = host1        timestamp = 1656561480000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+hostname = host1        timestamp = 1656561540000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+...
+Done: host1
 ```
 
 ### See Also

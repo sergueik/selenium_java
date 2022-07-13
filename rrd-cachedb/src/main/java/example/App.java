@@ -1,6 +1,5 @@
 package example;
 
-import sun.net.util.IPAddressUtil;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -65,9 +64,12 @@ public class App {
 	private static HostData hostData = null;
 	private static Map<String, String> data = new HashMap<>();
 	private static Map<String, String> metricExtractors = new HashMap<>();
-	// TODO: initialize
-	// {'load_average':'\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*',
-	// rpm:'\\b(\\d+)\\b', rpm_custom_name:'\\b(\\d+)\\b'}
+
+	static {
+		metricExtractors.put("load_average",
+				"\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*");
+		metricExtractors.put("rpm", "\\b(\\d+)\\b");
+	}
 
 	private static boolean noop = false;
 	private static boolean debug = false;
@@ -89,6 +91,14 @@ public class App {
 	private static CommandLine commandLine = null;
 
 	private static String hostname = null;
+	private static String[] labelNames = { "instance", "dc", "app", "env" };
+
+	private static String[] metricNames = { "memory", "cpu", "disk",
+			"load_average" };
+
+	private static Map<String, String> extractedMetricNames = new HashMap<>();
+	// TODO: initialize
+	// { 'load_average': 'loadaverage'}
 
 	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "help");
@@ -444,6 +454,11 @@ public class App {
 			String cpu = row.get("cpu");
 			String disk = row.get("disk");
 			String load_average = row.get("load_average");
+			if (debug)
+				System.err
+						.println("about to insert data row: " + Arrays.asList(new String[] {
+								hostname, timestamp, memory, cpu, disk, load_average }));
+
 			try {
 
 				// TODO
@@ -502,16 +517,6 @@ public class App {
 
 	}
 
-	private static String[] labelNames = { "instance", "dc", "app", "env" };
-
-	private static String[] metricNames = { "memory", "cpu", "disk",
-			"load_average" };
-
-	private static Map<String, String> extractedMetricNames = new HashMap<>();
-	// TODO: initialize
-
-	// { 'load_average': 'loadaverage'}
-
 	private static Map<String, List<String>> listFilesDsNames(String path,
 			List<String> collectFolders, List<String> rejectFolders)
 			throws IOException {
@@ -558,7 +563,9 @@ public class App {
 				hostData = new HostData(hostname,
 						o.getParent().toAbsolutePath().toString(),
 						o.getFileName().toString());
-
+				// sync debug settings
+				hostData.setDebug(debug);
+				// NOTE: metricNames are used in SQL insert when processing metricsData
 				hostData.setMetrics(Arrays.asList(metricNames));
 				if (debug)
 					System.err
