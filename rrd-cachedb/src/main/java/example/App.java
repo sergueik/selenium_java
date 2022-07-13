@@ -5,7 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
+
 import java.net.URL;
 
 import java.nio.file.Files;
@@ -18,7 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.Instant;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,19 +37,12 @@ import org.apache.commons.cli.ParseException;
 import org.rrd4j.core.RrdDb;
 import org.rrd4j.core.RrdMemoryBackendFactory;
 
-import example.HostData;
-
 // https://bitbucket.org/xerial/sqlite-jdbc
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
 
 public class App {
 
-	// TODO: make a parameter
-	// for RRD inventory operations
-	// private static final String filemask = ".*rrd$";
-	// for legacy data.txt inventory operations
-	private static final String filemask = "data.txt.*$";
-
+	private static final String filemask = ".*rrd$";
 	private static final Random randomId = new Random();
 	private static Connection connection = null;
 	private static String osName = getOSName();
@@ -59,21 +52,8 @@ public class App {
 	private Map<String, String> flags = new HashMap<>();
 	private static Map<String, List<String>> dsMap = new HashMap<>();
 
-	private static List<Map<String, String>> metricsData = new ArrayList<>();
-
-	private static HostData hostData = null;
-	private static Map<String, String> data = new HashMap<>();
-	private static Map<String, String> metricExtractors = new HashMap<>();
-
-	static {
-		metricExtractors.put("load_average",
-				"\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(?:\\S+)\\s\\s*(\\S+)\\s*");
-		metricExtractors.put("rpm", "\\b(\\d+)\\b");
-	}
-
-	private static boolean noop = false;
 	private static boolean debug = false;
-	private static boolean legacy = false;
+	private static boolean noop = false;
 	private static boolean save = false;
 	private static boolean verifylinks = false;
 
@@ -82,7 +62,6 @@ public class App {
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
 	private static String databaseTable = "cache_table";
-	private static String databaseTable2 = "metric_table";
 	private static String databaseUser = null;
 	private static String databasePassword = null;
 
@@ -90,25 +69,11 @@ public class App {
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
 
-	private static String hostname = null;
-	private static String[] labelNames = { "instance", "dc", "app", "env" };
-
-	private static String[] metricNames = { "memory", "cpu", "disk",
-			"load_average" };
-
-	private static Map<String, String> extractedMetricNames = new HashMap<>();
-	// TODO: initialize
-	// { 'load_average': 'loadaverage'}
-
 	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
-
 		options.addOption("s", "save", false, "save");
-		options.addOption("l", "legacy", false, "legacy");
 		options.addOption("p", "path", true, "path to scan");
-
-		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
@@ -144,21 +109,6 @@ public class App {
 		if (commandLine.hasOption("save")) {
 			save = true;
 		}
-
-		if (commandLine.hasOption("legacy")) {
-			legacy = true;
-		}
-
-		// NOTE; some challenge with hostname argument added to within some other
-		// argument check
-		hostname = commandLine.getOptionValue("x");
-		if (hostname == null) {
-			System.err.println("Missing argument: hostname. Using default");
-			hostname = "hostname";
-		} else {
-			System.err.println("hostname: " + hostname);
-		}
-
 		String vendor = commandLine.getOptionValue("vendor");
 		if (vendor == null) {
 			System.err.println("Missing argument: vendor. Using default");
@@ -242,16 +192,9 @@ public class App {
 		}
 
 		if (save) {
-			if (legacy) {
-				createTableForLegacyData();
-				saveLegacyData(metricsData);
-				// uncomment to run select with output to the console
-				// displayLegacyData();
-			} else {
-				createTable();
-				saveData(dsMap);
-				displayData();
-			}
+			createTable();
+			saveData(dsMap);
+			displayData();
 		}
 		if (debug) {
 			System.err.println("Done: " + path);
@@ -271,45 +214,9 @@ public class App {
 
 	}
 
-	// NOTE: close replica of displayData method
-	private static void displayLegacyData() {
-
-		try {
-			System.err.println(
-					"Querying data : " + connection.getMetaData().getDatabaseProductName()
-							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
-							+ connection.getSchema());
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-
-			ResultSet rs = statement.executeQuery(String.format(
-					"SELECT DISTINCT hostname" + "," + "timestamp" + "," + "memory" + ","
-							+ "cpu" + "," + "disk" + ","
-							+ "load_average FROM %s ORDER BY hostname, timestamp",
-					databaseTable2));
-			while (rs.next()) {
-				System.err.println("hostname = " + rs.getString("hostname") + "\t"
-						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
-						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
-						+ "\t" + "memory = " + rs.getString("memory") + "\t"
-						+ "load_average = " + rs.getString("load_average"));
-			}
-			statement.close();
-			statement = connection.createStatement();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				System.err.println(e);
-			}
-		}
-	}
-
 	private static void displayData() {
 		try {
+
 			System.err.println(
 					"Querying data : " + connection.getMetaData().getDatabaseProductName()
 							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
@@ -338,7 +245,7 @@ public class App {
 		}
 	}
 
-	private static void createTableCommon() {
+	private static void createTable() {
 		connection = null;
 
 		final String databasePath = String.format("%s%s%s",
@@ -355,19 +262,6 @@ public class App {
 					+ "catalog: " + connection.getCatalog() + "\t" + "schema: "
 					+ connection.getSchema());
 
-		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
-			System.exit(1);
-		}
-
-	}
-
-	private static void createTable() {
-		try {
-			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			String sql = String.format(
@@ -408,83 +302,6 @@ public class App {
 		*/
 	}
 
-	private static void createTableForLegacyData() {
-		// TODO - join with hostname/appid/invironment:
-		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
-		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
-		// KEY(`id`) )
-		// NOTE:
-		try {
-			createTableCommon();
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
-							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
-							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
-							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable2);
-			System.out.println("Running SQL: " + sql);
-			statement.executeUpdate(sql);
-			statement.close();
-
-		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
-			System.exit(1);
-		}
-	}
-
-	// NOTE: largely a replica of "saveData"
-	private static void saveLegacyData(List<Map<String, String>> metricsData) {
-		System.err.println("Saving data");
-		try {
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable2);
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		}
-		metricsData.stream().forEach(row -> {
-			String hostname = row.get("hostname");
-			String timestamp = row.get("timestamp");
-			String memory = row.get("memory");
-			String cpu = row.get("cpu");
-			String disk = row.get("disk");
-			String load_average = row.get("load_average");
-			if (debug)
-				System.err
-						.println("about to insert data row: " + Arrays.asList(new String[] {
-								hostname, timestamp, memory, cpu, disk, load_average }));
-
-			try {
-
-				// TODO
-				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
-						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
-						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
-						+ " VALUES (?, ?, ?,?, ?, ?, ?);", databaseTable2);
-				PreparedStatement preparedStatement = connection.prepareStatement(sql);
-
-				int id = randomId.nextInt(1_000_000_000);
-				preparedStatement.setInt(1, id);
-				preparedStatement.setString(2, hostname);
-				preparedStatement.setString(3, timestamp);
-				preparedStatement.setString(4, memory);
-				preparedStatement.setString(5, cpu);
-				preparedStatement.setString(6, disk);
-				preparedStatement.setString(7, load_average);
-				preparedStatement.execute();
-
-			} catch (SQLException e) {
-				System.err.println(e.getMessage());
-			}
-		});
-
-	}
-
 	private static void saveData(Map<String, List<String>> dsMap) {
 		System.err.println("Saving data");
 		try {
@@ -512,11 +329,13 @@ public class App {
 				} catch (SQLException e) {
 					System.err.println(e.getMessage());
 				}
+
 			});
 		});
 
 	}
 
+	@SuppressWarnings("unused")
 	private static Map<String, List<String>> listFilesDsNames(String path,
 			List<String> collectFolders, List<String> rejectFolders)
 			throws IOException {
@@ -555,43 +374,6 @@ public class App {
 						result.add(o);
 					});
 		}
-		if (noop) {
-			// if (debug)
-			System.err.println(String.format("Ingesting %d files: ", result.size()));
-			result.stream().forEach(o -> {
-
-				hostData = new HostData(hostname,
-						o.getParent().toAbsolutePath().toString(),
-						o.getFileName().toString());
-				// sync debug settings
-				hostData.setDebug(debug);
-				// NOTE: metricNames are used in SQL insert when processing metricsData
-				hostData.setMetrics(Arrays.asList(metricNames));
-				if (debug)
-					System.err
-							.println("about to add data: " + Arrays.asList(metricNames));
-				hostData.setExtractedMetricNames(extractedMetricNames);
-				hostData.setMetricExtractors(metricExtractors);
-				hostData.readData();
-				long timestamp = hostData.getTimestamp();
-				if (timestamp == 0)
-					timestamp = Instant.now().toEpochMilli();
-				if (debug)
-					System.err.println("adding timestamp: " + timestamp);
-				data = hostData.getData();
-				if (data != null && !data.isEmpty()) {
-					if (debug)
-						System.err.println("added data: " + data.keySet());
-					data.put("timestamp", Long.toString(timestamp, 10));
-					data.put("hostname", hostname);
-					metricsData.add(data);
-				} else {
-					if (debug)
-						System.err.println("data is empty: " + o.getFileName().toString());
-				}
-			});
-			return new HashMap<>();
-		}
 		result.stream().forEach(o -> {
 			try {
 				List<String> dsList = new ArrayList<>();
@@ -614,7 +396,6 @@ public class App {
 				System.err.println("Exception (ignored): " + e.toString());
 			}
 		});
-
 		assertThat(dsMap, notNullValue());
 		return dsMap;
 	}
@@ -781,9 +562,8 @@ public class App {
 	public static void help() {
 		System.err.println("Usage:\n"
 				+ "java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --file my.db --collect file1,file2 --reject file3,file4");
-		System.err
-				.println("use --legacy to import metrics from legacy plain text files");
 		System.exit(0);
 	}
 
 }
+
