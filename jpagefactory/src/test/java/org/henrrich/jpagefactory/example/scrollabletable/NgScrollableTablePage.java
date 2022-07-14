@@ -1,5 +1,6 @@
 package org.henrrich.jpagefactory.example.scrollabletable;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -49,8 +50,12 @@ public class NgScrollableTablePage {
 	}
 
 	private void waitPageLoad() {
-		wait = new WebDriverWait(ngDriver.getWrappedDriver(), flexibleWait);
-		wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		// wait = new WebDriverWait(ngDriver, flexibleWait);
+		wait = new WebDriverWait(ngDriver.getWrappedDriver(),
+				Duration.ofSeconds(flexibleWait));
+
+		// wait.pollingEvery(pollingInterval, TimeUnit.MILLISECONDS);
+		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		wait.until(ExpectedConditions
 				.visibilityOf(ngDriver.findElement(By.className("table-container"))));
 	}

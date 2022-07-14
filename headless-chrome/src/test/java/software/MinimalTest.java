@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.notNullValue;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,7 +33,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
 
 public class MinimalTest {
 
@@ -49,24 +55,36 @@ public class MinimalTest {
 			? String.format("%s\\Downloads",
 					getPropertyEnv("USERPROFILE", "C:\\Users\\Serguei"))
 			: String.format("%s/Downloads", getPropertyEnv("HOME", "/home/serguei"));
-	private final String version = "3.150.2";
+	private final String version = "4.2.0"; // "3.150.2";
+
+	private static boolean headless = false;
 
 	@BeforeClass
 	public static void setup() throws IOException {
 		getOSName();
-
+		headless = setHeadless();
 		System.setProperty("webdriver.chrome.driver", chomeDriverPath);
 
 		ChromeOptions options = new ChromeOptions();
-		options.setBinary(osName.equals("windows")
-				? (new File(
-						"C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"))
-								.getAbsolutePath()
+		// TODO: 64 bit
+		// PROCESSOR_ARCHITECTURE=AMD64
+		options.setBinary(osName.equals("windows") ? (new File(
+
+				(System.getenv().containsKey("PROCESSOR_ARCHITECTURE")
+						&& System.getenv("PROCESSOR_ARCHITECTURE").matches("(?:AMD64)"))
+								? "C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"
+								: "C:/Program Files/Google/Chrome/Application/chrome.exe"))
+										.getAbsolutePath()
 				// TODO: determine on the fly
 				: "/usr/bin/chromium-browser" /* "/usr/bin/google-chrome" */ );
-		for (String optionAgrument : (new String[] { "headless",
-				"--window-size=1200x800", "disable-gpu" })) {
-			options.addArguments(optionAgrument);
+		if (headless) {
+			for (String optionAgrument : (new String[] { "headless",
+					"--window-size=1200x800", "disable-gpu" })) {
+				options.addArguments(optionAgrument);
+			}
+			System.out.println("Switching to headless");
+		} else {
+			System.out.println("Switching to / staying visible");
 		}
 
 		// based on:
@@ -82,14 +100,33 @@ public class MinimalTest {
 			options.setExperimentalOption("prefs", chromePrefs);
 		}
 		// configuration state support like remote driver
+		/*
 		ChromeDriverService chromeDriverSevice = new ChromeDriverService.Builder()
 				.usingDriverExecutable(new File(chomeDriverPath)).usingAnyFreePort()
 				.build();
 		chromeDriverSevice.start();
-
+		driver = new ChromeDriver(chromeDriverSevice, options);
+		* */
 		// driver = new ChromeDriver(options);
 
-		driver = new ChromeDriver(chromeDriverSevice, options);
+		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		// capabilities.setCapability("headless", true);
+		capabilities.setCapability("platform", "WINDOWS");
+		capabilities.setCapability("version", "latest");
+		RemoteWebDriver driver = new RemoteWebDriver(
+				new URL("http://localhost:4444/wd/hub"), capabilities);
+
+		// driver = new RemoteWebDriver(new URL("https://localhost:4444/"),
+		// capabilities);
+		/* "http://localhost:4444/wd/hub" for 3.x but it does not honor headless option - fails to set headless...*/
+		//
+
+		// driver = new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),
+		// 		options);
+		/* "http://localhost:4444" for 4.x */
+
+		assertThat(driver, notNullValue());
+		/*
 		if (useChromiumSendCommand) {
 			Map<String, Object> commandParams = new HashMap<>();
 			commandParams.put("cmd", "Page.setDownloadBehavior");
@@ -98,7 +135,7 @@ public class MinimalTest {
 			params.put("downloadPath", downloadFilepath);
 			commandParams.put("params", params);
 			JSONObject commandParamsObj = new JSONObject(commandParams);
-
+		
 			HttpClient httpClient = HttpClientBuilder.create().build();
 			String payload = commandParamsObj.toString();
 			System.err.println("Posting: " + payload);
@@ -109,17 +146,10 @@ public class MinimalTest {
 			request.setEntity(new StringEntity(payload));
 			httpClient.execute(request);
 		}
-
+		*/
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
 	}
 
-	@Ignore
-	@Test
-	public void testChromeDriver() throws Exception {
-		assertThat(driver, notNullValue());
-	}
-
-	// @Ignore
 	@Test
 	public void testDownload() throws Exception {
 		driver.get("http://www.seleniumhq.org/download/");
@@ -146,7 +176,10 @@ public class MinimalTest {
 				System.err.println("Found " + filePath);
 			}
 		}
-		assertThat(fileExists, is(true));
+		assertThat(
+				"Fileshoulr be present: "
+						+ String.format("IEDriverServer_Win32_%s.zip", version),
+				fileExists, is(true));
 	}
 
 	@Test
@@ -185,12 +218,12 @@ public class MinimalTest {
 			// obscures it (the name of obscuring element varies)
 			try {
 				// take screenshot in catch block.
-				System.err.println("Taking a screenshot");
 				File scrFile = ((TakesScreenshot) driver)
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot1.png");
+				System.err.println("Taking a screenshot " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());
@@ -220,16 +253,19 @@ public class MinimalTest {
 				// take screenshot in teardown.
 				System.err.println("Taking a screenshot");
 				File scrFile = ((TakesScreenshot) driver)
+
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot2.png");
+				System.err.println("Taking a screenshot " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());
 				// ignore
 			}
 			driver.quit();
+			// should we just close it ?
 		}
 	}
 
@@ -244,6 +280,54 @@ public class MinimalTest {
 		return osName;
 	}
 
+	public static boolean setHeadless() {
+		boolean headless = false;
+		if (System.getenv().containsKey("HEADLESS")
+				&& System.getenv("HEADLESS").matches("(?:true|yes|1)")) {
+			headless = true;
+		}
+		if (!(getOSName().equals("windows"))
+				&& !(System.getenv().containsKey("DISPLAY"))) {
+			headless = true;
+		}
+
+		// alternatively not even add the environment variable WINDOWS_NO_DISPLAY
+		if (getOSName().equals("windows")) {
+			headless = false;
+			System.out
+					.println("Observed environment keys: " + System.getenv().keySet());
+
+			for (String key : (new String[] { "JAVA_OPTS", "MAVEN_OPTS",
+					"JAVA_TOOL_OPTIONS" })) {
+				System.out.println(String.format("Checking environment %s: %s", key,
+						System.getenv(key)));
+			}
+
+			// NOTE: when set through batch file the new environment variable
+			// WINDOWS_NO_DISPLAY
+			// remains undiscovered
+			if (System.getenv().containsKey("WINDOWS_NO_DISPLAY")
+					&& System.getenv("WINDOWS_NO_DISPLAY").matches("(?:true|yes|1)")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY");
+				headless = true;
+			}
+			if (getPropertyEnv("WINDOWS_NO_DISPLAY", "").matches("(?:true|yes|1)")) {
+				System.out
+						.println("Detected WINDOWS_NO_DISPLAY environment or property");
+				headless = true;
+			}
+			if (System.getenv().containsKey("JAVA_TOOL_OPTIONS")
+					&& System.getenv("JAVA_TOOL_OPTIONS")
+							.matches(".*WINDOWS_NO_DISPLAY=(?:true|yes|1).*")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY in JAVA_TOOL_OPTIONS");
+				headless = true;
+			}
+		}
+		if (readProperty("headless", "").equalsIgnoreCase("true"))
+			headless = true;
+		return headless;
+	}
+
 	// origin:
 	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
 	public static String getPropertyEnv(String name, String defaultValue) {
@@ -255,6 +339,49 @@ public class MinimalTest {
 			}
 		}
 		return value;
+	}
+
+	// based on:
+	// https://github.com/abhishek8908/selenium-drivers-download-plugin/blob/master/src/main/java/com/github/abhishek8908/util/DriverUtil.java
+	public static String readProperty(String propertyName, String propertyFile,
+			String defaultValue) {
+		String resourcePath = "";
+		try {
+			resourcePath = Thread.currentThread().getContextClassLoader()
+					.getResource("").getPath();
+			// will be target/test-classes during surefire run
+			System.err.println(String.format(
+					"The running application resource path: \"%s\"", resourcePath));
+		} catch (NullPointerException e) {
+			System.err.println("Exception (ignored): " + e.toString());
+			/*
+			 * if (debug) { e.printStackTrace(); }
+			 */
+		}
+		Configuration config = null;
+		try {
+			System.err
+					.println(String.format("Trying to read config from path: \"%s\"",
+							resourcePath + propertyFile));
+			config = new PropertiesConfiguration(resourcePath + propertyFile);
+
+			Configuration extConfig = ((PropertiesConfiguration) config)
+					.interpolatedConfiguration();
+			final String value = extConfig.getProperty(propertyName).toString();
+			return (value == null) ? defaultValue : value;
+		} catch (ConfigurationException e) {
+			return null;
+		}
+	}
+
+	public static String readProperty(String propertyName) {
+		return readProperty(propertyName, "application.properties", null);
+	}
+
+	public static String readProperty(String propertyName, String defaultValue) {
+		final String value = readProperty(propertyName, "application.properties",
+				defaultValue);
+		return value == null ? defaultValue : value;
 	}
 
 }

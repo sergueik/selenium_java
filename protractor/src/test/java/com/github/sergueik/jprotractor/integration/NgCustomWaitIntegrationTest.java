@@ -25,6 +25,7 @@ import com.github.sergueik.jprotractor.NgWebDriver;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings("deprecation")
 public class NgCustomWaitIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -41,7 +42,8 @@ public class NgCustomWaitIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}

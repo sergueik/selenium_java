@@ -42,6 +42,7 @@ import org.rrd4j.core.RrdMemoryBackendFactory;
 
 public class App {
 
+	private static final String filemask = ".*rrd$";
 	private static final Random randomId = new Random();
 	private static Connection connection = null;
 	private static String osName = getOSName();
@@ -52,6 +53,7 @@ public class App {
 	private static Map<String, List<String>> dsMap = new HashMap<>();
 
 	private static boolean debug = false;
+	private static boolean noop = false;
 	private static boolean save = false;
 	private static boolean verifylinks = false;
 
@@ -87,6 +89,7 @@ public class App {
 		options.addOption("u", "user", true, "database user");
 		options.addOption("t", "table", true, "database table");
 		options.addOption("z", "password", true, "database password");
+		options.addOption("n", "noop", false, "noop");
 
 		commandLine = commandLineparser.parse(options, args);
 		if (commandLine.hasOption("h")) {
@@ -94,6 +97,10 @@ public class App {
 		}
 		if (commandLine.hasOption("d")) {
 			debug = true;
+		}
+		if (commandLine.hasOption("noop")) {
+			// suppress actual rrd inspection
+			noop = true;
 		}
 		if (commandLine.hasOption("verifylinks")) {
 			verifylinks = true;
@@ -342,11 +349,12 @@ public class App {
 		List<Path> folders = new ArrayList<>();
 		// Probably quite sub-optimal
 		try (Stream<Path> walk = Files.walk(basePath)) {
-
+			// collect folders
 			folders = walk.filter(Files::isDirectory).filter(o -> {
 				String key = o.getFileName().toString();
 				System.err.println("inspect: " + key);
 				boolean status = true;
+				// NOTE: exact match required
 				if ((collectFolders.size() > 0 && !collectFolders.contains(key))
 						|| rejectFolders.size() > 0 && rejectFolders.contains(key)) {
 					status = false;
@@ -355,13 +363,14 @@ public class App {
 				return status;
 			}).collect(Collectors.toList());
 		}
-
+		// collect files in folders
 		for (Path folder : folders) {
 			Stream<Path> walk = Files.walk(folder);
 			walk.filter(Files::isRegularFile)
-					.filter(o -> o.getFileName().toString().matches(".*rrd$"))
+					.filter(o -> o.getFileName().toString().matches(filemask))
 					.forEach(o -> {
-						System.err.println("add: " + o.getFileName().toString());
+						if (debug)
+							System.err.println("found file: " + o.getFileName().toString());
 						result.add(o);
 					});
 		}
@@ -369,6 +378,7 @@ public class App {
 			try {
 				List<String> dsList = new ArrayList<>();
 				URL url = new URL(getDataFileUri(o.toAbsolutePath().toString()));
+				// NOTE: not the same as filemask
 				final String key = url.getFile().replaceFirst(basePathUri, "")
 						.replaceAll("/", ":").replaceFirst(".rrd$", "");
 				System.err.println("Reading RRD file: " + key);
@@ -410,10 +420,10 @@ public class App {
 		//
 		try (Stream<Path> walk = Files.walk(basePath)) {
 			result = walk.filter(Files::isRegularFile)
-					.filter(o -> o.getFileName().toString().matches(".*rrd$"))
+					.filter(o -> o.getFileName().toString().matches(filemask))
 					.collect(Collectors.toList());
 		}
-		// NOTE: streams are not meant to be reused
+		// NOTE: streams are not designed to be rescanned
 		if (verifylinks) {
 			try (Stream<Path> walk = Files.walk(basePath)) {
 				result2 = walk.filter(Files::isSymbolicLink).filter(o -> {
@@ -432,7 +442,7 @@ public class App {
 						// fall through
 					}
 					return false;
-				}).filter(o -> o.getFileName().toString().matches(".*rrd$"))
+				}).filter(o -> o.getFileName().toString().matches(filemask))
 						.collect(Collectors.toList());
 			}
 		}
@@ -552,7 +562,7 @@ public class App {
 	public static void help() {
 		System.err.println("Usage:\n"
 				+ "java -cp target/example.rrd-cachedb.jar:target/lib/* example.App --path data --save --file my.db --collect file1,file2 --reject file3,file4");
-		System.exit(1);
+		System.exit(0);
 	}
 
 }

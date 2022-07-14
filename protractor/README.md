@@ -413,13 +413,12 @@ to the  browser.  The __ngWebDriver__ always sends the whole library.
 This also allows one to patch the individual api (it was important a few years ago) and adding new api (currently, only one such API was added, the `selectedRepeaterOption`. This of course comes at a
 higher cost of integrating the "upstream" changes, but the genuine Protracror project is
 no longer evolving as quickly as it used to.
-### See Also
+### Note
 
- * [curious Case of Protractor and Page Synchronization](https://jarifibrahim.github.io/blog/protractor-and-page-synchronization/) blog
- * older post on [deprecation ana soon future removal of the WebDriverJS promise manager from SelnoumHQ](https://github.com/SeleniumHQ/selenium/issues/2969)
- * post on [Protractor end of life or support what next Future of Angular E2E](https://ganeshsirsi.medium.com/protractor-end-of-life-what-next-can-cypress-replace-the-protractor-3c58c0ecbb1c)
- * issue on SeleniumHQ on [future of Angular E2E & Plans for Protractor](https://github.com/angular/protractor/issues/5502)
-
+   * [curious Case of Protractor and Page Synchronization](https://jarifibrahim.github.io/blog/protractor-and-page-synchronization/) blog
+   * older post on [deprecation ana soon future removal of the WebDriverJS promise manager from SelnoumHQ](https://github.com/SeleniumHQ/selenium/issues/2969)
+   * post on [Protractor end of life or support what next Future of Angular E2E](https://ganeshsirsi.medium.com/protractor-end-of-life-what-next-can-cypress-replace-the-protractor-3c58c0ecbb1c)
+   * [announcement](https://github.com/angular/protractor/issues/5502) of end of the development of Protractor by the end of 2022 in conjunction with Angular v15.of end of the development of Protractor by the end of 2022 in conjunction with Angular v15. by Angular team 
 ### Authors
 * [Carlos Alexandro Becker](caarlos0@gmail.com)
 * [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>rrd-cachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.6.0-SNAPSHOT</version>
+  <version>0.11.0-SNAPSHOT</version>
   <name>rrd-cachedb</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -30,6 +30,7 @@
     <log4j.version>2.17.1</log4j.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <java.version>1.8</java.version>
+    <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
@@ -43,7 +44,7 @@
     <dependency>
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.12</version>
+      <version>${mysql-connector-java.version}</version>
     </dependency>
     <dependency>
       <groupId>org.rrd4j</groupId>

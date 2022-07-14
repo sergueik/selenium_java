@@ -6,8 +6,8 @@
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
-  <description></description>
-  <url></url>
+  <description/>
+  <url/>
   <developers>
     <developer>
       <name>Serguei Kouzmine</name>
@@ -49,15 +49,15 @@
       <version>${commons-exec.version}</version>
     </dependency>
     <dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-collections4</artifactId>
-    <version>${commons-collections4.version}</version>
-</dependency>
-<dependency>
-    <groupId>org.exparity</groupId>
-    <artifactId>hamcrest-date</artifactId>
-    <version>${hamcrest-date.version}</version>
-</dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-collections4</artifactId>
+      <version>${commons-collections4.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.exparity</groupId>
+      <artifactId>hamcrest-date</artifactId>
+      <version>${hamcrest-date.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>

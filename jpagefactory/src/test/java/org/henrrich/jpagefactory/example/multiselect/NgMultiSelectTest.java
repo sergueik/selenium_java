@@ -25,7 +25,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxProfile;
-import org.openqa.selenium.firefox.internal.ProfilesIni;
+// import org.openqa.selenium.firefox.internal.ProfilesIni;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 /**
@@ -57,7 +57,10 @@ public class NgMultiSelectTest {
 		System.setProperty("webdriver.chrome.driver", osName.toLowerCase().startsWith("windows")
 				? new File("c:/java/selenium/chromedriver.exe").getAbsolutePath() : resolveEnvVars(chromeDriverPath));
 
-		DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+    // DesiredCapabilities capabilities = DesiredCapabilities.chrome();
+		DesiredCapabilities capabilities = new DesiredCapabilities();
+		capabilities.setBrowserName("chrome");
+
 		if (isMobile) {
 			Map<String, String> mobileEmulation = new HashMap<>();
 			mobileEmulation.put("deviceName", "Google Nexus 5");

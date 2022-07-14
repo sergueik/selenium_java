@@ -40,6 +40,7 @@ import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
+@SuppressWarnings("deprecation")
 public class NgCssContainingTextTest {
 
 	private static NgWebDriver ngDriver;
@@ -65,7 +66,8 @@ public class NgCssContainingTextTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
+		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);

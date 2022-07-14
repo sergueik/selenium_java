@@ -51,10 +51,12 @@ public class MinimalTest {
 	// application configuration file
 	private static String propertiesFileName = "application.properties";
 	private static Map<String, String> propertiesMap = new HashMap<>();
+	private static boolean headless = false;
 
 	@BeforeClass
 	public static void setup() throws IOException {
 
+		headless = setHeadless();
 		propertiesMap = PropertiesParser
 				.getProperties(String.format("%s/src/main/resources/%s",
 						System.getProperty("user.dir"), propertiesFileName));
@@ -72,16 +74,23 @@ public class MinimalTest {
 		 * (Exception e) { }
 		 */
 		// TODO: convert to command line parameter
-		firefoxBinary.addCommandLineOptions("--headless");
-		// NOTE: size argument appears to be ignored
-		firefoxBinary.addCommandLineOptions("--window-size=320,200");
+		if (headless) {
+			firefoxBinary.addCommandLineOptions("--headless");
+			// NOTE: size argument appears to be ignored
+			firefoxBinary.addCommandLineOptions("--window-size=320,200");
+			System.out.println("Switching to headless");
+		} else {
+			System.out.println("Switching to / staying visible");
+		}
 
 		String browserDriver = (propertiesMap
 				.get(browserDrivers.get("browser")) != null)
 						? propertiesMap.get(browserDrivers.get("browser"))
 						: osName.equals("windows")
-								? new File(String.format("%s/Downloads/geckodriver.exe",
-										System.getenv("USERPROFILE"))).getAbsolutePath()
+								/* ? osName.equals("windows") new File(String.format("%s/Downloads/geckodriver.exe",
+										System.getenv("USERPROFILE"))).getAbsolutePath() */
+								? (new File("c:/java/selenium/geckodriver.exe"))
+										.getAbsolutePath()
 								: String.format("%s/Downloads/geckodriver",
 										System.getenv("HOME"));
 		// assuming browser is 32 bit firefox on Windows
@@ -97,12 +106,6 @@ public class MinimalTest {
 		driver = new FirefoxDriver(firefoxOptions);
 		// dynamicSearchButtonTest
 		driver.manage().timeouts().implicitlyWait(4, TimeUnit.SECONDS);
-	}
-
-	// @Ignore
-	@Test
-	public void testChromeDriver() throws Exception {
-		assertThat(driver, notNullValue());
 	}
 
 	@Test
@@ -140,12 +143,12 @@ public class MinimalTest {
 			// obscures it (the name of obscuring element varies)
 			try {
 				// take screenshot in catch block.
-				System.err.println("Taking a screenshot");
 				File scrFile = ((TakesScreenshot) driver)
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot1.png");
+				System.err.println("Taking a screenshot in exception: " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());
@@ -177,8 +180,9 @@ public class MinimalTest {
 				File scrFile = ((TakesScreenshot) driver)
 						.getScreenshotAs(OutputType.FILE);
 				String currentDir = System.getProperty("user.dir");
-				FileUtils.copyFile(scrFile,
-						new File(FilenameUtils.concat(currentDir, "screenshot.png")));
+				String filePath = FilenameUtils.concat(currentDir, "screenshot2.png");
+				System.err.println("Taking a screenshot in teardown: " + filePath);
+				FileUtils.copyFile(scrFile, new File(filePath));
 			} catch (IOException ex) {
 				System.err.println(
 						"Excepion when taking the screenshot (ignored) " + ex.toString());
@@ -198,4 +202,64 @@ public class MinimalTest {
 		}
 		return osName;
 	}
+
+	public static boolean setHeadless() {
+		boolean headless = false;
+		if (System.getenv().containsKey("HEADLESS")
+				&& System.getenv("HEADLESS").matches("(?:true|yes|1)")) {
+			headless = true;
+		}
+		if (!(getOSName().equals("windows"))
+				&& !(System.getenv().containsKey("DISPLAY"))) {
+			headless = true;
+		}
+
+		// alternatively not even add the environment variable WINDOWS_NO_DISPLAY
+		if (getOSName().equals("windows")) {
+			headless = false;
+			System.out
+					.println("Observed environment keys: " + System.getenv().keySet());
+
+			for (String key : (new String[] { "JAVA_OPTS", "MAVEN_OPTS",
+					"JAVA_TOOL_OPTIONS" })) {
+				System.out.println(String.format("Checking environment %s: %s", key,
+						System.getenv(key)));
+			}
+
+			// NOTE: when set through batch file the new environment variable
+			// WINDOWS_NO_DISPLAY
+			// remains undiscovered
+			if (System.getenv().containsKey("WINDOWS_NO_DISPLAY")
+					&& System.getenv("WINDOWS_NO_DISPLAY").matches("(?:true|yes|1)")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY");
+				headless = true;
+			}
+			if (getPropertyEnv("WINDOWS_NO_DISPLAY", "").matches("(?:true|yes|1)")) {
+				System.out
+						.println("Detected WINDOWS_NO_DISPLAY environment or property");
+				headless = true;
+			}
+			if (System.getenv().containsKey("JAVA_TOOL_OPTIONS")
+					&& System.getenv("JAVA_TOOL_OPTIONS")
+							.matches(".*WINDOWS_NO_DISPLAY=(?:true|yes|1).*")) {
+				System.out.println("Detected WINDOWS_NO_DISPLAY in JAVA_TOOL_OPTIONS");
+				headless = true;
+			}
+		}
+		return headless;
+	}
+
+	// origin:
+	// https://github.com/TsvetomirSlavov/wdci/blob/master/code/src/main/java/com/seleniumsimplified/webdriver/manager/EnvironmentPropertyReader.java
+	public static String getPropertyEnv(String name, String defaultValue) {
+		String value = System.getProperty(name);
+		if (value == null) {
+			value = System.getenv(name);
+			if (value == null) {
+				value = defaultValue;
+			}
+		}
+		return value;
+	}
+
 }

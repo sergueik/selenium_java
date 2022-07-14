@@ -34,7 +34,7 @@ shell_command1:  |
     Line 1
      Line 2
     Line 3
-    
+
 # NOTE: preserve a blank line above to terminate the value
 
 shell_command2:  >-
@@ -48,23 +48,45 @@ shell_command3: >
     Line 1
     Line 2
     Line 3
-    
+
 # NOTE: preserve a blank line above to terminate the value
 
 # https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
 compact: ["a","b","c"]
 compact_array: ["a"]
-info: {name: John Doe, job: Java Developer, skill: interm} 
+info: {name: John Doe, job: Java Developer, skill: interm}
 
 map_setting:
   boolean_setting: true
   integer_setting: 42
   string_setting: somethings
 
-key1: data 
+key1: data
 key2: 'data'
 key3: "data"
 # trailing space
-key4: data    
- 
+key4: data
 
+
+commands1:
+  - >
+    Line 1
+    Line 2
+  - command2
+  - 'command 3'
+  - >
+    #!/bin/sh
+    echo "Done"
+  - >
+    docker container stop $(docker container ls | grep $IMAGE | awk '{print $1}')
+    echo "Done"
+
+# NOTE: values have to be properly indented. 
+# The newlines within multiline value will be lost
+
+
+commands2:
+  - >-
+    Line 1
+    Line 2
+  - zzz
