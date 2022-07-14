@@ -105,6 +105,23 @@ sqlite> .schema
 ```text
 Error: database is locked
 ```
+
+the app itself supports `--query` option to run the SQL query, useful for debugging:
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p ..\rrd-cachedb\host1 -s --hostname hostt1 --query
+```
+this will prin (truncated):
+
+```text
+hostname = hostt1       timestamp = 1656647760000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+hostname = hostt1       timestamp = 1656647820000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+hostname = hostt1       timestamp = 1656647880000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+hostname = hostt1       timestamp = 1656647940000       disk = 42.5     cpu = 12
+        memory = 22     load_average = 6
+```
 ### See Also
 
 

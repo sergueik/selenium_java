@@ -55,6 +55,7 @@ public class App {
 
 	private static boolean debug = false;
 	private static boolean save = false;
+	private static boolean query = false;
 	private static boolean verifylinks = false;
 
 	private static String databaseHost = null;
@@ -95,6 +96,7 @@ public class App {
 		options.addOption("d", "debug", false, "debug");
 
 		options.addOption("s", "save", false, "save");
+		options.addOption("q", "query", false, "query");
 		options.addOption("p", "path", true, "path to scan");
 
 		options.addOption("x", "hostname", true, "hostname");
@@ -120,6 +122,9 @@ public class App {
 		}
 		if (commandLine.hasOption("d")) {
 			debug = true;
+		}
+		if (commandLine.hasOption("query")) {
+			query = true;
 		}
 		if (commandLine.hasOption("verifylinks")) {
 			verifylinks = true;
@@ -224,8 +229,10 @@ public class App {
 		if (save) {
 			createTableForLegacyData();
 			saveLegacyData(metricsData);
+		}
+		if (query) {
 			// uncomment to run select with output to the console
-			// displayLegacyData();
+			displayLegacyData();
 		}
 		if (debug) {
 			System.err.println("Done: " + path);
