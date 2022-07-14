@@ -64,8 +64,8 @@ map_setting:
 key1: data
 key2: 'data'
 key3: "data"
-# trailing space
-key4: data
+# NOTE: trailing space
+key4: data   
 
 
 commands1:
@@ -90,3 +90,4 @@ commands2:
     Line 1
     Line 2
   - zzz
+
