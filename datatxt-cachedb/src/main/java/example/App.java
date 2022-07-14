@@ -51,8 +51,6 @@ public class App {
 
 	final static Map<String, String> env = System.getenv();
 	private Map<String, String> flags = new HashMap<>();
-	private static Map<String, List<String>> dsMap = new HashMap<>();
-
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
 
 	private static boolean debug = false;
@@ -216,9 +214,9 @@ public class App {
 			List<String> rejectFolders = reject == null ? new ArrayList<>()
 					: Arrays.asList(reject.split(","));
 			if (collectFolders.size() != 0 || rejectFolders.size() != 0) {
-				dsMap = listFilesDsNames(path, collectFolders, rejectFolders);
+				metricsData = listFilesDsNames(path, collectFolders, rejectFolders);
 			} else {
-				dsMap = listFilesDsNames(path);
+				metricsData = listFilesDsNames(path);
 			}
 		} catch (IOException e) {
 		}
@@ -357,7 +355,8 @@ public class App {
 							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
 							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
 					databaseTable2);
-			System.out.println("Running SQL: " + sql);
+			if (debug)
+				System.err.println("Running SQL: " + sql);
 			statement.executeUpdate(sql);
 			statement.close();
 
@@ -418,12 +417,11 @@ public class App {
 
 	}
 
-	private static Map<String, List<String>> listFilesDsNames(String path,
+	private static List<Map<String, String>> listFilesDsNames(String path,
 			List<String> collectFolders, List<String> rejectFolders)
 			throws IOException {
 
 		final List<Path> result = new ArrayList<>();
-		final Map<String, List<String>> dsMap = new HashMap<>();
 		Path basePath = Paths.get(path);
 		final String basePathUri = new URL(
 				getDataFileUri(basePath.toAbsolutePath().toString())).getFile() + "/";
@@ -456,7 +454,12 @@ public class App {
 						result.add(o);
 					});
 		}
-		// if (debug)
+
+		return readFiles(result);
+	}
+
+	private static List<Map<String, String>> readFiles(List<Path> result) {
+		List<Map<String, String>> results = new ArrayList<>();
 		System.err.println(String.format("Ingesting %d files: ", result.size()));
 		result.stream().forEach(o -> {
 			hostData = new HostData(hostname,
@@ -482,13 +485,13 @@ public class App {
 					System.err.println("added data: " + data.keySet());
 				data.put("timestamp", Long.toString(timestamp, 10));
 				data.put("hostname", hostname);
-				metricsData.add(data);
+				results.add(data);
 			} else {
 				if (debug)
 					System.err.println("data is empty: " + o.getFileName().toString());
 			}
 		});
-		return new HashMap<>();
+		return results;
 	}
 
 	// NOTE: not reducing to calling the other method with a empty argument
@@ -496,11 +499,9 @@ public class App {
 	// path,
 	// new ArrayList<String>(),
 	// new ArrayList<String>());
-
-	private static Map<String, List<String>> listFilesDsNames(String path)
+	private static List<Map<String, String>> listFilesDsNames(String path)
 			throws IOException {
 
-		final Map<String, List<String>> dsMap = new HashMap<>();
 		Path basePath = Paths.get(path);
 		// NOTE: do not use File.separator
 		final String basePathUri = new URL(
@@ -540,38 +541,7 @@ public class App {
 						.collect(Collectors.toList());
 			}
 		}
-		System.err.println(String.format("Ingesting %d files: ", result.size()));
-		result.stream().forEach(o -> {
-			hostData = new HostData(hostname,
-					o.getParent().toAbsolutePath().toString(),
-					o.getFileName().toString());
-			// sync debug settings
-			hostData.setDebug(debug);
-			// NOTE: metricNames are used in SQL insert when processing metricsData
-			hostData.setMetrics(Arrays.asList(metricNames));
-			if (debug)
-				System.err.println("about to add data: " + Arrays.asList(metricNames));
-			hostData.setExtractedMetricNames(extractedMetricNames);
-			hostData.setMetricExtractors(metricExtractors);
-			hostData.readData();
-			long timestamp = hostData.getTimestamp();
-			if (timestamp == 0)
-				timestamp = Instant.now().toEpochMilli();
-			if (debug)
-				System.err.println("adding timestamp: " + timestamp);
-			data = hostData.getData();
-			if (data != null && !data.isEmpty()) {
-				if (debug)
-					System.err.println("added data: " + data.keySet());
-				data.put("timestamp", Long.toString(timestamp, 10));
-				data.put("hostname", hostname);
-				metricsData.add(data);
-			} else {
-				if (debug)
-					System.err.println("data is empty: " + o.getFileName().toString());
-			}
-		});
-		return new HashMap<>();
+		return readFiles(result);
 	}
 
 	private static String getOSName() {

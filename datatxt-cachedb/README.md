@@ -21,8 +21,10 @@ NOTE: building a one day worth of data takes approx 5 minute on Windows machine,
 ```cmd
 mvn package
 cp src/main/resources/cache.db ~
-java -cp target/example.datatxt-cachedb.jar:target/lib/* example.App -p host1 -s  --hostname hostt1
+java -cp target/example.datatxt-cachedb.jar:target/lib/* example.App -p host1 -s --hostname hostt1
 ```
+can use relative path: `--path ..\rrd-cachedb\host1`.
+
 to select / reject folders,use the `-i` and `-r` arguments:
 ```sh
 java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p 20220629 -s -i 20220629
