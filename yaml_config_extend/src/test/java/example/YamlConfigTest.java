@@ -188,6 +188,15 @@ public class YamlConfigTest {
 	}
 
 	@Test
+	public void getListWithHere() {
+		ArrayList<Object> value = config.getList("commands");
+		assertThat(value, notNullValue());
+		assertThat(value.size(), is(5));
+		assertThat(value.get(0).toString(), is("Line 1 Line 2 Line 3\n"));
+		assertThat(value.get(1).toString(), is("command2"));
+	}
+
+	@Test
 	public void getCompactArrayList() {
 		ArrayList<Object> value = config.getList("compact");
 		assertThat(value, notNullValue());

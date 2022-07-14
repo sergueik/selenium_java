@@ -54,5 +54,10 @@ boolean boolean_value = config.getBoolean("map_setting.boolean_setting");
 ```
 
 and similarly with other sub keys
+
+### See Also
+  * https://www.vogella.com/tutorials/Hamcrest/article.html
+
 ### Author
+
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
