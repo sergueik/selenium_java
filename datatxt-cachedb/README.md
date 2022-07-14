@@ -11,12 +11,21 @@ This directory contains project converted from [grafana-rrd-cachedb](https://git
 ./mkdatafiles.sh 2022 06 29
 ./mkdatafiles.sh 2022 06 30
 ```
+```sh
+mv 20220628/ host1
+mv 20220629/ host1
+mv 20220630/ host1
+
 ```
-mv 2022028/ host1
-mv 2022029/ host1
-mv 2022030/ host1
+* make few empty dirs to exercise the scripts
+
+```sh
+mkdir host1/20220627
+mkdir host1/20220626
+mkdir host1/20220625
+
 ```
-NOTE: building a one day worth of data takes approx 5 minute on Windows machine, git bash. It is significantly faster to touch files instead of storing a metric in each
+NOTE: building a one day worth of data takes approx 5 minute on Windows machine, git bash. It is significantly faster to touch files instead of storing a metric in each. The directory tree / file creation is instance under ubuntu
 * run the scanner to inventory
 ```cmd
 mvn package
@@ -32,8 +41,8 @@ java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p 20220629
 ```sh
 java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220628,20220629,20220630 --hostname host1
 ```
-
-will print to console (output is truncated):
+To estimate the run time with big directories  may omit the `-s` (`--save`) option.
+The default run will print to console (output is truncated):
 
 ```text
 hostname: host1
@@ -122,6 +131,22 @@ hostname = hostt1       timestamp = 1656647880000       disk = 42.5     cpu = 12
 hostname = hostt1       timestamp = 1656647940000       disk = 42.5     cpu = 12
         memory = 22     load_average = 6
 ```
+###  Preparing the wrapper
+
+```sh
+mkdir -p /tmp/basedir/{10,20,30,40}
+mkdir -p /tmp/basedir/10/{1,2,3,4}
+mkdir -p /tmp/basedir/20/{1,2}
+./count_subdirs1.sh /tmp/basedir/
+./count_subdirs2.sh /tmp/basedir/
+```
+running with timing the run time:
+```sh
+NUM=10
+date && for D in $(tail -$NUM /tmp/result.txt); do ./example.sh $D ; done; date
+```
+where `example.sh` wraps the call to `target/example.datatxt-cachedb.jar` with all flags and switches (not shown here)
+
 ### See Also
 
 
@@ -129,6 +154,7 @@ hostname = hostt1       timestamp = 1656647940000       disk = 42.5     cpu = 12
   * [Walking the File Tree - Essential Java Classes](https://docs.oracle.com/javase/tutorial/essential/io/walk.html)
   * [list files in a directory in Java](https://www.baeldung.com/java-list-directory-files) with `File.list`
   * [copy directory in Java](https://www.baeldung.com/java-copy-directory) with `File.walk`
+  * [documentation](https://commons.apache.org/proper/commons-csv/) of database vendor specific csv formats supported by `apache.commons-csv` - only essential for reading
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

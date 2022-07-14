@@ -1,4 +1,7 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+# #!/usr/bin/bash
+# NOTE: github bash is different location (/usr/bin/bash) than vanilla ubuntu (/bin/bash)
+
 YEAR=${1:-2022}
 MONTH=${2:-06}
 DAY=${3:-30}

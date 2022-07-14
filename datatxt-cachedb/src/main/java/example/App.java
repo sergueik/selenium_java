@@ -34,7 +34,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import example.HostData;
-
+import java.math.BigInteger;
 // https://bitbucket.org/xerial/sqlite-jdbc
 // https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
 
@@ -357,10 +357,10 @@ public class App {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
 			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
-							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
-							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
-							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
+					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` UNSIGNED BIG INT"
+							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
+							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
+							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
 					databaseTable2);
 			if (debug)
 				System.err.println("Running SQL: " + sql);
@@ -400,15 +400,24 @@ public class App {
 
 			try {
 
-				// TODO
+				// https://www.sqlite.org/datatype3.html
+				// java has no unsigned long type, you can treat signed 64-bit
+				// two's-complement integers (i.e. long values) as unsigned if you are
+				// careful about it
 				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
 						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
 						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
 						+ " VALUES (?, ?, ?,?, ?, ?, ?);", databaseTable2);
 				PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-				int id = randomId.nextInt(1_000_000_000);
-				preparedStatement.setInt(1, id);
+				long id = randomId.nextLong();
+				// NOTE: nextLong is a no arg method - cannot supply scale like with
+				// nextInt()
+				// 1_000_000_000_000L
+				// can use ThreadLocalRandom.current().nextLong(n)
+				// see also:
+				// https://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
+				preparedStatement.setLong(1, id);
 				preparedStatement.setString(2, hostname);
 				preparedStatement.setString(3, timestamp);
 				preparedStatement.setString(4, memory);
