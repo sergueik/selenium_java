@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>yaml_config_extend</artifactId>
-  <version>0.3.0-SNASHOT</version>
+  <version>0.4.0-SNASHOT</version>
   <name>yamlconfig</name>
   <description>serialize application configuration in YAML file and support classpath-style dotted notation.</description>
   <properties>

@@ -68,21 +68,25 @@ key3: "data"
 key4: data
 
 
-commands:
+commands1:
   - >
     Line 1
     Line 2
-    Line 3
   - command2
   - 'command 3'
   - >
     #!/bin/sh
-    ID=$(docker container ls -a | grep $IMAGE | awk '{print $1}');
-    docker container stop $ID;
-    docker container rm $ID;
+    echo "Done"
   - >
     docker container stop $(docker container ls | grep $IMAGE | awk '{print $1}')
     echo "Done"
 
 # NOTE: values have to be properly indented. 
 # The newlines within multiline value will be lost
+
+
+commands2:
+  - >-
+    Line 1
+    Line 2
+  - zzz

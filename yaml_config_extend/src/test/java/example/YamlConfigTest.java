@@ -189,11 +189,19 @@ public class YamlConfigTest {
 
 	@Test
 	public void getListWithHere() {
-		ArrayList<Object> value = config.getList("commands");
+		ArrayList<Object> value = config.getList("commands1");
 		assertThat(value, notNullValue());
 		assertThat(value.size(), is(5));
-		assertThat(value.get(0).toString(), is("Line 1 Line 2 Line 3\n"));
+		assertThat(value.get(0).toString(), is("Line 1 Line 2\n"));
 		assertThat(value.get(1).toString(), is("command2"));
+	}
+
+	@Test
+	public void getListWithHereWithNewline() {
+		ArrayList<Object> value = config.getList("commands2");
+		assertThat(value, notNullValue());
+		assertThat(value.size(), is(2));
+		assertThat(value.get(0).toString(), is("Line 1 Line 2"));
 	}
 
 	@Test
