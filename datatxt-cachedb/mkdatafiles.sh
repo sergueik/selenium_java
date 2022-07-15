@@ -22,7 +22,7 @@ for H in $(seq 0 1 23) ; do
     # TODO; randomize sec
     TIMESTAMP=$(date --date="${YEAR}/${MONTH}/${DAY} ${H}:${M}:00" +%s)
     # pad
-    TIMESTAMP="${TIMESTAMP}000"
+    TIMESTAMP="${TIMESTAMP}"
     cat <<EOF>$filename
 cpu: 12
 memory: 22

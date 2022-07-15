@@ -368,7 +368,7 @@ public class App {
 				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
 						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
 						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
-						+ " VALUES (?, ?, ?,?, ?, ?, ?);", databaseTable2);
+						+ " VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?);", databaseTable2);
 				PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 				long id = randomId.nextLong();
@@ -380,11 +380,11 @@ public class App {
 				// https://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
 				preparedStatement.setLong(1, id);
 				preparedStatement.setString(2, hostname);
-				preparedStatement.setString(3, timestamp);
-				preparedStatement.setString(4, memory);
-				preparedStatement.setString(5, cpu);
-				preparedStatement.setString(6, disk);
-				preparedStatement.setString(7, load_average);
+				preparedStatement.setInt(3, Integer.parseInt(timestamp) );
+				preparedStatement.setInt(4, Integer.parseInt(memory));
+				preparedStatement.setInt(5, Integer.parseInt(cpu));
+				preparedStatement.setFloat(6, Float.parseFloat(disk));
+				preparedStatement.setInt(7, Integer.parseInt(load_average));
 				preparedStatement.execute();
 
 			} catch (SQLException e) {
