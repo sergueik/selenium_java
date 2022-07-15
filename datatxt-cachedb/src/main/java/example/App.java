@@ -62,7 +62,6 @@ public class App {
 	private static String database = null;
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
-	private static String databaseTable = "cache_table";
 	private static String databaseTable2 = "metric_table";
 	private static String databaseUser = null;
 	private static String databasePassword = null;
@@ -181,12 +180,12 @@ public class App {
 				databaseUser = "java";
 			}
 
-			databaseTable = commandLine.getOptionValue("table");
+/*			databaseTable = commandLine.getOptionValue("table");
 			if (databaseTable == null) {
 				System.err.println("Missing argument: databaseTable. Using default");
 				databaseTable = "cache_table";
 			}
-
+*/
 			databasePassword = commandLine.getOptionValue("password");
 			if (databasePassword == null) {
 				System.err.println("Missing argument: databasePassword. Using default");
@@ -227,7 +226,10 @@ public class App {
 		}
 
 		if (save) {
+			// NEEDED for SQLite - the connection is not open
+		if (!(vendor.equals("mysql"))) {
 			createTableForLegacyData();
+}
 			saveLegacyData(metricsData);
 		}
 		if (query) {
@@ -240,19 +242,7 @@ public class App {
 
 	}
 
-	private static void clearData() {
-		try {
-			System.err.println("Querying data");
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable);
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		}
 
-	}
-
-	// NOTE: close replica of displayData method
 	private static void displayLegacyData() {
 
 		try {
@@ -274,36 +264,6 @@ public class App {
 						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
 						+ "\t" + "memory = " + rs.getString("memory") + "\t"
 						+ "load_average = " + rs.getString("load_average"));
-			}
-			statement.close();
-			statement = connection.createStatement();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				System.err.println(e);
-			}
-		}
-	}
-
-	private static void displayData() {
-		try {
-			System.err.println(
-					"Querying data : " + connection.getMetaData().getDatabaseProductName()
-							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
-							+ connection.getSchema());
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-
-			ResultSet rs = statement.executeQuery(
-					String.format("SELECT DISTINCT fname, ds FROM %s ORDER BY fname, ds",
-							databaseTable));
-			while (rs.next()) {
-				System.err.println("fname = " + rs.getString("fname") + "\t" + "ds = "
-						+ rs.getString("ds"));
 			}
 			statement.close();
 			statement = connection.createStatement();
@@ -356,15 +316,16 @@ public class App {
 			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
+// NOTE: "BIGINT" for MySQL
 			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` UNSIGNED BIG INT"
+					"CREATE TABLE IF NOT EXISTS `%s` " + "( " + "`id` UNSIGNED BIG INT"
 							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
 							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
 							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
 					databaseTable2);
 			if (debug)
 				System.err.println("Running SQL: " + sql);
-			statement.executeUpdate(sql);
+			// statement.executeUpdate(sql);
 			statement.close();
 
 		} catch (SQLException e) {
@@ -596,38 +557,7 @@ public class App {
 							.println("Connected to catalog: " + connection.getCatalog());
 					// System.out.println("Connected to: " + connection.getSchema());
 					// java.sql.SQLFeatureNotSupportedException: Not supported
-					Statement statement = connection.createStatement();
-					statement.setQueryTimeout(30);
-					// TODO: check syntax, removed "IF EXISTS"
-					String sql = String.format("DROP TABLE %s", databaseTable);
-					statement.executeUpdate(sql);
-
-					sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
-							+ "id MEDIUMINT PRIMARY KEY NOT NULL AUTO_INCREMENT,"
-							+ "ins_date datetime NOT NULL," + "ds VARCHAR(50) NOT NULL, "
-							+ "fname VARCHAR(255) NOT NULL,"
-							+ "expose VARCHAR(50) DEFAULT NULL " + " )", databaseTable);
-					System.out.println("Running SQL: " + sql);
-					statement.executeUpdate(sql);
-
-					PreparedStatement preparedStatement = connection
-							.prepareStatement(String.format(
-									"INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
-									databaseTable));
-
-					preparedStatement.setString(1, "fname");
-					preparedStatement.setString(2, "ds0");
-					preparedStatement.execute();
-
-					ResultSet resultSet = statement.executeQuery(String
-							.format("SELECT id, fname, ds, expose FROM %s", databaseTable));
-					while (resultSet.next()) {
-						System.out.println("fname = " + resultSet.getString("fname") + "\t"
-								+ "ds = " + resultSet.getString("ds") + "\t" + "expose = "
-								+ resultSet.getString("expose") + "\t" + "id = "
-								+ resultSet.getInt("id"));
-					}
-					connection.close();
+//					connection.close();
 				} else {
 					System.out.println("Failed to connect");
 				}

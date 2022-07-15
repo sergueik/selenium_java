@@ -36,9 +36,6 @@ can use relative path: `--path ..\rrd-cachedb\host1`.
 
 to select / reject folders,use the `-i` and `-r` arguments:
 ```sh
-java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p 20220629 -s -i 20220629
-```
-```sh
 java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220628,20220629,20220630 --hostname host1
 ```
 To estimate the run time with big directories  may omit the `-s` (`--save`) option.
@@ -147,6 +144,119 @@ date && for D in $(tail -$NUM /tmp/result.txt); do ./example.sh $D ; done; date
 ```
 where `example.sh` wraps the call to `target/example.datatxt-cachedb.jar` with all flags and switches (not shown here)
 
+### Connecting to mySQL server container
+
+* assuming the container named `mysql-server` was created earlier for some other task
+```sh
+NAME='mysql-server'
+docker container start $NAME
+```
+```sh
+NAME='mysql-server'
+docker container inspect $NAME | jq '.[]|.Config.Env'
+```
+
+this will show environment used when container was launched:
+```json
+[
+  "MYSQL_DATABASE=test",
+  "MYSQL_PASSWORD=password",
+  "MYSQL_ROOT_PASSWORD=password",
+  "MYSQL_USER=java",
+  "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+  "GOSU_VERSION=1.7",
+  "MYSQL_MAJOR=8.0",
+  "MYSQL_VERSION=8.0.18-1debian9"
+]
+```
+```sh
+docker container inspect mysql-server | jq '.[]|.Config.ExposedPorts'
+```
+```JSON
+{
+  "3306/tcp": {},
+  "33060/tcp": {}
+}
+```
+```sh
+docker container inspect mysql-server | jq '.[]|.NetworkSettings.Ports'
+```
+```JSON
+{
+  "3306/tcp": [
+    {
+      "HostIp": "0.0.0.0",
+      "HostPort": "3306"
+    }
+  ],
+  "33060/tcp": null
+}
+```
+
+* update the arguments in `App.java` run command accordingly - there currently is no `application.properties`, but all connection specific can be set on the command line
+
+if the error
+```text
+driverObject=class com.mysql.cj.jdbc.Driver
+Connected to product: MySQL
+Connected to catalog: test
+Exception: Unknown table 'test.cache_table'
+java.sql.SQLSyntaxErrorException: Unknown table 'test.cache_table'
+```
+
+is observed
+
+* run the commands
+```sh
+docker exec -it mysql-server mysql -u root -ppassword
+```
+then in
+```sh
+mysql>
+```
+```text
+use test
+
+CREATE TABLE `metric_table` ( `id` BIGINT, `hostname` TEXT NOT NULL,  `timestamp` TEXT, `memory` TEXT, `cpu` TEXT, `disk` TEXT, `load_average` TEXT, PRIMARY KEY(`id`) );
+```
+```text
+\q
+```
+* run the application with the `-vendor mysql`  option added:
+```sh
+java -cp target/example.datatxt-cachedb.jar:target/lib/* example.App -p host1 -s -i 20220628,20220629,20220630 --hostname host1 -vendor mysql
+```
+
+after it completes connect to database node and count inserved rows
+```sh
+docker exec -it mysql-server mysql -u java -ppassword
+```
+in
+```sh
+mysql>
+```
+run
+
+```text
+
+use test
+select count(1) from metric_table;
+```
+this will show
+```text
++----------+
+| count(1) |
++----------+
+|     2880 |
++----------+
+
+```
+after confirming thati dummy metric information is in
+there 
+next step is to attach the `mysql-server` node to the `grafana` one in a MySQL Data source [plugin](https://grafana.com/grafana/plugins/mysql/) (built in, native).
+
+### Connecting to Grafana
+
 ### See Also
 
 
@@ -155,6 +265,8 @@ where `example.sh` wraps the call to `target/example.datatxt-cachedb.jar` with a
   * [list files in a directory in Java](https://www.baeldung.com/java-list-directory-files) with `File.list`
   * [copy directory in Java](https://www.baeldung.com/java-copy-directory) with `File.walk`
   * [documentation](https://commons.apache.org/proper/commons-csv/) of database vendor specific csv formats supported by `apache.commons-csv` - only essential for reading
+  * [MySQL Data Source plugin] (https://grafana.com/grafana/plugins/mysql/)
+  * [Using MySQL in Grafana as Data Source](https://grafana.com/docs/grafana/v7.5/datasources/mysql/)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
