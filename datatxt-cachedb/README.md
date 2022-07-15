@@ -348,6 +348,11 @@ the data will show in the selected date range
 
 ![metric data](https://github.com/sergueik/selenium_java/blob/master/datatxt-cachedb/screenshots/capture-metric-data.png)
 
+
+the data can be also viewed /  schema improved in a regular desktop DB management tool, e.g. SQLite viewer (note the minor schema differences between database vendors):
+
+![metric db](https://github.com/sergueik/selenium_java/blob/master/datatxt-cachedb/screenshots/capture-db.png)
+
 ### Cleanup
 
 ```sh
