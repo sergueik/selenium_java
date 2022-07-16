@@ -21,7 +21,7 @@ mv 20220714/  20220713/ 20220715/ host1
 ```sh
 mkdir host1/202206{27,26,25}
 ```
-NOTE: building a one day worth of data takes approx 5 minute on Windows machine, git bash. It is significantly faster to touch files instead of storing a metric in each. The directory tree / file creation is instance under ubuntu
+NOTE: building a one day worth of data takes approx 5 minute on Windows machine, git bash. It is significantly faster to touch files instead of storing a metric in each. The directory tree / file creation is instant under ubuntu
 * run the scanner to inventory
 ```cmd
 mvn package

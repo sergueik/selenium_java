@@ -1,16 +1,11 @@
 package example;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,15 +28,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import example.HostData;
-import java.math.BigInteger;
-// https://bitbucket.org/xerial/sqlite-jdbc
-// https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
-
 public class App {
 
-	// TODO: make a parameter
-	// for legacy data.txt inventory operations
 	private static final String filemask = "data.txt.*$";
 
 	private static final Random randomId = new Random();
@@ -50,7 +38,7 @@ public class App {
 	public static final int INVALID_OPTION = 42;
 
 	final static Map<String, String> env = System.getenv();
-	private Map<String, String> flags = new HashMap<>();
+
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
 
 	private static boolean debug = false;
@@ -62,10 +50,10 @@ public class App {
 	private static String database = null;
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
-	private static String databaseTable2 = "metric_table";
+	private static String databaseTable = "metric_table";
 	private static String databaseUser = null;
 	private static String databasePassword = null;
-
+	private static String vendor = null;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
@@ -143,7 +131,7 @@ public class App {
 			System.err.println("hostname: " + hostname);
 		}
 
-		String vendor = commandLine.getOptionValue("vendor");
+		vendor = commandLine.getOptionValue("vendor");
 		if (vendor == null) {
 			System.err.println("Missing argument: vendor. Using default");
 			vendor = "sqlite";
@@ -180,12 +168,12 @@ public class App {
 				databaseUser = "java";
 			}
 
-/*			databaseTable = commandLine.getOptionValue("table");
+			databaseTable = commandLine.getOptionValue("table");
 			if (databaseTable == null) {
 				System.err.println("Missing argument: databaseTable. Using default");
-				databaseTable = "cache_table";
+				databaseTable = "metric_table";
 			}
-*/
+
 			databasePassword = commandLine.getOptionValue("password");
 			if (databasePassword == null) {
 				System.err.println("Missing argument: databasePassword. Using default");
@@ -226,14 +214,13 @@ public class App {
 		}
 
 		if (save) {
-			// NEEDED for SQLite - the connection is not open
-		if (!(vendor.equals("mysql"))) {
-			createTableForLegacyData();
-}
+			// TODO: refactoring needed - the connection is not open when doing SQLite
+			if (!(vendor.equals("mysql"))) {
+				createTableForLegacyData();
+			}
 			saveLegacyData(metricsData);
 		}
 		if (query) {
-			// uncomment to run select with output to the console
 			displayLegacyData();
 		}
 		if (debug) {
@@ -241,7 +228,6 @@ public class App {
 		}
 
 	}
-
 
 	private static void displayLegacyData() {
 
@@ -257,7 +243,7 @@ public class App {
 					"SELECT DISTINCT hostname" + "," + "timestamp" + "," + "memory" + ","
 							+ "cpu" + "," + "disk" + ","
 							+ "load_average FROM %s ORDER BY hostname, timestamp",
-					databaseTable2));
+					databaseTable));
 			while (rs.next()) {
 				System.err.println("hostname = " + rs.getString("hostname") + "\t"
 						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
@@ -303,10 +289,10 @@ public class App {
 					+ e.getMessage());
 			System.exit(1);
 		}
-
 	}
 
 	private static void createTableForLegacyData() {
+
 		// TODO - join with hostname/appid/invironment:
 		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
 		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
@@ -316,13 +302,13 @@ public class App {
 			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-// NOTE: "BIGINT" for MySQL
+			// NOTE: "BIGINT" for MySQL
 			String sql = String.format(
 					"CREATE TABLE IF NOT EXISTS `%s` " + "( " + "`id` UNSIGNED BIG INT"
 							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
 							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
 							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable2);
+					databaseTable);
 			if (debug)
 				System.err.println("Running SQL: " + sql);
 			// statement.executeUpdate(sql);
@@ -343,7 +329,7 @@ public class App {
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable2);
+			statement.executeUpdate("delete from " + databaseTable);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -365,10 +351,17 @@ public class App {
 				// java has no unsigned long type, you can treat signed 64-bit
 				// two's-complement integers (i.e. long values) as unsigned if you are
 				// careful about it
-				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
-						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
-						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
-						+ " VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?);", databaseTable2);
+				String sql = vendor.equals("mysql")
+						? String.format(
+								"INSERT INTO %s " + "( " + "`id`" + "," + "`hostname`" + ","
+										+ "`timestamp`" + "," + "`memory`"
+										+ "," + "`cpu`" + "," + "`disk`" + "," + "`load_average`"
+										+ ")" + " VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?);",
+								databaseTable)
+						: String.format("INSERT INTO %s " + "( " + "`id`" + ","
+								+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
+								+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
+								+ " VALUES (?, ?, ?, ?, ?, ?, ?);", databaseTable);
 				PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
 				long id = randomId.nextLong();
@@ -380,7 +373,11 @@ public class App {
 				// https://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
 				preparedStatement.setLong(1, id);
 				preparedStatement.setString(2, hostname);
-				preparedStatement.setInt(3, Integer.parseInt(timestamp) );
+				// NOTE:
+				// Exception in thread "main" java.lang.NumberFormatException:
+				// For input string: "1656475200000"
+				// influxDB needs nanosecond, Prometheus millisecond
+				preparedStatement.setInt(3, Integer.parseInt(timestamp));
 				preparedStatement.setInt(4, Integer.parseInt(memory));
 				preparedStatement.setInt(5, Integer.parseInt(cpu));
 				preparedStatement.setFloat(6, Float.parseFloat(disk));
@@ -557,7 +554,7 @@ public class App {
 							.println("Connected to catalog: " + connection.getCatalog());
 					// System.out.println("Connected to: " + connection.getSchema());
 					// java.sql.SQLFeatureNotSupportedException: Not supported
-//					connection.close();
+					// connection.close();
 				} else {
 					System.out.println("Failed to connect");
 				}
