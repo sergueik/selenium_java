@@ -51,6 +51,7 @@ public class App {
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
 	private static String databaseTable = "metric_table";
+
 	private static String databaseUser = null;
 	private static String databasePassword = null;
 	private static String vendor = null;
@@ -216,7 +217,8 @@ public class App {
 		if (save) {
 			// TODO: refactoring needed - the connection is not open when doing SQLite
 			if (!(vendor.equals("mysql"))) {
-				createTableForLegacyData();
+				createTableCommon();
+				// createTableForLegacyData();
 			}
 			saveLegacyData(metricsData);
 		}
@@ -377,13 +379,12 @@ public class App {
 				// Exception in thread "main" java.lang.NumberFormatException:
 				// For input string: "1656475200000"
 				// influxDB needs nanosecond, Prometheus millisecond
-				preparedStatement.setInt(3, Integer.parseInt(timestamp));
-				preparedStatement.setInt(4, Integer.parseInt(memory));
-				preparedStatement.setInt(5, Integer.parseInt(cpu));
+				preparedStatement.setLong(3, Long.parseLong(timestamp));
+				preparedStatement.setFloat(4, Float.parseFloat(memory));
+				preparedStatement.setFloat(5, Float.parseFloat(cpu));
 				preparedStatement.setFloat(6, Float.parseFloat(disk));
-				preparedStatement.setInt(7, Integer.parseInt(load_average));
+				preparedStatement.setFloat(7, Float.parseFloat(load_average));
 				preparedStatement.execute();
-
 			} catch (SQLException e) {
 				System.err.println(e.getMessage());
 			}
@@ -487,35 +488,42 @@ public class App {
 		List<Path> result;
 		List<Path> result2;
 		//
-		try (Stream<Path> walk = Files.walk(basePath)) {
-			result = walk.filter(Files::isRegularFile)
-					.filter(o -> o.getFileName().toString().matches(filemask))
-					.collect(Collectors.toList());
-		}
-		// NOTE: streams are not designed to be rescanned
 		if (verifylinks) {
 			try (Stream<Path> walk = Files.walk(basePath)) {
 				result2 = walk.filter(Files::isSymbolicLink).filter(o -> {
 					try {
 						Path targetPath = Files.readSymbolicLink(o.toAbsolutePath());
-						System.err.println("Testing link " + o.getFileName().toString()
-								+ " target path " + targetPath.toString());
+						if (debug)
+							System.err.println("Testing link " + o.getFileName().toString()
+									+ " target path " + targetPath.toString());
 
 						File target = new File(String.format("%s/%s",
 								o.getParent().toAbsolutePath(), targetPath.toString()));
 						if (target.exists() && target.isFile())
-							System.err.println("Valid link " + o.getFileName().toString()
-									+ " target path " + target.getCanonicalPath());
+							if (debug)
+								System.err.println("Valid link " + o.getFileName().toString()
+										+ " target path " + target.getCanonicalPath());
 						return true;
+
 					} catch (IOException e) {
 						// fall through
 					}
+
 					return false;
 				}).filter(o -> o.getFileName().toString().matches(filemask))
 						.collect(Collectors.toList());
 			}
+			return readFiles(result2);
+		} else {
+			try (Stream<Path> walk = Files.walk(basePath)) {
+				result = walk.filter(Files::isRegularFile)
+						.filter(o -> o.getFileName().toString().matches(filemask))
+						.collect(Collectors.toList());
+			}
+			// NOTE: streams are not designed to be rescanned
+			return readFiles(result);
 		}
-		return readFiles(result);
+
 	}
 
 	private static String getOSName() {
