@@ -51,6 +51,7 @@ public class App {
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
 	private static String databaseTable = "metric_table";
+	private static String linkedDataDir = null;
 
 	private static String databaseUser = null;
 	private static String databasePassword = null;
@@ -87,6 +88,7 @@ public class App {
 		options.addOption("q", "query", false, "query");
 		options.addOption("p", "path", true, "path to scan");
 
+		options.addOption("o", "link", true, "linked data dir");
 		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
@@ -116,6 +118,11 @@ public class App {
 		}
 		if (commandLine.hasOption("verifylinks")) {
 			verifylinks = true;
+		}
+		if (commandLine.hasOption("link")) {
+			linkedDataDir = commandLine.getOptionValue("link");
+		} else {
+			linkedDataDir = null;
 		}
 
 		if (commandLine.hasOption("save")) {
@@ -218,7 +225,6 @@ public class App {
 			// TODO: refactoring needed - the connection is not open when doing SQLite
 			if (!(vendor.equals("mysql"))) {
 				createTableCommon();
-				// createTableForLegacyData();
 			}
 			saveLegacyData(metricsData);
 		}
@@ -293,41 +299,13 @@ public class App {
 		}
 	}
 
-	private static void createTableForLegacyData() {
-
+	// NOTE: largely a replica of "saveData"
+	private static void saveLegacyData(List<Map<String, String>> metricsData) {
+		System.err.println("Saving data");
 		// TODO - join with hostname/appid/invironment:
 		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
 		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
 		// KEY(`id`) )
-		// NOTE:
-		try {
-			createTableCommon();
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			// NOTE: "BIGINT" for MySQL
-			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS `%s` " + "( " + "`id` UNSIGNED BIG INT"
-							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
-							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
-							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable);
-			if (debug)
-				System.err.println("Running SQL: " + sql);
-			// statement.executeUpdate(sql);
-			statement.close();
-
-		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
-			System.exit(1);
-		}
-	}
-
-	// NOTE: largely a replica of "saveData"
-	private static void saveLegacyData(List<Map<String, String>> metricsData) {
-		System.err.println("Saving data");
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
@@ -497,8 +475,11 @@ public class App {
 							System.err.println("Testing link " + o.getFileName().toString()
 									+ " target path " + targetPath.toString());
 
-						File target = new File(String.format("%s/%s",
-								o.getParent().toAbsolutePath(), targetPath.toString()));
+						File target = new File(
+								String.format(
+										"%s/%s", (linkedDataDir == null
+												? o.getParent().toAbsolutePath() : linkedDataDir),
+										targetPath.toString()));
 						if (target.exists() && target.isFile())
 							if (debug)
 								System.err.println("Valid link " + o.getFileName().toString()
