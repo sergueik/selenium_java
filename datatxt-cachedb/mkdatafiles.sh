@@ -1,4 +1,7 @@
-#!/usr/bin/bash
+#!/usr/bin/env bash
+# #!/usr/bin/bash
+# NOTE: github bash is different location (/usr/bin/bash) than vanilla ubuntu (/bin/bash)
+
 YEAR=${1:-2022}
 MONTH=${2:-06}
 DAY=${3:-30}
@@ -19,7 +22,7 @@ for H in $(seq 0 1 23) ; do
     # TODO; randomize sec
     TIMESTAMP=$(date --date="${YEAR}/${MONTH}/${DAY} ${H}:${M}:00" +%s)
     # pad
-    TIMESTAMP="${TIMESTAMP}000"
+    TIMESTAMP="${TIMESTAMP}"
     cat <<EOF>$filename
 cpu: 12
 memory: 22

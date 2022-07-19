@@ -1,16 +1,11 @@
 package example;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -33,15 +28,8 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-import example.HostData;
-
-// https://bitbucket.org/xerial/sqlite-jdbc
-// https://docs.oracle.com/javase/tutorial/jdbc/basics/sqlrowid.html
-
 public class App {
 
-	// TODO: make a parameter
-	// for legacy data.txt inventory operations
 	private static final String filemask = "data.txt.*$";
 
 	private static final Random randomId = new Random();
@@ -50,7 +38,7 @@ public class App {
 	public static final int INVALID_OPTION = 42;
 
 	final static Map<String, String> env = System.getenv();
-	private Map<String, String> flags = new HashMap<>();
+
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
 
 	private static boolean debug = false;
@@ -62,11 +50,12 @@ public class App {
 	private static String database = null;
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
-	private static String databaseTable = "cache_table";
-	private static String databaseTable2 = "metric_table";
+	private static String databaseTable = "metric_table";
+	private static String linkedDataDir = null;
+
 	private static String databaseUser = null;
 	private static String databasePassword = null;
-
+	private static String vendor = null;
 	private final static Options options = new Options();
 	private static CommandLineParser commandLineparser = new DefaultParser();
 	private static CommandLine commandLine = null;
@@ -99,6 +88,7 @@ public class App {
 		options.addOption("q", "query", false, "query");
 		options.addOption("p", "path", true, "path to scan");
 
+		options.addOption("o", "link", true, "linked data dir");
 		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 		options.addOption("v", "verifylinks", false,
@@ -129,6 +119,11 @@ public class App {
 		if (commandLine.hasOption("verifylinks")) {
 			verifylinks = true;
 		}
+		if (commandLine.hasOption("link")) {
+			linkedDataDir = commandLine.getOptionValue("link");
+		} else {
+			linkedDataDir = null;
+		}
 
 		if (commandLine.hasOption("save")) {
 			save = true;
@@ -144,7 +139,7 @@ public class App {
 			System.err.println("hostname: " + hostname);
 		}
 
-		String vendor = commandLine.getOptionValue("vendor");
+		vendor = commandLine.getOptionValue("vendor");
 		if (vendor == null) {
 			System.err.println("Missing argument: vendor. Using default");
 			vendor = "sqlite";
@@ -184,7 +179,7 @@ public class App {
 			databaseTable = commandLine.getOptionValue("table");
 			if (databaseTable == null) {
 				System.err.println("Missing argument: databaseTable. Using default");
-				databaseTable = "cache_table";
+				databaseTable = "metric_table";
 			}
 
 			databasePassword = commandLine.getOptionValue("password");
@@ -227,11 +222,13 @@ public class App {
 		}
 
 		if (save) {
-			createTableForLegacyData();
+			// TODO: refactoring needed - the connection is not open when doing SQLite
+			if (!(vendor.equals("mysql"))) {
+				createTableCommon();
+			}
 			saveLegacyData(metricsData);
 		}
 		if (query) {
-			// uncomment to run select with output to the console
 			displayLegacyData();
 		}
 		if (debug) {
@@ -240,19 +237,6 @@ public class App {
 
 	}
 
-	private static void clearData() {
-		try {
-			System.err.println("Querying data");
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable);
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		}
-
-	}
-
-	// NOTE: close replica of displayData method
 	private static void displayLegacyData() {
 
 		try {
@@ -267,43 +251,13 @@ public class App {
 					"SELECT DISTINCT hostname" + "," + "timestamp" + "," + "memory" + ","
 							+ "cpu" + "," + "disk" + ","
 							+ "load_average FROM %s ORDER BY hostname, timestamp",
-					databaseTable2));
+					databaseTable));
 			while (rs.next()) {
 				System.err.println("hostname = " + rs.getString("hostname") + "\t"
 						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
 						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
 						+ "\t" + "memory = " + rs.getString("memory") + "\t"
 						+ "load_average = " + rs.getString("load_average"));
-			}
-			statement.close();
-			statement = connection.createStatement();
-		} catch (SQLException e) {
-			System.err.println(e.getMessage());
-		} finally {
-			try {
-				if (connection != null)
-					connection.close();
-			} catch (SQLException e) {
-				System.err.println(e);
-			}
-		}
-	}
-
-	private static void displayData() {
-		try {
-			System.err.println(
-					"Querying data : " + connection.getMetaData().getDatabaseProductName()
-							+ "\t" + "catalog: " + connection.getCatalog() + "\t" + "schema: "
-							+ connection.getSchema());
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-
-			ResultSet rs = statement.executeQuery(
-					String.format("SELECT DISTINCT fname, ds FROM %s ORDER BY fname, ds",
-							databaseTable));
-			while (rs.next()) {
-				System.err.println("fname = " + rs.getString("fname") + "\t" + "ds = "
-						+ rs.getString("ds"));
 			}
 			statement.close();
 			statement = connection.createStatement();
@@ -343,46 +297,19 @@ public class App {
 					+ e.getMessage());
 			System.exit(1);
 		}
-
-	}
-
-	private static void createTableForLegacyData() {
-		// TODO - join with hostname/appid/invironment:
-		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
-		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
-		// KEY(`id`) )
-		// NOTE:
-		try {
-			createTableCommon();
-			Statement statement = connection.createStatement();
-			statement.setQueryTimeout(30);
-			String sql = String.format(
-					"CREATE TABLE IF NOT EXISTS %s " + "( " + "`id` INTEGER" + ","
-							+ "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT" + ","
-							+ "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT" + ","
-							+ "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable2);
-			if (debug)
-				System.err.println("Running SQL: " + sql);
-			statement.executeUpdate(sql);
-			statement.close();
-
-		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
-		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
-			System.exit(1);
-		}
 	}
 
 	// NOTE: largely a replica of "saveData"
 	private static void saveLegacyData(List<Map<String, String>> metricsData) {
 		System.err.println("Saving data");
+		// TODO - join with hostname/appid/invironment:
+		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
+		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
+		// KEY(`id`) )
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			statement.executeUpdate("delete from " + databaseTable2);
+			statement.executeUpdate("delete from " + databaseTable);
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
@@ -400,23 +327,42 @@ public class App {
 
 			try {
 
-				// TODO
-				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
-						+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
-						+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
-						+ " VALUES (?, ?, ?,?, ?, ?, ?);", databaseTable2);
+				// https://www.sqlite.org/datatype3.html
+				// java has no unsigned long type, you can treat signed 64-bit
+				// two's-complement integers (i.e. long values) as unsigned if you are
+				// careful about it
+				String sql = vendor.equals("mysql")
+						? String.format(
+								"INSERT INTO %s " + "( " + "`id`" + "," + "`hostname`" + ","
+										+ "`timestamp`" + "," + "`memory`"
+										+ "," + "`cpu`" + "," + "`disk`" + "," + "`load_average`"
+										+ ")" + " VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?);",
+								databaseTable)
+						: String.format("INSERT INTO %s " + "( " + "`id`" + ","
+								+ "`hostname`" + "," + "`timestamp`" + "," + "`memory`" + ","
+								+ "`cpu`" + "," + "`disk`" + "," + "`load_average`" + ")"
+								+ " VALUES (?, ?, ?, ?, ?, ?, ?);", databaseTable);
 				PreparedStatement preparedStatement = connection.prepareStatement(sql);
 
-				int id = randomId.nextInt(1_000_000_000);
-				preparedStatement.setInt(1, id);
+				long id = randomId.nextLong();
+				// NOTE: nextLong is a no arg method - cannot supply scale like with
+				// nextInt()
+				// 1_000_000_000_000L
+				// can use ThreadLocalRandom.current().nextLong(n)
+				// see also:
+				// https://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
+				preparedStatement.setLong(1, id);
 				preparedStatement.setString(2, hostname);
-				preparedStatement.setString(3, timestamp);
-				preparedStatement.setString(4, memory);
-				preparedStatement.setString(5, cpu);
-				preparedStatement.setString(6, disk);
-				preparedStatement.setString(7, load_average);
+				// NOTE:
+				// Exception in thread "main" java.lang.NumberFormatException:
+				// For input string: "1656475200000"
+				// influxDB needs nanosecond, Prometheus millisecond
+				preparedStatement.setLong(3, Long.parseLong(timestamp));
+				preparedStatement.setFloat(4, Float.parseFloat(memory));
+				preparedStatement.setFloat(5, Float.parseFloat(cpu));
+				preparedStatement.setFloat(6, Float.parseFloat(disk));
+				preparedStatement.setFloat(7, Float.parseFloat(load_average));
 				preparedStatement.execute();
-
 			} catch (SQLException e) {
 				System.err.println(e.getMessage());
 			}
@@ -520,35 +466,45 @@ public class App {
 		List<Path> result;
 		List<Path> result2;
 		//
-		try (Stream<Path> walk = Files.walk(basePath)) {
-			result = walk.filter(Files::isRegularFile)
-					.filter(o -> o.getFileName().toString().matches(filemask))
-					.collect(Collectors.toList());
-		}
-		// NOTE: streams are not designed to be rescanned
 		if (verifylinks) {
 			try (Stream<Path> walk = Files.walk(basePath)) {
 				result2 = walk.filter(Files::isSymbolicLink).filter(o -> {
 					try {
 						Path targetPath = Files.readSymbolicLink(o.toAbsolutePath());
-						System.err.println("Testing link " + o.getFileName().toString()
-								+ " target path " + targetPath.toString());
+						if (debug)
+							System.err.println("Testing link " + o.getFileName().toString()
+									+ " target path " + targetPath.toString());
 
-						File target = new File(String.format("%s/%s",
-								o.getParent().toAbsolutePath(), targetPath.toString()));
+						File target = new File(
+								String.format(
+										"%s/%s", (linkedDataDir == null
+												? o.getParent().toAbsolutePath() : linkedDataDir),
+										targetPath.toString()));
 						if (target.exists() && target.isFile())
-							System.err.println("Valid link " + o.getFileName().toString()
-									+ " target path " + target.getCanonicalPath());
+							if (debug)
+								System.err.println("Valid link " + o.getFileName().toString()
+										+ " target path " + target.getCanonicalPath());
 						return true;
+
 					} catch (IOException e) {
 						// fall through
 					}
+
 					return false;
 				}).filter(o -> o.getFileName().toString().matches(filemask))
 						.collect(Collectors.toList());
 			}
+			return readFiles(result2);
+		} else {
+			try (Stream<Path> walk = Files.walk(basePath)) {
+				result = walk.filter(Files::isRegularFile)
+						.filter(o -> o.getFileName().toString().matches(filemask))
+						.collect(Collectors.toList());
+			}
+			// NOTE: streams are not designed to be rescanned
+			return readFiles(result);
 		}
-		return readFiles(result);
+
 	}
 
 	private static String getOSName() {
@@ -587,38 +543,7 @@ public class App {
 							.println("Connected to catalog: " + connection.getCatalog());
 					// System.out.println("Connected to: " + connection.getSchema());
 					// java.sql.SQLFeatureNotSupportedException: Not supported
-					Statement statement = connection.createStatement();
-					statement.setQueryTimeout(30);
-					// TODO: check syntax, removed "IF EXISTS"
-					String sql = String.format("DROP TABLE %s", databaseTable);
-					statement.executeUpdate(sql);
-
-					sql = String.format("CREATE TABLE IF NOT EXISTS %s " + "( "
-							+ "id MEDIUMINT PRIMARY KEY NOT NULL AUTO_INCREMENT,"
-							+ "ins_date datetime NOT NULL," + "ds VARCHAR(50) NOT NULL, "
-							+ "fname VARCHAR(255) NOT NULL,"
-							+ "expose VARCHAR(50) DEFAULT NULL " + " )", databaseTable);
-					System.out.println("Running SQL: " + sql);
-					statement.executeUpdate(sql);
-
-					PreparedStatement preparedStatement = connection
-							.prepareStatement(String.format(
-									"INSERT INTO %s (ins_date, fname, ds) VALUES (now(), ?, ?)",
-									databaseTable));
-
-					preparedStatement.setString(1, "fname");
-					preparedStatement.setString(2, "ds0");
-					preparedStatement.execute();
-
-					ResultSet resultSet = statement.executeQuery(String
-							.format("SELECT id, fname, ds, expose FROM %s", databaseTable));
-					while (resultSet.next()) {
-						System.out.println("fname = " + resultSet.getString("fname") + "\t"
-								+ "ds = " + resultSet.getString("ds") + "\t" + "expose = "
-								+ resultSet.getString("expose") + "\t" + "id = "
-								+ resultSet.getInt("id"));
-					}
-					connection.close();
+					// connection.close();
 				} else {
 					System.out.println("Failed to connect");
 				}

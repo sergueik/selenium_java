@@ -56,7 +56,12 @@ boolean boolean_value = config.getBoolean("map_setting.boolean_setting");
 and similarly with other sub keys
 
 ### See Also
+
   * https://www.vogella.com/tutorials/Hamcrest/article.html
+  * [discussion](https://www.cyberforum.ru/shell/thread3007272.html)(in Russian) of using the rundown values with [gitlab]()
+  * multiline string YAML fragment [builder](https://yaml-multiline.info) (does not appear to show all cases) - see the definiton for "block scalar" and "flow scalar" entities
+  * related [stackoverfow](https://stackoverflow.com/questions/3790454/how-do-i-break-a-string-in-yaml-over-multiple-lines) post 
+  * YAML [cheat sheet](https://lzone.de/cheat-sheet/YAML)
 
 ### Author
 
