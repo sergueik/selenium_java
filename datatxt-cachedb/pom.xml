@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>datatxt-cachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.6.0-SNAPSHOT</version>
+  <version>0.7.0-SNAPSHOT</version>
   <name>datatxt-cachedb</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -109,12 +109,11 @@
       <version>${version.sqlite-jdbc}</version>
       <scope>runtime</scope>
     </dependency>
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-csv</artifactId>
-
-    <version>${commons-csv.version}</version>
-</dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>${commons-csv.version}</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>${finalName}</finalName>

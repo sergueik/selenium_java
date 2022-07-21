@@ -28,9 +28,13 @@ import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
+import example.dao.JDBCDao;
+import example.projection.ServerInstanceApplication;
+
 public class App {
 
 	private static final String filemask = "data.txt.*$";
+	private static JDBCDao dao = new JDBCDao();
 
 	private static final Random randomId = new Random();
 	private static Connection connection = null;
@@ -42,6 +46,7 @@ public class App {
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
 
 	private static boolean debug = false;
+	private static boolean merge = false;
 	private static boolean save = false;
 	private static boolean query = false;
 	private static boolean verifylinks = false;
@@ -83,6 +88,7 @@ public class App {
 	public static void main(String args[]) throws ParseException {
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
+		options.addOption("m", "merge", false, "merge");
 
 		options.addOption("s", "save", false, "save");
 		options.addOption("q", "query", false, "query");
@@ -113,6 +119,32 @@ public class App {
 		if (commandLine.hasOption("d")) {
 			debug = true;
 		}
+
+		if (commandLine.hasOption("merge")) {
+			merge = true;
+			@SuppressWarnings("unchecked")
+			List<ServerInstanceApplication> servers = (List<ServerInstanceApplication>) dao
+					.findAllServerInstanceApplication();
+
+			System.err.println("Merging server metadata: " + servers);
+			// NOTE: somehow even when toString() is called explicitly
+			// the output is the same as for generic Object:
+			// server: example.projection.ServerInstanceApplication@23bb8443
+
+			for (ServerInstanceApplication server : servers) {
+				System.err.println("server: " + server.toString());
+			}
+
+			for (ServerInstanceApplication server : servers) {
+				System.err.println("ServerInstanceApplication " + "[ " + "serverName = "
+						+ server.getServerName() + ", " + "instanceName = "
+						+ server.getInstanceName() + ", " + "applicationName = "
+						+ server.getApplicationName() + " ]");
+
+			}
+			return;
+		}
+
 		if (commandLine.hasOption("query")) {
 			query = true;
 		}
@@ -231,6 +263,7 @@ public class App {
 		if (query) {
 			displayLegacyData();
 		}
+
 		if (debug) {
 			System.err.println("Done: " + path);
 		}

@@ -223,6 +223,10 @@ CREATE TABLE `metric_table` ( `id` BIGINT, `hostname` TEXT NOT NULL,  `timestamp
 ```sh
 java -cp target/example.datatxt-cachedb.jar:target/lib/* example.App -p host1 -s --hostname host1 -vendor mysql
 ```
+* modify the command to Windows path and separator if testing on Windows:
+```cmd
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s --hostname host1
+```
 
 after it completes connect to database node and count inserved rows
 ```sh
@@ -251,6 +255,47 @@ this will show
 after confirming thati dummy metric information is in
 there 
 next step is to attach the `mysql-server` node to the `grafana` one in a MySQL Data source [plugin](https://grafana.com/grafana/plugins/mysql/) (built in, native).
+
+### Merging Server Inventory
+* to switch to querying and merging the server inventory data, use the `--merge` option:
+```cmd
+java -cp target\example.data txt-cachedb.jar;target\lib\* example.App -p host1 -s --hostname host1 --merge
+```
+
+this will print 
+```text
+Merging server metadata: [example.projection.ServerInstanceApplication@23bb8443,
+ example.projection.ServerInstanceApplication@1176dcec, example.projection.Serve
+rInstanceApplication@120d6fe6, example.projection.ServerInstanceApplication@4ba2
+ca36, example.projection.ServerInstanceApplication@3444d69d]
+```
+```text
+server: example.projection.ServerInstanceApplication@23bb8443
+server: example.projection.ServerInstanceApplication@1176dcec
+server: example.projection.ServerInstanceApplication@120d6fe6
+server: example.projection.ServerInstanceApplication@4ba2ca36
+server: example.projection.ServerInstanceApplication@3444d69d
+```
+```text
+ServerInstanceApplication [ serverName = hostname00, instanceName = instance01,
+applicationName = application01 ]
+ServerInstanceApplication [ serverName = hostname00, instanceName = instance02,
+applicationName = application01 ]
+ServerInstanceApplication [ serverName = hostname01, instanceName = instance03,
+applicationName = application01 ]
+ServerInstanceApplication [ serverName = hostname01, instanceName = instance04,
+applicationName = application01 ]
+ServerInstanceApplication [ serverName = hostname01, instanceName = instance05,
+applicationName = application02 ]
+```
+NOTE: the first two output samples illustrate that method override
+```java
+@Override
+public String toString() {
+	return "ServerInstanceApplication " + "[ " + "serverName = " + serverName + ", " + "instanceName = " + instanceName + ", " + "applicationName = " + applicationName + " ]";
+}
+```
+added to `ServerInstanceApplication` class is somehow ignored, not really needed for application in question.
 
 ### Connecting to Grafana
 
