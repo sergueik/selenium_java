@@ -30,15 +30,17 @@ import org.apache.commons.cli.ParseException;
 
 import example.dao.JDBCDao;
 import example.projection.ServerInstanceApplication;
+import example.utils.Utils;
 
 public class App {
 
+	private static Utils utils = Utils.getInstance();
 	private static final String filemask = "data.txt.*$";
 	private static JDBCDao dao = new JDBCDao();
 
 	private static final Random randomId = new Random();
 	private static Connection connection = null;
-	private static String osName = getOSName();
+	private static String osName = utils.getOSName();
 	public static final int INVALID_OPTION = 42;
 
 	final static Map<String, String> env = System.getenv();
@@ -126,15 +128,7 @@ public class App {
 			List<ServerInstanceApplication> servers = (List<ServerInstanceApplication>) dao
 					.findAllServerInstanceApplication();
 
-			System.err.println("Merging server metadata: " + servers);
-			// NOTE: somehow even when toString() is called explicitly
-			// the output is the same as for generic Object:
-			// server: example.projection.ServerInstanceApplication@23bb8443
-
-			for (ServerInstanceApplication server : servers) {
-				System.err.println("server: " + server.toString());
-			}
-
+			System.err.println("Merging server metadata");
 			for (ServerInstanceApplication server : servers) {
 				System.err.println("ServerInstanceApplication " + "[ " + "serverName = "
 						+ server.getServerName() + ", " + "instanceName = "
@@ -538,16 +532,6 @@ public class App {
 			return readFiles(result);
 		}
 
-	}
-
-	private static String getOSName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
 	}
 
 	private static String getDataFileUri(String dataFilePath) {

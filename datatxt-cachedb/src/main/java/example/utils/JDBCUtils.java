@@ -27,7 +27,10 @@ public class JDBCUtils {
 	public static PreparedStatement preparedStatement = null;
 	public static ResultSet resultSet = null;
 	final static Map<String, String> env = System.getenv();
-	private static String osName = getOSName();
+	
+	private static Utils utils = Utils.getInstance();
+
+	private static String osName = utils.getOSName();
 	private static String sqliteDatabaseName = "cache.db";
 	final static String databasePath = String.format("%s%s%s",
 			env.get(osName.equals("windows") ? "USERPROFILE" : "HOME"),
@@ -140,15 +143,4 @@ public class JDBCUtils {
 		m.appendTail(sb);
 		return sb.toString();
 	}
-
-	private static String getOSName() {
-		if (osName == null) {
-			osName = System.getProperty("os.name").toLowerCase();
-			if (osName.startsWith("windows")) {
-				osName = "windows";
-			}
-		}
-		return osName;
-	}
-
 }
