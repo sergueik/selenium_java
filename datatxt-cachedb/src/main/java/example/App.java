@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -86,8 +87,10 @@ public class App {
 	private static Map<String, String> extractedMetricNames = new HashMap<>();
 	// TODO: initialize
 	// { 'load_average': 'loadaverage'}
+	private static Properties prop;
 
 	public static void main(String args[]) throws ParseException {
+		prop = utils.getProperties();
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
 		options.addOption("m", "merge", false, "merge");
@@ -308,7 +311,8 @@ public class App {
 				File.separator, sqliteDatabaseName);
 		try {
 			connection = DriverManager
-					.getConnection("jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/"));
+					.getConnection(utils.resolveEnvVars(prop.getProperty("datasource.url",
+							"jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/"))));
 			System.out
 					.println("Opened database connection successfully: " + databasePath);
 
@@ -545,14 +549,16 @@ public class App {
 			try {
 				// TODO: refactor
 
-				Class driverObject = Class.forName(
-						"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */);
-				System.out.println("driverObject=" + driverObject);
+				Class driverObject = Class
+						.forName(prop.getProperty("datasource.driver-class-name",
+								"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */));
+				System.err.println("driverObject=" + driverObject);
 
-				final String url = "jdbc:mysql://" + databaseHost + ":" + databasePort
-						+ "/" + database;
-				connection = DriverManager.getConnection(url, databaseUser,
-						databasePassword);
+				final String url = prop.getProperty("datasource.url", "jdbc:mysql://"
+						+ databaseHost + ":" + databasePort + "/" + database);
+				connection = DriverManager.getConnection(url,
+						prop.getProperty("datasource.username", databaseUser),
+						prop.getProperty("datasource.password", databasePassword));
 				if (connection != null) {
 					System.out.println("Connected to product: "
 							+ connection.getMetaData().getDatabaseProductName());

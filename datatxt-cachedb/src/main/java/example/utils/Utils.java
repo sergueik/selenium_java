@@ -1,14 +1,15 @@
 package example.utils;
 
-import java.util.Random;
-
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utils {
 
@@ -28,6 +29,49 @@ public class Utils {
 			instance.set(new Utils());
 		}
 		return instance.get();
+	}
+
+	private Properties prop;
+
+	public Properties getProperties() {
+		prop = new Properties();
+		InputStream input = null;
+		try {
+			input = JDBCUtils.class.getClassLoader()
+					.getResourceAsStream("application.properties");
+			prop.load(input);
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		} finally {
+			if (input != null) {
+				try {
+					input.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+		return prop;
+	}
+
+	public String resolveEnvVars(String input) {
+		if (null == input) {
+			return null;
+		}
+		Pattern p = Pattern.compile("\\$(?:\\{([\\w.]+)\\}|([\\w.]+))");
+		Matcher m = p.matcher(input);
+		StringBuffer sb = new StringBuffer();
+		while (m.find()) {
+			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
+			// System.err.println("Replacing " + envVarName);
+			String envVarValue = prop.containsKey(envVarName)
+					? prop.get(envVarName).toString() : System.getenv(envVarName);
+			m.appendReplacement(sb,
+					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
+		}
+		m.appendTail(sb);
+		return sb.toString();
 	}
 
 	public String getOSName() {

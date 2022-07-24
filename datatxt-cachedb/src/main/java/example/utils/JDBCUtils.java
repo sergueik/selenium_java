@@ -1,8 +1,6 @@
 package example.utils;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -27,7 +25,7 @@ public class JDBCUtils {
 	public static PreparedStatement preparedStatement = null;
 	public static ResultSet resultSet = null;
 	final static Map<String, String> env = System.getenv();
-	
+
 	private static Utils utils = Utils.getInstance();
 
 	private static String osName = utils.getOSName();
@@ -36,43 +34,29 @@ public class JDBCUtils {
 			env.get(osName.equals("windows") ? "USERPROFILE" : "HOME"),
 			File.separator, sqliteDatabaseName);
 
-	private static final String datasourceUrl = "jdbc:sqlite:"
+	private static String datasourceUrl = "jdbc:sqlite:"
 			+ databasePath.replaceAll("\\\\", "/");
 
 	private JDBCUtils() {
 	}
 
 	public static Connection getConnection() {
-		// temporrily commented
-		/*
-		Properties prop = new Properties();
-		InputStream input = null;
-		try {
-			input = JDBCUtils.class.getClassLoader()
-					.getResourceAsStream("application.properties");
-			prop.load(input);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			if (input != null) {
-				try {
-					input.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-*/
-		String url = resolveEnvVars(datasourceUrl);
 
-		String username = "java";
-		String password = "password";
+		Properties prop = utils.getProperties();
+
+		String url = utils
+				.resolveEnvVars(prop.getProperty("datasource.url", datasourceUrl));
+		String filename = utils
+				.resolveEnvVars(prop.getProperty("datasource.filename"));
+		logger.info("Connect to database " + url + " " + filename);
+		String username = prop.getProperty("datasource.username");
+		String password = prop.getProperty("datasource.password");
 
 		if (connection != null) {
 			return connection;
 		}
 		try {
-			Class.forName("org.sqlite.JDBC" /* "com.mysql.cj.jdbc.Driver" */ )
+			Class.forName(prop.getProperty("datasource.driver-class-name"))
 					.newInstance();
 			connection = DriverManager.getConnection(url, username, password);
 		} catch (ClassNotFoundException | InstantiationException
@@ -127,20 +111,4 @@ public class JDBCUtils {
 		return list;
 	}
 
-	private static String resolveEnvVars(String input) {
-		if (null == input) {
-			return null;
-		}
-		Pattern p = Pattern.compile("\\$(?:\\{(\\w+)\\}|(\\w+))");
-		Matcher m = p.matcher(input);
-		StringBuffer sb = new StringBuffer();
-		while (m.find()) {
-			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
-			String envVarValue = System.getenv(envVarName);
-			m.appendReplacement(sb,
-					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
-		}
-		m.appendTail(sb);
-		return sb.toString();
-	}
 }
