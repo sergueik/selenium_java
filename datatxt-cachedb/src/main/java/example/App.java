@@ -253,7 +253,8 @@ public class App {
 		if (save) {
 			// TODO: refactoring needed - the connection is not open when doing SQLite
 			if (!(vendor.equals("mysql"))) {
-				createTableCommon();
+				// createTableCommon();
+				createTableForLegacyData();
 			}
 			saveLegacyData(metricsData);
 		}
@@ -300,6 +301,36 @@ public class App {
 			} catch (SQLException e) {
 				System.err.println(e);
 			}
+		}
+	}
+
+	private static void createTableForLegacyData() {
+
+		try {
+			createTableCommon();
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			// NOTE: "BIGINT" for MySQL
+			String sql = utils.getScriptContent("schema.sql");
+			/*
+					String.format(
+					"CREATE TABLE IF NOT EXISTS `%s` " + "( " + "`id` UNSIGNED BIG INT"
+							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
+							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
+							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
+					databaseTable);
+					*/
+			if (debug)
+				System.err.println("Running SQL: " + sql);
+			statement.executeUpdate(sql);
+			statement.close();
+
+		} catch (SQLException e) {
+			System.err.println("Exception (ignored)" + e.getMessage());
+		} catch (Exception e) {
+			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
+					+ e.getMessage());
+			System.exit(1);
 		}
 	}
 

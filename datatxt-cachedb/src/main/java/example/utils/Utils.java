@@ -74,6 +74,18 @@ public class Utils {
 		return sb.toString();
 	}
 
+	public String getScriptContent(String scriptName) {
+		try {
+			final InputStream stream = this.getClass().getClassLoader()
+					.getResourceAsStream(scriptName);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			return new String(bytes, "UTF-8");
+		} catch (IOException e) {
+			throw new RuntimeException(scriptName);
+		}
+	}
+
 	public String getOSName() {
 		if (osName == null) {
 			osName = System.getProperty("os.name").toLowerCase();
