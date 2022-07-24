@@ -1,6 +1,7 @@
 package example;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -28,6 +29,8 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 
 import example.dao.JDBCDao;
 import example.projection.ServerInstanceApplication;
@@ -47,6 +50,10 @@ public class App {
 	final static Map<String, String> env = System.getenv();
 
 	private static List<Map<String, String>> metricsData = new ArrayList<>();
+	private static String[] headers = { "hostname", "timestamp", "memory", "cpu",
+			"disk", "load_average" };
+	private static List<List<Object>> csvData = new ArrayList<>();
+
 
 	private static boolean debug = false;
 	private static boolean merge = false;
@@ -260,12 +267,33 @@ public class App {
 		}
 		if (query) {
 			displayLegacyData();
+			try {
+				createCSVFile();
+			} catch (IOException e) {
+				// ignore
+			}
+
 		}
 
 		if (debug) {
 			System.err.println("Done: " + path);
 		}
 
+	}
+
+	public static void createCSVFile() throws IOException {
+		FileWriter out = new FileWriter("book_new.csv");
+		try (@SuppressWarnings("deprecation")
+		CSVPrinter printer = new CSVPrinter(out,
+				CSVFormat.DEFAULT.withHeader(headers))) {
+			csvData.forEach((List<Object> row) -> {
+				try {
+					printer.printRecord(row);
+				} catch (IOException e) {
+					// ignore
+				}
+			});
+		}
 	}
 
 	private static void displayLegacyData() {
@@ -284,6 +312,11 @@ public class App {
 							+ "load_average FROM %s ORDER BY hostname, timestamp",
 					databaseTable));
 			while (rs.next()) {
+
+				csvData.add(Arrays.asList(
+						new Object[] { rs.getString("hostname"), rs.getString("timestamp"),
+								rs.getString("disk"), rs.getString("cpu"),
+								rs.getString("memory"), rs.getString("load_average") }));
 				System.err.println("hostname = " + rs.getString("hostname") + "\t"
 						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
 						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")

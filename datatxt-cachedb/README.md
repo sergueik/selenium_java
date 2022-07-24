@@ -375,6 +375,8 @@ docker container stop mysql-server
   * https://stackoverflow.com/questions/4125947/what-is-the-data-type-for-unix-timestamp-mysql
   * https://stackoverflow.com/questions/12333461/insert-unix-timestamp-in-mysql
   * https://www.w3schools.com/mysql/mysql_datatypes.asp
+  * [introduction to Apache Commons CSV](https://www.baeldung.com/apache-commons-csv) - does not cover multiple columns export
+  * alternative [fast CSV serializer](https://github.com/osiegmar/FastCSV)
 
 ### Youtube Videos
 
