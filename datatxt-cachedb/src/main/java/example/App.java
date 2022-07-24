@@ -54,7 +54,6 @@ public class App {
 			"disk", "load_average" };
 	private static List<List<Object>> csvData = new ArrayList<>();
 
-
 	private static boolean debug = false;
 	private static boolean merge = false;
 	private static boolean save = false;
@@ -65,6 +64,7 @@ public class App {
 	private static String database = null;
 	private static int databasePort = 3306;
 	private static String sqliteDatabaseName = "cache.db";
+	private static String csvFileName = "dump.csv";
 	private static String databaseTable = "metric_table";
 	private static String linkedDataDir = null;
 
@@ -109,6 +109,8 @@ public class App {
 		options.addOption("o", "link", true, "linked data dir");
 		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
+
+		options.addOption("с", "csv", true, "csv dump filename to write");
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
@@ -159,6 +161,10 @@ public class App {
 			linkedDataDir = commandLine.getOptionValue("link");
 		} else {
 			linkedDataDir = null;
+		}
+
+		if (commandLine.hasOption("csv")) {
+			csvFileName = commandLine.getOptionValue("csv");
 		}
 
 		if (commandLine.hasOption("save")) {
@@ -282,7 +288,7 @@ public class App {
 	}
 
 	public static void createCSVFile() throws IOException {
-		FileWriter out = new FileWriter("book_new.csv");
+		FileWriter out = new FileWriter(csvFileName);
 		try (@SuppressWarnings("deprecation")
 		CSVPrinter printer = new CSVPrinter(out,
 				CSVFormat.DEFAULT.withHeader(headers))) {
@@ -317,11 +323,12 @@ public class App {
 						new Object[] { rs.getString("hostname"), rs.getString("timestamp"),
 								rs.getString("disk"), rs.getString("cpu"),
 								rs.getString("memory"), rs.getString("load_average") }));
-				System.err.println("hostname = " + rs.getString("hostname") + "\t"
-						+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
-						+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
-						+ "\t" + "memory = " + rs.getString("memory") + "\t"
-						+ "load_average = " + rs.getString("load_average"));
+				if (debug)
+					System.err.println("hostname = " + rs.getString("hostname") + "\t"
+							+ "timestamp = " + rs.getString("timestamp") + "\t" + "disk = "
+							+ rs.getString("disk") + "\t" + "cpu = " + rs.getString("cpu")
+							+ "\t" + "memory = " + rs.getString("memory") + "\t"
+							+ "load_average = " + rs.getString("load_average"));
 			}
 			statement.close();
 			statement = connection.createStatement();
