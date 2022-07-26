@@ -103,6 +103,8 @@ public class App {
 		options.addOption("m", "merge", false, "merge");
 
 		options.addOption("s", "save", false, "save");
+		// NOTE: in few revisions, there was a conflicting single letter opton for
+		// both "query" and "vendor"
 		options.addOption("q", "query", false, "query");
 		options.addOption("p", "path", true, "path to scan");
 
@@ -110,14 +112,13 @@ public class App {
 		options.addOption("x", "hostname", true, "hostname");
 		options.addOption("f", "file", true, "sqlite database filename to write");
 
+		options.addOption("b", "vendor", true,
+				"database kind. surrently supported sqlite and mysql (partially)");
 		options.addOption("с", "csv", true, "csv dump filename to write");
 		options.addOption("v", "verifylinks", false,
 				"verify file links that are found during scan");
 		options.addOption("r", "reject", true, "folder(s) to reject");
 		options.addOption("i", "collect", true, "folder(s) to collect");
-
-		options.addOption("q", "vendor", true,
-				"database kind. surrently supported sqlite and mysql (partially)");
 
 		options.addOption("z", "host", true, "database host");
 		options.addOption("y", "port", true, "database port");
@@ -350,16 +351,7 @@ public class App {
 			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			// NOTE: "BIGINT" for MySQL
 			String sql = utils.getScriptContent("schema.sql");
-			/*
-					String.format(
-					"CREATE TABLE IF NOT EXISTS `%s` " + "( " + "`id` UNSIGNED BIG INT"
-							+ "," + "`hostname` TEXT NOT NULL" + "," + "`timestamp` TEXT"
-							+ "," + "`memory` TEXT" + "," + "`cpu` TEXT" + "," + "`disk` TEXT"
-							+ "," + "`load_average` TEXT" + "," + "PRIMARY KEY(`id`)" + ");",
-					databaseTable);
-					*/
 			if (debug)
 				System.err.println("Running SQL: " + sql);
 			statement.executeUpdate(sql);
