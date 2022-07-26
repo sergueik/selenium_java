@@ -103,8 +103,8 @@ public class App {
 		options.addOption("m", "merge", false, "merge");
 
 		options.addOption("s", "save", false, "save");
-		// NOTE: in few revisions, there was a conflicting single letter opton for
-		// both "query" and "vendor"
+		// NOTE: in few revisions, the same single letter option
+		// for "query" and "vendor"
 		options.addOption("q", "query", false, "query");
 		options.addOption("p", "path", true, "path to scan");
 
