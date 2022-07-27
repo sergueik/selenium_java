@@ -356,6 +356,13 @@ the data can be also viewed /  schema improved in a regular desktop DB managemen
 
 ![metric db](https://github.com/sergueik/selenium_java/blob/master/datatxt-cachedb/screenshots/capture-db.png)
 
+### Merge Data
+*  run with options
+```cmd
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s  --hostname host1 --csv a.csv -q -m -d
+```
+this will cause it to load the host inventory strongly typed `List<ServerInstanceApplication>` and save it into cache database `host_inventory.sql`
+
 ### Cleanup
 
 ```sh

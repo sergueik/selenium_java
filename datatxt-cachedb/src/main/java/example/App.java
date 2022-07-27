@@ -120,7 +120,7 @@ public class App {
 		options.addOption("r", "reject", true, "folder(s) to reject");
 		options.addOption("i", "collect", true, "folder(s) to collect");
 
-		options.addOption("z", "host", true, "database host");
+		options.addOption("x", "host", true, "database host");
 		options.addOption("y", "port", true, "database port");
 		options.addOption("w", "database", true, "database");
 		options.addOption("u", "user", true, "database user");
@@ -138,9 +138,12 @@ public class App {
 		if (commandLine.hasOption("merge")) {
 			merge = true;
 			@SuppressWarnings("unchecked")
+			// NOTE inventory uses separate connection
+			// receive stronglty typed JPA style object list
 			List<ServerInstanceApplication> servers = (List<ServerInstanceApplication>) dao
 					.findAllServerInstanceApplication();
 
+			createTableForLegacyData("host_inventory.sql");
 			System.err.println("Merging server metadata");
 			for (ServerInstanceApplication server : servers) {
 				System.err.println("ServerInstanceApplication " + "[ " + "serverName = "
@@ -172,7 +175,7 @@ public class App {
 			save = true;
 		}
 
-		// NOTE; some challenge with hostname argument added to within some other
+		// NOTE: some challenge with hostname argument added to within some other
 		// argument check
 		hostname = commandLine.getOptionValue("x");
 		if (hostname == null) {
@@ -346,22 +349,28 @@ public class App {
 	}
 
 	private static void createTableForLegacyData() {
+		createTableForLegacyData("metric_table.sql");
+	}
 
+	private static void createTableForLegacyData(
+			String schemaDefinitionFilename) {
 		try {
 			createTableCommon();
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-			String sql = utils.getScriptContent("schema.sql");
+			String sql = utils.getScriptContent(schemaDefinitionFilename);
 			if (debug)
 				System.err.println("Running SQL: " + sql);
 			statement.executeUpdate(sql);
 			statement.close();
 
 		} catch (SQLException e) {
-			System.err.println("Exception (ignored)" + e.getMessage());
+			System.err.println("Exception processing " + schemaDefinitionFilename
+					+ " (ignored)" + e.getMessage());
 		} catch (Exception e) {
-			System.err.println("Unexpected exception " + e.getClass().getName() + ": "
-					+ e.getMessage());
+			System.err
+					.println("Unexpected exception processing " + schemaDefinitionFilename
+							+ " " + e.getClass().getName() + ": " + e.getMessage());
 			System.exit(1);
 		}
 	}
@@ -373,8 +382,11 @@ public class App {
 				env.get(osName.equals("windows") ? "USERPROFILE" : "HOME"),
 				File.separator, sqliteDatabaseName);
 		try {
-			connection = DriverManager
-					.getConnection(utils.resolveEnvVars(prop.getProperty("datasource.url",
+
+			// NOTE: does not have to be in memory, can be persisted to disk during
+			// development
+			connection = DriverManager.getConnection(
+					utils.resolveEnvVars(prop.getProperty("cache.datasource.url",
 							"jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/"))));
 			System.out
 					.println("Opened database connection successfully: " + databasePath);

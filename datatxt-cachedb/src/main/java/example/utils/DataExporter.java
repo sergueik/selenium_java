@@ -125,31 +125,88 @@ public class DataExporter {
 
 	}
 
-	public String metrics(List<Map<String, String>> payload) {
+	// NOTE: alternative solution would be use SQL query to load the host data
+	// from one JDBC connection
+	// then insert into temporary database using separate JDBC connection
+	// and finally cvs dump or enrichMetrics using one rowset
+	public List<Map<String, String>> enrichMetrics(
+			List<Map<String, String>> hostmetrics,
+			Map<String, Map<String, String>> hostdata) {
+		List<Map<String, String>> mergedData = new ArrayList<>();
+		for (Map<String, String> data : hostmetrics) {
+			String serverName = data.get("hostname");
+			data.put("applicationName", hostdata.get(serverName).get("application"));
+			data.put("instanceName", hostdata.get(serverName).get("instance"));
+			mergedData.add(data);
+		}
+		return mergedData;
+	}
+
+	public String metrics(List<Map<String, String>> hostmetrics,
+			Map<String, Map<String, String>> hostdata) {
 		if (debug)
 			System.err.println("Starting reporting metrics");
 		Writer writer = new StringWriter();
 		try {
 			registry = CollectorRegistry.defaultRegistry;
 
-			for (Map<String, String> data : payload) {
+			for (Map<String, String> data : hostmetrics) {
 				// TODO: clear properly
 				registry.clear();
 				gauges.clear();
-				String timestamp = data.get("timestamp");
 				String serverName = data.get("hostname");
-				String applicationName = "application";
-				String instanceName = "instance";
+				String applicationName = hostdata.get(serverName).get("application");
+				String instanceName = hostdata.get(serverName).get("instance");
 				ServerInstanceApplication serverInstance = new ServerInstanceApplication(
 						serverName, instanceName, applicationName);
 				if (debug)
-					System.err.println(
-							String.format("Loading %d metrics for host: %s timestamp: %d",
-									data.keySet().size(), serverName, timestamp));
+					System.err.println(String.format("Loading %d metrics for host: %s",
+							data.keySet().size(), serverName));
 
 				for (String metricName : data.keySet()) {
+					if (metricName.equals("hostname"))
+						continue;
 					createGauge(metricName);
 					value = Float.parseFloat(data.get(metricName));
+					exampleGauge(metricName, serverInstance, value);
+				}
+				TextFormat.write004(writer, registry.metricFamilySamples());
+			}
+		} catch (
+
+		IOException e) {
+			System.err.println("Exception (caught):" + e.toString());
+			return null;
+		}
+		return writer.toString();
+
+	}
+
+	public String metrics(List<Map<String, String>> mergedMetrics) {
+		if (debug)
+			System.err.println("Starting reporting metrics");
+		Writer writer = new StringWriter();
+		try {
+			registry = CollectorRegistry.defaultRegistry;
+
+			for (Map<String, String> mergedData : mergedMetrics) {
+				// TODO: clear properly
+				registry.clear();
+				gauges.clear();
+				String serverName = mergedData.get("hostname");
+				String applicationName = mergedData.get("application");
+				String instanceName = mergedData.get("instance");
+				ServerInstanceApplication serverInstance = new ServerInstanceApplication(
+						serverName, instanceName, applicationName);
+				if (debug)
+					System.err.println(String.format("Loading %d metrics for host: %s",
+							mergedData.keySet().size() - 3, serverName));
+
+				for (String metricName : mergedData.keySet()) {
+					if (metricName.matches("(?:hostname|application|instance)"))
+						continue;
+					createGauge(metricName);
+					value = Float.parseFloat(mergedData.get(metricName));
 					exampleGauge(metricName, serverInstance, value);
 				}
 				TextFormat.write004(writer, registry.metricFamilySamples());
