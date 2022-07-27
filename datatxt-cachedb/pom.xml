@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>datatxt-cachedb</artifactId>
   <packaging>jar</packaging>
-  <version>0.12.1-SNAPSHOT</version>
+  <version>0.13.0-SNAPSHOT</version>
   <name>datatxt-cachedb</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -37,6 +37,7 @@
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <version.sqlite-jdbc>3.8.7</version.sqlite-jdbc>
+    <prometheus.version>0.12.0</prometheus.version>
     <testng.version>6.14.3</testng.version>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
   </properties>
@@ -45,6 +46,16 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>${mysql-connector-java.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient</artifactId>
+      <version>${prometheus.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.prometheus</groupId>
+      <artifactId>simpleclient_common</artifactId>
+      <version>${prometheus.version}</version>
     </dependency>
     <dependency>
       <groupId>org.exparity</groupId>
