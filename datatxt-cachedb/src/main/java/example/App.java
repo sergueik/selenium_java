@@ -259,8 +259,12 @@ public class App {
 			if (!(vendor.equals("mysql"))) {
 				// createTableCommon();
 				createTableForLegacyData();
+
 			}
-			saveLegacyData(metricsData);
+
+			//
+			// saveLegacyData(metricsData);
+			saveLegacyDataBatch(metricsData);
 		}
 		if (query) {
 			displayLegacyData();
@@ -302,12 +306,13 @@ public class App {
 							+ connection.getSchema());
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
-
-			ResultSet rs = statement.executeQuery(String.format(
+			String query = String.format(
 					"SELECT DISTINCT hostname" + "," + "timestamp" + "," + "memory" + ","
 							+ "cpu" + "," + "disk" + ","
 							+ "load_average FROM %s ORDER BY hostname, timestamp",
-					databaseTable));
+					databaseTable);
+			System.err.println("query: " + query);
+			ResultSet rs = statement.executeQuery(query);
 			while (rs.next()) {
 
 				csvData.add(Arrays.asList(
@@ -369,14 +374,24 @@ public class App {
 				env.get(osName.equals("windows") ? "USERPROFILE" : "HOME"),
 				File.separator, sqliteDatabaseName);
 		try {
-
+			/*
+			Class driverObject = Class
+					.forName(prop.getProperty("datasource.driver-class-name",
+							"com.mysql.cj.jdbc.Driver" ));
+			System.err.println("Get driverObject=" + driverObject);
+			*/
+			// TODO: fix
+			// Exception (ignored)invalid database address:
+			// jdbc:mysql://192.168.0.29:3306/test
 			// NOTE: does not have to be in memory, can be persisted to disk during
 			// development
-			connection = DriverManager.getConnection(
-					utils.resolveEnvVars(prop.getProperty("cache.datasource.url",
-							"jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/"))));
+			String connectionUrl = utils
+					.resolveEnvVars(prop.getProperty("cache.datasource.url",
+							"jdbc:sqlite:" + databasePath.replaceAll("\\\\", "/")));
+			System.out.println("Opening database connection: " + connectionUrl);
+			connection = DriverManager.getConnection(connectionUrl);
 			System.out
-					.println("Opened database connection successfully: " + databasePath);
+					.println("Opened database connection successfully: " + connectionUrl);
 
 			System.out.println("Connected to product: "
 					+ connection.getMetaData().getDatabaseProductName() + "\t"
@@ -392,13 +407,12 @@ public class App {
 		}
 	}
 
-	// NOTE: largely a replica of "saveData"
-	private static void saveLegacyData(List<Map<String, String>> metricsData) {
-		System.err.println("Saving data");
-		// TODO - join with hostname/appid/invironment:
-		// CREATE TABLE "hosts" ( `id` INTEGER, `hostname` TEXT NOT NULL, `appid`
-		// TEXT, `environment` TEXT, `datacenter` TEX, `addtime` TEXT, PRIMARY
-		// KEY(`id`) )
+	// origin:
+	// https://stackoverflow.com/questions/3784197/efficient-way-to-do-batch-inserts-with-jdbc
+	private static void saveLegacyDataBatch(
+			List<Map<String, String>> metricsData) {
+		System.err.println("Batch saving data");
+		/*
 		try {
 			Statement statement = connection.createStatement();
 			statement.setQueryTimeout(30);
@@ -406,6 +420,76 @@ public class App {
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());
 		}
+		*/
+		try {
+
+			// https://www.sqlite.org/datatype3.html
+			// java has no unsigned long type, you can treat signed 64-bit
+			// two's-complement integers (i.e. long values) as unsigned if you are
+			// careful about it
+			String sql = vendor.equals("mysql")
+					? String.format(
+							"INSERT INTO %s " + "( " + "`id`" + "," + "`hostname`" + ","
+									+ "`timestamp`" + "," + "`memory`" + "," + "`cpu`" + ","
+									+ "`disk`" + "," + "`load_average`" + ")"
+									+ " VALUES (?, ?, FROM_UNIXTIME(?), ?, ?, ?, ?);",
+							databaseTable)
+					: String.format("INSERT INTO %s " + "( " + "`id`" + "," + "`hostname`"
+							+ "," + "`timestamp`" + "," + "`memory`" + "," + "`cpu`" + ","
+							+ "`disk`" + "," + "`load_average`" + ")"
+							+ " VALUES (?, ?, ?, ?, ?, ?, ?);", databaseTable);
+			connection.setAutoCommit(false);
+			PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			// NOTE: optional
+			preparedStatement.clearParameters();
+			metricsData.stream().forEach(row -> {
+				String hostname = row.get("hostname");
+				String timestamp = row.get("timestamp");
+				String memory = row.get("memory");
+				String cpu = row.get("cpu");
+				String disk = row.get("disk");
+				String load_average = row.get("load_average");
+				if (debug)
+					System.err.println(
+							"about to insert data row: " + Arrays.asList(new String[] {
+									hostname, timestamp, memory, cpu, disk, load_average }));
+
+				long id = randomId.nextLong();
+				try {
+					preparedStatement.setLong(1, id);
+					preparedStatement.setString(2, hostname);
+					preparedStatement.setLong(3, Long.parseLong(timestamp));
+					preparedStatement.setFloat(4, Float.parseFloat(memory));
+					preparedStatement.setFloat(5, Float.parseFloat(cpu));
+					preparedStatement.setFloat(6, Float.parseFloat(disk));
+					preparedStatement.setFloat(7, Float.parseFloat(load_average));
+					preparedStatement.addBatch();
+				} catch (SQLException e) {
+					// Values not bound to statement
+					System.err
+							.println("Error in preparing batch statement: " + e.getMessage());
+				}
+			});
+			preparedStatement.executeBatch();
+			System.err.println("updated " + preparedStatement.getUpdateCount());
+		} catch (SQLException e) {
+			System.err
+					.println("Error in executing batch statement: " + e.getMessage());
+		}
+	}
+
+	// NOTE: largely a replica of "saveData"
+	private static void saveLegacyData(List<Map<String, String>> metricsData) {
+		System.err.println("Saving data");
+		/*
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.executeUpdate("delete from " + databaseTable);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+		*/
 		metricsData.stream().forEach(row -> {
 			String hostname = row.get("hostname");
 			String timestamp = row.get("timestamp");
@@ -607,6 +691,7 @@ public class App {
 	}
 
 	public static void testJDBCConnection(String vendor) throws Exception {
+		System.err.println("testJDBCConnection for vendor: " + vendor);
 		if (vendor.equals("mysql")) {
 			try {
 				// TODO: refactor
@@ -616,8 +701,9 @@ public class App {
 								"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */));
 				System.err.println("driverObject=" + driverObject);
 
-				final String url = prop.getProperty("datasource.url", "jdbc:mysql://"
-						+ databaseHost + ":" + databasePort + "/" + database);
+				final String url = utils
+						.resolveEnvVars(prop.getProperty("datasource.url", "jdbc:mysql://"
+								+ databaseHost + ":" + databasePort + "/" + database));
 				connection = DriverManager.getConnection(url,
 						prop.getProperty("datasource.username", databaseUser),
 						prop.getProperty("datasource.password", databasePassword));

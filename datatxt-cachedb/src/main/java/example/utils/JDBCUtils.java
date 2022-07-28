@@ -40,6 +40,7 @@ public class JDBCUtils {
 	private JDBCUtils() {
 	}
 
+	// NOTE: not connecting to "cache.datasource.url"
 	public static Connection getConnection() {
 
 		Properties prop = utils.getProperties();

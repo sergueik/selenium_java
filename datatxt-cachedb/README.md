@@ -384,6 +384,8 @@ docker container stop mysql-server
   * https://www.w3schools.com/mysql/mysql_datatypes.asp
   * [introduction to Apache Commons CSV](https://www.baeldung.com/apache-commons-csv) - does not cover multiple columns export
   * alternative [fast CSV serializer](https://github.com/osiegmar/FastCSV)
+  * efficient ways to do batch INSERTS with JDBC [stackoverflow](https://stackoverflow.com/questions/3784197/efficient-way-to-do-batch-inserts-with-jdbc)
+  * [link](https://stackoverflow.com/questions/26307760/mysql-and-jdbc-with-rewritebatchedstatements-true) about `rewriteBatchedStatements` parameter
 
 ### Youtube Videos
 
