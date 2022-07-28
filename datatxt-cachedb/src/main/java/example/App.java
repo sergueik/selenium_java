@@ -137,21 +137,8 @@ public class App {
 
 		if (commandLine.hasOption("merge")) {
 			merge = true;
-			@SuppressWarnings("unchecked")
-			// NOTE inventory uses separate connection
-			// receive stronglty typed JPA style object list
-			List<ServerInstanceApplication> servers = (List<ServerInstanceApplication>) dao
-					.findAllServerInstanceApplication();
 
-			createTableForLegacyData("host_inventory.sql");
-			System.err.println("Merging server metadata");
-			for (ServerInstanceApplication server : servers) {
-				System.err.println("ServerInstanceApplication " + "[ " + "serverName = "
-						+ server.getServerName() + ", " + "instanceName = "
-						+ server.getInstanceName() + ", " + "applicationName = "
-						+ server.getApplicationName() + " ]");
-
-			}
+			moveDataToCache();
 			return;
 		}
 
@@ -651,6 +638,59 @@ public class App {
 				e.printStackTrace();
 			}
 		}
+	}
+
+	private static void moveDataToCache() {
+		@SuppressWarnings("unchecked")
+		// NOTE inventory uses separate connection
+		// receive stronglty typed JPA style object list
+		List<ServerInstanceApplication> servers = (List<ServerInstanceApplication>) dao
+				.findAllServerInstanceApplication();
+
+		createTableForLegacyData("host_inventory.sql");
+		System.err.println("Merging server metadata");
+		String databaseTable = "host_inventory";
+		try {
+			Statement statement = connection.createStatement();
+			statement.setQueryTimeout(30);
+			statement.executeUpdate("delete from " + databaseTable);
+		} catch (SQLException e) {
+			System.err.println(e.getMessage());
+		}
+
+		servers.stream().forEach(server -> {
+			String serverName = server.getServerName();
+			String instanceName = server.getInstanceName();
+			String applicationName = server.getApplicationName();
+			if (debug)
+				System.err.println("ServerInstanceApplication " + "[ " + "serverName = "
+						+ server.getServerName() + ", " + "instanceName = "
+						+ server.getInstanceName() + ", " + "applicationName = "
+						+ server.getApplicationName() + " ]");
+
+			try {
+
+				String sql = String.format("INSERT INTO %s " + "( " + "`id`" + ","
+						+ "`server`" + "," + "`instance`" + "," + "`application`" + ")"
+						+ " VALUES (?, ?, ?, ?);", databaseTable);
+				PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+				long id = randomId.nextLong();
+				// NOTE: nextLong is a no arg method - cannot supply scale like with
+				// nextInt()
+				// 1_000_000_000_000L
+				// can use ThreadLocalRandom.current().nextLong(n)
+				// see also:
+				// https://stackoverflow.com/questions/2546078/java-random-long-number-in-0-x-n-range
+				preparedStatement.setLong(1, id);
+				preparedStatement.setString(2, serverName);
+				preparedStatement.setString(3, instanceName);
+				preparedStatement.setString(4, applicationName);
+				preparedStatement.execute();
+			} catch (SQLException e) {
+				System.err.println(e.getMessage());
+			}
+		});
 	}
 
 	public static void help() {
