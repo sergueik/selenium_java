@@ -363,6 +363,12 @@ java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s
 ```
 this will cause it to load the host inventory strongly typed `List<ServerInstanceApplication>` and save it into cache database `host_inventory.sql`
 
+### Batch  Update
+
+* note the mysql server errors logged to docker console
+```text
+2022-07-29  2:10:54 114 [Warning] Aborted connection 114 to db: 'test' user: 'java' host: '192.168.0.25' (Got an error reading communication packets)
+```
 ### Cleanup
 
 ```sh

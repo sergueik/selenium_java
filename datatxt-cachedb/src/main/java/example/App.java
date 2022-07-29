@@ -438,7 +438,7 @@ public class App {
 							+ "," + "`timestamp`" + "," + "`memory`" + "," + "`cpu`" + ","
 							+ "`disk`" + "," + "`load_average`" + ")"
 							+ " VALUES (?, ?, ?, ?, ?, ?, ?);", databaseTable);
-			connection.setAutoCommit(false);
+			// connection.setAutoCommit(false);
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			// NOTE: optional
 			preparedStatement.clearParameters();
