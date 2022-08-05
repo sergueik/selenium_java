@@ -50,28 +50,35 @@ public class Utils {
 				return (propertiesMap);
 			}
 		} else {
-			stream = Utils.class.getClassLoader().getResourceAsStream(fileName);
-		}
-
-		try {
-			p.load(stream);
-			@SuppressWarnings("unchecked")
-			Enumeration<String> e = (Enumeration<String>) p.propertyNames();
-			for (; e.hasMoreElements();) {
-				String key = e.nextElement();
-				String val = p.get(key).toString();
-				if (debug) {
-					System.err.println(String.format("Reading: '%s' = '%s'", key, val));
-				}
-				propertiesMap.put(key, resolveEnvVars(val));
+			String resourcefileName = fileName.replaceAll("^.*/", "");
+			if (debug) {
+				System.err.println(String.format(
+						"Reading properties resource stream: '%s'", resourcefileName));
 			}
+			stream = Utils.class.getClassLoader()
+					.getResourceAsStream(resourcefileName);
+		}
+		if (stream != null) {
+			try {
+				p.load(stream);
+				@SuppressWarnings("unchecked")
+				Enumeration<String> e = (Enumeration<String>) p.propertyNames();
+				for (; e.hasMoreElements();) {
+					String key = e.nextElement();
+					String val = p.get(key).toString();
+					if (debug) {
+						System.err.println(String.format("Reading: '%s' = '%s'", key, val));
+					}
+					propertiesMap.put(key, resolveEnvVars(val));
+				}
 
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(
-					String.format("Properties file was not found: '%s'", fileName));
-		} catch (IOException e) {
-			throw new RuntimeException(
-					String.format("Properties file is not readable: '%s'", fileName));
+			} catch (FileNotFoundException e) {
+				throw new RuntimeException(
+						String.format("Properties file was not found: '%s'", fileName));
+			} catch (IOException e) {
+				throw new RuntimeException(
+						String.format("Properties file is not readable: '%s'", fileName));
+			}
 		}
 		return (propertiesMap);
 	}

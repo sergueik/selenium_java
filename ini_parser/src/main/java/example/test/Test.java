@@ -10,8 +10,9 @@ import example.test.Utils;
 public class Test {
 	private static String iniFilename = "data.ini";
 	private static IniNewParser parser = IniNewParser.getInstance();
-	private static String iniFile = String.format("%s/src/main/resources/%s",
-			System.getProperty("user.dir"), iniFilename).replaceAll("\\\\", "/");
+	private static String iniFile = String
+			.format("%s/%s", System.getProperty("user.dir"), iniFilename)
+			.replaceAll("\\\\", "/");
 	private static Map<String, Map<String, Object>> data = new HashMap<>();
 	private static Map<String, Object> sectionData = new HashMap<>();
 	private static String[] entries = { "message", "flag", "number", "empty" };
@@ -33,8 +34,8 @@ public class Test {
 				.format("The running application resource path: \"%s\"", resourcePath));
 		*/
 		utils.setDebug(debug);
-		String fileName = String.format("%s\\src\\main\\resources\\%s",
-				System.getProperty("user.dir"), "custom.properties")
+		String fileName = String
+				.format("%s\\%s", System.getProperty("user.dir"), "custom.properties")
 				.replaceAll("\\\\", "/");
 
 		System.err.println("fileName: " + fileName);

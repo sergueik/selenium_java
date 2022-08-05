@@ -8,7 +8,7 @@ and a minor modifications to that project.
 ```cmd
 mvn package
 ```
-* write the file `src\main\resources\custom.properties`:
+* write the file `custom.properties` in the launcher directory:
 ```text
 USERNAME=defined
 # will be overridden by system property with the same name
@@ -35,6 +35,66 @@ option3: default value for option3
 ```
 NOTE: the output will be different on Linux where is no `USERPROFILE` environment variable
 
+* remove the file `custom.properties` and rerun. The `custom.properties` resource will be read 
+
+```
+rm -f ./custom.properties
+mvn clean package
+DEBUG=true java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+```
+
+```text
+Reading properties file: 'C:/developer/sergueik/selenium_java/ini_parser/custom.properties'
+Reading properties resource stream: 'custom.properties'
+Reading: 'option2' = 'FOO:${FOO}'
+getting property: FOO
+system property: null
+environment property: bar
+Reading: 'option1' = 'user:${USERNAME}'
+getting property: USERNAME
+system property: null
+environment property: Serguei
+Reading: 'FOO' = 'bar'
+Reading: 'USERNAME' = 'defined'
+getting property: option1
+system property: user:Serguei
+option1: user:Serguei
+getting property: option2
+system property: FOO:bar
+option2: FOO:bar
+getting property: option3
+system property: null
+environment property: null
+option3: default value for option3
+```
+
+* temporarily  remove the file `src/main/resources/custom.properties` and rebuild and rerun. The `custom.properties` resource will be read 
+```sh
+rm -f src/main/resources/custom.properties
+mvn clean package
+```
+```sh
+DEBUG=true java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+```
+```text
+debug: true
+fileName: C:/developer/sergueik/selenium_java/ini_parser/custom.properties
+Reading properties file: 'C:/developer/sergueik/selenium_java/ini_parser/custom.
+properties'
+Reading properties resource stream: 'custom.properties'
+getting property: option1
+system property: null
+environment property: null
+option1: default value for option1
+getting property: option2
+system property: null
+environment property: null
+option2: default value for option2
+getting property: option3
+system property: null
+environment property: null
+option3: default value for option3
+```
 ### See also:
   * [C# ini parser project by the same author](https://github.com/RdlP/IniParser/blob/master/IniParser.cs)
   * [same project embedded in Powershell script with Add-Type](https://github.com/sergueik/powershell_ui_samples/blob/master/ini_parser.ps1)
