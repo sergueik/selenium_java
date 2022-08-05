@@ -1,38 +1,31 @@
-package com.github.sergueik.iniparser;
+package example;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /*
  * @author Ángel Luis (angelluis.perales@um.es) 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-public final class IniNewParser {
+public final class IniParser {
 
-	private static IniNewParser instance = new IniNewParser();
+	private static IniParser instance = new IniParser();
 	private boolean debug = false;
 
 	public void setDebug(boolean value) {
 		this.debug = value;
 	}
 
-	private IniNewParser() {
+	private IniParser() {
 	}
 
-	public static IniNewParser getInstance() {
+	public static IniParser getInstance() {
 		return instance;
 	}
 
@@ -51,51 +44,30 @@ public final class IniNewParser {
 		try {
 			data.clear();
 			BufferedReader br = new BufferedReader(new FileReader(filePath));
-			String line = "";
-			StringBuilder stringBuilder = new StringBuilder();
-			String lineSeparator = System.getProperty("line.separator");
+			String line, lastSection = "";
 			while ((line = br.readLine()) != null) {
-				stringBuilder.append(line);
-				stringBuilder.append(lineSeparator);
-			}
-			String fileContents = stringBuilder.toString();
-			// positive lookahead keeping the section title and data together
-			String iniSectionPattern = "\\[(?=[^]]+\\])";
-			String[] iniSections = fileContents.split(iniSectionPattern);
-
-			// NOTE the "Count of sections" will be 1 too many
-			System.err.println("Count of sections = " + iniSections.length);
-			// String sectionHeaderPattern = "^(.+)\\]\\n.*$";
-			// Pattern pattern = Pattern.compile(sectionHeaderPattern,
-			// Pattern.CASE_INSENSITIVE | Pattern.MULTILINE);
-
-			for (String iniSection : iniSections) {
-				// TODO: use matched to capture section key and data
-				// Matcher matcher = pattern.matcher(iniSection);
-				String[] parts = iniSection.split("\\]");
-				if (parts.length != 0 && !parts[0].isEmpty()) {
-					String section = parts[0];
-					String rawData = parts[1];
+				int startSection = line.indexOf('[');
+				int endSection = line.indexOf(']');
+				if (startSection != -1 && endSection != -1
+						&& endSection > startSection) {
+					String section = lastSection = line.substring(startSection + 1,
+							endSection - startSection);
 					data.put(section, new HashMap<String, Object>());
-					System.err.println(
-							String.format("Section: %s\nData:\n----%s\n", section, rawData));
-					for (String dataLine : rawData.split("\\r?\\n")) {
-						if (dataLine.trim().startsWith(";")) {
-							continue;
-						}
-						if (dataLine.contains("=")) {
-							String[] entryParts = dataLine.split("=");
-							Map<String, Object> hash = data.get(section);
-							// TODO: better process comments
-							String entryKey = entryParts[0].trim();
-							String entryValue = entryParts[1].trim();
-							int hasComments = entryValue.indexOf(';');
-							if (hasComments > -1) {
-								hash.put(entryKey, entryValue.substring(0, hasComments));
-							} else {
-								hash.put(entryKey, entryValue);
-							}
-						}
+				} else if (line.contains("=") && !line.trim().startsWith(";")) {
+					String[] keyValue = line.split("=");
+					int hasComments = keyValue[1].trim().indexOf(';');
+					Map<String, Object> hash = data.get(lastSection);
+					if (hasComments == -1) {
+						hash.put(keyValue[0].trim(), keyValue[1].trim());
+					} else {
+						hash.put(keyValue[0].trim(),
+								keyValue[1].trim().substring(0, hasComments));
+					}
+				} else {
+					if (line.trim().startsWith(";")) {
+						String[] comment = line.split(";");
+						Map<String, Object> hash = data.get(lastSection);
+						hash.put(";", comment[1]);
 					}
 				}
 			}

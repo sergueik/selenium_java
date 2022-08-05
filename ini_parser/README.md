@@ -1,6 +1,39 @@
-### Info
+﻿### Info
 
-This directory contains a replica of [basic ini file parser](https://github.com/RdlP/IniParser) java project by Ángel Luis and a minor modifications to that project.
+This directory contains a replica of [basic ini file parser](https://github.com/RdlP/IniParser) java project by Ángel Luis 
+and a minor modifications to that project.
+
+### Usage
+* build app
+```cmd
+mvn package
+```
+* write the file `src\main\resources\custom.properties`:
+```text
+USERNAME=defined
+# will be overridden by system property with the same name
+option1=user:${USERNAME}
+FOO=bar
+option2=FOO:${FOO}
+```
+in the right hand side one can use properties just defined except when the property name collides with predefined ones like `USERNAME` on WINDOW or `HOME` on Unix.
+you can update the file any time 
+* run the app, which will simply echo the read values of few options
+```cmd
+set debug=false
+java -cp target\iniparser-0.1-SNAPSHOT.jar example.test.Test
+```
+
+or on Linux
+```
+DEBUG=false java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+```
+```text
+option1: user:Serguei
+option2: FOO:bar
+option3: default value for option3
+```
+NOTE: the output will be different on Linux where is no `USERPROFILE` environment variable
 
 ### See also:
   * [C# ini parser project by the same author](https://github.com/RdlP/IniParser/blob/master/IniParser.cs)

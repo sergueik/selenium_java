@@ -1,4 +1,4 @@
-package com.github.sergueik.iniparser.integration;
+package example;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.github.sergueik.iniparser.IniParser;
+import example.IniParser;
 
 /**
  * Local file Integration tests of ini parser

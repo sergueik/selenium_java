@@ -1,10 +1,10 @@
-package com.github.sergueik.iniparser.integration;
+package example;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import com.github.sergueik.iniparser.IniParser;
+import example.IniParser;
 
 /**
  * Common functions for integration testing of ini parser
