@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,10 @@ public class Utils {
 	}
 
 	private Map<String, String> propertiesMap;
+
+	public Map<String, String> getPropertiesMap() {
+		return propertiesMap;
+	}
 
 	// TODO: fix with absolute path in filename
 	public Map<String, String> getProperties(final String fileName) {
@@ -69,7 +74,8 @@ public class Utils {
 					if (debug) {
 						System.err.println(String.format("Reading: '%s' = '%s'", key, val));
 					}
-					propertiesMap.put(key, resolveEnvVars(val));
+					// NOTE: calling resolveEnvVars is too early
+					propertiesMap.put(key, val);
 				}
 
 			} catch (FileNotFoundException e) {
@@ -80,10 +86,21 @@ public class Utils {
 						String.format("Properties file is not readable: '%s'", fileName));
 			}
 		}
+		if (debug) {
+
+			for (Entry<String, String> propertyEntry : propertiesMap.entrySet()) {
+				System.err.println(String.format("Read: '%s' = '%s'",
+						propertyEntry.getKey(), propertyEntry.getValue()));
+			}
+		}
 		return (propertiesMap);
 	}
 
 	public String resolveEnvVars(String input) {
+		return resolveEnvVars(input, "");
+	}
+
+	public String resolveEnvVars(String input, String defaultValue) {
 		if (null == input) {
 			return null;
 		}
@@ -92,7 +109,7 @@ public class Utils {
 		StringBuffer sb = new StringBuffer();
 		while (m.find()) {
 			String envVarName = null == m.group(1) ? m.group(2) : m.group(1);
-			String envVarValue = getPropertyEnv(envVarName, "");
+			String envVarValue = getPropertyEnv(envVarName, defaultValue);
 			m.appendReplacement(sb,
 					null == envVarValue ? "" : envVarValue.replace("\\", "\\\\"));
 		}
@@ -105,10 +122,10 @@ public class Utils {
 		if (debug)
 			System.err.println("getting property: " + name);
 		value = propertiesMap.get(name);
-		// TODO: check if need it
+		// TODO: check if one even needs it
 		// value = System.getProperty(name);
 		if (debug)
-			System.err.println("system property: " + value);
+			System.err.println("Configuration file property: " + value);
 		if (value == null) {
 			value = System.getenv(name);
 			if (debug)

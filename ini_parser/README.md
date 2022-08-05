@@ -21,12 +21,12 @@ you can update the file any time
 * run the app, which will simply echo the read values of few options
 ```cmd
 set debug=false
-java -cp target\iniparser-0.1-SNAPSHOT.jar example.test.Test
+java -cp target\iniparser-0.3-SNAPSHOT.jar example.test.Test
 ```
 
 or on Linux
 ```
-DEBUG=false java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+DEBUG=false java -cp target/iniparser-0.3-SNAPSHOT.jar example.test.Test
 ```
 ```text
 option1: user:Serguei
@@ -40,7 +40,7 @@ NOTE: the output will be different on Linux where is no `USERPROFILE` environmen
 ```
 rm -f ./custom.properties
 mvn clean package
-DEBUG=true java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+DEBUG=true java -cp target/iniparser-0.3-SNAPSHOT.jar example.test.Test
 ```
 
 ```text
@@ -74,7 +74,7 @@ rm -f src/main/resources/custom.properties
 mvn clean package
 ```
 ```sh
-DEBUG=true java -cp target/iniparser-0.1-SNAPSHOT.jar example.test.Test
+DEBUG=true java -cp target/iniparser-0.3-SNAPSHOT.jar example.test.Test
 ```
 ```text
 debug: true

@@ -1,5 +1,9 @@
 package example.test;
 
+/**
+ * Copyright 2022 Serguei Kouzmine
+ */
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,15 +28,11 @@ public class Test {
 
 	public static void main(String[] args) {
 
+		// -apply argument
+		// -format ini,yaml
+		//
 		System.err.println("debug: " + debug);
-		// NPE
-		/*
-		String resourcePath = "";
-		resourcePath = Thread.currentThread().getContextClassLoader()
-				.getResource("").getPath();
-		System.err.println(String
-				.format("The running application resource path: \"%s\"", resourcePath));
-		*/
+
 		utils.setDebug(debug);
 		String fileName = String
 				.format("%s\\%s", System.getProperty("user.dir"), "custom.properties")
@@ -42,18 +42,21 @@ public class Test {
 		propertiesMap = utils.getProperties(fileName);
 		// propertiesMap = utils.getProperties("application.properties");
 
-		String option1 = utils.resolveEnvVars(
-				utils.getPropertyEnv("option1", "default value for option1"));
+		String option1 = utils
+				.resolveEnvVars(utils.getPropertiesMap().get("option1"));
+		if (option1 == null) {
+			option1 = "default value for option1";
+		}
+
 		System.err.println("option1: " + option1);
 		String option2 = utils.resolveEnvVars(
-				utils.getPropertyEnv("option2", "default value for option2"));
+				utils.getPropertiesMap().get("option2"), "default value for option2");
 		System.err.println("option2: " + option2);
 		String option3 = utils.resolveEnvVars(
-				utils.getPropertyEnv("option3", "default value for option3"));
+				utils.getPropertiesMap().get("option3"), "default value for option3");
 		System.err.println("option3: " + option3);
 		// ini file
 		/*
-		System.err.println(System.getProperty("user.dir"));
 		parser.parseFile(iniFile);
 		data = parser.getData();
 		sectionData = data.get("Section1");
