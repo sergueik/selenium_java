@@ -55,6 +55,57 @@ boolean boolean_value = config.getBoolean("map_setting.boolean_setting");
 
 and similarly with other sub keys
 
+### Usage
+
+```sh
+
+```
+
+### Integration
+
+
+Failed tests:
+```text
+  getStringArrayElement(example.YamlConfigExtendedTest): (..)
+  getInt(example.YamlConfigExtendedTest): (..)
+  getCompactCollectionElement(example.YamlConfigExtendedTest): (..)
+  getDocString1(example.YamlConfigExtendedTest): (..)
+  getDocString2(example.YamlConfigExtendedTest): (..)
+  getDocString3(example.YamlConfigExtendedTest): (..)
+  getCompactArrayElement(example.YamlConfigExtendedTest): (..)
+  getMap2(example.YamlConfigExtendedTest): expect the classpath notation to work for map_setting.boolean_setting(..)
+  getString(example.YamlConfigExtendedTest): (..)
+  getStringNumber(example.YamlConfigExtendedTest): (..)
+  getQuotesRemovedString(example.YamlConfigExtendedTest): (..)
+```
+total tests:
+```sh
+grep -i -A 1 @test src/test/java/example/YamlConfigExtendedTest.java   | grep -i 'public'
+```
+```text
+        public void getStringArrayElement() {
+        public void getStringOutOfIndex() {
+        public void getStringInvalidKey() {
+        public void getStringNumber() {
+        public void getString() {
+        public void getInt() {
+        public void getBadInt() {
+        public void getBoolean() {
+        public void getNullString() {
+        public void getQuotesRemovedString() {
+        public void getMap() {
+        public void getMap2() {
+        public void getNullInMap() {
+        public void getList() {
+        public void getListWithHere() {
+        public void getListWithHereWithNewline() {
+        public void getCompactArrayList() {
+        public void getCompactArrayElement() {
+        public void getCompactCollectionElement() {
+        public void getDocString1() {
+        public void getDocString2() {
+        public void getDocString3() {
+```
 ### See Also
 
   * https://www.vogella.com/tutorials/Hamcrest/article.html

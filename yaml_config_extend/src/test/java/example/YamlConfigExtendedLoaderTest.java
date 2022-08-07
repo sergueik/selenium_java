@@ -10,9 +10,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("deprecation")
-public class YamlConfigLoaderTest {
+public class YamlConfigExtendedLoaderTest {
 
-	private YamlConfig config;
+	private YamlConfigExtended config;
 	private final String yamlFile = "test.yml";
 	private final String propertiesFilePath = String
 			.format("%s/src/test/resources", System.getProperty("user.dir"));
@@ -21,7 +21,7 @@ public class YamlConfigLoaderTest {
 
 	@Before
 	public void setup() {
-		YamlConfig.setDebug(true);
+		YamlConfigExtended.setDebug(true);
 	}
 
 	@Test

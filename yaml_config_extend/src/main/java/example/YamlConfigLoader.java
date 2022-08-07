@@ -4,29 +4,32 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+
 public class YamlConfigLoader {
 
 	private final static boolean debug = false;
 
-	public static YamlConfig getYamlConfig(final String propertiesFileName) {
+	public static YamlConfigExtended getYamlConfig(
+			final String propertiesFileName) {
 		return getYamlConfig(propertiesFileName, null, false);
 	}
 
-	public static YamlConfig getYamlConfig(final String propertiesFileName,
-			boolean fromThread) {
+	public static YamlConfigExtended getYamlConfig(
+			final String propertiesFileName, boolean fromThread) {
 		return getYamlConfig(propertiesFileName, null, fromThread);
 	}
 
-	public static YamlConfig getYamlConfig(final String propertiesFileName,
-			String propertiesFilePath) {
+	public static YamlConfigExtended getYamlConfig(
+			final String propertiesFileName, String propertiesFilePath) {
 		return getYamlConfig(propertiesFileName, propertiesFilePath, false);
 	}
 
-	public static YamlConfig getYamlConfig(final String propertiesFileName,
-			String propertiesFilePath, boolean fromThread) {
+	public static YamlConfigExtended getYamlConfig(
+			final String propertiesFileName, String propertiesFilePath,
+			boolean fromThread) {
 		final InputStream stream;
 		String resourcePath = null;
-		final YamlConfig yamlConfig;
+		final YamlConfigExtended yamlConfig;
 
 		try {
 			// only works when jar has been packaged?
@@ -58,7 +61,7 @@ public class YamlConfigLoader {
 							"Reading properties file from disk: '%s'", propertiesFilePath));
 				stream = new FileInputStream(propertiesFilePath);
 			}
-			yamlConfig = YamlConfig.load(stream);
+			yamlConfig = YamlConfigExtended.load(stream);
 			stream.close();
 		} catch (IOException e) {
 			System.err.println(String.format(

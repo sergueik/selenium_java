@@ -10,8 +10,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import com.github.jsixface.YamlConfig;
 
-public class YamlConfig {
+public class YamlConfigExtended {
+
+	private YamlConfig yamlConfig;
 	private Object content;
 	private static boolean debug = false;
 
@@ -26,30 +29,75 @@ public class YamlConfig {
 		debug = value;
 	}
 
-	private YamlConfig() {
+	// NOTE: cannot create class YamlConfigExtended extends YamlConfig
+
+	// The YamlConfig no-argument constructor is private and is not visible to the
+	// subclass, leading to a compile-time error
+	// Implicit super constructor is not visible. Must explicitly invoke another
+	// constructor
+	private YamlConfigExtended() {
+
 	}
 
-	public static YamlConfig load(Reader reader) {
-		YamlConfig instance = new YamlConfig();
+	public static YamlConfigExtended load(Reader reader) {
+		YamlConfigExtended instance = new YamlConfigExtended();
 		Yaml yml = new Yaml();
 		instance.content = yml.load(reader);
-
+		instance.yamlConfig = YamlConfig.load(reader);
 		return instance;
 	}
 
-	public static YamlConfig load(InputStream in) {
-		YamlConfig instance = new YamlConfig();
+	public void dump() {
+		Yaml yml = new Yaml();
+		System.err.println("dump: " + yml.dump(this.content));
+	}
+
+	public static YamlConfigExtended load(InputStream in) {
+		YamlConfigExtended instance = new YamlConfigExtended();
 		Yaml yml = new Yaml();
 		instance.content = yml.load(in);
+		// no suitable method found for
+		// load(org.yaml.snakeyaml.Yaml,java.io.InputStream)
+		// for release 1.0.1
+		instance.yamlConfig = YamlConfig.load(in);
 		return instance;
 	}
 
 	public String getString(String key) {
 		Object foundNode = getNode(key, content);
 		if (foundNode != null && !(foundNode instanceof Collection)) {
-			return foundNode.toString();
+			if (debug)
+				System.err.println(
+						String.format("getString found String %s", foundNode.toString()));
+		} else {
+			if (debug)
+				System.err.println("getString found null or collection");
 		}
-		return null;
+		Object value = this.yamlConfig.getString(key);
+		if (debug)
+			System.err.println("super.getString found " + value);
+		return value != null ? value.toString() : null;
+	}
+
+	public Integer getInt(String key) {
+		Object foundNode = getNode(key, content);
+		if (foundNode instanceof Integer) {
+			if (debug)
+				System.err.println(
+						String.format("getInt found integer %d", (Integer) foundNode));
+		} else {
+			if (debug)
+				System.err.println("getInt found null");
+		}
+		Object value = this.yamlConfig.getInt(key);
+		if (debug)
+			System.err.println("super.getInt found " + value);
+		return (Integer) value;
+	}
+
+	public Boolean getBoolean(String key) {
+		Object foundNode = getNode(key, content);
+		return Boolean.parseBoolean(foundNode.toString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -86,19 +134,6 @@ public class YamlConfig {
 				if (debug)
 					System.err.println("Unexpected result type");
 			}
-		}
-		return null;
-	}
-
-	public Boolean getBoolean(String key) {
-		Object foundNode = getNode(key, content);
-		return Boolean.parseBoolean(foundNode.toString());
-	}
-
-	public Integer getInt(String key) {
-		Object foundNode = getNode(key, content);
-		if (foundNode instanceof Integer) {
-			return (Integer) foundNode;
 		}
 		return null;
 	}
@@ -142,6 +177,8 @@ public class YamlConfig {
 		return foundNode;
 	}
 
+	// NOTE: have to duplicate
+	// The method decompose(String) from the type YamlConfig is not visible
 	private String[] decompose(String key) {
 		return key.split("\\.");
 	}
