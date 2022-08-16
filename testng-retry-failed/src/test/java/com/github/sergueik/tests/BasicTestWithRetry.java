@@ -4,8 +4,11 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterClass;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
@@ -22,9 +25,13 @@ import java.nio.file.Paths;
 public class BasicTestWithRetry {
 	public static int cnt_retries_1 = 0;
 	public static int cnt_retries_2 = 0;
-
-	private static WebDriver driver;
+	private static DesiredCapabilities capabilities;
 	private static String osName = getOSName();
+	private WebDriver driver;
+
+	public WebDriver getDriver() {
+		return driver;
+	}
 
 	@BeforeClass
 	public static void init() {
@@ -39,18 +46,29 @@ public class BasicTestWithRetry {
 								.getAbsolutePath()
 						: "/usr/bin/firefox");
 		// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
-		DesiredCapabilities capabilities = DesiredCapabilities.firefox();
+		capabilities = DesiredCapabilities.firefox();
 		capabilities.setCapability("marionette", false);
 
+	}
+
+	// https://www.swtestacademy.com/testng-itestcontext-example/
+	// for junit 5.x equivalent
+	// see
+	// https://junit.org/junit5/docs/5.3.0/api/org/junit/jupiter/api/extension/ExtensionContext.Store.html
+	@SuppressWarnings("deprecation")
+	@BeforeMethod
+	public void initDriver(ITestContext context) {
 		driver = new FirefoxDriver(capabilities);
+		context.setAttribute("driver", driver);
 		driver.get("http://www.last.fm/ru/");
 	}
 
-	@AfterClass
-	public static void close() {
+	@AfterMethod
+	public void close() {
 		driver.close();
 	}
 
+	// https://www.swtestacademy.com/testng-itestcontext-example/
 	@Test(enabled = true, retryAnalyzer = RetryAnalyzer.class)
 	public void findLive() {
 		driver.findElement(By.cssSelector("[href='/ru/dashboard']")).click();

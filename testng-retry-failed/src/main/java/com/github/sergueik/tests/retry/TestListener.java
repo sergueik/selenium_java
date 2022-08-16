@@ -1,5 +1,6 @@
 package com.github.sergueik.tests.retry;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.ITestResult;
 import org.testng.TestListenerAdapter;
 
@@ -7,6 +8,9 @@ public class TestListener extends TestListenerAdapter {
 
 	@Override
 	public void onTestSuccess(ITestResult testResult) {
+		WebDriver driver = (WebDriver) testResult.getTestContext()
+				.getAttribute("driver");
+		System.err.println(driver.getCurrentUrl());
 		ReportCreator.addTestInfo(testResult.getName(),
 				testResult.getTestClass().toString(), resultOfTest(testResult), "");
 	}
