@@ -1,7 +1,16 @@
 package com.github.sergueik.tests.retry;
 
+import org.openqa.selenium.WebDriver;
 import org.testng.IRetryAnalyzer;
 import org.testng.ITestResult;
+
+import java.io.File;
+import java.io.IOException;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.TimeoutException;
+import org.apache.commons.io.FileUtils;
 
 /**
  * implements IRetryAnalyzer Interface to rank a failed test.
@@ -43,6 +52,23 @@ public class RetryAnalyzer implements IRetryAnalyzer {
 		if (testResult.getAttributeNames().contains("retry") == false) {
 			System.out.println("retry count = " + retryCount + "\n"
 					+ "max retry count = " + retryMaxCount);
+			WebDriver driver = (WebDriver) testResult.getTestContext()
+					.getAttribute("driver");
+			System.err.println(driver.getCurrentUrl());
+
+			TakesScreenshot screenshot = ((TakesScreenshot) driver);
+
+			File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
+			// Move image file to new destination
+			try {
+				String filename = String.format("c:\\temp\\UserID%d.jpg", retryCount);
+				FileUtils.copyFile(screenshotFile, new File(filename));
+				System.err.println(String.format("Screenshot saved in %s.", filename));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Exception (ignored): " + e.toString());
+			}
+
 			if (retryCount < retryMaxCount) {
 				// override status
 				testResult.setStatus(ITestResult.SUCCESS);
