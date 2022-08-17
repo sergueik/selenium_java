@@ -10,6 +10,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.CoreMatchers.is;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -29,13 +30,13 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 @ExtendWith(TestResultLoggerExtension.class)
 class ExtendedTest {
 
 	private static DesiredCapabilities capabilities;
 	private static String osName = getOSName();
 	private WebDriver driver;
+	private static WebDriver _driver;
 
 	public WebDriver getDriver() {
 		return driver;
@@ -74,7 +75,7 @@ class ExtendedTest {
 		// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 		capabilities = DesiredCapabilities.firefox();
 		capabilities.setCapability("marionette", false);
-
+		_driver = new FirefoxDriver(capabilities);
 	}
 
 	// see also:
@@ -84,15 +85,14 @@ class ExtendedTest {
 	@BeforeEach
 	public void beforeEach(/* ExtensionContext context */ ) {
 		// uncertain what can be done here
-		driver = new FirefoxDriver(capabilities);
-
+		this.driver = _driver;
 		driver.get("http://www.last.fm/ru/");
 
 	}
 
-	@AfterEach
-	public void close() {
-		driver.close();
+	@AfterAll
+	public static void close() {
+		_driver.close();
 	}
 
 	@Test

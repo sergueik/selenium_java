@@ -36,7 +36,6 @@ public class TestResultLoggerExtension
 	private Integer value = -1;
 	private WebDriver driver = null;
 
-
 	private final ExtensionContext.Namespace namespace = ExtensionContext.Namespace
 			.create(ExtendedTest.class);
 	/* ExtensionContext.Namespace.GLOBAL */ ;
@@ -93,7 +92,9 @@ public class TestResultLoggerExtension
 			LOG.info("failed to invoke method");
 		}
 		LOG.info("value is " + value);
-
+		// TODO: convert to static method
+		// see also:
+		// https://www.baeldung.com/java-invoke-static-method-reflection
 		methodName = "getDriver";
 		try {
 			Method getDriver = testClass.getClass().getMethod(methodName);
