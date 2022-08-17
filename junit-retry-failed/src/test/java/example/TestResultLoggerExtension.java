@@ -1,8 +1,11 @@
 package example;
 
-import java.lang.reflect.AnnotatedElement;
+import java.io.File;
+
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -10,17 +13,29 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.Test;
+import org.apache.commons.io.FileUtils;
+
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.TestWatcher;
+
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
+import org.openqa.selenium.WebDriver;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestResultLoggerExtension
 		implements TestWatcher, AfterAllCallback, BeforeAllCallback {
+	private Store store;
+	private String arg;
+	private ExtendedTest test;
+	private Integer value = -1;
+	private WebDriver driver = null;
+
 
 	private final ExtensionContext.Namespace namespace = ExtensionContext.Namespace
 			.create(ExtendedTest.class);
@@ -57,49 +72,63 @@ public class TestResultLoggerExtension
 		results.add(TestResultStatus.ABORTED);
 	}
 
-	private Store store;
-	private int cnt;
-	private ExtendedTest test;
-	private Integer value = -1;
-
 	// https://github.com/eugenp/tutorials/blob/master/spring-5/src/main/java/com/baeldung/jupiter/SpringExtension.java
+	// https://www.programcreek.com/java-api-examples/?api=org.junit.jupiter.api.extension.ExtensionContext.Store
 	@Override
 	public void testFailed(ExtensionContext context, Throwable cause) {
+
+		store = context.getStore(namespace);
+		arg = store.getOrDefault("arg1", String.class, "");
+		LOG.info("arg is " + arg);
 
 		Object testClass = context.getRequiredTestInstance();
 		String methodName = "getValue";
 		try {
-			Method takeScreenshot = testClass.getClass().getMethod(methodName);
-			takeScreenshot.setAccessible(true);
-			value = (int) takeScreenshot.invoke(testClass);
+			Method getValue = testClass.getClass().getMethod(methodName);
+			getValue.setAccessible(true);
+			value = (int) getValue.invoke(testClass);
 		} catch (InvocationTargetException | NoSuchMethodException
 				| SecurityException | IllegalAccessException
 				| IllegalArgumentException e) {
 			LOG.info("failed to invoke method");
 		}
 		LOG.info("value is " + value);
-		// https://www.programcreek.com/java-api-examples/?api=org.junit.jupiter.api.extension.ExtensionContext.Store
-		Optional<AnnotatedElement> optionalAnnotatedElement = context.getElement();
-		if (optionalAnnotatedElement.isPresent()) {
 
-			AnnotatedElement element = optionalAnnotatedElement.get();
-			store = context.getStore(namespace);
-			cnt = (int) store.getOrDefault("arg", Integer.TYPE, -1);
-			test = store.getOrDefault(ExtendedTest.class, ExtendedTest.class, null);
-			LOG.info("Test (1) is " + ((test != null) ? test.hashCode() : "null"));
-			LOG.info("cnt (1) is " + cnt);
+		methodName = "getDriver";
+		try {
+			Method getDriver = testClass.getClass().getMethod(methodName);
+			getDriver.setAccessible(true);
+			driver = (WebDriver) getDriver.invoke(testClass);
+		} catch (InvocationTargetException | NoSuchMethodException
+				| SecurityException | IllegalAccessException
+				| IllegalArgumentException e) {
+			LOG.info("failed to invoke method");
 		}
+		// NOTE:
+		// WARNING: Failed to invoke TestWatcher [example.TestResultLoggerExtension]
+		// for method [example.ExtendedTest#test4()] with display name [test4()]
+		// org.openqa.selenium.WebDriverException: java.net.ConnectException: Failed
+		// to connect to localhost/127.0.0.1:47779
+		LOG.info("driver url is " + driver.getCurrentUrl());
 
-		store = context.getRoot().getStore(namespace);
-		System.err.println(store.toString());
-		// NOTE: NPE if store.get("arg")
-		cnt = (int) store.getOrDefault("arg", Integer.TYPE, -1);
-		Test test = store.getOrDefault(Test.class, Test.class, null);
-		LOG.info("Test is " + ((test != null) ? test.hashCode() : "null"));
-		// int cnt = (int) store.get("arg");
-		LOG.info("Test Failed for test {}: cnt {}", context.getDisplayName(), cnt);
+		LOG.info("Test Failed for test {}: arg {}", context.getDisplayName(), arg);
 		// NOTE: when absent logback.xml, logging may get reduced
 		// System.err.println("**************");
+
+		TakesScreenshot screenshot = ((TakesScreenshot) driver);
+
+		File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
+		// Move image file to new destination
+		try {
+			int cnt = 1;
+			String filename = String.format("c:\\temp\\test%02d.jpg", cnt);
+			FileUtils.copyFile(screenshotFile, new File(filename));
+			System.err.println(String.format("Screenshot saved in %s.", filename));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			System.err.println("Exception (ignored): " + e.toString());
+		}
+
 		results.add(TestResultStatus.FAILED);
 	}
 
