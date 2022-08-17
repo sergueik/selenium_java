@@ -35,10 +35,9 @@ class ExtendedTest {
 
 	private static DesiredCapabilities capabilities;
 	private static String osName = getOSName();
-	private WebDriver driver;
-	private static WebDriver _driver;
+	private static WebDriver driver;
 
-	public WebDriver getDriver() {
+	public static WebDriver getDriver() {
 		return driver;
 	}
 
@@ -75,7 +74,7 @@ class ExtendedTest {
 		// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
 		capabilities = DesiredCapabilities.firefox();
 		capabilities.setCapability("marionette", false);
-		_driver = new FirefoxDriver(capabilities);
+		driver = new FirefoxDriver(capabilities);
 	}
 
 	// see also:
@@ -84,15 +83,12 @@ class ExtendedTest {
 	// https://github.com/manovotn/YetAnotherMinimalReproducer
 	@BeforeEach
 	public void beforeEach(/* ExtensionContext context */ ) {
-		// uncertain what can be done here
-		this.driver = _driver;
 		driver.get("http://www.last.fm/ru/");
-
 	}
 
 	@AfterAll
 	public static void close() {
-		_driver.close();
+		driver.close();
 	}
 
 	@Test

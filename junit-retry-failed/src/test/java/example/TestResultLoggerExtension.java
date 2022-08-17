@@ -99,37 +99,39 @@ public class TestResultLoggerExtension
 		try {
 			Method getDriver = testClass.getClass().getMethod(methodName);
 			getDriver.setAccessible(true);
-			driver = (WebDriver) getDriver.invoke(testClass);
+			driver = (WebDriver) getDriver.invoke(null);
+			LOG.info("driver url is " + driver.getCurrentUrl());
+			// NOTE:
+			// WARNING: Failed to invoke TestWatcher
+			// [example.TestResultLoggerExtension]
+			// for method [example.ExtendedTest#test4()] with display name [test4()]
+			// org.openqa.selenium.WebDriverException: java.net.ConnectException:
+			// Failed
+			// to connect to localhost/127.0.0.1:47779
 		} catch (InvocationTargetException | NoSuchMethodException
 				| SecurityException | IllegalAccessException
 				| IllegalArgumentException e) {
-			LOG.info("failed to invoke method");
+			LOG.info("failed to invoke static method");
 		}
-		// NOTE:
-		// WARNING: Failed to invoke TestWatcher [example.TestResultLoggerExtension]
-		// for method [example.ExtendedTest#test4()] with display name [test4()]
-		// org.openqa.selenium.WebDriverException: java.net.ConnectException: Failed
-		// to connect to localhost/127.0.0.1:47779
-		LOG.info("driver url is " + driver.getCurrentUrl());
 
 		LOG.info("Test Failed for test {}: arg {}", context.getDisplayName(), arg);
 		// NOTE: when absent logback.xml, logging may get reduced
 		// System.err.println("**************");
+		if (driver != null) {
+			TakesScreenshot screenshot = ((TakesScreenshot) driver);
 
-		TakesScreenshot screenshot = ((TakesScreenshot) driver);
-
-		File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
-		// Move image file to new destination
-		try {
-			int cnt = 1;
-			String filename = String.format("c:\\temp\\test%02d.jpg", cnt);
-			FileUtils.copyFile(screenshotFile, new File(filename));
-			System.err.println(String.format("Screenshot saved in %s.", filename));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.err.println("Exception (ignored): " + e.toString());
+			File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
+			// Move image file to new destination
+			try {
+				int cnt = 1;
+				String filename = String.format("c:\\temp\\test%02d.jpg", cnt);
+				FileUtils.copyFile(screenshotFile, new File(filename));
+				System.err.println(String.format("Screenshot saved in %s.", filename));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("Exception (ignored): " + e.toString());
+			}
 		}
-
 		results.add(TestResultStatus.FAILED);
 	}
 
