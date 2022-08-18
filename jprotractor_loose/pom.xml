@@ -33,8 +33,9 @@
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <minimal-json.version>0.9.5</minimal-json.version>
-    <selenium.version>4.1.4</selenium.version>
+    <selenium.version>4.4.0</selenium.version>
     <selenium-devtools-v101.version>${selenium.version}</selenium-devtools-v101.version>
+    <selenium-devtools-v104.version>${selenium.version}</selenium-devtools-v104.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <selenium-ie-driver.version>${selenium.version}</selenium-ie-driver.version>
@@ -88,6 +89,18 @@
       <exclusions>
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v103</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v102</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v101</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-devtools-v100</artifactId>
         </exclusion>
         <exclusion>
@@ -114,8 +127,8 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-devtools-v101</artifactId>
-      <version>${selenium-devtools-v101.version}</version>
+      <artifactId>selenium-devtools-v104</artifactId>
+      <version>${selenium-devtools-v104.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
