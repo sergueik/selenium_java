@@ -1,8 +1,5 @@
 package example;
 
-import java.io.File;
-
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -10,37 +7,32 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.io.FileUtils;
-
 import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ExtensionContext.Store;
 import org.junit.jupiter.api.extension.TestWatcher;
 
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TestResultLoggerExtension
-		implements TestWatcher, AfterAllCallback, BeforeAllCallback {
+		implements TestWatcher, AfterAllCallback /*, BeforeAllCallback */ {
 	private Store store;
 	private String arg;
-	private ExtendedTest test;
 	private Integer value = -1;
 	private WebDriver driver = null;
-
+	private final Utils utils = Utils.getInstance();
 	private final ExtensionContext.Namespace namespace = ExtensionContext.Namespace
 			.create(ExtendedTest.class);
 	/* ExtensionContext.Namespace.GLOBAL */ ;
 
-	private static final Logger LOG = LoggerFactory
+	private static final Logger logger = LoggerFactory
 			.getLogger(TestResultLoggerExtension.class);
 
 	private List<TestResultStatus> results = new ArrayList<>();
@@ -51,7 +43,7 @@ public class TestResultLoggerExtension
 
 	@Override
 	public void testDisabled(ExtensionContext context, Optional<String> reason) {
-		LOG.info("Test Disabled for test {}: with reason :- {}",
+		logger.info("Test Disabled for test {}: with reason :- {}",
 				context.getDisplayName(), reason.orElse("No reason"));
 
 		results.add(TestResultStatus.DISABLED);
@@ -59,14 +51,14 @@ public class TestResultLoggerExtension
 
 	@Override
 	public void testSuccessful(ExtensionContext context) {
-		LOG.info("Test Successful for test {}: ", context.getDisplayName());
+		logger.info("Test Successful for test {}: ", context.getDisplayName());
 
 		results.add(TestResultStatus.SUCCESSFUL);
 	}
 
 	@Override
 	public void testAborted(ExtensionContext context, Throwable cause) {
-		LOG.info("Test Aborted for test {}: ", context.getDisplayName());
+		logger.info("Test Aborted for test {}: ", context.getDisplayName());
 
 		results.add(TestResultStatus.ABORTED);
 	}
@@ -78,8 +70,9 @@ public class TestResultLoggerExtension
 
 		store = context.getStore(namespace);
 		arg = store.getOrDefault("arg1", String.class, "");
-		LOG.info("arg is " + arg);
+		logger.info("arg is " + arg);
 
+		// way to pass additional arguments
 		Object testClass = context.getRequiredTestInstance();
 		String methodName = "getValue";
 		try {
@@ -89,19 +82,19 @@ public class TestResultLoggerExtension
 		} catch (InvocationTargetException | NoSuchMethodException
 				| SecurityException | IllegalAccessException
 				| IllegalArgumentException e) {
-			LOG.info("failed to invoke method");
+			logger.info("failed to invoke method");
 		}
-		LOG.info("value is " + value);
-		// TODO: convert to static method
-		// see also:
+		logger.info("value is " + value);
+
 		// https://www.baeldung.com/java-invoke-static-method-reflection
 		methodName = "getDriver";
 		try {
 			Method getDriver = testClass.getClass().getMethod(methodName);
 			getDriver.setAccessible(true);
 			driver = (WebDriver) getDriver.invoke(null);
-			LOG.info("driver url is " + driver.getCurrentUrl());
+			logger.info("driver url is " + driver.getCurrentUrl());
 			// NOTE:
+			// when driver is destroyed in @AfterEach, the extension os failed
 			// WARNING: Failed to invoke TestWatcher
 			// [example.TestResultLoggerExtension]
 			// for method [example.ExtendedTest#test4()] with display name [test4()]
@@ -111,27 +104,15 @@ public class TestResultLoggerExtension
 		} catch (InvocationTargetException | NoSuchMethodException
 				| SecurityException | IllegalAccessException
 				| IllegalArgumentException e) {
-			LOG.info("failed to invoke static method");
+			logger.info("failed to invoke static method");
 		}
 
-		LOG.info("Test Failed for test {}: arg {}", context.getDisplayName(), arg);
-		// NOTE: when absent logback.xml, logging may get reduced
-		// System.err.println("**************");
-		if (driver != null) {
-			TakesScreenshot screenshot = ((TakesScreenshot) driver);
+		logger.info("Test Failed for test {}: arg {}", context.getDisplayName(),
+				arg);
 
-			File screenshotFile = screenshot.getScreenshotAs(OutputType.FILE);
-			// Move image file to new destination
-			try {
-				int cnt = 1;
-				String filename = String.format("c:\\temp\\test%02d.jpg", cnt);
-				FileUtils.copyFile(screenshotFile, new File(filename));
-				System.err.println(String.format("Screenshot saved in %s.", filename));
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				System.err.println("Exception (ignored): " + e.toString());
-			}
-		}
+		if (driver != null)
+			utils.takescreenshot(driver);
+
 		results.add(TestResultStatus.FAILED);
 	}
 
@@ -140,20 +121,23 @@ public class TestResultLoggerExtension
 		Map<TestResultStatus, Long> summary = results.stream().collect(
 				Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
-		LOG.info("Test result summary for {} {}", context.getDisplayName(),
+		logger.info("Test result summary for {} {}", context.getDisplayName(),
 				summary.toString());
 	}
 
+	// currently not used
+	// https://stackoverflow.com/questions/64523276/in-junit-5-how-can-i-call-a-test-class-method-from-an-extension
+	/*
 	@Override
 	public void beforeAll(ExtensionContext context) throws Exception {
-		LOG.info("Logger Extension class processes context " + context.getRoot());
+		logger
+				.info("Logger Extension class processes context " + context.getRoot());
 		if (context.getRoot().getStore(namespace).get("arg1",
 				String.class) == null) {
 			context.getRoot().getStore(namespace).put("arg1", "val1");
 		} else {
-			// this is never executed
-			LOG.info("Read cached data!");
+			logger.info("Read cached data!");
 		}
 	}
-	// https://stackoverflow.com/questions/64523276/in-junit-5-how-can-i-call-a-test-class-method-from-an-extension
+	*/
 }
