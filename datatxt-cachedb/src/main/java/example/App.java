@@ -97,13 +97,14 @@ public class App {
 	private static Properties propertiesObject;
 
 	public static void main(String args[]) throws ParseException {
-		
+
+		// NOTE: too late toset after the debug command line options is set
+		utils.setDebug(true);
 		// loads propertiesMapCache
 		// NOTE: cannot prepend with (void) leads to vague error
 		// "Type mismatch: cannot convert from void to boolean"
 		utils.getProperties("application.properties");
 
-		
 		propertiesObject = utils.getPropertiesObject();
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
@@ -703,17 +704,18 @@ public class App {
 			try {
 				// TODO: refactor
 
-				Class driverObject = Class
-						.forName(propertiesObject.getProperty("datasource.driver-class-name",
+				Class driverObject = Class.forName(
+						propertiesObject.getProperty("datasource.driver-class-name",
 								"com.mysql.cj.jdbc.Driver" /* "org.gjt.mm.mysql.Driver" */));
 				System.err.println("driverObject=" + driverObject);
 
-				final String url = utils
-						.resolveEnvVars(propertiesObject.getProperty("datasource.url", "jdbc:mysql://"
+				final String url = utils.resolveEnvVars(
+						propertiesObject.getProperty("datasource.url", "jdbc:mysql://"
 								+ databaseHost + ":" + databasePort + "/" + database));
 				connection = DriverManager.getConnection(url,
 						propertiesObject.getProperty("datasource.username", databaseUser),
-						propertiesObject.getProperty("datasource.password", databasePassword));
+						propertiesObject.getProperty("datasource.password",
+								databasePassword));
 				if (connection != null) {
 					System.out.println("Connected to product: "
 							+ connection.getMetaData().getDatabaseProductName());

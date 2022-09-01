@@ -375,6 +375,47 @@ this will cause it to load the host inventory strongly typed `List<ServerInstanc
 docker container stop $IMAGE
 docker container stop mysql-server
 ```
+
+### Testing Loading properties file
+* copy the file `application.properties` from source tree to the current directory:
+```cmd
+copy src\main\resources\application.properties .
+```
+* set the `debug` to true before loading the properties in `App.java` (this particular debug setting is  too late to update when configuration option `debug` is loaded, as the properties are cached:
+```java
+public static void main(String args[]) throws ParseException {
+
+	// NOTE: too late toset after the debug command line options is set
+	utils.setDebug(true);
+	utils.getProperties("application.properties");
+```
+* build and run the App
+```sh
+mvn package
+```
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
+```
+observe it load the properties from the specified file:
+```text
+Reading properties file: 'application.properties'
+Reading: 'datasource.driver-class-name' = 'org.sqlite.JDBC'
+```
+* remove the `application.properties` file copied locally and rerun without recompiling
+
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
+```
+
+* observe it attempt to read file, then fall back to property resource:
+```text
+Reading properties file: 'application.properties'
+Reading properties resource stream: 'application.properties'
+Reading: 'datasource.driver-class-name' = 'org.sqlite.JDBC'
+Reading: 'datasource.url' = 'jdbc:sqlite:${USERPROFILE}\${datasource.filename}'
+Reading: 'jdbc.server' = '192.168.0.64'
+Reading: 'datasource.username' = ''
+```
 ### See Also
 
 
