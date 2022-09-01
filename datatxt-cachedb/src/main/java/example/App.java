@@ -40,6 +40,12 @@ public class App {
 
 	private static Utils utils = Utils.getInstance();
 	private static final String filemask = "data.txt.*$";
+	// NOTE: it appears that the mixed code serving SQLite and MySQL databases
+	// has a logic bug
+	// java.sql.SQLException: invalid database address: jdbc:mysql://192.168.0.64:3306/test
+	// at org.sqlite.JDBC.createConnection(JDBC.java:111)
+	// ...
+	// at example.App.<clinit>(App.java:43)
 	private static JDBCDao dao = new JDBCDao();
 
 	private static final Random randomId = new Random();
@@ -95,6 +101,7 @@ public class App {
 	// TODO: initialize
 	// { 'load_average': 'loadaverage'}
 	private static Properties propertiesObject;
+	public static boolean var = false;
 
 	public static void main(String args[]) throws ParseException {
 
@@ -104,7 +111,35 @@ public class App {
 		// NOTE: cannot prepend with (void) leads to vague error
 		// "Type mismatch: cannot convert from void to boolean"
 		utils.getProperties("application.properties");
+		// interpolation test
+		if (var) {
+			final String data = utils
+					.resolveEnvVars(utils.getPropertyEnv("extra_var", "not defined"));
+			System.err.println("Extra var: " + data);
+			String url = utils.resolveEnvVars(
+					utils.getPropertyEnv("datasource.url", "not defined"));
+			System.err.println("url: " + url);
 
+			String basedir = utils.resolveEnvVars(
+					utils.getPropertyEnv(((utils.getOSName().equals("windows"))
+							? "basedir.windows" : "basedir.linux"), "not defined"));
+			System.err.println("basedir: " + basedir);
+
+			String logdir = utils.resolveEnvVars(
+					utils.getPropertyEnv(((utils.getOSName().equals("windows"))
+							? "logdir.windows" : "logdir.linux"), "not defined"));
+			System.err.println("logdir: " + logdir);
+
+			String x = utils.resolveEnvVars(utils.getPropertyEnv("x", "not defined"));
+			System.err.println("x: " + x);
+
+			String y = utils.resolveEnvVars(utils.getPropertyEnv("y", "not defined"));
+			System.err.println("y: " + y); 	
+
+			String z = utils.resolveEnvVars(utils.getPropertyEnv("z", "not defined"));
+			System.err.println("z: " + z);
+			return;
+		}
 		propertiesObject = utils.getPropertiesObject();
 		options.addOption("h", "help", false, "help");
 		options.addOption("d", "debug", false, "debug");
