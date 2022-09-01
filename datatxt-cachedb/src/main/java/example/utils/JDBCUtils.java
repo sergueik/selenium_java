@@ -43,21 +43,27 @@ public class JDBCUtils {
 	// NOTE: not connecting to "cache.datasource.url"
 	public static Connection getConnection() {
 
-		Properties prop = utils.getProperties();
-
-		String url = utils
-				.resolveEnvVars(prop.getProperty("datasource.url", datasourceUrl));
+		Properties propertiesObject = utils.getPropertiesObject();
+		// loads propertiesMapCache
+		// NOTE: cannot prepend with (void) leads to vague error
+		// "Type mismatch: cannot convert from void to boolean"
+		utils.getProperties("application.properties");
+		String url = utils.resolveEnvVars(
+				propertiesObject.getProperty("datasource.url", datasourceUrl));
+		url = utils
+				.resolveEnvVars(utils.getPropertyEnv("datasource.url", datasourceUrl));
 		String filename = utils
-				.resolveEnvVars(prop.getProperty("datasource.filename"));
+				.resolveEnvVars(propertiesObject.getProperty("datasource.filename"));
 		logger.info("Connect to database " + url + " " + filename);
-		String username = prop.getProperty("datasource.username");
-		String password = prop.getProperty("datasource.password");
+		String username = propertiesObject.getProperty("datasource.username");
+		String password = propertiesObject.getProperty("datasource.password");
 
 		if (connection != null) {
 			return connection;
 		}
 		try {
-			Class.forName(prop.getProperty("datasource.driver-class-name"))
+			Class
+					.forName(propertiesObject.getProperty("datasource.driver-class-name"))
 					.newInstance();
 			connection = DriverManager.getConnection(url, username, password);
 		} catch (ClassNotFoundException | InstantiationException
