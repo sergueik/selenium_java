@@ -416,6 +416,17 @@ Reading: 'datasource.url' = 'jdbc:sqlite:${USERPROFILE}\${datasource.filename}'
 Reading: 'jdbc.server' = '192.168.0.64'
 Reading: 'datasource.username' = ''
 ```
+### Note
+
+one does not have to have `maven-dependency-plugin` in the `pom.xml` `build` section
+if this is the case add the argument when building the package:
+```sh
+mvn compile dependency:copy-dependencies package
+```
+ and modify the launch command to take into account the default location of the dependency jars:
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\dependency\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
+```
 ### See Also
 
 
