@@ -48,6 +48,9 @@ public class App {
 		try {
 			commandLine = commandLineparser.parse(options, args);
 
+			if( commandLine.hasOption("debug"))
+				launcher.setDebug(true);
+
 			String wait = commandLine.getOptionValue("wait");
 			if (wait != null)
 				delay = Integer.parseInt(wait);

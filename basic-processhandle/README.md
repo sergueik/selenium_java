@@ -104,6 +104,24 @@ NOTE: Unrecognized option e.g. -Xmm512m will lead to hard to debug failures
 java -cp target\example.processhandle.jar;target\lib\* example.App -a powershell -w 5000 -file %TEMP%\pidfile.txt
 ```
 NOTE: specify the pid file path, using Windows environment notation e.g. `%TEMP%`
+
+### Debug Log
+
+* when run un debug mode
+```cmd
+java -cp target\example.processhandle.jar;target\lib\* example.App --debug --action powershell --wait 30000 
+```
+it will log some Powerhell settings to debug log file:
+```cmd
+type c:\temp\debug.log
+```
+will display something like
+
+```text
+currentdir: C:\developer\sergueik\selenium_java\basic-processhandle
+path:C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\sergueik\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;c:\java\zulu11.45.27-ca-jdk11.0.10-win_x64\bin
+```
+without `--debug` flag there will be no logging
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html
