@@ -223,7 +223,10 @@ CREATE TABLE `metric_table` ( `id` BIGINT, `hostname` TEXT NOT NULL,  `timestamp
 ```sh
 java -cp target/example.datatxt-cachedb.jar:target/lib/* example.App -p host1 -s --hostname host1 -vendor mysql
 ```
-
+* modify the command to Windows path and separator if testing on Windows:
+```cmd
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s --hostname host1
+```
 after it completes connect to database node and count inserved rows
 ```sh
 docker exec -it mysql-server mysql -u java -ppassword
@@ -353,11 +356,76 @@ the data can be also viewed /  schema improved in a regular desktop DB managemen
 
 ![metric db](https://github.com/sergueik/selenium_java/blob/master/datatxt-cachedb/screenshots/capture-db.png)
 
+### Merge Data
+*  run with options
+```cmd
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s  --hostname host1 --csv a.csv -q -m -d
+```
+this will cause it to load the host inventory strongly typed `List<ServerInstanceApplication>` and save it into cache database `host_inventory.sql`
+
+### Batch  Update
+
+* note the mysql server errors logged to docker console
+```text
+2022-07-29  2:10:54 114 [Warning] Aborted connection 114 to db: 'test' user: 'java' host: '192.168.0.25' (Got an error reading communication packets)
+```
 ### Cleanup
 
 ```sh
 docker container stop $IMAGE
 docker container stop mysql-server
+```
+
+### Testing Loading properties file
+* copy the file `application.properties` from source tree to the current directory:
+```cmd
+copy src\main\resources\application.properties .
+```
+* set the `debug` to true before loading the properties in `App.java` (this particular debug setting is  too late to update when configuration option `debug` is loaded, as the properties are cached:
+```java
+public static void main(String args[]) throws ParseException {
+
+	// NOTE: too late toset after the debug command line options is set
+	utils.setDebug(true);
+	utils.getProperties("application.properties");
+```
+* build and run the App
+```sh
+mvn package
+```
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
+```
+observe it load the properties from the specified file:
+```text
+Reading properties file: 'application.properties'
+Reading: 'datasource.driver-class-name' = 'org.sqlite.JDBC'
+```
+* remove the `application.properties` file copied locally and rerun without recompiling
+
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\lib\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
+```
+
+* observe it attempt to read file, then fall back to property resource:
+```text
+Reading properties file: 'application.properties'
+Reading properties resource stream: 'application.properties'
+Reading: 'datasource.driver-class-name' = 'org.sqlite.JDBC'
+Reading: 'datasource.url' = 'jdbc:sqlite:${USERPROFILE}\${datasource.filename}'
+Reading: 'jdbc.server' = '192.168.0.64'
+Reading: 'datasource.username' = ''
+```
+### Note
+
+one does not have to have `maven-dependency-plugin` in the `pom.xml` `build` section
+if this is the case add the argument when building the package:
+```sh
+mvn compile dependency:copy-dependencies package
+```
+ and modify the launch command to take into account the default location of the dependency jars:
+```sh
+java -cp target\example.datatxt-cachedb.jar;target\dependency\* example.App -p host1 -s -i 20220713,20220714,20220715 --hostname host1 -d
 ```
 ### See Also
 
@@ -372,6 +440,10 @@ docker container stop mysql-server
   * https://stackoverflow.com/questions/4125947/what-is-the-data-type-for-unix-timestamp-mysql
   * https://stackoverflow.com/questions/12333461/insert-unix-timestamp-in-mysql
   * https://www.w3schools.com/mysql/mysql_datatypes.asp
+  * [introduction to Apache Commons CSV](https://www.baeldung.com/apache-commons-csv) - does not cover multiple columns export
+  * alternative [fast CSV serializer](https://github.com/osiegmar/FastCSV)
+  * efficient ways to do batch INSERTS with JDBC [stackoverflow](https://stackoverflow.com/questions/3784197/efficient-way-to-do-batch-inserts-with-jdbc)
+  * [link](https://stackoverflow.com/questions/26307760/mysql-and-jdbc-with-rewritebatchedstatements-true) about `rewriteBatchedStatements` parameter
 
 ### Youtube Videos
 

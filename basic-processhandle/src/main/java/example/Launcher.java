@@ -50,7 +50,8 @@ public class Launcher {
 	}
 
 	private String pidfilePath = "C:\\TEMP\\pidfile.txt";
-
+	private String debugLogFilePath = "C:\\TEMP\\debug.log";
+	
 	public String getPidfilePath() {
 		return pidfilePath;
 	}
@@ -100,13 +101,23 @@ public class Launcher {
 		}
 	}
 
+	public String composeDebugCommand(String debugLogFilePath) {
+
+		return String.format("out-file -literalpath '%s' -encoding ascii -append "
+				+ "-inputobject " + "('currentdir: {0}{1}path:{2}' -f $pwd, ([char]13 + [char]10), $env:PATH); ", debugLogFilePath);
+	}
+
 	// https://stackoverflow.com/questions/7486717/finding-parent-process-id-on-windows
 	public void launchPowershell1() {
 		final int timeout = 10;
-		// dummy
-
+		String debugCommand = null;
+		if (debug)
+			debugCommand = composeDebugCommand(debugLogFilePath);
+		else 
+			// NOTE: cannot leave as "null"
+			debugCommand = "";
 		final String commandTemplate = "$info = start-process %s -passthru; $info.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; write-output ('Pid={0}' -f $info.id) | out-file -LiteralPath '%s' -encoding ascii;";
-		String command = String.format(commandTemplate, buildCommand(javaCommand),
+		String command = debugCommand + String.format(commandTemplate, buildCommand(javaCommand),
 				pidfilePath);
 		List<String> commandArguments = new ArrayList<>(
 				Arrays.asList(command.split("\\s+")));
