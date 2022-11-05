@@ -5,9 +5,9 @@ package com.github.sergueik.jprotractor.scripts;
  * @author Carlos Alexandro Becker (caarlos0@gmail.com)
  */
 public interface Script {
-    /**
-     * Script content.
-     * @return Contents of this script.
-     */
-    String content();
+	/**
+	 * Script content.
+	 * @return Contents of this script.
+	 */
+	String content();
 }

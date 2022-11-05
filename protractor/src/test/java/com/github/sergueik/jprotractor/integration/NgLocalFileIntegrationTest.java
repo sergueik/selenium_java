@@ -1,15 +1,13 @@
 package com.github.sergueik.jprotractor.integration;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
-
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -54,7 +52,6 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-@SuppressWarnings("deprecation")
 public class NgLocalFileIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -71,7 +68,7 @@ public class NgLocalFileIntegrationTest {
 	public static String localFile;
 	static StringBuilder sb;
 	static Formatter formatter;
-	private static String rootCauseMessage;
+	private static String fullStackTrace;
 
 	@BeforeClass
 	public static void setup() throws IOException {
@@ -83,10 +80,11 @@ public class NgLocalFileIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
-		
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
@@ -300,18 +298,20 @@ public class NgLocalFileIntegrationTest {
 			} else {
 				System.err.println(myFile.toString());
 			}
-		} catch (Exception e) {
-			rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-			System.err.println("Exception:\n" + rootCauseMessage);
+		} catch (Exception ex) {
+			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(ex);
+			System.err.println("Exception:\n" + fullStackTrace);
 		}
 		try {
 			String script = "var e = angular.element(arguments[0]); var f = e.scope().myFile; return f.name";
 			Object result = CommonFunctions.executeScript(script, ng_file);
 			assertThat(result, notNullValue());
 			System.err.println("myFile.name = " + result);
-		} catch (Exception e) {
-			rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-			System.err.println("Exception:\n" + rootCauseMessage);
+		} catch (Exception ex) {
+			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(ex);
+			System.err.println("Exception:\n" + fullStackTrace);
 		}
 	}
 
@@ -622,7 +622,7 @@ public class NgLocalFileIntegrationTest {
 		 * Object fruitSelected = new
 		 * NgWebElement(ngDriver,element).evaluate("fruit.Selected");
 		 * System.err.println("fruit.Selected = " + fruitSelected.toString()) ;
-		 * assertTrue(Boolean.parseBoolean(fruitSelected.toString()));
+		 * assertTrue(parseBoolean(fruitSelected.toString()));
 		 */
 
 		// System.err.println("findElement(NgBy.selectedRepeaterOption(...))");
@@ -709,7 +709,7 @@ public class NgLocalFileIntegrationTest {
 			if (option.getText().isEmpty()) {
 				break;
 			}
-			if (Boolean.parseBoolean(option.getAttribute("selected"))) {
+			if (parseBoolean(option.getAttribute("selected"))) {
 				System.err.println("Selected:	'" + option.getText() + "' value = "
 						+ option.getAttribute("value"));
 				// option.click();
@@ -742,7 +742,7 @@ public class NgLocalFileIntegrationTest {
 			actions.keyDown(Keys.CONTROL).click(option).keyUp(Keys.CONTROL).build()
 					.perform();
 			ngDriver.waitForAngular();
-			if (Boolean.parseBoolean(option.getAttribute("selected"))) {
+			if (parseBoolean(option.getAttribute("selected"))) {
 				data.add(option.getAttribute("value"));
 			}
 		}
@@ -791,7 +791,6 @@ public class NgLocalFileIntegrationTest {
 	}
 
 	// @Ignore
-
 	@Test
 	public void testFindElementByModel() {
 		// NOTE: works with Angular 1.2.13, fails with Angular 1.4.9
@@ -998,8 +997,8 @@ public class NgLocalFileIntegrationTest {
 				WebElement row = rows.get(0);
 				String field = row.getAttribute("ng-order-by");
 				NgWebElement ng_row = new NgWebElement(ngDriver, row);
-				boolean reverseSort = Boolean
-						.parseBoolean(ng_row.evaluate("reverseSort").toString());
+				boolean reverseSort = parseBoolean(
+						ng_row.evaluate("reverseSort").toString());
 				// Without Protractor:
 				// Then the data is sorted by <header> in <sort order>
 				// String binding = header_columns.get(header);
@@ -1016,10 +1015,8 @@ public class NgLocalFileIntegrationTest {
 						assertThat(empFieldElement, notNullValue());
 						System.err.println(empFieldElement.getText());
 					} catch (Exception e) {
-
-						rootCauseMessage = ExceptionUtils.getRootCauseMessage(e);
-						System.err.println("Exception:\n" + rootCauseMessage);
-
+						System.err.println(org.apache.commons.lang.exception.ExceptionUtils
+								.getFullStackTrace(e));
 					}
 				}
 
@@ -1159,10 +1156,11 @@ public class NgLocalFileIntegrationTest {
 		highlight(element);
 		actions.moveToElement(element).build().perform();
 		// Wait for the Angular 'hovering' property to get evaluated to true
-		// WebDriverWait wait2 = new WebDriverWait(seleniumDriver, 120);
-		WebDriverWait wait2 = new WebDriverWait(seleniumDriver, Duration.ofSeconds(120));
 
-		wait2.pollingEvery(Duration.ofMillis(pollingInterval));
+		WebDriverWait wait2 = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(120));
+
+		wait.pollingEvery(Duration.ofMillis(50));
 		wait2.until(new ExpectedCondition<Boolean>() {
 			// NOTE: 'until' only prints "hovering: true" and never "hovering: false"
 			@Override
@@ -1173,7 +1171,7 @@ public class NgLocalFileIntegrationTest {
 				NgWebElement ng_element = ngD.findElement(By.id("hover"));
 				Object value = ng_element.evaluate("hovering");
 				System.err.println("hovering: " + value.toString());
-				return Boolean.parseBoolean(value.toString());
+				return parseBoolean(value.toString());
 			}
 		});
 
@@ -1408,5 +1406,4 @@ public class NgLocalFileIntegrationTest {
 			e.printStackTrace();
 		}
 	}
-
 }

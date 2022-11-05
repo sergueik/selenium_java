@@ -22,25 +22,26 @@ import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.pagefactory.ByAll;
-import org.openqa.selenium.support.pagefactory.ByChained;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.FindBys;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import com.github.sergueik.jprotractor.NgBy;
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
+
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.FindBys;
+import org.openqa.selenium.support.pagefactory.ByAll;
+import org.openqa.selenium.support.pagefactory.ByChained;
+
 /**
- * Tests of Javascript scroll
+ * Tests of Javascript scrroll
  * http://www.globalsqa.com/angularJs-protractor/Scrollable/ based on
  * https://github.com/PiotrWysocki/globalsqa.com/blob/master/src/main/java/
  * scrollablepages/ScrollablePage.java
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
- */    
-@SuppressWarnings("deprecation")
+ */
 public class NgScrollableIntegrationTest {
 	private static String fullStackTrace;
 	private static NgWebDriver ngDriver;
@@ -69,10 +70,13 @@ public class NgScrollableIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		
+		
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
 
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
@@ -138,22 +142,6 @@ public class NgScrollableIntegrationTest {
 	}
 
 	// @Ignore
-	@Test
-	public void testCountRows() {
-
-		// Wait page to load
-		wait.until(ExpectedConditions
-				.visibilityOf(ngDriver.findElement(By.className("table-container"))));
-		List<WebElement> rows = ngDriver
-				.findElements(NgBy.repeater("row in rowCollection"));
-		List<WebElement> lastNameRows = ngDriver.findElements(new ByChained(
-				By.className("table-container"), NgBy.repeater("row in rowCollection"),
-				NgBy.binding("row.lastName")));
-		System.err.println("Rows: " + rows.size());
-		System.err.println("Last names: " + lastNameRows.size());
-	}
-
-	@Ignore
 	@Test
 	public void testEvaluateRowData() {
 

@@ -39,7 +39,7 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * Datetime Picker tests
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-@SuppressWarnings("deprecation")
+
 public class NgDatePickerIntegrationTest {
 
 	private static String fullStackTrace;
@@ -66,9 +66,10 @@ public class NgDatePickerIntegrationTest {
 		driver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(driver, flexibleWait);
 		wait = new WebDriverWait(driver, Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(driver);
 		ngDriver = new NgWebDriver(driver);
 	}
@@ -88,29 +89,25 @@ public class NgDatePickerIntegrationTest {
 		// Arrange
 		final String searchText = "Embedded calendar";
 		try {
-			// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-
-			// new WebDriverWait(driver, 5)
-			(new WebDriverWait(driver, Duration.ofSeconds(5)))
-					.until(new ExpectedCondition<Boolean>() {
-						@Override
-						public Boolean apply(WebDriver d) {
-							// cannot use Java streams here ?
-							Iterator<WebElement> elements = d
-									.findElements(By.className("col-sm-6")).iterator();
-							Boolean result = false;
-							WebElement element = null;
-							while (elements.hasNext() && !result) {
-								element = elements.next();
-								String text = element.getText();
-								result = text.contains(searchText);
-							}
-							if (result) {
-								actions.moveToElement(element).build().perform();
-							}
-							return result;
-						}
-					});
+			(new WebDriverWait(driver, Duration.ofSeconds(5))).until(new ExpectedCondition<Boolean>() {
+				@Override
+				public Boolean apply(WebDriver d) {
+					// cannot use Java streams here ?
+					Iterator<WebElement> elements = d
+							.findElements(By.className("col-sm-6")).iterator();
+					Boolean result = false;
+					WebElement element = null;
+					while (elements.hasNext() && !result) {
+						element = elements.next();
+						String text = element.getText();
+						result = text.contains(searchText);
+					}
+					if (result) {
+						actions.moveToElement(element).build().perform();
+					}
+					return result;
+				}
+			});
 		} catch (Exception e) {
 			System.err.println("Exception: " + e.toString());
 		}

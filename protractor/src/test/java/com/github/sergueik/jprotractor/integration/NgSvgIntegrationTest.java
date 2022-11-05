@@ -58,8 +58,8 @@ public class NgSvgIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
 
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);

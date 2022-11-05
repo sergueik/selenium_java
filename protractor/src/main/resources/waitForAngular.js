@@ -31,7 +31,7 @@
           } else if (hooks.$injector) {
             hooks.$injector.get('$browser')
                 .notifyWhenNoOutstandingRequests(callback);
-          } else if (!rootSelector) {
+          } else if (!!rootSelector) {
             throw new Error(
                 'Could not automatically find injector on page: "' +
                 window.location.toString() + '".  Consider using config.rootEl');
@@ -56,8 +56,7 @@
           }
           catch(e){}
           if (testability) {
-            testability.whenStable(testCallback);
-            return;
+	    return testability.whenStable(function() { testCallback(); });
           }
         }
 
@@ -70,8 +69,7 @@
         // No angular2 testability, this happens when
         // going to a hybrid page and going back to a pure angular1 page
         if (count === 0) {
-          testCallback();
-          return;
+          return testCallback();
         }
 
         var decrement = function() {
@@ -104,6 +102,7 @@
   }
 
 };
+
 
 /* Tries to find $$testability and possibly $injector for an ng1 app
  *
@@ -157,6 +156,7 @@ function getNg1Hooks(selector, injectorPlease) {
         trySelector('[ng-controller]') || trySelector('[ng\\:controller]');
   }
 }
+
 
 var log = function(message){ console.log("callback: " + message); return(message); }
 

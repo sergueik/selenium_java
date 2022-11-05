@@ -3,12 +3,10 @@ package com.github.sergueik.jprotractor.integration;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.Dimension;
@@ -24,12 +22,11 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * Local file Integration tests of using Protractor driver with non-Angular pages
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-@SuppressWarnings("deprecation")
 
 public class NgIgnoreSyncIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
-	private static String rootCauseMessage;
+	private static String fullStackTrace;
 	static WebDriverWait wait;
 	static Actions actions;
 	static Alert alert;
@@ -50,10 +47,11 @@ public class NgIgnoreSyncIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
 
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
@@ -78,8 +76,9 @@ public class NgIgnoreSyncIntegrationTest {
 			element.getAttribute("id");
 		} catch (TimeoutException exception) {
 			System.err.println("TimeoutException thrown:");
-			rootCauseMessage = ExceptionUtils.getRootCauseMessage(exception);
-			System.err.println("Exception thrown: " + rootCauseMessage);
+			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(exception);
+			System.err.println("Exception thrown: " + fullStackTrace);
 			return;
 		}
 	}
@@ -101,8 +100,9 @@ public class NgIgnoreSyncIntegrationTest {
 		try {
 			element.getAttribute("id");
 		} catch (TimeoutException exception) {
-			rootCauseMessage = ExceptionUtils.getRootCauseMessage(exception);
-			System.err.println("TimeoutException thrown: " + rootCauseMessage);
+			fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
+					.getFullStackTrace(exception);
+			System.err.println("TimeoutException thrown: " + fullStackTrace);
 			return;
 		}
 	}
