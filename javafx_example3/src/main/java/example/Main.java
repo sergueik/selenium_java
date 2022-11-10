@@ -21,7 +21,7 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws IOException {
         Rectangle2D rectangleScreen = Screen.getPrimary().getVisualBounds();
         System.out.println(this.getClass().getResource("/view.fxml"));
-        Parent root = FXMLLoader.load(this.getClass().getResource("/helloWorld.fxml"));
+        Parent root = FXMLLoader.load(this.getClass().getResource("/splash.fxml"));
         primaryStage.setTitle("TeachingEnglishApp");
         Scene scene = new Scene(root, rectangleScreen.getWidth()/2,rectangleScreen.getHeight()/2);
         scene.getStylesheets().add("/application.css");
