@@ -38,7 +38,7 @@
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <log4j-core.version>2.17.1</log4j-core.version>
-    <snakeyaml.version>1.24</snakeyaml.version>
+    <snakeyaml.version>1.32</snakeyaml.version>
     <sqljet.version>1.1.13</sqljet.version>
   </properties>
   <dependencies>
