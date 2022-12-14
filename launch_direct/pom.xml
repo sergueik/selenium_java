@@ -23,7 +23,7 @@
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
-    <snakeyaml.version>1.26</snakeyaml.version>
+    <snakeyaml.version>1.32</snakeyaml.version>
     <surefire.version>2.8</surefire.version>
   </properties>
   <dependencies>
