@@ -21,7 +21,7 @@
   from ossrh e.g.:
   https://oss.sonatype.org/content/repositories/snapshots/
 om/fasterxml/jackson/core/jackson-annotations/2.10.0-SNAPSHOT/jackson-annotatio
-s-2.10.0-20190601.024115-4.pom
+s-2.10.0-20190601.324115-4.pom
     which will lead to quickly polluting the maven local repository cache ~/.m2/repository/com/fasterxml/jackson with snapshot versions. -->
     <jackson-databind.version>2.13.4.1 </jackson-databind.version>
     <jsoup.version>1.15.3</jsoup.version>
@@ -36,8 +36,8 @@ s-2.10.0-20190601.024115-4.pom
     <phantomjsdriver.version>1.4.4</phantomjsdriver.version>
     <!-- cannot upgrade -  4.0.0 is too different - in particular Selenium driver no longer has Actions -->
     <selenium.version>4.0.0-alpha-2</selenium.version>
-    <!-- 3.141.59 - is the last 3.x version as of 8/1/2019 -->
-    <selenium.version>3.141.59</selenium.version>
+    <!-- 3.141.32 - is the last 3.x version as of 8/1/2019 -->
+    <selenium.version>3.141.32</selenium.version>
     <selenium.version>3.13.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
@@ -48,7 +48,7 @@ java.lang.NoClassDefFoundError: org/openqa/selenium/remote/DesiredCapabilities
 with 3.13.0
 java.lang.NoClassDefFoundError: org/openqa/selenium/remote/JsonToBeanConverter
 -->
-    <snakeyaml.version>1.26</snakeyaml.version>
+    <snakeyaml.version>1.32</snakeyaml.version>
     <sqlite-jdbc.version>3.25.2</sqlite-jdbc.version>
     <!-- 6.12+ cannot find symbol symbol:
         class Nullable location: package org.testng.internal
