@@ -16,4 +16,5 @@
 *.unc-backup~
 *.uncrustify
 *~
+**/*.sw?
 
