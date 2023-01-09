@@ -1,6 +1,6 @@
 package example;
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2023 Serguei Kouzmine
  */
 
 import static org.hamcrest.CoreMatchers.containsString;
@@ -44,11 +44,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * Integration tests of Calculator http://juliemr.github.io/protractor-demo/
  * without actually using NgWebDriver class at Java level
- * but not using
+ * but using individual Javascript methods of Protractor library injected in the browser
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * 
  */
-
+@SuppressWarnings({ "deprecation" })
 public class StandaloneIntegrationTest extends CommonTest {
 
 	private static List<WebElement> elements = new ArrayList<>();
@@ -56,7 +56,7 @@ public class StandaloneIntegrationTest extends CommonTest {
 	private static String script = null;
 	private static int cnt;
 
-	// @Ignore
+	@Ignore("suppressed while there is no internet connection")
 	@SuppressWarnings("unchecked")
 	@Test
 	public void test1() {
@@ -150,7 +150,7 @@ public class StandaloneIntegrationTest extends CommonTest {
 
 	}
 
-	// @Ignore
+	@Ignore("suppressed while there is no internet connection")
 	@SuppressWarnings("unchecked")
 	@Test
 	// entirely unmodified "clientscripts.js" - no longer runs due to typescript

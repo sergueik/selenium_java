@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2023 Serguei Kouzmine
  */
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThan;
@@ -28,6 +28,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings({ "deprecation" })
 public class DialogTest extends CommonTest {
 
 	private static List<WebElement> elements = new ArrayList<>();
@@ -49,7 +50,7 @@ public class DialogTest extends CommonTest {
 	}
 	private static String text = null;
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked" })
 	@Test
 	public void test1() {
 		getLocalPage("ng_modal2.htm");
@@ -85,7 +86,7 @@ public class DialogTest extends CommonTest {
 					By.cssSelector(String.format("form label[ for='%s']", inputId)));
 			assertThat(elements.size(), equalTo(1));
 			highlight(elements.get(0));
-*/
+			*/
 			element3 = element2
 					.findElement(By.cssSelector(String.format("form input#%s", inputId)));
 			assertThat(element3, notNullValue());
