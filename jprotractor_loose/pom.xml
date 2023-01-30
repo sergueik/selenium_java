@@ -4,7 +4,7 @@
   <groupId>com.mycompany.app</groupId>
   <artifactId>jprotractor_loose</artifactId>
   <packaging>jar</packaging>
-  <version>0.3.0-SNAPSHOT</version>
+  <version>0.4.0-SNAPSHOT</version>
   <name>app</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -33,8 +33,8 @@
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <minimal-json.version>0.9.5</minimal-json.version>
-    <selenium.version>4.6.0</selenium.version>
-    <selenium-devtools-v107.version>${selenium.version}</selenium-devtools-v107.version>
+    <selenium.version>4.8.0</selenium.version>
+    <selenium-devtools-v109.version>${selenium.version}</selenium-devtools-v109.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
     <selenium-ie-driver.version>${selenium.version}</selenium-ie-driver.version>
@@ -88,6 +88,14 @@
       <exclusions>
         <exclusion>
           <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v108</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
+          <artifactId>selenium-devtools-v107</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.seleniumhq.selenium</groupId>
           <artifactId>selenium-devtools-v106</artifactId>
         </exclusion>
         <exclusion>
@@ -138,8 +146,8 @@
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-devtools-v107</artifactId>
-      <version>${selenium-devtools-v107.version}</version>
+      <artifactId>selenium-devtools-v109</artifactId>
+      <version>${selenium-devtools-v109.version}</version>
     </dependency>
     <dependency>
       <groupId>org.seleniumhq.selenium</groupId>
