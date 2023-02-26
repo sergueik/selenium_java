@@ -33,7 +33,7 @@
     <maven-resources-plugin.version>3.1.0</maven-resources-plugin.version>
     <maven-surefire-plugin.version>2.20</maven-surefire-plugin.version>
     <minimal-json.version>0.9.5</minimal-json.version>
-    <selenium.version>4.8.0</selenium.version>
+    <selenium.version>4.8.1</selenium.version>
     <selenium-devtools-v109.version>${selenium.version}</selenium-devtools-v109.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
