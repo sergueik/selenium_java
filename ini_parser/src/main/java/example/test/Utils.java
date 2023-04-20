@@ -8,6 +8,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +41,55 @@ public class Utils {
 		return propertiesMap;
 	}
 
+	// NOTE: put inside "WEB-INF/classes" for web hosted app
+	public String getScriptContent(String resourceFileName) {
+		try {
+			if (debug) {
+				System.err
+						.println("Script contents: " + getResourceURI(resourceFileName));
+			}
+			final InputStream stream = getResourceStream(resourceFileName);
+			final byte[] bytes = new byte[stream.available()];
+			stream.read(bytes);
+			return new String(bytes, "UTF-8");
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	// NOTE: getResourceURI may not work with standalone or web hosted
+	// application
+	public String getResourceURI(String resourceFileName) {
+		try {
+			if (debug) {
+				System.err.println("Getting resource URI for: " + resourceFileName);
+			}
+
+			URI uri = this.getClass().getClassLoader().getResource(resourceFileName)
+					.toURI();
+			if (debug) {
+				System.err.println("Resource URI: " + uri.toString());
+			}
+			return uri.toString();
+		} catch (URISyntaxException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public InputStream getResourceStream(String resourceFilePath) {
+		return this.getClass().getClassLoader()
+				.getResourceAsStream(resourceFilePath);
+	}
+
+	public String getResourcePath(String resourceFileName) {
+		final String resourcePath = String.format("%s/src/main/resources/%s",
+				System.getProperty("user.dir"), resourceFileName);
+		if (debug) {
+			System.err.println("Project based resource path: " + resourcePath);
+		}
+		return resourcePath;
+	}
+
 	// TODO: fix with absolute path in filename
 	public Map<String, String> getProperties(final String fileName) {
 		Properties p = new Properties();
@@ -60,8 +111,7 @@ public class Utils {
 				System.err.println(String.format(
 						"Reading properties resource stream: '%s'", resourcefileName));
 			}
-			stream = Utils.class.getClassLoader()
-					.getResourceAsStream(resourcefileName);
+			stream = getResourceStream(resourcefileName);
 		}
 		if (stream != null) {
 			try {

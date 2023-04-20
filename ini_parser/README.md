@@ -103,6 +103,7 @@ option3: default value for option3
   * [yet another, somewhat bloated c# project containing complex hierarchy of classes just to deal with the ini file](https://github.com/simplesoft-pt/IniParser)
   * [default Ruby package for ini files](https://github.com/TwP/inifile)
   * [blog](https://ourcodeworld.com/articles/read/839/how-to-read-parse-from-and-write-to-ini-files-easily-in-java) on how to read and write to INI files easily in Java using `org.ini4j.ini4j` [jar](https://mvnrepository.com/artifact/org.ini4j/ini4j)
-  
+  * how to Avoid the Java `FileNotFoundExceptio`n When Loading Resources [document](https://www.baeldung.com/java-classpath-resource-cannot-be-opened)
+
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
