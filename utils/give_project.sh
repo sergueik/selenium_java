@@ -1,2 +1,2 @@
 #!/bin/sh
-pwd | sed 's|^/c/|c\\:|;s|/|\\|g;'
+pwd | sed 's|^/c/|c:\\|;s|/|\\|g;'
