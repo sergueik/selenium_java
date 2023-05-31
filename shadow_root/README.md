@@ -102,8 +102,13 @@ from file `querySelector.js`.
   * https://www.webcomponents.org/community/articles/introduction-to-shadow-dom
   * https://www.grapecity.com/blogs/what-is-shadow-dom-how-to-build-shadow-elements
   * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
-  * https://www.html5rocks.com/en/tutorials/webcomponents/shadowdom/
+  * https://www.html5rocks.com/en/tutorials/webcomponents/shadowdom/ - moved to  [Shadow DOM 101](https://web.dev/shadowdom/) and [Shadow DOM 201](https://web.dev/shadowdom-201/)
+  * https://medium.com/@mariusbongarts/the-complete-web-component-guide-shadow-dom-2e40921eb77
+  * https://medium.com/@vinaykrmittal/shadow-dom-implementation-in-javascript-1a3cc8c01687
   * https://ultimatecourses.com/blog/understanding-shadow-dom-in-web-components
   * [documentation](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM)
   * Everything you need to know about Shadow DOM [gist](https://gist.github.com/praveenpuglia/0832da687ed5a5d7a0907046c9ef1813)
   * [post](https://groups.google.com/g/selenium-users/c/nrRS34V8jUo) about ShadowDOM support by [selenide](https://github.com/selenide/selenide)
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
