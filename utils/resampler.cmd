@@ -25,6 +25,7 @@ if not "%3" == "" set "MAX_PROCESSES=%3"
 echo Will run !MAX_PROCESSES! in parallel
 cd /d "%SOURCPATH%"
 REM no need for "tokens=*" 
+ 
 REM set OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 set OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 for /R "%SOURCPATH%" %%_ in (*.flac) do (
@@ -39,21 +40,39 @@ for /R "%SOURCPATH%" %%_ in (*.flac) do (
     echo Running !PROCESS_COUNTER! processes
     if !PROCESS_COUNTER! geq !MAX_PROCESSES! (
         rem Wait for any of the launched processes to finish before launching more
-        call :WAIT_FOR_PROCESS
+        call :COUNT_FOR_PROCESS
     )
 )
 
 :WAIT_FOR_PROCESS
-echo Wait for process to finish
-rem Wait for one process to finish
-Rem echo timeout.exe /T !TIMEOUT! /NOBREAK
+echo Wait untill all processes finish
+rem Wait untill all processes finish
 C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
-
-for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq ReSampler.exe" /NH') do (
-    if "%%_" == "ReSampler.exe" (
+set IMAGENAME=ReSampler.exe
+for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH') do (
+    if "%%_" == "!IMAGENAME!" (
         rem There is still at least one instance of the ReSampler.exe tool running
         goto :WAIT_FOR_PROCESS
     )
 )
 set "PROCESS_COUNTER=0"
+exit /B
+goto :EOF
+
+REM use trick from https://devblogs.microsoft.com/oldnewthing/20110825-00/?p=9803
+:COUNT_FOR_PROCESS
+echo Wait untill at least one processes finish
+rem Wait untill at least one processes finish
+C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
+set IMAGENAME=ReSampler.exe
+set /A RUNNING_PPOCESS_COUNT=0
+for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH ^| C:\Windows\System32\find.exe "!IMAGENAME!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
+    set /A RUNNING_PPOCESS_COUNT=%%_
+    echo !RUNNING_PPOCESS_COUNT! !IMAGENAME! is running
+    if !RUNNING_PPOCESS_COUNT! equ !MAX_PROCESSES! (
+       goto :COUNT_FOR_PROCESS
+    )
+)
+set /A "PROCESS_COUNTER=!MAX_PROCESSES! - !RUNNING_PPOCESS_COUNT!"
+echo set PROCESS_COUNTER to !PROCESS_COUNTER!
 exit /B
