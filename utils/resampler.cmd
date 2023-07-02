@@ -73,6 +73,6 @@ for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH ^| C:
        goto :COUNT_FOR_PROCESS
     )
 )
-set /A "PROCESS_COUNTER=!MAX_PROCESSES! - !RUNNING_PPOCESS_COUNT!"
+set /A "PROCESS_COUNTER=!RUNNING_PPOCESS_COUNT!"
 echo set PROCESS_COUNTER to !PROCESS_COUNTER!
 exit /B
