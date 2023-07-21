@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>xls-validate</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-SNAPSHOT</version>
+  <version>0.2-SNAPSHOT</version>
   <name>xls-validate</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -28,12 +28,9 @@
     <java.version>1.8</java.version>
     <jOpenDocument.version>1.3</jOpenDocument.version>
     <json.version>20080701</json.version>
-	        <jxls-reader.version>2.0.6</jxls-reader.version>
-	        <jxls-core.version>1.0.6</jxls-core.version>
-
+    <jxls-reader.version>2.0.6</jxls-reader.version>
+    <jxls-core.version>1.0.6</jxls-core.version>
     <commons-jexl.version>2.1.1</commons-jexl.version>
-
-
     <json-path.version>2.4.0</json-path.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
@@ -50,44 +47,26 @@
     <mainClass>EntryPoint</mainClass>
   </properties>
   <dependencies>
-	  <dependency>
-    <groupId>org.jxls</groupId>
-    <artifactId>jxls-reader</artifactId>
-    <version>${jxls-reader.version}</version>
-</dependency>
-
-<dependency>
-    <groupId>net.sf.jxls</groupId>
-    <artifactId>jxls-core</artifactId>
-    <version>1.0.5</version>
-</dependency>
-<!-- 
-[WARNING] The POM for org.jxls:jxls-core:jar:1.0.6 is missing, no dependency inf
-ormation available
--->
-<!--
-<dependency>
-    <groupId>net.sf.jxls</groupId>
-    <artifactId>jxls-core</artifactId>
-    <version>1.0.6</version>
-</dependency>
-	<dependency>
-    <groupId>org.jxls</groupId>
-    <artifactId>jxls-core</artifactId>
-    <version>${jxls-core.version}</version>
-</dependency>
--->
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-jexl</artifactId>
-    <version>${commons-jexl.version}</version>
-</dependency>
+    <dependency>
+      <groupId>org.jxls</groupId>
+      <artifactId>jxls-reader</artifactId>
+      <version>${jxls-reader.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.jxls</groupId>
+      <artifactId>jxls-core</artifactId>
+      <version>${jxls-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-jexl</artifactId>
+      <version>${commons-jexl.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.jopendocument</groupId>
       <artifactId>jOpenDocument</artifactId>
       <version>${jOpenDocument.version}</version>
     </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
