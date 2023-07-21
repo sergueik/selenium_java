@@ -1,4 +1,5 @@
 #!/bin/bash
+# https://www.ubuntu18.com/install-vnc-server-ubuntu-18/
 # TODO: check the DIPLAY_PORT part
 COMMAND=${1:-stop}
 if [ "$COMMAND" = "stop" ]; then

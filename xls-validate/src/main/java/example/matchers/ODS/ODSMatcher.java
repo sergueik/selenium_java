@@ -1,6 +1,5 @@
 package example.matchers.ODS;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.hamcrest.SelfDescribing;
 import org.hamcrest.TypeSafeMatcher;

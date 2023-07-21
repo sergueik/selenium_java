@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Description;
 import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Sheet;

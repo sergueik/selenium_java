@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE=${1:-lenovo120s}
+IMAGE=${1:-lenovo40withminikube}
 DISK=${2:-/dev/sdc}
 # When copying larger ssd to a later useful is to provide count e.g.
 # count=64 bs=500M

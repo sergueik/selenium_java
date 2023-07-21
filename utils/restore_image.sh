@@ -1,5 +1,5 @@
 #!/bin/bash
-IMAGE=${1:-lenovo120s}
+IMAGE=${1:-lenovo40withminikube}
 DISK=${2:-/dev/sdc}
 STAGING='/media/sergueik/Windows8_OS/Users/Serguei/Desktop/Private/z/'
 if [ ! -d $STAGING ] ;then

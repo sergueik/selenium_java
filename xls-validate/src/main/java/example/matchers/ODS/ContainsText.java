@@ -1,7 +1,5 @@
 package example.matchers.ODS;
 
-import org.apache.commons.lang3.StringUtils;
-
 import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.Sheet;
 
