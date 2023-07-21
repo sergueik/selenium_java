@@ -4,9 +4,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.hamcrest.Matcher;
 
-import example.matchers.ContainsRow;
-import example.matchers.ContainsText;
-import example.matchers.DoesNotContainText;
+import example.matchers.XLS.ContainsRow;
+import example.matchers.XLS.ContainsText;
+import example.matchers.XLS.DoesNotContainText;
 
 import static example.IO.readBytes;
 import static example.IO.readFile;
