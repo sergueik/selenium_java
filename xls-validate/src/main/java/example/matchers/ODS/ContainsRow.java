@@ -20,33 +20,31 @@ public class ContainsRow extends ODSMatcher {
 		this.cellTexts = cellTexts;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected boolean matchesSafely(ODS item) {
+		for (int sheetIndex = 0; sheetIndex < item.ods
+				.getSheetCount(); sheetIndex++) {
 
-		for (int i = 0; i < item.ods.getSheetCount(); i++) {
-			// Sheet sheet = item.excel.getSheetAt(i);
-			Sheet sheet = item.ods.getSheet(i);
+			Sheet sheet = item.ods.getSheet(sheetIndex);
 			int columnCount = sheet.getColumnCount();
-			int rowCount = sheet.getRowCount();
-			@SuppressWarnings("rawtypes")
-			Cell cell = null;
-			for (int rowIndex = 1; rowIndex < rowCount && StringUtils.isNotBlank(sheet
-					.getImmutableCellAt(0, rowIndex).getValue().toString()); rowIndex++) {
+
+			for (int rowIndex = 0; rowIndex < sheet.getRowCount(); rowIndex++) {
+				if (sheet.getImmutableCellAt(0, rowIndex).isEmpty())
+					break;
 				Queue<String> expectedTexts = new LinkedList<>(asList(cellTexts));
 				for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-					cell = sheet.getImmutableCellAt(columnIndex, rowIndex);
-					if (StringUtils.isNotBlank(cell.getValue().toString())) {
-						Object cellValue = item.safeOOCellValue(cell);
-						String expectedText = expectedTexts.peek();
-						if (cellValue.toString().contains(expectedText)) {
-							expectedTexts.remove();
-						}
-					}
+
+					Cell cell = sheet.getImmutableCellAt(columnIndex, rowIndex);
+					if (cell.isEmpty())
+						break;
+					String expectedText = expectedTexts.peek();
+					if (item.safeOOCellValue(cell).toString().contains(expectedText))
+						expectedTexts.remove();
 				}
 				if (expectedTexts.isEmpty())
 					return true;
 			}
-
 		}
 		return false;
 	}

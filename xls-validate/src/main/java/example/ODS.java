@@ -78,7 +78,12 @@ public class ODS {
 			result = Double.valueOf(cell.getValue().toString());
 			break;
 		case STRING:
+			// NOTE: NPE
+			// try {
 			result = cell.getTextValue();
+			// } catch (java.lang.NullPointerException e) {
+			// result = "";
+			// }
 			break;
 		case TIME:
 			result = null; // TODO

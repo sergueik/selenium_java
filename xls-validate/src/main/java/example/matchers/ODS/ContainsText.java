@@ -16,25 +16,25 @@ public class ContainsText extends ODSMatcher {
 		this.substring = reduceSpaces(substring);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	protected boolean matchesSafely(ODS item) {
 
-		for (int i = 0; i < item.ods.getSheetCount(); i++) {
-			// Sheet sheet = item.excel.getSheetAt(i);
-			Sheet sheet = item.ods.getSheet(i);
+		for (int sheetIndex = 0; sheetIndex < item.ods
+				.getSheetCount(); sheetIndex++) {
+
+			Sheet sheet = item.ods.getSheet(sheetIndex);
 			int columnCount = sheet.getColumnCount();
-			int rowCount = sheet.getRowCount();
-			@SuppressWarnings("rawtypes")
-			Cell cell = null;
-			for (int rowIndex = 1; rowIndex < rowCount && StringUtils.isNotBlank(sheet
-					.getImmutableCellAt(0, rowIndex).getValue().toString()); rowIndex++) {
+
+			for (int rowIndex = 0; rowIndex < sheet.getRowCount(); rowIndex++) {
+				if (sheet.getImmutableCellAt(0, rowIndex).isEmpty())
+					break;
 				for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-					cell = sheet.getImmutableCellAt(columnIndex, rowIndex);
-					if (StringUtils.isNotBlank(cell.getValue().toString())) {
-						Object cellValue = item.safeOOCellValue(cell);
-						if (cellValue.toString().contains(substring))
-							return true;
-					}
+					Cell cell = sheet.getImmutableCellAt(columnIndex, rowIndex);
+					if (cell.isEmpty())
+						break;
+					if (item.safeOOCellValue(cell).toString().contains(substring))
+						return true;
 				}
 			}
 		}

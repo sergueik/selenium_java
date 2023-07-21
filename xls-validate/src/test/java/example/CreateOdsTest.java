@@ -19,32 +19,32 @@ public class CreateOdsTest {
 	public void fromFile() throws Exception {
 		File file = new File(
 				getClass().getClassLoader().getResource("statement.ods").toURI());
-		assertThat(new ODS(file), containsText("Выписка"));
+		assertThat(new ODS(file), containsText("allure"));
 	}
 
 	@Test
 	public void fromUrl() throws Exception {
 		URL url = getClass().getClassLoader().getResource("statement.ods");
-		assertThat(new ODS(url), containsText("Выписка"));
+		assertThat(new ODS(url), containsText("allure"));
 	}
 
 	@Test
 	public void fromUri() throws Exception {
 		URI uri = getClass().getClassLoader().getResource("statement.ods").toURI();
-		assertThat(new ODS(uri), containsText("Выписка"));
+		assertThat(new ODS(uri), containsText("allure"));
 	}
 
 	@Test
 	public void fromInputStream() throws Exception {
 		InputStream inputStream = getClass().getClassLoader()
 				.getResourceAsStream("statement.ods");
-		assertThat(new ODS(inputStream), containsText("Выписка"));
+		assertThat(new ODS(inputStream), containsText("allure"));
 	}
 
 	@Test
 	public void fromBytes() throws Exception {
 		byte[] bytes = Files.readAllBytes(Paths
 				.get(getClass().getClassLoader().getResource("statement.ods").toURI()));
-		assertThat(new ODS(bytes), containsText("Выписка"));
+		assertThat(new ODS(bytes), containsText("allure"));
 	}
 }
