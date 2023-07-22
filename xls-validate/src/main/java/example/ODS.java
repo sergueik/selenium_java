@@ -7,11 +7,14 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 import org.hamcrest.Matcher;
 import org.jopendocument.dom.ODDocument;
+import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.ODValueType;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
@@ -65,9 +68,10 @@ public class ODS {
 		return new DoesNotContainText(text);
 	}
 
+	// see also:
+	//
 	// https://www.jopendocument.org/docs/org/jopendocument/dom/ODValueType.html
-	public Object safeOOCellValue(
-			org.jopendocument.dom.spreadsheet.Cell<ODDocument> cell) {
+	public Object safeOOCellValue(Cell<ODDocument> cell) {
 		if (cell == null) {
 			return null;
 		}
@@ -78,12 +82,22 @@ public class ODS {
 			result = Double.valueOf(cell.getValue().toString());
 			break;
 		case STRING:
-			// NOTE: NPE
-			// try {
-			result = cell.getTextValue();
-			// } catch (java.lang.NullPointerException e) {
-			// result = "";
-			// }
+			try {
+				result = cell.getElement().getValue();
+				System.err.println("got result (1): " + result);
+			} catch (NullPointerException e) {
+				System.err.println("Exception (ignored)" + e.toString());
+			}
+
+			try {
+				result = cell.getTextValue();
+				System.err.println("got result (2): " + result);
+			} catch (NullPointerException e) {
+				System.err.println("in exception handler");
+				result = cell.getElement().getValue();
+				System.err.println("got result (3): " + result);
+			}
+
 			break;
 		case TIME:
 			result = null; // TODO

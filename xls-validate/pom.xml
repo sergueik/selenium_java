@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>xls-validate</artifactId>
   <packaging>jar</packaging>
-  <version>0.2-SNAPSHOT</version>
+  <version>0.3-SNAPSHOT</version>
   <name>xls-validate</name>
   <url>http://maven.apache.org</url>
   <developers>
