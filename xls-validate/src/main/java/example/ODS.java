@@ -69,46 +69,31 @@ public class ODS {
 	}
 
 	// see also:
-	//
+	// https://stackoverflow.com/questions/64423111/javajopendocument-nullpointerexception-when-using-getcellat0-0
 	// https://www.jopendocument.org/docs/org/jopendocument/dom/ODValueType.html
 	public Object safeOOCellValue(Cell<ODDocument> cell) {
 		if (cell == null) {
 			return null;
 		}
 		Object result;
+		String data = cell.getElement().getValue();
 		ODValueType type = cell.getValueType();
 		switch (type) {
 		case FLOAT:
-			result = Double.valueOf(cell.getValue().toString());
+			result = Double.valueOf(data);
 			break;
 		case STRING:
-			try {
-				result = cell.getElement().getValue();
-				System.err.println("got result (1): " + result);
-			} catch (NullPointerException e) {
-				System.err.println("Exception (ignored)" + e.toString());
-			}
-
-			try {
-				result = cell.getTextValue();
-				System.err.println("got result (2): " + result);
-			} catch (NullPointerException e) {
-				System.err.println("in exception handler");
-				result = cell.getElement().getValue();
-				System.err.println("got result (3): " + result);
-			}
-
+			result = data;
 			break;
 		case TIME:
 			result = null; // TODO
 			break;
 		case BOOLEAN:
-			result = Boolean.getBoolean(cell.getValue().toString());
+			result = Boolean.getBoolean(data);
 			break;
 		default:
 			throw new IllegalStateException("Can't evaluate cell value");
 		}
-		// return (result == null) ? null : result.toString();
 		return result;
 	}
 

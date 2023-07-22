@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>xls-validate</artifactId>
   <packaging>jar</packaging>
-  <version>0.3-SNAPSHOT</version>
+  <version>0.4-SNAPSHOT</version>
   <name>xls-validate</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -21,6 +21,7 @@
     <junit.version>4.13.1</junit.version>
     <java.version>1.8</java.version>
     <jOpenDocument.version>1.3</jOpenDocument.version>
+    <!-- NOTE: on https://www.jopendocument.org/download.html the releases 1.4 and 1.5 of jOpenDocument.jar are available, but on maven central the 1.3 is the latests -->
     <jxls-reader.version>2.0.6</jxls-reader.version>
     <jxls-core.version>1.0.6</jxls-core.version>
     <commons-jexl.version>2.1.1</commons-jexl.version>
