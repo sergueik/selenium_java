@@ -31,6 +31,18 @@ public class ContainsRowTest {
 
 	@Test
 	public void rowContainsCells_all() throws IOException {
+		for (String[] texts : Arrays.asList(new String[][] {
+				{ "1", "junit", "202", "Sun Jul 23 00:00:00 EDT 2023" },
+				{ "2", "testng", "52", "Sun Jul 23 00:00:00 EDT 2023" },
+				{ "3", "spock", "22", "Sun Jul 23 00:00:00 EDT 2023" },
+				{ "4", "allure", "50", "Sun Jul 23 00:00:00 EDT 2023" } })) {
+			assertThat(sheet, containsRow(texts));
+
+		}
+	}
+
+	@Test
+	public void rowContainsCells_partial() throws IOException {
 		for (String[] texts : Arrays.asList(
 				new String[][] { { "1", "junit", "202" }, { "2", "testng", "52" },
 						{ "3", "spock", "22" }, { "4", "allure", "50" } })) {

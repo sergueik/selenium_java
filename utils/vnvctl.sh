@@ -1,6 +1,12 @@
 #!/bin/bash
+# https://serverok.in/install-xfce-vnc-remote-desktop-on-ubuntu
 # TODO: check the DIPLAY_PORT part
 # NOTE: unable to connecting to DISPLAY :0
+# NOTE: the original article suggests having in ~/.vnc/xstartup
+# /usr/bin/vncconfig -nowin -display :1 &
+#
+# startxfce4 &
+# this is not stable: no window manager
 # https://www.ubuntu18.com/install-vnc-server-ubuntu-18
 # see also: https://a-katyrev.blogspot.com/2019/11/vnc-lubuntu-1804.html
 COMMAND=${1:-stop}

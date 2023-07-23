@@ -38,7 +38,10 @@ public class ContainsRow extends ODSMatcher {
 					if (cell.isEmpty())
 						break;
 					String expectedText = expectedTexts.peek();
-					if (item.safeOOCellValue(cell).toString().contains(expectedText))
+					if (expectedText == null)
+						break;
+					Object data = item.safeOOCellValue(cell);
+					if (data != null && data.toString().contains(expectedText))
 						expectedTexts.remove();
 				}
 				if (expectedTexts.isEmpty())

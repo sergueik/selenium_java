@@ -7,16 +7,17 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.hamcrest.Matcher;
 import org.jopendocument.dom.ODDocument;
-import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.ODValueType;
+import org.jopendocument.dom.spreadsheet.Cell;
 import org.jopendocument.dom.spreadsheet.SpreadSheet;
 
 import example.matchers.ODS.ContainsRow;
@@ -71,6 +72,7 @@ public class ODS {
 	// see also:
 	// https://stackoverflow.com/questions/64423111/javajopendocument-nullpointerexception-when-using-getcellat0-0
 	// https://www.jopendocument.org/docs/org/jopendocument/dom/ODValueType.html
+	@SuppressWarnings("deprecation")
 	public Object safeOOCellValue(Cell<ODDocument> cell) {
 		if (cell == null) {
 			return null;
@@ -85,6 +87,15 @@ public class ODS {
 		case STRING:
 			result = data;
 			break;
+		case DATE:
+			Date date;
+			try {
+				date = new SimpleDateFormat("MM/dd/yy").parse(data);
+			} catch (ParseException e) {
+				date = new Date("01/01/1970");
+			}
+			result = date;
+			break;
 		case TIME:
 			result = null; // TODO
 			break;
@@ -92,7 +103,8 @@ public class ODS {
 			result = Boolean.getBoolean(data);
 			break;
 		default:
-			throw new IllegalStateException("Can't evaluate cell value");
+			throw new IllegalStateException(
+					"Can't evaluate cell value of " + type.getName());
 		}
 		return result;
 	}

@@ -4,7 +4,7 @@
   <groupId>example</groupId>
   <artifactId>xls-validate</artifactId>
   <packaging>jar</packaging>
-  <version>0.4-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <name>xls-validate</name>
   <url>http://maven.apache.org</url>
   <developers>
@@ -30,7 +30,6 @@
     <!-- runs ant build.xml script embedded in the pom -->
     <poi.version>4.1.2</poi.version>
     <poiooxml.version>${poi.version}</poiooxml.version>
-    <mainClass>EntryPoint</mainClass>
   </properties>
   <dependencies>
     <dependency>
@@ -59,11 +58,6 @@
       <version>${junit.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.jopendocument</groupId>
-      <artifactId>jOpenDocument</artifactId>
-      <version>${jOpenDocument.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>${poiooxml.version}</version>
@@ -87,7 +81,8 @@
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest-all</artifactId>
       <version>${hamcrest-all.version}</version>
-    </dependency>  </dependencies>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>
