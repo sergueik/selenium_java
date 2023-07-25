@@ -32,10 +32,11 @@ public class ContainsRowTest {
 	@Test
 	public void rowContainsCells_all() throws IOException {
 		for (String[] texts : Arrays.asList(new String[][] {
-				{ "1", "junit", "202", "Sun Jul 23 00:00:00 EDT 2023" },
-				{ "2", "testng", "52", "Sun Jul 23 00:00:00 EDT 2023" },
-				{ "3", "spock", "22", "Sun Jul 23 00:00:00 EDT 2023" },
-				{ "4", "allure", "50", "Sun Jul 23 00:00:00 EDT 2023" } })) {
+				{ "1", "junit", "202", "07/23/23" },
+				{ "2", "testng", "52", "07/23/23" }, { "3", "spock", "22", "07/23/23" },
+				{ "4", "allure", "50", "07/23/23" }, { "5", "хабр", "123", "07/23/23" },
+				{ "6", "разработка", "192", "07/23/23" },
+				{ "7", "фриланс", "83", "07/23/23" } })) {
 			assertThat(sheet, containsRow(texts));
 
 		}
@@ -43,28 +44,22 @@ public class ContainsRowTest {
 
 	@Test
 	public void rowContainsCells_partial() throws IOException {
-		for (String[] texts : Arrays.asList(
-				new String[][] { { "1", "junit", "202" }, { "2", "testng", "52" },
-						{ "3", "spock", "22" }, { "4", "allure", "50" } })) {
+		for (String[] texts : Arrays.asList(new String[][] {
+				{ "1", "junit", "202" }, { "2", "testng", "52" },
+				{ "3", "spock", "22" }, { "4", "allure", "50" }, { "5", "хабр", "123" },
+				{ "6", "разработка", "192" }, { "7", "фриланс", "83" } })) {
 			assertThat(sheet, containsRow(texts));
 
 		}
 	}
 
-	@Ignore
-	@Test
-	public void rowContainsCells_withGaps() throws Exception {
-		assertThat(sheet, containsRow("PP028000"));
-		assertThat(sheet, containsRow("PP028000", "281814930"));
-		assertThat(sheet, containsRow("281814930"));
-		assertThat(sheet, containsRow("Итого по терминалу", "48,271.00"));
-	}
-
 	@Test
 	public void rowContainsCells_noMatch() throws IOException {
-		assertThat(sheet, not(containsRow("foobar")));
-		assertThat(sheet, not(containsRow("2", "testng", "51")));
-		assertThat(sheet, not(containsRow("1", "testng", "52")));
+		for (String[] texts : Arrays.asList(new String[][] { { "foobar" },
+				{ "2", "testng", "51" }, { "2", "testng", "testng", "52" },
+				{ "7", "фриланс", "83", "123", "456" } })) {
+			assertThat(sheet, not(containsRow(texts)));
+		}
 	}
 
 	@Test

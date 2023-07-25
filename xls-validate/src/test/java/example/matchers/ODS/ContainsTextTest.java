@@ -30,8 +30,8 @@ public class ContainsTextTest {
 
 	@Test
 	public void canAssertThatXlsContainsText() throws IOException {
-		for (String text : Arrays
-				.asList(new String[] { "junit", "testng", "allure" })) {
+		for (String text : Arrays.asList(new String[] { "junit", "testng", "allure",
+				"хабр", "разработка", "фриланс", "расчёт" })) {
 			assertThat(sheet, containsText(text));
 		}
 	}
@@ -43,26 +43,29 @@ public class ContainsTextTest {
 
 	@Test
 	public void errorDescriptionForDoesNotContainTextMatcher() {
-		String text = "junit";
-		try {
-			assertThat(sheet, doesNotContainText(text));
-			fail("expected AssertionError");
-		} catch (AssertionError expected) {
-			assertThat(expected.getMessage(), containsString(
-					String.format("Expected: a ODS not containing text \"%s\"", text)));
+		for (String text : Arrays.asList(new String[] { "allure", "хабр" })) {
+			try {
+				assertThat(sheet, doesNotContainText(text));
+				fail("expected AssertionError");
+			} catch (AssertionError expected) {
+				assertThat(expected.getMessage(), containsString(
+						String.format("Expected: a ODS not containing text \"%s\"", text)));
+			}
 		}
 	}
 
 	@Test
 	public void errorDescriptionForContainsTextMatcher() {
-		String text = "wrong text";
-		String message = String.format("Expected: a ODS containing text \"%s\"",
-				text);
-		try {
-			assertThat(sheet, containsText(text));
-			fail("expected AssertionError");
-		} catch (AssertionError expected) {
-			assertThat(expected.getMessage(), containsString(message));
+		for (String text : Arrays.asList(new String[] { "nunit", "кодер" })) {
+
+			String message = String.format("Expected: a ODS containing text \"%s\"",
+					text);
+			try {
+				assertThat(sheet, containsText(text));
+				fail("expected AssertionError");
+			} catch (AssertionError expected) {
+				assertThat(expected.getMessage(), containsString(message));
+			}
 		}
 	}
 }

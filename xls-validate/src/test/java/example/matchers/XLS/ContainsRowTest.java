@@ -18,7 +18,7 @@ public class ContainsRowTest {
 	@Test
 	public void rowContainsCells_all() throws IOException {
 		XLS xls = new XLS(getClass().getClassLoader().getResource("acquiring.xls"));
-		assertThat(xls,
+		assertThat(xls	,
 				containsRow("PP028000",
 						"дом 261Б, ул Семафорная, г Красноярск, 197372, РОССИЯ", "Оплата",
 						"1,021.00", "10.21", "1,010.79", "27.05.2015 00:00:00",

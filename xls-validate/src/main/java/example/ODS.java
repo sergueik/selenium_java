@@ -88,16 +88,12 @@ public class ODS {
 			result = data;
 			break;
 		case DATE:
-			Date date;
-			try {
-				date = new SimpleDateFormat("MM/dd/yy").parse(data);
-			} catch (ParseException e) {
-				date = new Date("01/01/1970");
-			}
-			result = date;
+			// NOTE: too many date formats. Keep reading cell value as plain text
+			result = data;
 			break;
 		case TIME:
-			result = null; // TODO
+			// NOTE: too many time formats. Keep reading cell value as plain text
+			result = data;
 			break;
 		case BOOLEAN:
 			result = Boolean.getBoolean(data);
