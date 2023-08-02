@@ -9,13 +9,8 @@
   <description>A library to access HTTP archive format with Java</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jackson.core.version>2.13.2</jackson.core.version>
-<!-- NOTE: exception from using mimatched versions of jackson.core (2.11.1) and jackson.databind (2.13.2):
-cannot access com.fasterxml.jackson.core.JacksonException
-  class file for com.fasterxml.jackson.core.JacksonException not found
-while there is no explicit reference of JacksonException in the source code
- -->
-    <jackson.databind.version>2.13.2.1</jackson.databind.version>
+    <jackson.core.version>2.13.4</jackson.core.version>
+    <jackson.databind.version>2.13.4.1 </jackson.databind.version>
     <junit.version>4.13.1</junit.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
     <maven-core.version>3.3.1</maven-core.version>

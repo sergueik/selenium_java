@@ -1,4 +1,4 @@
-﻿		### Info
+﻿### Info
 This directory contains basic example of [pdfbox](https://pdfbox.apache.org)-based pdf document text extractor
 
 ###  Usage
@@ -65,5 +65,8 @@ java -cp target\lib\*;target\example.pdf_reader.jar example.ReadingPDF alphabet_
   * legacy [.NET version](https://svn.apache.org/repos/asf/pdfbox/site/publish/userguide/dot_net.html?p=1197837) - needs the [IKVM.NET](http://www.ikvm.net) (implementation of Java for Mono and the Microsoft .NET Framework) - presumably better alternatives exist
  * [PDFsharp](http://pdfsharp.net/?AspxAutoDetectCookieSupport=1) - an .NET library for processing PDF
  * old article on [working with PDF files in C# using PdfBox and IKVM](https://www.codeproject.com/articles/538617/working-with-pdf-files-in-csharp-using-pdfbox-and)
+  * pdfbox-based __PDF testing library__ with misc. custom matchers [repository](https://github.com/codeborne/pdf-test)
+
 ### Author
+
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)

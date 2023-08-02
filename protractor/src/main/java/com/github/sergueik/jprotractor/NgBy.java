@@ -43,7 +43,7 @@ public final class NgBy {
 		int patternFlags = pattern.flags();
 		String patternText = String
 				.format("__REGEXP__/%s/%s%s",
-						pattern.pattern() /* Pattern.quote(pattern.pattern() ) */,
+						pattern.pattern(),
 						((patternFlags
 								& Pattern.CASE_INSENSITIVE) == Pattern.CASE_INSENSITIVE) ? "i"
 										: "",

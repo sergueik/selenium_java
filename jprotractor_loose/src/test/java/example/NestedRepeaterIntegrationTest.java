@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2021 Serguei Kouzmine
+ * Copyright 2021,2023 Serguei Kouzmine
  */
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.Matchers.greaterThan;
@@ -19,6 +19,7 @@ import org.openqa.selenium.WebElement;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
+@SuppressWarnings({ "deprecation" })
 public class NestedRepeaterIntegrationTest extends CommonTest {
 
 	private static List<WebElement> elements = new ArrayList<>();

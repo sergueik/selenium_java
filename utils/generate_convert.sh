@@ -161,6 +161,7 @@ if [[ "${INSPECT}" = 'true' ]]; then
   fi
 
   SIZES=( '1024x768:svga'
+    # 667x500 
     '1024x576:hd480'
     '1920x1080:qhd'
     '800x600:spal'

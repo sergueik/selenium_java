@@ -11,6 +11,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.openqa.selenium.Alert;
@@ -31,7 +32,6 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-@SuppressWarnings("deprecation")
 public class NgPlaceholderTextTest {
 
 	// NOTE: non-Angular page
@@ -58,15 +58,15 @@ public class NgPlaceholderTextTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
 
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	// @Ignore
+	@Ignore
 	@Test
 	public void testNonAngularIgnoreSync() {
 		if (isCIBuild) {

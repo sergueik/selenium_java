@@ -52,9 +52,14 @@ shell_command3: >
 # NOTE: preserve a blank line above to terminate the value
 
 # https://docs.ansible.com/ansible/latest/reference_appendices/YAMLSyntax.html
+# NOTE: the brackets should be present. the following is invalid:
+# compact: "a","b","c"
 compact: ["a","b","c"]
-compact_array: ["a"]
+compact_empty_array: []
 info: {name: John Doe, job: Java Developer, skill: interm}
+# ansible favorite shorthand syntax
+undecorated_compact_info: foo=1 bar=2
+
 
 map_setting:
   boolean_setting: true

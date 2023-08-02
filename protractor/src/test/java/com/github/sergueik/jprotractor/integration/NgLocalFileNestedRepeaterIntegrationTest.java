@@ -84,7 +84,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
-	// @Ignore
+	@Ignore
 	// TODO: report in Angular Protractor / Angular bug that a DOM element between
 	// repeater and binding is needed for the call to succeed:
 	// <ul><li ng:repeat="item in data"><span>{{item.name}}</span></li>
@@ -178,6 +178,7 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 
+	@Ignore
 	@Test
 	public void test2() {
 		getPageContent("ng_local_service.htm");
@@ -198,6 +199,48 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 	}
 
 	// @Ignore
+	@Test
+	public void test5() {
+		getPageContent("ng_nested_repeater2.htm");
+		String payload = null;
+		List<String> keyColumns = Arrays
+				.asList(new String[] { "Chrome", "Firefox" });
+
+		Map<String, String> data = new HashMap<>();
+		for (WebElement element : ngDriver
+				.findElements(NgBy.repeater("row in data"))) {
+			payload = element.getText();
+			if (payload.isEmpty()) {
+				break;
+			}
+			System.err.println("Text of the element: " + payload);
+
+			String[] lines = payload.split("\r?\n");
+			int index = 0;
+			for (index = 0; index != lines.length - 1; index++) {
+				String line = lines[index];
+				Stream<String> keyColumnStream = keyColumns.stream();
+				// NOTE: cannot define keyColumnStream outside of the loop and use more
+				// than once:
+				// java.lang.IllegalStateException:
+				// stream has already been operated upon or closed
+
+				List<String> columns = keyColumnStream.filter(o -> line.contains(o))
+						.collect(Collectors.toList());
+
+				if (columns != null && columns.size() > 0) {
+					String column = columns.get(0);
+					data.put(column, lines[index + 1]);
+				}
+			}
+			System.err.println("data collected: "
+					+ data.entrySet().stream().map(e -> e.getKey() + " " + e.getValue())
+							.collect(Collectors.toList()));
+		}
+
+	}
+
+	@Ignore
 	@Test
 	public void test3() {
 		getPageContent("ng_nested_repeater2.htm");
@@ -273,49 +316,6 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 
-	// @Ignore
-	@Test
-	public void test5() {
-		getPageContent("ng_nested_repeater2.htm");
-		String payload = null;
-		List<String> keyColumns = Arrays
-				.asList(new String[] { "Chrome", "Firefox" });
-
-		Map<String, String> data = new HashMap<>();
-		for (WebElement element : ngDriver
-				.findElements(NgBy.repeater("row in data"))) {
-			payload = element.getText();
-			if (payload.isEmpty()) {
-				break;
-			}
-			System.err.println("Text of the element: " + payload);
-
-			String[] lines = payload.split("\r?\n");
-			int index = 0;
-			for (index = 0; index != lines.length - 1; index++) {
-				String line = lines[index];
-				Stream<String> keyColumnStream = keyColumns.stream();
-				// NOTE: cannot define keyColumnStream outside of the loop and use more
-				// than once:
-				// java.lang.IllegalStateException:
-				// stream has already been operated upon or closed
-
-				List<String> columns = keyColumnStream.filter(o -> line.contains(o))
-						.collect(Collectors.toList());
-
-				if (columns != null && columns.size() > 0) {
-					String column = columns.get(0);
-					data.put(column, lines[index + 1]);
-				}
-			}
-			System.err.println("data collected: "
-					+ data.entrySet().stream().map(e -> e.getKey() + " " + e.getValue())
-							.collect(Collectors.toList()));
-		}
-
-	}
-
-
 	@AfterClass
 	public static void teardown() {
 		ngDriver.close();
@@ -365,4 +365,3 @@ public class NgLocalFileNestedRepeaterIntegrationTest {
 		}
 	}
 }
-

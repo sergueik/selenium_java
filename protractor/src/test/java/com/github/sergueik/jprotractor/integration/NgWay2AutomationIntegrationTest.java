@@ -19,7 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,7 +41,6 @@ import com.github.sergueik.jprotractor.NgBy;
 import com.github.sergueik.jprotractor.NgWebDriver;
 import com.github.sergueik.jprotractor.NgWebElement;
 
-@SuppressWarnings("deprecation")
 public class NgWay2AutomationIntegrationTest {
 
 	private static NgWebDriver ngDriver;
@@ -66,8 +65,9 @@ public class NgWay2AutomationIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
@@ -375,7 +375,7 @@ public class NgWay2AutomationIntegrationTest {
 			// return;
 		} catch (WebDriverException ex) {
 			// fullStackTrace =
-			// org.apache.commons.lang3.exception.ExceptionUtils.getFullStackTrace(ex);
+			// org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(ex);
 			// System.err.println("Alert was not handled by PhantomJS: " +
 			// fullStackTrace);
 			System.err.println("Alert was not handled by PhantomJS: "

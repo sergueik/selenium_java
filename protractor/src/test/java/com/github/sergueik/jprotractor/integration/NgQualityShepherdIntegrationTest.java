@@ -34,7 +34,7 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * ref. Protractor test spec
  * https://github.com/qualityshepherd/protractor_example/specs/friendSpec.js
  */
-@SuppressWarnings("deprecation")
+
 public class NgQualityShepherdIntegrationTest {
 
 	private static NgWebDriver ngDriver;
@@ -59,9 +59,11 @@ public class NgQualityShepherdIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 		CommonFunctions.setHighlightTimeout(1000);

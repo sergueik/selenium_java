@@ -1,10 +1,12 @@
 package example;
 /**
- * Copyright 2021-2022 Serguei Kouzmine
+ * Copyright 2021,2022,2023 Serguei Kouzmine
  */
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -91,7 +93,7 @@ public class App {
 			runProcessls(Arrays.asList(argumentsArray));
 		} else {
 			// generic command
-			runProcess(String.format("%s %s", command, arguments));
+			runProcess(String.format("%s %s", command, arguments), null);
 		}
 		if (debug) {
 			System.err.println("Done: " + command + " " + arguments);
@@ -127,14 +129,37 @@ public class App {
 	public static void runProcessls(List<String> dirs) {
 		final String command = useBash ? buildLsBashcommand(dirs)
 				: buildLscommand(dirs);
-		runProcess(command);
+		runProcess(command, null);
 	}
 
 	// https://www.javaworld.com/article/2071275/core-java/when-runtime-exec---won-t.html?page=2
-	public static void runProcess(String command) {
+	public static void runProcess(String command, String payload) {
+
 		try {
 			Runtime runtime = Runtime.getRuntime();
-			Process process = runtime.exec(command);
+
+			Process process = null;
+
+			if (payload != null) {
+				// see also:
+				// execute the specified string command in a separate process
+				// with the specified environment
+				// http://docs.oracle.com/javase/6/docs/api/java/lang/Runtime.html#exec%28java.lang.String,%20java.lang.String%5B%5D%29
+				String[] envp = { String.format("CONTENT_LENGTH=%d", payload.length()),
+						"REQUEST_METHOD=POST" };
+				System.err.println("Running with environment: " + Arrays.asList(envp));
+				process = runtime.exec(command, envp);
+				BufferedWriter bufferedWriter = new BufferedWriter(
+						new OutputStreamWriter(process.getOutputStream()));
+				System.err.println("Passing the payload: " + payload);
+				// Passing the payload: %7B%22foo%22%3A+%22bar%22%7D=
+				bufferedWriter.write(payload);
+				bufferedWriter.newLine();
+				bufferedWriter.flush();
+				bufferedWriter.close();
+			} else {
+				process = runtime.exec(command);
+			}
 			// process.redirectErrorStream( true);
 
 			BufferedReader stdoutBufferedReader = new BufferedReader(
@@ -143,7 +168,6 @@ public class App {
 			BufferedReader stderrBufferedReader = new BufferedReader(
 					new InputStreamReader(process.getErrorStream()));
 			String line = null;
-
 			StringBuffer processOutput = new StringBuffer();
 			while ((line = stdoutBufferedReader.readLine()) != null) {
 				processOutput.append(line);
@@ -156,13 +180,14 @@ public class App {
 			}
 			int exitCode = process.waitFor();
 			// ignore exit code 128 on Windows: the process "<browser driver>" not
-			// found.
+			// found
 			if (exitCode != 0 && (exitCode ^ 128) != 0) {
 				System.err.println("Process exit code: " + exitCode);
 				if (processOutput.length() > 0) {
 					System.err.println("<OUTPUT>" + ((useQuoteArg)
 							? fixQuotedOutput(processOutput.toString()) : processOutput)
 							+ "</OUTPUT>");
+
 				}
 				if (processError.length() > 0) {
 					System.err.println("<ERROR>" + processError + "</ERROR>");
@@ -173,10 +198,12 @@ public class App {
 							? fixQuotedOutput(processOutput.toString()) : processOutput)
 							+ "</OUTPUT>");
 				}
+
 			}
 		} catch (Exception e) {
 			System.err.println("Exception (ignored): " + e.getMessage());
 		}
+
 	}
 
 	public static String getOSName() {

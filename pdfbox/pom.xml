@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>pdf_reader</artifactId>
-  <version>0.4.0-SNAPSHOT</version>
+  <version>0.5.0-SNAPSHOT</version>
   <name>pdf_reader</name>
   <properties>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <junit.version>4.13.1</junit.version>
-    <commandline-parser.version>0.2.0-SNAPSHOT</commandline-parser.version>
+    <commandline-parser.version>0.8.0-SNAPSHOT</commandline-parser.version>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
@@ -17,6 +17,7 @@
     <maven-dependency-plugin.version>3.1.1</maven-dependency-plugin.version>
     <maven-jar-plugin.version>3.0.2</maven-jar-plugin.version>
     <maven.compiler.source>1.8</maven.compiler.source>
+    <pdfbox.version>2.0.20</pdfbox.version>
   </properties>
   <dependencies>
     <dependency>
@@ -56,7 +57,7 @@
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
-      <version>2.0.20</version>
+      <version>${pdfbox.version}</version>
     </dependency>
   </dependencies>
   <build>

@@ -5,16 +5,19 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Platform;
@@ -32,9 +35,7 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.openqa.selenium.Platform;
 
 /**
  * Common functions for integration testing
@@ -56,10 +57,11 @@ public class CommonFunctions {
 	static boolean isCIBuild = false;
 	private static long highlightInterval = 100;
 	private static Map<String, String> env = System.getenv();
-	private static final String browser = "chrome";
 	private static String chromeDriverPath = null;
-	private static String osName = null;
-
+	private static final String browser = "chrome";
+	protected static String osName = getOSName();
+	// private static String osName = System.getProperty("os.name");
+	
 	@SuppressWarnings("deprecation")
 	public static WebDriver getSeleniumDriver() throws IOException {
 		checkEnvironment();
@@ -69,17 +71,20 @@ public class CommonFunctions {
 			// For Vagrant box browser testing have localhost port 4444 forwarded to
 			// the hub 4444
 			// Alternatively make the test class launch the browser
-			osName = System.getProperty("os.name");
+
 			if (browser.equals("chrome")) {
+								
 				System.setProperty("webdriver.chrome.driver",
-						new File((chromeDriverPath == null)
-								? osName.toLowerCase().startsWith("windows")
-										? "C:\\java\\selenium\\chromedriver.exe"
-										: "/tmp/chromedriver"
-								: chromeDriverPath).getAbsolutePath());
+						osName.equals("windows")
+								? (new File("c:/java/selenium/chromedriver.exe"))
+										.getAbsolutePath()
+								: Paths.get(System.getProperty("user.home")).resolve("Downloads")
+										.resolve("chromedriver").toAbsolutePath().toString());
+
+				// https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/remote/DesiredCapabilities.html#%3Cinit%3E(java.lang.String,java.lang.String,org.openqa.selenium.Platform)
 				// DesiredCapabilities capabilities = DesiredCapabilities.chrome();
-				DesiredCapabilities capabilities = new DesiredCapabilities();
-				capabilities.setBrowserName("chrome");
+				DesiredCapabilities capabilities = new DesiredCapabilities("chrome", "",
+						Platform.ANY);
 				ChromeOptions options = new ChromeOptions();
 
 				Map<String, Object> chromePrefs = new HashMap<>();
@@ -100,45 +105,56 @@ public class CommonFunctions {
 						"--browser.helperApps.neverAsk.saveToDisk=image/jpg,text/csv,text/xml,application/xml,application/vnd.ms-excel,application/x-excel,application/x-msexcel,application/excel,application/pdf");
 				options.addArguments("browser.download.dir=" + downloadFilepath);
 				// options.addArguments("user-data-dir=/path/to/your/custom/profile");
-				// capabilities
-				// .setBrowserName(DesiredCapabilities.chrome().getBrowserName());
-
-				capabilities.setBrowserName("chrome");
-
+				capabilities.setBrowserName(
+						(new DesiredCapabilities("chrome", "", Platform.ANY))
+								.getBrowserName());
 				capabilities.setCapability(ChromeOptions.CAPABILITY, options);
 				capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
-				seleniumDriver = new ChromeDriver(capabilities);
+				// TODO: recover the code
+				// https://stackoverflow.com/questions/25616227/chrome-driver-with-selenium-no-suitable-constructor-found-for-remotewebdriver
+				// seleniumDriver = new ChromeDriver(capabilities);
+				seleniumDriver = new ChromeDriver();
 			} else if (browser.equals("firefox")) {
 				// alternatively one can add Geckodriver to system path
 				System.setProperty("webdriver.gecko.driver",
 						"c:/java/selenium/geckodriver.exe");
 				// https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities
+				// https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/remote/DesiredCapabilities.html#%3Cinit%3E(java.lang.String,java.lang.String,org.openqa.selenium.Platform)
 				// DesiredCapabilities capabilities = DesiredCapabilities.firefox();
-				DesiredCapabilities capabilities = new DesiredCapabilities();
-				capabilities.setBrowserName("firefox");
-
+				DesiredCapabilities capabilities = new DesiredCapabilities("firefox",
+						"", Platform.ANY);
 				// use legacy FirefoxDriver
 				capabilities.setCapability("marionette", false);
 				// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.selenium.firefox.FirefoxProfile
 				capabilities.setCapability("locationContextEnabled", false);
 				capabilities.setCapability("acceptSslCerts", true);
 				capabilities.setCapability("elementScrollBehavior", 1);
+
 				FirefoxProfile profile = new FirefoxProfile();
 				profile.setAcceptUntrustedCertificates(true);
 				profile.setAssumeUntrustedCertificateIssuer(true);
+				// https://automated-testing.info/t/perehvat-logov-selenium-i-geckodriver-v-log4j2/21505
+				profile.setPreference("webdriver.firefox.logfile", "/dev/nul");
+				// The setting appears to have no effect.
+				// NOTE: does one need os-specific definition of /dev/null (like nul in
+				// Windows case) ?
+
 				// no longer supported as of Selenium 3.8.x
 				// profile.setEnableNativeEvents(false);
 
 				System.out.println(System.getProperty("user.dir"));
-				// TODO: probably won't work with simply "profile"
-				capabilities.setCapability("profile", profile);
+				// TODO: recover
 				// capabilities.setCapability(FirefoxDriver.PROFILE, profile);
 				try {
 					// java.lang.ClassCastException:
 					// org.openqa.selenium.remote.service.DriverCommandExecutor cannot be
 					// cast to
 					// org.openqa.selenium.firefox.FirefoxDriver$LazyCommandExecutor
-					seleniumDriver = new FirefoxDriver(capabilities);
+					
+					// TODO: recover the code
+					// https://stackoverflow.com/questions/25616227/chrome-driver-with-selenium-no-suitable-constructor-found-for-remotewebdriver
+					// seleniumDriver = new FirefoxDriver(capabilities);
+					seleniumDriver = new FirefoxDriver();
 				} catch (WebDriverException e) {
 					e.printStackTrace();
 					throw new RuntimeException("Cannot initialize Firefox driver");
@@ -200,10 +216,10 @@ public class CommonFunctions {
 
 	public static void highlight(WebElement element) {
 		if (wait == null) {
-			// wait = new WebDriverWait(seleniumDriver, flexibleWait);
 			wait = new WebDriverWait(seleniumDriver,
 					Duration.ofSeconds(flexibleWait));
 			wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		}
 		try {
 			wait.until(ExpectedConditions.visibilityOf(element));
@@ -227,9 +243,7 @@ public class CommonFunctions {
 	// custom wait e.g. while Login light box is visible
 	public static void waitWhileElementIsVisible(By locator) {
 		final By _locator = locator;
-		// new WebDriverWait(seleniumDriver, flexibleWait)
 		new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait))
-
 				.pollingEvery(Duration.ofMillis(pollingInterval))
 				.until(new ExpectedCondition<Boolean>() {
 					@Override
@@ -239,6 +253,17 @@ public class CommonFunctions {
 					}
 				});
 
+	}
+	
+	// Utilities
+	public static String getOSName() {
+		if (osName == null) {
+			osName = System.getProperty("os.name").toLowerCase();
+			if (osName.startsWith("windows")) {
+				osName = "windows";
+			}
+		}
+		return osName;
 	}
 
 	public static String getPropertyEnv(String name, String defaultValue) {

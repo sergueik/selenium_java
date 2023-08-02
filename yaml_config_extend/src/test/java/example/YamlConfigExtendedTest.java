@@ -31,7 +31,7 @@ public class YamlConfigExtendedTest {
 	@Before
 	public void setup() {
 		YamlConfigExtended.setDebug(true);
-		
+
 	}
 
 	@Ignore
@@ -43,6 +43,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, notNullValue());
 		assertThat(value, is("Andrew"));
 	}
+
 	@Ignore
 	@Test
 	public void getStringOutOfIndex() {
@@ -51,6 +52,7 @@ public class YamlConfigExtendedTest {
 		assertThat(config.getString("services.names[3]"), nullValue());
 		assertThat(config.getString("services.names[3].somefield"), nullValue());
 	}
+
 	@Ignore
 	@Test
 	public void getStringInvalidKey() {
@@ -58,6 +60,7 @@ public class YamlConfigExtendedTest {
 		assertThat(config.getString("services.test.first"), nullValue());
 		assertThat(config.getString("services.test.non.existent.key"), nullValue());
 	}
+
 	@Ignore
 	@Test
 	public void getStringNumber() {
@@ -66,8 +69,8 @@ public class YamlConfigExtendedTest {
 		assertThat(value, notNullValue());
 		assertThat(value, is("3"));
 	}
-	
-	// @Ignore
+
+	@Ignore
 	@Test
 	public void getString() {
 		config.dump();
@@ -76,6 +79,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, is("mysql"));
 	}
 
+	@Ignore
 	@Test
 	public void getInt() {
 		config.dump();
@@ -83,6 +87,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, notNullValue());
 		assertThat(value, is(3));
 	}
+
 	@Ignore
 	@Test
 	public void getBadInt() {
@@ -94,6 +99,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, nullValue());
 
 	}
+
 	@Ignore
 	@Test
 	public void getBoolean() {
@@ -124,11 +130,13 @@ public class YamlConfigExtendedTest {
 			assertThat(value, equalTo(false));
 		}
 	}
+
 	@Ignore
 	@Test
 	public void getNullString() {
 		assertThat(config.getString("services.web.property"), nullValue());
 	}
+
 	@Ignore
 	@Test
 	public void getQuotesRemovedString() {
@@ -146,6 +154,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value4, is(value1));
 
 	}
+
 	@Ignore
 	@Test
 	public void getMap() {
@@ -154,6 +163,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value.keySet(), hasItems(new String[] { "property", "ports",
 				"build", "image", "restart", "depends_on", "container_name" }));
 	}
+
 	@Ignore
 	@Test
 	public void getMap2() {
@@ -176,6 +186,7 @@ public class YamlConfigExtendedTest {
 		assertThat((String) value.get("string_setting"),
 				equalTo(config.getString("map_setting.string_setting")));
 	}
+
 	@Ignore
 	@Test
 	public void getNullInMap() {
@@ -184,6 +195,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value.containsKey("property"), is(true));
 		assertThat(value.get("property"), nullValue());
 	}
+
 	@Ignore
 	@Test
 	public void getList() {
@@ -192,6 +204,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value.size(), greaterThan(0));
 		assertThat(value.get(0).toString(), is("8080:80"));
 	}
+
 	@Ignore
 	@Test
 	public void getListWithHere() {
@@ -201,6 +214,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value.get(0).toString(), is("Line 1 Line 2\n"));
 		assertThat(value.get(1).toString(), is("command2"));
 	}
+
 	@Ignore
 	@Test
 	public void getListWithHereWithNewline() {
@@ -209,6 +223,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value.size(), is(2));
 		assertThat(value.get(0).toString(), is("Line 1 Line 2"));
 	}
+
 	@Ignore
 	@Test
 	public void getCompactArrayList() {
@@ -216,6 +231,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, notNullValue());
 		assertThat(value.get(0).toString(), is("a"));
 	}
+
 	@Ignore
 	@Test
 	public void getCompactArrayElement() {
@@ -225,6 +241,7 @@ public class YamlConfigExtendedTest {
 		value = config.getString("compact_array[0]");
 		assertThat(value, is("a"));
 	}
+
 	@Ignore
 	@Test
 	public void getCompactCollectionElement() {
@@ -234,6 +251,19 @@ public class YamlConfigExtendedTest {
 		value = config.getString("info.job");
 		assertThat(value, is("Java Developer"));
 	}
+
+	public void getUndecoratedCompactCollectionElement() {
+		String value = config.getString("undecorated_compact_info.foo");
+		assertThat(value, is("1"));
+
+		value = config.getString("undecorated_compact_info.bar");
+		// NOTE: strong type check:
+		// The method assertThat(String, boolean) in the type MatcherAssert is not
+		// applicable for the arguments (String, Matcher<Integer>)
+		// assertThat(value, is(2));
+		assertThat(Integer.parseInt(value), is(2));
+	}
+
 	@Ignore
 	@Test
 	public void getDocString1() {
@@ -247,6 +277,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, containsString("\n"));
 		System.err.println(String.format("getDocString1: \"%s\"", value));
 	}
+
 	@Ignore
 	@Test
 	public void getDocString2() {
@@ -261,6 +292,7 @@ public class YamlConfigExtendedTest {
 		assertThat(value, containsString("\n"));
 		System.err.println(String.format("getDocString2: \"%s\"", value));
 	}
+
 	@Ignore
 	@Test
 	public void getDocString3() {

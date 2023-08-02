@@ -4,12 +4,10 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
+import org.apache.commons.lang.exception.ExceptionUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -25,7 +23,6 @@ import com.github.sergueik.jprotractor.NgWebDriver;
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
 
-@SuppressWarnings("deprecation")
 public class NgCustomWaitIntegrationTest {
 	private static NgWebDriver ngDriver;
 	private static WebDriver seleniumDriver;
@@ -42,9 +39,12 @@ public class NgCustomWaitIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}
 
@@ -87,7 +87,7 @@ public class NgCustomWaitIntegrationTest {
 			System.out.println("Exception (ignored): " + e.toString());
 		} catch (Exception e) {
 			throw new RuntimeException(String.format(
-					"Unexpected exception: " + ExceptionUtils.getRootCauseMessage(e)));
+					"Unexpected exception: " + ExceptionUtils.getFullStackTrace(e)));
 		}
 	}
 

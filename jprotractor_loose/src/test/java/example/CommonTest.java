@@ -44,7 +44,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 /**
  * Integration tests of Calculator http://juliemr.github.io/protractor-demo/
  * without actually using NgWebDriver class at Java level
- * but not using
+ * but using individual Javascript methods of Protractor library injected in the browser
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  * 
  */

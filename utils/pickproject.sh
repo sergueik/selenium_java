@@ -1,6 +1,6 @@
 #!/bin/bash
 PROJECT=$1
-if [ -z $PROJECT ] ; then
+if [ -z "${PROJECT}" ] ; then
   PROJECT=$(pwd | sed 's|^.*/||') # current directory
 else
   mkdir $PROJECT

@@ -30,7 +30,6 @@ import com.github.sergueik.jprotractor.NgWebElement;
  * 
  * @author Serguei Kouzmine (kouzmine_serguei@yahoo.com)
  */
-@SuppressWarnings("deprecation")
 
 public class NgDragDropIntegrationTest {
 	private static NgWebDriver ngDriver;
@@ -57,9 +56,11 @@ public class NgDragDropIntegrationTest {
 		seleniumDriver.manage().timeouts().pageLoadTimeout(50, TimeUnit.SECONDS)
 				.implicitlyWait(implicitWait, TimeUnit.SECONDS)
 				.setScriptTimeout(10, TimeUnit.SECONDS);
-		// wait = new WebDriverWait(seleniumDriver, flexibleWait);
-		wait = new WebDriverWait(seleniumDriver, Duration.ofSeconds(flexibleWait));
+		wait = new WebDriverWait(seleniumDriver,
+				Duration.ofSeconds(flexibleWait));
+
 		wait.pollingEvery(Duration.ofMillis(pollingInterval));
+
 		actions = new Actions(seleniumDriver);
 		ngDriver = new NgWebDriver(seleniumDriver);
 	}

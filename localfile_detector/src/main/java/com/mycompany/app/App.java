@@ -74,7 +74,7 @@ import static org.junit.Assert.assertTrue;
 public class App {
 
 	private static WebDriver driver;
-	static String baseUrl = "http://www.freetranslation.com/";
+	static String baseUrl = "https://www.freetranslations.org/";
 	static int flexible_wait_interval = 5;
 	static long implicit_wait_interval = 3;
 	static long wait_polling_interval = 500;
@@ -126,9 +126,8 @@ public class App {
 	public static void testUpload() throws Exception {
 
 		// Wait for the page to load ( check that logo / title is updated )
-		WebElement element = driver.findElement(By.cssSelector("a.brand"));
-		assertThat(element.getAttribute("title"),
-				containsString("Translate text, documents and websites for free"));
+		WebElement element = driver.findElement(By.cssSelector("div.logo img"));
+		assertThat(element.getAttribute("alt"), containsString("freetranslation"));
 
 		// optional:
 		// driver.manage().window().maximize();

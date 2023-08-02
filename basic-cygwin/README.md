@@ -10,18 +10,54 @@ mvn package
 ```
 * run via `CLASSPATH`:
 ```
-java -cp target\example.cygwin.jar;target\lib\* example.App /var/log
+java -cp target\example.cygwin.jar;target\lib\* example.App -command ls -arguments /var/log -debug
 ```
+
 this outputs
-```cmd
-Listing the dirs: [/var/log]
-Running the command: c:\cygwin\bin\bash.exe -c "/bin/ls -Q $0 $1 $2 $3 $4 $5 $6 $7 $8 $9" /var/log
 ```
-```cmd
+command: ls
+arguments: /var/log
+args: []
+All optons:
+ls
+/var/log
+null
+Listing the dirs: /var/log
 <OUTPUT>lastlog
 setup.log
 setup.log.full
-sshd.log</OUTPUT>
+sshd.log
+</OUTPUT>
+Done: ls /var/log
+```
+
+
+```cmd
+java -cp target\example.cygwin.jar;target\lib\* example.App -command ls -arguments /var/log -debug -bash
+```
+this outputs
+```text
+command: ls
+arguments: /var/log
+args: []
+All optons:
+ls
+/var/log
+null
+null
+Listing the dirs: /var/log
+<OUTPUT>lastlog
+setup.log
+setup.log.full
+sshd.log
+
+
+
+
+
+
+</OUTPUT>
+Done: ls /var/log
 ```
 
 This matches the output of the
@@ -39,7 +75,7 @@ sshd.log
 
 * try non existent dir, to trigger error:
 ```cmd
-java -cp target\example.cygwin.jar;target\lib\* example.App /baddir
+java -cp target\example.cygwin.jar;target\lib\* example.App -c ls -a /baddir
 ```
 
 ```cmd
