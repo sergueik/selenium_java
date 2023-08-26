@@ -3,8 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>yamlconfig_extend</artifactId>
-  <version>0.6.1-SNASHOT</version>
-  <name>yamlconfigi_extend</name>
+  <version>0.7.0-SNASHOT</version>
+  <name>yamlconfig_extend</name>
   <description>serialize application configuration in YAML file and support classpath-style dotted notation.</description>
   <properties>
     <hamcrest-all.version>1.3</hamcrest-all.version>
