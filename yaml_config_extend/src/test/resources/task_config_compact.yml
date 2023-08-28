@@ -1,8 +1,0 @@
----
-!!example.Configuration
-# the type is optional
-services:
-  - microservice: {image: 'mysql:latest', name: db}
-  - microservice: {image: 'alpine:python', name: web}
-settings: {boolean_setting: true, integer_setting: 100, string_setting: value}
-version: '2.0'
