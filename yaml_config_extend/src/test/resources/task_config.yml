@@ -1,0 +1,18 @@
+---
+!!example.Configuration
+# require for ???
+services: 
+  - microservice:
+      name: db
+      image: mysql
+  - microservice:      
+      name: web
+      image: apache
+
+settings:
+  boolean_setting: true
+  integer_setting: 42
+  string_setting: somethings
+
+version: 3
+      
