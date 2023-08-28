@@ -52,6 +52,7 @@ public class SnakeStronglyTypedYamlTest {
 	private Yaml yaml1;
 	private Yaml yaml2;
 	private Yaml yaml3;
+	private Yaml yaml4;
 
 	private String text;
 	private final String yamlFile1 = "task_config.yml";
@@ -76,6 +77,7 @@ public class SnakeStronglyTypedYamlTest {
 		dumperOptions.setPrettyFlow(true);
 		dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
 		yaml3 = new Yaml(dumperOptions);
+		yaml4 = new Yaml(new Constructor(ComplexConfiguration.class));
 	}
 
 	@After
@@ -90,27 +92,27 @@ public class SnakeStronglyTypedYamlTest {
 
 		Settings settings = new Settings(true, 100, "value");
 		Microservice microservice = new Microservice("db", "mysql:latest");
-		Services services = new Services(
-				Arrays.asList(new Microservice[] { microservice }));
+		Services services = new Services(microservice);
 		String version = "2.0";
-		Configuration object3 = new Configuration(version, services, settings);
+		Configuration object3 = new Configuration(version,
+				Arrays.asList(new Services[] { services }), settings);
 		String output = yaml3.dump(object3);
 
 		System.err.println("test3 result (with indentation):" + "\n" + output);
 	}
 
-	// see also:
-	// https://stackabuse.com/reading-and-writing-yaml-files-in-java-with-snakeyaml/
 	@Test
 	public void test4() /* throws IOException */ {
 
 		Settings settings = new Settings(true, 100, "value");
 		Microservice microservice1 = new Microservice("db", "mysql:latest");
 		Microservice microservice2 = new Microservice("web", "alpine:python");
-		Services services = new Services(
-				Arrays.asList(new Microservice[] { microservice1, microservice2 }));
+		Services services1 = new Services(microservice1);
+		Services services2 = new Services(microservice2);
+
 		String version = "2.0";
-		Configuration object3 = new Configuration(version, services, settings);
+		Configuration object3 = new Configuration(version,
+				Arrays.asList(new Services[] { services1, services2 }), settings);
 		String output = yaml2.dump(object3);
 
 		System.err.println("test4 result:" + output);
@@ -134,8 +136,7 @@ public class SnakeStronglyTypedYamlTest {
 		// System.err.println("Configuration: " + object2);
 	}
 
-	// @Ignore
-	@Test(expected = ConstructorException.class)
+	@Test(/* expected = ConstructorException.class */)
 	public void test2() throws ConstructorException, IOException {
 		try {
 			text = readAll(resource1);
@@ -155,6 +156,15 @@ public class SnakeStronglyTypedYamlTest {
 	public void test5() throws IOException {
 		text = readAll(resource2);
 		Configuration object2 = (Configuration) yaml2.load(text);
+		assertThat(object2, notNullValue());
+		System.err.println("Configuration:  " + object2);
+	}
+
+	// @Ignore
+	@Test(expected = ConstructorException.class)
+	public void test6() throws IOException {
+		text = readAll(resource3);
+		ComplexConfiguration object2 = (ComplexConfiguration) yaml4.load(text);
 		assertThat(object2, notNullValue());
 		System.err.println("Configuration:  " + object2);
 	}

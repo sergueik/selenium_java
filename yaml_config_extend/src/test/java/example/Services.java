@@ -3,20 +3,20 @@ package example;
 import java.util.List;
 
 public class Services {
-	private List<Microservice> microservice;
+	private Microservice microservice;
 
 	public Services() {
 	}
 
-	public Services(List<Microservice> microservice) {
+	public Services(Microservice microservice) {
 		this.microservice = microservice;
 	}
 
-	public List<Microservice> getMicroservice() {
+	public Microservice getMicroservice() {
 		return microservice;
 	}
 
-	public void setMicroservice(List<Microservice> microservice) {
+	public void setMicroservice(Microservice microservice) {
 		this.microservice = microservice;
 	}
 

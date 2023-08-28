@@ -5,7 +5,7 @@ import java.util.List;
 public class Configuration {
 	private String version;
 	// NOTE: has to be named "Services" , not "Service"
-	private Services services;
+	private List<Services> services;
 	private Settings settings;
 
 	public Settings getSettings() {
@@ -16,7 +16,8 @@ public class Configuration {
 		this.settings = settings;
 	}
 
-	public Configuration(String version, Services services, Settings settings) {
+	public Configuration(String version, List<Services> services,
+			Settings settings) {
 		this.version = version;
 		this.services = services;
 		this.settings = settings;
@@ -33,11 +34,11 @@ public class Configuration {
 		this.version = version;
 	}
 
-	public Services getServices() {
+	public List<Services> getServices() {
 		return services;
 	}
 
-	public void setServices(Services services) {
+	public void setServices(List<Services> services) {
 		this.services = services;
 	}
 }
