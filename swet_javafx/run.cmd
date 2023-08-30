@@ -9,7 +9,7 @@ if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
 if "%JAVA_HOME%"=="" set JAVA_HOME=%TOOLS_DIR%\jdk%JAVA_VERSION%
 set JAVA_OPTS=-Xms256m -Xmx512m
 
-if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.6.1
+if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.3.9
 if "%M2_HOME%"=="" set M2_HOME=%TOOLS_DIR%\apache-maven-%MAVEN_VERSION%
 if "%M2%"=="" set M2=%M2_HOME%\bin
 
