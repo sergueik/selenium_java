@@ -9,5 +9,7 @@ if errorlevel 1 goto :SKIP
 call mvn package
 echo done
 :SKIP
-java -cp target\example.javafx_markdown.jar;target\lib\*.* example.Example
+REM the *.* mask should not be used here
+java -cp target\example.javafx_markdown.jar;target\lib\* example.Example
 REM java -jar target\example.javafx_markdown.jar
+
