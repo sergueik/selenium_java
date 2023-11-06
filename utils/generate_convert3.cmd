@@ -25,26 +25,26 @@ set RUN=c:\temp\convert0374.cmd
 :BEGIN
 echo @echo OFF
 echo SETLOCAL ENABLEDELAYEDEXPANSION
-echo set /a N=%%RANDOM%%
-echo set /a N=^^!N^^! %%%% 20
-echo echo N=^^!N^^!
-echo set N=%%1
-echo timeout.exe /T ^^!N^^! /nobreak
+echo set /a DELAY=%%RANDOM%%
+echo set /a DELAY=^^!DELAY^^! %%%% 10 + 1
+echo echo DELAY=^^!DELAY^^!
+echo set DELAY=%%1
+echo timeout.exe /T ^^!DELAY^^! /nobreak
 echo goto :EOF
-echo PATH=%PATH%;C:\tools\ffmpeg-4.0.2-win64-static\bin
+echo PATH=%%PATH%%;C:\tools\ffmpeg-4.0.2-win64-static\bin
 REM Using
 REM ffprobe.exe
 REM ffmpeg.exe
 
 REM dir /b/s *.!EXT!
 for /F "tokens=*" %%. in ('dir /b/s *.!EXT!') do (
-set D=%%~dp.
-set S=%%~nx.
-set T=%%~n..mkv
-if NOT "!D!" equ "." echo 1^>NUL 2^>NUL pushd "!D!"
-echo if NOT exist "!T!" ^(
-echo ffmpeg.exe -i "!S!" -c:v vp9 -s !SIZE! -v 0 "!T!"
+set DIRECTORY=%%~dp.
+set INPUTFILE=%%~nx.
+set OUTPUTFILE=%%~n..mkv
+if NOT "!DIRECTORY!" equ "." echo 1^>NUL 2^>NUL pushd "!DIRECTORY!"
+echo if NOT exist "!OUTPUTFILE!" ^(
+echo ffmpeg.exe -i "!INPUTFILE!" -c:v vp9 -s !SIZE! -v 0 "!OUTPUTFILE!"
 echo ^)
-if NOT "!D!" equ "." echo 1^>NUL 2^>NUL popd
+if NOT "!DIRECTORY!" equ "." echo 1^>NUL 2^>NUL popd
 )
 goto :EOF

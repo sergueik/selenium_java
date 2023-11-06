@@ -27,32 +27,21 @@ set RUN=c:\temp\convert0374.cmd
 echo @echo OFF >%RUN%
 
 echo SETLOCAL ENABLEDELAYEDEXPANSION >>%RUN%
-echo set /a N=%%RANDOM%% >>%RUN%
-echo set /a N=^^!N^^! %%%% 20 >>%RUN%
-echo set N=%%1 >>%RUN%
-echo echo N=^^!N^^! >>%RUN%
-echo echo timeout.exe /T ^^!N^^! /nobreak >>%RUN%
-echo if NOT "^^!N^^!" equ "" timeout.exe /T ^^!N^^! /nobreak >>%RUN%
-REM echo goto :EOF >>%RUN%
+echo set DELAY=%%1 >>%RUN%
+echo echo DELAY=^^!DELAY^^! >>%RUN%
+echo echo timeout.exe /T ^^!DELAY^^! /nobreak >>%RUN%
+echo if NOT "^^!DELAY^^!" equ "" timeout.exe /T ^^!DELAY^^! /nobreak >>%RUN%
 echo echo Start >>%RUN%
-echo PATH=%PATH%;C:\tools\ffmpeg-4.0.2-win64-static\bin >>%RUN%
+echo PATH=%%PATH%%;C:\tools\ffmpeg-4.0.2-win64-static\bin >>%RUN%
 for /F "tokens=*" %%. in ('dir /b/s *.!EXT!') do (
-set D=%%~dp.
-set S=%%~nx.
-set T=%%~n..mkv
-if NOT "!D!" equ "." echo 1^>NUL 2^>NUL pushd "!D!" >>%RUN%
-echo if NOT exist "!T!" ^( >>%RUN%
-echo C:\tools\ffmpeg-4.0.2-win64-static\bin\ffmpeg.exe -i "!S!" -c:v vp9 -s !SIZE! -v 0 "!T!" >>%RUN%
+set DIRECTORY=%%~dp.
+set INPUTFILE=%%~nx.
+set OUTPUTFILE=%%~n..mkv
+if NOT "!DIRECTORY!" equ "." echo 1^>NUL 2^>NUL pushd "!DIRECTORY!" >>%RUN%
+echo if NOT exist "!OUTPUTFILE!" ^( >>%RUN%
+echo C:\tools\ffmpeg-4.0.2-win64-static\bin\ffmpeg.exe -i "!INPUTFILE!" -c:v vp9 -s !SIZE! -v 0 "!OUTPUTFILE!" >>%RUN%
 echo ^)  >>%RUN%
-if NOT "!D!" equ "." echo 1^>NUL 2^>NUL popd >>%RUN%
+if NOT "!DIRECTORY!" equ "." echo 1^>NUL 2^>NUL popd >>%RUN%
 )
-for /L %%. in ( 1 1 4) do (
- set /a N=!RANDOM!
- set /a N=!N! %% 10
- set /a N=!N! + 1
- echo start cmd /c %RUN%  !N!
- REM set /A N=%%.
- REM echo start cmd /c %RUN% !N!
- start cmd /c %RUN%  !N!
-)
+for /L %%. in ( 1 1 4) do set /a DELAY=!RANDOM! %% 10 + 1 &&start cmd /c %RUN% !DELAY!
 goto :EOF
