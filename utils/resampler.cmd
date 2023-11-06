@@ -54,13 +54,13 @@ for  %OPT% %%_ in (*.flac) do (
 )
 
 :WAIT_FOR_PROCESS
-echo Wait untill all processes finish
+
 rem Wait untill all processes finish
-C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
-set IMAGENAME=ReSampler.exe
-for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH') do (
-    if "%%_" == "!IMAGENAME!" (
-        rem There is still at least one instance of the ReSampler.exe tool running
+timeout.exe /T !TIMEOUT! /nobreak 
+set TOOL=ReSampler.exe
+for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH') do (
+    if "%%_" == "!TOOL!" (
+        rem There is still at least one instance of the !TOOL! running
         goto :WAIT_FOR_PROCESS
     )
 )
@@ -71,14 +71,14 @@ goto :EOF
 
 REM use trick from https://devblogs.microsoft.com/oldnewthing/20110825-00/?p=9803
 :COUNT_FOR_PROCESS
-echo Wait untill at least one processes finish
-rem Wait untill at least one processes finish
-C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
-set IMAGENAME=ReSampler.exe
+
+rem Wait untill at least one !TOOL! process finishes
+timeout.exe /T !TIMEOUT! /nobreak 
+set TOOL=ReSampler.exe
 set /A RUNNING_PPOCESS_COUNT=0
-for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH ^| C:\Windows\System32\find.exe /i "!IMAGENAME!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
+for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH ^| C:\Windows\System32\find.exe /i "!TOOL!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
     set /A RUNNING_PPOCESS_COUNT=%%_
-    echo !RUNNING_PPOCESS_COUNT! !IMAGENAME! is running
+    echo !RUNNING_PPOCESS_COUNT! !TOOL! processes are running
     if !RUNNING_PPOCESS_COUNT! equ !MAX_PROCESSES! (
        goto :COUNT_FOR_PROCESS
     )
