@@ -56,7 +56,7 @@ for  %OPT% %%_ in (*.flac) do (
 :WAIT_FOR_PROCESS
 
 rem Wait untill all processes finish
-timeout.exe /T !TIMEOUT! /nobreak 
+C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
 set TOOL=ReSampler.exe
 for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH') do (
     if "%%_" == "!TOOL!" (
@@ -73,7 +73,7 @@ REM use trick from https://devblogs.microsoft.com/oldnewthing/20110825-00/?p=980
 :COUNT_FOR_PROCESS
 
 rem Wait untill at least one !TOOL! process finishes
-timeout.exe /T !TIMEOUT! /nobreak 
+C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
 set TOOL=ReSampler.exe
 set /A RUNNING_PPOCESS_COUNT=0
 for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH ^| C:\Windows\System32\find.exe /i "!TOOL!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
