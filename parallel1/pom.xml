@@ -10,6 +10,7 @@
   <!--  // TODO: https://github.com/maven-download-plugin/maven-download-plugin -->
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <commons-io.version>2.7</commons-io.version>
     <junit.version>4.13.1</junit.version>
     <selenium.version>2.53.0</selenium.version>
     <maven-compiler-plugin.version>2.0.2</maven-compiler-plugin.version>
@@ -54,7 +55,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>${commons-io.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
