@@ -69,6 +69,10 @@ ascii;,
 2021-09-19 18:41:39  [main] - INFO  Waiting for 30000 millisecond
 2021-09-19 18:42:09  [main] - INFO  C:\TEMP\pidfile.txt data:2832
 2021-09-19 18:42:09  [main] - INFO  is alive: true
+2021-09-19 18:42:20  [main] - INFO  Running the command: [cmd, /c, tasklist /FI "PID eq 2832"]
+2021-09-19 18:42:29  [main] - INFO  is alive (Windows version): true
+2021-09-19 18:42:49  [main] - INFO  Killing the process pid: 2832
+```
 2021-09-19 18:42:09  [main] - INFO  Killing the process pid: 2832
 ```
 NOTE the doubled commas in the `ProcessBuilder arguments` above is expected - needed to build Powershell's `start-process` `ArgumentListt` part:
@@ -122,6 +126,15 @@ currentdir: C:\developer\sergueik\selenium_java\basic-processhandle
 path:C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\local\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\usr\bin;C:\Program Files\Git\mingw64\bin;C:\Program Files\Git\usr\bin;C:\Users\sergueik\bin;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0;c:\java\zulu11.45.27-ca-jdk11.0.10-win_x64\bin
 ```
 without `--debug` flag there will be no logging
+
+### TODO
+<!-- invalid flag: --release 
+TODO: profiles -->
+can not use the XML comment:
+```text
+[ERROR]     Non-parseable POM c:\developer\sergueik\selenium_java\basic-processhandle\pom.xml: in comment after two dashes (--) next character must be > not r (  position: END_TAG seen ...<target>${java.version}</target>\r\n<!-- invalid flag:
+ --r... @85:23)  @ line 85, column 23 -> [Help 2]
+```
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html

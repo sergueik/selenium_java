@@ -1,7 +1,7 @@
 package example;
 
 /**
- * Copyright 2021,2022 Serguei Kouzmine
+ * Copyright 2021,2022,2024 Serguei Kouzmine
  */
 
 import java.io.BufferedReader;
@@ -106,6 +106,10 @@ public class App {
 				int pid = launcher.getPid();
 				boolean isAlive = isProcessIdRunning(pid);
 				logger.info("is alive: " + isAlive);
+				isAlive = isProcessIdRunningOnWindows(pid);
+				logger.info("is alive (Windows version): " + isAlive);
+				
+				
 				killProcess(pid);
 			}
 		} catch (ParseException e) {
