@@ -18,16 +18,18 @@ public class InvalidPdfTest {
 	public void throws_IOException_ifFailedToReadPdfFile() throws IOException {
 		new PDF(new File("src/test/resources/invalid-file.pdf"));
 	}
-
+	// NOTE: need to create the file
+	// touch dummy.pdf
 	@Test
 	public void throws_IllegalArgumentException_inCaseOfInvalidPdfFile()
 			throws IOException {
+		final String filename = "dummy.pdf";
 		try {
-			new PDF(new File("build.gradle"));
+			new PDF(new File(filename));
 			fail("expected IllegalArgumentException");
 		} catch (IllegalArgumentException expected) {
 			assertThat(expected.getMessage(), is("Invalid PDF file: "
-					+ System.getProperty("user.dir") + "/build.gradle"));
+					+ System.getProperty("user.dir") + "/" + filename));
 			assertThat(expected.getCause(), is(notNullValue()));
 		}
 	}
