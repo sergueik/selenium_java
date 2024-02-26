@@ -16,6 +16,7 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
     <source.version>1.8</source.version>
     <target.version>1.8</target.version>
     <commons-io.version>2.7</commons-io.version>
+    <commons-net.version>3.9.0</commons-net.version>
     <commons-text.version>1.10.0</commons-text.version>
     <skipTests>true</skipTests>
     <selenium.version>4.1.1</selenium.version>
@@ -323,7 +324,7 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
           <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.6</version>
+            <version>${commons-net.version}</version>
           </dependency>
           <dependency>
             <groupId>org.apache.ant</groupId>
