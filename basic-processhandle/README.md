@@ -160,7 +160,70 @@ while (-not $process.HasExited) {
 get-content -path "${process_workdir}\${logfile}"
 
 ```
+![launch capture](https://github.com/sergueik/selenium_java/blob/master/basic-processhandle/screenshots/capture-launch-noshell.jpg)
 
+if there is an error reported by Java code in the console
+
+```text
+Exception in thread "main" java.lang.NumberFormatException: For input string: ""
+
+        at java.base/java.lang.NumberFormatException.forInputString(NumberFormatException.java:65)
+        at java.base/java.lang.Integer.parseInt(Integer.java:662)
+        at java.base/java.lang.Integer.parseInt(Integer.java:770)
+        at example.Launcher.getPid(Launcher.java:173)
+        at example.App.main(App.java:106)
+```
+
+which is because there is no PID information in the pid file `C:\TEMP\pidfile.txt`:
+```text
+Pid=
+```
+to find the root cause, extract and run directly the command from the log:
+
+```txt
+2024-03-21 14:40:48  [main] - INFO  Launching command: powershell.exe /noprofile /executionpolicy bypass "&{ $o = new-object System.Diagnostics.ProcessStartInfo;$o.FileName = 'java.exe';$o.Arguments = ' -cp target\example.processhandle.jar;target\lib\* example.Dialog';$o.UseShellExecute = $false;$o.RedirectStandardOutput = $false;$o.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden;$o.ErrorDialog = $false;$o.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; $p = [System.Diagnostics.Process]::Start($o);while ($p.ID -eq 0) {start-sleep -millisecond 100;}write-output ('Pid={0}' -f $p.Id) | out-file -LiteralPath 'C:\TEMP\pidfile.txt' -encoding ascii; }"
+```
+The command will be
+```cmd
+powershell.exe /noprofile /executionpolicy bypass "&{ $o = new-object System.Diagnostics.ProcessStartInfo;$o.FileName = 'java.exe';$o.Arguments = ' -cp target\example.processhandle.jar;target\lib\* example.Dialog';$o.UseShellExecute = $false;$o.RedirectStandardOutput = $false;$o.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden;$o.ErrorDialog = $false;$p = [System.Diagnostics.Process]::Start($o);$p.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; while ($p.Id -eq 0) {start-sleep -millisecond 100;}write-output ('Pid={0}' -f $p.Id) | out-file -LiteralPath 'C:\T EMP\pidfile.txt' -encoding ascii; }"
+```
+the error will be displayed in clear text in the console output e.g.
+```text
+Exception calling "Start" with "1" argument(s): "The system cannot find the file specified"
+At line:1 char:316
+```
+or 
+```text
+System.Diagnostics.ProcessPriorityClass]::BelowNormal : The term
+'System.Diagnostics.ProcessPriorityClass]::BelowNormal' is not recognized as the name of a cmdlet, function, script file, or operable program. Check the spelling of the name, or if a path was included, verify that the path is correct and try again.
+```
+### NOTE
+
+when JDK from the path containg special characters is used. using quotes in the evvironment variables corrupts the path
+
+```cmd
+JAVA_HOME="c:\java\jdk-11.0.12+7"
+```
+
+
+this leads to weird error:
+```cmd
+where.exe java
+```
+```text
+INFO: Could not find files for the given pattern(s).
+
+```
+
+```cmd
+java -version
+```
+
+```text
+openjdk version "11.0.12" 2021-07-20
+OpenJDK Runtime Environment Temurin-11.0.12+7 (build 11.0.12+7)
+OpenJDK Client VM Temurin-11.0.12+7 (build 11.0.12+7, mixed mode)
+```
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html
