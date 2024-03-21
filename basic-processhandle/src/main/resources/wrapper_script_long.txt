@@ -1,0 +1,35 @@
+<# NOTE: the script will be concatenated in a oneliner #>
+[bool]$wait = $false;
+  
+<# 
+$filename = 'cmd.exe';
+$arguments = '/c C:\Windows\System32\PING.EXE -n 3 www.google.com'
+#>
+$filename = 'java.exe';
+$arguments = '-cp target\example.processhandle.jar;target\lib\* example.Dialog';
+$startInfo.FileName = $filename;
+
+if ($wait) {
+  $arguments =  ('{1} >> {0}' -f $arguments, $logfile );
+}
+$startInfo.Arguments = $arguments;
+
+<# $startInfo.UseShellExecute = $true; #>
+$startInfo.UseShellExecute = $false;
+<# NOTE: The Process object must have the UseShellExecute property set to false in order to redirect IO streams. #>
+$startInfo.RedirectStandardOutput = $false;
+$startInfo.WorkingDirectory = $process_workdir;
+$startInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden;
+$startInfo.ErrorDialog = $true;
+<# the following does not help #>
+while (-not $process.Responding) { start-sleep -seconds 1;}
+[System.Diagnostics.Process] $process = [System.Diagnostics.Process]::Start($startInfo);
+if ($wait) {
+  while (-not $process.HasExited) {
+    start-sleep -seconds 1;
+  }
+  get-content -path "${process_workdir}\${logfile}";
+} else {
+# return PID
+}
+

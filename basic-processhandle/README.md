@@ -135,6 +135,32 @@ can not use the XML comment:
 [ERROR]     Non-parseable POM c:\developer\sergueik\selenium_java\basic-processhandle\pom.xml: in comment after two dashes (--) next character must be > not r (  position: END_TAG seen ...<target>${java.version}</target>\r\n<!-- invalid flag:
  --r... @85:23)  @ line 85, column 23 -> [Help 2]
 ```
+
+### NOTE
+
+When developing the code one may use a longer version of the Poweshell Process Creation helper snippet, e.g.
+
+```powershell
+
+[System.Diagnostics.ProcessStartInfo] $startInfo = new-object System.Diagnostics.ProcessStartInfo
+$startInfo.FileName = 'java.exe'
+$startInfo.Arguments = ('-cp target\example.processhandle.jar;target\lib\* example.Dialog >> {0}' -f $logfile )
+$startInfo.UseShellExecute = $true
+# NOTE: The Process object must have the UseShellExecute property set to false in order to redirect IO streams.
+$startInfo.RedirectStandardOutput = $false
+$startInfo.WorkingDirectory = $process_workdir
+$startInfo.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden
+$startInfo.ErrorDialog = $true
+[System.Diagnostics.Process] $process = [System.Diagnostics.Process]::Start($startInfo)
+# TODO: improve wait until exited
+while (-not $process.HasExited) {
+  start-sleep -seconds 1
+}
+
+get-content -path "${process_workdir}\${logfile}"
+
+```
+
 ### See Aso
 
 	* https://docs.oracle.com/javase/9/docs/api/java/lang/ProcessHandle.html
@@ -144,8 +170,9 @@ can not use the XML comment:
 	* https://dev.to/harithay/introduction-to-java-processhandle-5950
 	* https://www.baeldung.com/java-process-api (legacy)
 	* https://www.baeldung.com/java-9-process-api (improvements)
-
-
+  * https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process?view=netframework-4.5
+  * https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.processstartinfo?view=netframework-4.5
+    
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
 

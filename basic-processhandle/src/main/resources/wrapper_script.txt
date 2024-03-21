@@ -1,0 +1,12 @@
+$o = new-object System.Diagnostics.ProcessStartInfo;
+$o.FileName = 'java.exe';
+$o.Arguments = '%s';
+$o.UseShellExecute = $false;
+$o.RedirectStandardOutput = $false;
+$o.WindowStyle = [System.Diagnostics.ProcessWindowStyle]::Hidden;
+$o.ErrorDialog = $false;
+$o.PriorityClass=System.Diagnostics.ProcessPriorityClass]::BelowNormal; 
+$p = [System.Diagnostics.Process]::Start($o);
+while ($p.Id -eq 0) { start-sleep -millisecond 100;}
+write-output ('Pid={0}' -f $p.Id) | out-file -LiteralPath '%s' -encoding ascii;
+

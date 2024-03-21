@@ -12,6 +12,8 @@ import javax.swing.JPanel;
 
 // origin: http://www.java2s.com/Tutorial/Java/0240__Swing/ASimpleModalDialog.htm
 public class Dialog extends JDialog implements ActionListener {
+	private static final long serialVersionUID = 1L;
+
 	public Dialog(JFrame parent, String title, String message) {
 		super(parent, title, true);
 		JPanel messagePane = new JPanel();
