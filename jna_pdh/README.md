@@ -1,7 +1,16 @@
 ### Info
+
 this directory contains
 a fragment of the `PDHTest.java` [test class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/PdhTest.java) from
-[jna](https://github.com/java-native-access/jna) project focusing on collecting the `System\Processor Queue Length` performance metric
+[jna](https://github.com/java-native-access/jna) project focusing on collecting the Windows Performance Counters metrics,
+for example the `System\Processor Queue Length` or `Processor\% Processor Time\0` where the notation is:
+
+
+token | description | comment
+--- | --- | ---
+`Processor` | category |
+`% Processor Time`| counter |
+`0`  | Instance  | blank for *single instance* counters
 
 The code was modeled after the native app implementation found in [host-sflow](https://github.com/sflow/host-sflow):
 ```c
@@ -82,6 +91,13 @@ mvn test
 ```text
 \System\Processor Queue Length Thu Mar 03 08:50:27 PST 2022 1st=14 2nd=0 multi=1
 ```
+### See Also
+   * [Performance Counters](https://learn.microsoft.com/en-us/windows/win32/perfctrs/performance-counters-portal)
+     + [About Performance Counters](https://learn.microsoft.com/en-us/windows/win32/perfctrs/about-performance-counters)
+     + [Using Performance Counters](https://learn.microsoft.com/en-us/windows/win32/perfctrs/using-performance-counters)
+     + [Performance Counters Reference](https://learn.microsoft.com/en-us/windows/win32/perfctrs/performance-counters-reference)
+     + [Performance Counter functions](https://learn.microsoft.com/en-us/windows/win32/perfctrs/performance-counters-functions)
+     + [performance Counters XML Schema](https://learn.microsoft.com/en-us/windows/win32/perfctrs/performance-counters-schema)
 
 ### Author
 [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
