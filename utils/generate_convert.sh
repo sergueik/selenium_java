@@ -74,10 +74,12 @@
 
 # custom sizes:
 # '1280x800' => '852x532'
-OPTS=`getopt -o dvnhibks:e: --long debug,verbose,dry-run,help,inspect,batterycheck,keep,size:,extension: -n 'parse-options' -- "$@"`
+OPTS=`getopt -o dvnhibks:e:a: --long debug,verbose,dry-run,help,inspect,battery,keep,size:,extension:,name: -n 'parse-options' -- "$@"`
 if [ $? != 0 ] ; then echo "Failed parsing options." >&2 ; exit 1 ; fi
 # TODO: dirscan
-# find . -iname '*mp4' | sed 's|\([^.]\)/.*$|\1|g'|sort -u
+# EXTENSION='*mp4'
+# NAME='*filename*'
+# find . -iname "$NAME.$EXTENSION" | sed 's|\([^.]\)/.*$|\1|g'|sort -u
 VERBOSE=false
 HELP=false
 DRY_RUN=false
@@ -85,17 +87,19 @@ KEEP_SIZE=false
 BATTERY_CHECK=false
 SIZE='qhd'
 EXTENSION='mp4'
+NAME='*'
 
 while true; do
   case "$1" in
-    -d | --debug ) DEBUG=true; shift ;;
-    -v | --verbose ) VERBOSE=true; shift ;;
-    -i | --inspect ) INSPECT=true; shift ;;
-    -h | --help )    HELP=true; shift ;;
-    -n | --dry-run ) DRY_RUN=true; shift ;;
-    -b | --battery-check ) BATTERY_CHECK=true; shift ;;
-    -s | --size ) SIZE="$2"; shift; shift ;;
-    -k | --keep ) KEEP_SIZE=true; shift ;;
+    -d | --debug )     DEBUG=true; shift ;;
+    -v | --verbose )   VERBOSE=true; shift ;;
+    -i | --inspect )   INSPECT=true; shift ;;
+    -a | --name )      NAME="*$2*"; shift ;;
+    -h | --help )      HELP=true; shift ;;
+    -n | --dry-run )   DRY_RUN=true; shift ;;
+    -b | --battery )   BATTERY_CHECK=true; shift ;;
+    -s | --size )      SIZE="$2"; shift; shift ;;
+    -k | --keep )      KEEP_SIZE=true; shift ;;
     -e | --extension ) EXTENSION="$2"; shift; shift ;;
     -- ) shift; break ;;
     * ) break ;;
@@ -149,7 +153,7 @@ if [[ "${INSPECT}" = 'true' ]]; then
     echo "Inspecting first file \"*${EXTENSION}\""
   fi
   # ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_height=\(.*\)$|\1|p'
-  S=$(find . -iname "*${EXTENSION}" | head -1)
+  S=$(find . -iname "${NAME}.${EXTENSION}" | head -1)
   H=$(ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_height=\(.*\)$|\1|p')
   W=$(ffprobe -select_streams v -show_streams "$S" 2>&1 | sed -n 's|coded_width=\(.*\)$|\1|p')
 
@@ -183,7 +187,7 @@ if [[ "${INSPECT}" = 'true' ]]; then
   exit 0
 fi
 # technically able to descend, seldom used
-find . -iname "*${EXTENSION}" | sort | while read filename ; do
+find . -iname "${NAME}.${EXTENSION}" | sort | while read filename ; do
   D=$(dirname "$filename")
   S=$(basename "$filename")
   N="${S/.${EXTENSION}/.temp.mkv}"
