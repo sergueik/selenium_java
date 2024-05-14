@@ -3,7 +3,7 @@
 this directory contains
 a fragment of the `PDHTest.java` [test class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/PdhTest.java) from
 [jna](https://github.com/java-native-access/jna) project focusing on collecting the Windows Performance Counters metrics,
-for example the `System\Processor Queue Length` or `Processor\% Processor Time\0` where the notation is:
+for example the `System\Processor Queue Length` or `Processor\0\% Processor Time` where the notation is:
 
 
 token | description | comment
@@ -12,7 +12,7 @@ token | description | comment
 `% Processor Time`| counter |
 `0`  | Instance  | blank for *single instance* counters
 
-The code was modeled after the native app implementation found in [host-sflow](https://github.com/sflow/host-sflow):
+The code was modeled after the native C app implementation found in [host-sflow](https://github.com/sflow/host-sflow):
 ```c
 uint64_t readFormattedCounter(char* path)
 {
