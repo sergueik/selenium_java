@@ -9,9 +9,9 @@ REMOTE_USER=${2:-sergueik}
 # using gnu tar exclude option
 # NOTE: can also use simpler expression like --exclude 'packages'
 if [[ $DEBUG == 'true' ]] ; then
-  echo tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' .
+  echo tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' --exclude './*/.terraform/*'  --exclude './.terraform/*' .
 fi
-tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' .
+tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' --exclude './*/.terraform/*'  --exclude './.terraform/*' .
 if [[ $DEBUG == 'true' ]] ; then
   echo scp ../$PROJECT.tar.gz $REMOTE_USER@${REMOTE_HOST}:
 fi
