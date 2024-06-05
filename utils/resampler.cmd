@@ -18,61 +18,68 @@ set "SOURCPATH=%CD%"
 if not "%~1" == "" set "SOURCPATH=%~1"
 set TIMEOUT=10
 set PATH=%PATH%;c:\tools\resampler
+set TOOL=resampler.exe
+set FILESCAN_OPTIONS=
+if not "%2" equ "" set FILESCAN_OPTIONS=/R "%SOURCEPATH%"
+
 set "MAX_PROCESSES=2"
 set "PROCESS_COUNTER=0"
 for /F "tokens=2 delims==" %%. in ('wmic.exe cpu get NumberOfCores /format:list') do set /A "MAX_PROCESSES=%%. * 2"
 if not "%3" == "" set "MAX_PROCESSES=%3"
-echo Will run !MAX_PROCESSES! in parallel
+@echo Will run !MAX_PROCESSES! in parallel
 cd /d "%SOURCPATH%"
 REM no need for "tokens=*" 
  
-REM set OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-set OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-for /R "%SOURCPATH%" %%_ in (*.flac) do (
+REM set CONVERT_OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
+set CONVERT_OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
+REM Relies on
+
+REM Walks the directory tree %SOURCEPATH%, executing the FOR statement in each directory of the tree
+REM or just the current directory when the option is not set
+for  %FILESCAN_OPTIONS% %%_ in (*.flac) do (
     set "INPUTFILE=%%_"
     set "OUTPUTFILE=%%~dp_%%~n_ - 01%%~x_"
-    rem NODE dealing with quotes
-    set "COMMAND=ReSampler.exe -i "!INPUTFILE!" -o "!OUTPUTFILE!" !OPTIONS!"
-    echo Launch the resampler tool in a separate process: !COMMAND!
+    REM NOTE dealing with quotes
+    set "COMMAND=!TOOL! -i "!INPUTFILE!" -o "!OUTPUTFILE!" !CONVERT_OPTIONS!"
+    @echo Launch the resampler tool in a separate process: !COMMAND!
     start /B CMD /C "!COMMAND!"
 
     set /A PROCESS_COUNTER+=1
-    echo Running !PROCESS_COUNTER! processes
+    @echo Running !PROCESS_COUNTER! processes
     if !PROCESS_COUNTER! geq !MAX_PROCESSES! (
-        rem Wait for any of the launched processes to finish before launching more
+        REM Wait for any of the launched processes to finish before launching more
         call :COUNT_FOR_PROCESS
     )
 )
 
 :WAIT_FOR_PROCESS
-echo Wait untill all processes finish
+
 rem Wait untill all processes finish
 C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
-set IMAGENAME=ReSampler.exe
-for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH') do (
-    if "%%_" == "!IMAGENAME!" (
-        rem There is still at least one instance of the ReSampler.exe tool running
+for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH') do (
+    if "%%_" == "!TOOL!" (
+        REM There is still at least one instance of the !TOOL! running
         goto :WAIT_FOR_PROCESS
     )
 )
 set "PROCESS_COUNTER=0"
+cls
 exit /B
 goto :EOF
 
-REM use trick from https://devblogs.microsoft.com/oldnewthing/20110825-00/?p=9803
+REM use trick from https://devblogs.microsoft.com/oldnewthing/20110825-00/?p=980xi3
 :COUNT_FOR_PROCESS
-echo Wait untill at least one processes finish
-rem Wait untill at least one processes finish
+
+REM Wait untill at least one !TOOL! process finishes
 C:\Windows\System32\timeout.exe /T !TIMEOUT! /nobreak 
-set IMAGENAME=ReSampler.exe
 set /A RUNNING_PPOCESS_COUNT=0
-for /f "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !IMAGENAME!" /NH ^| C:\Windows\System32\find.exe "!IMAGENAME!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
+for /F "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH ^| C:\Windows\System32\find.exe /i "!TOOL!" ^|C:\Windows\System32\find.exe/c /v "" ') do (
     set /A RUNNING_PPOCESS_COUNT=%%_
-    echo !RUNNING_PPOCESS_COUNT! !IMAGENAME! is running
+    @echo !RUNNING_PPOCESS_COUNT! !TOOL! processes are running
     if !RUNNING_PPOCESS_COUNT! equ !MAX_PROCESSES! (
        goto :COUNT_FOR_PROCESS
     )
 )
 set /A "PROCESS_COUNTER=!RUNNING_PPOCESS_COUNT!"
-echo set PROCESS_COUNTER to !PROCESS_COUNTER!
+@echo set PROCESS_COUNTER to !PROCESS_COUNTER!
 exit /B

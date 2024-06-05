@@ -10,45 +10,20 @@
   <url>https://github.com/vmi/selenese-runner-java</url>
   <description>This is selenese script interpreter implemented by Java.
 It supports test-case and test-suite which are Selenium IDE's native format.</description>
-
-  <licenses>
-    <license>
-      <name>The Apache Software License, Version 2.0</name>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-
-  <scm>
-    <connection>scm:git:git@github.com:vmi/selenese-runner-java.git</connection>
-    <developerConnection>scm:git:git@github.com:vmi/selenese-runner-java.git</developerConnection>
-    <url>git@github.com:vmi/selenese-runner-java.git</url>
-    <tag>HEAD</tag>
-  </scm>
-
-  <developers>
-    <developer>
-      <id>vmi</id>
-      <name>IWAMURO Motonori</name>
-      <email>vmi@nifty.com</email>
-    </developer>
-    <developer>
-      <id>hayato1980</id>
-      <name>ITO Hayato</name>
-      <email>haya10.ito@gmail.com</email>
-    </developer>
-  </developers>
-
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <source.version>1.8</source.version>
     <target.version>1.8</target.version>
+    <commons-io.version>2.7</commons-io.version>
+    <commons-net.version>3.9.0</commons-net.version>
+    <commons-text.version>1.10.0</commons-text.version>
     <skipTests>true</skipTests>
     <selenium.version>4.1.1</selenium.version>
     <htmlunit.version>2.56.0</htmlunit.version>
     <htmlunit-core-js.version>${htmlunit.version}</htmlunit-core-js.version>
     <neko-htmlunit.version>${htmlunit.version}</neko-htmlunit.version>
+    <logback.version>1.2.13</logback.version>
     <htmlunit-driver.version>3.56.0</htmlunit-driver.version>
     <slf4j.version>1.7.32</slf4j.version>
     <maven.version.rules>file://${basedir}/version-rules.xml</maven.version.rules>
@@ -349,7 +324,7 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
           <dependency>
             <groupId>commons-net</groupId>
             <artifactId>commons-net</artifactId>
-            <version>3.6</version>
+            <version>${commons-net.version}</version>
           </dependency>
           <dependency>
             <groupId>org.apache.ant</groupId>
@@ -522,12 +497,12 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-text</artifactId>
-      <version>1.10.0</version>
+      <version>${commons-text.version}</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.6</version>
+      <version>${commons-io.version}</version>
     </dependency>
     <dependency>
       <groupId>args4j</groupId>
@@ -547,7 +522,7 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.2.3</version>
+      <version>${logback.version}</version>
     </dependency>
     <dependency>
       <groupId>xalan</groupId>
@@ -577,7 +552,7 @@ It supports test-case and test-suite which are Selenium IDE's native format.</de
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
+      <version>4.13.1</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>

@@ -6,12 +6,12 @@ REMOTE_USER=${2:-sergueik}
 # unfortunately `whoami` in Windows in git bash can be different from
 # target unix machine user
 
-# using gnu tar exclude option
-# NOTE: can also use simpler expression like --exclude 'packages'
+# using gnu tar exclude option: --exclude='packages'
+# TODO: switch to compact --exclude=PATTERN exclude files, given as a PATTERN
 if [[ $DEBUG == 'true' ]] ; then
-  echo tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' .
+  echo tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude='packages' --exclude='obj' --exclude='bin' --exclude='.terraform' .
 fi
-tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude './packages/*' --exclude './*/obj/*' --exclude './*/bin/*' .
+tar czvf ../$PROJECT.tar.gz --exclude='.git*' --exclude='target' --exclude='packages' --exclude='obj' --exclude='bin' --exclude='.terraform' .
 if [[ $DEBUG == 'true' ]] ; then
   echo scp ../$PROJECT.tar.gz $REMOTE_USER@${REMOTE_HOST}:
 fi

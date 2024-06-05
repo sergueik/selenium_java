@@ -17,13 +17,13 @@
   </developers>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commons-configuration.version>1.32</commons-configuration.version>
+    <commons-configuration.version>2.0</commons-configuration.version>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.7</commons-io.version>
     <commons-lang3.version>3.5</commons-lang3.version>
-    <google-api-client.version>1.32.0</google-api-client.version>
-    <google-oauth-client-jetty.version>1.32.0</google-oauth-client-jetty.version>
-    <google-api-services-sheets.version>v4-rev493-1.32.0</google-api-services-sheets.version>
+    <google-api-client.version>2.0.0</google-api-client.version>
+    <google-oauth-client-jetty.version>2.0.0</google-oauth-client-jetty.version>
+    <google-api-services-sheets.version>v4-rev493-2.0.0</google-api-services-sheets.version>
     <hamcrest-all.version>1.3</hamcrest-all.version>
     <java.version>1.8</java.version>
     <!-- https://blog.codefx.org/tools/maven-on-java-9/ the version numbering changed with JDK 9  -->
@@ -38,7 +38,7 @@
     <maven-antrun-plugin.version>1.8</maven-antrun-plugin.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>${poi.version}</poiooxml.version>
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
   </properties>
   <dependencies>
     <dependency>

@@ -1,5 +1,5 @@
 @echo OFF
-REM do not name this script run.cmd
+REM avoid naming this script "run.cmd"
 where.exe mvn.cmd 2>NUL 1>NUL
 if errorlevel 1 goto :SKIP
 
@@ -13,7 +13,7 @@ echo done
 :SKIP
 
 echo Launching with classpath ^+ modulepath semantics
-java -Dprism.order=sw -cp target\example.javafx_markdown.jar;target\lib\* ^
+java -Dprism.order=sw -cp target\example.javafx_markdown.jar;target\lib\*.* ^
 --module-path target/lib ^
 --add-modules=javafx.base,javafx.graphics,javafx.controls ^
 example.Example

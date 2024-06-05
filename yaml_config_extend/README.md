@@ -1,8 +1,9 @@
 ### Info
 
 
-Replica of [sixface/YamlConfig](https://github.com/jsixface/YamlConfig) by Arumugam Jeganathan from version __1.0.1__ 
-extended
+Replica of [sixface/YamlConfig](https://github.com/jsixface/YamlConfig) by Arumugam Jeganathan from version __1.0.1__  (the latest release is __1.1.1__)
+
+extended the upstream class
 by adding methods to load Maps:
 ```java
 public Map<String, Object> getMap(String key)
@@ -106,6 +107,10 @@ grep -i -A 1 @test src/test/java/example/YamlConfigExtendedTest.java   | grep -i
         public void getDocString2() {
         public void getDocString3() {
 ```
+### Note
+
+there exists a similar [PR](https://github.com/jsixface/YamlConfig/pull/12) with `getStringList()` method by some other developer
+
 ### See Also
 
   * https://www.vogella.com/tutorials/Hamcrest/article.html

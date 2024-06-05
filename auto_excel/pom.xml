@@ -13,7 +13,7 @@
     <poi.version>3.17</poi.version>
     <!-- <version>4.1.2</version> -->
     <poiooxml.version>${poi.version}</poiooxml.version>
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
     <testng.version>6.14.3</testng.version>
     <junit.version>4.13.1</junit.version>
     <mainClass>EntryPoint</mainClass>

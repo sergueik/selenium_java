@@ -12,8 +12,8 @@
     <!-- NOTE: do not use dot in the mainClass property -->
     <mainClass>SimpleToolBarEx</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commons-configuration.version>1.32</commons-configuration.version>
-    <commons-fileupload.version>1.4</commons-fileupload.version>
+    <commons-configuration.version>2.0</commons-configuration.version>
+    <commons-fileupload.version>1.5</commons-fileupload.version>
     <commons-collections4.version>4.2</commons-collections4.version>
     <commons-exec.version>1.3</commons-exec.version>
     <commons-io.version>2.7</commons-io.version>
@@ -54,7 +54,7 @@
     <selenium.version>4.3.0</selenium.version>
     <selenium-chrome-driver.version>${selenium.version}</selenium-chrome-driver.version>
     <selenium-firefox-driver.version>${selenium.version}</selenium-firefox-driver.version>
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
     <!--   <build_os>win64</build_os> -->
   </properties>
   <dependencies>

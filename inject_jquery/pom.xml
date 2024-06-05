@@ -12,6 +12,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <junit.version>4.13.1</junit.version>
+    <commons-io.version>2.7</commons-io.version>
     <selenium.version>2.53.0</selenium.version>
     <maven-compiler-plugin.version>3.6.0</maven-compiler-plugin.version>
     <java.version>1.8</java.version> 
@@ -55,7 +56,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.4</version>
+      <version>${commons-io.version}</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

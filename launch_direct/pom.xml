@@ -8,7 +8,7 @@
   <description>YAML inventory parsing app</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commons-configuration.version>1.32</commons-configuration.version>
+    <commons-configuration.version>2.0</commons-configuration.version>
     <mainClass>LaunchDirect</mainClass>
     <commandline-parser.version>0.11.0-SNAPSHOT</commandline-parser.version>
     <commons-exec.version>1.3</commons-exec.version>
@@ -23,7 +23,7 @@
     <maven-surefire-plugin.version>2.19.1</maven-surefire-plugin.version>
     <poi.version>3.17</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
-    <snakeyaml.version>1.32</snakeyaml.version>
+    <snakeyaml.version>2.0</snakeyaml.version>
     <surefire.version>2.8</surefire.version>
   </properties>
   <dependencies>

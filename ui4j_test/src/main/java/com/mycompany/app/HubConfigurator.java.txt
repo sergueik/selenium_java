@@ -1,0 +1,64 @@
+package com.mycompany.app;
+
+import org.openqa.grid.common.GridRole;
+import org.openqa.grid.common.RegistrationRequest;
+import org.openqa.grid.internal.utils.GridHubConfiguration;
+import org.openqa.grid.internal.utils.SelfRegisteringRemote;
+import org.openqa.grid.selenium.proxy.DefaultRemoteProxy;
+import org.openqa.grid.web.Hub;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.server.SeleniumServer;
+
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
+// origin: https://groups.google.com/forum/#!topic/selenium-users/JDBr7LRPulw
+// http://www.programcreek.com/java-api-examples/index.php?api=org.openqa.grid.internal.utils.GridHubConfigurations
+public class HubConfigurator {
+	public static void main(String[] args) throws Exception {
+		String strIP = "localhost";
+
+		GridHubConfiguration config = new GridHubConfiguration();
+		config.setTimeout(30000000);
+		config.setPort(4444);
+		config.setHost(strIP);
+
+		Hub hub = new Hub(config);
+		hub.start();
+		RegistrationRequest req = new RegistrationRequest();
+		req.setRole(GridRole.NODE);
+		Map<String, Object> nodeConfiguration = new HashMap<>();
+		nodeConfiguration.put(RegistrationRequest.PROXY_CLASS,
+				DefaultRemoteProxy.class.getName());
+
+		nodeConfiguration.put(RegistrationRequest.MAX_SESSION, 5);
+		nodeConfiguration.put(RegistrationRequest.PORT, 5555);
+		nodeConfiguration.put(RegistrationRequest.HOST, 4444);
+		nodeConfiguration.put(RegistrationRequest.AUTO_REGISTER, true);
+		nodeConfiguration.put(RegistrationRequest.REGISTER_CYCLE, 5000);
+		nodeConfiguration.put(RegistrationRequest.HUB_HOST, "localhost");
+		nodeConfiguration.put(RegistrationRequest.HUB_PORT, 4444);
+		nodeConfiguration.put("remoteHost", "http://" + strIP + ":5555");
+		nodeConfiguration.put("url", "http://" + strIP + ":5555");
+
+		nodeConfiguration.put("role", "node");
+		nodeConfiguration.put("hub", "http://localhost:4444/grid/register");
+		URL remoteURL = new URL("http://" + strIP + ":5555");
+		nodeConfiguration.put(RegistrationRequest.REMOTE_HOST,
+				remoteURL.toExternalForm());
+
+		req.setConfiguration(nodeConfiguration);
+		DesiredCapabilities capabilities2 = DesiredCapabilities.chrome();
+		capabilities2.setCapability("browserName", "chrome");
+		capabilities2.setCapability("platform", "MAC");
+		capabilities2.setCapability("ensureCleanSession", "true");
+		capabilities2.setCapability("maxInstances", 5);
+		req.addDesiredCapability(capabilities2);
+		SelfRegisteringRemote remote = new SelfRegisteringRemote(req);
+		remote.setRemoteServer(new SeleniumServer(req.getConfiguration()));
+		remote.startRemoteServer();
+		remote.startRegistrationProcess();
+		Thread.currentThread().join();
+	}
+}
