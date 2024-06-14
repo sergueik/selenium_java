@@ -8,3 +8,6 @@ This directory contains a replica of [Justify CLI](https://github.com/leadpony/j
   * https://www.jsonschema.net/
   * https://github.com/fge/json-schema-processor-examples
 
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
