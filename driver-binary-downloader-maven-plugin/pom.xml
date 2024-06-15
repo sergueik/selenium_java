@@ -22,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <log4j-core.version>2.17.1</log4j-core.version>
     <slf4j.version>1.7.30</slf4j.version>
-    <jetty.version>10.0.10</jetty.version>
+    <jetty.version>10.0.14</jetty.version>
   </properties>
   <dependencies>
     <dependency>
