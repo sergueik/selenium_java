@@ -131,8 +131,9 @@ cat <<EOF>>$SCRIPT
 check_remaining_battery () {
 STATE=\$(upower -i \$(upower -e | grep -i battery | head -1)| grep -E 'state: *' | awk '{print \$2}')
 MINUTES=\$(upower -i \$(upower -e | grep -i battery | head -1)| grep 'time to empty' | grep minutes | awk '{print \$4}' | sed 's|\.[0-9][0-9]*||')
-if [[ "\${STATE}" -ne 'charging' ]]
+if [[ "\${STATE}" -eq 'discharging' ]]
 # when the battery is charging the time to empty is meaningless
+# NOTE: == / != is better than -eq / -ne , since -ne does not work
 then
   if [[ ! -z \$MINUTES ]]
   then
