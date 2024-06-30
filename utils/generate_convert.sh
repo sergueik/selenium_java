@@ -70,7 +70,7 @@
 # 'whuxga' 7680x4800
 # 
 #
-# origin: https://gist.github.com/cosimo/3760587
+# based on: https://gist.github.com/cosimo/3760587
 
 # custom sizes:
 # '1280x800' => '852x532'
@@ -105,7 +105,13 @@ while true; do
     * ) break ;;
   esac
 done
-
+if [[ "${HELP}" = "true" ]]; then
+cat <<EOF
+Usage:
+  $0 [-d|--debug] [-h|--help] [-i|--inspect] [-n|--dry-run] [-b|--battery] [-k|--keep] [-v|--verbose] [-s|--size] SIZE [-a|--name] NAME [-e|--extension] EXTENSION
+EOF
+exit 0
+fi
 if [[ "${VERBOSE}" = "true" ]]; then
   echo VERBOSE=$VERBOSE
   echo INSPECT=$INSPECT
