@@ -1,8 +1,15 @@
 ### Info
 
 this directory contains
-a fragment of the `PDHTest.java` [test class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/PdhTest.java) from
-[jna](https://github.com/java-native-access/jna) project focusing on collecting the Windows Performance Counters metrics,
+a derivative of the `PDHTest.java` [test class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/PdhTest.java)
+and its dependencies 
+  * `AbstractPlatformTestSupport` [class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/AbstractPlatformTestSupport.java)
+  * `AbstractWin32TestSupport` [class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/AbstractWin32TestSupport.java)
+
+ from
+[jna](https://github.com/java-native-access/jna) contribution project 
+
+focusing on collecting the Windows specific __Performance Counters__ metrics,
 for example the `System\Processor Queue Length` or `Processor\0\% Processor Time` where the notation is:
 
 
