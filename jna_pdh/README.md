@@ -7,8 +7,11 @@ and its dependencies
   * `AbstractWin32TestSupport` [class](https://github.com/java-native-access/jna/blob/master/contrib/platform/test/com/sun/jna/platform/win32/AbstractWin32TestSupport.java)
 
  from
-[jna](https://github.com/java-native-access/jna) contribution project 
+[jna](https://github.com/java-native-access/jna) contribution project.
 
+Note, that since the code above is part of the test, it is not included in the `jna-platform.jar` released to [Maven Central](https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform) (the `Pdh.java` is )
+
+The test is
 focusing on collecting the Windows specific __Performance Counters__ metrics,
 for example the `System\Processor Queue Length` or `Processor\0\% Processor Time` where the notation is:
 
