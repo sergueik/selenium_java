@@ -22,7 +22,7 @@
     <junit.version>4.13.1</junit.version>
     <lombok.version>1.15.34</lombok.version>
     <mongo-java-driver.version>3.8.0</mongo-java-driver.version>
-    <undertow.version>2.1.6.Final</undertow.version>
+    <undertow.version>2.3.17.Final</undertow.version>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
   </properties>
   <dependencies>
