@@ -8,7 +8,7 @@
     <mainClass>Example</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <flexmark-java.version>0.62.2</flexmark-java.version>
-    <cssfx.version>11.2.0</cssfx.version>
+    <cssfx.version>1.1.1</cssfx.version>
 
     <commons-configuration.version>1.10</commons-configuration.version>
     <commons-collections4.version>4.2</commons-collections4.version>

@@ -35,9 +35,10 @@ echo done
 :SKIP
 
 echo Launching with classpath ^+ modulepath semantics
-java -Dprism.order=sw -cp target\example.javafx_markdown.jar;target\lib\*.* ^
+java -Dprism.order=sw ^
 --module-path target/lib ^
 --add-modules=javafx.base,javafx.graphics,javafx.controls ^
+-cp target\example.javafx_markdown.jar;target\lib\*;.  ^
 example.Example
 REM java.lang.module.FindException: Module org.fxmisc.cssfx not found
 REM Caused by: java.lang.NoClassDefFoundError: org/fxmisc/cssfx/CSSFX

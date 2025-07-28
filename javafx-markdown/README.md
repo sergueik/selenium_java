@@ -82,6 +82,15 @@ leads to build error:
 ```text
 java.lang.module.FindException: Module org.fxmisc.cssfx not found
 ```
+#### Note
+
+ * to check if cssfx is a JPMS module
+
+```cmd
+jar tf target/lib/cssfx-11.2.0.jar | findstr.exe module-info.class
+```
+
+
 ### Testing
 
 #### Linux with JDK 8
