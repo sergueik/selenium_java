@@ -1,12 +1,15 @@
 @echo OFF
 
-REM NOTE: this scropt does not work with JDK 11
-set JAVA_HOME=c:\java\zulu11.45.27-ca-jdk11.0.10-win_x64
+REM WARNING: avoid naming this script "run.cmd"
+REM if JDK 11 is not the default on the host, set it to JDK 1.8 now
+set JAVA_HOME=c:\java\jdk1.8.0_202
+set JAVA_VERSION=1.8.0_202
 call c:\java\init.cmd
+java.exe -version
 where.exe mvn.cmd 2>NUL 1>NUL
-REM avoid naming this script "run.cmd"
+
 if errorlevel 1 goto :SKIP
-call mvn package
+call mvn clean package
 echo done
 :SKIP
 REM the *.* mask should not be used here

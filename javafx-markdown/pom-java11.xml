@@ -7,6 +7,7 @@
   <properties>
     <mainClass>Example</mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <cssfx.version>11.2.0</cssfx.version>
     <flexmark-java.version>0.64.2</flexmark-java.version>
     <commons-configuration.version>1.10</commons-configuration.version>
     <commons-collections4.version>4.2</commons-collections4.version>
@@ -22,7 +23,7 @@
     <dependency>
       <groupId>org.fxmisc.cssfx</groupId>
       <artifactId>cssfx</artifactId>
-      <version>1.1.1</version>
+      <version>${cssfx.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vladsch.flexmark</groupId>
