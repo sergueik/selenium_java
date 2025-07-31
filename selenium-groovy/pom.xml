@@ -10,7 +10,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.selenium.version>2.44.0</project.selenium.version>
-    <groovyVersion>2.2.2</groovyVersion>
+    <groovyVersion>2.4.21</groovyVersion>
     <log4j-core.version>2.17.1</log4j-core.version>
     <junit.version>4.13.1</junit.version>
     <slf4j.version>1.7.5</slf4j.version>
