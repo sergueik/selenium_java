@@ -9,7 +9,7 @@
     <java.version>1.8</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <sourceDir.prop>${project.basedir}/src/main/java</sourceDir.prop>
-    <poi.version>3.17</poi.version>
+    <poi.version>4.1.1</poi.version>
     <log4j-core.version>2.17.1</log4j-core.version>
     <slf4j.version>1.7.5</slf4j.version>
     <testResourceDir.prop>${project.basedir}/src/test/resources</testResourceDir.prop>
