@@ -16,6 +16,8 @@
     <commons-io.version>2.7</commons-io.version>
     <commons-lang3.version>3.3.1</commons-lang3.version>
     <finalName>${project.groupId}.${project.artifactId}</finalName>
+    <log4j-core.version>2.17.1</log4j-core.version>
+    <slf4j.version>1.7.5</slf4j.version>
     <maven-assembly-plugin.version>3.2.0</maven-assembly-plugin.version>
   </properties>
   <dependencies>
@@ -53,6 +55,26 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-exec</artifactId>
       <version>${commons-exec.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j-core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>${slf4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>${slf4j.version}</version>
     </dependency>
   </dependencies>
   <build>

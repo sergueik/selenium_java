@@ -8,6 +8,7 @@ import com.vladsch.flexmark.ext.gfm.strikethrough.Strikethrough;
 import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
 import com.vladsch.flexmark.ext.gfm.tasklist.TaskListItem;
+
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -37,13 +38,13 @@ public class MDFXNodeHelper extends VBox {
 	final static String BOLD_CLASS_NAME = "markdown-bold";
 	final static String STRIKETHROUGH_CLASS_NAME = "markdown-strikethrough";
 
-	List<String> elemStyleClass = new LinkedList<String>();
+	List<String> elemStyleClass = new LinkedList<>();
 
-	List<Consumer<Pair<Node, String>>> elemFunctions = new LinkedList<Consumer<Pair<Node, String>>>();
+	List<Consumer<Pair<Node, String>>> elemFunctions = new LinkedList<>();
 
 	Boolean nodePerWord = false;
 
-	List<String> styles = new LinkedList<String>();
+	List<String> styles = new LinkedList<>();
 
 	VBox root = new VBox();
 
