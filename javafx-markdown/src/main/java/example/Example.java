@@ -7,114 +7,106 @@ import javafx.scene.Scene;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.layout.Priority;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.fxmisc.cssfx.CSSFX;
 
 @SuppressWarnings("restriction")
 public class Example extends Application {
 
-	private String mdfxTxt = null;
+    private static boolean debug = true;
+    private String mdfxTxt = null;
 
-	@Override
-	public void start(Stage primaryStage) throws Exception {
+    @Override
+    public void start(Stage primaryStage) throws Exception {
 
-		CSSFX.start();
+        CSSFX.start();
 
-		mdfxTxt = IOUtils.toString(getClass().getResourceAsStream("/syntax.md"),
-				"UTF-8");
-		mdfxTxt = mdfxTxt.replaceAll("local_image.jpg",
-				getResourcePath("local_image.jpg"));
-		System.err.println("Sample: " + mdfxTxt);
-		MarkdownView markdownView = new MarkdownView(mdfxTxt) {
-			// @Override
-			// public boolean showChapter(int[] currentChapter) {
-			// return currentChapter[1] == 1;
-			// }
+        // Load markdown text and replace local image paths
+        mdfxTxt = IOUtils.toString(getClass().getResourceAsStream("/syntax.md"), "UTF-8");
+        mdfxTxt = mdfxTxt.replaceAll("local_image.jpg", getResourcePath("local_image.jpg"));
+        if (debug) System.err.println("Sample: " + mdfxTxt);
 
-			@Override
-			public void setLink(Node node, String link, String description) {
-				System.out.println("setLink: " + link);
-				node.setCursor(Cursor.HAND);
-				node.setOnMouseClicked(e -> {
-					System.out.println("link: " + link);
-				});
-			}
+        MarkdownView markdownView = new MarkdownView(mdfxTxt) {
 
-			@Override
-			public Node generateImage(String url) {
-				if (url.equals("node://colorpicker")) {
-					return new ColorPicker();
-				} else {
-					return super.generateImage(url);
-				}
-			}
-		};
+            @Override
+            public void setLink(Node node, String link, String description) {
+                if (debug) System.out.println("setLink: " + link);
+                node.setCursor(Cursor.HAND);
+                node.setOnMouseClicked(e -> System.out.println("link: " + link));
+            }
 
-		TextArea textArea = new TextArea(mdfxTxt);
+            @Override
+            public Node generateImage(String url) {
+                if (url.equals("node://colorpicker")) {
+                    return new ColorPicker();
+                } else {
+                    return super.generateImage(url);
+                }
+            }
+        };
 
-		markdownView.mdStringProperty().bind(textArea.textProperty());
-		markdownView.getStylesheets().add("/css/mdfx-sample.css");
+        TextArea textArea = new TextArea(mdfxTxt);
+        markdownView.mdStringProperty().bind(textArea.textProperty());
+        markdownView.getStylesheets().add("/css/mdfx-sample.css");
 
-		ScrollPane content = new ScrollPane(markdownView);
+        ScrollPane content = new ScrollPane(markdownView);
+        content.setFitToWidth(true);
+        textArea.setMinWidth(350);
 
-		content.setFitToWidth(true);
+        // --- Top content: TextArea + MarkdownView ---
+        HBox mainContent = new HBox(textArea, content);
+        mainContent.setSpacing(5);
+        VBox.setVgrow(mainContent, Priority.ALWAYS);
 
-		textArea.setMinWidth(350);
-		HBox root = new HBox(textArea, content);
+        // --- Bottom version label ---
+        InputStream propStream = getClass().getResourceAsStream("/application.properties");
+        
 
-		Scene scene = new Scene(root, 700, 700);
+        Configurations configs = new Configurations();
+        PropertiesConfiguration config = configs.properties(getClass().getResource("/application.properties"));
+        String version = config.getString("version", "0.1.0");Label versionLabel = new Label(String.format("Version: %s", version));
+        versionLabel.setFont(Font.font("Arial", 12));
+        versionLabel.setTextFill(Color.DARKGRAY);
+        versionLabel.setStyle("-fx-background-color: rgba(255,255,255,0.6); -fx-padding: 2;");
 
-		primaryStage.setScene(scene);
+        HBox bottomBox = new HBox(versionLabel);
+        bottomBox.setAlignment(Pos.CENTER_RIGHT);
+        bottomBox.setPadding(new Insets(5));
+        bottomBox.setStyle("-fx-background-color: #f0f0f0;");
 
-		primaryStage.show();
-	}
+        // --- Root VBox ---
+        VBox root = new VBox(mainContent, bottomBox);
+        root.setSpacing(2);
 
-	private static boolean debug = true;
+        Scene scene = new Scene(root, 700, 700);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
 
-	// NOTE: getResourceURI may not work with standalone or web hosted
-	// application
-	public String getResourceURI(String resourceFileName) {
-
-		if (debug) {
-			System.err.println("Getting resource URI for: " + resourceFileName);
-		}
-		Class<?> thisClass = this.getClass();
-		System.err.println("Class: " + thisClass.getSimpleName());
-		ClassLoader classLoader = thisClass.getClassLoader();
-		URL resourceURL = classLoader.getResource(resourceFileName);
-		if (resourceURL != null) {
-			try {
-				System.err.println("Resource URL: " + resourceURL.toString());
-				URI uri = resourceURL.toURI();
-				if (debug) {
-					System.err.println("Resource URI: " + uri.toString());
-				}
-				return uri.toString();
-			} catch (URISyntaxException e) {
-				throw new RuntimeException(e);
-			}
-		} else {
-			return null;
-		}
-	}
-
-	public static String getResourcePath(String resourceFileName) {
-		String prefix = "file://";
-		final String resourcePath = String
-				.format("%s/%s/src/main/resources/%s", prefix,
-						System.getProperty("user.dir"), resourceFileName)
-				.replaceAll("\\\\", "/");
-		if (debug)
-			System.err.println("Project based resource path: " + resourcePath);
-
-		return resourcePath;
-	}
+    // --- Resource path helper ---
+    public static String getResourcePath(String resourceFileName) {
+        String prefix = "file://";
+        final String resourcePath = String
+                .format("%s/%s/src/main/resources/%s", prefix, System.getProperty("user.dir"), resourceFileName)
+                .replaceAll("\\\\", "/");
+        if (debug) System.err.println("Project based resource path: " + resourcePath);
+        return resourcePath;
+    }
 
 }
