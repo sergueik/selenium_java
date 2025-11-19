@@ -9,6 +9,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <flexmark-java.version>0.62.2</flexmark-java.version>
     <cssfx.version>1.1.1</cssfx.version>
+    <commons-binutils.version>1.10.0</commons-binutils.version>
     <commons-configuration2.version>2.4</commons-configuration2.version>
     <commons-collections4.version>4.2</commons-collections4.version>
     <commons-exec.version>1.3</commons-exec.version>
@@ -34,6 +35,12 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-configuration2</artifactId>
       <version>${commons-configuration2.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-beanutils</artifactId>
+      <version>${commons-binutils.version}</version>
+      <version>1.10.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -88,7 +95,7 @@
           <target>1.8</target>
         </configuration>
       </plugin>
-<!--
+      <!--
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
