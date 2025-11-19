@@ -73,8 +73,7 @@ public class Example extends Application {
         mainContent.setSpacing(5);
         VBox.setVgrow(mainContent, Priority.ALWAYS);
 
-        // --- Bottom version label ---
-        InputStream propStream = getClass().getResourceAsStream("/application.properties");
+        // InputStream propStream = getClass().getResourceAsStream("/application.properties");
         
         Properties properties = new Properties();
         
@@ -91,7 +90,7 @@ public class Example extends Application {
 
         Label versionLabel = new Label(String.format("Version: %s", version));
         versionLabel.setFont(Font.font("Arial", 12));
-        versionLabel.setTextFill(Color.DARKGRAY);
+        versionLabel.setTextFill(Color.BLACK);
         versionLabel.setStyle("-fx-background-color: rgba(255,255,255,0.6); -fx-padding: 2;");
 
         HBox bottomBox = new HBox(versionLabel);

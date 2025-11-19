@@ -1,6 +1,11 @@
 package example;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -120,7 +125,7 @@ public class MarkdownView extends VBox {
 	// when an exception occurs, substitute a placeholder Image instead of 
 	// letting the exception flow out and crash the JavaFX renderer
 	
-	public Image generateImageWithPlaceholder(String url) {
+	public Image generateImageWithPlaceholderOld(String url) {
 	    if (url == null || url.isEmpty()) {
 	        return getPlaceholder();
 	    }
@@ -146,6 +151,38 @@ public class MarkdownView extends VBox {
 	    }
 	}
 
+	private Image generateImageWithPlaceholder(String url) {
+	    try {
+	        byte[] data = downloadBytes(url);
+	        if (data == null || data.length == 0) {
+	            return getPlaceholder();
+	        }
+	        return new Image(new ByteArrayInputStream(data));
+	    } catch (Exception e) {
+	        logger.error("Image load failed for: " + url, e);
+	        return getPlaceholder();
+	    }
+	}
+
+	private byte[] downloadBytes(String urlStr) throws IOException {
+	    URL url = new URL(urlStr);
+	    URLConnection conn = url.openConnection();
+	    conn.setRequestProperty("User-Agent", "Mozilla/5.0"); // required!
+	    conn.setUseCaches(false);
+
+	    try (InputStream in = conn.getInputStream();
+	         ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+	        byte[] buf = new byte[8192];
+	        int len;
+	        while ((len = in.read(buf)) != -1) {
+	            out.write(buf, 0, len);
+	        }
+	        return out.toByteArray();
+	    }
+	}
+	
+	
 	private Image getPlaceholder() {
 	    try {
 	        URL res = getClass().getResource("/images/placeholder.png");
