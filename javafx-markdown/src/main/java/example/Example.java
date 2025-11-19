@@ -17,13 +17,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.configuration2.Configuration;
-import org.apache.commons.configuration2.builder.fluent.Configurations;
-import org.apache.commons.configuration2.PropertiesConfiguration;
+
 import org.fxmisc.cssfx.CSSFX;
 
 @SuppressWarnings("restriction")
@@ -77,10 +76,20 @@ public class Example extends Application {
         // --- Bottom version label ---
         InputStream propStream = getClass().getResourceAsStream("/application.properties");
         
+        Properties properties = new Properties();
+        
+        try (InputStream input = Thread.currentThread()
+                .getContextClassLoader()
+                .getResourceAsStream("application.properties")) {
+            if (input != null) {
+            	properties.load(input);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        String version = properties.getProperty("version", "0.1.0");
 
-        Configurations configs = new Configurations();
-        PropertiesConfiguration config = configs.properties(getClass().getResource("/application.properties"));
-        String version = config.getString("version", "0.1.0");Label versionLabel = new Label(String.format("Version: %s", version));
+        Label versionLabel = new Label(String.format("Version: %s", version));
         versionLabel.setFont(Font.font("Arial", 12));
         versionLabel.setTextFill(Color.DARKGRAY);
         versionLabel.setStyle("-fx-background-color: rgba(255,255,255,0.6); -fx-padding: 2;");
