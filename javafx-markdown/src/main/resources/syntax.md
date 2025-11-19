@@ -42,6 +42,14 @@ asdf | asdfsdf | asdf
 ![Image](https://www.jpro.one/app/default/resourcesencoded/jar:file:/home/ubuntu/jpro/jpro.one-jpro/libs/jpro.one.jar!/one/jpro/img/landing/Java-Logo.png)
 
 * image from earlier deployed `README.md`
+<!-- use fully qualified path to the image for testing -->
+
+```
+![application](https://github.com/sergueik/selenium_java/blob/master/javafx-markdown/screenshots/app.png)
+<!-- use fully qualified path to the image for testing -->
+```
+![application](https://github.com/sergueik/selenium_java/blob/master/javafx-markdown/screenshots/app.png)
+
 
 ```
 ![APM Example](https://github.com/sergueik/springboot_study/blob/master/basic-elk-cluster/screenshots/capture-apm-example.png)

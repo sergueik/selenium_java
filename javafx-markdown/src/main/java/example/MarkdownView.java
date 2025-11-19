@@ -12,6 +12,9 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.image.PixelWriter;
 import javafx.scene.layout.VBox;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +25,11 @@ public class MarkdownView extends VBox {
     private final Logger logger = LoggerFactory
             .getLogger(MarkdownView.class);
 
-
+    private static final Pattern GITHUB_BLOB_PATTERN = Pattern.compile(
+    	    "https?://github\\.com/(?<user>[^/]+)/(?<repo>[^/]+)/(?:blob|tree)/(?<branch>[^/]+)/(?<path>.+)",
+    	    Pattern.CASE_INSENSITIVE
+    	);
+    
 	private SimpleStringProperty mdString = new SimpleStringProperty("");
 
 	public MarkdownView(String mdString) {
@@ -67,9 +74,47 @@ public class MarkdownView extends VBox {
 		if (url.isEmpty()) {
 			return new Group();
 		} else {
-			return new ImageView(generateImageWithPlaceholder(url));
+			return new ImageView(generateImageWithPlaceholder(translateImageUrl(url)));
 		}
 	}
+	
+	private String translateImageUrl(String url) {
+	    if (url == null || url.isEmpty()) return url;
+
+	    Matcher m = GITHUB_BLOB_PATTERN.matcher(url);
+	    if (m.matches()) {
+	        String user = m.group("user");
+	        String repo = m.group("repo");
+	        String branch = m.group("branch");
+	        String path = m.group("path");
+
+	        // Normalize path (remove possible leading slashes)
+	        if (path.startsWith("/")) path = path.substring(1);
+
+	        String translated = String.format("https://raw.githubusercontent.com/%s/%s/%s/%s",
+	                                          user, repo, branch, path);
+	        logger.warn(String.format("translateImageUrl: %s -> %s", url, translated));
+	        System.err.println(String.format("translateImageUrl: %s -> %s", url, translated));
+	        return translated;
+	    }
+
+	    // No match: return original URL unchanged
+	    logger.warn(String.format("translateImageUrl: %s (unchanged)", url));
+	    return url;
+	}
+	
+	private String translateImageUrlShort(String url) {
+	    final String regex = "\\(https://github\\.com/([^/]+)/([^/]+)/blob/([^/]+)/(.*?)\\)";	    
+	    String translatedUrl = url.replaceAll(
+	        regex,
+	        "(https://raw.githubusercontent.com/$1/$2/$3/$4)"
+	    );
+	    System.err.println(String.format("translated %s to %s ", url, translatedUrl));
+	    // if (debug) System.err.println(String.format("translated %s to %s ", url, translatedUrl));
+	    logger.info(String.format("translated %s to %s ", url, translatedUrl));
+	    return translatedUrl;
+	}
+	
 	
 	// wrap the image generation in a try/catch, 
 	// when an exception occurs, substitute a placeholder Image instead of 
