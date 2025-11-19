@@ -27,13 +27,7 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("restriction")
 public class MarkdownView extends VBox {
 
-    private final Logger logger = LoggerFactory
-            .getLogger(MarkdownView.class);
-
-    private static final Pattern GITHUB_BLOB_PATTERN = Pattern.compile(
-    	    "https?://github\\.com/(?<user>[^/]+)/(?<repo>[^/]+)/(?:blob|tree)/(?<branch>[^/]+)/(?<path>.+)",
-    	    Pattern.CASE_INSENSITIVE
-    	);
+	private final Logger logger = LoggerFactory.getLogger(MarkdownView.class);
     
 	private SimpleStringProperty mdString = new SimpleStringProperty("");
 
@@ -86,7 +80,11 @@ public class MarkdownView extends VBox {
 	private String translateImageUrl(String url) {
 	    if (url == null || url.isEmpty()) return url;
 
-	    Matcher m = GITHUB_BLOB_PATTERN.matcher(url);
+	    final Pattern pattern = Pattern.compile(
+	    	    "https?://github\\.com/(?<user>[^/]+)/(?<repo>[^/]+)/(?:blob|tree)/(?<branch>[^/]+)/(?<path>.+)",
+	    	    Pattern.CASE_INSENSITIVE
+	    	);
+	    Matcher m = pattern.matcher(url);
 	    if (m.matches()) {
 	        String user = m.group("user");
 	        String repo = m.group("repo");
@@ -99,30 +97,28 @@ public class MarkdownView extends VBox {
 	        String translated = String.format("https://raw.githubusercontent.com/%s/%s/%s/%s",
 	                                          user, repo, branch, path);
 	        logger.warn(String.format("translateImageUrl: %s -> %s", url, translated));
-	        System.err.println(String.format("translateImageUrl: %s -> %s", url, translated));
 	        return translated;
 	    }
 
-	    // No match: return original URL unchanged
+	    // return original URL unchanged when no match observed 
 	    logger.warn(String.format("translateImageUrl: %s (unchanged)", url));
 	    return url;
 	}
 	
 	private String translateImageUrlShort(String url) {
-	    final String regex = "\\(https://github\\.com/([^/]+)/([^/]+)/blob/([^/]+)/(.*?)\\)";	    
+
+		final String regex = "https?://github\\.com/([^/]+)/([^/]+)/(?:blob|tree)/([^/]+)/(?.+)";	   
+	    
 	    String translatedUrl = url.replaceAll(
 	        regex,
 	        "(https://raw.githubusercontent.com/$1/$2/$3/$4)"
 	    );
-	    System.err.println(String.format("translated %s to %s ", url, translatedUrl));
-	    // if (debug) System.err.println(String.format("translated %s to %s ", url, translatedUrl));
 	    logger.info(String.format("translated %s to %s ", url, translatedUrl));
 	    return translatedUrl;
 	}
 	
 	
-	// wrap the image generation in a try/catch, 
-	// when an exception occurs, substitute a placeholder Image instead of 
+	// if an exception occurs during image generation, substitute a placeholder Image instead of 
 	// letting the exception flow out and crash the JavaFX renderer
 	
 	public Image generateImageWithPlaceholderOld(String url) {
@@ -181,7 +177,6 @@ public class MarkdownView extends VBox {
 	        return out.toByteArray();
 	    }
 	}
-	
 	
 	private Image getPlaceholder() {
 	    try {

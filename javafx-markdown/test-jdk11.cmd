@@ -9,10 +9,11 @@ if NOT EXIST "c:\java\zulu-jdk11" (
 REM the original launcher does not work with OpenJDK 11 due to 
 REM its module boundaries
 REM if JDK 11 is not the default on the host, set it to custom vendor JDK 
-REM which has JAVAFX  now
+REM which has JAVAFX now
 
 
 set JAVA_VERSION=
+REM NOTE non-standard directory naming with Azul
 set JAVA_HOME=c:\java\zulu-jdk11
 
 REM if JAVA_HOME points to an empty / non existend directory 
@@ -27,14 +28,14 @@ set JAVA_HOME=c:\java\jdk1.8.0_202
 :INIT
 set JAVA_VERSION=1.8.0_202
 call c:\java\init.cmd
-java.exe -version
+java.exe -version 2>&1
 where.exe mvn.cmd 2>NUL 1>NUL
 
 call mvn -f %~dp0pom-java11.xml clean package
-echo done
+REM echo done
 :SKIP
 
-echo Launching with classpath ^+ modulepath semantics
+REM echo Launching with classpath ^+ modulepath semantics
 java -Dprism.order=sw ^
 --module-path target/lib ^
 --add-modules=javafx.base,javafx.graphics,javafx.controls ^
