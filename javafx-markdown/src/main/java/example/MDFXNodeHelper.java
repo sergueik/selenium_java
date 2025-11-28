@@ -59,6 +59,7 @@ public class MDFXNodeHelper extends VBox {
 
 	int[] currentChapter = new int[6];
 
+	private Document node;
 	public boolean shouldShowContent() {
 		return parent.showChapter(currentChapter);
 	}
@@ -83,13 +84,15 @@ public class MDFXNodeHelper extends VBox {
 		extensions.add(TaskListExtension.create());
 		Parser parser = Parser.builder().extensions(extensions).build();
 
-		Document node = parser.parse(mdstring);
-
+		/* Document */ node = parser.parse(mdstring);
 		new MDParser(node).visitor.visitChildren(node);
 
 		this.getChildren().add(root);
 	}
 
+	public Document getNode() {
+		return node;
+	}
 	class MDParser {
 
 		Document document;

@@ -3,6 +3,7 @@ package example;
 import javafx.application.Application;
 import javafx.application.Platform; 
 import javafx.concurrent.Worker;
+import javafx.concurrent.Worker.State;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -108,30 +109,58 @@ public class Example extends Application {
 		    final double pct = vbar.getValue();
 
 		    final WebView webView = markdownView.getWebView();
+			logger.info(String.format("webWiew: %s", (webView != null ? webView.toString() : "null")));
+		    logger.info(String.format("Scroll %.2f", pct));
+
 		    if (webView == null) return;
 
 		    Platform.runLater(new Runnable() {
 		        @Override
 		        public void run() {
+		        	// https://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/Worker.html
 		            final Worker<Void> loadWorker = webView.getEngine().getLoadWorker();
+		            
+		            
+		            logger.info(String.format("btnSync clicked, WebView = " + webView));
+		            logger.info(String.format("WebEngine = " + webView.getEngine()));
+		            logger.info(String.format("LoadWorker state = " + webView.getEngine().getLoadWorker().getState()));
 		            
 		            Runnable doScroll = new Runnable() {
 		                @Override
 		                public void run() {
-		                    String js = "var root = document.documentElement;"
-		                              + "var h = root.scrollHeight - root.clientHeight;"
-		                              + "root.scrollTop = h * " + pct + ";";
+		                    String js = "var root = document.documentElement; var h = root.scrollHeight - root.clientHeight; root.scrollTop = h * " + pct + ";";
+		                    
+		                    js =
+		                    	    "var pct = " + pct + ";" +
+		                    	    "var de = document.documentElement;" +
+		                    	    "var b = document.body;" +
+		                    	    "var h1 = de.scrollHeight - de.clientHeight;" +
+		                    	    "var h2 = b.scrollHeight - b.clientHeight;" +
+
+		                    	    // pick the scrollable element
+		                    	    "if (h2 > h1) {" +
+		                    	    "  b.scrollTop = h2 * pct;" +
+		                    	    "} else {" +
+		                    	    "  de.scrollTop = h1 * pct;" +
+		                    	    "}";
+		                    js +=  "alert('JS executed!');";
+		                    logger.info(String.format("executing: \"%s\"", js ));
 		                    webView.getEngine().executeScript(js);
 		                }
 		            };
 
-		            if (loadWorker.getState() == Worker.State.SUCCEEDED) {
+		            Object html = webView.getEngine().executeScript("document.documentElement.outerHTML");
+		            logger.info(String.format("HTML content length: " + (html != null ? html.toString().length() : "null")));
+		            logger.info(String.format("HTML content :%s" , html));
+		            logger.info(String.format("Webvire Enging Loadworker state :%s" , loadWorker.getState()));
+		            // https://docs.oracle.com/javase/8/javafx/api/javafx/concurrent/Worker.State.html
+		            if (loadWorker.getState() == State.SUCCEEDED) {
 		                // Page already loaded → execute immediately
 		                doScroll.run();
 		            } else {
 		                // Page still loading → attach listener
 		                loadWorker.stateProperty().addListener((obs, oldState, newState) -> {
-		                    if (newState == Worker.State.SUCCEEDED) {
+		                    if (newState == State.SUCCEEDED) {
 		                        doScroll.run();
 		                    }
 		                });
@@ -140,23 +169,6 @@ public class Example extends Application {
 		    });
 		});
 
-		btnSync.setOnAction(e -> {
-		    ScrollBar vbar = findVerticalScrollbar(textArea);
-		    if (vbar == null) {
-		        return;
-		    }
-
-		    double pct = vbar.getValue();  // between 0.0 and 1.0
-
-		    String script =
-		        "var root = document.documentElement;" +
-		        "var h = root.scrollHeight - root.clientHeight;" +
-		        "root.scrollTop = h * " + pct + ";";
-		    logger.info(String.format("Scroll %.2f", pct));
-		    // System.err.println(String.format("Scroll %.2f", pct));
-		    markdownView.getWebView().getEngine().executeScript(script);
-		});
-		
 		Label versionLabel = new Label(String.format("Version: %s", version));
 		versionLabel.setFont(Font.font("Arial", 12));
 		versionLabel.setTextFill(Color.BLACK);

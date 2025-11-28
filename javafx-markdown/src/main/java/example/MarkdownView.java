@@ -10,6 +10,7 @@ import java.net.URLConnection;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import javafx.application.Platform; 
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.web.WebView;
@@ -24,6 +25,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.vladsch.flexmark.html.HtmlRenderer;
 
 
 @SuppressWarnings("restriction")
@@ -44,17 +47,27 @@ public class MarkdownView extends VBox {
 
 	public MarkdownView(String mdString) {
 		this.mdString.set(mdString);
-        webView = new WebView();
-        this.getChildren().add(webView);
-		this.mdString.addListener((p, o, n) -> updateContent());
+		// https://docs.oracle.com/javase/8/javafx/api/javafx/scene/web/WebView.html
+		this.webView = new WebView();
+		logger.info(String.format("webWiew: %s", (webView != null ? webView.toString() : "null")));
+ 		this.mdString.addListener((p, o, n) -> updateContent());
 		getStylesheets().add("/css/mdfx.css");
 		updateContent();
+		webView.getEngine().setJavaScriptEnabled(true); 
+		webView.getEngine().setOnAlert(e -> logger.info(String.format("JS: %s" ,  e.getData())));
+        this.getChildren().add(webView);
 	}
 
 	private void updateContent() {
+		
 		MDFXNodeHelper content = new MDFXNodeHelper(this, mdString.getValue());
 		getChildren().clear();
 		getChildren().add(content);
+		HtmlRenderer renderer = HtmlRenderer.builder().build();
+		String html = renderer.render(content.getNode());
+		logger.info(String.format("Html: %s",html));
+		
+		Platform.runLater(() -> webView.getEngine().loadContent(html));
 	}
 
 	public StringProperty mdStringProperty() {
