@@ -1,6 +1,5 @@
-**Why memo-posting will not disappear in Event Epoch**
+### **Why memo-posting will not disappear in Event Epoch**
 
-\
 for someone who is very strong in software/QA but new to
 core banking.
 
@@ -75,7 +74,7 @@ The authorization and final settlement can differ in:
 - tips (restaurants)
 - hotel/car rental extended holds
 
-➡️ ****Core must handle temporary holds &gt; final postings.\
+ ****Core must handle temporary holds &gt; final postings.\
 Memo logic is required.****
 
 ## B. ACH is fundamentally batch
