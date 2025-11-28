@@ -9,8 +9,10 @@ import java.net.URLConnection;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.web.WebView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -27,19 +29,26 @@ import org.slf4j.LoggerFactory;
 @SuppressWarnings("restriction")
 public class MarkdownView extends VBox {
 
+	private final WebView webView;
+
+	public MarkdownView() {
+		this("");
+	}
+	
+    public WebView getWebView() {
+        return webView;
+    }
 	private final Logger logger = LoggerFactory.getLogger(MarkdownView.class);
     
 	private SimpleStringProperty mdString = new SimpleStringProperty("");
 
 	public MarkdownView(String mdString) {
 		this.mdString.set(mdString);
+        webView = new WebView();
+        this.getChildren().add(webView);
 		this.mdString.addListener((p, o, n) -> updateContent());
 		getStylesheets().add("/css/mdfx.css");
 		updateContent();
-	}
-
-	public MarkdownView() {
-		this("");
 	}
 
 	private void updateContent() {

@@ -12,6 +12,7 @@ import com.vladsch.flexmark.ext.gfm.tasklist.TaskListItem;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;

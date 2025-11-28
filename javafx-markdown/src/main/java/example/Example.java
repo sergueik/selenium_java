@@ -1,6 +1,8 @@
 package example;
 
 import javafx.application.Application;
+import javafx.application.Platform; 
+import javafx.concurrent.Worker;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -8,6 +10,12 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Label;
+import javafx.scene.control.Button;
+import javafx.scene.control.ScrollBar;
+
+import javafx.scene.web.WebView;
+
+import javafx.geometry.Orientation;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.Priority;
@@ -20,6 +28,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 
@@ -91,12 +100,70 @@ public class Example extends Application {
 		}
 		String version = properties.getProperty("version", "0.1.0");
 
+		Button btnSync = new Button("Sync Scroll");
+
+		btnSync.setOnAction(e -> {
+		    ScrollBar vbar = findVerticalScrollbar(textArea);
+		    if (vbar == null) return;
+		    final double pct = vbar.getValue();
+
+		    final WebView webView = markdownView.getWebView();
+		    if (webView == null) return;
+
+		    Platform.runLater(new Runnable() {
+		        @Override
+		        public void run() {
+		            final Worker<Void> loadWorker = webView.getEngine().getLoadWorker();
+		            
+		            Runnable doScroll = new Runnable() {
+		                @Override
+		                public void run() {
+		                    String js = "var root = document.documentElement;"
+		                              + "var h = root.scrollHeight - root.clientHeight;"
+		                              + "root.scrollTop = h * " + pct + ";";
+		                    webView.getEngine().executeScript(js);
+		                }
+		            };
+
+		            if (loadWorker.getState() == Worker.State.SUCCEEDED) {
+		                // Page already loaded → execute immediately
+		                doScroll.run();
+		            } else {
+		                // Page still loading → attach listener
+		                loadWorker.stateProperty().addListener((obs, oldState, newState) -> {
+		                    if (newState == Worker.State.SUCCEEDED) {
+		                        doScroll.run();
+		                    }
+		                });
+		            }
+		        }
+		    });
+		});
+
+		btnSync.setOnAction(e -> {
+		    ScrollBar vbar = findVerticalScrollbar(textArea);
+		    if (vbar == null) {
+		        return;
+		    }
+
+		    double pct = vbar.getValue();  // between 0.0 and 1.0
+
+		    String script =
+		        "var root = document.documentElement;" +
+		        "var h = root.scrollHeight - root.clientHeight;" +
+		        "root.scrollTop = h * " + pct + ";";
+		    logger.info(String.format("Scroll %.2f", pct));
+		    // System.err.println(String.format("Scroll %.2f", pct));
+		    markdownView.getWebView().getEngine().executeScript(script);
+		});
+		
 		Label versionLabel = new Label(String.format("Version: %s", version));
 		versionLabel.setFont(Font.font("Arial", 12));
 		versionLabel.setTextFill(Color.BLACK);
 		versionLabel.setStyle("-fx-background-color: rgba(255,255,255,0.6); -fx-padding: 2;");
 
 		HBox bottomBox = new HBox(versionLabel);
+		bottomBox.getChildren().add(0, btnSync);  
 		bottomBox.setAlignment(Pos.CENTER_RIGHT);
 		bottomBox.setPadding(new Insets(5));
 		bottomBox.setStyle("-fx-background-color: #f0f0f0;");
@@ -120,4 +187,18 @@ public class Example extends Application {
 		return resourcePath;
 	}
 
+	private ScrollBar findVerticalScrollbar(TextArea textArea) {
+		Set<Node> nodes = textArea.lookupAll(".scroll-bar");
+	    for (Node node : nodes) {
+	        if (node instanceof ScrollBar) {
+	            ScrollBar sb = (ScrollBar) node;
+	            if (sb.getOrientation() == Orientation.VERTICAL) {
+	                return sb;
+	            }
+	        }
+	    }
+	    return null;
+    }
+	
 }
+

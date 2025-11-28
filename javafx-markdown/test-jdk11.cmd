@@ -38,7 +38,7 @@ REM echo done
 REM echo Launching with classpath ^+ modulepath semantics
 java -Dprism.order=sw ^
 --module-path target/lib ^
---add-modules=javafx.base,javafx.graphics,javafx.controls ^
+--add-modules=javafx.base,javafx.graphics,javafx.controls,javafx.web ^
 -cp target\example.javafx_markdown.jar;target\lib\*;.  ^
 example.Example
 REM java.lang.module.FindException: Module org.fxmisc.cssfx not found
