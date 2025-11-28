@@ -1,0 +1,56 @@
+digraph banking_memo_evolution {
+    rankdir=LR;
+    fontsize=10;
+
+    node [shape=box, style=filled, fillcolor="#f9f9f9", fontsize=10];
+
+    subgraph cluster_legacy {
+        label="LEGACY BANK ARCHITECTURE (Batch-Centric)";
+        style=filled;
+        color="#cccccc";
+
+        legacy1 [label="Customer Transaction Arrives\n(ATM, Teller, POS, ACH File)"];
+        legacy2 [label="Memo-Post (Shadow Entry)\n- affects AVAILABLE balance\n- does NOT hit ledger"];
+        legacy3 [label="Daytime Queue / Staging Files\n(transaction store for EOD batch)"];
+        legacy4 [label="End-of-Day Batch Posting\n- Resolve memos\n- Post to Ledger\n- Fees, Interest, Reversals"];
+        legacy5 [label="Next Morning Balance Available"];
+
+        legacy1 -> legacy2 -> legacy3 -> legacy4 -> legacy5;
+    }
+
+    subgraph cluster_modern {
+        label="MODERN ARCHITECTURE (Real-Time Event Driven)";
+        style=filled;
+        color="#bcd7ff";
+
+        mod1 [label="Customer Transaction Arrives\n(API, Mobile, POS, Real-Time Feed)"];
+        mod2 [label="Authorization / Hold Event\n(real-time balance projection)\n== Memo equivalent"];
+        mod3 [label="Event Stream (Kafka/Pulsar)\nproducing:\n- hold events\n- fraud checks\n- AML checks"];
+        mod4 [label="Real-Time Balance Service\n(projected balance = ledger + holds)"];
+        mod5 [label="Settlement Event (Card, ACH, Wire)\nMay occur hours/days later"];
+        mod6 [label="Ledger Write\n(final posting)\n(event-sourced or cloud core)"];
+
+        mod1 -> mod2 -> mod3 -> mod4 -> mod5 -> mod6;
+    }
+
+    subgraph cluster_equiv {
+        label="FUNCTIONAL EQUIVALENTS (Legacy vs Modern)";
+        style=filled;
+        color="#e8ffe8";
+
+        eq1 [label="Legacy Memo-Post\n(Shadow entry)"];
+        eq2 [label="Modern Hold / Authorization Ledger\n(real-time reservations)"];
+
+        eq3 [label="Legacy Daytime Queues"];
+        eq4 [label="Modern Event Streams (Kafka, etc.)"];
+
+        eq5 [label="Legacy EOD Batch Posting"];
+        eq6 [label="Modern Finalization Event → Ledger Write"];
+    }
+
+    // Cross-lane conceptual equivalence arrows (dotted)
+    eq1 -> eq2 [style=dotted, label="evolution"];
+    eq3 -> eq4 [style=dotted, label="evolution"];
+    eq5 -> eq6 [style=dotted, label="evolution"];
+}
+
