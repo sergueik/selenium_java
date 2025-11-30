@@ -1,7 +1,7 @@
 ### Info
 
 This directory contains a minimal desktop application showcasing a standalone replica of the  
-[`MarkdownView`](https://github.com/JPro-one/markdown-javafx-renderer) __Markdown for JavaFX__ advanced HTML WebView renderer hosted inside a basic [JavaFX](https://en.wikipedia.org/wiki/JavaFX) UI to run on Linux or Windows laptop.
+[`MarkdownView`](https://github.com/JPro-one/markdown-javafx-renderer) __Markdown for JavaFX__ advanced HTML WebView renderer based on [WebKit](https://en.wikipedia.org/wiki/WebKit) layout engine hosted inside a basic [JavaFX](https://en.wikipedia.org/wiki/JavaFX) UI to run on Linux or Windows laptop.
 
 ![application](screenshots/app.png)
 The project uses:

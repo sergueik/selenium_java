@@ -29,3 +29,8 @@ Improved workflow: Once fully implemented, this will allow for a more seamless w
 ### See Also
 
    * https://nibblestew.blogspot.com/2022/09/looking-at-libreoffices-windows.html
+   * __Markdig__- Markdown processor for .NET. - [repo](https://github.com/xoofx/markdig) and [artifact](https://www.nuget.org/packages/Markdig)
+
+### Author
+
+[Serguei Kouzmine](mailto:kouzmine_serguei@yahoo.com)
