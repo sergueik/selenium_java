@@ -9,6 +9,7 @@ install_path="$install_dir/$script_name"
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 find_npp() {
+    # Prefer Notepad++ installed per-user or system-wide
     for p in \
         "$LOCALAPPDATA/Notepad++/notepad++.exe" \
         "/c/Program Files/Notepad++/notepad++.exe" \
@@ -22,35 +23,33 @@ find_npp() {
 install_self() {
     mkdir -p "$install_dir"
 
-    # If exists, compare hashes
+    # If already exists, check content or symlink target
     if [ -e "$install_path" ] || [ -L "$install_path" ]; then
-        echo "Installation target already exists: $install_path"
+        echo "Existing installation detected: $install_path"
 
-        # Compare symlink target
         if [ -L "$install_path" ]; then
             target="$(readlink -f "$install_path")"
             if [ "$target" = "$script_self" ]; then
-                echo "Identical symlink already installed."
+                echo "Already installed and identical (symlink)."
                 exit 0
             else
-                die "Different symlink target — refusing to overwrite (no --force available)"
+                [ "${FORCE:-0}" = "1" ] || die "Different symlink target: $target (use --force)"
+            fi
+        else
+            # Compare with hash if file
+            existing_hash="$(sha256sum "$install_path" | awk '{print $1}')"
+            my_hash="$(sha256sum "$script_self" | awk '{print $1}')"
+            if [ "$existing_hash" = "$my_hash" ]; then
+                echo "Already installed and identical (file)."
+                exit 0
+            else
+                [ "${FORCE:-0}" = "1" ] || die \
+                    "Existing file differs from this version (use --force to replace)"
             fi
         fi
 
-        # Compare file contents with sha256sum
-        if ! command -v sha256sum >/dev/null 2>&1; then
-            die "sha256sum not found — cannot safely compare existing installation"
-        fi
-
-        existing_hash="$(sha256sum "$install_path" | awk '{print $1}')"
-        my_hash="$(sha256sum "$script_self" | awk '{print $1}')"
-
-        if [ "$existing_hash" = "$my_hash" ]; then
-            echo "Existing file is identical — nothing to do."
-            exit 0
-        else
-            die "Existing file differs — refusing to overwrite (no --force available)"
-        fi
+        echo "Overwriting due to --force"
+        rm -f "$install_path"
     fi
 
     ln -s "$script_self" "$install_path"
@@ -60,6 +59,13 @@ install_self() {
 main() {
     case "${1:-}" in
         --install)
+            install_self
+            exit 0
+            ;;
+        --force)
+            FORCE=1
+            shift
+            [ "${1:-}" = "--install" ] || die "--force only allowed with --install"
             install_self
             exit 0
             ;;
