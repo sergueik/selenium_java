@@ -1,0 +1,42 @@
+#!/bin/bash
+# robust wrapper for Notepad++ in Git Bash
+
+# Try common locations first
+NPP=""
+for path in \
+    "/c/Program Files/Notepad++/notepad++.exe" \
+    "/c/Program Files (x86)/Notepad++/notepad++.exe" \
+    "$LOCALAPPDATA/Programs/Notepad++/notepad++.exe"
+do
+    if [ -x "$path" ]; then
+        NPP="$path"
+        break
+    fi
+done
+
+# Fallback: search PATH using where.exe
+if [ -z "$NPP" ]; then
+    WINPATH=$(cmd.exe /C "where notepad++.exe" 2>/dev/null | tr -d '\r' | head -n1)
+    if [ -n "$WINPATH" ]; then
+        NPP=$(cygpath "$WINPATH")
+    fi
+fi
+
+if [ -z "$NPP" ]; then
+    echo "Notepad++ not found!"
+    exit 1
+fi
+
+# Convert Git Bash paths to Windows paths
+WINARGS=()
+for arg in "$@"; do
+    if [[ "$arg" == /* ]]; then
+        WINARGS+=("$(cygpath -w "$arg")")
+    else
+        WINARGS+=("$arg")
+    fi
+done
+
+# Launch Notepad++
+"$NPP" "${WINARGS[@]}" &
+
