@@ -1,42 +1,76 @@
 #!/bin/bash
-# robust wrapper for Notepad++ in Git Bash
+# npp: launch Notepad++ from Git Bash / MSYS
+# also supports:  npp --install
 
-# Try common locations first
-NPP=""
-for path in \
-    "/c/Program Files/Notepad++/notepad++.exe" \
-    "/c/Program Files (x86)/Notepad++/notepad++.exe" \
+SELF="$0"
+
+install_self() {
+    local target="$HOME/bin/npp"
+
+    mkdir -p "$HOME/bin"
+
+    # If target already exists, replace it
+    if [ -e "$target" ]; then
+        echo "Removing existing $target"
+        rm -f "$target"
+    fi
+
+    # Prefer symlink (best for repo use)
+    if ln -s "$(realpath "$SELF")" "$target" 2>/dev/null; then
+        echo "Installed symlink: $target"
+    else
+        # If symlinks not supported (rare), fall back to copy
+        cp "$SELF" "$target"
+        chmod +x "$target"
+        echo "Installed copy: $target"
+    fi
+
+    echo "Done. Make sure ~/bin is in your PATH (Git Bash does this automatically)."
+    exit 0
+}
+
+if [[ "$1" == "--install" ]]; then
+    install_self
+fi
+
+# --- Locate Notepad++ -------------------------------------------------------
+
+CANDIDATES=(
+    "/c/Program Files/Notepad++/notepad++.exe"
+    "/c/Program Files (x86)/Notepad++/notepad++.exe"
     "$LOCALAPPDATA/Programs/Notepad++/notepad++.exe"
-do
+)
+
+for path in "${CANDIDATES[@]}"; do
     if [ -x "$path" ]; then
         NPP="$path"
         break
     fi
 done
 
-# Fallback: search PATH using where.exe
 if [ -z "$NPP" ]; then
-    WINPATH=$(cmd.exe /C "where notepad++.exe" 2>/dev/null | tr -d '\r' | head -n1)
-    if [ -n "$WINPATH" ]; then
-        NPP=$(cygpath "$WINPATH")
+    FOUND=$(cmd.exe /C "where notepad++.exe" 2>/dev/null | tr -d '\r' | head -n1)
+    if [ -n "$FOUND" ]; then
+        NPP=$(cygpath "$FOUND")
     fi
 fi
 
 if [ -z "$NPP" ]; then
-    echo "Notepad++ not found!"
+    echo "Notepad++ not found."
     exit 1
 fi
 
-# Convert Git Bash paths to Windows paths
+# --- Convert arguments ------------------------------------------------------
+
 WINARGS=()
 for arg in "$@"; do
-    if [[ "$arg" == /* ]]; then
-        WINARGS+=("$(cygpath -w "$arg")")
-    else
-        WINARGS+=("$arg")
-    fi
+    case "$arg" in
+        /*) WINARGS+=("$(cygpath -w "$arg")") ;;
+        *)  WINARGS+=("$arg") ;;
+    esac
 done
 
-# Launch Notepad++
+# --- Launch ----------------------------------------------------------------
+
 "$NPP" "${WINARGS[@]}" &
 
