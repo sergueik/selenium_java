@@ -1,39 +1,85 @@
 #!/bin/bash
-# npp: launch Notepad++ from Git Bash / MSYS
-# also supports:  npp --install
+# npp: Notepad++ launcher for Git Bash / MSYS / MinGW
+# Supports: npp --install (safe installer)
 
-SELF="$0"
+SELF="$(realpath "$0")"
+TARGET="$HOME/bin/npp"
+
+# ------------------------------- UTILITIES ----------------------------------
+
+sha1() {
+    # portable: works in Git Bash, MSYS, MinGW
+    if command -v sha1sum >/dev/null 2>&1; then
+        sha1sum "$1" | awk '{print $1}'
+    elif command -v shasum >/dev/null 2>&1; then
+        shasum -a 1 "$1" | awk '{print $1}'
+    else
+        echo "no-sha"
+    fi
+}
+
+# ----------------------------- INSTALL LOGIC --------------------------------
 
 install_self() {
-    local target="$HOME/bin/npp"
 
     mkdir -p "$HOME/bin"
 
-    # If target already exists, replace it
-    if [ -e "$target" ]; then
-        echo "Removing existing $target"
-        rm -f "$target"
+    # If no previous file → safe install
+    if [ ! -e "$TARGET" ]; then
+        if ln -s "$SELF" "$TARGET" 2>/dev/null; then
+            echo "Installed symlink: $TARGET"
+        else
+            cp "$SELF" "$TARGET"
+            chmod +x "$TARGET"
+            echo "Installed copy: $TARGET"
+        fi
+        exit 0
     fi
 
-    # Prefer symlink (best for repo use)
-    if ln -s "$(realpath "$SELF")" "$target" 2>/dev/null; then
-        echo "Installed symlink: $target"
-    else
-        # If symlinks not supported (rare), fall back to copy
-        cp "$SELF" "$target"
-        chmod +x "$target"
-        echo "Installed copy: $target"
+    # Case 1: existing target is a symlink
+    if [ -L "$TARGET" ]; then
+        LINK_DEST="$(readlink "$TARGET")"
+
+        if [ "$LINK_DEST" = "$SELF" ]; then
+            echo "Already installed: $TARGET → $SELF"
+            exit 0
+        else
+            echo "Refusing to install: $TARGET already symlinks to:"
+            echo "  $LINK_DEST"
+            echo "Different from:"
+            echo "  $SELF"
+            exit 1
+        fi
     fi
 
-    echo "Done. Make sure ~/bin is in your PATH (Git Bash does this automatically)."
-    exit 0
+    # Case 2: existing target is a regular file
+    if [ -f "$TARGET" ]; then
+        SELF_HASH=$(sha1 "$SELF")
+        TGT_HASH=$(sha1 "$TARGET")
+
+        if [ "$SELF_HASH" = "$TGT_HASH" ]; then
+            echo "Existing file matches hash; already installed: $TARGET"
+            exit 0
+        else
+            echo "Refusing to install: existing $TARGET differs."
+            echo "Self hash: $SELF_HASH"
+            echo "File hash: $TGT_HASH"
+            exit 1
+        fi
+    fi
+
+    # Case 3: weird case (dir, device, etc.)
+    echo "Refusing to install: $TARGET exists and is not a file or symlink."
+    exit 1
 }
+
+# ------------------------- HANDLE --install OPTION ---------------------------
 
 if [[ "$1" == "--install" ]]; then
     install_self
 fi
 
-# --- Locate Notepad++ -------------------------------------------------------
+# ---------------------- LOCATE NOTEPAD++ ------------------------------------
 
 CANDIDATES=(
     "/c/Program Files/Notepad++/notepad++.exe"
@@ -49,10 +95,8 @@ for path in "${CANDIDATES[@]}"; do
 done
 
 if [ -z "$NPP" ]; then
-    FOUND=$(cmd.exe /C "where notepad++.exe" 2>/dev/null | tr -d '\r' | head -n1)
-    if [ -n "$FOUND" ]; then
-        NPP=$(cygpath "$FOUND")
-    fi
+    FOUND=$(cmd.exe /C "where notepad++.exe" 2>/dev/null | tr -d '\r' | head -n 1)
+    [ -n "$FOUND" ] && NPP=$(cygpath "$FOUND")
 fi
 
 if [ -z "$NPP" ]; then
@@ -60,7 +104,7 @@ if [ -z "$NPP" ]; then
     exit 1
 fi
 
-# --- Convert arguments ------------------------------------------------------
+# ---------------------- ARG PATH CONVERSION ----------------------------------
 
 WINARGS=()
 for arg in "$@"; do
@@ -70,7 +114,7 @@ for arg in "$@"; do
     esac
 done
 
-# --- Launch ----------------------------------------------------------------
+# -------------------------- LAUNCH NOTEPAD++ ---------------------------------
 
 "$NPP" "${WINARGS[@]}" &
 
