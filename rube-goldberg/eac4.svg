@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="900" height="420" viewBox="0 0 900 420" aria-label="Cartoon Rube Goldberg machine pouring tea">
+  <style>
+    .stroke { stroke: #222; stroke-width:3; stroke-linecap:round; stroke-linejoin:round; }
+    .cartoon { fill:#f6f2ef; stroke:#222; stroke-width:2; }
+    .accent { fill:#f9d976; }
+    .metal { fill:#d1d8e0; }
+    .wood { fill:#b5884a; }
+    .cup { fill:#ffffff; stroke:#222; stroke-width:2; }
+    .tea { fill:#b76b2b; opacity:0.95; }
+    .shadow { fill: rgba(0,0,0,0.08); }
+    text { font-family: "Segoe UI", Roboto, sans-serif; font-size:12px; fill:#222; }
+  </style>
+
+  <!-- Ground -->
+  <rect x="0" y="340" width="900" height="80" fill="#e9e6e2"/>
+
+  <!-- Alarm clock (left) -->
+  <g id="alarm" transform="translate(50,110)">
+    <ellipse cx="0" cy="0" rx="46" ry="44" class="cartoon"/>
+    <circle cx="-18" cy="-18" r="6" class="metal stroke"/>
+    <rect x="-40" y="44" width="80" height="8" rx="3" class="metal stroke" />
+    <!-- tongs/hammer -->
+    <g id="tongs" transform="translate(46,-10) rotate(-25)">
+      <rect x="-2" y="-2" width="60" height="8" rx="4" fill="#c84b4b" class="stroke"/>
+      <rect x="56" y="-6" width="12" height="12" rx="3" fill="#e9a3a3" class="stroke"/>
+      <!-- swing animation -->
+      <animateTransform xlink:href="#tongs"
+                        attributeName="transform"
+                        type="rotate"
+                        values="-25 46 -10; 10 46 -10; -25 46 -10"
+                        dur="3.8s"
+                        begin="0s"
+                        repeatCount="indefinite"
+                        keyTimes="0;0.45;1"/>
+    </g>
+    <text x="-28" y="70">Alarm</text>
+  </g>
+
+  <!-- First dominos (line) -->
+  <g id="dominoes" transform="translate(170,240)">
+    <!-- five dominos; each will rotate to simulate fall, staggered with begin offsets -->
+    <g id="d1" transform="translate(0,0)">
+      <rect x="-6" y="-40" width="12" height="40" rx="2" fill="#2a4d6d" class="stroke"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0 0 0; -60 0 0" begin="0.75s" dur="0.35s" fill="freeze"/>
+    </g>
+
+    <g id="d2" transform="translate(28,0)">
+      <rect x="-6" y="-40" width="12" height="40" rx="2" fill="#2e7a5b" class="stroke"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0 0 0; -60 0 0" begin="0.95s" dur="0.35s" fill="freeze"/>
+    </g>
+
+    <g id="d3" transform="translate(56,0)">
+      <rect x="-6" y="-40" width="12" height="40" rx="2" fill="#c27aa8" class="stroke"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0 0 0; -60 0 0" begin="1.15s" dur="0.35s" fill="freeze"/>
+    </g>
+
+    <g id="d4" transform="translate(84,0)">
+      <rect x="-6" y="-40" width="12" height="40" rx="2" fill="#f1a742" class="stroke"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0 0 0; -60 0 0" begin="1.35s" dur="0.35s" fill="freeze"/>
+    </g>
+
+    <g id="d5" transform="translate(112,0)">
+      <rect x="-6" y="-40" width="12" height="40" rx="2" fill="#7aa6ff" class="stroke"/>
+      <animateTransform attributeName="transform" type="rotate"
+                        values="0 0 0; -60 0 0" begin="1.55s" dur="0.35s" fill="freeze"/>
+    </g>
+  </g>
+
+  <!-- path along which ball will roll -->
+  <path id="ballPath" d="M 300 260 C 340 240, 380 210, 430 210 L 520 210" fill="none" stroke="none"/>
+
+  <!-- rolling ball -->
+  <g id="ball" transform="translate(270,260)">
+    <circle cx="0" cy="0" r="12" fill="#ff6b6b" class="stroke"/>
+    <!-- animate along path, begins after domino fall -->
+    <animateMotion dur="3.2s" begin="1.6s" fill="freeze" repeatCount="indefinite">
+      <mpath xlink:href="#ballPath"/>
+    </animateMotion>
+    <!-- rotate to look like rolling -->
+    <animateTransform attributeName="transform" type="rotate"
+                      from="0" to="720" dur="1.6s" begin="1.6s" repeatCount="indefinite"/>
+  </g>
+
+  <!-- seesaw lever that the ball hits -->
+  <g id="seesaw" transform="translate(520,210)">
+    <!-- pivot -->
+    <polygon points="-8,6 0,-36 8,6" class="wood stroke"/>
+    <!-- plank -->
+    <g id="plank" transform="translate(0,-14)">
+      <rect x="-120" y="-8" width="240" height="16" rx="6" class="wood stroke"/>
+      <!-- tilt animation triggered after ball arrives -->
+      <animateTransform xlink:href="#plank"
+                        attributeName="transform"
+                        type="rotate"
+                        values="0 -0 -14; 25 -0 -14; 0 -0 -14"
+                        begin="3.0s"
+                        dur="1.0s"
+                        fill="freeze"
+                        repeatCount="indefinite"/>
+    </g>
+  </g>
+
+  <!-- small weight falls and pulls a pin -->
+  <g id="weight" transform="translate(340,80)">
+    <circle cx="0" cy="0" r="14" class="metal stroke"/>
+    <rect x="-6" y="-30" width="12" height="30" class="stroke" fill="#8b5a2b"/>
+    <!-- animation: nothing fancy, it's part of chain via timing -->
+    <animateTransform attributeName="transform" type="translate"
+                      values="0,0; 0,0" begin="0s" dur="1s" fill="freeze"/>
+  </g>
+
+  <!-- kettle perched on a latch; will tip to pour -->
+  <g id="kettle" transform="translate(710,130)">
+    <g id="kettleBody" transform="rotate(0)">
+      <ellipse cx="0" cy="0" rx="46" ry="36" class="cartoon"/>
+      <rect x="-46" y="-6" width="26" height="8" rx="3" class="metal stroke" transform="translate(-30,-24) rotate(-30)"/>
+      <path d="M -22 -4 q -12 -4 -14 -16 q 6 -8 22 -6" fill="#e8e8e8" class="stroke"/>
+    </g>
+
+    <!-- spout -->
+    <g id="spout" transform="translate(45,-6)">
+      <path d="M0,0 q18,-6 28,6" class="stroke" fill="none"/>
+    </g>
+
+    <!-- kettle tipping animation that begins when seesaw tilts -->
+    <animateTransform xlink:href="#kettle"
+                      attributeName="transform"
+                      type="rotate"
+                      values="0 710 130; 12 710 130; 0 710 130"
+                      begin="4.0s"
+                      dur="1.2s"
+                      repeatCount="indefinite"
+                      fill="freeze"/>
+  </g>
+
+  <!-- tea stream (a mask reveals stream only during pour) -->
+  <g id="teapour">
+    <!-- stream path -->
+    <path id="stream" d="M740 140 q 20 30 40 60 q 10 30 -20 60" fill="none" stroke="#b76b2b" stroke-width="10" stroke-linecap="round" opacity="0">
+      <animate attributeName="opacity" values="0;1;0" begin="4.1s" dur="1.2s" repeatCount="indefinite"/>
+      <!-- slight stroke dash to appear flowing -->
+      <animate attributeName="stroke-dashoffset" from="40" to="0" dur="1.2s" begin="4.1s" repeatCount="indefinite"/>
+    </path>
+  </g>
+
+  <!-- cup on table (right) -->
+  <g id="cup" transform="translate(780,300)">
+    <ellipse cx="0" cy="-6" rx="34" ry="12" class="shadow"/>
+    <g class="cup" transform="translate(0,-2)">
+      <path d="M-34,-6 q4,32 34,32 q30,0 34,-32 z" class="cup stroke"/>
+      <path d="M36,-2 q10,6 2,18 q-6,8 -18,4" class="cup stroke" fill="none"/>
+      <!-- tea level (starts empty, fills during pour via height change) -->
+      <rect id="teaLevel" x="-30" y="6" width="64" height="0" fill="#b76b2b" rx="6">
+        <animate attributeName="height" values="0;24;0" begin="4.1s" dur="1.2s" repeatCount="indefinite"/>
+        <animate attributeName="y" values="6;-18;6" begin="4.1s" dur="1.2s" repeatCount="indefinite"/>
+      </rect>
+    </g>
+    <text x="-36" y="36">Tea cup</text>
+  </g>
+
+  <!-- decorative labels and arrows (cartoon) -->
+  <g opacity="0.9">
+    <text x="220" y="330">domino chain →</text>
+    <text x="420" y="180">ball →</text>
+    <text x="560" y="165">seesaw →</text>
+    <text x="660" y="120">kettle →</text>
+  </g>
+
+  <!-- small play button hint -->
+  <g transform="translate(30,360)">
+    <rect x="0" y="0" width="120" height="38" rx="8" fill="#fff" class="stroke"/>
+    <text x="12" y="24">Animated loop — alarm triggers pour</text>
+  </g>
+
+  <!-- Invisible rectangle to reset the loop: we use repeatCount on everything to loop.
+       (SMIL keeps running in modern browsers; if your browser blocks SMIL, animations can be ported to CSS/js.) -->
+</svg>
+

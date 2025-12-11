@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+    <command name="OpenApplication" type="APPIntegration">
+        <parameters>
+            <parameter name="ApplicationPath" value="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" />
+        </parameters>
+    </command>
+    <command name="Delay" type="Misc">
+        <parameters>
+            <parameter name="DelayTime" value="2000" />
+        </parameters>
+    </command>
+    <command name="WindowAction" type="Window">
+        <parameters>
+            <parameter name="WindowName" value="Google Chrome" />
+            <parameter name="Action" value="Maximize" />
+        </parameters>
+    </command>
+    <command name="MessageBox" type="Misc">
+        <parameters>
+            <parameter name="Message" value="Hello from Automation Anywhere!" />
+            <parameter name="Title" value="Bot Message" />
+        </parameters>
+    </command>
+</root>

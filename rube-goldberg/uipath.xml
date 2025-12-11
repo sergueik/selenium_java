@@ -1,0 +1,41 @@
+<Activity x:Class="Main" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <TextExpression.NamespacesForImplementation>
+    <sco:Collection x:TypeArguments="x:String">
+      <x:String>System.Activities</x:String>
+    </sco:Collection>
+  </TextExpression.NamespacesForImplementation>
+  <Sequence DisplayName="Main Sequence" sap2010:WorkflowViewState.IdRef="Sequence_1">
+    <Sequence.Variables>
+      <Variable x:TypeArguments="uit:TerminalConnection" Name="outputConnection">
+        <sap:WorkflowViewStateService.ViewState>
+          <scg:Dictionary x:TypeArguments="x:String, x:Object">
+            <x:String x:Key="SourceIdRef">TerminalSession_1</x:String>
+            <x:String x:Key="SourcePropertyName">OutputConnection</x:String>
+          </scg:Dictionary>
+        </sap:WorkflowViewStateService.ViewState>
+      </Variable>
+    </Sequence.Variables>
+    <sap:WorkflowViewStateService.ViewState>
+      <scg:Dictionary x:TypeArguments="x:String, x:Object">
+        <x:Boolean x:Key="IsExpanded">True</x:Boolean>
+      </scg:Dictionary>
+    </sap:WorkflowViewStateService.ViewState>
+    <uit:TerminalSession SSHPassword="{x:Null}" SSHUserName="{x:Null}" CloseConnection="False" DisplayName="Terminal Session" >
+      <uit:TerminalSession.Body>
+        <ActivityAction x:TypeArguments="uit:TerminalConnection">
+	  <ActivityAction.Argument/>
+          <Sequence>
+              <uit:TerminalSetField DelayMS="300" DisplayName="Set Field" FollowedBy="Enter" >
+                <uit:TerminalSetField.LabeledBy>
+                  <InArgument x:TypeArguments="x:String">
+                    <Literal x:TypeArguments="x:String" Value="" />
+                  </InArgument>
+                </uit:TerminalSetField.LabeledBy>
+              </uit:TerminalSetField>
+            </Sequence>
+          </Sequence>
+        </ActivityAction>
+      </uit:TerminalSession.Body>
+    </uit:TerminalSession>
+  </Sequence>
+</Activity>

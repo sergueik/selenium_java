@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core">
+
+    <http:listener-config name="HTTP_Listener_config" host="0.0.0.0" port="8081" doc:name="HTTP Listener Config"/>
+
+    <flow name="helloMuleFlow" doc:id="a1b2c3d4-e5f6-7890-1234-567890abcdef">
+        <http:listener path="/hello" config-ref="HTTP_Listener_config" doc:name="HTTP Listener"/>
+        <set-payload value="Hello, Mule!" doc:name="Set Payload"/>
+        <logger level="INFO" message="Payload set to: #[payload]" doc:name="Logger"/>
+    </flow>
+
+</mule>

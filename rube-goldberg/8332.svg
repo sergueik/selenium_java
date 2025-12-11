@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="900" height="420" viewBox="0 0 900 420"
+     version="1.1">
+
+  <!-- Ground -->
+  <rect x="0" y="340" width="900" height="80"
+        fill="#e9e6e2" stroke="none"/>
+
+  <!-- Alarm clock -->
+  <g transform="translate(70,150)">
+    <ellipse cx="0" cy="0" rx="46" ry="44"
+             fill="#f6f2ef" stroke="#222" stroke-width="3"/>
+    <circle cx="-18" cy="-18" r="6"
+            fill="#d1d8e0" stroke="#222" stroke-width="2"/>
+    <rect x="-40" y="44" width="80" height="8" rx="3"
+          fill="#d1d8e0" stroke="#222" stroke-width="2"/>
+    <!-- tongs at rest -->
+    <rect x="30" y="-8" width="60" height="8" rx="4"
+          fill="#c84b4b" stroke="#222" stroke-width="2"
+          transform="rotate(-20 30 -8)"/>
+    <rect x="88" y="-12" width="12" height="12" rx="3"
+          fill="#e9a3a3" stroke="#222" stroke-width="2"
+          transform="rotate(-20 30 -8)"/>
+    <text x="-28" y="70" font-size="14" font-family="sans-serif">Alarm</text>
+  </g>
+
+  <!-- Dominoes -->
+  <g transform="translate(200,260)">
+    <rect x="0"   y="-40" width="12" height="40" rx="2" fill="#2a4d6d" stroke="#222" stroke-width="2"/>
+    <rect x="30"  y="-40" width="12" height="40" rx="2" fill="#2e7a5b" stroke="#222" stroke-width="2"/>
+    <rect x="60"  y="-40" width="12" height="40" rx="2" fill="#c27aa8" stroke="#222" stroke-width="2"/>
+    <rect x="90"  y="-40" width="12" height="40" rx="2" fill="#f1a742" stroke="#222" stroke-width="2"/>
+    <rect x="120" y="-40" width="12" height="40" rx="2" fill="#7aa6ff" stroke="#222" stroke-width="2"/>
+    <text x="0" y="60" font-size="14" font-family="sans-serif">Domino chain</text>
+  </g>
+
+  <!-- Ball -->
+  <g transform="translate(400,220)">
+    <circle cx="0" cy="0" r="12"
+            fill="#ff6b6b" stroke="#222" stroke-width="2"/>
+    <text x="-12" y="40" font-size="14" font-family="sans-serif">Ball</text>
+  </g>
+
+  <!-- Seesaw -->
+  <g transform="translate(550,220)">
+    <polygon points="-10,10 0,-40 10,10"
+             fill="#b5884a" stroke="#222" stroke-width="2"/>
+    <rect x="-120" y="-8" width="240" height="16" rx="6"
+          fill="#b5884a" stroke="#222" stroke-width="2"/>
+    <text x="-20" y="60" font-size="14" font-family="sans-serif">Seesaw</text>
+  </g>
+
+  <!-- Kettle -->
+  <g transform="translate(740,150)">
+    <ellipse cx="0" cy="0" rx="46" ry="36"
+             fill="#f6f2ef" stroke="#222" stroke-width="3"/>
+    <path d="M-22 -4 q -12 -4 -14 -16 q 6 -8 22 -6"
+          fill="#e8e8e8" stroke="#222" stroke-width="2"/>
+    <text x="-20" y="70" font-size="14" font-family="sans-serif">Kettle</text>
+  </g>
+
+  <!-- Cup -->
+  <g transform="translate(820,300)">
+    <ellipse cx="0" cy="-6" rx="34" ry="12"
+             fill="rgba(0,0,0,0.15)" stroke="none"/>
+    <path d="M-34,-6 q4,32 34,32 q30,0 34,-32 z"
+          fill="#ffffff" stroke="#222" stroke-width="3"/>
+    <path d="M36,-2 q10,6 2,18 q-6,8 -18,4"
+          fill="none" stroke="#222" stroke-width="3"/>
+    <text x="-20" y="50" font-size="14" font-family="sans-serif">Cup</text>
+  </g>
+
+</svg>
+

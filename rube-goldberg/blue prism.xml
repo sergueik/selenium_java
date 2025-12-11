@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<process name="ExampleProcess" version="1.0" description="A simple example process">
+  <pages>
+    <page name="Main" type="ProcessPage">
+      <stages>
+        <stage>
+          <action stageid="12345678-abcd-efgh-ijkl-1234567890ab" name="Call External Service">
+            <businessobject name="ExternalAPIHandler"/>
+            <action name="CallExternalService"/>
+            <inputs>
+              <input name="InputParameter1" type="Text">
+                <value>"Hello World"</value>
+              </input>
+            </inputs>
+            <outputs>
+              <output name="OutputResult" type="Text" storedas="ExternalServiceResult"/>
+            </outputs>
+          </action>
+          <nextstage>Log Message</nextstage>
+        </stage>
+        <stage type="Code" name="Log Message">
+          <code language="C#"><![CDATA[
+              // Example C# code to log a message
+              BP.Log("Current Date: " + CurrentDate.ToString());
+            ]]></code>
+          <nextstage>End</nextstage>
+        </stage>
+        <stage type="End" name="End">
+        </stage>
+      </stages>
+      <dataitems>
+        <dataitem name="CurrentDate" type="Date"/>
+      </dataitems>
+    </page>
+  </pages>
+  <dataitems/>
+  <globals/>
+</process>
