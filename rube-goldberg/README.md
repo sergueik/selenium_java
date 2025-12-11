@@ -92,16 +92,17 @@ Jenkins Job
 ![blue prism](screenshots/blue_prism.jpg)
 Blue Prism Process
 
+
 ![uipath Main XAML](screenshots/uipath_main.jpg)
 UIPath FlowChart
 
-![uipath IDE](screenshots/uipath_ui.jpg)
-UIPath Designer
+![uipath IDE](screenshots/uipath_ide.jpg)
+UIPath Studio Designer 
 
-![Visual Studio Workflow IDE](screenshots/wwf.jpg)
+![Visual Studio Workflow IDE](screenshots/wwf_ide.jpg)
 Visual Studio 2010 Workflow Designer
 
 ![Mule Step Flow](screenshots/mule.jpg)
-Mule Strp Flow
+Mule Step Flow
 
 Despite XAML’s infamous reputation as part of Microsoft’s largely failed ‘Internet reinvention’ during the Vista era and its practical dormancy for decades thereafter, UiPath adopted it as the foundation for workflow serialization
