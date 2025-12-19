@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Atidarykite RTF failą greitai ir nemokamai"
+   },
+   "application_title": {
+      "message": "„RTF Viewer“"
+   },
+   "btn1": {
+      "message": "RTF peržiūros programa"
+   },
+   "btn2": {
+      "message": "Iš savo kompiuterio"
+   },
+   "btn3": {
+      "message": "Iš „Google“ disko"
+   },
+   "btn4": {
+      "message": "Prašau įvertink mus"
+   },
+   "btn5": {
+      "message": "Naudodamiesi mūsų svetaine."
+   },
+   "btn6": {
+      "message": "galite per kelias minutes redaguoti savo dokumentus. Tokiu būdu jūs neturėsite įdiegti jokios darbalaukio programinės įrangos. Ši paslauga yra visiškai nemokama. Palaikomi iki 100 MB failai, ji yra pilna versija ir nėra atnaujinimų / demonstracinių versijų. Tikimės, kad jums patiko naudotis mūsų internetiniu dokumentų redagavimo įrankiu."
+   },
+   "btn7": {
+      "message": "Dėl techninių apribojimų negalime leisti jums pasirinkti failų iš jūsų"
+   },
+   "btn8": {
+      "message": "Google diskas. Norėdami tai padaryti, naudokite programą iš"
+   },
+   "btn9": {
+      "message": "mūsų svetainėje."
+   }
+}

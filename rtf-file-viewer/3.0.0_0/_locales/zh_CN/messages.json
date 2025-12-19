@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "快速免费打开RTF文件"
+   },
+   "application_title": {
+      "message": "RTF查看器"
+   },
+   "btn1": {
+      "message": "RTF查看器"
+   },
+   "btn2": {
+      "message": "在您的电脑上"
+   },
+   "btn3": {
+      "message": "从您的Google云端硬盘"
+   },
+   "btn4": {
+      "message": "请给我们打分"
+   },
+   "btn5": {
+      "message": "使用我们的网站。"
+   },
+   "btn6": {
+      "message": "您可以在几分钟内编辑文档。这样，您将不必安装任何桌面软件。这项服务是完全免费的。支持最高100 Mb的文件，它是完整版本，没有升级/演示版本。我们希望您喜欢使用我们的在线文档编辑器工具。"
+   },
+   "btn7": {
+      "message": "由于技术限制，我们不能让您从您的文件中选取文件"
+   },
+   "btn8": {
+      "message": "Google云端硬碟。为此，请使用以下应用程序"
+   },
+   "btn9": {
+      "message": "我们的网站。"
+   }
+}

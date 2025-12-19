@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/css/all.css">
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/flat.css">
+<title>RTF Viewer</title>
+
+    <link rel="stylesheet" href="/css/rtf.css">
+   
+    
+</head>
+<style>
+    label {
+    padding: 10px;
+    background: #007bff;
+    display: table;
+    color: #fff;
+    height: 50px;
+    
+    border-radius: 3px;
+    width: 300px;
+    text-align: center;
+}
+input[type="file"] {
+    display: none;
+}
+</style>
+<body lang="en">
+
+        <div class="container">
+            <div class="d-flex align-items-center">
+                <h1 class="flex-grow-1" style="text-align: center; font-weight: bold;" data-loc="btn1"></h1>
+            </div>
+        </div> 
+<br>
+    <section id="section-main" class="main-content">
+        <div class="container">
+            <div class="page-content" id="row-step-3">
+                <div class="row" style="text-align: center; margin-bottom: -25px;">
+                    <div class="col-md-4"  id="file-upload" class="hidden">
+                          <label  for="upload-field"  id="upload-button">
+                            <span data-loc="btn2"></span>
+                           <input type="file" id="upload-field" style="width: 90%;border: 1px solid #272727;" value="OpenFile" class="btn btn-blockwarning" accept=".rtf" >
+                                                    
+                         </label>
+                    </div>
+
+                    <div class="col-md-4" id="link-drive"  class="hidden">
+                         <a class="btn btn-info" href="http://documents.freebusinessapps.net" style="width: 300px; height: 50px; padding:10px;"><i class="fab fa-google-drive" data-loc="btn3"></i ></a>
+                    </div>
+                    <div class="col-md-4" id="link-drive"  class="hidden">
+                        <a href="#" style="height: 50px;" class="btn btn-block btn-lg btn-warning teaser" target="_blank" data-loc="btn4"></a>
+                    </div>
+                </div>
+                <br><br>
+<div id="main" class="hidden"></div>
+ <div id="toolbar" class="hidden">
+   
+</div>
+               
+                <hr>
+                <div style="text-align: center;">
+
+<a href="http://documents.freebusinessapps.net" target="_blank" data-loc="btn5"> </a>, <span data-loc="btn6"></span> 
+
+</div>
+  <p class="text-danger" style="text-align: center;" data-loc="btn7"> </p> 
+  <i class="fab fa-google-drive"></i><span data-loc="btn8"></span> <a href="https://documents.freebusinessapps.net" target="_blank" data-loc="btn9">  </a>
+                </div>
+
+            </div>
+        </div>
+    </section>
+   <script defer type="module" src="common.js"></script>
+   <script defer type="module" src="popup.js"></script>
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/dompurify.1.0.2.purify.min.js"></script>
+    <script src="/js/jquery.svg.min.js"></script>
+    <script src="/js/jquery.svgfilter.min.js"></script>
+    <script src="/js/WMFJS.bundle.min.js"></script>
+    <script src="/js/EMFJS.bundle.min.js"></script>
+    <script src="/js/RTFJS.bundle.min.js"></script>
+    <script src="/js/rtf.js"></script>
+    <script src="rate.js"></script>
+
+</body>
+</html>

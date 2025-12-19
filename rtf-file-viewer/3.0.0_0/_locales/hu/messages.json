@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Nyissa meg az RTF fájlt gyorsan és ingyenesen"
+   },
+   "application_title": {
+      "message": "RTF Viewer"
+   },
+   "btn1": {
+      "message": "RTF Viewer"
+   },
+   "btn2": {
+      "message": "A számítógépről"
+   },
+   "btn3": {
+      "message": "A Google Drive-ról"
+   },
+   "btn4": {
+      "message": "Kérjük, értékelje minket"
+   },
+   "btn5": {
+      "message": "Weboldalunk használata."
+   },
+   "btn6": {
+      "message": "néhány perc alatt szerkesztheti a dokumentumait. Ilyen módon nem kell minden asztali szoftvert telepítenie. Ez a szolgáltatás teljesen ingyenes. A legfeljebb 100 MB fájlokat támogatja, ez egy teljes verzió, és nincs frissítés / bemutató verzió. Reméljük, hogy élvezi online dokumentumszerkesztő eszközünk használatát."
+   },
+   "btn7": {
+      "message": "A műszaki korlátozások miatt nem engedhetjük meg, hogy fájlokat válasszon a"
+   },
+   "btn8": {
+      "message": "Google Drive. Ehhez kérjük, használja az alkalmazást a"
+   },
+   "btn9": {
+      "message": "a honlapunk."
+   }
+}

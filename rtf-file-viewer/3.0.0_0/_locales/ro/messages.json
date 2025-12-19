@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Deschideți fișierul RTF rapid și gratuit"
+   },
+   "application_title": {
+      "message": "RTF Viewer"
+   },
+   "btn1": {
+      "message": "Vizualizator RTF"
+   },
+   "btn2": {
+      "message": "De pe computer"
+   },
+   "btn3": {
+      "message": "De pe Google Drive"
+   },
+   "btn4": {
+      "message": "Vă rugăm să ne evaluați"
+   },
+   "btn5": {
+      "message": "Folosind site-ul nostru web."
+   },
+   "btn6": {
+      "message": "puteți edita documentele în câteva minute. În acest fel, nu va trebui să instalați niciun software desktop. Acest serviciu este gratuit. Sunt acceptate fișiere de până la 100 Mb, este o versiune completă și nu există versiuni de actualizare / demo. Sperăm să vă placă folosind instrumentul nostru de redactor de documente online."
+   },
+   "btn7": {
+      "message": "Din cauza limitării tehnice, nu vă putem permite să alegeți fișierele de la dvs."
+   },
+   "btn8": {
+      "message": "Google Drive. Pentru a face acest lucru, utilizați aplicația din"
+   },
+   "btn9": {
+      "message": "siteul nostru."
+   }
+}

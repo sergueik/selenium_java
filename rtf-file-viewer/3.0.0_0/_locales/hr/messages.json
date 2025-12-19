@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Otvorite datoteku RTF brzo i besplatno"
+   },
+   "application_title": {
+      "message": "RTF Viewer"
+   },
+   "btn1": {
+      "message": "RTF preglednik"
+   },
+   "btn2": {
+      "message": "S vašeg računala"
+   },
+   "btn3": {
+      "message": "S vašeg Google diska"
+   },
+   "btn4": {
+      "message": "Ocijenite nas"
+   },
+   "btn5": {
+      "message": "Korištenje naše web stranice."
+   },
+   "btn6": {
+      "message": "možete uređivati svoje dokumente u roku od nekoliko minuta. Na taj način nećete morati instalirati bilo koji softver za radnu površinu. Ova je usluga apsolutno besplatna. Podržane su datoteke do 100 Mb, puna je verzija i nema nadogradnje / demo verzije. Nadamo se da ćete uživati u korištenju našeg mrežnog alata za uređivanje dokumenata."
+   },
+   "btn7": {
+      "message": "Zbog tehničkih ograničenja ne možemo vam dopustiti da odaberete datoteke s vašeg"
+   },
+   "btn8": {
+      "message": "Google vožnja. Da biste to učinili, koristite aplikaciju iz"
+   },
+   "btn9": {
+      "message": "naše web stranice."
+   }
+}

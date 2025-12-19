@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="google" content="notranslate">
+    <title>RTF viewer</title>
+
+    <script src="../external/dompurify.2.2.0.purify.min.js"></script>
+
+    <script src="../external/WMFJS.bundle.min.js"></script>
+    <script src="../external/EMFJS.bundle.min.js"></script>
+    <script src="../external/RTFJS.bundle.min.js"></script>
+
+    <link rel="stylesheet" href="viewer.css">
+    <script src="viewer.js"></script>
+</head>
+
+<body>
+<div id="file-upload" class="hidden">
+    <input type="file" name="upload-field" id="upload-field">
+    <label for="upload-field" class="button" id="upload-button">Open a local file</label>
+</div>
+<div id="main" class="hidden"></div>
+<div id="toolbar" class="hidden">
+    <a id="download" class="button" href="#">Download</a>
+</div>
+</body>
+</html>

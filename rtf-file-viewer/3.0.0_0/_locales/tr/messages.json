@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "RTF dosyasını hızlı ve ücretsiz bir şekilde açın"
+   },
+   "application_title": {
+      "message": "RTF Görüntüleyici"
+   },
+   "btn1": {
+      "message": "RTF Görüntüleyici"
+   },
+   "btn2": {
+      "message": "PC&#39;nizden"
+   },
+   "btn3": {
+      "message": "Google Drive&#39;ınızdan"
+   },
+   "btn4": {
+      "message": "Lütfen bizi değerlendirin"
+   },
+   "btn5": {
+      "message": "Web sitemizi kullanarak."
+   },
+   "btn6": {
+      "message": "belgelerinizi dakikalar içinde düzenleyebilirsiniz. Bu şekilde, herhangi bir masaüstü yazılımı yüklemenize gerek kalmaz. Bu hizmet kesinlikle ücretsizdir. 100 Mb&#39;a kadar dosyalar desteklenir, tam sürümdür ve yükseltme / demo sürümü yoktur. Çevrimiçi belge düzenleme aracımızı kullanmaktan keyif alacağınızı umuyoruz."
+   },
+   "btn7": {
+      "message": "Teknik sınırlamalar nedeniyle, dosyalarınızdan dosya seçmenize izin veremeyiz."
+   },
+   "btn8": {
+      "message": "Google sürücü. Bunu yapmak için lütfen şuradaki uygulamayı kullanın:"
+   },
+   "btn9": {
+      "message": "web sitemiz."
+   }
+}

@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Otwórz plik RTF szybko i za darmo"
+   },
+   "application_title": {
+      "message": "Przeglądarka RTF"
+   },
+   "btn1": {
+      "message": "Przeglądarka RTF"
+   },
+   "btn2": {
+      "message": "Z twojego komputera"
+   },
+   "btn3": {
+      "message": "Z Twojego Dysku Google"
+   },
+   "btn4": {
+      "message": "Oceń nas"
+   },
+   "btn5": {
+      "message": "Korzystanie z naszej strony internetowej."
+   },
+   "btn6": {
+      "message": "możesz edytować swoje dokumenty w ciągu kilku minut. W ten sposób nie będziesz musiał instalować żadnego oprogramowania komputerowego. Ta usługa jest całkowicie bezpłatna. Obsługiwane są pliki do 100 Mb, jest to pełna wersja i nie ma uaktualnień / wersji demonstracyjnych. Mamy nadzieję, że spodoba Ci się nasz internetowy edytor dokumentów."
+   },
+   "btn7": {
+      "message": "Ze względu na ograniczenia techniczne nie możemy pozwolić Ci wybrać plików z Twojego"
+   },
+   "btn8": {
+      "message": "Dysk Google. Aby to zrobić, użyj aplikacji z"
+   },
+   "btn9": {
+      "message": "nasza strona internetowa."
+   }
+}

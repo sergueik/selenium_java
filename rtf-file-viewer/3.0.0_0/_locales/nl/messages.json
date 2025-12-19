@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Open het RTF-bestand snel en gratis"
+   },
+   "application_title": {
+      "message": "RTF-kijker"
+   },
+   "btn1": {
+      "message": "RTF Viewer"
+   },
+   "btn2": {
+      "message": "Vanaf uw pc"
+   },
+   "btn3": {
+      "message": "Van uw Google Drive"
+   },
+   "btn4": {
+      "message": "Beoordeel ons"
+   },
+   "btn5": {
+      "message": "Gebruik van onze website."
+   },
+   "btn6": {
+      "message": "u kunt uw documenten binnen enkele minuten bewerken. Op die manier hoeft u geen desktopsoftware te installeren. Deze service is absoluut gratis. Bestanden tot 100 Mb worden ondersteund, het is een volledige versie en er zijn geen upgrades / demo-versies. We hopen dat u veel plezier beleeft aan het gebruik van onze online documenteditor."
+   },
+   "btn7": {
+      "message": "Vanwege technische beperkingen kunnen we u geen bestanden laten kiezen uit uw"
+   },
+   "btn8": {
+      "message": "Google Drive. Gebruik hiervoor de app van"
+   },
+   "btn9": {
+      "message": "onze website."
+   }
+}

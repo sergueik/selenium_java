@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Rýchlo a bezplatne otvorte súbor RTF"
+   },
+   "application_title": {
+      "message": "Prehliadač RTF"
+   },
+   "btn1": {
+      "message": "RTF Viewer"
+   },
+   "btn2": {
+      "message": "Z počítača"
+   },
+   "btn3": {
+      "message": "Z vášho Disku Google"
+   },
+   "btn4": {
+      "message": "Ohodnoťte nás"
+   },
+   "btn5": {
+      "message": "Pomocou našej webovej stránky."
+   },
+   "btn6": {
+      "message": "svoje dokumenty môžete upravovať v priebehu niekoľkých minút. Týmto spôsobom nebudete musieť inštalovať žiadny softvér pre stolné počítače. Táto služba je úplne zadarmo. Sú podporované súbory až do 100 Mb, jedná sa o plnú verziu a nie sú k dispozícii žiadne aktualizácie / demo verzie. Dúfame, že sa vám bude páčiť pomocou nášho online nástroja na úpravu dokumentov."
+   },
+   "btn7": {
+      "message": "Z dôvodu technického obmedzenia vám nemôžeme dovoliť vyberať súbory z vášho"
+   },
+   "btn8": {
+      "message": "Disk Google. Použite na to aplikáciu z"
+   },
+   "btn9": {
+      "message": "naše webové stránky."
+   }
+}

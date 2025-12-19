@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Atveriet RTF failu ātri un bez maksas"
+   },
+   "application_title": {
+      "message": "RTF skatītājs"
+   },
+   "btn1": {
+      "message": "RTF skatītājs"
+   },
+   "btn2": {
+      "message": "No datora"
+   },
+   "btn3": {
+      "message": "No sava Google diska"
+   },
+   "btn4": {
+      "message": "Lūdzu, novērtējiet mūs"
+   },
+   "btn5": {
+      "message": "Izmantojot mūsu vietni."
+   },
+   "btn6": {
+      "message": "dokumentus var rediģēt dažu minūšu laikā. Tādā veidā jums nav jāinstalē jebkura darbvirsmas programmatūra. Šis pakalpojums ir absolūti bezmaksas. Tiek atbalstīti faili līdz 100 MB, tā ir pilna versija, un nav jaunināšanas / demonstrācijas versiju. Mēs ceram, ka jums patiks izmantot mūsu tiešsaistes dokumentu redaktora rīku."
+   },
+   "btn7": {
+      "message": "Tehnisku ierobežojumu dēļ mēs nevaram ļaut jums izvēlēties failus no jūsu"
+   },
+   "btn8": {
+      "message": "Google disks. Lai to izdarītu, lūdzu, izmantojiet lietotni no"
+   },
+   "btn9": {
+      "message": "mūsu mājas lapā."
+   }
+}

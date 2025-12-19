@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Apri il file RTF rapidamente e gratuitamente"
+   },
+   "application_title": {
+      "message": "Visualizzatore RTF"
+   },
+   "btn1": {
+      "message": "RTF Viewer"
+   },
+   "btn2": {
+      "message": "Dal tuo PC"
+   },
+   "btn3": {
+      "message": "Dal tuo Google Drive"
+   },
+   "btn4": {
+      "message": "Per favore, valutaci"
+   },
+   "btn5": {
+      "message": "Utilizzando il nostro sito web."
+   },
+   "btn6": {
+      "message": "puoi modificare i tuoi documenti in pochi minuti. In questo modo, non dovrai installare alcun software desktop. Questo servizio è assolutamente gratuito. Sono supportati file fino a 100 Mb, è una versione completa e non ci sono aggiornamenti / versioni demo. Ci auguriamo che ti piaccia utilizzare il nostro strumento di editor di documenti online."
+   },
+   "btn7": {
+      "message": "A causa di limitazioni tecniche, non possiamo permetterti di scegliere file dal tuo"
+   },
+   "btn8": {
+      "message": "Google Drive. Per farlo, utilizza l&#39;app da"
+   },
+   "btn9": {
+      "message": "il nostro sito web."
+   }
+}

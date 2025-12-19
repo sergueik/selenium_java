@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Avaa RTF-tiedosto nopeasti ja ilmaiseksi"
+   },
+   "application_title": {
+      "message": "RTF Viewer"
+   },
+   "btn1": {
+      "message": "RTF-katseluohjelma"
+   },
+   "btn2": {
+      "message": "Tietokoneeltasi"
+   },
+   "btn3": {
+      "message": "Google Drivesta"
+   },
+   "btn4": {
+      "message": "Arvioi meitä"
+   },
+   "btn5": {
+      "message": "Verkkosivumme käyttäminen."
+   },
+   "btn6": {
+      "message": "Voit muokata dokumenttejasi muutamassa minuutissa. Tällä tavoin sinun ei tarvitse asentaa mitään työpöytäohjelmistoja. Tämä palvelu on täysin ilmainen. Enintään 100 Mt: n tiedostoja tuetaan, se on täysversio, eikä päivityksiä / esittelyversioita ole. Toivomme sinun nauttivan online-asiakirjaeditorityökalumme käytöstä."
+   },
+   "btn7": {
+      "message": "Teknisten rajoitusten takia emme voi antaa sinun valita tiedostoja hakemistostasi"
+   },
+   "btn8": {
+      "message": "Google asema. Käytä sovellusta osoitteesta"
+   },
+   "btn9": {
+      "message": "meidän nettisivumme."
+   }
+}

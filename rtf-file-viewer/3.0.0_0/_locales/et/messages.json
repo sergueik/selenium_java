@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Avage RTF-fail kiiresti ja tasuta"
+   },
+   "application_title": {
+      "message": "RTF-i vaataja"
+   },
+   "btn1": {
+      "message": "RTF vaataja"
+   },
+   "btn2": {
+      "message": "Arvutist"
+   },
+   "btn3": {
+      "message": "Teie Google Drive&#39;ist"
+   },
+   "btn4": {
+      "message": "Palun hinnake meid"
+   },
+   "btn5": {
+      "message": "Meie veebisaidi kasutamine."
+   },
+   "btn6": {
+      "message": "saate oma dokumente mõne minuti jooksul redigeerida. Nii ei pea te installima mingit töölaua tarkvara. See teenus on täiesti tasuta. Kuni 100 MB suuruseid faile toetatakse, see on täisversioon ja versiooniuuendusi / demoversioone pole. Loodame, et teile meeldib meie veebidokumentide redigeerimise tööriista kasutamine."
+   },
+   "btn7": {
+      "message": "Tehniliste piirangute tõttu ei saa me lubada teil oma failidest faile valida"
+   },
+   "btn8": {
+      "message": "Google Drive. Selleks kasutage rakendust alates"
+   },
+   "btn9": {
+      "message": "meie veebisaidil."
+   }
+}

@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Obriu el fitxer RTF de forma ràpida i gratuïta"
+   },
+   "application_title": {
+      "message": "Visualitzador de RTF"
+   },
+   "btn1": {
+      "message": "Visualitzador de RTF"
+   },
+   "btn2": {
+      "message": "Des del vostre PC"
+   },
+   "btn3": {
+      "message": "Des de Google Drive"
+   },
+   "btn4": {
+      "message": "Valoreu-nos"
+   },
+   "btn5": {
+      "message": "Utilitzant el nostre lloc web."
+   },
+   "btn6": {
+      "message": "podeu editar els vostres documents en pocs minuts. D’aquesta manera, no haureu d’instal·lar cap programari d’escriptori. Aquest servei és totalment gratuït. S&#39;admeten fitxers de fins a 100 Mb, és una versió completa i no hi ha versions actualitzades / demo. Esperem que us agradi utilitzar la nostra eina d’editor de documents en línia."
+   },
+   "btn7": {
+      "message": "Degut a limitació tècnica, no podem deixar que seleccioneu fitxers"
+   },
+   "btn8": {
+      "message": "Google Drive. Per fer-ho, utilitzeu l&#39;aplicació des de"
+   },
+   "btn9": {
+      "message": "el nostre lloc web."
+   }
+}

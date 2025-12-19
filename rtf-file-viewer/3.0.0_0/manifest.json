@@ -1,0 +1,30 @@
+{
+   "action": {
+      "default_icon": {
+         "16": "icon-16.png",
+         "32": "icon-32.png"
+      }
+   },
+   "background": {
+      "service_worker": "/js/bg-worker.js"
+   },
+   "container": [ "GOOGLE_DRIVE" ],
+   "default_locale": "en_US",
+   "description": "__MSG_application_description__",
+   "homepage_url": "https://rtf-viewer.freeonlineapps.net/",
+   "icons": {
+      "128": "icon-128.png",
+      "16": "icon-16.png",
+      "256": "icon-256.png",
+      "32": "icon-32.png",
+      "48": "icon-48.png",
+      "512": "icon-512.png",
+      "64": "icon-64.png"
+   },
+   "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAy97WOOZ+vSHj1Ob6aIlxr3TJqGWI5EHD8tHq0Rsq+KsogLOinPuO3w9d99SPh0VK7xc8X/7/X+VX4jbaIK2hUvacreJpPg3GgYteEbjwQAhxIo66jsFunp6CvOtt6sX7ViamGM/D3UT7PzyTZXCfeVyiFifFSCxAxvY3hr0A5RQHH14la+d/gYp6HGkHYyPFe+Z3EHpsHQuRXUyYL8WfakeK1phElZB2xT2b1P1yGJ/cBn6zdqjilAyccAJn/K+sJug/7HN9h0R3nSiERRdTO7FYkhqw5xvBhumsO3Jt33GffpL++9uS+9TntDNpvkW9koNW07NY16FoN9riTiUhiQIDAQAB",
+   "manifest_version": 3,
+   "name": "__MSG_application_title__",
+   "offline_enabled": true,
+   "update_url": "https://clients2.google.com/service/update2/crx",
+   "version": "3.0.0"
+}

@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Otevřete soubor RTF rychle a zdarma"
+   },
+   "application_title": {
+      "message": "Prohlížeč RTF"
+   },
+   "btn1": {
+      "message": "Prohlížeč RTF"
+   },
+   "btn2": {
+      "message": "Z vašeho PC"
+   },
+   "btn3": {
+      "message": "Z vašeho Disku Google"
+   },
+   "btn4": {
+      "message": "Ohodnoťte nás"
+   },
+   "btn5": {
+      "message": "Pomocí našeho webu."
+   },
+   "btn6": {
+      "message": "můžete své dokumenty upravovat během několika minut. Tímto způsobem nebudete muset instalovat žádný stolní software. Tato služba je zcela zdarma. Jsou podporovány soubory až do 100 Mb, jedná se o plnou verzi a neexistují žádné aktualizace / demoverze. Doufáme, že se vám bude líbit používání našeho online editoru dokumentů."
+   },
+   "btn7": {
+      "message": "Vzhledem k technickým omezením vám nemůžeme dovolit vybrat soubory z vašeho"
+   },
+   "btn8": {
+      "message": "Disk Google. Chcete-li tak učinit, použijte aplikaci od"
+   },
+   "btn9": {
+      "message": "naše webové stránky."
+   }
+}

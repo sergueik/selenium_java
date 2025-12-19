@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Buka file RTF dengan cepat dan gratis"
+   },
+   "application_title": {
+      "message": "Penampil RTF"
+   },
+   "btn1": {
+      "message": "Penampil RTF"
+   },
+   "btn2": {
+      "message": "Dari PC Anda"
+   },
+   "btn3": {
+      "message": "Dari Google Drive Anda"
+   },
+   "btn4": {
+      "message": "Silakan nilai kami"
+   },
+   "btn5": {
+      "message": "Menggunakan situs web kami."
+   },
+   "btn6": {
+      "message": "Anda dapat mengedit dokumen Anda dalam beberapa menit. Dengan begitu, Anda tidak perlu menginstal perangkat lunak desktop apa pun. Layanan ini benar-benar gratis. File hingga 100 Mb didukung, ini adalah versi lengkap dan tidak ada peningkatan / versi demo. Kami harap Anda menikmati menggunakan alat editor dokumen online kami."
+   },
+   "btn7": {
+      "message": "Karena batasan teknis, kami tidak dapat mengizinkan Anda mengambil file dari"
+   },
+   "btn8": {
+      "message": "Google Drive. Untuk melakukannya, gunakan aplikasi dari"
+   },
+   "btn9": {
+      "message": "situs web kami."
+   }
+}

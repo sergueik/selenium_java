@@ -1,0 +1,35 @@
+{
+   "application_description": {
+      "message": "Mở tệp RTF nhanh chóng và miễn phí"
+   },
+   "application_title": {
+      "message": "Trình xem RTF"
+   },
+   "btn1": {
+      "message": "Trình xem RTF"
+   },
+   "btn2": {
+      "message": "Từ PC của bạn"
+   },
+   "btn3": {
+      "message": "Từ Google Drive của bạn"
+   },
+   "btn4": {
+      "message": "Vui lòng đánh giá chúng tôi"
+   },
+   "btn5": {
+      "message": "Sử dụng trang web của chúng tôi."
+   },
+   "btn6": {
+      "message": "bạn có thể chỉnh sửa tài liệu của mình trong vòng vài phút. Bằng cách đó, bạn sẽ không phải cài đặt bất kỳ phần mềm máy tính nào. Dịch vụ này hoàn toàn miễn phí. Các tệp có dung lượng lên đến 100 Mb được hỗ trợ, đây là phiên bản đầy đủ và không có bản nâng cấp / phiên bản demo. Chúng tôi hy vọng bạn thích sử dụng công cụ biên tập tài liệu trực tuyến của chúng tôi."
+   },
+   "btn7": {
+      "message": "Do giới hạn kỹ thuật, chúng tôi không thể cho phép bạn chọn tệp từ"
+   },
+   "btn8": {
+      "message": "Google Drive. Để làm như vậy, vui lòng sử dụng ứng dụng từ"
+   },
+   "btn9": {
+      "message": "website của chúng tôi."
+   }
+}

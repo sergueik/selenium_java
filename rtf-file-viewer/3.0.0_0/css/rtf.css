@@ -1,0 +1,68 @@
+/*
+ * Toolbar styles
+ */
+#toolbar{
+    position: fixed;
+    top: 5px;
+    right: 5px;
+
+    /* For later use with additional buttons
+    padding: 10px;
+    border-radius: 4px;
+    background-color: darkgrey;
+    */
+}
+
+.button{
+    display: block;
+    font-size: 16px;
+    padding: 6px;
+    background-color: grey;
+    border-radius: 4px;
+    text-decoration: none;
+    color: white;
+}
+
+a.button:link {
+    color: white;
+}
+a.button:visited {
+    color: white;
+}
+a.button:hover {
+    color: white;
+}
+a.button:active {
+    color: white;
+}
+
+.hidden {
+    display: none;
+}
+
+#upload-field {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+
+
+/*
+ * Display styles
+ */
+#main{
+    margin: auto;
+    padding: 5px 20px;
+    box-shadow: 0 1px 1.5px 3px #E6E1E1;
+
+    /*Default document width per RTF 1.9 spec (12240 twips)*/
+    width: 816px;
+}
+
+span{
+    white-space: pre-wrap;
+}
