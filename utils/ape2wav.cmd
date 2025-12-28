@@ -16,7 +16,6 @@ set EXTENSION=%1
 if /i "%EXTENSION%" EQU "" set EXTENSION=ape
 
 REM Visit subdirectories containg files  with EXTENSION, only once
-set "EXT=log"
 
 for /d /r %%d in (*) do (
     if exist "%%d\*.%EXTENSION%" (
