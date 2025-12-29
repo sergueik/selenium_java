@@ -8,3 +8,7 @@ This directory contains a replica of old version of [Java Class Viewer](https://
   * refactoreed [version](https://github.com/turbanoff/JavaClassViewer)
   * [Java Decompiler](http://java-decompiler.github.io/)
 
+---
+
+### Author
+[Serguei Kouzmine](kouzmine_serguei@yahoo.com)
