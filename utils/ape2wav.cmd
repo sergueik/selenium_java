@@ -30,5 +30,21 @@ call :CONVERT
 goto :EOF
 REM
 :CONVERT
-for /F "tokens=*" %%.  in ('dir /b *.%EXTENSION%') do echo Converting %%. && call "c:\tools\ffmpeg-4.0.2-win64-static\bin\ffmpeg.exe" -i "%%." -v quiet "%%~n..wav"
+REM Never use for /F to enumerate files
+REM The for /F is one CMD construct that must never touch Unicode filenames:
+REM dir outputs Unicode filenames in OEM code page
+REM Unicode filename
+REM converted to OEM code page (chcp)
+REM printed to stdout
+REM e.g. long dash U+2013 becomes a regular dash - 0x002D
+REM or a visually similar glyph with wrong code point
+REM on contrast, for %%F in (*)
+REM does NT kernel enumeration
+REM while the inner for /F
+REM is parsing ASCII only
+for %%. in (*.%EXTENSION%) do (
+  echo Converting %%.
+  call "c:\tools\ffmpeg-4.0.2-win64-static\bin\ffmpeg.exe" -i "%%." -v quiet "%%~n..wav
+)
+
 goto :EOF
