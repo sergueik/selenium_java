@@ -25,16 +25,17 @@ Done: decode
 
 ```cmd
 java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -outputfile test.txt -operation encode -data "abcdefghijklmnopqrstuvwxyz0123456789"
-``
+```
 ```text
 818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9
 ```
 ```cmd
 java -cp target/example.ascii-ebcdic.jar;target\lib\* example.ManageConfig -inputfile sample.txt -outputfile result.txt  -operation encode
+```
 
 ```cmd
 java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -outputfile test.txt -operation decode -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9"
-``
+```
 ```text
 abcdefghijklmnopqrstuvwxyz0123456789
 ```
