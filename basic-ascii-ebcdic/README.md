@@ -42,6 +42,8 @@ abcdefghijklmnopqrstuvwxyz0123456789
 ### See Also
 
   * https://www.baeldung.com/java-ebcdic-ascii-conversion
-  * https://stackoverflow.com/questions/368603/convert-string-from-ascii-to-ebcdic-in-java
 
 
+### Author
+
+* [Serguei Kouzmine](kouzmine_serguei@yahoo.com)
