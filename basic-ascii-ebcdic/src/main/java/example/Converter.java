@@ -141,15 +141,44 @@ public class Converter {
 		// Console-safe
 		System.out.println(new String(converted, target));
 	}
+	// NOTE map may be over-engineering if one only handles 3 charmaps:
+	/*
+	private static final Map<Charset, Function<byte[], ValidationResult>> VALIDATORS =
+	        new HashMap<>();
 
+	static {
+	    VALIDATORS.put(StandardCharsets.US_ASCII, Convertor::validateAscii);
+	    VALIDATORS.put(StandardCharsets.UTF_8, Convertor::validateUtf8);
+	}
+	*/
+	enum Validator {
+	    ASCII {
+	        ValidationResult validate(byte[] data) { return validateAscii(data); }
+	    },
+	    UTF8 {
+	        ValidationResult validate(byte[] data) { return validateUtf8(data); }
+	    },
+	    EBCDIC {
+	        ValidationResult validate(byte[] data) { return validateEbcdic(data); }
+	    };
+
+	    abstract ValidationResult validate(byte[] data);
+	}
+	
 	private static void validate(String inputFile, String data, Charset charset) throws IOException {
 		byte[] input;
 		if (inputFile != null)
 			input = Files.readAllBytes(Path.of(inputFile));
 		else
 			input = hexToByteArray(data); // console
-		ValidationResult validationResult = (charset == StandardCharsets.US_ASCII) ? validateAscii(input)
-				: (charset == StandardCharsets.UTF_8) ? validateUtf8(input) : validateEbcdic(input);
+		
+		Validator validator = (charset == StandardCharsets.US_ASCII)
+		        ? Validator.ASCII
+		        : (charset == StandardCharsets.UTF_8)
+		            ? Validator.UTF8
+		            : Validator.EBCDIC;
+
+		ValidationResult validationResult =  validator.validate(input);
 		System.err.println(validationResult.isValid() ? "valid" : "invalid");
 		if (debug)
 			System.err.println(validationResult.getMessage());
@@ -183,8 +212,10 @@ public class Converter {
 					status = false;
 					message = String.format("null character on %d", cnt);
 				}
-				boolean valid = charCode == 0x40 || // space
-						 // digits
+				boolean valid = 
+						// space
+						charCode == 0x40 ||
+						// digits
 						(charCode >= 0xF0 && charCode <= 0xF9) ||
 						// uppercase
 						(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9) || (charCode >= 0xE2 && charCode <= 0xE9) ||

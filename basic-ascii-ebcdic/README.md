@@ -74,19 +74,36 @@ invalid US-ASCII character 0xF9 on 35
 
 EBCDIC has a weird layout but text tends to cluster:
 
-letters: 0x81–0xA9
-letters: 0xC1–0xE9
-digits : 0xF0–0xF9
-punct  : ~0x4A–0x6F
+![charmap](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/capture-charmap.jpg)
 
-CP1047 / most Latin EBCDIC tables, the typical display ranges are roughly:
+			
+| Category     | Hex range                              |
+| ------------ | -------------------------------------- |
+| space	       | 0x40                                   |
+| lowercase    | 0x81–0x89, 0x91–0x99, 0xA2–0xA9         |
+| uppercase    | 0xC1–0xC9, 0xD1–0xD9, 0xE2–0xE9        |
+| digits       | 0xF0–0xF9                              |
+| punctuation  | 0x4B, 0x6B, 0x5A, 0x7A, 0x60–0x6F      |
+|    |         |
 
-Category	Hex range
-space	0x40
-lowercase	0x81–0x89, 0x91–0x99, 0xA2–0xA9
-uppercase	0xC1–0xC9, 0xD1–0xD9, 0xE2–0xE9
-digits	0xF0–0xF9
-common punctuation	0x4B, 0x6B, 0x5A, 0x7A, 0x60–0x6F, etc
+
+
+This leads to  the following "in the range" probe:
+
+```java
+boolean valid = charCode == 0x40 || // space
+  // digits
+  (charCode >= 0xF0 && charCode <= 0xF9) ||
+  // uppercase
+  (charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9) || (charCode >= 0xE2 && charCode <= 0xE9) ||
+  // lowercase
+  (charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9) ||
+  // basic punctuation window
+  (charCode >= 0x4A && charCode <= 0x6F);
+```
+
+
+
 
 ### See Also
 
