@@ -1,6 +1,7 @@
 package example;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
 
 import java.util.stream.Stream;
 
@@ -12,40 +13,31 @@ public class EbcdicValidationTest {
 
 	@ParameterizedTest
 	@MethodSource("samples")
-	void testEbcdicValidation(String hex, boolean expectedValid) {
+	void testEbcdicValidation(String description, String hex, boolean expectedValid) {
 
 		byte[] data = Converter.hexToByteArray(hex);
 
 		ValidationResult result = Converter.validateEbcdic(data);
 
-		assertEquals(expectedValid, result.isValid(), "hex=" + hex + " message=" + result.getMessage());
+		assertThat(description + " hex=" + hex + " message=" + result.getMessage(), result.isValid(),
+				is(expectedValid));
 	}
 
 	static Stream<Arguments> samples() {
 		return Stream.of(
 
-				// HELLO
-				Arguments.of("C8C5D3D3D6", true),
-
-				// hello
-				Arguments.of("8885939396", true),
-
-				// digits
-				Arguments.of("F1F2F3F4F5", true),
-
-				// space + punctuation
-				Arguments.of("40C8C5D3D34BC8C5D3D3D6", true), // HELLO.HELLO
-
-				// null byte
-				Arguments.of("C8C500D3D6", false),
-
-				// control-like garbage
-				Arguments.of("151515", false),
-
-				// binary-like
-				Arguments.of("C8C5FFFFD3", false),
-
-				// mixed good/bad
-				Arguments.of("C8C5D315D6", false));
+				Arguments.of("uppercase HELLO", "C8C5D3D3D6", true),
+				Arguments.of("lowercase hello", "8885939396", true), Arguments.of("digits 12345", "F1F2F3F4F5", true),
+				Arguments.of("HELLO.HELLO punctuation", "C8C5D3D3D64BC8C5D3D3D6", true),
+				Arguments.of("contains NULL byte", "C8C500D3D6", false),
+				Arguments.of("control characters 0x15", "151515", false),
+				Arguments.of("mixed valid and invalid", "C8C5D315D6", false),
+				// --- encoding confusion cases ---
+				Arguments.of("UTF-8 string 'HELLO'", "48454C4C4F", false),
+				Arguments.of("ASCII digits '12345'", "3132333435", false),
+				Arguments.of("UTF-16BE 'HELLO'", "00480045004C004C004F", false),
+				Arguments.of("UTF-16 BOM + text", "FEFF00480045004C004C004F", false),
+				// there is overlap between valid picture EBCDIC byte ranges and UTF-8
+				Arguments.of("UTF-8 string 'é' (C3 A9)", "C3A9", true));
 	}
 }
