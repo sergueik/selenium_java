@@ -169,7 +169,7 @@ public class Converter {
 		return new ValidationResult(status, message);
 	}
 
-	private static ValidationResult validateEbcdic(byte[] data) {
+	public static ValidationResult validateEbcdic(byte[] data) {
 		boolean status = false;
 		String message = null;
 		try {
@@ -183,10 +183,23 @@ public class Converter {
 					status = false;
 					message = String.format("null character on %d", cnt);
 				}
+				boolean valid = b == 0x40 || // space
+						(b >= 0xF0 && b <= 0xF9) || // digits
+
+						// uppercase
+						(b >= 0xC1 && b <= 0xC9) || (b >= 0xD1 && b <= 0xD9) || (b >= 0xE2 && b <= 0xE9) ||
+
+						// lowercase
+						(b >= 0x81 && b <= 0x89) || (b >= 0x91 && b <= 0x99) || (b >= 0xA2 && b <= 0xA9) ||
+
+						// basic punctuation window
+						(b >= 0x4A && b <= 0x6F);
+				if (!valid)
+					message = String.format("invalid EBCDIC character 0x%02X on %d", b, cnt);
+				status &= valid;
 			}
 		} catch (CharacterCodingException e) {
 			message = String.format("invalid: %s", e.getMessage());
-			message = String.format("invalid: %s", e.toString());
 		}
 		return new ValidationResult(status, message);
 	}

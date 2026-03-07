@@ -72,6 +72,13 @@ invalid US-ASCII character 0xF9 on 35
 
 ### Technical Details
 
+EBCDIC has a weird layout but text tends to cluster:
+
+letters: 0x81–0xA9
+letters: 0xC1–0xE9
+digits : 0xF0–0xF9
+punct  : ~0x4A–0x6F
+
 CP1047 / most Latin EBCDIC tables, the typical display ranges are roughly:
 
 Category	Hex range
