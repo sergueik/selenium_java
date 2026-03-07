@@ -4,7 +4,10 @@ package example;
  * Copyright 2026 Serguei Kouzmine
  */
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -56,50 +59,66 @@ public class Converter {
 		if (operation.equalsIgnoreCase("decode")) {
 			decodeFile(inputFile, outputFile, data, Charset.forName(codepage), StandardCharsets.US_ASCII);
 		}
+
+		if (operation.equalsIgnoreCase("validate")) {
+			Charset charset = codepage == null ? StandardCharsets.US_ASCII
+					: (codepage.equalsIgnoreCase("ebcdic") || codepage.equalsIgnoreCase("cp037"))
+							? Charset.forName("CP1047")
+							: (codepage.equalsIgnoreCase("us-ascii") || codepage.equalsIgnoreCase("ascii"))
+									? StandardCharsets.US_ASCII
+									: Charset.forName(codepage);
+			validate(inputFile, data, charset);
+		}
 		if (debug) {
 			System.err.println("Done: " + operation);
 		}
 	}
 
-	public static byte[] convertBytes(byte[] input, Charset source, Charset target) {
+	public static byte[] convertBytes(byte[] input, Charset sourceCharset, Charset targetCharset) {
 
-		String unicode = new String(input, source);
-		return unicode.getBytes(target);
+		String unicode = new String(input, sourceCharset);
+		return unicode.getBytes(targetCharset);
 	}
 
-	public static byte[] convertString(String input, Charset source, Charset target) {
-		return convertBytes(input.getBytes(source), source, target);
+	public static byte[] convertString(String input, Charset sourceCharset, Charset targetCharset) {
+		return convertBytes(input.getBytes(sourceCharset), sourceCharset, targetCharset);
 	}
 
 	public static String byteArrayToHex(byte[] bytes) {
-		StringBuilder sb = new StringBuilder(bytes.length * 2);
+		StringBuilder stringBuilder = new StringBuilder(bytes.length * 2);
 		for (byte b : bytes) {
-			sb.append(String.format("%02X", b));
+			stringBuilder.append(String.format("%02X", b));
 		}
-		return sb.toString();
+		return stringBuilder.toString();
 	}
 
-	public static byte[] hexToByteArray(String hex) {
-		hex = hex.replaceAll("[^0-9A-Fa-f]", "");
-		if ((hex.length() & 1) != 0) {
+	public static byte[] hexToByteArray(String hexString) {
+		if (debug)
+			System.err.println("hexString " + hexString);
+
+		// deal with dash or whitespace formatted hex strings
+		hexString = hexString.replaceAll("[^0-9A-Fa-f]", "");
+		if ((hexString.length() & 1) != 0) {
 			throw new IllegalArgumentException("Odd-length hex string");
 		}
 
-		byte[] data = new byte[hex.length() / 2];
-		for (int i = 0; i < hex.length(); i += 2) {
-			data[i / 2] = (byte) Integer.parseInt(hex.substring(i, i + 2), 16);
+		byte[] bytes = new byte[hexString.length() / 2];
+		for (int i = 0; i < hexString.length(); i += 2) {
+			bytes[i / 2] = (byte) Integer.parseInt(hexString.substring(i, i + 2), 16);
 		}
-		return data;
+		if (debug)
+			System.err.println(String.format("Read %d bytes", bytes.length));
+		return bytes;
 	}
 
-	private static void encodeFile(String inputFile, String outputFile, String data, Charset source, Charset target)
-			throws IOException {
+	private static void encodeFile(String inputFile, String outputFile, String data, Charset sourceCharset,
+			Charset targetCharset) throws IOException {
 		byte[] input;
 		if (inputFile != null)
 			input = Files.readAllBytes(Path.of(inputFile));
 		else
-			input = data.getBytes(StandardCharsets.US_ASCII);
-		byte[] converted = convertBytes(input, source, target);
+			input = data.getBytes(StandardCharsets.US_ASCII); // console
+		byte[] converted = convertBytes(input, sourceCharset, targetCharset);
 		if (outputFile != null)
 			Files.write(Path.of(outputFile), converted);
 		System.out.println(byteArrayToHex(converted));
@@ -123,4 +142,67 @@ public class Converter {
 		System.out.println(new String(converted, target));
 	}
 
+	private static void validate(String inputFile, String data, Charset charset) throws IOException {
+		byte[] input;
+		if (inputFile != null)
+			input = Files.readAllBytes(Path.of(inputFile));
+		else
+			input = hexToByteArray(data); // console
+		ValidationResult validationResult = (charset == StandardCharsets.US_ASCII) ? validateAscii(input)
+				: (charset == StandardCharsets.UTF_8) ? validateUtf8(input) : validateEbcdic(input);
+		System.err.println(validationResult.isValid() ? "valid" : "invalid");
+		if (debug)
+			System.err.println(validationResult.getMessage());
+
+	}
+
+	private static ValidationResult validateUtf8(byte[] data) {
+		boolean status = false;
+		String message = null;
+		try {
+			CharsetDecoder characterDecoder = StandardCharsets.UTF_8.newDecoder();
+			characterDecoder.decode(ByteBuffer.wrap(data));
+			status = true;
+		} catch (CharacterCodingException e) {
+			message = String.format("invalid: %s", e.getMessage());
+		}
+		return new ValidationResult(status, message);
+	}
+
+	private static ValidationResult validateEbcdic(byte[] data) {
+		boolean status = false;
+		String message = null;
+		try {
+			CharsetDecoder characterDecoder = Charset.forName("CP1047").newDecoder();
+			characterDecoder.decode(ByteBuffer.wrap(data));
+			status = true;
+			// range probing
+			for (int cnt = 0; cnt != data.length; cnt++) {
+				int b = data[cnt] & 0xFF;
+				if (b == 0) {
+					status = false;
+					message = String.format("null character on %d", cnt);
+				}
+			}
+		} catch (CharacterCodingException e) {
+			message = String.format("invalid: %s", e.getMessage());
+			message = String.format("invalid: %s", e.toString());
+		}
+		return new ValidationResult(status, message);
+	}
+
+	// range probing
+	private static ValidationResult validateAscii(byte[] data) {
+		boolean status = true;
+		String message = null;
+		// range probing
+		for (int cnt = 0; cnt != data.length; cnt++) {
+			int b = data[cnt] & 0xFF;
+			if (b > 127) {
+				status = false;
+				message = String.format("invalid US-ASCII character 0x%02X on %d", b, cnt);
+			}
+		}
+		return new ValidationResult(status, message);
+	}
 }
