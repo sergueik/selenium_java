@@ -178,24 +178,22 @@ public class Converter {
 			status = true;
 			// range probing
 			for (int cnt = 0; cnt != data.length; cnt++) {
-				int b = data[cnt] & 0xFF;
-				if (b == 0) {
+				int charCode = data[cnt] & 0xFF;
+				if (charCode == 0) {
 					status = false;
 					message = String.format("null character on %d", cnt);
 				}
-				boolean valid = b == 0x40 || // space
-						(b >= 0xF0 && b <= 0xF9) || // digits
-
+				boolean valid = charCode == 0x40 || // space
+						 // digits
+						(charCode >= 0xF0 && charCode <= 0xF9) ||
 						// uppercase
-						(b >= 0xC1 && b <= 0xC9) || (b >= 0xD1 && b <= 0xD9) || (b >= 0xE2 && b <= 0xE9) ||
-
+						(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9) || (charCode >= 0xE2 && charCode <= 0xE9) ||
 						// lowercase
-						(b >= 0x81 && b <= 0x89) || (b >= 0x91 && b <= 0x99) || (b >= 0xA2 && b <= 0xA9) ||
-
+						(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9) ||
 						// basic punctuation window
-						(b >= 0x4A && b <= 0x6F);
+						(charCode >= 0x4A && charCode <= 0x6F);
 				if (!valid)
-					message = String.format("invalid EBCDIC character 0x%02X on %d", b, cnt);
+					message = String.format("invalid EBCDIC character 0x%02X on %d", charCode, cnt);
 				status &= valid;
 			}
 		} catch (CharacterCodingException e) {
@@ -210,10 +208,10 @@ public class Converter {
 		String message = null;
 		// range probing
 		for (int cnt = 0; cnt != data.length; cnt++) {
-			int b = data[cnt] & 0xFF;
-			if (b > 127) {
+			int charCode = data[cnt] & 0xFF;
+			if (charCode > 127) {
 				status = false;
-				message = String.format("invalid US-ASCII character 0x%02X on %d", b, cnt);
+				message = String.format("invalid US-ASCII character 0x%02X on %d", charCode, cnt);
 			}
 		}
 		return new ValidationResult(status, message);
