@@ -189,23 +189,63 @@ public class Converter {
 	}
 
 	private static IntPredicate isValidChar = (int charCode) ->
-	 		// space
-			charCode == 0x40 ||
-			// digits
+	// space
+	charCode == 0x40 ||
+	// digits
 			(charCode >= 0xF0 && charCode <= 0xF9) ||
 			// uppercase
 			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-			|| (charCode >= 0xE2 && charCode <= 0xE9) || 
+			|| (charCode >= 0xE2 && charCode <= 0xE9) ||
 			// lowercase
 			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
 			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
 			// basic punctuation
-			(charCode >= 0x4A && charCode <= 0x6F
-			); 
+			(charCode >= 0x4A && charCode <= 0x6F);
 
+	// ASCII predicate: 7-bit printable region is continuous
+	// tilde
+	private static IntPredicate isAsciiValidChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
+
+	// strict ASCII validator (trusted)
+	public static ValidationResult validateASCII(byte[] data) {
+		boolean status = true;
+		String message = null;
+		// valid 7-bit ASCII range probing
+		for (int cnt = 0; cnt != data.length; cnt++) {
+			int charCode = data[cnt] & 0xFF; // unsigned
+			if (!isAsciiValidChar.test(charCode)) {
+				status = false;
+				message = String.format("invalid US-ASCII character 0x%02X on %d", charCode, cnt);
+			}
+		}
+		return new ValidationResult(status, message);
+	}
+
+	// new threshold tolerance-based ASCII validator
+	public static ValidationResult validateASCII(byte[] data, double threshold) {
+		boolean status = true;
+		String message = null;
+		int validCount = 0;
+
+		for (int i = 0; i < data.length; i++) {
+			int charCode = data[i] & 0xFF;
+			if (isAsciiValidChar.test(charCode)) {
+				validCount++;
+			}
+		}
+
+		double ratio = (double) validCount / data.length;
+		if (ratio < threshold) {
+			status = false;
+			message = String.format("valid ASCII byte ratio %.2f below threshold %.2f", ratio, threshold);
+		}
+
+		return new ValidationResult(status, message);
+	}
 
 	// minimum valid byte ratio
-	public static ValidationResult validateEBCDIC(byte[] data, double threshold ) {
+
+	public static ValidationResult validateEBCDIC(byte[] data, double threshold) {
 		boolean status = false;
 		String message = null;
 
@@ -267,18 +307,4 @@ public class Converter {
 		return new ValidationResult(status, message);
 	}
 
-	// range probing
-	private static ValidationResult validateASCII(byte[] data) {
-		boolean status = true;
-		String message = null;
-		// valid 7-bit ASCII range probing
-		for (int cnt = 0; cnt != data.length; cnt++) {
-			int charCode = data[cnt] & 0xFF; // unsigned
-			if (charCode > 127) {
-				status = false;
-				message = String.format("invalid US-ASCII character 0x%02X on %d", charCode, cnt);
-			}
-		}
-		return new ValidationResult(status, message);
-	}
 }
