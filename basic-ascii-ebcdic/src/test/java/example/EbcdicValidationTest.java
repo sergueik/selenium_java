@@ -22,27 +22,23 @@ public class EbcdicValidationTest {
 	@DisplayName("strict pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
-	void test1(String description, String hex, boolean expectedValid) {
+	void test1(String description, String input, boolean expected) {
 
-		byte[] data = Converter.hexToByteArray(hex);
-
+		byte[] data = Converter.hexToByteArray(input);
 		ValidationResult result = Converter.validateEBCDIC(data);
-
-		assertThat(description + " hex=" + hex + " message=" + result.getMessage(), result.isValid(),
-				is(expectedValid));
+		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}
 
 	@DisplayName("threshold pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
-	void test2(String description, String hex, boolean expectedValid) {
+	void test2(String description, String input, boolean expected) {
 
-		byte[] data = Converter.hexToByteArray(hex);
+		byte[] data = Converter.hexToByteArray(input);
 
 		ValidationResult result = Converter.validateEBCDIC(data, threshold);
 
-		assertThat(description + " hex=" + hex + " message=" + result.getMessage(), result.isValid(),
-				is(expectedValid));
+		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}
 
 	static Stream<Arguments> samples() {

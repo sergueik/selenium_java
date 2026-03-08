@@ -174,64 +174,89 @@ public class Converter {
 
 	}
 
-	// predicates
-	private static IntPredicate isValidChar = charCode -> charCode == 0x40 || (charCode >= 0xF0 && charCode <= 0xF9)
-			|| (charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-			|| (charCode >= 0xE2 && charCode <= 0xE9) || (charCode >= 0x81 && charCode <= 0x89)
-			|| (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9)
-			|| (charCode >= 0x4A && charCode <= 0x6F);
+	// EBCDIC predicate: non-contiguous valid ranges, including digits, letters,
+	// punctuation
+	// EBCDIC isn’t contiguous like ASCII
+	private static IntPredicate isValidEBCDICChar = charCode ->
+		// space
+		charCode == 0x40 ||
+		// digits
+		(charCode >= 0xF0 && charCode <= 0xF9) ||
+		// uppercase letters
+		(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+		|| (charCode >= 0xE2 && charCode <= 0xE9) ||
+		// lowercase letters
+		(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
+		|| (charCode >= 0xA2 && charCode <= 0xA9) ||
+		// basic punctuation
+		(charCode >= 0x4A && charCode <= 0x6F) ||
+		// generic fallback bytes for Western European characters
+	    // NOTE: these represent accented letters or symbols outside ASCII,
+		charCode == 0x45 ||charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
 
+	// ASCII predicate: 7-bit printable region is continuous
 	private static IntPredicate isAsciiValidChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
 
-	// generic validator: strict or threshold,
-	// WARNING: using arguments to guide the logic - need to use boxed double
-	// null = strict mode
+	public static IntPredicate getIntPredicate(final String codePage) {
+		return isValidEBCDICChar;
+	}
+
+	// generic validator: strict or threshold
+	// null threshold = strict mode, otherwise threshold mode
 	public static ValidationResult validateGeneric(final byte[] data, final String codePage, final Charset decoder,
 			final IntPredicate rangeValidator, final Double threshold) {
 		boolean status = true;
 		String message = null;
 		int validCount = 0;
-		// Strict mode if threshold is null
 		boolean strict = (threshold == null);
-
+		if (decoder == null && rangeValidator == null) {
+			throw new IllegalArgumentException("Invalid arguments: both decoder and rangeValidator are null");
+		}
 		// optional decoder check
 		if (decoder != null) {
 			try {
 				decoder.newDecoder().decode(ByteBuffer.wrap(data));
 			} catch (CharacterCodingException e) {
 				status = false;
-				message = String.format("failed to decode in code page %s: %s", decoder.name(), e.getMessage());
+				message = String.format("failed to decode in code page %s: %s", codePage, e.getMessage());
 				return new ValidationResult(status, message);
 			}
 		}
 
 		if (rangeValidator != null) {
-			for (int i = 0; i < data.length; i++) {
-				int charCode = data[i] & 0xFF;
-				if (charCode == 0) {
-					status = false;
-					if (message == null)
-						message = String.format("null character at position %d", i);
-				}
+			for (int pos = 0; pos < data.length; pos++) {
+				int charCode = data[pos] & 0xFF; // unsigned
 
+				// null character check
+				if (0 == charCode) {
+					status = false;
+					if (message == null) {
+						message = String.format("null character at position %d", pos);
+					}
+				}
+				// range check
 				boolean valid = rangeValidator.test(charCode);
 				if (valid) {
 					validCount++;
 				}
 
+				// strict mode: any invalid char fails immediately
 				if (!valid && strict) {
 					status = false;
 					if (message == null) {
-						message = String.format("invalid character 0x%02X at position %d", charCode, i);
+						message = String.format("invalid code page %s character 0x%02X at position %d", codePage,
+								charCode, pos);
 					}
 				}
 			}
 
+			// threshold mode: ratio check
 			if (!strict) {
 				double ratio = (double) validCount / data.length;
 				if (ratio < threshold) {
 					status = false;
-					message = String.format("valid byte ratio %.2f below threshold %.2f", ratio, threshold);
+					message = String.format("valid byte ratio %.2f below threshold %.2f for code page %s", ratio,
+							threshold, codePage);
 				}
 			}
 		}
@@ -249,11 +274,11 @@ public class Converter {
 	}
 
 	public static ValidationResult validateEBCDIC(byte[] data) {
-		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidChar, null);
+		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidEBCDICChar, null);
 	}
 
 	public static ValidationResult validateEBCDIC(byte[] data, double threshold) {
-		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidChar, threshold);
+		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidEBCDICChar, threshold);
 	}
 
 	public static ValidationResult validateUTF8(byte[] data) {
