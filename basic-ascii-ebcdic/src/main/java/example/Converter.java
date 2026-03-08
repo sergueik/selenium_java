@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import java.util.function.IntPredicate;
+
 import example.CommandLineParser;
 
 public class Converter {
@@ -113,11 +115,8 @@ public class Converter {
 
 	private static void encodeFile(String inputFile, String outputFile, String data, Charset sourceCharset,
 			Charset targetCharset) throws IOException {
-		byte[] input;
-		if (inputFile != null)
-			input = Files.readAllBytes(Path.of(inputFile));
-		else
-			input = data.getBytes(StandardCharsets.US_ASCII); // console
+		byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
+				: data.getBytes(StandardCharsets.US_ASCII); // console
 		byte[] converted = convertBytes(input, sourceCharset, targetCharset);
 		if (outputFile != null)
 			Files.write(Path.of(outputFile), converted);
@@ -127,13 +126,7 @@ public class Converter {
 	private static void decodeFile(String inputFile, String outputFile, String data, Charset source, Charset target)
 			throws IOException {
 
-		byte[] input;
-
-		if (inputFile != null) {
-			input = Files.readAllBytes(Path.of(inputFile));
-		} else {
-			input = hexToByteArray(data);
-		}
+		byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile)) : hexToByteArray(data); // console
 
 		byte[] converted = convertBytes(input, source, target);
 		if (outputFile != null)
@@ -141,56 +134,53 @@ public class Converter {
 		// Console-safe
 		System.out.println(new String(converted, target));
 	}
+
 	// NOTE map may be over-engineering if one only handles 3 charmaps:
 	/*
-	private static final Map<Charset, Function<byte[], ValidationResult>> VALIDATORS =
-	        new HashMap<>();
-
-	static {
-	    VALIDATORS.put(StandardCharsets.US_ASCII, Convertor::validateAscii);
-	    VALIDATORS.put(StandardCharsets.UTF_8, Convertor::validateUtf8);
-	}
-	*/
+	 * private static final Map<Charset, Function<byte[], ValidationResult>>
+	 * VALIDATORS = new HashMap<>();
+	 * 
+	 * static { VALIDATORS.put(StandardCharsets.US_ASCII, Convertor::validateASCII);
+	 * VALIDATORS.put(StandardCharsets.UTF_8, Convertor::validateUTF8); }
+	 */
 	enum Validator {
-	    ASCII {
-	        ValidationResult validate(byte[] data) { return validateAscii(data); }
-	    },
-	    UTF8 {
-	        ValidationResult validate(byte[] data) { return validateUtf8(data); }
-	    },
-	    EBCDIC {
-	        ValidationResult validate(byte[] data) { return validateEbcdic(data); }
-	    };
+		ASCII {
+			ValidationResult validate(byte[] data) {
+				return validateASCII(data);
+			}
+		},
+		UTF8 {
+			ValidationResult validate(byte[] data) {
+				return validateUTF8(data);
+			}
+		},
+		EBCDIC {
+			ValidationResult validate(byte[] data) {
+				return validateEBCDIC(data);
+			}
+		};
 
-	    abstract ValidationResult validate(byte[] data);
+		abstract ValidationResult validate(byte[] data);
 	}
-	
-	private static void validate(String inputFile, String data, Charset charset) throws IOException {
-		byte[] input;
-		if (inputFile != null)
-			input = Files.readAllBytes(Path.of(inputFile));
-		else
-			input = hexToByteArray(data); // console
-		
-		Validator validator = (charset == StandardCharsets.US_ASCII)
-		        ? Validator.ASCII
-		        : (charset == StandardCharsets.UTF_8)
-		            ? Validator.UTF8
-		            : Validator.EBCDIC;
 
-		ValidationResult validationResult =  validator.validate(input);
+	private static void validate(String inputFile, String data, Charset charset) throws IOException {
+		byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile)) : hexToByteArray(data); // console
+
+		Validator validator = (charset == StandardCharsets.US_ASCII) ? Validator.ASCII
+				: (charset == StandardCharsets.UTF_8) ? Validator.UTF8 : Validator.EBCDIC;
+
+		ValidationResult validationResult = validator.validate(input);
 		System.err.println(validationResult.isValid() ? "valid" : "invalid");
 		if (debug)
 			System.err.println(validationResult.getMessage());
 
 	}
 
-	private static ValidationResult validateUtf8(byte[] data) {
+	private static ValidationResult validateUTF8(byte[] data) {
 		boolean status = false;
 		String message = null;
 		try {
-			CharsetDecoder characterDecoder = StandardCharsets.UTF_8.newDecoder();
-			characterDecoder.decode(ByteBuffer.wrap(data));
+			StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(data));
 			status = true;
 		} catch (CharacterCodingException e) {
 			message = String.format("invalid: %s", e.getMessage());
@@ -198,31 +188,75 @@ public class Converter {
 		return new ValidationResult(status, message);
 	}
 
-	public static ValidationResult validateEbcdic(byte[] data) {
+	private static IntPredicate isValidChar = (int charCode) ->
+	 		// space
+			charCode == 0x40 ||
+			// digits
+			(charCode >= 0xF0 && charCode <= 0xF9) ||
+			// uppercase
+			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+			|| (charCode >= 0xE2 && charCode <= 0xE9) || 
+			// lowercase
+			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
+			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
+			// basic punctuation
+			(charCode >= 0x4A && charCode <= 0x6F
+			); 
+
+
+	// minimum valid byte ratio
+	public static ValidationResult validateEBCDIC(byte[] data, double threshold ) {
+		boolean status = false;
+		String message = null;
+
+		try {
+			// quick decode check
+			Charset.forName("CP1047").newDecoder().decode(ByteBuffer.wrap(data));
+			status = true;
+
+			// picture range predicate
+			int validCount = 0;
+			for (int i = 0; i < data.length; i++) {
+				int charCode = data[i] & 0xFF; // unsigned
+				if (charCode == 0) {
+					status = false;
+					message = String.format("null character on %d", i);
+				}
+				if (isValidChar.test(charCode))
+					validCount++;
+			}
+
+			// compute ratio
+			double ratio = (double) validCount / data.length;
+			if (ratio < threshold) {
+				status = false;
+				message = String.format("valid byte ratio %.2f below threshold %.2f", ratio, threshold);
+			}
+
+		} catch (CharacterCodingException e) {
+			message = String.format("invalid: %s", e.getMessage());
+			status = false;
+		}
+
+		return new ValidationResult(status, message);
+	}
+
+	// strict validator
+	public static ValidationResult validateEBCDIC(byte[] data) {
 		boolean status = false;
 		String message = null;
 		try {
-			CharsetDecoder characterDecoder = Charset.forName("CP1047").newDecoder();
-			characterDecoder.decode(ByteBuffer.wrap(data));
+			Charset.forName("CP1047").newDecoder().decode(ByteBuffer.wrap(data));
 			status = true;
-			// range probing
+			// EBCDIC picture range probing
+			// EBCDIC isn’t contiguous like ASCII
 			for (int cnt = 0; cnt != data.length; cnt++) {
-				int charCode = data[cnt] & 0xFF;
+				int charCode = data[cnt] & 0xFF; // unsigned
 				if (charCode == 0) {
 					status = false;
 					message = String.format("null character on %d", cnt);
 				}
-				boolean valid = 
-						// space
-						charCode == 0x40 ||
-						// digits
-						(charCode >= 0xF0 && charCode <= 0xF9) ||
-						// uppercase
-						(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9) || (charCode >= 0xE2 && charCode <= 0xE9) ||
-						// lowercase
-						(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9) ||
-						// basic punctuation window
-						(charCode >= 0x4A && charCode <= 0x6F);
+				boolean valid = isValidChar.test(charCode);
 				if (!valid)
 					message = String.format("invalid EBCDIC character 0x%02X on %d", charCode, cnt);
 				status &= valid;
@@ -234,12 +268,12 @@ public class Converter {
 	}
 
 	// range probing
-	private static ValidationResult validateAscii(byte[] data) {
+	private static ValidationResult validateASCII(byte[] data) {
 		boolean status = true;
 		String message = null;
-		// range probing
+		// valid 7-bit ASCII range probing
 		for (int cnt = 0; cnt != data.length; cnt++) {
-			int charCode = data[cnt] & 0xFF;
+			int charCode = data[cnt] & 0xFF; // unsigned
 			if (charCode > 127) {
 				status = false;
 				message = String.format("invalid US-ASCII character 0x%02X on %d", charCode, cnt);

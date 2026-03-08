@@ -5,19 +5,35 @@ import static org.hamcrest.Matchers.is;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class EbcdicValidationTest {
 
+	private double threshold = 0.96;
+	@DisplayName("strict pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
-	void testEbcdicValidation(String description, String hex, boolean expectedValid) {
+	void test1(String description, String hex, boolean expectedValid) {
 
 		byte[] data = Converter.hexToByteArray(hex);
 
-		ValidationResult result = Converter.validateEbcdic(data);
+		ValidationResult result = Converter.validateEBCDIC(data);
+
+		assertThat(description + " hex=" + hex + " message=" + result.getMessage(), result.isValid(),
+				is(expectedValid));
+	}
+
+	@DisplayName("threshold pass or fail")
+	@ParameterizedTest
+	@MethodSource("samples")
+	void test2(String description, String hex, boolean expectedValid) {
+
+		byte[] data = Converter.hexToByteArray(hex);
+
+		ValidationResult result = Converter.validateEBCDIC(data,threshold);
 
 		assertThat(description + " hex=" + hex + " message=" + result.getMessage(), result.isValid(),
 				is(expectedValid));
