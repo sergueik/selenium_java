@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 public class EbcdicValidationTest {
 
-	private double threshold = 0.96;
+	private Double threshold = 0.96;
 
 	@DisplayName("strict pass or fail")
 	@ParameterizedTest

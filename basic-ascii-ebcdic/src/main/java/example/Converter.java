@@ -7,11 +7,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
-import java.nio.charset.CharsetDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
 import java.util.function.IntPredicate;
 
 import example.CommandLineParser;
@@ -176,135 +174,90 @@ public class Converter {
 
 	}
 
-	private static ValidationResult validateUTF8(byte[] data) {
-		boolean status = false;
-		String message = null;
-		try {
-			StandardCharsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(data));
-			status = true;
-		} catch (CharacterCodingException e) {
-			message = String.format("invalid: %s", e.getMessage());
-		}
-		return new ValidationResult(status, message);
-	}
+	// predicates
+	private static IntPredicate isValidChar = charCode -> charCode == 0x40 || (charCode >= 0xF0 && charCode <= 0xF9)
+			|| (charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+			|| (charCode >= 0xE2 && charCode <= 0xE9) || (charCode >= 0x81 && charCode <= 0x89)
+			|| (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9)
+			|| (charCode >= 0x4A && charCode <= 0x6F);
 
-	private static IntPredicate isValidChar = (int charCode) ->
-	// space
-	charCode == 0x40 ||
-	// digits
-			(charCode >= 0xF0 && charCode <= 0xF9) ||
-			// uppercase
-			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-			|| (charCode >= 0xE2 && charCode <= 0xE9) ||
-			// lowercase
-			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
-			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
-			// basic punctuation
-			(charCode >= 0x4A && charCode <= 0x6F);
-
-	// ASCII predicate: 7-bit printable region is continuous
-	// tilde
 	private static IntPredicate isAsciiValidChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
 
-	// strict ASCII validator (trusted)
-	public static ValidationResult validateASCII(byte[] data) {
-		boolean status = true;
-		String message = null;
-		// valid 7-bit ASCII range probing
-		for (int cnt = 0; cnt != data.length; cnt++) {
-			int charCode = data[cnt] & 0xFF; // unsigned
-			if (!isAsciiValidChar.test(charCode)) {
-				status = false;
-				message = String.format("invalid US-ASCII character 0x%02X on %d", charCode, cnt);
-			}
-		}
-		return new ValidationResult(status, message);
-	}
-
-	// new threshold tolerance-based ASCII validator
-	public static ValidationResult validateASCII(byte[] data, double threshold) {
+	// generic validator: strict or threshold,
+	// WARNING: using arguments to guide the logic - need to use boxed double
+	// null = strict mode
+	public static ValidationResult validateGeneric(final byte[] data, final String codePage, final Charset decoder,
+			final IntPredicate rangeValidator, final Double threshold) {
 		boolean status = true;
 		String message = null;
 		int validCount = 0;
+		// Strict mode if threshold is null
+		boolean strict = (threshold == null);
 
-		for (int i = 0; i < data.length; i++) {
-			int charCode = data[i] & 0xFF;
-			if (isAsciiValidChar.test(charCode)) {
-				validCount++;
+		// optional decoder check
+		if (decoder != null) {
+			try {
+				decoder.newDecoder().decode(ByteBuffer.wrap(data));
+			} catch (CharacterCodingException e) {
+				status = false;
+				message = String.format("failed to decode in code page %s: %s", decoder.name(), e.getMessage());
+				return new ValidationResult(status, message);
 			}
 		}
 
-		double ratio = (double) validCount / data.length;
-		if (ratio < threshold) {
-			status = false;
-			message = String.format("valid ASCII byte ratio %.2f below threshold %.2f", ratio, threshold);
+		if (rangeValidator != null) {
+			for (int i = 0; i < data.length; i++) {
+				int charCode = data[i] & 0xFF;
+				if (charCode == 0) {
+					status = false;
+					if (message == null)
+						message = String.format("null character at position %d", i);
+				}
+
+				boolean valid = rangeValidator.test(charCode);
+				if (valid) {
+					validCount++;
+				}
+
+				if (!valid && strict) {
+					status = false;
+					if (message == null) {
+						message = String.format("invalid character 0x%02X at position %d", charCode, i);
+					}
+				}
+			}
+
+			if (!strict) {
+				double ratio = (double) validCount / data.length;
+				if (ratio < threshold) {
+					status = false;
+					message = String.format("valid byte ratio %.2f below threshold %.2f", ratio, threshold);
+				}
+			}
 		}
 
 		return new ValidationResult(status, message);
 	}
 
-	// minimum valid byte ratio
+	// strict validators
+	public static ValidationResult validateASCII(byte[] data) {
+		return validateGeneric(data, "ASCII", null, isAsciiValidChar, null);
+	}
+
+	public static ValidationResult validateASCII(byte[] data, double threshold) {
+		return validateGeneric(data, "ASCII", null, isAsciiValidChar, threshold);
+	}
+
+	public static ValidationResult validateEBCDIC(byte[] data) {
+		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidChar, null);
+	}
 
 	public static ValidationResult validateEBCDIC(byte[] data, double threshold) {
-		boolean status = false;
-		String message = null;
-
-		try {
-			// quick decode check
-			Charset.forName("CP1047").newDecoder().decode(ByteBuffer.wrap(data));
-			status = true;
-
-			// picture range predicate
-			int validCount = 0;
-			for (int i = 0; i < data.length; i++) {
-				int charCode = data[i] & 0xFF; // unsigned
-				if (charCode == 0) {
-					status = false;
-					message = String.format("null character on %d", i);
-				}
-				if (isValidChar.test(charCode))
-					validCount++;
-			}
-
-			// compute ratio
-			double ratio = (double) validCount / data.length;
-			if (ratio < threshold) {
-				status = false;
-				message = String.format("valid byte ratio %.2f below threshold %.2f", ratio, threshold);
-			}
-
-		} catch (CharacterCodingException e) {
-			message = String.format("invalid: %s", e.getMessage());
-			status = false;
-		}
-
-		return new ValidationResult(status, message);
+		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidChar, threshold);
 	}
 
-	// strict validator
-	public static ValidationResult validateEBCDIC(byte[] data) {
-		boolean status = false;
-		String message = null;
-		try {
-			Charset.forName("CP1047").newDecoder().decode(ByteBuffer.wrap(data));
-			status = true;
-			// EBCDIC picture range probing
-			// EBCDIC isn’t contiguous like ASCII
-			for (int cnt = 0; cnt != data.length; cnt++) {
-				int charCode = data[cnt] & 0xFF; // unsigned
-				if (charCode == 0) {
-					status = false;
-					message = String.format("null character on %d", cnt);
-				}
-				boolean valid = isValidChar.test(charCode);
-				if (!valid)
-					message = String.format("invalid EBCDIC character 0x%02X on %d", charCode, cnt);
-				status &= valid;
-			}
-		} catch (CharacterCodingException e) {
-			message = String.format("invalid: %s", e.getMessage());
-		}
-		return new ValidationResult(status, message);
+	public static ValidationResult validateUTF8(byte[] data) {
+		return validateGeneric(data, "UTF-8", StandardCharsets.UTF_8, null, null);
 	}
 
 }
