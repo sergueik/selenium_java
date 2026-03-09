@@ -178,27 +178,28 @@ public class Converter {
 	// punctuation
 	// EBCDIC isn’t contiguous like ASCII
 	private static IntPredicate isValidEBCDICChar = charCode ->
-		// space
-		charCode == 0x40 ||
-		// digits
-		(charCode >= 0xF0 && charCode <= 0xF9) ||
-		// uppercase letters
-		(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-		|| (charCode >= 0xE2 && charCode <= 0xE9) ||
-		// lowercase letters
-		(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
-		|| (charCode >= 0xA2 && charCode <= 0xA9) ||
-		// basic punctuation
-		(charCode >= 0x4A && charCode <= 0x6F) ||
-		// generic fallback bytes for Western European characters
-	    // NOTE: these represent accented letters or symbols outside ASCII,
-		charCode == 0x45 ||charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
+	// space
+	charCode == 0x40 ||
+	// digits
+			(charCode >= 0xF0 && charCode <= 0xF9) ||
+			// uppercase letters
+			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+			|| (charCode >= 0xE2 && charCode <= 0xE9) ||
+			// lowercase letters
+			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
+			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
+			// basic punctuation
+			(charCode >= 0x4A && charCode <= 0x6F) ||
+			// generic fallback bytes for Western European characters
+			// NOTE: these represent accented letters or symbols outside ASCII,
+			charCode == 0x45 || charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
 
 	// ASCII predicate: 7-bit printable region is continuous
-	private static IntPredicate isAsciiValidChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
+	private static IntPredicate isValidAsciiChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
 
 	public static IntPredicate getIntPredicate(final String codePage) {
-		return isValidEBCDICChar;
+		return codePage.contains("ASCII") ? isValidAsciiChar
+				: codePage.equalsIgnoreCase("UTF_8") ? null : isValidEBCDICChar;
 	}
 
 	// generic validator: strict or threshold
@@ -266,11 +267,11 @@ public class Converter {
 
 	// strict validators
 	public static ValidationResult validateASCII(byte[] data) {
-		return validateGeneric(data, "ASCII", null, isAsciiValidChar, null);
+		return validateGeneric(data, "ASCII", null, isValidAsciiChar, null);
 	}
 
 	public static ValidationResult validateASCII(byte[] data, double threshold) {
-		return validateGeneric(data, "ASCII", null, isAsciiValidChar, threshold);
+		return validateGeneric(data, "ASCII", null, isValidAsciiChar, threshold);
 	}
 
 	public static ValidationResult validateEBCDIC(byte[] data) {

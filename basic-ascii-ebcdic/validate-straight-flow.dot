@@ -1,0 +1,41 @@
+digraph validateEBCDIC {
+    rankdir=TB;
+
+    node [shape=box];
+    start [label="Start validateEBCDIC(data)"];
+    decode [label="Try decode with CP1047"];
+
+    decode_ok [shape=diamond, label="Decoding successful?"];
+    decode_fail [label="message = decode error\nstatus = false"];
+
+    loop [label="Loop through bytes"];
+    null_check [shape=diamond, label="charCode == 0 ?"];
+    null_msg [label="message = 'null character'"];
+
+    range_check [shape=diamond, label="isValidChar.test(charCode) ?"];
+    invalid_msg [label="message = 'invalid EBCDIC char'"];
+
+    endloop [label="Continue until end of data"];
+    result [label="return ValidationResult(status, message)"];
+
+    start -> decode;
+    decode -> decode_ok;
+
+    decode_ok -> decode_fail [label="no"];
+    decode_ok -> loop [label="yes"];
+
+    loop -> null_check;
+
+    null_check -> null_msg [label="yes"];
+    null_check -> range_check [label="no"];
+
+    null_msg -> range_check;
+
+    range_check -> endloop [label="yes"];
+    range_check -> invalid_msg [label="no"];
+
+    invalid_msg -> endloop;
+
+    endloop -> loop [label="next byte"];
+    endloop -> result [label="done"];
+}

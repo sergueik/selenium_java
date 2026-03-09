@@ -1,6 +1,7 @@
 ### Info
 
 
+
 Example external jar-clean java class for convert EBCDIC to ASCII and back	
 ### Usage
 #### Basic
@@ -77,21 +78,23 @@ EBCDIC has a weird layout but text tends to cluster:
 ![charmap](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/capture-charmap.jpg)
 
 			
-| Category     | Hex range                              |
-| ------------ | -------------------------------------- |
-| space	       | 0x40                                   |
-| lowercase    | 0x81–0x89, 0x91–0x99, 0xA2–0xA9         |
-| uppercase    | 0xC1–0xC9, 0xD1–0xD9, 0xE2–0xE9        |
-| digits       | 0xF0–0xF9                              |
-| punctuation  | 0x4B, 0x6B, 0x5A, 0x7A, 0x60–0x6F      |
-|    |         |
+| Category       | Hex range                              |
+| ---------------- | -------------------------------------- |
+| space	         | 0x40                                   |
+| lowercase      | 0x81–0x89, 0x91–0x99, 0xA2–0xA9         |
+| uppercase      | 0xC1–0xC9, 0xD1–0xD9, 0xE2–0xE9        |
+| digits         | 0xF0–0xF9                              |
+| punctuation    | 0x4B, 0x6B, 0x5A, 0x7A, 0x60–0x6F      |
+| fallback bytes | 0x45, 0xCE, 0xE9, 0xD3 , 0xC7          |
 
 
 
 This leads to  the following "in the range" probe:
 
 ```java
-boolean valid = charCode == 0x40 || // space
+boolean valid =
+  // space
+  charCode == 0x40 || 
   // digits
   (charCode >= 0xF0 && charCode <= 0xF9) ||
   // uppercase
@@ -99,9 +102,20 @@ boolean valid = charCode == 0x40 || // space
   // lowercase
   (charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99) || (charCode >= 0xA2 && charCode <= 0xA9) ||
   // basic punctuation window
-  (charCode >= 0x4A && charCode <= 0x6F);
+  (charCode >= 0x4A && charCode <= 0x6F) ||
+  // fallback bytes for accented letters of Western European or symbols outside ASCII,
+  charCode == 0x45 ||charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
 ```
+### Flow
 
+#### Separate Validators → Simpler Control Flow, Easy Diagrams
+
+![strict](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/validate-straight-flow.png)
+
+
+![threshold](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/validate-threshold-flow.png)
+
+#### Merged Generic Validator → No Code Duplicatiom ,  Heavier Logic Graph
 
 
 

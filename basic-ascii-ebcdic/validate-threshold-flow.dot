@@ -1,0 +1,59 @@
+digraph validateEBCDIC_threshold {
+    rankdir=TB;
+
+    node [shape=box];
+
+    start [label="Start validateEBCDIC(data, threshold)"];
+    decode [label="Try decode with CP1047"];
+
+    decode_ok [shape=diamond, label="Decoding successful?"];
+    decode_fail [label="status = false\nmessage = decode error"];
+
+    init [label="status = true\nvalidCount = 0"];
+    loop [label="Loop through bytes"];
+
+    null_check [shape=diamond, label="charCode == 0 ?"];
+    null_msg [label="status=false\nmessage='null character'"];
+
+    range_check [shape=diamond, label="isValidChar.test(charCode) ?"];
+    count_valid [label="validCount++"];
+
+    next_byte [label="next byte"];
+    ratio_calc [label="ratio = validCount / length"];
+
+    ratio_check [shape=diamond, label="ratio < threshold ?"];
+    ratio_fail [label="status=false\nmessage='ratio below threshold'"];
+
+    result [label="return ValidationResult(status, message)"];
+
+    start -> decode;
+    decode -> decode_ok;
+
+    decode_ok -> decode_fail [label="no"];
+    decode_ok -> init [label="yes"];
+
+    init -> loop;
+    loop -> null_check;
+
+    null_check -> null_msg [label="yes"];
+    null_check -> range_check [label="no"];
+
+    null_msg -> range_check;
+
+    range_check -> count_valid [label="yes"];
+    range_check -> next_byte [label="no"];
+
+    count_valid -> next_byte;
+
+    next_byte -> loop [label="more bytes"];
+    next_byte -> ratio_calc [label="done"];
+
+    ratio_calc -> ratio_check;
+
+    ratio_check -> ratio_fail [label="yes"];
+    ratio_check -> result [label="no"];
+
+    ratio_fail -> result;
+
+    decode_fail -> result;
+}
