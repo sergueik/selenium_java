@@ -175,24 +175,36 @@ public class Converter {
 	}
 
 	// EBCDIC predicate: non-contiguous valid ranges, including digits, letters,
-	// punctuation
+	// punctuation and fallback
 	// EBCDIC isn’t contiguous like ASCII
 	private static IntPredicate isValidEBCDICChar = charCode ->
-	// space
-	charCode == 0x40 ||
-	// digits
-			(charCode >= 0xF0 && charCode <= 0xF9) ||
-			// uppercase letters
-			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-			|| (charCode >= 0xE2 && charCode <= 0xE9) ||
-			// lowercase letters
-			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
-			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
-			// basic punctuation
-			(charCode >= 0x4A && charCode <= 0x6F) ||
-			// generic fallback bytes for Western European characters
-			// NOTE: these represent accented letters or symbols outside ASCII,
-			charCode == 0x45 || charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
+		// space
+		charCode == 0x40 ||
+		// digits
+		(charCode >= 0xF0 && charCode <= 0xF9) ||
+		// uppercase letters
+		(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+		|| (charCode >= 0xE2 && charCode <= 0xE9) ||
+		// lowercase letters
+		(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
+		|| (charCode >= 0xA2 && charCode <= 0xA9) ||
+		// basic punctuation
+		(charCode >= 0x4A && charCode <= 0x6F) ||
+		// generic fallback bytes for Western European accented  characters
+		// Use with caution: feeding it arbitrary unknown input 
+		// e.g., passport names or company names entered from localized keyboards
+		// may pass validation even though the bytes do not accurately represent the original characters
+		charCode == 0x3F ||  // '?' fallback for unmapped characters
+		charCode == 0x45 ||  // generic accented/fallback
+		charCode == 0x49 ||  // generic accented/fallback
+		charCode == 0x7D ||  // generic accented/fallback
+		charCode == 0xCE ||  // generic accented/fallback
+		charCode == 0xDE ||  // generic accented/fallback
+		charCode == 0xD3 ||  // generic accented/fallback
+		charCode == 0xC7 ||  // generic accented/fallback
+		charCode == 0xE9 ||  // generic accented/fallback
+		charCode == 0xDC;    // generic accented/fallback
+
 
 	// ASCII predicate: 7-bit printable region is continuous
 	private static IntPredicate isValidAsciiChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;

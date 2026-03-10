@@ -22,11 +22,10 @@ public class InternationalEBCDICValidationTest {
 
 	// NOTE: CP1047 limitations:
 	// only ASCII letters be properly encoded, all accented letters
-	// in Spanish: "Cómo estás" or French "Ça va bien" are silently replaced with
-	// fallback bytes )
+	// are silently replaced with fallback bytes
 	static Stream<Arguments> samples3() {
-		return Stream.of(Arguments.of("Spanish accented characters in CP1047", "Cómo estás", true),
-				Arguments.of("Canadian French accented characters in CP1047", "Ça va bien", true));
+		return Stream.of(Arguments.of("Spanish accented characters in CP1047", "El veloz murciélago hindú comía feliz cardillo y kiwi; la cigüeña tocaba el saxofón detrás del palenque de paja", true),
+				Arguments.of("Canadian French accented characters in CP1047", "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi", true));
 	}
 
 	@DisplayName("EBCDIC strict validation for non-US")

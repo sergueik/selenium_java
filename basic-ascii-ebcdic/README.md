@@ -106,6 +106,82 @@ boolean valid =
   // fallback bytes for accented letters of Western European or symbols outside ASCII,
   charCode == 0x45 ||charCode == 0xCE || charCode == 0xE9 || charCode == 0xD3 || charCode == 0xC7;
 ```
+
+### Full European Character Scan
+
+to construct a full alphabet covering phrase in Eutopean languages, one may pick that language equivalent of "the quick brown fox" phrase:
+
+![charmap es](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/capture-charmap-es.jpg)
+
+![charmap fr](https://github.com/sergueik/selenium_java/blob/master/basic-ascii-ebcdic/screenshots/capture-charmap-fr.jpg)
+
+to workaround unrecognized fallback character code errors, one has to provid additional accepted character codes:
+```java
+	// EBCDIC predicate: non-contiguous valid ranges, including digits, letters,
+	// punctuation and fallback
+	// EBCDIC isn’t contiguous like ASCII
+	private static IntPredicate isValidEBCDICChar = charCode ->
+		// space
+		charCode == 0x40 ||
+		// digits
+		(charCode >= 0xF0 && charCode <= 0xF9) ||
+		// uppercase letters
+		(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
+		|| (charCode >= 0xE2 && charCode <= 0xE9) ||
+		// lowercase letters
+		(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
+		|| (charCode >= 0xA2 && charCode <= 0xA9) ||
+		// basic punctuation
+		(charCode >= 0x4A && charCode <= 0x6F) ||
+		// generic fallback bytes for Western European accented  characters
+		// Use with caution: feeding it arbitrary unknown input
+		// e.g., passport names or company names entered from localized keyboards
+		// may pass validation even though the bytes do not accurately represent the original characters
+		charCode == 0x3F ||  // '?' fallback for unmapped characters
+		charCode == 0x45 ||  // generic accented/fallback
+		charCode == 0x49 ||  // generic accented/fallback
+		charCode == 0x7D ||  // generic accented/fallback
+		charCode == 0xCE ||  // generic accented/fallback
+		charCode == 0xDE ||  // generic accented/fallback
+		charCode == 0xD3 ||  // generic accented/fallback
+		charCode == 0xC7 ||  // generic accented/fallback
+		charCode == 0xE9 ||  // generic accented/fallback
+		charCode == 0xDC;    // generic accented/fallback
+
+
+```
+this makes the tests pass:
+```java
+	static Stream<Arguments> samples() {
+    		return Stream.of(Arguments.of("Spanish accented characters in CP1047", "El veloz murciélago hindú comía feliz cardillo y kiwi; la cigüeña tocaba el saxofón detrás del palenque de paja", true),
+				Arguments.of("Canadian French accented characters in CP1047", "Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi", true));
+;
+	}
+
+	@DisplayName("EBCDIC strict validation for non-US")
+	@ParameterizedTest
+	@MethodSource("sample")
+	void test1(String description, String input, boolean expected) {
+
+		// validate encoded string
+		ValidationResult result = Converter.validateGeneric(input.getBytes(Charset.forName(codePage)), codePage,
+				charset, Converter.getIntPredicate(codePage), null);
+
+		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
+
+	}
+
+```
+
+```sh
+mvn test -Dtest=example.InternationalEBCDICValidationTest
+```
+```text
+[INFO]
+[INFO] Results:
+[INFO]
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+```
 ### Flow
 
 #### Separate Validators → Simpler Control Flow, Easy Diagrams
