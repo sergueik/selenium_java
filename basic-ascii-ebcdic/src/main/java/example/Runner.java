@@ -65,20 +65,19 @@ public class Runner {
 		if (debug) {
 			System.err.println("Doing: " + operation + " " + codePage);
 		}
-		final Converter converter = new Converter(data, codePage, outputFile, codePage, threshold);
+		final Converter converter = new Converter(inputFile, outputFile, codePage, threshold, data);
 		if (operation.equalsIgnoreCase("encode")) {
-			converter.encodeFile(inputFile, outputFile, data, StandardCharsets.US_ASCII, Charset.forName(codePage));
+			converter.encodeFile();
 		}
 
 		if (operation.equalsIgnoreCase("decode")) {
-			converter.decodeFile(inputFile, outputFile, data, Charset.forName(codePage), StandardCharsets.US_ASCII);
+			converter.decodeFile();
 		}
 
 		if (operation.equalsIgnoreCase("validate")) {
 			byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
 					: converter.hexToByteArray(data);
-			ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
-					converter.getIntPredicate(codePage), (threshold != 0L) ? Double.valueOf(threshold * .01) : null);
+			ValidationResult result = converter.validateGeneric();
 			System.err.println(result.isValid() ? "valid" : "invalid");
 		}
 		if (debug) {

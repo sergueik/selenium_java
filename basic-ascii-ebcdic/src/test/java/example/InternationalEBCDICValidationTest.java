@@ -7,17 +7,19 @@ import java.nio.charset.Charset;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
-import example.Converter;
-import example.ValidationResult;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+import example.Converter;
+import example.ValidationResult;
 
 @TestInstance(Lifecycle.PER_CLASS)
 public class InternationalEBCDICValidationTest {
@@ -31,7 +33,7 @@ public class InternationalEBCDICValidationTest {
 
 	@BeforeAll
 	public void beforeall() {
-		converter = new Converter(data, codePage, outputFile, codePage, threshold);
+
 	}
 
 	// NOTE: CP1047 limitations:
@@ -42,30 +44,43 @@ public class InternationalEBCDICValidationTest {
 				"El veloz murciélago hindú comía feliz cardillo y kiwi; la cigüeña tocaba el saxofón detrás del palenque de paja",
 				true),
 				Arguments.of("Canadian French accented characters in CP1047",
-						"Voix ambiguë d'un cœur qui au zéphyr préfère les jattes de kiwi", true));
+						"Voix ambiguë d'un cœur " + "qui au zéphyr préfère les jattes de kiwi", true));
 	}
 
+	// @Disabled
 	@DisplayName("EBCDIC strict validation for non-US")
 	@ParameterizedTest
 	@MethodSource("samples3")
-	void test1(String description, String input, boolean expected) {
+	void test1(String description, String data, boolean expected) {
 
+		threshold = null;
+		converter = new Converter(inputFile, outputFile, codePage, threshold, toCp1047Hex(data));
 		// validate encoded string
-		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codePage)), codePage,
-				converter.getDecoder(codePage), converter.getIntPredicate(codePage), null);
+		ValidationResult result = converter.validateGeneric();
 
-		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
+		assertThat(description + " data=" + data + " message=" + result.getMessage(), result.isValid(), is(expected));
 
 	}
 
+	// @Disabled
 	@DisplayName("EBCDIC threshold validation for non-US")
 	@ParameterizedTest
 	@MethodSource("samples3")
-	void test2(String description, String input, boolean expected) {
+	void test2(String description, String data, boolean expected) {
 		// Validate encoded string with threshold
-		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codePage)), codePage,
-				converter.getDecoder(codePage), converter.getIntPredicate(codePage), threshold * .01);
+		threshold = 90L;
+		converter = new Converter(inputFile, outputFile, codePage, threshold, toCp1047Hex(data));
+		ValidationResult result = converter.validateGeneric();
 
-		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
+		assertThat(description + " data=" + data + " message=" + result.getMessage(), result.isValid(), is(expected));
+	}
+
+	static String toCp1047Hex(String data) {
+		byte[] bytes = data.getBytes(Charset.forName("CP1047"));
+		StringBuilder stringBuilder = new StringBuilder(bytes.length * 2);
+		for (byte b : bytes) {
+			stringBuilder.append(String.format("%02X", b));
+		}
+		return stringBuilder.toString();
 	}
 }
