@@ -3,19 +3,29 @@ package example;
 /**
  * Copyright 2026 Serguei Kouzmine
  */
-import java.io.IOException;
+
 import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+
 import java.util.function.IntPredicate;
+import java.util.Map;
 import java.util.function.Function;
 
 public class Converter {
 
 	private final boolean debug = false;
+	private static final Logger log = LoggerFactory.getLogger(Converter.class);
 
 	private String codepage = "CP1047";
 	private String inputfile;
@@ -48,8 +58,7 @@ public class Converter {
 	}
 
 	public byte[] hexToByteArray(String hexString) {
-		if (debug)
-			System.err.println("hexString " + hexString);
+		log.debug("hexString: {}", hexString);
 
 		// deal with dash or whitespace formatted hex strings
 		hexString = hexString.replaceAll("[^0-9A-Fa-f]", "");
@@ -61,8 +70,7 @@ public class Converter {
 		for (int i = 0; i < hexString.length(); i += 2) {
 			bytes[i / 2] = (byte) Integer.parseInt(hexString.substring(i, i + 2), 16);
 		}
-		if (debug)
-			System.err.println(String.format("Read %d bytes", bytes.length));
+		log.debug("Read {} bytes", bytes.length);
 		return bytes;
 	}
 
@@ -119,54 +127,46 @@ public class Converter {
 
 		System.err.println(result.isValid() ? "valid" : "invalid");
 
-		if (debug)
-			System.err.println(result.getMessage());
+		if (result.getMessage() != null)
+			log.debug(result.getMessage());
 	}
 
-	// EBCDIC predicate: non-contiguous valid ranges, including digits, letters,
-	// punctuation and fallback
-	// EBCDIC isn’t contiguous like ASCII
-	private IntPredicate isValidEBCDICChar = charCode ->
-	// space
-	charCode == 0x40 ||
-	// digits
-			(charCode >= 0xF0 && charCode <= 0xF9) ||
-			// uppercase letters
-			(charCode >= 0xC1 && charCode <= 0xC9) || (charCode >= 0xD1 && charCode <= 0xD9)
-			|| (charCode >= 0xE2 && charCode <= 0xE9) ||
-			// lowercase letters
-			(charCode >= 0x81 && charCode <= 0x89) || (charCode >= 0x91 && charCode <= 0x99)
-			|| (charCode >= 0xA2 && charCode <= 0xA9) ||
-			// basic punctuation
-			(charCode >= 0x4A && charCode <= 0x6F) ||
-			// generic fallback bytes for Western European accented characters
-			// Use with caution: feeding it arbitrary unknown input
-			// e.g., passport names or company names entered from localized keyboards
-			// may pass validation even though the bytes do not accurately represent the
-			// original characters
-			charCode == 0x3F || // '?' fallback for unmapped characters
-			charCode == 0x45 || // generic accented/fallback
-			charCode == 0x49 || // generic accented/fallback
-			charCode == 0x7D || // generic accented/fallback
-			charCode == 0xCE || // generic accented/fallback
-			charCode == 0xDE || // generic accented/fallback
-			charCode == 0xD3 || // generic accented/fallback
-			charCode == 0xC7 || // generic accented/fallback
-			charCode == 0xE9 || // generic accented/fallback
-			charCode == 0xDC; // generic accented/fallback
+	private static final Map<String, IntPredicate> PREDICATES = Map.of(
+			// ASCII predicate: 7-bit printable region is continuous
+			"ASCII", c -> c >= 0x20 && c <= 0x7E,
 
-	// ASCII predicate: 7-bit printable region is continuous
-	private IntPredicate isValidAsciiChar = charCode -> charCode >= 0x20 && charCode <= 0x7E;
+			// EBCDIC isn’t contiguous
+			"CP1047", c -> c == 0x40 || // space
+					(c >= 0xF0 && c <= 0xF9) || // digits
+					(c >= 0xC1 && c <= 0xC9) || // uppercase
+					(c >= 0xD1 && c <= 0xD9) || (c >= 0xE2 && c <= 0xE9) || (c >= 0x81 && c <= 0x89) || // lowercase
+					(c >= 0x91 && c <= 0x99) || (c >= 0xA2 && c <= 0xA9) || (c >= 0x4A && c <= 0x6F) || // punctuation
 
-	public IntPredicate getIntPredicate(final String codePage) {
-		return codePage.contains("ASCII") ? isValidAsciiChar
-				: codePage.equalsIgnoreCase("UTF_8") ? null : isValidEBCDICChar;
+					// fallback bytes for Western European accents
+					c == 0x3F || c == 0x45 || c == 0x49 || c == 0x7D || c == 0xCE || c == 0xDE || c == 0xD3 || c == 0xC7
+					|| c == 0xE9 || c == 0xDC);
+
+	public IntPredicate getIntPredicate(String codePage) {
+		return PREDICATES.get(codePage);
+	}
+
+	@FunctionalInterface
+	public interface DecoderFunction {
+		CharBuffer apply(byte[] data) throws CharacterCodingException;
+	}
+
+	public /* Function<byte[], CharBuffer> */ DecoderFunction getDecoder(final String codePage) {
+		final Charset charset = codePage.equalsIgnoreCase("UTF_8") ? StandardCharsets.UTF_8 : Charset.forName(codePage);
+		return codePage.contains("ASCII") ? null
+				: (byte[] data) -> charset.newDecoder().onMalformedInput(CodingErrorAction.REPORT)
+						.onUnmappableCharacter(CodingErrorAction.REPORT).decode(ByteBuffer.wrap(data));
 	}
 
 	// generic validator: strict or threshold
 	// null threshold = strict mode, otherwise threshold mode
-	public ValidationResult validateGeneric(final byte[] data, final String codePage, final Charset decoder,
+	public ValidationResult validateGeneric(final byte[] data, final String codePage, final DecoderFunction decoder,
 			final IntPredicate rangeValidator, final Double threshold) {
+
 		boolean status = true;
 		String message = null;
 		int validCount = 0;
@@ -174,18 +174,19 @@ public class Converter {
 		if (decoder == null && rangeValidator == null) {
 			throw new IllegalArgumentException("Invalid arguments: both decoder and rangeValidator are null");
 		}
-		// optional decoder check
+		// optional decoder apply
 		if (decoder != null) {
 			try {
-				decoder.newDecoder().decode(ByteBuffer.wrap(data));
+				decoder.apply(data);
 			} catch (CharacterCodingException e) {
 				status = false;
 				message = String.format("failed to decode in code page %s: %s", codePage, e.getMessage());
 				return new ValidationResult(status, message);
 			}
 		}
-
+		// optional range validator run
 		if (rangeValidator != null) {
+			boolean valid = false;
 			for (int pos = 0; pos < data.length; pos++) {
 				int charCode = data[pos] & 0xFF; // unsigned
 
@@ -197,24 +198,23 @@ public class Converter {
 					}
 				}
 				// range check
-				boolean valid = rangeValidator.test(charCode);
+				valid = rangeValidator.test(charCode);
 				if (valid) {
 					validCount++;
-				}
-
-				// strict mode: any invalid char fails immediately
-				if (!valid && strict) {
-					status = false;
-					if (message == null) {
+				} else {
+					// strict mode: any invalid char fails immediately
+					if (strict) {
+						status = false;
 						message = String.format("invalid code page %s character 0x%02X at position %d", codePage,
 								charCode, pos);
+						log.debug(message);
 					}
 				}
 			}
-
-			// threshold mode: ratio check
+			// threshold mode: compute ratio
 			if (!strict) {
 				double ratio = (double) validCount / data.length;
+				log.debug(String.format("threshold mode:  valid byte ratio %.2f threshold %.2f", ratio, threshold));
 				if (ratio < threshold) {
 					status = false;
 					message = String.format("valid byte ratio %.2f below threshold %.2f for code page %s", ratio,
@@ -222,29 +222,38 @@ public class Converter {
 				}
 			}
 		}
-
+		if (message != null)
+			log.debug(message);
 		return new ValidationResult(status, message);
+
 	}
 
 	// strict validators
 	public ValidationResult validateASCII(byte[] data) {
-		return validateGeneric(data, "ASCII", null, isValidAsciiChar, null);
+		final String codePage = "ASCII";
+		return validateGeneric(data, codePage, getDecoder(codePage) /* null */, getIntPredicate(codePage), null);
 	}
 
 	public ValidationResult validateASCII(byte[] data, double threshold) {
-		return validateGeneric(data, "ASCII", null, isValidAsciiChar, threshold * 0.01);
+		final String codePage = "ASCII";
+		return validateGeneric(data, codePage, getDecoder(codePage) /* null */, getIntPredicate(codePage),
+				Double.valueOf(threshold));
 	}
 
 	public ValidationResult validateEBCDIC(byte[] data) {
-		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidEBCDICChar, null);
+		final String codePage = "CP1047";
+		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage), null);
 	}
 
 	public ValidationResult validateEBCDIC(byte[] data, double threshold) {
-		return validateGeneric(data, "CP1047", Charset.forName("CP1047"), isValidEBCDICChar, threshold * 0.01);
+		final String codePage = "CP1047";
+		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage),
+				Double.valueOf(threshold));
 	}
 
 	public ValidationResult validateUTF8(byte[] data) {
-		return validateGeneric(data, "UTF-8", StandardCharsets.UTF_8, null, null);
+		final String codePage = "UTF-8";
+		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage) /* null */, null);
 	}
 
 }

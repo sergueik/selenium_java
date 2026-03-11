@@ -26,12 +26,12 @@ public class InternationalEBCDICValidationTest {
 	final String inputFile = null;
 	final String outputFile = null;
 	final String data = null;
-	final String codepage = "cp037";
+	final String codePage = "cp037";
 	Long threshold = 90L;
 
 	@BeforeAll
 	public void beforeall() {
-		converter = new Converter(data, codepage, outputFile, codepage, threshold);
+		converter = new Converter(data, codePage, outputFile, codePage, threshold);
 	}
 
 	// NOTE: CP1047 limitations:
@@ -51,8 +51,8 @@ public class InternationalEBCDICValidationTest {
 	void test1(String description, String input, boolean expected) {
 
 		// validate encoded string
-		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codepage)), codepage,
-				Charset.forName(codepage), converter.getIntPredicate(codepage), null);
+		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codePage)), codePage,
+				converter.getDecoder(codePage), converter.getIntPredicate(codePage), null);
 
 		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 
@@ -63,8 +63,8 @@ public class InternationalEBCDICValidationTest {
 	@MethodSource("samples3")
 	void test2(String description, String input, boolean expected) {
 		// Validate encoded string with threshold
-		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codepage)), codepage,
-				Charset.forName(codepage), converter.getIntPredicate(codepage), threshold * .01);
+		ValidationResult result = converter.validateGeneric(input.getBytes(Charset.forName(codePage)), codePage,
+				converter.getDecoder(codePage), converter.getIntPredicate(codePage), threshold * .01);
 
 		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}

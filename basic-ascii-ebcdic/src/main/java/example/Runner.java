@@ -8,6 +8,7 @@ import java.io.File;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,9 +28,9 @@ public class Runner {
 		String inputFile = null;
 		String outputFile = null;
 		String data = null;
-		String codepage = "cp037";
+		String codePage = "cp037";
 		String operation = null;
-		Long threshold = 90L;
+		Long threshold = 0L;
 
 		if (cli.containsKey("debug")) {
 			debug = true;
@@ -40,7 +41,7 @@ public class Runner {
 		 * if (cli.containsKey("help") || !cli.containsKey("inputfile") ||
 		 * !cli.containsKey("operation") || !cli.containsKey("outputfile")) {
 		 * System.err.println(String.format("Usage: jar " +
-		 * "-inputfile <filename> -outputfile  <filename> -codepage  <codepage> -threshold <number> -debug true\r\n"
+		 * "-inputfile <filename> -outputfile  <filename> -codePage  <codePage> -threshold <number> -debug true\r\n"
 		 * )); return; }
 		 */
 		if (cli.containsKey("outputfile"))
@@ -53,7 +54,7 @@ public class Runner {
 			threshold = Long.parseLong(cli.get("threshold"));
 
 		if (cli.containsKey("codepage"))
-			codepage = cli.get("codepage");
+			codePage = cli.get("codepage");
 		if (cli.containsKey("operation"))
 			operation = cli.get("operation");
 
@@ -62,28 +63,33 @@ public class Runner {
 			return;
 		}
 		if (debug) {
-			System.err.println("Doing: " + operation + " " + codepage);
+			System.err.println("Doing: " + operation + " " + codePage);
 		}
-		final Converter converter = new Converter(data, codepage, outputFile, codepage, threshold);
+		final Converter converter = new Converter(data, codePage, outputFile, codePage, threshold);
 		if (operation.equalsIgnoreCase("encode")) {
-			converter.encodeFile(inputFile, outputFile, data, StandardCharsets.US_ASCII, Charset.forName(codepage));
+			converter.encodeFile(inputFile, outputFile, data, StandardCharsets.US_ASCII, Charset.forName(codePage));
 		}
 
 		if (operation.equalsIgnoreCase("decode")) {
-			converter.decodeFile(inputFile, outputFile, data, Charset.forName(codepage), StandardCharsets.US_ASCII);
+			converter.decodeFile(inputFile, outputFile, data, Charset.forName(codePage), StandardCharsets.US_ASCII);
 		}
 
 		if (operation.equalsIgnoreCase("validate")) {
-			converter.validate(inputFile, data, codepage);
+			byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
+					: converter.hexToByteArray(data);
+			ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
+					converter.getIntPredicate(codePage), (threshold != 0L) ? Double.valueOf(threshold * .01) : null);
+			System.err.println(result.isValid() ? "valid" : "invalid");
 		}
 		if (debug) {
-			System.err.println("Done: " + operation + " " + codepage);
+			System.err.println("Done: " + operation + " " + codePage);
 		}
 	}
 
 	// Extremely simple CLI parser: -key value
 	private static Map<String, String> parseArgs(String[] args) {
-		System.err.println("Processing: " + Arrays.asList(args));
+		if (Arrays.asList(args).contains("debug"))
+			System.err.println("Processing: " + Arrays.asList(args));
 		Map<String, String> map = new HashMap<>();
 		for (int i = 0; i < args.length - 1; i++) {
 			if (args[i].startsWith("-")) {
