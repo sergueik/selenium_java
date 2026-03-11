@@ -27,33 +27,35 @@ public class EbcdicValidationTest {
 	final String inputFile = "example.in";
 	final String outputFile = "sample.out";
 	final String data = null;
-	final String codepage = "cp037";
+	private String codePage = "cp037";
 
 	@BeforeAll
 	public void beforeall() {
-		converter = new Converter(data, codepage, outputFile, codepage, threshold);
+		converter = new Converter(data, codePage, outputFile, codePage, threshold);
 	}
 
 	@DisplayName("strict pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
-	void test1(String description, String input, boolean expected) {
-
-		byte[] data = converter.hexToByteArray(input);
-		ValidationResult result = converter.validateEBCDIC(data);
-		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
+	void test1(String description, String data, boolean expected) {
+		codePage = "cp037";
+		byte[] input = converter.hexToByteArray(data);
+		ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
+				converter.getIntPredicate(codePage), Double.valueOf(threshold * .01));
+		final String info = description + " data=" + data + " message=" + result.getMessage();
+		assertThat(info, result.isValid(), is(expected));
 	}
 
 	@DisplayName("threshold pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
-	void test2(String description, String input, boolean expected) {
+	void test2(String description, String data, boolean expected) {
 
-		byte[] data = converter.hexToByteArray(input);
-
-		ValidationResult result = converter.validateEBCDIC(data, threshold * .01);
-
-		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
+		byte[] input = converter.hexToByteArray(data);
+		ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
+				converter.getIntPredicate(codePage), Double.valueOf(threshold * .01));
+		final String info = description + " data=" + data + " message=" + result.getMessage();
+		assertThat(info, result.isValid(), is(expected));
 	}
 
 	static Stream<Arguments> samples() {
@@ -81,12 +83,13 @@ public class EbcdicValidationTest {
 	@DisplayName("threshold pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples2")
-	void test3(String input, boolean status) {
-
+	void test3(String data, boolean status) {
+		codePage = "ASCII";
 		StringBuffer stringBuffer = new StringBuffer();
-		input.chars().mapToObj(ch -> String.format("%02X", ch)).forEach(stringBuffer::append);
-		byte[] data = converter.hexToByteArray(stringBuffer.toString());
-		ValidationResult result = converter.validateASCII(data);
+		data.chars().mapToObj(ch -> String.format("%02X", ch)).forEach(stringBuffer::append);
+		byte[] input = converter.hexToByteArray(stringBuffer.toString());
+		ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
+				converter.getIntPredicate(codePage), null);
 		assertThat(result.getMessage(), result.isValid(), is(status));
 
 	}
@@ -95,11 +98,12 @@ public class EbcdicValidationTest {
 	@DisplayName("threshold pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples2")
-	void test4(String input, boolean status) {
+	void test4(String data, boolean status) {
 
-		byte[] data = converter
-				.hexToByteArray(input.chars().mapToObj(ch -> String.format("%02X", ch)).collect(Collectors.joining()));
-		ValidationResult result = converter.validateASCII(data, threshold * .01);
+		byte[] input = converter
+				.hexToByteArray(data.chars().mapToObj(ch -> String.format("%02X", ch)).collect(Collectors.joining()));
+		ValidationResult result = converter.validateGeneric(input, codePage, converter.getDecoder(codePage),
+				converter.getIntPredicate(codePage), Double.valueOf(threshold * .01));
 		assertThat(result.getMessage(), result.isValid(), is(status));
 	}
 

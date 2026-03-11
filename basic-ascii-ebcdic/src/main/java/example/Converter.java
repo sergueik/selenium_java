@@ -96,40 +96,10 @@ public class Converter {
 		System.out.println(new String(converted, target));
 	}
 
-	// NOTE map may be over-engineering if one only handles 3 charmaps:
-	/*
-	 * private final Map<Charset, Function<byte[], ValidationResult>> VALIDATORS =
-	 * new HashMap<>();
-	 * 
-	 * { VALIDATORS.put(StandardCharsets.US_ASCII, Convertor::validateASCII);
-	 * VALIDATORS.put(StandardCharsets.UTF_8, Convertor::validateUTF8); }
-	 */
-
-	public void validate(String inputFile, String data, String codepage) throws IOException {
-
-		byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile)) : hexToByteArray(data);
-
-		ValidationResult result;
-
-		if (codepage == null || codepage.equalsIgnoreCase("ascii") || codepage.equalsIgnoreCase("us-ascii")) {
-
-			result = validateASCII(input);
-
-		} else if (codepage.equalsIgnoreCase("utf8") || codepage.equalsIgnoreCase("utf-8")) {
-
-			result = validateUTF8(input);
-
-		} else {
-
-			// default EBCDIC family
-			result = validateEBCDIC(input);
-		}
-
-		System.err.println(result.isValid() ? "valid" : "invalid");
-
-		if (result.getMessage() != null)
-			log.debug(result.getMessage());
-	}
+	// NOTE: possible to use Charset.availableCharsets()
+	private static final Map<String, String> CODEPAGE_ALIASES = Map.ofEntries(Map.entry("cp037", "CP1047"),
+			Map.entry("cp1047", "CP1047"), Map.entry("ibm1047", "CP1047"), Map.entry("ascii", "ASCII"),
+			Map.entry("us-ascii", "ASCII"), Map.entry("utf8", "UTF_8"), Map.entry("utf-8", "UTF_8"));
 
 	private static final Map<String, IntPredicate> PREDICATES = Map.of(
 			// ASCII predicate: 7-bit printable region is continuous
@@ -147,7 +117,7 @@ public class Converter {
 					|| c == 0xE9 || c == 0xDC);
 
 	public IntPredicate getIntPredicate(String codePage) {
-		return PREDICATES.get(codePage);
+		return PREDICATES.get(CODEPAGE_ALIASES.getOrDefault(codePage.toLowerCase(), codePage.toUpperCase()));
 	}
 
 	@FunctionalInterface
@@ -180,6 +150,7 @@ public class Converter {
 				decoder.apply(data);
 			} catch (CharacterCodingException e) {
 				status = false;
+				log.debug("failed to decode in code page {}: {}", codePage, e.getMessage(), e);
 				message = String.format("failed to decode in code page %s: %s", codePage, e.getMessage());
 				return new ValidationResult(status, message);
 			}
@@ -226,34 +197,6 @@ public class Converter {
 			log.debug(message);
 		return new ValidationResult(status, message);
 
-	}
-
-	// strict validators
-	public ValidationResult validateASCII(byte[] data) {
-		final String codePage = "ASCII";
-		return validateGeneric(data, codePage, getDecoder(codePage) /* null */, getIntPredicate(codePage), null);
-	}
-
-	public ValidationResult validateASCII(byte[] data, double threshold) {
-		final String codePage = "ASCII";
-		return validateGeneric(data, codePage, getDecoder(codePage) /* null */, getIntPredicate(codePage),
-				Double.valueOf(threshold));
-	}
-
-	public ValidationResult validateEBCDIC(byte[] data) {
-		final String codePage = "CP1047";
-		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage), null);
-	}
-
-	public ValidationResult validateEBCDIC(byte[] data, double threshold) {
-		final String codePage = "CP1047";
-		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage),
-				Double.valueOf(threshold));
-	}
-
-	public ValidationResult validateUTF8(byte[] data) {
-		final String codePage = "UTF-8";
-		return validateGeneric(data, codePage, getDecoder(codePage), getIntPredicate(codePage) /* null */, null);
 	}
 
 }
