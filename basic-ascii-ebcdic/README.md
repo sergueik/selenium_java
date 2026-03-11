@@ -1,8 +1,54 @@
 ### Info
 
 
+### Updated Usage
 
-Example external jar-clean java class for convert EBCDIC to ASCII and back	
+```cmd
+java -cp target\example.ascii-ebcdic.jar;target\lib\* example.Runner -help
+```
+```text
+Usage: jar -inputfile <filename> -outputfile <filename> -codepage <codepage> -threshold <number>
+Example external jar-clean java class for convert EBCDIC to ASCII and back
+```
+
+```sh
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -inputfile sample.txt -outputfile result.txt -operation decode -codepage cp037 -debug true
+```
+```text
+1234567890abcdefghijklmnopqrstuvwxyz
+Done: decode
+```
+```java
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
+```
+```text
+Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
+[debug, data, codepage, operation]
+Doing: validate cp037
+valid
+Done: validate cp037
+```
+```java
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
+```
+```text
+Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
+[debug, data, codepage, operation]
+Doing: validate cp037
+valid
+Done: validate cp037
+```
+```sh
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data "48454C4C4F" -operation validate  -debug true -codepage cp037
+```
+```text
+Processing: [-data, 48454C4C4F, -operation, validate, -debug, true, -codepage, cp037]
+[debug, data, codepage, operation]
+Doing: validate cp037
+invalid
+Done: validate cp037
+```
+
 ### Usage
 #### Basic
 ```cmd

@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,17 +16,31 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
+
+@TestInstance(Lifecycle.PER_CLASS)
 public class EbcdicValidationTest {
 
-	private Double threshold = 0.96;
+	private Long threshold = 90L;
+	private Converter converter = null;
+	final String inputFile = "example.in";
+	final String outputFile = "sample.out";
+	final String data = null;
+	final String codepage = "cp037";
+
+	@BeforeAll
+	public void beforeall() {
+		converter = new Converter(data, codepage, outputFile, codepage, threshold);
+	}
 
 	@DisplayName("strict pass or fail")
 	@ParameterizedTest
 	@MethodSource("samples")
 	void test1(String description, String input, boolean expected) {
 
-		byte[] data = Converter.hexToByteArray(input);
-		ValidationResult result = Converter.validateEBCDIC(data);
+		byte[] data = converter.hexToByteArray(input);
+		ValidationResult result = converter.validateEBCDIC(data);
 		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}
 
@@ -34,9 +49,9 @@ public class EbcdicValidationTest {
 	@MethodSource("samples")
 	void test2(String description, String input, boolean expected) {
 
-		byte[] data = Converter.hexToByteArray(input);
+		byte[] data = converter.hexToByteArray(input);
 
-		ValidationResult result = Converter.validateEBCDIC(data, threshold);
+		ValidationResult result = converter.validateEBCDIC(data, threshold * .01);
 
 		assertThat(description + " input=" + input + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}
@@ -70,8 +85,8 @@ public class EbcdicValidationTest {
 
 		StringBuffer stringBuffer = new StringBuffer();
 		input.chars().mapToObj(ch -> String.format("%02X", ch)).forEach(stringBuffer::append);
-		byte[] data = Converter.hexToByteArray(stringBuffer.toString());
-		ValidationResult result = Converter.validateASCII(data);
+		byte[] data = converter.hexToByteArray(stringBuffer.toString());
+		ValidationResult result = converter.validateASCII(data);
 		assertThat(result.getMessage(), result.isValid(), is(status));
 
 	}
@@ -82,9 +97,9 @@ public class EbcdicValidationTest {
 	@MethodSource("samples2")
 	void test4(String input, boolean status) {
 
-		byte[] data = Converter
+		byte[] data = converter
 				.hexToByteArray(input.chars().mapToObj(ch -> String.format("%02X", ch)).collect(Collectors.joining()));
-		ValidationResult result = Converter.validateASCII(data, threshold);
+		ValidationResult result = converter.validateASCII(data, threshold * .01);
 		assertThat(result.getMessage(), result.isValid(), is(status));
 	}
 
