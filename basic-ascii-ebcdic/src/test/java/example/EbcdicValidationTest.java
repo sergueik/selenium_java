@@ -37,7 +37,7 @@ public class EbcdicValidationTest {
 	void test1(String description, String data, boolean expected) {
 		threshold = null;
 		converter = new Converter(inputFile, outputFile, codePage, threshold, data);
-		ValidationResult result = converter.validateGeneric();
+		ValidationResult result = converter.validate();
 		final String info = description + " data=" + data + " message=" + result.getMessage();
 		assertThat(info, result.isValid(), is(expected));
 	}
@@ -49,7 +49,7 @@ public class EbcdicValidationTest {
 
 		threshold = 90L;
 		converter = new Converter(inputFile, outputFile, codePage, threshold, data);
-		ValidationResult result = converter.validateGeneric();
+		ValidationResult result = converter.validate();
 		final String info = description + " data=" + data + " message=" + result.getMessage();
 		assertThat(info, result.isValid(), is(expected));
 	}

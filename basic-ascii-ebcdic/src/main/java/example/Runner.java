@@ -77,7 +77,7 @@ public class Runner {
 		if (operation.equalsIgnoreCase("validate")) {
 			byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
 					: converter.hexToByteArray(data);
-			ValidationResult result = converter.validateGeneric();
+			ValidationResult result = converter.validate();
 			System.err.println(result.isValid() ? "valid" : "invalid");
 		}
 		if (debug) {

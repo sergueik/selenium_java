@@ -1,4 +1,5 @@
 package example;
+
 /**
  * Copyright 2026 Serguei Kouzmine
  */
@@ -97,10 +98,14 @@ public class Converter {
 	public void encodeFile() throws IOException {
 		byte[] input = (data != null) ? data
 				: (inputFile != null ? Files.readAllBytes(Path.of(inputFile)) : new byte[0]);
-		Charset target = StandardCharsets.US_ASCII; // encode to ASCII
-		byte[] converted = convertBytes(input, target);
-		if (outputFile != null)
+
+		byte[] converted = convertBytes(input, charset);
+
+		if (outputFile != null) {
 			Files.write(Path.of(outputFile), converted);
+		}
+
+		// print hex string to console (always useful for binary content)
 		System.out.println(byteArrayToHex(converted));
 	}
 
@@ -108,10 +113,12 @@ public class Converter {
 	public void decodeFile() throws IOException {
 		byte[] input = (data != null) ? data
 				: (inputFile != null ? Files.readAllBytes(Path.of(inputFile)) : new byte[0]);
-		Charset target = StandardCharsets.US_ASCII; // decode to ASCII
+
+		Charset target = StandardCharsets.UTF_8; // decode to UTF_8
 		byte[] converted = convertBytes(input, target);
 		if (outputFile != null)
 			Files.write(Path.of(outputFile), converted);
+		// print decoded string to console
 		System.out.println(new String(converted, target));
 	}
 
@@ -128,7 +135,7 @@ public class Converter {
 	}
 
 	/** Validate internal data; throws if data is null */
-	public ValidationResult validateGeneric() {
+	public ValidationResult validate() {
 		if (data == null)
 			throw new IllegalArgumentException("Data cannot be null for validation");
 

@@ -56,7 +56,7 @@ public class InternationalEBCDICValidationTest {
 		threshold = null;
 		converter = new Converter(inputFile, outputFile, codePage, threshold, toCp1047Hex(data));
 		// validate encoded string
-		ValidationResult result = converter.validateGeneric();
+		ValidationResult result = converter.validate();
 
 		assertThat(description + " data=" + data + " message=" + result.getMessage(), result.isValid(), is(expected));
 
@@ -70,7 +70,7 @@ public class InternationalEBCDICValidationTest {
 		// Validate encoded string with threshold
 		threshold = 90L;
 		converter = new Converter(inputFile, outputFile, codePage, threshold, toCp1047Hex(data));
-		ValidationResult result = converter.validateGeneric();
+		ValidationResult result = converter.validate();
 
 		assertThat(description + " data=" + data + " message=" + result.getMessage(), result.isValid(), is(expected));
 	}
