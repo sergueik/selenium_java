@@ -37,13 +37,12 @@ public class Runner {
 		}
 		if (debug)
 			System.err.println(cli.keySet());
-		/*
-		 * if (cli.containsKey("help") || !cli.containsKey("inputfile") ||
-		 * !cli.containsKey("operation") || !cli.containsKey("outputfile")) {
-		 * System.err.println(String.format("Usage: jar " +
-		 * "-inputfile <filename> -outputfile  <filename> -codePage  <codePage> -threshold <number> -debug true\r\n"
-		 * )); return; }
-		 */
+		if (cli.containsKey("help")) {
+			System.err.println(String.format(
+					"Usage: %s -operation=[encode|decode] -data <string> -inputfile <filename> -outputfile <filename> -codepage <codepage>",
+					"jar"));
+			return;
+		}
 		if (cli.containsKey("outputfile"))
 			outputFile = cli.get("outputfile");
 		if (cli.containsKey("data"))
@@ -65,19 +64,19 @@ public class Runner {
 		if (debug) {
 			System.err.println("Doing: " + operation + " " + codePage);
 		}
-		final Converter converter = new Converter(inputFile, outputFile, codePage, threshold, data);
 		if (operation.equalsIgnoreCase("encode")) {
-			converter.encodeFile();
+			Converter.encodeFile(inputFile, outputFile, data, StandardCharsets.US_ASCII, Charset.forName(codePage));
 		}
 
 		if (operation.equalsIgnoreCase("decode")) {
-			converter.decodeFile();
+			Converter.decodeFile(inputFile, outputFile, data, Charset.forName(codePage), StandardCharsets.US_ASCII);
 		}
 
 		if (operation.equalsIgnoreCase("validate")) {
 			byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
-					: converter.hexToByteArray(data);
-			ValidationResult result = converter.validate();
+					: Converter.hexToByteArray(data);
+			final Validator validator = new Validator(input, codePage, threshold);
+			ValidationResult result = validator.validate();
 			System.err.println(result.isValid() ? "valid" : "invalid");
 		}
 		if (debug) {

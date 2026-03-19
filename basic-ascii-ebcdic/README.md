@@ -1,58 +1,34 @@
 ### Info
 
 
-### Updated Usage
-
-```cmd
-java -cp target\example.ascii-ebcdic.jar;target\lib\* example.Runner -help
-```
-```text
-Usage: jar -inputfile <filename> -outputfile <filename> -codepage <codepage> -threshold <number>
-Example external jar-clean java class for convert EBCDIC to ASCII and back
-```
-
-```sh
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -inputfile sample.txt -outputfile result.txt -operation decode -codepage cp037 -debug true
-```
-```text
-1234567890abcdefghijklmnopqrstuvwxyz
-Done: decode
-```
-```java
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
-```
-```text
-Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
-[debug, data, codepage, operation]
-Doing: validate cp037
-valid
-Done: validate cp037
-```
-```java
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
-```
-```text
-Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
-[debug, data, codepage, operation]
-Doing: validate cp037
-valid
-Done: validate cp037
-```
-```sh
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data "48454C4C4F" -operation validate  -debug true -codepage cp037
-```
-```text
-Processing: [-data, 48454C4C4F, -operation, validate, -debug, true, -codepage, cp037]
-[debug, data, codepage, operation]
-Doing: validate cp037
-invalid
-Done: validate cp037
-```
-
 ### Usage
-#### Basic
+
 ```cmd
 mvn clean package
+```
+
+
+
+```cmd
+java -cp target\example.ascii-ebcdic.jar;target\lib\* example.Runner -help true
+```
+```text
+Usage: jar -operation=[encode|decode] -data <string> -inputfile <filename> -outputfile <filename> -codepage <codepage>
+```
+
+```cmd
+java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner  -operation validate -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9" -codepage EBCDIC
+```
+```text
+valid
+```
+
+
+```cmd
+java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner  -outputfile sample.txt -operation encode -data "1234567890abcdefghijklmnopqrstuvwxyz"
+```
+```text
+F1F2F3F4F5F6F7F8F9F0818283848586878889919293949596979899A2A3A4A5A6A7A8A9
 ```
 
 ```cmd
@@ -62,6 +38,40 @@ type sample.txt
 ```text
 %≥≤⌠⌡÷≈°∙≡üéâäàåçêëæÆôöòûùÿÖóúñÑªº¿⌐
 ```
+
+
+
+```sh
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -inputfile sample.txt -outputfile result.txt -operation decode -codepage cp037 -debug true
+```
+```text
+Doing: decode cp037
+1234567890abcdefghijklmnopqrstuvwxyz
+
+Done: decode cp037
+```
+```java
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
+```
+```text
+Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
+[debug, data, codepage, operation]
+Doing: validate cp037
+valid
+Done: validate cp037
+```
+
+```sh
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data "C8C500D3D6" -operation validate  -debug true -codepage cp037
+```
+```text
+[debug, data, codepage, operation]
+Doing: validate cp037
+invalid
+Done: validate cp037
+```
+### Usage
+#### Basic
 
 ```sh
 java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter -inputfile sample.txt -outputfile result.txt -operation decode -debug
@@ -102,12 +112,6 @@ java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -opera
 java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation validate -data "abcdefghijklmnopqrstuvwxyz0123456789" -codepage EBCDIC
 ```
 
-```sh
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation validate -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9" -codepage EBCDIC
-```
-```text
-valid
-```
 ```
 java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation validate -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9" -codepage ascii -debug
 ```

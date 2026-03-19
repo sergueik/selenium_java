@@ -25,9 +25,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 public class EbcdicValidationTest {
 
 	private Long threshold = 90L;
-	private Converter converter = null;
-	final String inputFile = null;
-	final String outputFile = null;
+	private Validator validator = null;
 	final String data = null;
 	private String codePage = "cp037";
 
@@ -36,8 +34,8 @@ public class EbcdicValidationTest {
 	@MethodSource("samples")
 	void test1(String description, String data, boolean expected) {
 		threshold = null;
-		converter = new Converter(inputFile, outputFile, codePage, threshold, data);
-		ValidationResult result = converter.validate();
+		validator = new Validator(data, codePage, threshold );
+		ValidationResult result = validator.validate();
 		final String info = description + " data=" + data + " message=" + result.getMessage();
 		assertThat(info, result.isValid(), is(expected));
 	}
@@ -48,8 +46,8 @@ public class EbcdicValidationTest {
 	void test2(String description, String data, boolean expected) {
 
 		threshold = 90L;
-		converter = new Converter(inputFile, outputFile, codePage, threshold, data);
-		ValidationResult result = converter.validate();
+		validator = new Validator( data, codePage, threshold );
+		ValidationResult result = validator.validate();
 		final String info = description + " data=" + data + " message=" + result.getMessage();
 		assertThat(info, result.isValid(), is(expected));
 	}
