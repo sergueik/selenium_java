@@ -34,6 +34,10 @@ public class Validator {
 			Map.entry("ascii", "ASCII"), Map.entry("us-ascii", "ASCII"), Map.entry("utf8", "UTF_8"),
 			Map.entry("utf-8", "UTF_8"));
 
+	public String toString() {
+		return String.format("codepage=%s threshold=%d data=%s", codepage, threshold, Converter.byteArrayToHex(data));
+	}
+
 	private static final Map<String, IntPredicate> PREDICATES = Map.of("ASCII", c -> c >= 0x20 && c <= 0x7E, "CP1047",
 			c -> c == 0x40 || (c >= 0xF0 && c <= 0xF9) || (c >= 0xC1 && c <= 0xC9) || (c >= 0xD1 && c <= 0xD9)
 					|| (c >= 0xE2 && c <= 0xE9) || (c >= 0x81 && c <= 0x89) || (c >= 0x91 && c <= 0x99)
@@ -42,22 +46,18 @@ public class Validator {
 
 	public Validator(String data, String codepage, Long threshold) {
 		this.threshold = threshold;
-
 		this.codepage = CODEPAGE_ALIASES.getOrDefault(codepage.toLowerCase(), codepage.toUpperCase());
 		this.charset = this.codepage.equals("UTF_8") ? StandardCharsets.UTF_8 : Charset.forName(this.codepage);
-
-		// normalize data once
 		this.data = (data != null) ? Converter.hexToByteArray(data) : null;
+		log.debug(this.toString());
 	}
 
 	public Validator(byte[] data, String codepage, Long threshold) {
 		this.threshold = threshold;
-
 		this.codepage = CODEPAGE_ALIASES.getOrDefault(codepage.toLowerCase(), codepage.toUpperCase());
 		this.charset = this.codepage.equals("UTF_8") ? StandardCharsets.UTF_8 : Charset.forName(this.codepage);
-
-		// normalize data once
 		this.data = data;
+		log.debug(this.toString());
 	}
 
 	@FunctionalInterface
@@ -65,7 +65,6 @@ public class Validator {
 		CharBuffer apply(byte[] data) throws CharacterCodingException;
 	}
 
-	/** Validate internal data; throws if data is null */
 	public ValidationResult validate() {
 		if (data == null)
 			throw new IllegalArgumentException("Data cannot be null for validation");
@@ -83,7 +82,6 @@ public class Validator {
 		if (decoder == null && rangeValidator == null)
 			throw new IllegalArgumentException("Decoder and validator both null");
 
-		// Decoder step
 		if (decoder != null) {
 			try {
 				decoder.apply(data);
@@ -94,7 +92,6 @@ public class Validator {
 			}
 		}
 
-		// Range validation
 		if (rangeValidator != null) {
 			for (int pos = 0; pos < data.length; pos++) {
 				int charCode = data[pos] & 0xFF;

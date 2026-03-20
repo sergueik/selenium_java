@@ -75,9 +75,14 @@ public class Runner {
 		if (operation.equalsIgnoreCase("validate")) {
 			byte[] input = (inputFile != null) ? Files.readAllBytes(Path.of(inputFile))
 					: Converter.hexToByteArray(data);
-			final Validator validator = new Validator(input, codePage, threshold);
+			final Validator validator = new Validator(input, codePage, threshold == 0L ? null : threshold);
 			ValidationResult result = validator.validate();
 			System.err.println(result.isValid() ? "valid" : "invalid");
+			if (!result.isValid())
+				if (debug) {
+					System.err.println(result.getMessage());
+				}
+
 		}
 		if (debug) {
 			System.err.println("Done: " + operation + " " + codePage);

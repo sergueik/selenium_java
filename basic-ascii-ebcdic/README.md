@@ -40,7 +40,6 @@ type sample.txt
 ```
 
 
-
 ```sh
 java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -inputfile sample.txt -outputfile result.txt -operation decode -codepage cp037 -debug true
 ```
@@ -51,74 +50,41 @@ Doing: decode cp037
 Done: decode cp037
 ```
 ```java
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate  -debug true -codepage cp037
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C5D3D3D6 -operation validate -codepage cp037
 ```
 ```text
-Processing: [-data, C8C5D3D3D6, -operation, validate, -debug, true, -codepage, cp037]
-[debug, data, codepage, operation]
-Doing: validate cp037
 valid
-Done: validate cp037
 ```
 
 ```sh
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data "C8C500D3D6" -operation validate  -debug true -codepage cp037
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data C8C500D3D6 -operation validate -codepage cp037
+```
+```text
+invalid
+```
+
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data 616263646582 -operation validate -codepage utf-8
+valid
+		
+```cmd
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data 6192 -operation validate -codepage utf-8 -debug true
 ```
 ```text
 [debug, data, codepage, operation]
-Doing: validate cp037
+Doing: validate utf-8
 invalid
-Done: validate cp037
+failed to decode in code page UTF_8: Input length = 1
+Done: validate utf-8	
 ```
-### Usage
-#### Basic
-
-```sh
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter -inputfile sample.txt -outputfile result.txt -operation decode -debug
-```
-
-```text
-1234567890abcdefghijklmnopqrstuvwxyz
-Done: decode
-```
-
-```cmd
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -outputfile test.txt -operation encode -data "abcdefghijklmnopqrstuvwxyz0123456789"
+```ch
+java -cp target/example.ascii-ebcdic.jar;target\lib\* example.Runner -data 6192 -operation validate -codepage ascii -debug true
 ```
 ```text
-818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9
-```
-```cmd
-java -cp target/example.ascii-ebcdic.jar;target\lib\* example.ManageConfig -inputfile sample.txt -outputfile result.txt  -operation encode
-```
-
-```cmd
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -outputfile test.txt -operation decode -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9"
-```
-```text
-abcdefghijklmnopqrstuvwxyz0123456789
-```
-
-### Validation
-
-```sh
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation encode -data "abcdefghijklmnopqrstuvwxyz0123456789"
-```
-```text
-818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9
-```
-
-```sh
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation validate -data "abcdefghijklmnopqrstuvwxyz0123456789" -codepage EBCDIC
-```
-
-```
-java  -cp target/example.ascii-ebcdic.jar;target\lib\* example.Converter  -operation validate -data "818283848586878889919293949596979899A2A3A4A5A6A7A8A9F0F1F2F3F4F5F6F7F8F9" -codepage ascii -debug
-```
-```text
-Read 36 bytes
+[debug, data, codepage, operation]
+Doing: validate ascii
 invalid
-invalid US-ASCII character 0xF9 on 35
+invalid code page ASCII char 0x92 at 1
+Done: validate ascii
 ```
 
 ### Technical Details
