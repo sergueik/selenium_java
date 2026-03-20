@@ -22,7 +22,7 @@ import example.Validator;
 import example.ValidationResult;
 
 @TestInstance(Lifecycle.PER_CLASS)
-public class InternationalEBCDICValidationTest {
+public class InternationalTests {
 
 	private Validator validator = null;
 	final String data = null;
