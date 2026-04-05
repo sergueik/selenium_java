@@ -249,12 +249,12 @@ public class BrowserManager {
         Path versionDir = CACHE_ROOT
                 .resolve(browserType.getId())
                 .resolve(platform.getIdentifier())
-                .resolve(info.version());
+                .resolve(info.getVersion());
         Files.createDirectories(versionDir);
 
         Path zipFile = versionDir.resolve("browser.zip");
-        log.info("Downloading {} {} from {}", browserType, info.version(), info.url());
-        downloadFile(info.url(), zipFile);
+		log.info("Downloading {} {} from {}", browserType, info.getVersion(), info.getUrl());
+		downloadFile(info.getUrl(), zipFile);
 
         log.info("Extracting archive to {}", versionDir);
         extractZip(zipFile, versionDir);
@@ -485,5 +485,22 @@ public class BrowserManager {
      * @param version dotted version string (e.g. {@code "131.0.6778.108"})
      * @param url     ZIP download URL for this platform
      */
-    private record DownloadInfo(String version, String url) {}
+	private class DownloadInfo {
+		private String version;
+		private String url;
+
+		public String getVersion() {
+			return version;
+		}
+
+		public String getUrl() {
+			return url;
+		}
+
+		public DownloadInfo(String version, String url) {
+			this.version = version;
+			this.url = url;
+
+		}
+	}
 }

@@ -192,7 +192,8 @@ public class ChromeElement implements WebElement {
                     text.append(seq);
                 }
             }
-            if (text.isEmpty()) {
+            // Equivalent of text.isEmpty() in Java 11:
+            if (text.length() == 0) {
                 return;
             }
 

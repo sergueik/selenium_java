@@ -106,12 +106,12 @@ public class ChromeDriver implements WebDriver {
                     .build();
 
             launcher = new BrowserLauncher(options);
-            LaunchResult launchResult = launcher.launch();
+			LaunchResult launchResult = launcher.launch();
 
             // Extract the targetId from the WebSocket URL so window handles work
-            this.currentTargetId = extractTargetId(launchResult.webSocketUrl());
+            this.currentTargetId = extractTargetId(launchResult.getWebSocketUrl());
 
-            URI wsUri = new URI(launchResult.webSocketUrl());
+            URI wsUri = new URI(launchResult.getWebSocketUrl());
             wsClient = new NihoniumWebSocketClient(wsUri);
             wsClient.connectBlocking();
 

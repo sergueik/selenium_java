@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>example</groupId>
   <artifactId>ascii-ebcdic</artifactId>
-  <version>0.15.0-SNAPSHOT</version>
+  <version>0.15.1-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>${project.groupId}:${project.artifactId}</name>
   <properties>
@@ -175,6 +175,7 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <includes>
+            <include>**/*Tests.java</include>
             <include>**/*Test.java</include>
           </includes>
           <useModulePath>false</useModulePath>
