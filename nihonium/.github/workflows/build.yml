@@ -1,0 +1,99 @@
+name: Java Build and Test
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+  workflow_dispatch:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # required for version-bump commit and tag push on main
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Configure Git
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Increment Version (Main Branch)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          # Get current version
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "Current version: $CURRENT_VERSION"
+
+          # Remove -SNAPSHOT if present
+          CLEAN_VERSION=${CURRENT_VERSION%-SNAPSHOT}
+
+          # Parse version components
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CLEAN_VERSION"
+
+          # Increment patch version
+          NEW_PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$NEW_PATCH"
+
+          echo "New version: $NEW_VERSION"
+
+          # Set new version in pom.xml
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+
+          # Commit version change
+          git add pom.xml
+          git commit -m "chore: bump version to $NEW_VERSION [skip ci]"
+
+          # Create and push tag
+          git tag -a "v$NEW_VERSION" -m "Release version $NEW_VERSION"
+          git push origin main
+          git push origin "v$NEW_VERSION"
+
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Configure GPG
+        if: github.ref == 'refs/heads/main'
+        run: |
+          echo "${{ secrets.GPG_PRIVATE_KEY }}" | gpg --batch --import
+          echo "allow-loopback-pinentry" >> ~/.gnupg/gpg-agent.conf
+          echo "pinentry-mode loopback" >> ~/.gnupg/gpg.conf
+          gpg-connect-agent reloadagent /bye
+          export GPG_TTY=$(tty)
+
+      - name: Create Maven settings.xml
+        if: github.ref == 'refs/heads/main'
+        run: |
+          mkdir -p ~/.m2
+          cat > ~/.m2/settings.xml << EOF
+          <settings>
+            <servers>
+              <server>
+                <id>central</id>
+                <username>${{ secrets.MAVEN_USERNAME }}</username>
+                <password>${{ secrets.MAVEN_PASSWORD }}</password>
+              </server>
+            </servers>
+          </settings>
+          EOF
+
+      - name: Build and Install (Main Branch)
+        if: github.ref == 'refs/heads/main'
+        run: mvn clean install -DskipTests -Dgpg.passphrase="${{ secrets.GPG_PASSPHRASE }}"
+
+      - name: Build (Other Branches)
+        if: github.ref != 'refs/heads/main'
+        run: mvn clean package -DskipTests
