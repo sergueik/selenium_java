@@ -16,7 +16,7 @@ Arguments:
   output_dir  Local target root (default: current directory)
 
 Example:
-  $0 sergueik powershell_samples external/csharp/basic-log2console
+  $0 sergueik springboot_study basic-static
 EOF
 }
 
@@ -33,21 +33,19 @@ PROJECT=${3:?project folder required}
 BRANCH=${4:-master}
 OUTPUT_DIR=${5:-.}
 
-TREE_URL="https://api.github.com/repos/${OWNER}/${REPO}/git/trees/${BRANCH}?recursive=1"
-GITHUB_BASE="https://raw.githubusercontent.com/${OWNER}/${REPO}/${BRANCH}"
+TREE_URL="https://api.github.com/repos/$OWNER/$REPO/git/trees/${BRANCH}?recursive=1"
+GITHUB_BASE="https://raw.githubusercontent.com/$OWNER/$REPO/$BRANCH"
 LIST_FILE=/tmp/a.$$
 
 if [ "$OUTPUT_DIR" != "." ] ; then mkdir -p "$OUTPUT_DIR" ; fi
 
 curl -fsSL "$TREE_URL" |
-jq -r --arg prefix "${PROJECT}/" '
+jq -r --arg prefix "$PROJECT/" '
     .tree[]
     | select(.type == "blob")
     | select(.path | startswith($prefix))
     | .path
-    ' | tr -d '\r' | tee $LIST_FILE | cat >& 2
-# NOTE the last may be simplified to
-# | tee /dev/stderr
+    ' | tr -d '\r' | tee $LIST_FILE /dev/stderr >/dev/null
 while IFS= read -r SOURCE; do
     SOURCE=${SOURCE%$'\r'}
 
