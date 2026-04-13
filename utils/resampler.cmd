@@ -17,8 +17,21 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 set "SOURCPATH=%CD%"
 if not "%~1" == "" set "SOURCPATH=%~1"
 set TIMEOUT=10
-set PATH=%PATH%;c:\tools\resampler
+set RESAMPLE_HOME=c:\tools\resampler
+set PATH=%PATH%;%RESAMPLE_HOME%
 set TOOL=resampler.exe
+%TOOL% --version
+REM 2.0.4
+REM Dependencies: https://github.com/jniemann66/ReSampler/releases/tag/v2.0.4
+REM install win64-mingw-w64-compiler build
+REM put everything in c:\tools\resampler or other %RESAMPLE_HOME%
+REM NOTE: latest release
+REM https://github.com/jniemann66/ReSampler/releases/tag/v2.1.2
+REM fails due to missing libwinpthread-1.dll
+REM dll-files.com/libwinpthread-1.dll.html 
+REM then fails with
+REM ReSampler.exe - Application Error 0xc000007b
+
 set FILESCAN_OPTIONS=
 if not "%2" equ "" set FILESCAN_OPTIONS=/R "%SOURCEPATH%"
 
@@ -83,3 +96,4 @@ for /F "tokens=1" %%_ in ('tasklist.exe /FI "IMAGENAME eq !TOOL!" /NH ^| C:\Wind
 set /A "PROCESS_COUNTER=!RUNNING_PPOCESS_COUNT!"
 @echo set PROCESS_COUNTER to !PROCESS_COUNTER!
 exit /B
+
