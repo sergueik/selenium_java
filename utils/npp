@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-script_self="$(readlink -f "$0")"
-script_name="$(basename "$0")"
-install_dir="$HOME/bin"
-install_path="$install_dir/$script_name"
+SELF="$(readlink -f "$0")"
+SCRIPT_NAME="$(basename "$SELF")"
+INSTALL_DIR="$HOME/bin"
+INSTALL_PATH="$INSTALL_DIR/$SCRIPT_NAME"
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 find_npp() {
     # Prefer Notepad++ installed per-user or system-wide
     for p in \
+	    $(cat /proc/registry/HKEY_CLASSES_ROOT/Applications/notepad++.exe/shell/open/command/\@ | sed 's|\\|\/|g; s|c:|/c|i; s|\("[^"]*"\).*|\1|') \
         "$LOCALAPPDATA/Notepad++/notepad++.exe" \
         "/c/Program Files/Notepad++/notepad++.exe" \
         "/c/Program Files (x86)/Notepad++/notepad++.exe"
@@ -21,15 +22,15 @@ find_npp() {
 }
 
 install_self() {
-    mkdir -p "$install_dir"
+    mkdir -p "$INSTALL_DIR"
 
     # If already exists, check content or symlink target
-    if [ -e "$install_path" ] || [ -L "$install_path" ]; then
-        echo "Existing installation detected: $install_path"
+    if [ -e "$INSTALL_PATH" ] || [ -L "$INSTALL_PATH" ]; then
+        echo "Existing installation detected: $INSTALL_PATH"
 
-        if [ -L "$install_path" ]; then
-            target="$(readlink -f "$install_path")"
-            if [ "$target" = "$script_self" ]; then
+        if [ -L "$INSTALL_PATH" ]; then
+            target="$(readlink -f "$INSTALL_PATH")"
+            if [ "$target" = "$SELF" ]; then
                 echo "Already installed and identical (symlink)."
                 exit 0
             else
@@ -37,8 +38,8 @@ install_self() {
             fi
         else
             # Compare with hash if file
-            existing_hash="$(sha256sum "$install_path" | awk '{print $1}')"
-            my_hash="$(sha256sum "$script_self" | awk '{print $1}')"
+            existing_hash="$(sha256sum "$INSTALL_PATH" | awk '{print $1}')"
+            my_hash="$(sha256sum "$SELF" | awk '{print $1}')"
             if [ "$existing_hash" = "$my_hash" ]; then
                 echo "Already installed and identical (file)."
                 exit 0
@@ -49,11 +50,11 @@ install_self() {
         fi
 
         echo "Overwriting due to --force"
-        rm -f "$install_path"
+        rm -f "$INSTALL_PATH"
     fi
 
-    ln -s "$script_self" "$install_path"
-    echo "Installed $script_name → $install_path"
+    ln -s "$SELF" "$INSTALL_PATH"
+    echo "Installed $SCRIPT_NAME → $INSTALL_PATH"
 }
 
 main() {
