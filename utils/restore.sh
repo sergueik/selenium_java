@@ -16,7 +16,7 @@ Arguments:
   output_dir  Local target root (default: current directory)
 
 Example:
-  $0 sergueik springboot_study basic-static
+  $0 sergueik springboot_study basic-static master basic-static
 EOF
 }
 
