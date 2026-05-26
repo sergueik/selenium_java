@@ -18,7 +18,8 @@ REM popd
 set PICTURE=%1
 if /i "%PICTURE%" EQU "" set PICTURE=folder.jpg
 set EXTENSION=flac
-
+set PATH=%PATH%;c:\TOOLS\FLAC
 :CONVERT
-for /F "tokens=*" %%.  in ('dir /b *.%EXTENSION%') do echo Tmporting picture into %%. && call "c:\tools\flac\metaflac.exe" --import-picture-from=%PICTURE% "%%."
+for /F "tokens=*" %%.  in ('dir /b *.%EXTENSION%') do echo Importing picture into %%. && call metaflac.exe --import-picture-from=%PICTURE% "%%."
 goto :EOF
+
