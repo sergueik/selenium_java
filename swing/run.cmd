@@ -1,26 +1,13 @@
 @echo OFF
-SETLOCAL
-
-REM NOTE: Cannot set SETLOCAL ENABLEDELAYEDEXPANSION
-REM Because of inline ie script in :CALL_JAVASCRIPT
-
-if "%TOOLS_DIR%"=="" set TOOLS_DIR=c:\java
-if "%JAVA_VERSION%"=="" set JAVA_VERSION=1.8.0_101
-if "%JAVA_HOME%"=="" set JAVA_HOME=%TOOLS_DIR%\jdk%JAVA_VERSION%
-set JAVA_OPTS=-Xms256m -Xmx512m
-
-if "%MAVEN_VERSION%"=="" set MAVEN_VERSION=3.5.0
-if "%M2_HOME%"=="" set M2_HOME=%TOOLS_DIR%\apache-maven-%MAVEN_VERSION%
-if "%M2%"=="" set M2=%M2_HOME%\bin
+SETLOCAL enableextensions
 
 set MAVEN_OPTS=-Xms256m -Xmx512m
 REM TODO: monochrome
 set TERM=
 
-PATH=%JAVA_HOME%\bin;%M2%;%PATH%
 set TARGET=%CD%\target
 set DEBUG=false
-set SKIP_TEST=tue
+set SKIP_TEST=true
 set SKIP_PACKAGE_VERSION=false
 
 REM this currently is not loaded from pom.xml
@@ -59,6 +46,10 @@ call :SHOW_VARIABLE APP_JAR
 
 set MAIN_CLASS=%1
 if NOT "%MAIN_CLASS%" == "" shift
+REM TODO: inspect
+REM   <properties>
+REM    <main.class>example.SampleGui</main.class>
+
 if "%MAIN_CLASS%"=="" set MAIN_CLASS=%DEFAULT_MAIN_CLASS%
 set APP_HOME=%CD:\=/%
 
@@ -68,6 +59,9 @@ if "%SKIP_TEST%"=="" (
 REM Test
 call mvn test
 REM Compile
+REM NOTE: failing with java 1.8:
+REM [ERROR] Plugin org.apache.maven.plugins:maven-jar-plugin:2.6 or one of its dependencies could not be resolved: Failed to read artifact descriptor for org.apache.maven.plugins:maven-jar-plugin:jar:2.6: Could not transfer artifact org.apache.maven.plugins:maven-jar-plugin:pom:2.6 from/to central (https://repo.maven.apache.org/maven2): sun.security.validator.ValidatorException: PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException: unable to find valid certification path to requested target -> [Help 1]
+REM [ERROR]
 call mvn package install
 ) else (
 REM compile
