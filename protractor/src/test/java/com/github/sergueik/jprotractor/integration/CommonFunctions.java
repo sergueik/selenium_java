@@ -109,7 +109,8 @@ public class CommonFunctions {
 						(new DesiredCapabilities("chrome", "", Platform.ANY))
 								.getBrowserName());
 				capabilities.setCapability(ChromeOptions.CAPABILITY, options);
-				capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+                                // TODO: study versions
+				// capabilities.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
 				// TODO: recover the code
 				// https://stackoverflow.com/questions/25616227/chrome-driver-with-selenium-no-suitable-constructor-found-for-remotewebdriver
 				// seleniumDriver = new ChromeDriver(capabilities);
