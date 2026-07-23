@@ -10,8 +10,11 @@ enhance the capabilities of AI coding tools like Claude Code, Cursor, and GitHub
   * https://github.com/affaan-m/ECC
   * https://www.linkedin.com/posts/aagupta_a-developer-on-github-just-built-a-full-development-share-7440035210542575616-nKr1/
 
-
-
+  * https://github.com/jkordick/wad-ghcp-cobol/tree/main/.github
+  * [modernizing legacy code with GitHub Copilot: Tips and examples](https://github.blog/ai-and-ml/github-copilot/modernizing-legacy-code-with-github-copilot-tips-and-examples/)
+  * [COBOL developmen with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
+  * https://github.com/pegasystems/pega-launchpad-agent-skills
+  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
 ### Not Yet
 
 There is currently no equivalent of awesome-copilot dedicated to COBOL/JCL/CICS/IMS/DB2/PEGA that has achieved broad recognition across the mainframe community.
@@ -213,23 +216,22 @@ repeatedly correcting the same procedural issues.
 In this way, the repository evolves into a living engineering knowledge base.
 As new lessons are learned, they are captured once, version-controlled alongside the code,
 reviewed like any other engineering artifact, and immediately made available to every current and future contributor.
-
 ### See Also
 
   * https://github.com/pegasystems/pega-launchpad-agent-skills
   * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
-
+  * [COBOL Development with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
 
 Proposal: Treat AI repository configuration as a first-class project artifact
 
 Over the years, our repositories have accumulated a number of "small" configuration files that have proven to be surprisingly valuable:
 
-.gitignore
-CODEOWNERS
-CI/CD workflows (ci.yml, build.yml, etc.)
-lint and formatter configuration (.editorconfig, Checkstyle, ESLint, ktlint, SwiftLint, SpotBugs, etc.)
-dependency management
-repository templates
+  * `.gitignore`
+  * `CODEOWNERS`
+  * CI/CD workflows: `ci.yml`, `build.yml`, etc.
+  * lint and formatter configuration (target language specific: `.editorconfig`, `Checkstyle`, `ESLint`, `ktlint`, `SwiftLint`, `SpotBugs`, etc.)
+  * dependency management
+  * repository templates
 
 None of these files directly contribute to business functionality. Nevertheless, they have become standard practice because they improve consistency, reduce onboarding time, capture team conventions, and raise the productivity floor for everyone on the team.
 
@@ -394,4 +396,7 @@ As new lessons are learned, they are captured once, version-controlled alongside
 reviewed like any other engineering artifact, and immediately made available to every current and future contributor.
 
 
+
+
+The character code for the man facepalming emoji (🤦‍♂️) is a sequence of multiple Unicode code points: U+1F926 (face palm), U+200D (zero width joiner), U+2642 (male sign), and U+FE0F (variation selector-16).
 
