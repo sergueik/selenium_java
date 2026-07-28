@@ -63,6 +63,59 @@ one can sort and limit:
 ```
 curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo "Searching $repo..." ; done
 ```
+```sh
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo -e "\t$repo" ; done
+```
+
+```text
+anthropics/skills
+DietrichGebert/ponytail
+nexu-io/open-design
+addyosmani/agent-skills
+ComposioHQ/awesome-claude-skills
+VoltAgent/awesome-openclaw-skills
+hesreallyhim/awesome-claude-code
+CherryHQ/cherry-studio
+sickn33/agentic-awesome-skills
+wshobson/agents
+github/awesome-copilot
+K-Dense-AI/scientific-agent-skills
+blader/humanizer
+googleworkspace/cli
+topoteretes/cognee
+VoltAgent/awesome-agent-skills
+OthmanAdi/planning-with-files
+phuryn/pm-skills
+JimLiu/baoyu-skills
+agentskills/agentskills
+```
+
+
+```sh
+./find-skill.sh --repo sickn33/agentic-awesome-skills --skill java-pro
+```
+```text
+sickn33/agentic-awesome-skills/skills/java-pro
+```
+```sh
+./find-skill.sh --repo sickn33/agentic-awesome-skills --skill java-pro -h
+```
+```text
+Usage:
+  ./find-skill.sh -r owner/repository -s skill-name
+
+Options:
+  -r, --repo      GitHub repository (owner/name)
+  -s, --skill     Skill directory name to find
+  -h, --help      Show this help
+
+Example:
+  ./find-skill.sh -r sickn33/agentic-awesome-skills -s java-pro
+will ourput:
+sickn33/agentic-awesome-skills/skills/java-pro
+
+
+```
 #### See Also:
 
  

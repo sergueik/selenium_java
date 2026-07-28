@@ -1,14 +1,56 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-repo="$1"
-skill="$2"
+set -euo pipefail
 
-if [ -z "$repo" ] || [ -z "$skill" ]; then
-    echo "Usage: $0 owner/repo skill-name"
+usage() {
+    cat <<EOF
+Usage:
+  $0 -r owner/repository -s skill-name
+
+Options:
+  -r, --repo      GitHub repository (owner/name)
+  -s, --skill     Skill directory name to find
+  -h, --help      Show this help
+
+Example:
+  $0 -r sickn33/agentic-awesome-skills -s java-pro
+EOF
+}
+
+repo=""
+skill=""
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -r|--repo)
+            repo="$2"
+            shift 2
+            ;;
+        -s|--skill)
+            skill="$2"
+            shift 2
+            ;;
+        -h|--help)
+            usage
+            exit 0
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage >&2
+            exit 1
+            ;;
+    esac
+done
+
+if [[ -z "$repo" || -z "$skill" ]]; then
+    usage >&2
     exit 1
 fi
 
 curl -sf \
   "https://api.github.com/repos/$repo/contents/skills" \
-| jq -r --arg skill "$skill" \
-  '.[]?.name | select(. == $skill)'
+| jq -r --arg skill "$skill" --arg repo "$repo" '
+    .[]?
+    | select(.name == $skill)
+    | "\($repo)/\(.path)"
+'
