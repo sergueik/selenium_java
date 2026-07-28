@@ -115,6 +115,32 @@ will output:
 
 https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 ```
+alternatively 
+```powershell
+ . .\find-skill.ps1
+
+```
+```text
+Usage:
+  ./find-skill.ps1 -Repo owner/repository -Skill skill-name
+
+Options:
+  -Repo        GitHub repository (owner/name)
+  -Skill       Skill directory name to find
+  -Help        Show this help
+  -Debug       Show diagnostic information
+
+Example:
+  ./find-skill.ps1
+      -Repo sickn33/agentic-awesome-skills
+      -Skill java-pro
+```
+```powershell
+. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill  "java-pro"
+```
+```text
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
+```
 #### See Also:
 
  
