@@ -4,6 +4,68 @@ The *GitHub Skills collection* refers to a rapidly growing ecosystem
 of open-source "agent skills"—modular, installable files (often .skill or .md) that
 enhance the capabilities of AI coding tools like Claude Code, Cursor, and GitHub Copilot
 
+The best repository for GitHub Copilot agent skills collections on GitHub is the official [github/awesome-copilot](https://github.com/github/awesome-copilot) repository,
+(a.k.a.  https://awesome-copilot.github.com/skills/) which serves as the gold standard for verified, community-driven `SKILL.md` collections,
+and also misc. tools, and modular agent prompts. As of mid-2026, 
+
+an 12,232 public repositories matching the [agent-skills topic](https://github.com/topics/agent-skills)
+
+A typical skill collection repository may have thousands of entries:
+```sh
+
+git clone https://github.com/sickn33/agentic-awesome-skills/
+ls -1 agentic-awesome-skills/skills |wc -l
+```
+```text
+1903
+```
+or compact
+```sh
+curl -skL -s https://github.com/sickn33/agentic-awesome-skills/archive/refs/heads/main.tar.gz | tar -tzf - | cut -d/ -f2-3  | sort -u| grep '^skills/[^/]*$'  | wc -l
+```
+```text
+1905
+```
+or
+```
+curl -s https://api.github.com/repos/sickn33/agentic-awesome-skills/git/trees/main?recursive=1 | jq -r '.tree[].path' | grep '^skills/[^/]\+$' | wc -l
+```
+```
+1904
+```
+
+GitHub search supports combining topics and search terms. For example:
+```sh
+```
+
+which may be done with `gh` of plain GitHub REST API:
+```
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills+spring-batch'
+```
+
+however one has to be careful :
+
+```sh
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills+spring-batch' | jq '.'
+```
+```js
+{
+  "total_count": 0,
+  "incomplete_results": false,
+  "items": []
+}
+
+```
+GitHub currently indexes repositories and source code separately. While repositories can be discovered by topic (e.g., agent-skills), there is no REST API query that directly searches for a skill inside all repositories having a given topic. A practical solution is therefore a two-stage search (repository discovery followed by code search), or maintaining a dedicated skill index.
+
+one can sort and limit:
+
+```
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo "Searching $repo..." ; done
+```
+#### See Also:
+
+ 
 ### Not Yet
 
 Until very recently there was no equivalent of awesome-copilot dedicated to COBOL/JCL/CICS/IMS/DB2/PEGA that has achieved broad recognition across the mainframe community.
@@ -385,8 +447,6 @@ As new lessons are learned, they are captured once, version-controlled alongside
 reviewed like any other engineering artifact, and immediately made available to every current and future contributor.
 
 
-
-
 The character code for the man facepalming emoji (🤦‍♂️) is a sequence of multiple Unicode code points: U+1F926 (face palm), U+200D (zero width joiner), U+2642 (male sign), and U+FE0F (variation selector-16).
 
 
@@ -394,6 +454,7 @@ The character code for the man facepalming emoji (🤦‍♂️) is a sequence o
   * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
   * https://github.com/JetBrains/skills
   * https://awesome-copilot.github.com/skills/ a.k.a. https://github.com/github/awesome-copilot
+  * [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)
   * https://github.com/affaan-m/ECC
   * https://www.linkedin.com/posts/aagupta_a-developer-on-github-just-built-a-full-development-share-7440035210542575616-nKr1/
 
