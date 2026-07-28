@@ -117,8 +117,7 @@ https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 ```
 alternatively 
 ```powershell
- . .\find-skill.ps1
-
+. .\find-skill.ps1
 ```
 ```text
 Usage:
@@ -136,14 +135,47 @@ Example:
       -Skill java-pro
 ```
 ```powershell
-. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill  "java-pro"
+. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill "java-pro"
 ```
 ```text
 https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 ```
-#### See Also:
+```powershell
+. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill  "java-pr" -debug
+```
+```text
+Repository: sickn33/agentic-awesome-skills
+Skill:      java-pr
+API URL:    https://api.github.com/repos/sickn33/agentic-awesome-skills/contents/skills
+Calling GitHub API...
+Received 1000 entries
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
+```
 
- 
+```powershell
+@('anthropics/skills', 'DietrichGebert/ponytail', 'nexu-io/open-design', 'addyosmani/agent-skills', 'ComposioHQ/awesome-claude-skills', 'VoltAgent/awesome-openclaw-skills', 'hesreallyhim/awesome-claude-code', 'CherryHQ/cherry-studio', 'sickn33/agentic-awesome-skills', 'wshobson/agents', 'github/awesome-copilot', 'K-Dense-AI/scientific-agent-skills', 'blader/humanizer', 'googleworkspace/cli', 'topoteretes/cognee', 'VoltAgent/awesome-agent-skills', 'OthmanAdi/planning-with-files', 'phuryn/pm-skills', 'JimLiu/baoyu-skills', 'agentskills/agentskills') | foreach-object { . .\find-skill.ps1 -repo $_ -skill 'java' -ErrorAction SilentlyContinue }
+```
+
+```text
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-java-project
+https://github.com/github/awesome-copilot/tree/main/skills/java-add-graalvm-native-image-support
+https://github.com/github/awesome-copilot/tree/main/skills/java-docs
+https://github.com/github/awesome-copilot/tree/main/skills/java-helidon
+https://github.com/github/awesome-copilot/tree/main/skills/java-junit
+https://github.com/github/awesome-copilot/tree/main/skills/java-mcp-server-generator
+https://github.com/github/awesome-copilot/tree/main/skills/java-refactoring-extract-method
+https://github.com/github/awesome-copilot/tree/main/skills/java-refactoring-remove-parameter
+https://github.com/github/awesome-copilot/tree/main/skills/java-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/javascript-typescript-jest
+https://github.com/github/awesome-copilot/tree/main/skills/javax-to-jakarta-migration
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-java-project
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-kotlin-project
+https://github.com/github/awesome-copilot/tree/main/skills/java-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/kotlin-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/spring-boot-testing
+```
+
+There are also still classifier repositories like https://github.com/VoltAgent/awesome-agent-skills 
 ### Not Yet
 
 Until very recently there was no equivalent of awesome-copilot dedicated to COBOL/JCL/CICS/IMS/DB2/PEGA that has achieved broad recognition across the mainframe community.

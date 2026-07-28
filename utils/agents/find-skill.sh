@@ -19,17 +19,17 @@ https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 EOF
 }
 
-repo=""
-skill=""
+REPO=''
+SKILL=''
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
         -r|--repo)
-            repo="$2"
+            REPO="$2"
             shift 2
             ;;
         -s|--skill)
-            skill="$2"
+            SKILL="$2"
             shift 2
             ;;
         -h|--help)
@@ -44,15 +44,15 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ -z "$repo" || -z "$skill" ]]; then
+if [[ -z "$REPO" || -z "$SKILL" ]]; then
     usage >&2
     exit 1
 fi
 
 curl -sf \
-  "https://api.github.com/repos/$repo/contents/skills" \
-  | jq -r --arg skill "$skill" '
+  "https://api.github.com/repos/$REPO/contents/skills" \
+  | jq -r --arg skill "$SKILL" '
     .[]?
-    | select(.name == $skill)
+    | select(.name | contains($skill))
     | .html_url
 '
