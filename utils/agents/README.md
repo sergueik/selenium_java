@@ -115,6 +115,19 @@ will output:
 
 https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 ```
+```
+./find-skill.sh  -r JetBrains/skills -s spring -p .
+```
+```
+https://github.com/JetBrains/skills/tree/main/jpa-spring-data-kotlin-mapper
+https://github.com/JetBrains/skills/tree/main/kotlin-idiomatic-refactorer-spring-aware
+https://github.com/JetBrains/skills/tree/main/kotlin-spring-proxy-compatibility
+https://github.com/JetBrains/skills/tree/main/spring-context-di-reasoning
+https://github.com/JetBrains/skills/tree/main/spring-kotlin-code-review
+https://github.com/JetBrains/skills/tree/main/spring-mvc-webflux-api-builder
+https://github.com/JetBrains/skills/tree/main/spring-security-configurator-auditor
+```
+
 alternatively 
 ```powershell
 . .\find-skill.ps1
@@ -175,7 +188,11 @@ https://github.com/github/awesome-copilot/tree/main/skills/kotlin-springboot
 https://github.com/github/awesome-copilot/tree/main/skills/spring-boot-testing
 ```
 
-There are also still classifier repositories like https://github.com/VoltAgent/awesome-agent-skills 
+There are also still curated classifier skill repositories repositories like https://github.com/VoltAgent/awesome-agent-skills 
+containing focused links e.g.
+
+https://github.com/redis/agent-skills/tree/main/skills
+
 ### Not Yet
 
 Until very recently there was no equivalent of awesome-copilot dedicated to COBOL/JCL/CICS/IMS/DB2/PEGA that has achieved broad recognition across the mainframe community.
