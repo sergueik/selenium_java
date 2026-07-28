@@ -111,10 +111,9 @@ Options:
 
 Example:
   ./find-skill.sh -r sickn33/agentic-awesome-skills -s java-pro
-will ourput:
-sickn33/agentic-awesome-skills/skills/java-pro
+will output:
 
-
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 ```
 #### See Also:
 

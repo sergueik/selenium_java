@@ -14,6 +14,8 @@ Options:
 
 Example:
   $0 -r sickn33/agentic-awesome-skills -s java-pro
+This outputs:
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
 EOF
 }
 
@@ -49,8 +51,8 @@ fi
 
 curl -sf \
   "https://api.github.com/repos/$repo/contents/skills" \
-| jq -r --arg skill "$skill" --arg repo "$repo" '
+  | jq -r --arg skill "$skill" '
     .[]?
     | select(.name == $skill)
-    | "\($repo)/\(.path)"
+    | .html_url
 '
