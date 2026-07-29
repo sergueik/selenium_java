@@ -191,7 +191,73 @@ https://github.com/github/awesome-copilot/tree/main/skills/spring-boot-testing
 There are also still curated classifier skill repositories repositories like https://github.com/VoltAgent/awesome-agent-skills 
 containing focused links e.g.
 
+
 https://github.com/redis/agent-skills/tree/main/skills
+
+
+### TL,DR;
+
+Over roughly the last year, several related ideas have converged:
+| observe            | remark                                      |
+|--------------------|---------------------------------------------|
+|Agent Skills        | reusable bundles of instructions, workflows, and supporting files that an AI agent can invoke for specific tasks. These became prominent through GitHub Copilot, Anthropic projects, community skill libraries, and similar ecosystems|
+| Precision prompting | moving away from long conversational prompts toward well-structured, deterministic prompts with explicit goals, constraints, examples, and success criteria |
+| Prompt engineering becoming software engineering | prompts increasingly live in version control, are tested, reviewed, and treated as project assets rather than ad hoc text|
+| Tool-augmented agents | agents that can call tools, search, execute code, access MCP servers, or interact with APIs instead of relying only on the LLM's internal knowledge|
+|Reusable context | project memories, repositories of conventions, style guides, and organization-specific knowledge replacing repeated prompt text|
+|Structured outputs |JSON schemas, typed outputs, N8N, Mermaid, and predictable interfaces replacing free-form natural language where automation is involved|
+|MCP and agent protocols| moving AI capability out of a single IDE into a standardized ecosystem where agents can discover and use tools, services, repositories, and enterprise systems independently of the editor|
+
+One could summarize the trend as:
+
+The shift from *"prompting an LLM"* to *"engineering AI agents with reusable skills, tools, and structured context."*
+
+Or even more succinctly:
+
+*"The industrialization of prompt engineering"*
+
+For an article or presentation, you could reasonably write something like:
+
+One of the defining AI engineering trends of the past year has been the emergence of reusable agent skills, precision prompting, and tool-integrated workflows. Rather than relying on increasingly elaborate ad hoc prompts, developers are encapsulating domain knowledge, project conventions, and best practices into version-controlled, reusable assets that enable more reliable and maintainable AI-assisted development.
+
+That captures the broader movement without overstating the novelty of any single component.
+
+> The romantic era of prompting is ending. The future is not the perfect prompt, but the engineered agent: skills, tools, context, and workflows replacing improvisation with repeatable intelligence
+
+> Prompting is entering its post-romantic era. Like chess after the age of immortal games, AI work is moving from individual brilliance toward engineered systems where every move can be prepared, reproduced, and improved.
+
+
+High risk appetite — accepting material imbalance and uncertainty.
+Preference for initiative — speed, development, king attacks, forcing moves.
+Gambits — giving material to gain time, activity, or psychological pressure.
+Aesthetic priorities — beauty, originality, and brilliance mattered.
+Less emphasis on long-term positional accumulation — at least compared with later classical schools.
+
+But, as you point out, the "they underestimated strategy" narrative is too shallow. They underestimated the size of the strategic domain. Many ideas that seemed like "mere calculation" or "attacker's intuition" were later understood as deeper positional concepts:
+
+initiative is a strategic asset;
+development advantage is a positional advantage;
+king safety is not just an attacking theme but a long-term structural factor;
+space, activity, and coordination can compensate for material.
+
+The Romantic players were exploring a part of the chess state space that later theory formalized.
+
+That maps surprisingly well to early AI prompting.
+
+The "prompt romantic" might be characterized as:
+
+Romantic prompting trait	Later interpretation
+Clever wording tricks	Early exploration of the interface between human intent and model behavior
+Huge creative prompts	Discovery of latent capabilities
+"Prompt hacks"	Prototype versions of workflow engineering
+Personal intuition	Informal domain expertise
+Improvised chains of reasoning	Early agent workflows
+
+omantic prompting → engineered agents as a historical transition
+Skills/context/tools/protocols as the equivalent of chess theory, opening books, and positional understanding
+The shift from individual prompt brilliance to reproducible systems
+MCP and agent protocols as infrastructure rather than a replacement for the IDE
+The caution that early "romantic" practitioners explored real territory, even if the model was incomplete
 
 ### Not Yet
 
