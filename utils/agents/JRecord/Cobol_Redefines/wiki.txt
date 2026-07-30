@@ -1,0 +1,126 @@
+#### Cobol Redefines
+
+A cobol Redefines sets a 2 or more Field Mappings to a block of storage.
+It can be used like
+```
+        10 Birth-Date            Pic 9(8).
+        10 redefines Birth-Date.
+           15 Birth-Year         Pic 9(4).
+           15 Birth-Month        Pic 99.
+           15 Birth-Day          Pic 99.
+```
+The above provides access to the birth-date as both a 8 digit number and individual
+Year, month day fields. In the above Birth-Year, Birth-Month and Birth-Day Overlay Birth-date
+```
+          Birth-Date
+              | 
+       <------+------>
+       2 0 1 7 0 9 0 6    <-- Bytes (characters) in Memory
+       <--+--> <-> <->
+          |     |   |
+  Birth-Year    |   Birth-Day 
+                |
+      Birth-Month
+```
+In java you could implement the above Cobol as
+```java
+    class MyDate {
+       public int day, month, year;
+
+       public int getDateYYMD() {
+          return year * 10000 + month * 100 + day;
+      }
+      public setDateYYMD(int date) {
+          year = date \ 10000;
+          month = (date \ 100) % 100;
+          day = date % 100;
+   }
+```   
+Note: I am defined public fields because it makes the examples shorter than
+if I defined getter/setter methods. I am trying to explain the Cobol in a format
+a java programmer will understand.
+
+Redefines are not always as nice as the first example. The Redefines can be quite different in formats
+e.g.
+```
+        05 Surname               Pic x(20).
+        05 First-Name            Pic x(20).
+        05 Type-of-Person        pic x.
+        ...
+        05 Specific-details      pic x(300).
+        05 Student-Details redefines Specific-details.
+           07 Start-Date         pic s9(8) comp-3.
+           07 Results occurs 12.
+              ...
+        05 Staff-Details redefines Specific-details.
+           07 Department          pic x(10).
+           07 Type-Of-Emkployee   pic x(10).
+           ....
+```
+In this case Type-of-Person determines which redefines branch to use.
+This file is sort of like
+```java
+       abstract Class Person {
+
+          public String surname, firstName;
+          public PersonType typeOfPerson;
+       }
+
+       Class Student extends Person {
+          public Date startDate;
+          public Results results;
+          ....
+      }
+
+      Class Staff extends Person {
+          public String department;
+          public EmploymentType typeOfEmployee;
+          ...
+     }
+```    
+A Cobol Record can have multiple redefines in it
+
+e.g. in the following only one of customer-number-pre-1983 and
+customer-number-post-1983 can be valid. A date field will determine which field
+should be used.
+```
+     05  Customer-Number                pic x(10).
+     05  Pre-1983-format redefines  Customer-Number.
+         07 customer-number-pre-1983    pic s9(5) comp-3.
+         07 Customer-number-filler     pic x(6).
+     05  Post-1983-format redefines  Customer-Number.
+         07 customer-number-post-1983  pic x(10).
+      ....
+
+     05  Payment-details               pic x(20).
+     05  US-Payment-Details.
+         07 Payment-code               pic s9(7) comp-3.
+         07 US-Account-Number          pic s9(14) comp-3.
+     05  European-Payment-Details redefines Payment-details.
+         07 Payment-code               pic x(05).
+         07 US-Account-Number          pic s9(14) comp-3.
+     05  US-Government-Details redefines Payment-details.         ...        
+
+
+     05  Customer-details           pic 500.
+     05  Corperate-Customer-Details redefines Customer-details.
+         ....
+     05  Private-Indivual-Customer-Details redefines Customer-details.
+         ....
+```
+In a record like this, it will be seperate fields that determine which redefines is valid.
+
+With Cobol there is nothing in the Cobol Copybook which tells you
+which redefines is valid. The Cobol program determines which Redefines is valid.
+I can not empasise enough it is the Cobol Program not the Cobol Copybook
+that determines which redefines is valid. JRecord can not
+decide between redefines options (or Record-Types in a Multi-Record files).
+
+To determine the record format, the Cobol program could use:
+
+* A single field in the record
+* Multiple fields in the record.
+* External data e.g. a Database
+
+
+origin: https://sourceforge.net/p/jrecord/wiki/Cobol%20Redefines/

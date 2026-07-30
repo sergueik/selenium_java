@@ -1028,3 +1028,5 @@ developer working on this specific project.
   * [spring-projects/spring-batch](https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md)  - Spring Batch Samples
   * [MCP Server GitHub Skills](https://mcpservers.org/agent-skills/author/github)
   * [javacodingskills/SpringBatch](https://github.com/javacodingskills/SpringBatch) - All the spring batch related code base
+  * [majiayu000/claude-skill-registry](https://github.com/majiayu000/claude-skill-registry) - he most comprehensive Claude Code skills registry | Web Search: - note massive 
+  * https://github.com/majiayu000/claude-skill-registry/tree/main/skills
