@@ -4,6 +4,261 @@ The *GitHub Skills collection* refers to a rapidly growing ecosystem
 of open-source "agent skills"—modular, installable files (often .skill or .md) that
 enhance the capabilities of AI coding tools like Claude Code, Cursor, and GitHub Copilot
 
+The best repository for GitHub Copilot agent skills collections on GitHub is the official [github/awesome-copilot](https://github.com/github/awesome-copilot) repository,
+(a.k.a.  https://awesome-copilot.github.com/skills/) which serves as the gold standard for verified, community-driven `SKILL.md` collections,
+and also misc. tools, and modular agent prompts. As of mid-2026, 
+
+an 12,232 public repositories matching the [agent-skills topic](https://github.com/topics/agent-skills)
+
+A typical skill collection repository may have thousands of entries:
+```sh
+
+git clone https://github.com/sickn33/agentic-awesome-skills/
+ls -1 agentic-awesome-skills/skills |wc -l
+```
+```text
+1903
+```
+or compact
+```sh
+curl -skL -s https://github.com/sickn33/agentic-awesome-skills/archive/refs/heads/main.tar.gz | tar -tzf - | cut -d/ -f2-3  | sort -u| grep '^skills/[^/]*$'  | wc -l
+```
+```text
+1905
+```
+or
+```
+curl -s https://api.github.com/repos/sickn33/agentic-awesome-skills/git/trees/main?recursive=1 | jq -r '.tree[].path' | grep '^skills/[^/]\+$' | wc -l
+```
+```
+1904
+```
+
+GitHub search supports combining topics and search terms. For example:
+```sh
+```
+
+which may be done with `gh` of plain GitHub REST API:
+```
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills+spring-batch'
+```
+
+however one has to be careful :
+
+```sh
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills+spring-batch' | jq '.'
+```
+```js
+{
+  "total_count": 0,
+  "incomplete_results": false,
+  "items": []
+}
+
+```
+GitHub currently indexes repositories and source code separately. While repositories can be discovered by topic (e.g., agent-skills), there is no REST API query that directly searches for a skill inside all repositories having a given topic. A practical solution is therefore a two-stage search (repository discovery followed by code search), or maintaining a dedicated skill index.
+
+one can sort and limit:
+
+```
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo "Searching $repo..." ; done
+```
+```sh
+curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo -e "\t$repo" ; done
+```
+
+```text
+anthropics/skills
+DietrichGebert/ponytail
+nexu-io/open-design
+addyosmani/agent-skills
+ComposioHQ/awesome-claude-skills
+VoltAgent/awesome-openclaw-skills
+hesreallyhim/awesome-claude-code
+CherryHQ/cherry-studio
+sickn33/agentic-awesome-skills
+wshobson/agents
+github/awesome-copilot
+K-Dense-AI/scientific-agent-skills
+blader/humanizer
+googleworkspace/cli
+topoteretes/cognee
+VoltAgent/awesome-agent-skills
+OthmanAdi/planning-with-files
+phuryn/pm-skills
+JimLiu/baoyu-skills
+agentskills/agentskills
+```
+
+
+```sh
+./find-skill.sh --repo sickn33/agentic-awesome-skills --skill java-pro
+```
+```text
+sickn33/agentic-awesome-skills/skills/java-pro
+```
+```sh
+./find-skill.sh --repo sickn33/agentic-awesome-skills --skill java-pro -h
+```
+```text
+Usage:
+  ./find-skill.sh -r owner/repository -s skill-name
+
+Options:
+  -r, --repo      GitHub repository (owner/name)
+  -s, --skill     Skill directory name to find
+  -h, --help      Show this help
+
+Example:
+  ./find-skill.sh -r sickn33/agentic-awesome-skills -s java-pro
+will output:
+
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
+```
+```
+./find-skill.sh  -r JetBrains/skills -s spring -p .
+```
+```
+https://github.com/JetBrains/skills/tree/main/jpa-spring-data-kotlin-mapper
+https://github.com/JetBrains/skills/tree/main/kotlin-idiomatic-refactorer-spring-aware
+https://github.com/JetBrains/skills/tree/main/kotlin-spring-proxy-compatibility
+https://github.com/JetBrains/skills/tree/main/spring-context-di-reasoning
+https://github.com/JetBrains/skills/tree/main/spring-kotlin-code-review
+https://github.com/JetBrains/skills/tree/main/spring-mvc-webflux-api-builder
+https://github.com/JetBrains/skills/tree/main/spring-security-configurator-auditor
+```
+
+alternatively 
+```powershell
+. .\find-skill.ps1
+```
+```text
+Usage:
+  ./find-skill.ps1 -Repo owner/repository -Skill skill-name
+
+Options:
+  -Repo        GitHub repository (owner/name)
+  -Skill       Skill directory name to find
+  -Help        Show this help
+  -Debug       Show diagnostic information
+
+Example:
+  ./find-skill.ps1
+      -Repo sickn33/agentic-awesome-skills
+      -Skill java-pro
+```
+```powershell
+. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill "java-pro"
+```
+```text
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
+```
+```powershell
+. .\find-skill.ps1 -repo "sickn33/agentic-awesome-skills" -skill  "java-pr" -debug
+```
+```text
+Repository: sickn33/agentic-awesome-skills
+Skill:      java-pr
+API URL:    https://api.github.com/repos/sickn33/agentic-awesome-skills/contents/skills
+Calling GitHub API...
+Received 1000 entries
+https://github.com/sickn33/agentic-awesome-skills/tree/main/skills/java-pro
+```
+
+```powershell
+@('anthropics/skills', 'DietrichGebert/ponytail', 'nexu-io/open-design', 'addyosmani/agent-skills', 'ComposioHQ/awesome-claude-skills', 'VoltAgent/awesome-openclaw-skills', 'hesreallyhim/awesome-claude-code', 'CherryHQ/cherry-studio', 'sickn33/agentic-awesome-skills', 'wshobson/agents', 'github/awesome-copilot', 'K-Dense-AI/scientific-agent-skills', 'blader/humanizer', 'googleworkspace/cli', 'topoteretes/cognee', 'VoltAgent/awesome-agent-skills', 'OthmanAdi/planning-with-files', 'phuryn/pm-skills', 'JimLiu/baoyu-skills', 'agentskills/agentskills') | foreach-object { . .\find-skill.ps1 -repo $_ -skill 'java' -ErrorAction SilentlyContinue }
+```
+
+```text
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-java-project
+https://github.com/github/awesome-copilot/tree/main/skills/java-add-graalvm-native-image-support
+https://github.com/github/awesome-copilot/tree/main/skills/java-docs
+https://github.com/github/awesome-copilot/tree/main/skills/java-helidon
+https://github.com/github/awesome-copilot/tree/main/skills/java-junit
+https://github.com/github/awesome-copilot/tree/main/skills/java-mcp-server-generator
+https://github.com/github/awesome-copilot/tree/main/skills/java-refactoring-extract-method
+https://github.com/github/awesome-copilot/tree/main/skills/java-refactoring-remove-parameter
+https://github.com/github/awesome-copilot/tree/main/skills/java-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/javascript-typescript-jest
+https://github.com/github/awesome-copilot/tree/main/skills/javax-to-jakarta-migration
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-java-project
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-kotlin-project
+https://github.com/github/awesome-copilot/tree/main/skills/java-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/kotlin-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/spring-boot-testing
+```
+
+There are also still curated classifier skill repositories repositories like https://github.com/VoltAgent/awesome-agent-skills 
+containing focused links e.g.
+
+
+https://github.com/redis/agent-skills/tree/main/skills
+
+
+### TL,DR;
+
+Over roughly the last year, several related ideas have converged:
+| observe            | remark                                      |
+|--------------------|---------------------------------------------|
+|Agent Skills        | reusable bundles of instructions, workflows, and supporting files that an AI agent can invoke for specific tasks. These became prominent through GitHub Copilot, Anthropic projects, community skill libraries, and similar ecosystems|
+| Precision prompting | moving away from long conversational prompts toward well-structured, deterministic prompts with explicit goals, constraints, examples, and success criteria |
+| Prompt engineering becoming software engineering | prompts increasingly live in version control, are tested, reviewed, and treated as project assets rather than ad hoc text|
+| Tool-augmented agents | agents that can call tools, search, execute code, access MCP servers, or interact with APIs instead of relying only on the LLM's internal knowledge|
+|Reusable context | project memories, repositories of conventions, style guides, and organization-specific knowledge replacing repeated prompt text|
+|Structured outputs |JSON schemas, typed outputs, N8N, Mermaid, and predictable interfaces replacing free-form natural language where automation is involved|
+|MCP and agent protocols| moving AI capability out of a single IDE into a standardized ecosystem where agents can discover and use tools, services, repositories, and enterprise systems independently of the editor|
+
+One could summarize the trend as:
+
+The shift from *"prompting an LLM"* to *"engineering AI agents with reusable skills, tools, and structured context."*
+
+Or even more succinctly:
+
+*"The industrialization of prompt engineering"*
+
+For an article or presentation, you could reasonably write something like:
+
+One of the defining AI engineering trends of the past year has been the emergence of reusable agent skills, precision prompting, and tool-integrated workflows. Rather than relying on increasingly elaborate ad hoc prompts, developers are encapsulating domain knowledge, project conventions, and best practices into version-controlled, reusable assets that enable more reliable and maintainable AI-assisted development.
+
+That captures the broader movement without overstating the novelty of any single component.
+
+> The romantic era of prompting is ending. The future is not the perfect prompt, but the engineered agent: skills, tools, context, and workflows replacing improvisation with repeatable intelligence
+
+> Prompting is entering its post-romantic era. Like chess after the age of immortal games, AI work is moving from individual brilliance toward engineered systems where every move can be prepared, reproduced, and improved.
+
+
+High risk appetite — accepting material imbalance and uncertainty.
+Preference for initiative — speed, development, king attacks, forcing moves.
+Gambits — giving material to gain time, activity, or psychological pressure.
+Aesthetic priorities — beauty, originality, and brilliance mattered.
+Less emphasis on long-term positional accumulation — at least compared with later classical schools.
+
+But, as you point out, the "they underestimated strategy" narrative is too shallow. They underestimated the size of the strategic domain. Many ideas that seemed like "mere calculation" or "attacker's intuition" were later understood as deeper positional concepts:
+
+initiative is a strategic asset;
+development advantage is a positional advantage;
+king safety is not just an attacking theme but a long-term structural factor;
+space, activity, and coordination can compensate for material.
+
+The Romantic players were exploring a part of the chess state space that later theory formalized.
+
+That maps surprisingly well to early AI prompting.
+
+The "prompt romantic" might be characterized as:
+
+Romantic prompting trait	Later interpretation
+Clever wording tricks	Early exploration of the interface between human intent and model behavior
+Huge creative prompts	Discovery of latent capabilities
+"Prompt hacks"	Prototype versions of workflow engineering
+Personal intuition	Informal domain expertise
+Improvised chains of reasoning	Early agent workflows
+
+omantic prompting → engineered agents as a historical transition
+Skills/context/tools/protocols as the equivalent of chess theory, opening books, and positional understanding
+The shift from individual prompt brilliance to reproducible systems
+MCP and agent protocols as infrastructure rather than a replacement for the IDE
+The caution that early "romantic" practitioners explored real territory, even if the model was incomplete
+
 ### Not Yet
 
 Until very recently there was no equivalent of awesome-copilot dedicated to COBOL/JCL/CICS/IMS/DB2/PEGA that has achieved broad recognition across the mainframe community.
@@ -385,8 +640,6 @@ As new lessons are learned, they are captured once, version-controlled alongside
 reviewed like any other engineering artifact, and immediately made available to every current and future contributor.
 
 
-
-
 The character code for the man facepalming emoji (🤦‍♂️) is a sequence of multiple Unicode code points: U+1F926 (face palm), U+200D (zero width joiner), U+2642 (male sign), and U+FE0F (variation selector-16).
 
 
@@ -394,6 +647,7 @@ The character code for the man facepalming emoji (🤦‍♂️) is a sequence o
   * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
   * https://github.com/JetBrains/skills
   * https://awesome-copilot.github.com/skills/ a.k.a. https://github.com/github/awesome-copilot
+  * [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)
   * https://github.com/affaan-m/ECC
   * https://www.linkedin.com/posts/aagupta_a-developer-on-github-just-built-a-full-development-share-7440035210542575616-nKr1/
 
