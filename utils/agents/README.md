@@ -64,33 +64,67 @@ one can sort and limit:
 curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo "Searching $repo..." ; done
 ```
 ```sh
-curl -s 'https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=20' | jq -r '.items[].full_name' | while read repo; do     echo -e "\t$repo" ; done
+COUNT=50
+curl -s "https://api.github.com/search/repositories?q=topic:agent-skills&sort=stars&order=desc&per_page=$COUNT" | jq -r '.items[].full_name' | while read repo; do     echo -e "\t$repo" ; done
 ```
 
 ```text
-anthropics/skills
-DietrichGebert/ponytail
-nexu-io/open-design
-addyosmani/agent-skills
-ComposioHQ/awesome-claude-skills
-VoltAgent/awesome-openclaw-skills
-hesreallyhim/awesome-claude-code
-CherryHQ/cherry-studio
-sickn33/agentic-awesome-skills
-wshobson/agents
-github/awesome-copilot
-K-Dense-AI/scientific-agent-skills
-blader/humanizer
-googleworkspace/cli
-topoteretes/cognee
-VoltAgent/awesome-agent-skills
-OthmanAdi/planning-with-files
-phuryn/pm-skills
-JimLiu/baoyu-skills
-agentskills/agentskills
+	anthropics/skills
+	
+	
+	VoltAgent/awesome-openclaw-skills
+	CherryHQ/cherry-studio
+	sickn33/agentic-awesome-skills
+	wshobson/agents
+	github/awesome-copilot
+	K-Dense-AI/scientific-agent-skills
+	blader/humanizer
+	
+	OthmanAdi/planning-with-files
+	phuryn/pm-skills
+	
+	alirezarezvani/claude-skills
+	
+	kubesphere/kubesphere
+	alibaba/zvec
+	
+	
+	nexu-io/html-anything
+	tt-a1i/archify
+	AgriciDaniel/claude-ad
+	refly-ai/refly
+	jnMetaCode/superpowers-zh
+	Agents365-ai/drawio-skill
+	htmlstreamofficial/preline
+	
+	ThinkInAIXYZ/deepchat
+	
+	breaking-brake/cc-wf-studio
+	gosom/google-maps-scraper
+	
+	tinyplex/tinybase
+	0xNyk/awesome-hermes-agent
+	
+	
+
 ```
 
 
+```
+https://github.com/github/awesome-copilot/tree/main/skills/create-spring-boot-java-project
+https://github.com/github/awesome-copilot/tree/main/skills/java-springboot
+https://github.com/github/awesome-copilot/tree/main/skills/spring-boot-testing
+https://github.com/jdubois/dr-jskill/blob/main/SKILL.md
+https://github.com/anthropics/skills/tree/main/skills/webapp-testing
+
+https://github.com/Amplicode/spring-skills/blob/main/skills/spring-data-jpa/SKILL.md
+https://github.com/Amplicode/spring-skills/blob/main/skills/dto-creator/
+https://github.com/Amplicode/spring-skills/tree/main/skills/spring-security-configuration
+https://github.com/Amplicode/spring-skills/tree/main/skills
+https://github.com/alirezarezvani/claude-skills/tree/main/markdown-html/skills
+https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md
+https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md
+```
 ```sh
 ./find-skill.sh --repo sickn33/agentic-awesome-skills --skill java-pro
 ```
@@ -258,6 +292,17 @@ Skills/context/tools/protocols as the equivalent of chess theory, opening books,
 The shift from individual prompt brilliance to reproducible systems
 MCP and agent protocols as infrastructure rather than a replacement for the IDE
 The caution that early "romantic" practitioners explored real territory, even if the model was incomplete
+### 
+It has the same "romantic" flavor because it emphasizes compression without loss of expressive power.
+
+The idea is that languages like Mermaid, Graphviz DOT, PlantUML, and workflow DSLs are not merely concise—they deliberately eliminate incidental detail so that the remaining words carry more semantic weight.
+
+The same principle should not be misunderstood as a rejection of more verbose enterprise automation formats. Counterparts such as Jenkins Jelly, Workflow Foundation XAML, UiPath workflow artifacts, Blue Prism process definitions, and BPM-oriented IDE representations may appear heavy compared with the elegance of Graphviz DOT or Mermaid. Yet their verbosity is not accidental noise; it is often an implementation detail carrying metadata, tooling contracts, versioning information, execution semantics, and enterprise governance requirements. Their role is closer to XML in the software ecosystem: not replaced by the elegance of YAML or JSON, but continuing to exist because different layers require different forms of expression.
+
+Or, with the romantic metaphor preserved:
+
+Not every language seeks to be poetry. Some are closer to engineering blueprints: verbose by necessity, rich in annotations, and designed for machines, auditors, and enterprise lifecycles. Their beauty lies not in brevity, but in faithfully carrying complexity.
+
 
 ### Not Yet
 
@@ -642,6 +687,326 @@ reviewed like any other engineering artifact, and immediately made available to 
 
 The character code for the man facepalming emoji (🤦‍♂️) is a sequence of multiple Unicode code points: U+1F926 (face palm), U+200D (zero width joiner), U+2642 (male sign), and U+FE0F (variation selector-16).
 
+https://github.com/Amplicode/spring-skills/tree/main/skills/
+# Plan for Building the Spring Batch Skill
+
+## Goal
+
+Create a **project-specific Skill** that teaches both humans and LLMs how to
+understand, extend, and maintain this Spring Batch application. The Skill should
+capture not only APIs but also architecture, conventions, workflows, and
+engineering practices.
+
+---
+
+## Phase 1 — Inventory the Project
+
+Document the application's major capabilities.
+
+Topics to identify:
+
+- Spring Batch version
+- Spring Boot version
+- Chunk processing
+- Tasklets
+- Parallel execution
+- Partitioning
+- JobRepository
+- Restartability
+- ExecutionContext
+- Scheduling
+- Large file processing
+- REST API
+- WebSocket progress reporting
+- Browser UI
+- Metrics
+- Testing
+- Deployment model
+
+Deliverable:
+A concise architecture inventory.
+
+---
+
+## Phase 2 — Collect Authoritative References
+
+Rank references by authority.
+
+Primary
+
+- Spring Batch Reference Documentation
+- Official Spring Batch Samples
+  https://github.com/spring-projects/spring-batch/tree/main/spring-batch-samples
+- Spring Batch migration guides
+
+Secondary
+
+- Project source code
+- https://github.com/javacodingskills/SpringBatch
+- Production blog posts
+- Frequently cited StackOverflow discussions
+
+Goal:
+Prefer official patterns whenever examples disagree.
+
+---
+
+## Phase 3 — Reverse Engineer Project Patterns
+
+Identify recurring implementation patterns.
+
+Examples
+
+- Job classes
+- Step definitions
+- Reader implementations
+- Processor implementations
+- Writer implementations
+- Tasklets
+- Listeners
+- Configuration classes
+- REST controllers
+- WebSocket handlers
+- DTOs
+- Utility classes
+
+Deliverable:
+A catalog of reusable project conventions.
+
+---
+
+## Phase 4 — Separate Concepts from APIs
+
+Teach responsibilities instead of syntax.
+
+Examples
+
+Job
+- orchestrates work
+
+Step
+- performs work
+
+Reader
+- acquires data
+
+Processor
+- transforms data
+
+Writer
+- persists data
+
+Tasklet
+- performs imperative operations
+
+Listeners
+- observe execution
+
+---
+
+## Phase 5 — Build the Mental Model
+
+Describe the overall execution flow.
+
+Example
+
+User
+
+↓
+
+REST API
+
+↓
+
+Launch Job
+
+↓
+
+Job
+
+↓
+
+Step
+
+↓
+
+Reader
+
+↓
+
+Processor
+
+↓
+
+Writer
+
+↓
+
+Commit
+
+↓
+
+Progress Event
+
+↓
+
+WebSocket
+
+↓
+
+Browser UI
+
+Deliverable:
+A high-level execution model.
+
+---
+
+## Phase 6 — Capture Project Conventions
+
+Examples
+
+- Constructor injection only
+- Readers contain no business logic
+- Processors are stateless
+- Writers own persistence
+- Every Step is restartable
+- Chunk size is configurable
+- ExecutionContext stores restart state
+- Progress events are asynchronous
+- UI never polls the database directly
+- Every Job has integration tests
+
+Deliverable:
+Coding conventions for the project.
+
+---
+
+## Phase 7 — Create a Recipe Catalog
+
+Index common engineering tasks.
+
+Examples
+
+- Import CSV
+- Import XML
+- Import JSON
+- Process ZIP archives
+- Database-to-database jobs
+- Multi-file reader
+- Parallel processing
+- Partitioned jobs
+- Restart failed job
+- Resume checkpoint
+- Tasklet implementation
+- Progress reporting
+- WebSocket monitoring
+
+Each recipe should reference the best example.
+
+---
+
+## Phase 8 — Record Anti-Patterns
+
+Document mistakes to avoid.
+
+Examples
+
+- Business logic inside Reader
+- Database updates inside Processor
+- Mutable singleton state
+- Static caches
+- Ignoring restartability
+- Bypassing JobRepository
+- Missing transaction boundaries
+- Blocking WebSocket threads
+- UI coupled directly to batch logic
+
+Deliverable:
+Common pitfalls section.
+
+---
+
+## Phase 9 — Organize the Skill as a Knowledge Base
+
+Suggested layout
+
+skills/
+└── spring-batch/
+    ├── SKILL.md
+    ├── architecture.md
+    ├── batch-lifecycle.md
+    ├── chunk-processing.md
+    ├── tasklets.md
+    ├── readers.md
+    ├── processors.md
+    ├── writers.md
+    ├── restartability.md
+    ├── partitioning.md
+    ├── scaling.md
+    ├── websocket-progress.md
+    ├── frontend.md
+    ├── testing.md
+    ├── conventions.md
+    ├── pitfalls.md
+    └── recipes.md
+
+SKILL.md should remain concise and point to these deeper documents.
+
+---
+
+## Phase 10 — Build a Review Checklist
+
+When modifying code, the Skill should guide the agent through questions such as:
+
+1. Which Job is affected?
+2. Which Step is affected?
+3. Chunk or Tasklet?
+4. Is restartability preserved?
+5. Are transaction boundaries correct?
+6. Reader responsibilities respected?
+7. Processor responsibilities respected?
+8. Writer responsibilities respected?
+9. Parallel execution still safe?
+10. Progress reporting updated?
+11. WebSocket notifications correct?
+12. UI impact considered?
+13. Tests updated?
+14. Does the solution follow project conventions?
+
+Deliverable:
+A repeatable engineering review process.
+
+---
+
+## Phase 11 — Future Enhancements
+
+Possible specialized sub-skills
+
+- Spring Batch Testing
+- Spring Batch Scaling
+- Spring Batch Performance Tuning
+- Spring Batch Monitoring
+- Spring Batch WebSocket Dashboard
+- Spring Batch Migration
+- Spring Batch Operational Runbook
+
+---
+
+## Final Objective
+
+Produce a Skill that teaches:
+
+- architecture
+- conventions
+- engineering methodology
+- implementation patterns
+- operational practices
+- project-specific knowledge
+
+rather than serving as another API reference.
+
+The finished Skill should help an LLM think like an experienced Spring Batch
+developer working on this specific project.
 
 ### See Also
   * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
@@ -660,3 +1025,6 @@ The character code for the man facepalming emoji (🤦‍♂️) is a sequence o
   * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
   * https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-python/skills/fastapi-router-py
   * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
+  * [spring-projects/spring-batch](https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md)  - Spring Batch Samples
+  * [MCP Server GitHub Skills](https://mcpservers.org/agent-skills/author/github)
+  * [javacodingskills/SpringBatch](https://github.com/javacodingskills/SpringBatch) - All the spring batch related code base
