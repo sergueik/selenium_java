@@ -1007,6 +1007,18 @@ rather than serving as another API reference.
 
 The finished Skill should help an LLM think like an experienced Spring Batch
 developer working on this specific project.
+### Security
+
+I would say that **Skills** present a relatively low risk of prompt injection because, by definition, these artifacts are `Markdown`-formatted documents—essentially **README**-class documentation rather than executable scripts.
+
+It is also worth noting what they are **not**. Skills are plain Markdown files, **not** Jupyter notebooks (`.ipynb`) or other document formats that can embed executable code while still appearing to be documentation at first glance. Their role is to provide guidance and context, not to execute logic. While an LLM may read their contents as part of its context, the files themselves have no execution semantics, which significantly reduces the attack surface compared with notebooks, scripts, extensions, or other active content.
+
+
+A more realistic attack scenario would involve an IDE—particularly VS Code, whose extension ecosystem is built around a powerful Node.js runtime—silently invoking an interpreted script disguised as a Copilot tool after a user naively approves the "Do you trust the authors of this workspace?" prompt. By comparison, IntelliJ-based IDEs rely primarily on compiled Java and Kotlin plugins, resulting in a different extension model and a somewhat smaller surface for this particular class of attack.
+
+Even in such a scenario, the risk originates from the IDE executing an untrusted tool rather than from the Skill document itself. The Skill remains a Markdown document that is typically presented for inspection and included in the LLM's context, not executed as code. Consequently, while malicious instructions embedded in the document could attempt a prompt injection against the model, the likelihood of the document itself directly triggering arbitrary code execution is considerably lower than with executable scripts, notebooks, or IDE extensions.
+
+"In other words, a Skill is much closer to an untrusted README than to an untrusted VS Code extension: the former may attempt to influence the model, while the latter can potentially influence the host."
 
 ### See Also
   * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
