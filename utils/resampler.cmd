@@ -1,5 +1,6 @@
 @echo off
 
+REM origin: https://github.com/sergueik/Resampler-Script
 REM based on: https://raw.githubusercontent.com/melk0r64/Resampler-Script/main/ReSampler.bat
 REM the original code scaned subbolders
 REM NOTE: the original code relied on Window title scan by tasklist.exe 
@@ -11,7 +12,9 @@ REM see also: http://sox.sourceforge.net/SoX/Resampling
 REM see also: https://github.com/melk0r64/Resampler-Script
 REM see also: https://github.com/jniemann66/ReSampler
 REM see also: https://github.com/tchnmf/sox/tree/master/scripts
-
+REM 
+REM https://github.com/jniemann66/ReSampler
+REM ReSampler is a high-performance command-line audio sample rate conversion tool which can convert audio file formats with a variety of different bit-depths and audio channel configurations
 SETLOCAL ENABLEDELAYEDEXPANSION
 
 set "SOURCPATH=%CD%"
@@ -25,7 +28,7 @@ REM 2.0.4
 REM Dependencies: https://github.com/jniemann66/ReSampler/releases/tag/v2.0.4
 REM install win64-mingw-w64-compiler build
 REM put everything in c:\tools\resampler or other %RESAMPLE_HOME%
-REM NOTE: latest release
+REM NOTE: The latest release is 2.12
 REM https://github.com/jniemann66/ReSampler/releases/tag/v2.1.2
 REM fails due to missing libwinpthread-1.dll
 REM dll-files.com/libwinpthread-1.dll.html 
@@ -45,6 +48,7 @@ REM no need for "tokens=*"
  
 REM set CONVERT_OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 set CONVERT_OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
+REM set CONVERT_OPTIONS=-r 96000 -b 24 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 REM Relies on
 
 REM Walks the directory tree %SOURCEPATH%, executing the FOR statement in each directory of the tree
