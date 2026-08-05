@@ -87,3 +87,14 @@ $files | foreach-object {
 }
 # don't worry if one finds oneself 
 # continuously discovering boundary conditions between incompatible execution models
+
+<#
+#  early version of the tool has interface that models the *implementation*:
+```
+tool owner repo project [branch] [output_dir]
+```
+# The new interface should model the *user intent*:
+```
+tool <github-tree-url> [output_dir]
+```
+#>
