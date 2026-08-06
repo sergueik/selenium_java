@@ -25,16 +25,11 @@
 
 param(
   [switch]$flag
+  # currently unused
 )
 
-$args_copy = @()
-
 if ($args.Count -gt 0 ) {
-  write-host ('processing {0} arguments' -f $args.Count)
-  write-host ('first argument: {0}' -f $args.Item(0))
-  write-host ('last argument: {0}' -f $args[$args.Count - 1])
-  write-host ('arguments: {0}' -f ($args -join ',' ))
-  write-host ('iterating over the args (does not work)')
+  write-verbose 'iterating over the args (does not work)'
   $status_continue = $true
   (0..$($args.Count - 1)) | foreach-object {
     if (-not $status_continue ) {
@@ -42,9 +37,9 @@ if ($args.Count -gt 0 ) {
     }
     $index = $_
     try {
-      write-host ('index: {0}' -f $index )
-      write-host ('args[{0}]: "{1}"' -f $index, $args[$index])
-      write-host ('args[{0}]: "{1}"' -f $index, $args.Item($index))
+      write-verbose ('args[{0}]: "{1}"' -f $index, $args[$index])
+	  # Item isn't Powershell ideomatic
+      # write-host ('args[{0}]: "{1}"' -f $index, $args.Item($index))
     } catch [Exception] {
       # Error: Index was outside the bounds of the array
       write-output ( 'Error: {0}' -f $_.Exception.Message )
@@ -74,39 +69,27 @@ try {
 }
 if ($args.Item(0) -match '^https://github\.com/' ){
   $url = $args.Item(0)
-  [string]$output_dir = '.'
-  [String]$p = 'github\.com/([^/]+)/([^/]+)/tree/([^/]+)/(.*)$'
+  $output_dir = '.'
+  $p = 'github\.com/([^/]+)/([^/]+)/tree/([^/]+)/(.*)$'
   $m = select-string -pattern $p -InputObject $url
-  if (($m -ne $null ) -and ($m.matches -ne $null)) {
-    try {
-      $g = $m.Matches.Groups
-      $owner = $g.Item(1).Value
-      $repo = $g.Item(2).Value
-      $branch = $g.Item(3).Value
-      $project = $g.Item(4).Value
-    } catch [System.Management.Automation.RuntimeException] {
-      write-host ('Exception (ignored): {0} {1}' -f $_.Exception.GetType().FullName, $_.Exception.Message)
-   }
- } else {
+  if (($m -ne $null ) -and ($m.matches -ne $null)  -and ($m.matches.Count -gt 0 )	) {
+    $g = $m.Matches.Groups
+    $owner = $g[1].Value
+    $repo = $g[2].Value
+    $branch = $g[3].Value
+    $project = $g[4].Value
+  } else {
    # warn	     
    write-error ('invalid argument: {0} must be a directory' -f $url ) 
    exit 1
   }
 } else {
   if ($args.Count -gt 2 ) {
-    [string]$owner = $args.Item(0)
-    [string]$repo= $args.Item(1)
-    [string]$project= $args.Item(2)
-    if ($args.Count -gt 3 ) {
-      [string]$branch = $args[3]
-    } else {
-      [string]$branch = 'master'
-    }
-    if ($args.Count -gt 4 ) {
-      [string]$output_dir = $args[4]
-    } else {
-      [string]$output_dir = '.'
-    }
+    $owner = $args[0]
+    $repo= $args[1]
+    $project= $args[2]
+	$branch  = if ($args.Count -gt 3) { $args[3] } else { 'master' }
+    $output_dir = if ($args.Count -gt 4) { $args[4] } else { '.' }
   } else {
     # warn	     
     write-error ('invalid arguments: need at least 3' ) 
