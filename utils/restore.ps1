@@ -1,4 +1,4 @@
-#Copyright (c) 2020,2021,2025 Serguei Kouzmine
+#Copyright (c) 2020,2021,2025,2026 Serguei Kouzmine
 #
 #Permission is hereby granted, free of charge, to any person obtaining a copy
 #of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,68 @@
 
 # surprisingly, the PowerShell version becomes lighter, not heavier
 # usage $0 sergueik springboot_study basic-static
+[CmdletBinding(DefaultParameterSetName = 'url')]
+
 param(
-  [Parameter(Mandatory = $true)]
+  [Parameter(Mandatory = $true, Position=0, ParameterSetName = 'url')]
+  [string]$url,
+  [Parameter(Mandatory = $true, Position=0, ParameterSetName = 'detailed')]
   [string]$owner,
-  [Parameter(Mandatory = $true)]
+  [Parameter(Mandatory = $true, Position=1, ParameterSetName = 'detailed')]
   [string]$repo,
-  [Parameter(Mandatory = $true)]
+  [Parameter(Mandatory = $true, Position=2, ParameterSetName = 'detailed')]
   [string]$project,
+  [Parameter(Mandatory = $false, Position=3,ParameterSetName = 'detailed')]
   [string]$branch = 'master',
   [string]$output_dir = '.'
 )
+
+# NOTE:
+# Parameter binding happens before any script code executes.
+# If PowerShell selects the wrong parameter set, execution never reaches
+# this point. The typical symptom is:
+#
+#   A positional parameter cannot be found that accepts argument '<argument 2>'.
+try {
+  # idiomatic Powershell discourages strict type declaration and in certain scenarios it is impossible tecnically:
+  # Microsoft.PowerShell.Commands.MatchInfo is the runtime type returned by Select-String, but it cannot
+  # be referenced as a type literal:
+  #
+  #   [Microsoft.PowerShell.Commands.MatchInfo]$m = $null
+  #
+  # results in:
+  #
+  #   Unable to find type
+  #
+  # Therefore PowerShell code typically leaves this variable untyped (or
+  # uses [object]), relying on type inference.  [Microsoft.PowerShell.Commands.MatchInfo]$m = $null
+} catch [System.Management.Automation.RuntimeException] {
+  # Unable to find type [Microsoft.PowerShell.Commands.MatchInfo].
+  write-host ('Exception (ignored): {0} {1}' -f $_.Exception.GetType().FullName, $_.Exception.Message)
+}
+switch ($PSCmdlet.ParameterSetName) {
+    'Url' {
+	    if ($url -match '^https://github\.com/' ){
+              [String]$p = 'github\.com/([^/]+)/([^/]+)/tree/([^/]+)/(.*)$'
+              $m = select-string -pattern $p -InputObject $url
+              if (($m -ne $null ) -and ($m.matches -ne $null)) {
+                try {
+                  $g = $m.Matches.Groups
+                  $owner = $g.Item(1).Value
+                  $repo = $g.Item(2).Value
+                  $branch = $g.Item(3).Value
+                  $project = $g.Item(4).Value
+                } catch [System.Management.Automation.RuntimeException] {
+  	          write-host ('Exception (ignored): {0} {1}' -f $_.Exception.GetType().FullName, $_.Exception.Message)
+               }
+             }
+           } else {
+             write-error ('invalid argument: {0}' -f $url ) 
+	     exit 1
+           }
+         }
+    'detailed' { }
+}
 
 $tree_url = "https://api.github.com/repos/$owner/$repo/git/trees/${branch}?recursive=1"
 <#
@@ -85,7 +137,7 @@ $files | foreach-object {
 
   invoke-webrequest -Uri $url -OutFile $target
 }
-# don't worry if one finds oneself 
+# don't worry if one finds oneself
 # continuously discovering boundary conditions between incompatible execution models
 
 <#
