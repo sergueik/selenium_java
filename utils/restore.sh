@@ -16,7 +16,11 @@ Arguments:
   output_dir  Local target root (default: current directory)
 
 Example:
-  $0 sergueik springboot_study basic-static master basic-static
+  $0 sergueik springboot_study app_context b9ca61f4193c8a8e403c6f470db7eff412980f27 .
+  $0 sergueik springboot_study app_context
+  $0 https://github.com/sergueik/springboot_study/tree/master/app_context
+
+  All three pull directory locally
 EOF
 }
 
@@ -26,26 +30,28 @@ case "${1:-}" in
         exit 0
         ;;
 esac
-if [ "$#" -le 2 ]; then
-  URL=$1
-  OUTPUT_DIR=${2:-.}
-  if [[ $URL =~ github\.com/([^/]+)/([^/]+)/tree/([^/]+)/(.*)$ ]]; then
-    OWNER=${BASH_REMATCH[1]}
-    REPO=${BASH_REMATCH[2]}
-    BRANCH=${BASH_REMATCH[3]}
-    PROJECT=${BASH_REMATCH[4]}
-  else
-    echo 'Invalid GitHub tree URL'
-    exit 1
-  fi
-else 
 
-  OWNER=${1:?owner required}
-  REPO=${2:?repo required}
-  PROJECT=${3:?project folder required}
-  BRANCH=${4:-master}
-  OUTPUT_DIR=${5:-.}
+if [[ $1 =~ ^https://github\.com/ ]]; then
+    URL=$1
+    OUTPUT_DIR=${2:-.}
+
+    if [[ $URL =~ github\.com/([^/]+)/([^/]+)/tree/([^/]+)/(.*)$ ]]; then
+        OWNER=${BASH_REMATCH[1]}
+        REPO=${BASH_REMATCH[2]}
+        BRANCH=${BASH_REMATCH[3]}
+        PROJECT=${BASH_REMATCH[4]}
+    else
+        echo "Invalid GitHub tree URL: $URL" >&2
+        exit 1
+    fi
+else
+    OWNER=${1:?owner required}
+    REPO=${2:?repo required}
+    PROJECT=${3:?project folder required}
+    BRANCH=${4:-master}
+    OUTPUT_DIR=${5:-.}
 fi
+
 TREE_URL="https://api.github.com/repos/$OWNER/$REPO/git/trees/${BRANCH}?recursive=1"
 GITHUB_BASE="https://raw.githubusercontent.com/$OWNER/$REPO/$BRANCH"
 LIST_FILE=/tmp/a.$$
