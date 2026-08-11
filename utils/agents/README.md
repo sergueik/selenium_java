@@ -459,11 +459,6 @@ Surprisingly, despite the rapid growth of public AI skill ecosystems,
 there does not appear to be a widely recognized GitHub repository dedicated to these enterprise legacy domains yet.
 
 
-### See Also
-
-  * https://github.com/pegasystems/pega-launchpad-agent-skills
-  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
-
 
 ### The new team member
 
@@ -505,11 +500,6 @@ repeatedly correcting the same procedural issues.
 In this way, the repository evolves into a living engineering knowledge base.
 As new lessons are learned, they are captured once, version-controlled alongside the code,
 reviewed like any other engineering artifact, and immediately made available to every current and future contributor.
-### See Also
-
-  * https://github.com/pegasystems/pega-launchpad-agent-skills
-  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
-  * [COBOL Development with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
 
 Proposal: Treat AI repository configuration as a first-class project artifact
 
@@ -1020,31 +1010,6 @@ Even in such a scenario, the risk originates from the IDE executing an untrusted
 
 "In other words, a Skill is much closer to an untrusted README than to an untrusted VS Code extension: the former may attempt to influence the model, while the latter can potentially influence the host."
 
-### See Also
-  * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
-  * https://github.com/JetBrains/skills
-  * https://awesome-copilot.github.com/skills/ a.k.a. https://github.com/github/awesome-copilot
-  * [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)
-  * https://github.com/affaan-m/ECC
-  * https://www.linkedin.com/posts/aagupta_a-developer-on-github-just-built-a-full-development-share-7440035210542575616-nKr1/
-
-  * https://github.com/jkordick/wad-ghcp-cobol/tree/main/.github
-  * [modernizing legacy code with GitHub Copilot: Tips and examples](https://github.blog/ai-and-ml/github-copilot/modernizing-legacy-code-with-github-copilot-tips-and-examples/)
-  * [COBOL developmen with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
-  * https://github.com/pegasystems/pega-launchpad-agent-skills
-  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
-  * https://raw.githubusercontent.com/aiskillstore/marketplace/refs/heads/main/skills/0xdarkmatter/mcp-patterns/SKILL.md
-  * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
-  * https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-python/skills/fastapi-router-py
-  * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
-  * [spring-projects/spring-batch](https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md)  - Spring Batch Samples
-  * [MCP Server GitHub Skills](https://mcpservers.org/agent-skills/author/github)
-  * [javacodingskills/SpringBatch](https://github.com/javacodingskills/SpringBatch) - All the spring batch related code base
-  * [majiayu000/claude-skill-registry](https://github.com/majiayu000/claude-skill-registry/tree/main/skills) - the most comprehensive Claude Code skills registry | Web Search: - note massive 
-  * [how can one download the intelligent Blue Prism automation skills](https://community.blueprism.com/t5/Product-Forum/How-can-I-download-the-intelligent-automation-skills/td-p/92951) - apparently requires a valid Blue Prism Portal login to give access to "developer exchange" [materials](https://digitalexchange.blueprism.com/). Collections are represented by __Visual Business Object__ (VBO) - pre-built modular component used internally by SS&C Blue Prism (BP )Robotic Process Automation (RPA) platform - artifacts
-  * [XML Schemas for the Blue Prism file formats](https://github.com/mclayan/blueprism-schemas)
-  * [prompt injection](https://en.wikipedia.org/wiki/Prompt_injection)
-  * [what Is a Prompt Injection Attack](https://www.ibm.com/think/topics/prompt-injection)
 
 > **NOTE:** Some of the most dangerous AI-agent attacks look almost embarrassingly simple. The exploit itself is often not technically sophisticated—the sophistication lies in crossing trust boundaries rather than in clever programming. Many reported scenarios resemble the elementary `"LOVE-LETTER-FOR-YOU.TXT.VBS"` attacks from early Windows security, suggesting that similar architectural mistakes are being rediscovered in the era of LLM agents.
 >
@@ -1221,3 +1186,40 @@ One should not expect exploits hidden in SKILLS.md to require complex coding. Th
 The history of security shows that catastrophic impact does not require sophisticated payloads. Multi-million-dollar incidents have sometimes originated from mechanisms no more complex than a middle-school programming exercise—LOVE-LETTER-FOR-YOU.TXT.VBS being the classic example. The critical factor was not the complexity of the script, but the environment that trusted and executed it. A similar pattern may emerge with AI agent ecosystems: the dangerous SKILLS.md artifact is unlikely to be an advanced exploit; it may be a simple instruction fragment that becomes powerful only because an agent treats it as authoritative guidance.
 
 The current SKILLS.md ecosystem appears to focus primarily on discovery, organization, and reuse of capabilities. The corresponding security question—treating skills as potentially untrusted behavioral input—may still be immature.
+
+### See Also
+
+  * https://github.com/pegasystems/pega-launchpad-agent-skills
+  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
+
+
+  * https://github.com/pegasystems/pega-launchpad-agent-skills
+  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
+  * [COBOL Development with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
+  * [softaworks/agent-toolkit](https://github.com/softaworks/agent-toolkit)
+  * https://github.com/JetBrains/skills
+  * https://awesome-copilot.github.com/skills/ a.k.a. https://github.com/github/awesome-copilot
+  * [anthropics/skills](https://github.com/anthropics/skills/tree/main/skills)
+  * https://github.com/affaan-m/ECC
+  * https://www.linkedin.com/posts/aagupta_a-developer-on-github-just-built-a-full-development-share-7440035210542575616-nKr1/
+
+  * https://github.com/jkordick/wad-ghcp-cobol/tree/main/.github
+  * [modernizing legacy code with GitHub Copilot: Tips and examples](https://github.blog/ai-and-ml/github-copilot/modernizing-legacy-code-with-github-copilot-tips-and-examples/)
+  * [COBOL developmen with GitHub Copilot](https://pub.towardsai.net/cobol-development-with-github-copilot-fbb916d60d45)
+  * https://github.com/pegasystems/pega-launchpad-agent-skills
+  * https://github.com/perinbaraj/cobol-app-modernization/tree/main/.github/skills/copybook-mapper
+  * https://raw.githubusercontent.com/aiskillstore/marketplace/refs/heads/main/skills/0xdarkmatter/mcp-patterns/SKILL.md
+  * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
+  * https://github.com/microsoft/skills/tree/main/.github/plugins/azure-sdk-python/skills/fastapi-router-py
+  * https://github.com/microsoft/skills/blob/main/.github/skills/mcp-builder/SKILL.md
+  * [spring-projects/spring-batch](https://github.com/spring-projects/spring-batch/blob/main/spring-batch-samples/README.md)  - Spring Batch Samples
+  * https://github.com/skills/modernize-your-legacy-code-with-github-copilot/tree/main/src/cobol
+  * [MCP Server GitHub Skills](https://mcpservers.org/agent-skills/author/github)
+  * [javacodingskills/SpringBatch](https://github.com/javacodingskills/SpringBatch) - All the spring batch related code base
+  * [majiayu000/claude-skill-registry](https://github.com/majiayu000/claude-skill-registry/tree/main/skills) - the most comprehensive Claude Code skills registry | Web Search: - note massive 
+  * [how can one download the intelligent Blue Prism automation skills](https://community.blueprism.com/t5/Product-Forum/How-can-I-download-the-intelligent-automation-skills/td-p/92951) - apparently requires a valid Blue Prism Portal login to give access to "developer exchange" [materials](https://digitalexchange.blueprism.com/). Collections are represented by __Visual Business Object__ (VBO) - pre-built modular component used internally by SS&C Blue Prism (BP )Robotic Process Automation (RPA) platform - artifacts
+  * [XML Schemas for the Blue Prism file formats](https://github.com/mclayan/blueprism-schemas)
+  * [prompt injection](https://en.wikipedia.org/wiki/Prompt_injection)
+  * [what Is a Prompt Injection Attack](https://www.ibm.com/think/topics/prompt-injection)
+  * [skills for interfacing UiPath capabilities to external developers](https://github.com/UiPath/skills)
+  * https://github.com/membranedev/application-skills/tree/main/skills
