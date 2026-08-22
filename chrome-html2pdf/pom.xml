@@ -120,7 +120,7 @@
     <dependency>
       <groupId>org.java-websocket</groupId>
       <artifactId>Java-WebSocket</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -162,7 +162,7 @@
     <dependency>
       <groupId>org.java-websocket</groupId>
       <artifactId>Java-WebSocket</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
@@ -179,7 +179,7 @@
     <dependency>
       <groupId>org.java-websocket</groupId>
       <artifactId>Java-WebSocket</artifactId>
-      <version>1.4.0</version>
+      <version>1.5.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
