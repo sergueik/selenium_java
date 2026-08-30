@@ -19,6 +19,8 @@ SETLOCAL ENABLEDELAYEDEXPANSION
 
 set "SOURCPATH=%CD%"
 if not "%~1" == "" set "SOURCPATH=%~1"
+echo Will scan !SOURCPATH!
+
 set TIMEOUT=10
 set RESAMPLE_HOME=c:\tools\resampler
 set PATH=%PATH%;%RESAMPLE_HOME%
@@ -36,29 +38,39 @@ REM then fails with
 REM ReSampler.exe - Application Error 0xc000007b
 
 set FILESCAN_OPTIONS=
-if not "%2" equ "" set FILESCAN_OPTIONS=/R "%SOURCEPATH%"
-
+if not "%~2" equ "" set FILESCAN_OPTIONS=/R "%SOURCEPATH%"
+REM The system cannot find the path specified.
+REM The full path of  is too long.
 set "MAX_PROCESSES=2"
 set "PROCESS_COUNTER=0"
 for /F "tokens=2 delims==" %%. in ('wmic.exe cpu get NumberOfCores /format:list') do set /A "MAX_PROCESSES=%%. * 2"
-if not "%3" == "" set "MAX_PROCESSES=%3"
-@echo Will run !MAX_PROCESSES! in parallel
+if not "%~3" == "" set "MAX_PROCESSES=%~3"
+echo Will run !MAX_PROCESSES! in parallel
 cd /d "%SOURCPATH%"
 REM no need for "tokens=*" 
- 
+set SAMPLERATE=44100
+REM 96000
+if not "%~3" == "" set "SAMPLERATE=%~3"
+
+
+set SUFFIX=01
+if not "%~4" == "" set "SUFFIX=%~4"
+echo Will use suffix !SUFFIX!
+
 REM set CONVERT_OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-set CONVERT_OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-REM set CONVERT_OPTIONS=-r 96000 -b 24 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
+REM set CONVERT_OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
+set CONVERT_OPTIONS=-r %SAMPLERATE% -b 24 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 REM Relies on
 
 REM Walks the directory tree %SOURCEPATH%, executing the FOR statement in each directory of the tree
 REM or just the current directory when the option is not set
 for  %FILESCAN_OPTIONS% %%_ in (*.flac) do (
     set "INPUTFILE=%%_"
-    set "OUTPUTFILE=%%~dp_%%~n_ - 01%%~x_"
+    set "OUTPUTFILE=%%~dp_%%~n_ - %SUFFIX%%%~x_"
+    echo will use outputfile !OUTPUTFILE!
     REM NOTE dealing with quotes
     set "COMMAND=!TOOL! -i "!INPUTFILE!" -o "!OUTPUTFILE!" !CONVERT_OPTIONS!"
-    @echo Launch the resampler tool in a separate process: !COMMAND!
+    echo Launch the resampler tool in a separate process: !COMMAND!
     start /B CMD /C "!COMMAND!"
 
     set /A PROCESS_COUNTER+=1
