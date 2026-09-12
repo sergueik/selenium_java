@@ -42,7 +42,7 @@
 		<version.mockito>1.9.0</version.mockito>
 		<version.springframework>3.1.2.RELEASE</version.springframework>
 		<version.slf4j>1.7.25</version.slf4j>
-		<version.hsqldb>2.0.0</version.hsqldb>
+		<version.hsqldb>2.7.1</version.hsqldb>
 		<version.sqljdbc>3.0</version.sqljdbc>
 		<version.ojdbc14>10.2.0.2.0</version.ojdbc14>
 		<version.workflow>2.12</version.workflow>
