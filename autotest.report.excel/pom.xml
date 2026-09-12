@@ -9,7 +9,7 @@
   <properties>
     <spring.version>4.3.7.RELEASE</spring.version>
     <junit.version>4.13.1</junit.version>
-    <poi.version>3.17</poi.version>
+    <poi.version>4.1.1</poi.version>
     <poiooxml.version>3.17</poiooxml.version>
     <selenium.version>3.3.1</selenium.version>
     <aspectj.version>1.8.7</aspectj.version>
