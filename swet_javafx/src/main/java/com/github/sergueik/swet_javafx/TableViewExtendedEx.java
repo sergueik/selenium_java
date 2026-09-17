@@ -322,7 +322,10 @@ public class TableViewExtendedEx extends Application {
 				createTextField();
 				setText(null);
 				setGraphic(textField);
-				textField.selectAll();
+				textField.requestFocus();
+           			// textField.selectAll(); commenting out this because
+            			// JavaFX confuses the caret position.
+            			// Seems to be a bug.
 			}
 		}
 
