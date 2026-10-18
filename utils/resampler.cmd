@@ -49,18 +49,18 @@ echo Will run !MAX_PROCESSES! in parallel
 cd /d "%SOURCPATH%"
 REM no need for "tokens=*" 
 set SAMPLERATE=44100
-REM 96000
 if not "%~3" == "" set "SAMPLERATE=%~3"
 
+set BITFORMAT=16
+if not "%~4" == "" set "BITFORMAT=%~4"
+if !SAMPLERATE! GTR 44100 set BITFORMAT=24
+echo Will use bitformat !BITFORMAT!
 
 set SUFFIX=01
-if not "%~4" == "" set "SUFFIX=%~4"
+if not "%~5" == "" set "SUFFIX=%~5"
 echo Will use suffix !SUFFIX!
 
-REM set CONVERT_OPTIONS=-r 44100 -b 16 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-REM set CONVERT_OPTIONS=-r 44100 -b 16 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-set CONVERT_OPTIONS=-r %SAMPLERATE% -b 24 --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
-REM Relies on
+set CONVERT_OPTIONS=-r !SAMPLERATE! -b !BITFORMAT! --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 
 REM Walks the directory tree %SOURCEPATH%, executing the FOR statement in each directory of the tree
 REM or just the current directory when the option is not set
@@ -80,7 +80,8 @@ for  %FILESCAN_OPTIONS% %%_ in (*.flac) do (
         call :COUNT_FOR_PROCESS
     )
 )
-
+cls 
+goto :EOF
 :WAIT_FOR_PROCESS
 
 rem Wait untill all processes finish
