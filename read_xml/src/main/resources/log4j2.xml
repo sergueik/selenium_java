@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<Configuration status="WARN" strict="false">
+  <!-- https://logging.apache.org/log4j/2.x/manual/migration.html -->
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%t] - %-5p %msg%n"/>
+    </Console>
+    <!-- not specifying the fileOwner and fileGroup -->
+    <File name="RootFileLogger" fileName="logs/Common.log" append="true">
+      <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} %F [%c{1}] - [%M] - %m%n"/>
+    </File>
+    <RollingFile name="AppFileLogger" fileName="logs/App.log" append="true" filePattern="logs/App.%i.log.gz" filePermissions="rw-rw-r--">
+      <!-- Double hyphen within comment eror if placing unix file mask into comment.  Keep rw- for owner,group and other while inside the XML comment, then update accordingly after convertingto real attribute -->
+      <!-- filePermissions="rw-rw-rw-" -->
+      <PatternLayout pattern="%-5p %d{yyyy-MM-dd HH:mm:ss} %F [%c{1}] - [%M] - %m%n"/>
+      <Policies>
+        <SizeBasedTriggeringPolicy size="1KB"/>
+      </Policies>
+      <DefaultRolloverStrategy max="3"/>
+    </RollingFile>
+  </Appenders>
+  <Loggers>
+    <Root level="${sys:log.level:-INFO}">
+      <AppenderRef ref="Console"/>
+      <AppenderRef ref="RootFileLogger"/>
+    </Root>
+  </Loggers>
+</Configuration>
