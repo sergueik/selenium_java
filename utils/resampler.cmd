@@ -63,13 +63,17 @@ set SUFFIX=01
 if not "%~5" == "" set "SUFFIX=%~5"
 echo Will use suffix !SUFFIX!
 
+REM ReSampler.exe natively reads .dsf (DSD Stream File) audio files and flac
+set EXTENSION=flac
+if not "%~6" == "" set "EXTENSION=%~6"
+echo Will use suffix !EXTENSION!
 set CONVERT_OPTIONS=-r !SAMPLERATE! -b !BITFORMAT! --dither 3 --minphase --relaxedLPF --showStages --tempDir "%TEMP%"
 
 REM Walks the directory tree %SOURCEPATH%, executing the FOR statement in each directory of the tree
 REM or just the current directory when the option is not set
-for  %FILESCAN_OPTIONS% %%_ in (*.flac) do (
+for  %FILESCAN_OPTIONS% %%_ in (*.%EXTENSION%) do (
     set "INPUTFILE=%%_"
-    set "OUTPUTFILE=%%~dp_%%~n_ - %SUFFIX%%%~x_"
+    set "OUTPUTFILE=%%~dp_%%~n_ - %SUFFIX%.flac"
     echo will use outputfile !OUTPUTFILE!
     REM NOTE dealing with quotes
     set "COMMAND=!TOOL! -i "!INPUTFILE!" -o "!OUTPUTFILE!" !CONVERT_OPTIONS!"
