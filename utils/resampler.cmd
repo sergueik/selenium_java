@@ -10,11 +10,14 @@ REM see also: https://forums.stevehoffman.tv/threads/high-res-downsampling-for-d
 REM see also: https://sox.sourceforge.net
 REM see also: http://sox.sourceforge.net/SoX/Resampling
 REM see also: https://github.com/melk0r64/Resampler-Script
-REM see also: https://github.com/jniemann66/ReSampler
+REM The underlying tool: JNIemann's High quality command-line audio sample rate converter
+REM https://github.com/jniemann66/ReSampler
 REM see also: https://github.com/tchnmf/sox/tree/master/scripts
 REM 
-REM https://github.com/jniemann66/ReSampler
 REM ReSampler is a high-performance command-line audio sample rate conversion tool which can convert audio file formats with a variety of different bit-depths and audio channel configurations
+REM The --info option displays header and metadata information for an input file, without performing any conversion
+REM This option was added in version v2.1.2
+
 SETLOCAL ENABLEDELAYEDEXPANSION
 
 set "SOURCPATH=%CD%"
@@ -22,7 +25,7 @@ if not "%~1" == "" set "SOURCPATH=%~1"
 echo Will scan !SOURCPATH!
 
 set TIMEOUT=10
-set RESAMPLE_HOME=c:\tools\resampler
+set RESAMPLE_HOME=c:\tools
 set PATH=%PATH%;%RESAMPLE_HOME%
 set TOOL=resampler.exe
 %TOOL% --version
