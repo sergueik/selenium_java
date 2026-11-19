@@ -10,7 +10,7 @@
     <java.version>1.8</java.version>
     <jOpenDocument.version>1.3</jOpenDocument.version>
     <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-    <poi.version>3.17</poi.version>
+    <poi.version>4.1.1</poi.version>
     <!-- <version>4.1.2</version> -->
     <poiooxml.version>${poi.version}</poiooxml.version>
     <snakeyaml.version>2.0</snakeyaml.version>
